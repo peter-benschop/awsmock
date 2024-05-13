@@ -16,7 +16,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
@@ -25,8 +25,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = _tableCollection.insert_one(table.ToDocument());
                 session.commit_transaction();
-                log_trace << "DynamoDb table created, oid: "
-                          << result->inserted_id().get_oid().value.to_string();
+                log_trace << "DynamoDb table created, oid: " << result->inserted_id().get_oid().value.to_string();
                 return GetTableById(result->inserted_id().get_oid().value);
 
             } catch (const mongocxx::exception &exc) {
@@ -45,7 +44,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
@@ -55,7 +54,7 @@ namespace AwsMock::Database {
             }
 
             Entity::DynamoDb::Table result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             log_debug << "Got table by ID, table: " << result.ToString();
             return result;
 
@@ -71,7 +70,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value>
                         mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
@@ -81,7 +80,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::DynamoDb::Table result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 log_debug << "Got table by ID, table: " << result.ToString();
                 return result;
 
@@ -115,7 +114,7 @@ namespace AwsMock::Database {
             try {
 
                 int64_t count;
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
                 if (!region.empty()) {
@@ -144,7 +143,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
                 if (region.empty()) {
 
@@ -185,7 +184,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
                 if (region.empty()) {
 
@@ -223,7 +222,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
@@ -252,7 +251,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
@@ -279,7 +278,7 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
@@ -309,7 +308,7 @@ namespace AwsMock::Database {
             try {
 
                 int64_t count;
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
                 if (!region.empty()) {
                     count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
@@ -335,7 +334,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::ItemList items;
         if (_useDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
             try {
 
@@ -387,7 +386,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
                 auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: "
@@ -410,7 +409,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
                 auto result = _itemCollection.delete_many({});
                 log_debug << "DynamoDB items deleted, count: " << result->deleted_count();

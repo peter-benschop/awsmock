@@ -7,9 +7,9 @@
 
 namespace AwsMock::Service {
 
-    ModuleService::ModuleService(Core::Configuration &configuration, Service::ServerMap &serverMap) : _configuration(configuration), _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
+    ModuleService::ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
 
-        _prettyPrint = _configuration.getBool("awsmock.pretty", false);
+        _prettyPrint = Core::Configuration::instance().getBool("awsmock.pretty", false);
     }
 
     Database::Entity::Module::ModuleList ModuleService::ListModules() {
@@ -63,6 +63,9 @@ namespace AwsMock::Service {
             } else if (module.name == "dynamodb") {
                 auto dynamoDbServer = _serverMap[module.name];
                 dynamoDbServer->Start();
+            } else if (module.name == "kms") {
+                auto kmsServer = _serverMap[module.name];
+                kmsServer->Start();
             } else if (module.name == "gateway") {
                 auto gatewayServer = _serverMap[module.name];
                 gatewayServer->Start();
@@ -122,7 +125,7 @@ namespace AwsMock::Service {
             } else {
                 for (const auto &server: _serverMap) {
                     if (name == server.first) {
-                        server.second->StopServer();
+                        server.second->Stop();
                     }
                 }
             }

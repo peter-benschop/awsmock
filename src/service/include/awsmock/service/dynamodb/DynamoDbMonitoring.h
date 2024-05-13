@@ -64,5 +64,7 @@ namespace AwsMock::Service {
          */
         int _period{};
     };
+
 }// namespace AwsMock::Service
+
 #endif// AWSMOCK_SERVICE_DYNAMODB_MONITORING_H

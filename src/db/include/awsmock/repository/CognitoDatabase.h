@@ -16,22 +16,27 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+
     /**
-     * Cognito MongoDB database.
+     * @brief Cognito MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoDatabase : public Database {
+    class CognitoDatabase : public DatabaseBase {
 
       public:
 
         /**
          * Constructor
          */
-        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(Database::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"){};
+        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(DatabaseBase::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"){};
 
         /**
          * Singleton instance

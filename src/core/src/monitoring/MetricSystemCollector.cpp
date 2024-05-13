@@ -6,7 +6,9 @@
 
 namespace AwsMock::Core {
 
-    MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector", 5) {
+    MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector") {
+
+        _period = Core::Configuration::instance().getInt("awsmock.monitoring.period", 60);
 
         _virtualMemory = new Poco::Prometheus::Gauge(VIRTUAL_MEMORY);
         _realMemory = new Poco::Prometheus::Gauge(REAL_MEMORY);
@@ -14,6 +16,8 @@ namespace AwsMock::Core {
         _totalCpu = new Poco::Prometheus::Gauge(TOTAL_CPU);
         _userCpu = new Poco::Prometheus::Gauge(USER_CPU);
         _systemCpu = new Poco::Prometheus::Gauge(SYSTEM_CPU);
+
+        Start(_period);
     }
 
     MetricSystemCollector::~MetricSystemCollector() {
@@ -26,7 +30,7 @@ namespace AwsMock::Core {
     }
 
     void MetricSystemCollector::Initialize() {
-
+#ifndef _WIN32
         FILE *file;
         struct tms timeSample {};
         char line[128];
@@ -44,6 +48,7 @@ namespace AwsMock::Core {
         fclose(file);
         numProcessors /= 2;
         log_debug << "Got number of processors, numProcs: " << numProcessors;
+#endif
     }
 
     void MetricSystemCollector::Run() {
@@ -56,6 +61,7 @@ namespace AwsMock::Core {
     void MetricSystemCollector::CollectSystemCounter() {
         log_trace << "System collector starting";
 
+#ifndef _WIN32
         std::string line;
         std::ifstream ifs("/proc/self/status");
         while (ifs) {
@@ -114,6 +120,7 @@ namespace AwsMock::Core {
         lastCPU = now;
         lastSysCPU = timeSample.tms_stime;
         lastUserCPU = timeSample.tms_utime;
+#endif
     }
 
 }// namespace AwsMock::Core

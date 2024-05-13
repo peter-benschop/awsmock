@@ -1,6 +1,6 @@
-# aws-mock
+# awsmock
 
-aws-mock is a high performance, persistent AWS simulation. Currently, the following services are supported:
+awsmock is a high performance, persistent AWS simulation. Currently, the following services are supported:
 
 - [S3](docs/man/awsmocks3.1.md): Amazon Simple Storage Service
 - [SQS](docs/man/awsmocksqs.1.md): Amazon Simple Queue Service
@@ -10,8 +10,9 @@ aws-mock is a high performance, persistent AWS simulation. Currently, the follow
 - [DynamoDB](docs/man/awsmockdynamodb.1.md): Amazon Dynamo database service
 - [Transfer](docs/man/awsmocktransfer.1.md): Amazon transfer family, supporting FTP
 - [SecretsManager](docs/man/awsmocktransfer.1.md): Amazon secrets manager service
+- [KMS](docs/man/awsmocktransfer.1.md): Amazon key management service
 
-aws-mock is written in C++ with an optional MongoDB persistence layer. If needed all objects can be stored in the
+awsmock is written in C++ with an optional MongoDB persistence layer. If needed all objects can be stored in the
 database. The simulation reacts to all AWS commands send to the default port 4566. For a lists of supported command see
 below tables for the different AWS services.
 
@@ -140,7 +141,7 @@ To start the docker image:
 1. Pull the docker image:
 
   ```
-  docker pull jensvogt/aws-mock:latest
+  docker pull jensvogt/awsmock:latest
   ```
 
 2. Start the container

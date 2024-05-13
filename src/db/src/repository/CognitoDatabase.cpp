@@ -6,17 +6,13 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     bool CognitoDatabase::UserPoolExists(const std::string &region, const std::string &name) {
 
         if (_hasDatabase) {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 int64_t count = _userPoolCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
                 log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
@@ -39,7 +35,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 int64_t count = _userPoolCollection.count_documents(make_document(kvp("userPoolId", id)));
                 log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
@@ -60,7 +56,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
             auto session = client->start_session();
 
@@ -88,7 +84,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
@@ -97,7 +93,7 @@ namespace AwsMock::Database {
             }
 
             Entity::Cognito::UserPool result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } catch (const mongocxx::exception &exc) {
@@ -113,7 +109,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
@@ -122,7 +118,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::Cognito::UserPool result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (const mongocxx::exception &exc) {
@@ -152,7 +148,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
             auto session = client->start_session();
 
@@ -184,7 +180,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 if (region.empty()) {
 
@@ -224,7 +220,7 @@ namespace AwsMock::Database {
 
             try {
                 long count = 0;
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 if (region.empty()) {
                     count = _userPoolCollection.count_documents(make_document());
@@ -249,7 +245,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
             auto session = client->start_session();
 
@@ -276,7 +272,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
             auto session = client->start_session();
 
@@ -305,7 +301,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
                 int64_t count = _userCollection.count_documents(make_document(kvp("region", region),
                                                                               kvp("userPoolId", userPoolId),
@@ -328,7 +324,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
             auto session = client->start_session();
 
@@ -356,7 +352,7 @@ namespace AwsMock::Database {
 
         try {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
@@ -366,7 +362,7 @@ namespace AwsMock::Database {
             }
 
             Entity::Cognito::User result;
-            result.FromDocument(mResult);
+            result.FromDocument(mResult->view());
             return result;
 
         } catch (const mongocxx::exception &exc) {
@@ -381,7 +377,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
                 auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
                 if (!mResult) {
@@ -390,7 +386,7 @@ namespace AwsMock::Database {
                 }
 
                 Entity::Cognito::User result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
 
             } catch (const mongocxx::exception &exc) {
@@ -423,7 +419,7 @@ namespace AwsMock::Database {
             try {
 
                 long count = 0;
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
                 if (!region.empty() && !userPoolId.empty()) {
                     count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId)));
@@ -454,7 +450,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = GetClient();
+                auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
                 if (!region.empty() && !userPoolId.empty()) {
 
@@ -502,7 +498,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
             auto session = client->start_session();
 
@@ -542,7 +538,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
             auto session = client->start_session();
 
@@ -569,7 +565,7 @@ namespace AwsMock::Database {
 
         if (_hasDatabase) {
 
-            auto client = GetClient();
+            auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
             auto session = client->start_session();
 

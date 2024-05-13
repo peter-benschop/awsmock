@@ -11,9 +11,6 @@
 #include <string>
 
 // Poco includes
-#include <Poco/ClassLibrary.h>
-#include <Poco/DynamicFactory.h>
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/URI.h>
@@ -26,7 +23,7 @@
 #include <awsmock/resource/factory/IFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 
-namespace AwsMock::Controller {
+namespace AwsMock::Manager {
 
     /**
      * Management router
@@ -40,11 +37,9 @@ namespace AwsMock::Controller {
         /**
          * Constructor
          *
-         * @param configuration application configuration
-         * @param metricService common monitoring module
          * @param serverMap map of services
          */
-        Router(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+        explicit Router(Service::ServerMap &serverMap);
 
         /**
          * Add a route
@@ -79,17 +74,7 @@ namespace AwsMock::Controller {
          * @param authorization authorization string
          * @return module name
          */
-        std::string GetModule(const std::string &authorization);
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * Metric module
-         */
-        Core::MetricService &_metricService;
+        static std::string GetModule(const std::string &authorization);
 
         /**
          * Server map
@@ -102,6 +87,6 @@ namespace AwsMock::Controller {
         std::map<std::string, std::string> _routingTable;
     };
 
-}// namespace AwsMock::Controller
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_MANAGER_ROUTER_H

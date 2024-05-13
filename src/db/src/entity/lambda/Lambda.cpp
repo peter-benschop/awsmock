@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/entity/lambda/Lambda.h"
+#include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::Lambda {
             tagsDoc.append(kvp(t.first, t.second));
         }
 
-        view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", ephemeralStorage.size));
+        view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
 
         view_or_value<view, value> lambdaDoc = make_document(
                 kvp("region", region),
@@ -43,9 +43,9 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("runtime", runtime),
                 kvp("role", role),
                 kvp("handler", handler),
-                kvp("memorySize", memorySize),
+                kvp("memorySize", static_cast<bsoncxx::types::b_int64>(memorySize)),
                 kvp("ephemeralStorage", ephemeralStorageDoc),
-                kvp("codeSize", codeSize),
+                kvp("codeSize", static_cast<bsoncxx::types::b_int64>(codeSize)),
                 kvp("fileName", fileName),
                 kvp("imageId", imageId),
                 kvp("containerId", containerId),
@@ -98,7 +98,7 @@ namespace AwsMock::Database::Entity::Lambda {
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-            for (bsoncxx::document::element tagElement: tagsView) {
+            for (const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
@@ -107,42 +107,51 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     Poco::JSON::Object Lambda::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("user", user);
-        jsonObject.set("function", function);
-        jsonObject.set("runtime", runtime);
-        jsonObject.set("role", role);
-        jsonObject.set("handler", handler);
-        jsonObject.set("memorySize", memorySize);
-        jsonObject.set("ephemeralStorage", ephemeralStorage.ToJsonObject());
-        jsonObject.set("codeSize", codeSize);
-        jsonObject.set("fileName", fileName);
-        jsonObject.set("imageId", imageId);
-        jsonObject.set("containerId", containerId);
-        jsonObject.set("arn", arn);
-        jsonObject.set("codeSha256", codeSha256);
-        jsonObject.set("hostPort", hostPort);
-        jsonObject.set("timeout", timeout);
-        jsonObject.set("concurrency", concurrency);
-        jsonObject.set("environment", environment.ToJsonObject());
-        jsonObject.set("state", LambdaStateToString(state));
-        jsonObject.set("stateReason", stateReason);
-        jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
-        jsonObject.set("lastInvocation", Poco::DateTimeFormatter::format(lastInvocation, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-        // Tags
-        if (!tags.empty()) {
-            Poco::JSON::Array jsonTagArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object jsonTagObject;
-                jsonTagObject.set(tag.first, tag.second);
-                jsonTagArray.add(jsonTagObject);
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("region", region);
+            jsonObject.set("user", user);
+            jsonObject.set("function", function);
+            jsonObject.set("runtime", runtime);
+            jsonObject.set("role", role);
+            jsonObject.set("handler", handler);
+            jsonObject.set("memorySize", memorySize);
+            jsonObject.set("ephemeralStorage", ephemeralStorage.ToJsonObject());
+            jsonObject.set("codeSize", codeSize);
+            jsonObject.set("fileName", fileName);
+            jsonObject.set("imageId", imageId);
+            jsonObject.set("containerId", containerId);
+            jsonObject.set("arn", arn);
+            jsonObject.set("codeSha256", codeSha256);
+            jsonObject.set("hostPort", hostPort);
+            jsonObject.set("timeout", timeout);
+            jsonObject.set("concurrency", concurrency);
+            jsonObject.set("environment", environment.ToJsonObject());
+            jsonObject.set("state", LambdaStateToString(state));
+            jsonObject.set("stateReason", stateReason);
+            jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
+            jsonObject.set("lastInvocation", Poco::DateTimeFormatter::format(lastInvocation, Poco::DateTimeFormat::ISO8601_FORMAT));
+
+            // Tags
+            if (!tags.empty()) {
+                Poco::JSON::Array jsonTagArray;
+                for (const auto &tag: tags) {
+                    Poco::JSON::Object jsonTagObject;
+                    jsonTagObject.set(tag.first, tag.second);
+                    jsonTagArray.add(jsonTagObject);
+                }
+                jsonObject.set("tags", jsonTagArray);
             }
-            jsonObject.set("tags", jsonTagArray);
-        }
 
-        return jsonObject;
+            return jsonObject;
+
+
+        } catch (Poco::Exception &e) {
+            log_error << "JSON Exception" << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string Lambda::ToString() const {

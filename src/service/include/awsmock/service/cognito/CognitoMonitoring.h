@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Cognito monitoring thread
+     * @brief Cognito monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -64,5 +64,7 @@ namespace AwsMock::Service {
          */
         int _period{};
     };
+
 }// namespace AwsMock::Service
+
 #endif// AWSMOCK_SERVICE_COGNITO_MONITORING_H

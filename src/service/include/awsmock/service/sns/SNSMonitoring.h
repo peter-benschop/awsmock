@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SNS monitoring thread
+     * @brief SNS monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SNSMonitoring(int timeout) : Core::Timer("sns-monitoring", timeout) {}
+        explicit SNSMonitoring(int timeout);
 
         /**
          * Initialization

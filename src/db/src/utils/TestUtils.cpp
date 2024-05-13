@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "cognito", "gateway", "database"};
+    std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "cognito", "gateway", "database", "kms", "dynamodb"};
 
     void TestUtils::CreateServices() {
         ModuleDatabase &_serviceDatabase = ModuleDatabase::instance();

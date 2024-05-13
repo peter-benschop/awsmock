@@ -9,9 +9,11 @@
 #include <chrono>
 #include <sstream>
 #include <string>
+#ifndef _WIN32
 #include <sys/resource.h>
 #include <sys/time.h>
 #include <sys/times.h>
+#endif
 #include <thread>
 
 // Poco includes
@@ -388,11 +390,6 @@ namespace AwsMock::Core {
         std::shared_ptr<MetricSystemCollector> _metricSystemCollector{};
 
         /**
-         * System monitoring thread
-         */
-        std::shared_ptr<Poco::Timer> _metricSystemTimer{};
-
-        /**
          * Counter map
          */
         CounterMap _counterMap;
@@ -421,11 +418,6 @@ namespace AwsMock::Core {
          * Port for the monitoring manager
          */
         long _port;
-
-        /**
-         * System collector timeout
-         */
-        long _timeout;
 
         /**
          * Mutex

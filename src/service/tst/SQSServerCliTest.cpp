@@ -32,8 +32,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.port", _port);
             _accountId = _configuration.getString("awsmock.account.userPoolId", SQS_ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
@@ -46,7 +46,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.StopServer();
+            _sqsServer.Stop();
         }
 
         static std::string GetReceiptHandle(const std::string &jsonString) {
@@ -142,9 +142,11 @@ namespace AwsMock::Service {
         // arrange
         Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
         EXPECT_EQ(0, createResult.status);
+        Core::ExecResult getQueueUrlResult = Core::TestUtils::SendCliCommand("aws sqs get-queue-url --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+        std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
 
         // act
-        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-queue --queue-url " + _queueUrl + " --endpoint " + _endpoint);
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-queue --queue-url " + queueUrl + " --endpoint " + _endpoint);
         Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
         // assert
@@ -156,11 +158,12 @@ namespace AwsMock::Service {
 
         // arrange
         Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
+        std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
         EXPECT_EQ(0, createResult.status);
 
         // act
-        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
-        long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+        long messageCount = _sqsDatabase.CountMessages(REGION, queueUrl);
 
         // assert
         EXPECT_EQ(0, result.status);
@@ -172,11 +175,13 @@ namespace AwsMock::Service {
         // arrange
         Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
         EXPECT_EQ(0, createResult.status);
-        Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+        std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
+
+        Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
         EXPECT_EQ(0, sendResult.status);
 
         // act
-        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs receive-message --queue-url " + _queueUrl + " --endpoint " + _endpoint);
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs receive-message --queue-url " + queueUrl + " --endpoint " + _endpoint);
 
         // assert
         EXPECT_EQ(0, result.status);
@@ -189,14 +194,17 @@ namespace AwsMock::Service {
         // arrange
         Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name " + TEST_QUEUE + " --endpoint " + _endpoint);
         EXPECT_EQ(0, createResult.status);
-        Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
+        std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
+
+        Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
         EXPECT_EQ(0, sendResult.status);
-        Core::ExecResult receiveResult = Core::TestUtils::SendCliCommand("aws sqs receive-message --queue-url " + _queueUrl + " --endpoint " + _endpoint);
+
+        Core::ExecResult receiveResult = Core::TestUtils::SendCliCommand("aws sqs receive-message --queue-url " + queueUrl + " --endpoint " + _endpoint);
         EXPECT_EQ(0, receiveResult.status);
         std::string receiptHandle = GetReceiptHandle(receiveResult.output);
 
         // act
-        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-message --queue-url " + _queueUrl + " --receipt-handle " + receiptHandle + " --endpoint " + _endpoint);
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-message --queue-url " + queueUrl + " --receipt-handle " + receiptHandle + " --endpoint " + _endpoint);
         EXPECT_EQ(0, receiveResult.status);
         long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
 

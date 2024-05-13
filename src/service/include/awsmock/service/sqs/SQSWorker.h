@@ -27,7 +27,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SQSWorker(int timeout) : Core::Timer("sns-worker", timeout) {}
+        explicit SQSWorker(int timeout) : Core::Timer("sqs-worker", timeout) {}
 
         /**
          * Initialization

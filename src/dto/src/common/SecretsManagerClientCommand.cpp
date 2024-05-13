@@ -16,6 +16,7 @@ namespace AwsMock::Dto::Common {
         this->user = user;
         this->method = method;
         this->payload = GetBodyAsString(request);
+        this->url = request.getURI();
 
         // Command
         std::string action = request.get("X-Amz-Target");

@@ -11,27 +11,26 @@
 #include <string>
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/CurlUtils.h"
-#include "awsmock/core/FileUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/RandomUtils.h"
-#include "awsmock/core/ServiceException.h"
-#include "awsmock/core/StreamFilter.h"
-#include "awsmock/core/SystemUtils.h"
-#include "awsmock/core/TarUtils.h"
-#include "awsmock/dto/docker/CreateContainerRequest.h"
-#include "awsmock/dto/docker/CreateContainerResponse.h"
-#include "awsmock/dto/docker/ListContainerResponse.h"
-#include "awsmock/dto/docker/ListImageResponse.h"
-#include "awsmock/dto/docker/PruneContainerResponse.h"
-#include "awsmock/dto/docker/VersionResponse.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/FileUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/RandomUtils.h>
+#include <awsmock/core/ServiceException.h>
+#include <awsmock/core/StreamFilter.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/TarUtils.h>
+#include <awsmock/dto/docker/CreateContainerRequest.h>
+#include <awsmock/dto/docker/CreateContainerResponse.h>
+#include <awsmock/dto/docker/ListContainerResponse.h>
+#include <awsmock/dto/docker/ListImageResponse.h>
+#include <awsmock/dto/docker/PruneContainerResponse.h>
+#include <awsmock/dto/docker/VersionResponse.h>
 
 #define DOCKER_SOCKET "/var/run/docker.sock"
 #define NETWORK_NAME ".dockerhost.net"
@@ -266,6 +265,11 @@ namespace AwsMock::Service {
          * Docker internal network name
          */
         std::string _containerPort;
+
+        /**
+         * Docker listening socket
+         */
+        std::string _dockerSocket;
     };
 
 }// namespace AwsMock::Service

@@ -17,9 +17,15 @@
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief List object version request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListObjectVersionsRequest {
 
         /**
@@ -36,6 +42,31 @@ namespace AwsMock::Dto::S3 {
          * Prefix
          */
         std::string prefix;
+
+        /**
+         * Delimiter
+         */
+        std::string delimiter;
+
+        /**
+         * Encoding type
+         */
+        std::string encodingType;
+
+        /**
+         * Page size
+         */
+        int pageSize;
+
+        /**
+         * Maximal number of keys
+         */
+        int maxKeys;
+
+        /**
+         * Version ID marker
+         */
+        std::string versionIdMarker;
 
         /**
          * Convert to a JSON string

@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * S3 monitoring thread
+     * @brief S3 monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit S3Monitoring(int timeout) : Core::Timer("s3-monitoring", timeout) {}
+        explicit S3Monitoring(int timeout);
 
         /**
          * Initialization

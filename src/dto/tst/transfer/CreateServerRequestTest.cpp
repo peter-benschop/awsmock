@@ -16,7 +16,7 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
-#define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={region='eu-central-1', tags=[Tag={key='version', value='1.0'}], protocols=['ftp', 'sftp']}"
+#define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={\"Domain\":\"test.com\",\"Region\":\"eu-central-1\"}"
 #define CREATE_SERVER_REQUEST_TO_JSON "{\"Domain\":\"test.com\",\"Region\":\"eu-central-1\"}"
 #define CREATE_SERVER_REQUEST_FROM_JSON "{\"Domain\":\"test.com\",\"Region\":\"eu-central-1\", \"Protocols\":[\"ftp\", \"sftp\"], \"tags\":[{\"key\":\"value\"}]}"
 

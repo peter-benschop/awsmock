@@ -32,16 +32,18 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _snsPort = _configuration.getString("awsmock.service.sns.port", std::to_string(KMS_DEFAULT_PORT));
-            std::string _snsHost = _configuration.getString("awsmock.service.sns.host", SNS_DEFAULT_HOST);
-            std::string _sqsPort = _configuration.getString("awsmock.service.sqs.port", std::to_string(SQS_DEFAULT_PORT));
-            std::string _sqsHost = _configuration.getString("awsmock.service.sqs.host", SQS_DEFAULT_HOST);
+            std::string _snsPort = _configuration.getString("awsmock.service.sns.http.port", std::to_string(KMS_DEFAULT_PORT));
+            std::string _snsHost = _configuration.getString("awsmock.service.sns.http.host", SNS_DEFAULT_HOST);
+            std::string _sqsPort = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
+            std::string _sqsHost = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
             _snsEndpoint = "http://" + _snsHost + ":" + _snsPort;
             _sqsEndpoint = "http://" + _sqsHost + ":" + _sqsPort;
 
             // Start HTTP services
-            _snsServer.Start();
-            _sqsServer.Start();
+            _snsServer = std::make_unique<SNSServer>(_configuration);
+            _sqsServer = std::make_unique<SQSServer>(_configuration);
+            _snsServer->Start();
+            _sqsServer->Start();
         }
 
         void TearDown() override {
@@ -49,8 +51,8 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.StopServer();
-            _snsServer.StopServer();
+            _sqsServer->Stop();
+            _snsServer->Stop();
         }
 
         static std::string GetTopicArn(const std::string &jsonString) {
@@ -131,8 +133,8 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSServer _snsServer = SNSServer(_configuration);
-        SQSServer _sqsServer = SQSServer(_configuration);
+        std::unique_ptr<SNSServer> _snsServer;
+        std::unique_ptr<SQSServer> _sqsServer;
     };
 
     TEST_F(SNSServerCliTest, TopicCreateTest) {

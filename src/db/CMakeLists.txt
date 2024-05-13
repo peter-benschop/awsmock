@@ -24,21 +24,32 @@ set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secre
         src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
-set(UTIL_SOURCES src/utils/MongoUtils.cpp)
+set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${UTIL_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
+if (NOT WIN32)
+    add_subdirectory(tst)
+endif ()
 
 # Includes
-include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi
-        /usr/include/mongocxx/v_noabi)
+if (WIN32)
+    include_directories(./include ../core/include ${AWSMOCK_WIN32_DIR}/include)
+    link_directories(../core/${CMAKE_BUILD_TYPE} ${AWSMOCK_WIN32_DIR}/lib)
+else ()
+    include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+endif ()
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+
+if (WIN32)
+    target_link_libraries(${LIBRARY} awsmockcore.lib libssl.lib libcrypto.lib libcurl_imp.lib archive.lib
+            bsoncxx-v_noabi-rhb-x64-v143-md.lib mongocxx-v_noabi-rhb-x64-v143-md.lib)
+endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

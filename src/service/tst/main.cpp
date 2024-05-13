@@ -8,9 +8,6 @@
 // GTest includes
 #include <gtest/gtest.h>
 
-// GTest includes
-#include <Poco/ThreadPool.h>
-
 // Test includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/utils/TestUtils.h>
@@ -21,9 +18,8 @@ class TestEnvironment : public ::testing::Environment {
 
     // Initialise a test configuration.
     void SetUp() override {
-        AwsMock::Core::TestUtils::CreateTestConfigurationFile();
+        AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
         AwsMock::Database::TestUtils::CreateServices();
-        Poco::ThreadPool::defaultPool().addCapacity(256);
     }
 };
 

@@ -19,7 +19,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/KMSDatabase.h>
 

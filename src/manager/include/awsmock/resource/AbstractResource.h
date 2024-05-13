@@ -10,18 +10,16 @@
 #include <string>
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
-#include "Poco/LogStream.h"
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandler.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
 #include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequestHandler.h>
+#include <Poco/Net/HTTPServerRequest.h>
+#include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/RegularExpression.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/URI.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -31,7 +29,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/resource/HandlerException.h>
 
-namespace AwsMock::Resource {
+namespace AwsMock::Manager {
 
     typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
 
@@ -271,6 +269,6 @@ namespace AwsMock::Resource {
         HeaderMap _headerMap;
     };
 
-}// namespace AwsMock::Resource
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_ABSTRACTRESOURCE_H

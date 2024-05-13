@@ -39,20 +39,21 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _dynamodbServer.Start();
+            _dynamodbServer = std::make_unique<DynamoDbServer>(_configuration);
+            _dynamodbServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint-url http://localhost:8000");
             EXPECT_EQ(0, deleteResult1.status);
-            _dynamodbServer.StopServer();
+            _dynamodbServer->Stop();
         }
 
         std::string _endpoint, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        DynamoDbServer _dynamodbServer = DynamoDbServer(_configuration);
+        std::unique_ptr<DynamoDbServer> _dynamodbServer;
     };
 
     TEST_F(DynamoDbServerCliTest, TableCreateTest) {

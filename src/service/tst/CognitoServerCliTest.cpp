@@ -33,26 +33,28 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.cognito.port", std::to_string(COGNITO_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.cognito.host", COGNITO_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.cognito.http.port", std::to_string(COGNITO_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.port", _port);
             _accountId = _configuration.getString("awsmock.account.userPoolId", ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
 
+            _cognitoServer = std::make_unique<CognitoServer>(_configuration);
+
             // Start HTTP manager
-            _dynamodbServer.Start();
+            _cognitoServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllUserPools();
-            _dynamodbServer.StopServer();
+            _cognitoServer->Stop();
         }
 
         std::string _endpoint, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Database::CognitoDatabase _database = Database::CognitoDatabase();
-        CognitoServer _dynamodbServer = CognitoServer(_configuration);
+        Database::CognitoDatabase &_database = Database::CognitoDatabase::instance();
+        std::unique_ptr<CognitoServer> _cognitoServer;
     };
 
     TEST_F(CognitoServerCliTest, UserPoolCreateTest) {
@@ -92,7 +94,7 @@ namespace AwsMock::Service {
         std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws cognito-idp delete-user-pool --user-pool-userPoolId " + userPoolId + "  --endpoint " + _endpoint);
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws cognito-idp delete-user-pool --user-pool-id " + userPoolId + "  --endpoint " + _endpoint);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
 
         // assert
@@ -109,7 +111,7 @@ namespace AwsMock::Service {
         std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-userPoolId " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -124,11 +126,11 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, createUserPoolResult.status);
         Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         std::string userPoolId = createdPoolList.front().userPoolId;
-        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-userPoolId " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
         EXPECT_EQ(0, createUserPoolResult.status);
 
         // act
-        Core::ExecResult deleteUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-delete-user --user-pool-userPoolId " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        Core::ExecResult deleteUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-delete-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert

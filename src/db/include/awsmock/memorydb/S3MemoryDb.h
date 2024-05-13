@@ -110,6 +110,16 @@ namespace AwsMock::Database {
         bool HasObjects(const Entity::S3::Bucket &bucket);
 
         /**
+         * List objects on a bucket.
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @param maxKeys maximal number of return elements
+         * @return list of S3 objects
+         */
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
+
+        /**
          * List all objects of a bucket
          *
          * @param bucket S3 bucket name
@@ -202,6 +212,18 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key);
+
+        /**
+         * Gets an object from a bucket using the bucket, key and MD5 sum as query parameter
+         *
+         * @param region AWS S3 region name
+         * @param bucket object bucket
+         * @param key object key
+         * @param md5sum MD5 sum of object
+         * @return S3 object
+         * @throws DatabaseException
+         */
+        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum);
 
         /**
          * Counts the number of keys in a bucket

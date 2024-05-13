@@ -27,7 +27,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferDatabase : public Database {
+    class TransferDatabase : public DatabaseBase {
 
       public:
 

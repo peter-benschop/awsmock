@@ -7,12 +7,12 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     void EphemeralStorage::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-        size = mResult.value()["size"].get_int64();
+        size = static_cast<long>(mResult.value()["size"].get_int64());
     }
 
     view_or_value<view, value> EphemeralStorage::ToDocument() const {
 
-        view_or_value<view, value> ephemeralStorageDocument = make_document(kvp("size", size));
+        view_or_value<view, value> ephemeralStorageDocument = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
         return ephemeralStorageDocument;
     }
 

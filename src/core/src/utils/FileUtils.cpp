@@ -1,6 +1,4 @@
-#include "awsmock/core/FileUtils.h"
-#include "awsmock/core/ResourceNotFoundException.h"
-#include <execution>
+#include <awsmock/core/FileUtils.h>
 
 namespace AwsMock::Core {
 
@@ -28,8 +26,12 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
+#ifndef _WIN32
         std::filesystem::path path(fileName);
         return path.parent_path();
+#else
+        return fileName.substr(0, fileName.find_last_of("/\\"));
+#endif
     }
 
     long FileUtils::FileSize(const std::string &fileName) {
@@ -146,12 +148,62 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
+#ifndef _WIN32
         struct stat info {};
         stat(fileName.c_str(), &info);// Error check omitted
         struct passwd *pw = getpwuid(info.st_uid);
         if (pw) {
             return pw->pw_name;
         }
+#else
+        PSID pSidOwner = NULL;
+        PSECURITY_DESCRIPTOR pSD = NULL;
+        LPTSTR AcctName = NULL;
+        LPTSTR DomainName = NULL;
+        DWORD dwAcctName = 1, dwDomainName = 1;
+        SID_NAME_USE eUse = SidTypeUnknown;
+        BOOL bRtnBool = TRUE;
+        HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        DWORD dwRtnCode = GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &pSidOwner, NULL, NULL, NULL, &pSD);
+        bRtnBool = LookupAccountSid(NULL, pSidOwner, AcctName, (LPDWORD) &dwAcctName, DomainName, (LPDWORD) &dwDomainName, &eUse);
+        // Reallocate memory for the buffers.
+        AcctName = (LPTSTR) GlobalAlloc(GMEM_FIXED, dwAcctName);
+
+        // Check GetLastError for GlobalAlloc error condition.
+        if (AcctName == NULL) {
+            DWORD dwErrorCode = 0;
+            dwErrorCode = GetLastError();
+            log_error << "GlobalAlloc error:" << dwErrorCode;
+        }
+
+        DomainName = (LPTSTR) GlobalAlloc(GMEM_FIXED, dwDomainName);
+
+        // Check GetLastError for GlobalAlloc error condition.
+        if (DomainName == NULL) {
+            DWORD dwErrorCode = 0;
+            dwErrorCode = GetLastError();
+            log_error << "GlobalAlloc error:" << dwErrorCode;
+        }
+
+        // Second call to LookupAccountSid to get the account name.
+        bRtnBool = LookupAccountSid(NULL, pSidOwner, AcctName, (LPDWORD) &dwAcctName, DomainName, (LPDWORD) &dwDomainName, &eUse);
+
+        // Check GetLastError for LookupAccountSid error condition.
+        if (bRtnBool == FALSE) {
+            DWORD dwErrorCode = 0;
+            dwErrorCode = GetLastError();
+            if (dwErrorCode == ERROR_NONE_MAPPED) {
+                log_error << "Account owner not found for specified SID";
+            } else {
+                log_error << "Error in LookupAccountSid.";
+            }
+        } else if (bRtnBool == TRUE) {
+
+            // Print the account name.
+            log_debug << "Account owner: " << AcctName;
+            return AcctName;
+        }
+#endif
         return {};
     }
 
@@ -188,7 +240,7 @@ namespace AwsMock::Core {
     }
 
     bool FileUtils::Touch(const std::string &fileName) {
-
+#ifndef _WIN32
         int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
         if (fd < 0) {
             log_error << "Could not open file: " << fileName;
@@ -200,6 +252,7 @@ namespace AwsMock::Core {
             return false;
         }
         close(fd);
+#endif
         return true;
     }
 

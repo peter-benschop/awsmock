@@ -33,14 +33,30 @@ set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp ${S3_SO
         ${DYNAMODB_SOURCES} ${SECRETMANAGER_SOURCES} ${KMS_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
+if (NOT WIN32)
+    add_subdirectory(tst)
+endif ()
 
 # Includes
-include_directories(include ../core/include ../db/include ../dto/include /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+if (WIN32)
+    include_directories(./include ../core/include ../db/include ../dto/include ${AWSMOCK_WIN32_DIR}/include)
+    link_directories(${AWSMOCK_WIN32_DIR}/lib ../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE} ../dto/${CMAKE_BUILD_TYPE})
+else ()
+    include_directories(include ../core/include ../db/include ../dto/include)
+    include_directories(/usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+endif ()
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/service/s3/S3HashCreator.h
+        src/s3/S3HashCreator.cpp
+)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 
+if (WIN32)
+    target_link_libraries(${LIBRARY} awsmockcore.lib awsmockdb.lib awsmockdto.lib libssl.lib libcrypto.lib
+            libcurl_imp.lib archive.lib bson-1.0.lib bsoncxx-v_noabi-rhb-x64-v143-md.lib
+            mongocxx-v_noabi-rhb-x64-v143-md.lib)
+endif ()
+
 install(TARGETS ${LIBRARY} DESTINATION lib)
-install(TARGETS ${LIBRARY_STATIC} DESTINATION lib)

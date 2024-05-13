@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Configuration &configuration) : AbstractServer(configuration, "s3", 10), _configuration(configuration), _module("s3") {
+    S3Server::S3Server(Core::Configuration &configuration) : AbstractServer(configuration, "s3"), _configuration(configuration), _module("s3") {
 
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.s3.http.port", S3_DEFAULT_PORT);
@@ -18,8 +18,6 @@ namespace AwsMock::Service {
 
         // Monitoring
         _s3Monitoring = std::make_unique<S3Monitoring>(_monitoringPeriod);
-
-        // Sleeping period
         log_debug << "S3 module initialized, endpoint: " << _host << ":" << _port;
     }
 
@@ -32,19 +30,16 @@ namespace AwsMock::Service {
         }
         log_info << "S3 module starting";
 
-        // Start monitoring
-        _s3Monitoring->Start();
-
         // Start REST module
         StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
     }
 
     void S3Server::Run() {
-        log_trace << "S3 processing started";
     }
 
     void S3Server::Shutdown() {
-        StopHttpServer();
+        log_debug << "Shutdown initiated, s3";
         _s3Monitoring->Stop();
+        StopHttpServer();
     }
 }// namespace AwsMock::Service

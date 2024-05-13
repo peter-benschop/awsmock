@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
         void TearDown() override {
             _database.DeleteAllLambdas();
-            _lambdaServer.StopServer();
+            _lambdaServer.Stop();
         }
 
         std::string _endpoint, _accountId;

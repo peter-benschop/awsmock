@@ -6,13 +6,6 @@
 
 namespace AwsMock::Service {
 
-    template<class F, class entity>
-    void CallAsyncCalculateHashes(F *&&fun, entity &&e) {
-        std::make_unique<std::future<void>>((std::async(std::launch::async, [&fun, &e]() {
-            fun->CalculateHashes(e);
-        }))).reset();
-    }
-
     S3Service::S3Service(Core::Configuration &configuration) : _configuration(configuration), _database(Database::S3Database::instance()), _lambdaService(configuration) {
 
         _accountId = _configuration.getString("awsmock.account.userPoolId");
@@ -288,8 +281,8 @@ namespace AwsMock::Service {
                 });
 
         // Calculate the hashes asynchronously
-        if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
-            CallAsyncCalculateHashes(this, object);
+        if (!request.checksumAlgorithm.empty()) {
+            Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
         }
 
@@ -603,8 +596,27 @@ namespace AwsMock::Service {
     Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) {
         log_trace << "List object versions request: " << request.ToString();
 
+        // Check bucket existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+            throw Core::ServiceException("Bucket does not exist");
+        }
+
+        // Get bucket
+        Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
+        if (!bucketEntity.IsVersioned()) {
+            throw Core::ServiceException("Bucket is not versioned");
+        }
+
         Dto::S3::ListObjectVersionsResponse response;
-        return response;
+        try {
+
+            std::vector<Database::Entity::S3::Object> objectList = _database.GetBucketObjectList(request.region, request.bucket, request.pageSize);
+            return Dto::S3::Mapper::map(request, objectList);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "S3 put bucket encryption request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
     }
 
     void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) {
@@ -852,8 +864,8 @@ namespace AwsMock::Service {
         // Meta data
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
         log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
-        if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
-            CallAsyncCalculateHashes(this, object);
+        if (!request.checksumAlgorithm.empty()) {
+            Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
         }
 
@@ -893,7 +905,8 @@ namespace AwsMock::Service {
         Database::Entity::S3::Object object;
 
         // Check existence by
-        Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, request.md5Sum);
+        std::string md5sum = Core::Crypto::HexEncode(Core::Crypto::Base64Decode(request.md5Sum));
+        Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, md5sum);
         if (existingObject.oid.empty()) {
 
             // Version ID
@@ -921,8 +934,8 @@ namespace AwsMock::Service {
             log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
             // Checksums
-            if (request.checksumAlgorithm == "SHA1" || request.checksumAlgorithm == "SHA256") {
-                CallAsyncCalculateHashes(this, object);
+            if (!request.checksumAlgorithm.empty()) {
+                Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
             }
 
@@ -1078,11 +1091,4 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::CalculateHashes(Database::Entity::S3::Object &object) {
-        std::string filename = _dataS3Dir + Poco::Path::separator() + object.internalName;
-        object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
-        object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
-        _database.UpdateObject(object);
-        log_debug << "Calculated hashes, key: " << object.key;
-    }
 }// namespace AwsMock::Service

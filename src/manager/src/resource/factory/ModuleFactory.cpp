@@ -4,9 +4,9 @@
 
 #include <awsmock/resource/factory/ModuleFactory.h>
 
-namespace AwsMock::Resource::Factory {
+namespace AwsMock::Manager {
 
-    Poco::Net::HTTPRequestHandler *ModuleFactory::createResource(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap) {
-        return new ModuleHandler(configuration, metricService, serverMap);
+    Poco::Net::HTTPRequestHandler *ModuleFactory::createResource(Service::ServerMap &serverMap) {
+        return new ModuleHandler(serverMap);
     }
-}// namespace AwsMock::Resource::Factory
+}// namespace AwsMock::Manager

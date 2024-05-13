@@ -18,24 +18,29 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+
     /**
-     * Module MongoDB database.
+     * @brief Module MongoDB database.
+     *
+     * Controls all the AwsMock modules.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleDatabase : public Database {
+    class ModuleDatabase : public DatabaseBase {
 
       public:
 
         /**
          * Constructor
-         *
-         * @param configuration configuration properties
          */
-        explicit ModuleDatabase();
+        explicit ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
 
         /**
          * Singleton instance
@@ -44,6 +49,18 @@ namespace AwsMock::Database {
             static Poco::SingletonHolder<ModuleDatabase> sh;
             return *sh.get();
         }
+
+        /**
+         * Initialize the database
+         */
+        void Initialize();
+
+        /**
+         * Returns a list of existing modules.
+         *
+         * @return map of existing modules
+         */
+        std::map<std::string, Entity::Module::Module> GetExisting();
 
         /**
          * Checks the active flag.
@@ -180,6 +197,11 @@ namespace AwsMock::Database {
          * Database name
          */
         std::string _databaseName;
+
+        /**
+         * Module collection name
+         */
+        std::string _moduleCollectionName;
 
         /**
          * Modules in-memory database

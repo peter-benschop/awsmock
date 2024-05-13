@@ -2,18 +2,17 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include <utility>
+#include <awsmock/controller/RestService.h>
 
-#include "awsmock/controller/RestService.h"
+namespace AwsMock::Manager {
 
-namespace AwsMock {
+    RestService::RestService() : _port(MANAGER_DEFAULT_PORT), _host(MANAGER_DEFAULT_HOST) {
 
-    RestService::RestService(Core::Configuration &configuration) : _port(MANAGER_DEFAULT_PORT), _host(MANAGER_DEFAULT_HOST), _configuration(configuration) {
-
-        _port = _configuration.getInt("awsmock.manager.port", MANAGER_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.manager.host", MANAGER_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.manager.max.queue", MANAGER_MAX_CONNECTIONS);
-        _maxThreads = _configuration.getInt("awsmock.manager.max.threads", MANAGER_MAX_THREADS);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.manager.port", MANAGER_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.manager.host", MANAGER_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.manager.max.queue", MANAGER_MAX_CONNECTIONS);
+        _maxThreads = configuration.getInt("awsmock.manager.max.threads", MANAGER_MAX_THREADS);
 
         log_debug << "AwsMock manager initialized, endpoint: " << _host << ":" << _port;
     }
@@ -22,8 +21,8 @@ namespace AwsMock {
         _port = port;
     }
 
-    void RestService::setRouter(Poco::Net::HTTPRequestHandlerFactory *router) {
-        _router = router;
+    void RestService::setRouter(std::unique_ptr<Manager::Router> router) {
+        _router = std::move(router);
     }
 
     void RestService::StartServer() {
@@ -33,7 +32,7 @@ namespace AwsMock {
 
         httpServerParams->setMaxQueued(_maxQueueLength);
         httpServerParams->setMaxThreads(_maxThreads);
-        _httpServer = std::make_shared<Poco::Net::HTTPServer>(_router, Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
+        _httpServer = std::make_shared<Poco::Net::HTTPServer>(_router.get(), Poco::Net::ServerSocket(Poco::UInt16(_port)), httpServerParams);
 
         if (_httpServer) {
             _httpServer->start();
@@ -41,15 +40,9 @@ namespace AwsMock {
         }
     }
 
-    void RestService::StartServer(Poco::Net::HTTPRequestHandlerFactory *router, int port) {
-        setPort(port);
-        setRouter(router);
-        StartServer();
-    }
-
     void RestService::StopServer() {
         if (_httpServer) {
             _httpServer->stop();
         }
     }
-}// namespace AwsMock
+}// namespace AwsMock::Manager

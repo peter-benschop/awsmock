@@ -18,24 +18,22 @@ namespace AwsMock::Core {
         Initialize();
         log_debug << "Timer initialized, name: " << _name;
 
-        auto future = std::shared_future<void>(_stop.get_future());
-        _thread_handle = std::async(std::launch::async, [future, this]() {
-            std::future_status status;
-            do {
-                status = future.wait_for(std::chrono::seconds(_timeout));
-                if (status == std::future_status::timeout) {
+        std::jthread(&Timer::DoWork, this, _stopSource).detach();
+    }
 
-                    Run();
-
-                } else if (status == std::future_status::ready) {
-
-                    log_debug << "Timer stopped, name: " << _name;
-                }
-            } while (status != std::future_status::ready);
-
-            Shutdown();
-            log_debug << "Timer shutdown, name: " << _name;
-        });
+    void Timer::DoWork(const std::stop_source &stopSource) {
+        std::stop_token stopToken = stopSource.get_token();
+        thread_local int i = 0;
+        while (!stopToken.stop_requested()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            if (stopToken.stop_requested()) {
+                break;
+            }
+            if (++i >= _timeout) {
+                Run();
+                i = 0;
+            }
+        }
     }
 
     void Timer::Restart() {
@@ -50,6 +48,10 @@ namespace AwsMock::Core {
     }
 
     void Timer::Stop() {
-        _stop.set_value();
+        log_debug << "Timer shutdown requested , name: " << _name;
+        Shutdown();
+        _stopSource.request_stop();
+        log_debug << "Timer shutdown finished, name: " << _name;
     }
+
 }// namespace AwsMock::Core

@@ -5,10 +5,13 @@
 #ifndef AWSMOCK_CORE_CURL_UTILS_H
 #define AWSMOCK_CORE_CURL_UTILS_H
 
+// C includes
+#include <sys/stat.h>
+
 // C++ standard includes
 #include <iostream>
+#include <map>
 #include <string>
-#include <sys/stat.h>
 #include <utility>
 
 // Curl includes
@@ -70,19 +73,11 @@ namespace AwsMock::Core {
          *
          * @param method HTTP method
          * @param path request path
-         * @return Dto::Curl::CurlResponse
-         */
-        CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path);
-
-        /**
-         * Send request
-         *
-         * @param method HTTP method
-         * @param path request path
          * @param body request body
+         * @param dockerSocket docker socket path
          * @return Dto::Curl::CurlResponse
          */
-        CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path, const std::string &body);
+        CurlResponse SendUnixSocketRequest(const std::string &method, const std::string &path, const std::string &body = {}, const std::string &dockerSocket = DOCKER_SOCKET);
 
         /**
          * Send a file request using unix sockets
@@ -91,9 +86,10 @@ namespace AwsMock::Core {
          * @param path request path
          * @param header request extra headers
          * @param fileName filename to send as request body
+         * @param dockerSocket docker socket path
          * @return Dto::Curl::CurlResponse
          */
-        CurlResponse SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName);
+        CurlResponse SendUnixSocketFileRequest(const std::string &method, const std::string &path, const std::string &header, const std::string &fileName, const std::string &dockerSocket = DOCKER_SOCKET);
 
       private:
 

@@ -18,7 +18,7 @@
 namespace AwsMock::Core {
 
     /**
-     * JSON utilities.
+     * @brief JSON utilities.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -109,7 +109,7 @@ namespace AwsMock::Core {
          * {
          *  "map.first": "map.second"
          * }
-         * </pre
+         * @endcode
          *
          * @param values vector of string values
          * @return JSON object

@@ -13,7 +13,7 @@
 // AwsMock includes
 #include "awsmock/dto/common/ResourceNotFoundResponse.h"
 
-namespace AwsMock::Core {
+namespace AwsMock::Manager {
 
     /**
      * AwsMock resource not found response.
@@ -33,6 +33,6 @@ namespace AwsMock::Core {
         void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
     };
 
-}// namespace AwsMock::Core
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_CONTROLLER_RESOURCE_NOT_FOUND_H

@@ -32,7 +32,7 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/ListObjectVersionsResponse.cpp src/s3/PutBucketNotificationRequest.cpp src/s3/model/FilterRule.cpp
         src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
         src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/model/LambdaConfiguration.cpp
-        src/s3/PutBucketEncryptionRequest.cpp)
+        src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/Image.cpp src/docker/ListContainerResponse.cpp
         src/docker/ListImageResponse.cpp src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp
         src/docker/CreateContainerResponse.cpp)
@@ -79,17 +79,31 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCK
         ${MODULE_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
+if (NOT WIN32)
+    add_subdirectory(tst)
+endif ()
 
 # Includes
-include_directories(include ../core/include ../db/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+if (WIN32)
+    include_directories(./include ../core/include ../db/include ${AWSMOCK_WIN32_DIR}/include)
+    link_directories(${AWSMOCK_WIN32_DIR}/lib ../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE})
+else ()
+    include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+endif ()
 
 add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/s3/model/FilterRule.h
-        include/awsmock/dto/s3/model/NotificationEvent.h
-        include/awsmock/dto/lambda/model/Tags.h
-        include/awsmock/dto/lambda/model/Error.h)
+        include/awsmock/dto/s3/mapper/Mapper.h
+        src/s3/mapper/Mapper.cpp
+        include/awsmock/dto/s3/model/ObjectVersion.h
+        src/s3/model/ObjectVersion.cpp
+        include/awsmock/dto/s3/model/RestoreStatus.h
+        src/s3/model/RestoreStatus.cpp)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+
+if (WIN32)
+    target_link_libraries(${LIBRARY} awsmockcore.lib awsmockdb.lib libssl.lib libcrypto.lib libcurl_imp.lib archive.lib bson-1.0.lib
+            bsoncxx-v_noabi-rhb-x64-v143-md.lib mongocxx-v_noabi-rhb-x64-v143-md.lib)
+endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

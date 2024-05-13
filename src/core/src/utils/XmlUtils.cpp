@@ -1,6 +1,4 @@
 
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/XML/XMLWriter.h>
 #include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Core {

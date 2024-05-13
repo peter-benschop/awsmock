@@ -68,8 +68,8 @@ namespace AwsMock::Service {
         Dto::Lambda::ListFunctionResponse response = _service.ListFunctions(REGION);
 
         // assert
-        EXPECT_FALSE(response.functions.empty());
-        EXPECT_TRUE(response.functions.front().functionName == FUNCTION_NAME);
+        EXPECT_FALSE(response.lambdaList.empty());
+        EXPECT_TRUE(response.lambdaList.front().function == FUNCTION_NAME);
     }
 
     TEST_F(LambdaServiceTest, LambdaCreateTagsTest) {

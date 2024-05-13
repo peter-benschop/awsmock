@@ -12,6 +12,7 @@
 // Poco includes
 #include <Poco/DOM/AutoPtr.h>
 #include <Poco/DOM/DOMParser.h>
+#include <Poco/DOM/DOMWriter.h>
 #include <Poco/DOM/Document.h>
 #include <Poco/DOM/Element.h>
 #include <Poco/DOM/NodeList.h>
@@ -19,6 +20,7 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+#include <Poco/XML/XMLWriter.h>
 
 namespace AwsMock::Core {
 

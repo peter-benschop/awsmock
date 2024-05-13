@@ -6,13 +6,12 @@
 #define AWSMOCK_SERVICE_S3_HANDLER_FACTORY_H
 
 // Poco includes
-#include "Poco/Logger.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
-#include "S3Handler.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/MetricService.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/MetricService.h>
+#include <awsmock/service/s3/S3Handler.h>
 
 namespace AwsMock::Service {
 

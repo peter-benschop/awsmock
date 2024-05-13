@@ -8,12 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Logger.h>
-#include <Poco/NotificationQueue.h>
-#include <Poco/Runnable.h>
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
@@ -38,7 +32,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Lambda server
+     * @brief Lambda server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -54,14 +48,11 @@ namespace AwsMock::Service {
         explicit LambdaServer(Core::Configuration &configuration);
 
         /**
-         * Destructor
-         */
-        ~LambdaServer() override;
-
-        /**
          * Initialization
          */
         void Initialize() override;
+
+      protected:
 
         /**
          * Main method

@@ -25,10 +25,65 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/s3/model/ObjectVersion.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief List S3 object version response
+     *
+     * Example:
+     * @code{.xml}
+     * <ListVersionsResult>
+     *   <IsTruncated>boolean</IsTruncated>
+     *   <KeyMarker>string</KeyMarker>
+     *   <VersionIdMarker>string</VersionIdMarker>
+     *   <NextKeyMarker>string</NextKeyMarker>
+     *   <NextVersionIdMarker>string</NextVersionIdMarker>
+     *   <Version>
+     *     <ChecksumAlgorithm>string</ChecksumAlgorithm>
+     *     ...
+     *     <ETag>string</ETag>
+     *     <IsLatest>boolean</IsLatest>
+     *     <Key>string</Key>
+     *     <LastModified>timestamp</LastModified>
+     *     <Owner>
+     *       <DisplayName>string</DisplayName>
+     *       <ID>string</ID>
+     *      </Owner>
+     *     <RestoreStatus>
+     *       <IsRestoreInProgress>boolean</IsRestoreInProgress>
+     *       <RestoreExpiryDate>timestamp</RestoreExpiryDate>
+     *     </RestoreStatus>
+     *     <Size>long</Size>
+     *     <StorageClass>string</StorageClass>
+     *     <VersionId>string</VersionId>
+     *   </Version>
+     *   ...
+     *   <DeleteMarker>
+     *     <IsLatest>boolean</IsLatest>
+     *     <Key>string</Key>
+     *     <LastModified>timestamp</LastModified>
+     *     <Owner>
+     *       <DisplayName>string</DisplayName>
+     *       <ID>string</ID>
+     *     </Owner>
+     *     <VersionId>string</VersionId>
+     *   </DeleteMarker>
+     *   ...
+     *   <Name>string</Name>
+     *   <Prefix>string</Prefix>
+     *   <Delimiter>string</Delimiter>
+     *   <MaxKeys>integer</MaxKeys>
+     *   <CommonPrefixes>
+     *     <Prefix>string</Prefix>
+     *   </CommonPrefixes>
+     *   ...
+     *   <EncodingType>string</EncodingType>
+     * </ListVersionsResult>
+     * @endcode
+     */
     struct DeleteMarker {
 
         /**
@@ -55,86 +110,6 @@ namespace AwsMock::Dto::S3 {
          * Version ID
          */
         std::string versionId;
-
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-    };
-
-    struct RestoreStatus {
-
-        /**
-         * Is restore in progress
-         */
-        bool isRestoreInProgress;
-
-        /**
-         * Expiration datetime
-         */
-        Poco::DateTime restoreExpiryDate;
-
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-    };
-
-    struct Version {
-
-        /**
-         * Key
-         */
-        std::string key;
-
-        /**
-         * ETag
-         */
-        std::string eTag;
-
-        /**
-         * VersionId
-         */
-        std::string versionId;
-
-        /**
-         * Storage class
-         */
-        std::string storageClass;
-
-        /**
-         * Checksum algorithm
-         */
-        std::string checksumAlgorithm;
-
-        /**
-         * Is latest
-         */
-        bool isLatest;
-
-        /**
-         * Size
-         */
-        long size;
-
-        /**
-         * Is latest
-         */
-        Poco::DateTime lastModified;
-
-        /**
-         * Owner
-         */
-        Owner owner;
-
-        /**
-         * Restore status
-         */
-        RestoreStatus restoreStatue;
 
         /**
          * Convert to a JSON object
@@ -217,7 +192,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Versions
          */
-        std::vector<Version> versions;
+        std::vector<ObjectVersion> versions;
 
         /**
          * Delete markers

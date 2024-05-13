@@ -12,6 +12,10 @@
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
 
+#ifdef _WIN32
+#undef DELETE
+#endif
+
 namespace AwsMock::Dto::Common {
 
     enum class HttpMethod {

@@ -99,7 +99,7 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::StripWhiteSpaces(std::string &str) {
-        const std::string &chars = "\t\n\r\v\f";
+        const std::string &chars = "\t\n\r\v\f ";
         str.erase(remove_if(str.begin(), str.end(), [&chars](const char &c) {
                       return chars.find(c) != std::string::npos;
                   }),
@@ -197,7 +197,7 @@ namespace AwsMock::Core {
         const char *patloc;
 
         // find how many times the pattern occurs in the original string
-        patloc = strstr(oriptr, pattern);
+        patloc = strstr(original, pattern);
         for (oriptr = original; patloc; oriptr = patloc + patlen) {
             patcnt++;
             patloc = strstr(oriptr, pattern);
@@ -242,6 +242,7 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::SanitizeUtf8(std::string &input) {
+#ifndef _WIN32
         size_t inbytes_len = input.length();
         char *inbuf = const_cast<char *>(input.c_str());
 
@@ -259,6 +260,7 @@ namespace AwsMock::Core {
         iconv_close(cd);
         input.assign(result);
         delete result;
+#endif
         return input;
     }
 

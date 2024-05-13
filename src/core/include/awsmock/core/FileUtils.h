@@ -7,17 +7,26 @@
 
 // Standard C includes
 #include <fcntl.h>
+#ifndef _WIN32
 #include <grp.h>
 #include <pwd.h>
-#include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <utime.h>
+#else
+#include "accctrl.h"
+#include "aclapi.h"
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
+#endif
+#include <sys/stat.h>
+#include <sys/types.h>
 
 // Standard C++ includes
 #include <cstdio>
 #include <cstdlib>
+#include <execution>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -30,6 +39,7 @@
 #include <Poco/BinaryWriter.h>
 #include <Poco/DirectoryIterator.h>
 #include <Poco/File.h>
+#include <Poco/Format.h>
 #include <Poco/Path.h>
 #include <Poco/RegularExpression.h>
 #include <Poco/StreamCopier.h>
@@ -41,6 +51,7 @@
 // AwsMock includes
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {

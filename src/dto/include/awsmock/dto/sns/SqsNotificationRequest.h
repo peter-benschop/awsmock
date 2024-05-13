@@ -40,6 +40,7 @@ namespace AwsMock::Dto::SNS {
      *   "SigningCertURL" : "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem",
      *   "UnsubscribeURL" : "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:012096702153:pim-prod-protokollierung-topic:a278c03b-c5de-42a4-9c0e-f9c3412de940"
      * }
+     * @endcode
      */
     struct SqsNotificationRequest {
 

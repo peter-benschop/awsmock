@@ -47,7 +47,7 @@ namespace AwsMock::Core {
 
         // assert
         for (int i = 0; i < size; i++) {
-            EXPECT_TRUE(result[i] > min && result[i] < max);
+            EXPECT_TRUE(result[i] >= min && result[i] <= max);
         }
         result.clear();
     }

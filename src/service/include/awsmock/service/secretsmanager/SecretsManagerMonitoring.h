@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Cognito monitoring thread
+     * @brief Secret manager monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */

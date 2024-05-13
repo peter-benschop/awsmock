@@ -13,17 +13,21 @@
 
 // Plog includes
 #define PLOG_OMIT_LOG_DEFINES
+#include <plog/Appenders/RollingFileAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
+#include <plog/Initializers/ConsoleInitializer.h>
+#include <plog/Log.h>
 
 // AwsMock includes
-#include <awsmock/core/logging/plog/Formatters/TxtFormatter.h>
-#include <awsmock/core/logging/plog/Init.h>
-#include <awsmock/core/logging/plog/Initializers/ConsoleInitializer.h>
-#include <awsmock/core/logging/plog/Log.h>
+#include <awsmock/core/LogFormatter.h>
 
 namespace AwsMock::Core {
 
     /**
-     * Logging setup
+     * @brief Logging stream
+     *
+     * Based on <a https://github.com/SergiusTheBest/plog>Plog</a>.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -34,7 +38,12 @@ namespace AwsMock::Core {
         /**
          * Constructor
          */
-        LogStream();
+        LogStream() = default;
+
+        /**
+         * Initialization
+         */
+        static void Initialize();
 
         /**
          * Constructor
@@ -42,6 +51,20 @@ namespace AwsMock::Core {
          * @param severity PLog severity string
          */
         explicit LogStream(const std::string &severity);
+
+        /**
+         * Set the maximum severity
+         *
+         * @param severity PLog severity string
+         */
+        static void SetSeverity(const std::string &severity);
+
+        /**
+         * Set the log filename
+         *
+         * @param filename name of the log file
+         */
+        static void SetFilename(const std::string &filename);
     };
 
 }// namespace AwsMock::Core

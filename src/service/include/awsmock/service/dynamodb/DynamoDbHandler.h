@@ -6,10 +6,6 @@
 #define AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPServerRequestImpl.h>
 
 // AwsMock includes

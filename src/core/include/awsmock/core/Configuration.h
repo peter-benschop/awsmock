@@ -19,6 +19,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CoreException.h>
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Version.h>
 
@@ -180,6 +181,20 @@ namespace AwsMock::Core {
         void Initialize();
 
         /**
+         * Save the environment variables as key/value pair
+         *
+         * @param key environment variable key
+         * @param value environment variable value
+         */
+        void AddToEnvList(const std::string &key, const std::string &value);
+
+        /**
+         * Reapply the environment variables to the properties, as environment variables have precedence over
+         * file variables.
+         */
+        void ApplyEnvSettings();
+
+        /**
          * Name of the configuration file
          */
         std::string _filename;
@@ -188,6 +203,12 @@ namespace AwsMock::Core {
          * Profile configuration file
          */
         std::string _profile;
+
+        /**
+         * List of defined environment variables and their value. After a configuration has been read, the environment variables need to be reapplied,
+         * as environment variables have precedence over config file variables.
+         */
+        std::map<std::string, std::string> _envList;
 
         /**
          * Stream provider.
@@ -199,4 +220,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif//A WSMOCK_CORE_CONFIGURATION_H
+#endif// AWSMOCK_CORE_CONFIGURATION_H

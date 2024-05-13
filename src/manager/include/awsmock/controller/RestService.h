@@ -5,11 +5,16 @@
 #ifndef AWSMOCK_MANAGER_REST_SERVICE_H
 #define AWSMOCK_MANAGER_REST_SERVICE_H
 
+
+// C++ includes
+#include <utility>
+
 // Poco includes
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServer.h"
+#include <Poco/Net/HTTPRequestHandlerFactory.h>
+#include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
+#include <awsmock/controller/Router.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 
@@ -18,7 +23,7 @@
 #define MANAGER_MAX_CONNECTIONS 250
 #define MANAGER_MAX_THREADS 50
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     /**
      * General REST module
@@ -31,10 +36,8 @@ namespace AwsMock {
 
         /**
          * Constructor
-         *
-         * @param configuration application configuration
          */
-        explicit RestService(Core::Configuration &configuration);
+        explicit RestService();
 
         /**
          * Sets the REST port.
@@ -48,7 +51,7 @@ namespace AwsMock {
          *
          * @param router HTTP request router.
          */
-        void setRouter(Poco::Net::HTTPRequestHandlerFactory *router);
+        void setRouter(std::unique_ptr<Manager::Router> router);
 
         /**
          * Start the restfull module.
@@ -56,14 +59,6 @@ namespace AwsMock {
          * The router has to be defined before the HTTP manager is started.
          */
         void StartServer();
-
-        /**
-         * Start with port and router.
-         *
-         * @param router router to use
-         * @param port port to use (default: 9100)
-         */
-        void StartServer(Poco::Net::HTTPRequestHandlerFactory *router, int port = MANAGER_DEFAULT_PORT);
 
         /**
          * Stop the manager
@@ -83,14 +78,9 @@ namespace AwsMock {
         std::string _host;
 
         /**
-        * Logger
-        */
-        Core::Configuration &_configuration;
-
-        /**
          * REST router
          */
-        Poco::Net::HTTPRequestHandlerFactory *_router{};
+        std::unique_ptr<Manager::Router> _router;
 
         /**
          * HTTP manager instance
@@ -107,6 +97,6 @@ namespace AwsMock {
          */
         int _maxThreads;
     };
-}// namespace AwsMock
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_MANAGER_REST_SERVICE_H

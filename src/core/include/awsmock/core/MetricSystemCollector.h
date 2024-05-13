@@ -10,15 +10,17 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#ifndef _WIN32
 #include <sys/times.h>
+#endif
 
 // Poco includes
 #include <Poco/Prometheus/Counter.h>
 #include <Poco/Prometheus/Gauge.h>
 #include <Poco/Prometheus/MetricsServer.h>
-#include <Poco/Timer.h>
 
 // AwsMock includes
+#include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/Timer.h>
@@ -123,6 +125,11 @@ namespace AwsMock::Core {
          * Last user CPU
          */
         clock_t lastUserCPU{};
+
+        /**
+         * Monitoring period
+         */
+        int _period = 60;
     };
 
 }// namespace AwsMock::Core

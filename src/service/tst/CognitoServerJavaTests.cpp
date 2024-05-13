@@ -29,8 +29,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.cognito.port", std::to_string(COGNITO_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.cognito.host", COGNITO_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.cognito.http.port", std::to_string(COGNITO_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Set base command
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllUserPools();
-            _dynamoDbServer.StopServer();
+            _dynamoDbServer.Stop();
         }
 
         std::string _endpoint, _baseCommand;

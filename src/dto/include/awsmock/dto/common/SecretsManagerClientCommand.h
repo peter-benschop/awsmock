@@ -76,6 +76,11 @@ namespace AwsMock::Dto::Common {
         std::string region;
 
         /**
+         * HTTP URL
+         */
+        std::string url;
+
+        /**
          * Client user
          */
         std::string user;

@@ -7,7 +7,9 @@
 
 // Standard C includes
 #include <fcntl.h>
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -23,6 +25,14 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+
+// TODO: Removed, until AWS uses openssl 3.0
+// AWS cryptographic methods
+//#include <aws/cal/cal.h>
+//#include <aws/common/allocator.h>
+//#include <aws/common/encoding.h>
+//#include <aws/crt/Api.h>
+//#include <aws/crt/crypto/Hash.h>
 
 // Openssl includes
 #include <openssl/aes.h>
@@ -66,8 +76,10 @@ namespace AwsMock::Core {
     static const std::string _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     /**
-     * Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
+     * @brief Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
      *
+     * @par
+     * This class contains AWS cryptographic method as well as OpenSSL methods. AWS cryptographic methods a are denoted with a preceding 'AWS'.
      * @author jens.vogt\@opitz-consulting.com
      */
     class Crypto {
@@ -83,12 +95,30 @@ namespace AwsMock::Core {
         static std::string GetMd5FromString(const std::string &content);
 
         /**
+         * @brief Returns the MD5 hash of a string using AWS cryptographic methods from aws-crt-cal.
+         *
+         * @param content string to hash
+         * @return MD5 hash of the given string
+         */
+        // TODO: Removed, until AWS uses openssl 3.0
+        //static std::string AWSGetMd5FromString(const std::string &content);
+
+        /**
          * @brief Returns the MD5 hash of a file.
          *
          * @param fileName file name to hash
          * @return MD5 hash of the given file
          */
         static std::string GetMd5FromFile(const std::string &fileName);
+
+        /**
+         * @brief Returns the MD5 hash of a file using AWS cryptographic methods from aws-crt-cal.
+         *
+         * @param fileName file name to hash
+         * @return MD5 hash of the given file
+         */
+        // TODO: Removed, until AWS uses openssl 3.0
+        //static std::string AwsGetMd5FromFile(const std::string &fileName);
 
         /**
          * @brief Returns the SHA1 hash of a string.

@@ -6,7 +6,6 @@
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
 // Poco includes
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <Poco/Net/HTTPServer.h>
 
@@ -14,8 +13,6 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/ThreadPool.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3HandlerFactory.h>
 #include <awsmock/service/s3/S3Monitoring.h>

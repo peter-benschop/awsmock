@@ -12,15 +12,17 @@ namespace AwsMock::Service {
         log_debug << "AbstractServer initialized, name: " << _name;
     }
 
+    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : Timer(name), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
+
+        // Create environment
+        log_debug << "AbstractServer initialized, name: " << _name;
+    }
+
     bool AbstractServer::IsActive(const std::string &name) {
         return _moduleDatabase.IsActive(name);
     }
 
-    bool AbstractServer::IsRunning() const {
-        return _running;
-    }
-
-    void AbstractServer::StopServer() {
+    void AbstractServer::Shutdown() {
         StopHttpServer();
         log_debug << "Stop broadcast";
     }
@@ -47,15 +49,11 @@ namespace AwsMock::Service {
     }
 
     void AbstractServer::StopHttpServer() {
+        _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
         if (_httpServer) {
             _httpServer->stopAll(true);
             log_debug << "HTTP server stopped: " << _name;
         }
-    }
-
-    AbstractServer::~AbstractServer() {
-        log_info << "HTTP server " << _name << " destroyed";
-        Stop();
     }
 
 }// namespace AwsMock::Service

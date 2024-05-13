@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SQS monitoring thread
+     * @brief SQS monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SQSMonitoring(int timeout) : Core::Timer("sqs-monitoring", timeout) {}
+        explicit SQSMonitoring(int timeout);
 
         /**
          * Initialization

@@ -47,6 +47,7 @@
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
@@ -56,6 +57,7 @@
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/s3/S3HashCreator.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 

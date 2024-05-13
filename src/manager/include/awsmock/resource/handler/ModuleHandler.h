@@ -6,12 +6,11 @@
 #define AWSMOCK_RESOURCE_MODULE_HANDLER_H
 
 // Poco includes
-#include "Poco/JSON/JSON.h"
-#include "Poco/Logger.h"
-#include "Poco/Task.h"
-#include "Poco/TaskManager.h"
 #include <Poco/JSON/Array.h>
+#include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Object.h>
+#include <Poco/Task.h>
+#include <Poco/TaskManager.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -40,25 +39,23 @@
 #include <awsmock/service/sqs/SQSServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
 
-namespace AwsMock {
+namespace AwsMock::Manager {
 
     /**
      * AwsMock module handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleHandler : public AwsMock::Resource::AbstractResource {
+    class ModuleHandler : public AwsMock::Manager::AbstractResource {
 
       public:
 
         /**
          * Constructor
          *
-         * @param configuration application configuration
-         * @param metricService monitoring module
          * @param serverMap map of services
          */
-        ModuleHandler(Core::Configuration &configuration, Core::MetricService &metricService, Service::ServerMap &serverMap);
+        explicit ModuleHandler(Service::ServerMap &serverMap);
 
       protected:
 
@@ -128,16 +125,6 @@ namespace AwsMock {
       private:
 
         /**
-         * Handler configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * Metric module
-         */
-        Core::MetricService &_metricService;
-
-        /**
          * Timer manager
          */
         Service::ServerMap &_serverMap;
@@ -153,6 +140,6 @@ namespace AwsMock {
         std::shared_ptr<Service::ModuleService> _moduleService;
     };
 
-}// namespace AwsMock
+}// namespace AwsMock::Manager
 
 #endif// AWSMOCK_RESOURCE_MODULE_HANDLER_H

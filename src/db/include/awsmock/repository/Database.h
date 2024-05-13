@@ -10,6 +10,7 @@
 
 // MongoDB includes
 #include <mongocxx/client.hpp>
+#include <mongocxx/database.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <mongocxx/exception/query_exception.hpp>
 #include <mongocxx/pool.hpp>
@@ -21,6 +22,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 
@@ -29,7 +31,7 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class Database {
+    class DatabaseBase {
 
       public:
 
@@ -38,7 +40,7 @@ namespace AwsMock::Database {
          *
          * @param configuration configuration properties
          */
-        explicit Database();
+        explicit DatabaseBase();
 
         /**
          * Returns a MongoDB connection from the pool
@@ -59,7 +61,7 @@ namespace AwsMock::Database {
          *
          * <p>Normally done during manager StartServer.</p>
          */
-        void CreateIndexes();
+        void CreateIndexes() const;
 
         /**
          * Check whether we are running without database
@@ -119,11 +121,6 @@ namespace AwsMock::Database {
          * Database password
          */
         std::string _password;
-
-        /**
-         * MongoDB URI
-         */
-        mongocxx::uri _uri;
 
         /**
          * Database client

@@ -12,7 +12,6 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/ThreadPool.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -31,7 +30,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SNS server thread
+     * @brief SNS server thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -50,6 +49,8 @@ namespace AwsMock::Service {
          * Initialization
          */
         void Initialize() override;
+
+      protected:
 
         /**
          * Main method

@@ -204,7 +204,7 @@ namespace AwsMock::Core {
          * @return HTTP endpoint
          */
         static std::string GetEndpoint(const Configuration &configuration) {
-            int port = configuration.getInt("awsmock.service.gateway.port", GATEWAY_DEFAULT_PORT);
+            int port = configuration.getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
             std::string hostname = configuration.getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
             return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
         }

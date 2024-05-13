@@ -28,6 +28,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/TaskPool.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>

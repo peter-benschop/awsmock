@@ -12,6 +12,7 @@ namespace AwsMock::Dto::Common {
         this->region = region;
         this->user = user;
         this->method = method;
+        this->url = request.getURI();
 
         // Command
         std::string action = request.get("X-Amz-Target");

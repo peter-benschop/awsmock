@@ -12,8 +12,6 @@
 #include <utility>
 
 // Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Logger.h>
 #include <Poco/Net/HTTPServer.h>
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Task.h>
@@ -47,9 +45,12 @@ namespace AwsMock::Service {
         explicit AbstractServer(Core::Configuration &configuration, std::string name, int timeout);
 
         /**
-         * Destructor
+         * Constructor
+         *
+         * @param configuration AwsMock configuration
+         * @param name manager name
          */
-        virtual ~AbstractServer();
+        explicit AbstractServer(Core::Configuration &configuration, std::string name);
 
         /**
          * Checks whether the module is active
@@ -57,16 +58,6 @@ namespace AwsMock::Service {
          * @param name module name
          */
         bool IsActive(const std::string &name);
-
-        /**
-         * Returns the running flag
-         */
-        [[nodiscard]] bool IsRunning() const;
-
-        /**
-         * Stop the manager
-         */
-        void StopServer();
 
         /**
          * Start the HTTP manager
@@ -92,10 +83,11 @@ namespace AwsMock::Service {
          */
         void Run() override = 0;
 
+
         /**
-         * Shutdown condition
+         * Stop the server
          */
-        Poco::Condition _condition;
+        void Shutdown() override;
 
       private:
 
