@@ -229,6 +229,30 @@ namespace AwsMock::Core {
          */
         [[maybe_unused]] static std::string GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &key);
 
+        /**
+         * Returns the headers as a map of strings
+         *
+         * @param request HTTP request
+         * @return map of strings
+         */
+        static std::map<std::string, std::string> GetHeaders(const Poco::Net::HTTPRequest &request);
+
+        /**
+         * Returns the content type
+         *
+         * @param request HTTP request
+         * @return reduced content type, either 'json' or 'xml.
+         */
+        static std::string GetContentType(const Poco::Net::HTTPRequest &request);
+
+        /**
+         * Returns the content length
+         *
+         * @param request HTTP request
+         * @return content length on bytes
+         */
+        static long GetContentLength(const Poco::Net::HTTPRequest &request);
+
       private:
 
         /**

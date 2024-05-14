@@ -79,9 +79,14 @@ namespace AwsMock::Dto::SQS {
         int waitTimeSeconds = 1;
 
         /**
-         * MessageAttribute names
+         * List of attribute names
          */
-        std::vector<std::string> attributeName = {"All"};
+        std::vector<std::string> attributeNames = {"All"};
+
+        /**
+         * List of message attribute names
+         */
+        std::vector<std::string> messageAttributeNames = {"All"};
 
         /**
          * Resource

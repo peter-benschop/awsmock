@@ -5,7 +5,7 @@ set(LIBRARY_STATIC awsmockdto_static)
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
         src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/Infrastructure.cpp
         src/common/Services.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp)
-set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
+set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/TagQueueRequest.cpp
         src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
@@ -32,13 +32,15 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/ListObjectVersionsResponse.cpp src/s3/PutBucketNotificationRequest.cpp src/s3/model/FilterRule.cpp
         src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
         src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/model/LambdaConfiguration.cpp
-        src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp)
+        src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
+        src/s3/mapper/Mapper.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/Image.cpp src/docker/ListContainerResponse.cpp
         src/docker/ListImageResponse.cpp src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp
         src/docker/CreateContainerResponse.cpp)
-set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/DeadLetterConfig.cpp
-        src/lambda/Function.cpp src/lambda/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp
-        src/lambda/GetFunctionResponse.cpp src/lambda/Tags.cpp src/lambda/Error.cpp src/lambda/Environment.cpp)
+set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/DeadLetterConfig.cpp
+        src/lambda/model/Function.cpp src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp
+        src/lambda/CreateFunctionResponse.cpp src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp
+        src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp

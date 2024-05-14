@@ -25,9 +25,9 @@
 
 // AwsMock utils
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/JTimer.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricSystemCollector.h>
+#include <awsmock/core/Timer.h>
 
 #define TIME_DIFF(x) ((double) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerKey(x)]).count())
 
@@ -45,7 +45,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MetricService : public Core::JTimer {
+    class MetricService : public Core::Timer {
 
       public:
 

@@ -180,9 +180,27 @@ namespace AwsMock::Dto::Common {
             if (infrastructureObject->has("sqs-messages")) {
                 Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-messages");
                 for (int i = 0; i < sqsMessageArray->size(); i++) {
-                    Database::Entity::SQS::Message sqsMessageObject;
-                    sqsMessageObject.FromJsonObject(sqsMessageArray->getObject(i));
-                    sqsMessages.emplace_back(sqsMessageObject);
+                    Database::Entity::SQS::Message sqsMessage;
+                    sqsMessage.FromJsonObject(sqsMessageArray->getObject(i));
+                    sqsMessages.emplace_back(sqsMessage);
+                }
+            }
+
+            if (infrastructureObject->has("sns-topics")) {
+                Poco::JSON::Array::Ptr snsTopicArray = infrastructureObject->getArray("sns-topics");
+                for (int i = 0; i < snsTopicArray->size(); i++) {
+                    Database::Entity::SNS::Topic snsTopic;
+                    snsTopic.FromJsonObject(snsTopicArray->getObject(i));
+                    snsTopics.emplace_back(snsTopic);
+                }
+            }
+
+            if (infrastructureObject->has("sns-messages")) {
+                Poco::JSON::Array::Ptr snsMessageArray = infrastructureObject->getArray("sns-messages");
+                for (int i = 0; i < snsMessageArray->size(); i++) {
+                    Database::Entity::SNS::Message snsMessage;
+                    snsMessage.FromJsonObject(snsMessageArray->getObject(i));
+                    snsMessages.emplace_back(snsMessage);
                 }
             }
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_DELETETAGSREQUEST_H
-#define AWSMOCK_DTO_LAMBDA_DELETETAGSREQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_DELETE_TAGS_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_DELETE_TAGS_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -17,34 +17,34 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
-#include "awsmock/dto/lambda/model/Environment.h"
-#include "awsmock/dto/lambda/model/EphemeralStorage.h"
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/lambda/model/Environment.h>
+#include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
     struct DeleteTagsRequest {
 
         /**
-     * ARN
-     */
+         * ARN
+         */
         std::string arn;
 
         /**
-     * Tags
-     */
+         * Tags
+         */
         std::vector<std::string> tags;
 
         /**
-     * Constructor
-     */
+         * Constructor
+         */
         DeleteTagsRequest(std::string arn, std::vector<std::string> tags) : arn(std::move(arn)), tags(tags) {}
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -52,10 +52,10 @@ namespace AwsMock::Dto::Lambda {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteTagsRequest &r) {
             os << "DeleteTagsRequest={tags='[";
             for (const auto &it: r.tags) {
@@ -68,4 +68,4 @@ namespace AwsMock::Dto::Lambda {
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_DELETETAGSREQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_DELETE_TAGS_REQUEST_H

@@ -2,7 +2,7 @@
 // Created by vogje01 on 21/06/2023.
 //
 
-#include <awsmock/dto/lambda/model/Environment.h>
+#include "awsmock/dto/lambda/model/Environment.h"
 
 namespace AwsMock::Dto::Lambda {
 

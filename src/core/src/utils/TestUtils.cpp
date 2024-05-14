@@ -6,19 +6,18 @@
 
 namespace AwsMock::Core {
 
-    void TestUtils::CreateTestConfigurationFile() {
-        //
-        CreateTestConfigurationFile(true);
-        Core::Configuration &configuration = Core::Configuration::instance();
-        configuration.SetFilename(TMP_PROPERTIES_FILE);
+    void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
 
         // Logging
-        Core::LogStream log;
-        Core::LogStream::SetFilename("/tmp/awsmock-test.log");
-        Core::LogStream::SetSeverity("debug");
-    }
+        if (getenv("AWSMOCK_TEST_LOG") != nullptr) {
+            Core::LogStream::Initialize();
+            Core::LogStream::SetFilename("/tmp/awsmock-test.log");
+            Core::LogStream::SetSeverity("debug");
+        } else {
+            Core::LogStream::Initialize();
+            Core::LogStream::SetSeverity("none");
+        }
 
-    void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
         int port = 14566;//SystemUtils::GetRandomPort();
         std::string hostName = SystemUtils::GetNodeName();
         std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
@@ -90,13 +89,6 @@ namespace AwsMock::Core {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         configuration.SetFilename(TMP_PROPERTIES_FILE);
-
-        // Logging
-        if (getenv("AWSMOCK_TEST_LOG")) {
-            Core::LogStream log;
-            Core::LogStream::SetFilename("/tmp/awsmock-test.log");
-            Core::LogStream::SetSeverity("debug");
-        }
     }
 
     std::string TestUtils::GetTestConfigurationFilename() {

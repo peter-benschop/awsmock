@@ -21,9 +21,9 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/JTimer.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/Timer.h>
 
 // System counter
 #define VIRTUAL_MEMORY "virtual_memory_used"
@@ -40,7 +40,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MetricSystemCollector : public Core::JTimer {
+    class MetricSystemCollector : public Core::Timer {
 
       public:
 

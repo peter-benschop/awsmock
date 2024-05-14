@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_LISTFUNCTIONREQUEST_H
-#define AWSMOCK_DTO_LAMBDA_LISTFUNCTIONREQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -58,4 +58,4 @@ namespace AwsMock::Dto::Lambda {
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_LISTFUNCTIONREQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_REQUEST_H

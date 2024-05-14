@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
-#include <fstream>
 
 namespace AwsMock::Dto::Lambda {
 

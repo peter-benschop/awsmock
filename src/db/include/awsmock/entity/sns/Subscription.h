@@ -23,6 +23,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Database::Entity::SNS {
@@ -76,6 +77,13 @@ namespace AwsMock::Database::Entity::SNS {
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the jsonObject to a entity
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * Converts the DTO to a string representation.

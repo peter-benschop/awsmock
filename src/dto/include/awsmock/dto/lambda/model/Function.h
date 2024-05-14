@@ -10,11 +10,11 @@
 #include <vector>
 
 // AwsMock includes
-#include "DeadLetterConfig.h"
-#include "Environment.h"
-#include "awsmock/core/JsonException.h"
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/lambda/model/DeadLetterConfig.h>
+#include <awsmock/dto/lambda/model/Environment.h>
 
 namespace AwsMock::Dto::Lambda {
 

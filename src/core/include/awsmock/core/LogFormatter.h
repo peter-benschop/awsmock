@@ -27,7 +27,7 @@ namespace AwsMock::Core {
      * 2024-05-10 14:38:53.933 DEBUG [1255973] [Service::DockerService::StartDockerContainer:248] Sending StartServer container request
      * 2024-05-10 14:38:53.933 WARN  [1255973] [Service::DockerService::StartDockerContainer:252] Start container failed, state: 0
      * 2024-05-10 14:38:53.933 INFO  [1255973] [Service::DynamoDbServer::StartLocalDynamoDb:87] Docker containers for DynamoDB started
-     * 2024-05-10 14:38:53.933 DEBUG [1255973] [Core::JTimer::Start:16] Timer starting, name: dynamodb timeout: 10
+     * 2024-05-10 14:38:53.933 DEBUG [1255973] [Core::Timer::Start:16] Timer starting, name: dynamodb timeout: 10
      * @endcode
      *
      * @see plog::Formatters/TxtFormatter.h

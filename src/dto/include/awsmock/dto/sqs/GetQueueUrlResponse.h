@@ -23,6 +23,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
@@ -70,7 +71,7 @@ namespace AwsMock::Dto::SQS {
          *
          * @return JSON string
          */
-        std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Convert from JSON representation

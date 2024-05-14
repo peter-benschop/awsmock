@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/30/24.
 //
 
-#include <awsmock/dto/lambda/model/Error.h>
+#include "awsmock/dto/lambda/model/Error.h"
 
 namespace AwsMock::Dto::Lambda {
 

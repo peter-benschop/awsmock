@@ -179,12 +179,31 @@ namespace AwsMock::Core {
         return url;
     }
 
-    [[maybe_unused]] std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
+    std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
         std::string headerValue = request.get(name);
         if (headerValue.empty()) {
             log_warning << "Header value not found, key: " << name;
         }
         return headerValue;
+    }
+
+    std::map<std::string, std::string> HttpUtils::GetHeaders(const Poco::Net::HTTPRequest &request) {
+
+        std::map<std::string, std::string> headers;
+        for (const auto &header: request) {
+            headers[header.first] = header.second;
+        }
+        return headers;
+    }
+
+    std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {
+
+        return Core::StringUtils::ContainsIgnoreCase(request.getContentType(), "json") ? "json" : "xml";
+    }
+
+    long HttpUtils::GetContentLength(const Poco::Net::HTTPRequest &request) {
+
+        return static_cast<long>(request.getContentLength64());
     }
 
     bool HttpUtils::IsUrlEncoded(const std::string &value) {

@@ -18,7 +18,23 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueString("QueueName", rootObject, queueName);
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    std::string GetQueueUrlRequest::ToJson() const {
+
+        try {
+
+            Poco::JSON::Object rootJson;
+            rootJson.set("QueueName", queueName);
+
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -29,7 +45,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const GetQueueUrlRequest &r) {
-        os << "GetQueueUrlRequest={region='" << r.region << "' queueName='" << r.queueName << "'}";
+        os << "GetQueueUrlRequest=" << r.ToJson();
         return os;
     }
 

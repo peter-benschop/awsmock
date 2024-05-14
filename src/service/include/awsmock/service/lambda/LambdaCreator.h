@@ -21,7 +21,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricService.h>
-#include <awsmock/core/Timer.h>
+#include <awsmock/core/Task.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/DockerService.h>
@@ -33,24 +33,24 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaCreator {
+    class LambdaCreator : public Core::Task {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor.
          *
-         * @param configuration module configuration
-         */
-        [[maybe_unused]] explicit LambdaCreator(const Core::Configuration &configuration);
-
-        /**
-         * Create new lambda function
+         * Will start itself as background thread,
          *
          * @param functionCode zipped and BASE64 encoded function code
          * @param functionId lambda function OID
          */
-        void CreateLambdaFunction(const std::string &functionCode, const std::string &functionId);
+        [[maybe_unused]] explicit LambdaCreator(std::string functionCode, std::string functionId);
+
+        /**
+         * Create new lambda function
+         */
+        void Run() override;
 
       private:
 
@@ -77,7 +77,7 @@ namespace AwsMock::Service {
          * @param lambdaEnvironment lambda environment
          * @return vector of strings containing the runtime environment
          */
-        std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
+        static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
 
         /**
          * Unpack the provided ZIP file.
@@ -116,11 +116,6 @@ namespace AwsMock::Service {
         static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
-         * Configuration
-         */
-        const Core::Configuration &_configuration;
-
-        /**
          * Database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -139,6 +134,16 @@ namespace AwsMock::Service {
          * Docker module
          */
         Service::DockerService _dockerService;
+
+        /**
+         * Function code
+         */
+        std::string _functionCode;
+
+        /**
+         * Function ID
+         */
+        std::string _functionId;
     };
 
 }//namespace AwsMock::Service

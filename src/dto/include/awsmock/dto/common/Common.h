@@ -43,4 +43,4 @@ namespace AwsMock::Dto {
 
 }// namespace AwsMock::Dto
 
-#endif//AWS_MOCK_DTO_INCLUDE_AWSMOCK_DTO_COMMON_COMMON_H
+#endif// AWSMOCK_DTO_COMMON_COMMON_H

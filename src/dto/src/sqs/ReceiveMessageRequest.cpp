@@ -10,7 +10,7 @@ namespace AwsMock::Dto::SQS {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
-        auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
 
@@ -19,6 +19,18 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueInt("MaxNumberOfMessages", rootObject, maxMessages);
             Core::JsonUtils::GetJsonValueInt("WaitTimeSeconds", rootObject, waitTimeSeconds);
             Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
+
+            // Attributes
+            Poco::JSON::Array::Ptr attributes = rootObject->getArray("AttributeNames");
+            for (const auto &attribute: *attributes) {
+                messageAttributeNames.emplace_back(attribute.convert<std::string>());
+            }
+
+            // Message attributes
+            Poco::JSON::Array::Ptr messageAttributes = rootObject->getArray("MessageAttributeNames");
+            for (const auto &messageAttribute: *messageAttributes) {
+                messageAttributeNames.emplace_back(messageAttribute.convert<std::string>());
+            }
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message(), 500);

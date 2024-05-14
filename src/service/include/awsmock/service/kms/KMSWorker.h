@@ -13,11 +13,11 @@
 namespace AwsMock::Service {
 
     /**
-     * KMS worker thread
+     * @brief KMS worker thread
      *
-     * <p>
-     * Used as background thread to do maintenance work.
-     * </p>
+     * @par
+     * Used as background thread to do maintenance work. The KMS monitoring is 'self-starting', which means the constructor start
+     * itself as a background process.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -28,7 +28,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit KMSWorker(int timeout) : Core::Timer("kms-worker", timeout) {}
+        explicit KMSWorker(int timeout);
 
         /**
          * Initialization

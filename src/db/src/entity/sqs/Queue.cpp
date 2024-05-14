@@ -32,7 +32,6 @@ namespace AwsMock::Database::Entity::SQS {
     Entity::SQS::Queue Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         try {
-
             oid = mResult.value()["_id"].get_oid().value.to_string();
             region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
             name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
@@ -47,7 +46,7 @@ namespace AwsMock::Database::Entity::SQS {
             if (mResult.value().find("tags") != mResult.value().end()) {
                 if (mResult.value().find("tags") != mResult.value().end()) {
                     bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-                    for (bsoncxx::document::element tagElement: tagsView) {
+                    for (const bsoncxx::document::element &tagElement: tagsView) {
                         std::string key = bsoncxx::string::to_string(tagElement.key());
                         std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                         tags.emplace(key, value);

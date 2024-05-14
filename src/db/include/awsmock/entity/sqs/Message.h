@@ -108,9 +108,27 @@ namespace AwsMock::Database::Entity::SQS {
         std::string md5SystemAttr;
 
         /**
-         * List of sqs
+         * Attributes
+         *
+         * Fixed system attributes:
+         *
+         * - ApproximateReceiveCount
+         * - ApproximateFirstReceiveTimestamp
+         * - MessageDeduplicationId
+         * - MessageGroupId
+         * - SenderId
+         * - SentTimestamp
+         * - SequenceNumber
+         * - SequenceNumber
          */
-        MessageAttributeList attributes;
+        std::map<std::string, std::string> attributes;
+
+        /**
+         * List of message attributes.
+         *
+         * This are the user contributed message attributes.
+         */
+        MessageAttributeList messageAttributes;
 
         /**
          * Creation date

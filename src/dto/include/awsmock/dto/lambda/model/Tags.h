@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -20,7 +21,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Tags
          */
-        std::vector<std::pair<std::string, std::string>> tags;
+        std::map<std::string, std::string> tags;
 
         /**
          * Checks whether a tags with the given tags key exists.
@@ -37,6 +38,20 @@ namespace AwsMock::Dto::Lambda {
          * @return tag value
          */
         std::string GetTagValue(const std::string &key);
+
+        /**
+         * Convert to a JSON array
+         *
+         * @return JSON array
+         */
+        [[nodiscard]] Poco::JSON::Array ToJsonObject() const;
+
+        /**
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Convert to a JSON string

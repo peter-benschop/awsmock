@@ -58,7 +58,9 @@ namespace AwsMock::Manager {
 
       public:
 
-        AwsMockServer() = default;
+        AwsMockServer() {
+            Core::LogStream::Initialize();
+        }
 
       protected:
 
@@ -125,7 +127,6 @@ namespace AwsMock::Manager {
          * @param value command line option value.
          */
         void handleOption(const std::string &name, const std::string &value) override {
-
             if (name == "help") {
 
                 Poco::Util::HelpFormatter helpFormatter(options());
@@ -216,7 +217,7 @@ namespace AwsMock::Manager {
                 mongocxx::options::client client_options;
                 auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
                 client_options.server_api_opts(api);
-                pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
+                pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri)));
 
                 // Create database indexes
                 Database::ModuleDatabase::instance().CreateIndexes();
@@ -326,11 +327,6 @@ namespace AwsMock::Manager {
         }
 
       private:
-
-        /**
-         * Logger
-         */
-        Core::LogStream _logger = Core::LogStream("info");
 
         /**
          * Gateway router

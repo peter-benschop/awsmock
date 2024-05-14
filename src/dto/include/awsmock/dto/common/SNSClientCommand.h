@@ -14,6 +14,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -58,50 +59,12 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SNSClientCommand {
-
-        /**
-         * HTTP request type
-         */
-        HttpMethod method;
-
-        /**
-         * Client region
-         */
-        std::string region;
-
-        /**
-         * HTTP URL
-         */
-        std::string url;
-
-        /**
-         * Client user
-         */
-        std::string user;
+    struct SNSClientCommand : public BaseClientCommand {
 
         /**
          * Client command
          */
-        SNSCommandType command;
-
-        /**
-         * Content type
-         */
-        std::string contentType;
-
-        /**
-         * Message body
-         */
-        std::string payload;
-
-        /**
-         * Returns the message body as string.
-         *
-         * @param request HTTP request
-         * @return message body as string
-         */
-        static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+        SNSCommandType command{};
 
         /**
          * Returns the command from HTTP header

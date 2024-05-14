@@ -48,27 +48,17 @@ namespace AwsMock::Core {
          *
          * @param name task name
          */
-        explicit Task(std::string name) : _name(std::move(name)) {}
-
-        /**
-         * Start the task
-         */
-        void Start();
-
-        /**
-         * Stop the task
-         */
-        void Stop();
-
-        /**
-         * Main loop
-         */
-        virtual void Initialize() = 0;
+        explicit Task(std::string name);
 
         /**
          * Main loop
          */
         virtual void Run() = 0;
+
+        /**
+         * Actually do the work. WIll call Run method.
+         */
+        [[maybe_unused]] void DoWork();
 
       private:
 
@@ -83,14 +73,9 @@ namespace AwsMock::Core {
         std::string _name;
 
         /**
-         * Promise for stopping thread
+         * Stop source
          */
-        std::promise<void> _stop;
-
-        /**
-         * Thread handle
-         */
-        std::future<void> _thread_handle;
+        std::stop_source _stopSource;
     };
 
 }// namespace AwsMock::Core

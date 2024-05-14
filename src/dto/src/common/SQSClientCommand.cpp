@@ -15,9 +15,11 @@ namespace AwsMock::Dto::Common {
         this->method = httpMethod;
         this->region = awsRegion;
         this->user = awsUser;
-        this->contentType = userAgent.contentType;
-        this->payload = GetBodyAsString(request);
         this->url = request.getURI();
+        this->contentType = Core::HttpUtils::GetContentType(request);
+        this->contentLength = Core::HttpUtils::GetContentLength(request);
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
+        this->headers = Core::HttpUtils::GetHeaders(request);
 
         if (userAgent.clientCommand.empty()) {
 
@@ -27,12 +29,7 @@ namespace AwsMock::Dto::Common {
 
             this->command = Dto::Common::SqsCommandTypeFromString(userAgent.clientCommand);
         }
-    }
-
-    std::string SQSClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-        std::stringstream sstream;
-        sstream << request.stream().rdbuf();
-        return sstream.str();
+        log_debug << ToJson();
     }
 
     std::string SQSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const {
@@ -55,14 +52,24 @@ namespace AwsMock::Dto::Common {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("method", method);
+            rootJson.set("method", HttpMethodToString(method));
             rootJson.set("region", region);
             rootJson.set("user", user);
-            rootJson.set("command", command);
+            rootJson.set("url", url);
             rootJson.set("contentType", contentType);
             rootJson.set("payload", payload);
+            rootJson.set("command", SqsCommandTypeToString(command));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            // Headers
+            Poco::JSON::Array jsonHeaders;
+            for (const auto &header: headers) {
+                Poco::JSON::Object jsonHeader;
+                jsonHeader.set(header.first, header.second);
+                jsonHeaders.add(jsonHeader);
+            }
+            rootJson.set("headers", jsonHeaders);
+
+            return Core::JsonUtils::ToJsonString(rootJson, true);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

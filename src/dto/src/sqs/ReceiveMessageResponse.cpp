@@ -2,6 +2,7 @@
 // Created by vogje01 on 03/10/2023.
 //
 
+#include "awsmock/core/XmlUtils.h"
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 
 namespace AwsMock::Dto::SQS {
@@ -22,136 +23,108 @@ namespace AwsMock::Dto::SQS {
 
                 Dto::SQS::MessageAttributeList messageAttributeListDto;
 
-                Poco::JSON::Object attributeObject;
-                for (auto &at: message.attributes) {
+                // Message attributes
+                Poco::JSON::Object messageAttributeObject;
+                for (const auto &at: message.messageAttributes) {
 
                     Dto::SQS::MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
 
-                    Poco::JSON::Object attributeValueObject;
+                    Poco::JSON::Object messageAttributesObject;
                     if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
-                        attributeValueObject.set("DataType", "String");
-                        attributeValueObject.set("StringValue", at.attributeValue);
+                        messageAttributesObject.set("DataType", "String");
+                        messageAttributesObject.set("StringValue", at.attributeValue);
                         messageAttributeDto.type = MessageAttributeDataType::STRING;
                     } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
-                        attributeValueObject.set("DataType", "Number");
-                        attributeValueObject.set("StringValue", at.attributeValue);
+                        messageAttributesObject.set("DataType", "Number");
+                        messageAttributesObject.set("StringValue", at.attributeValue);
                         messageAttributeDto.type = MessageAttributeDataType::NUMBER;
                     }
                     messageAttributeListDto[at.attributeName] = messageAttributeDto;
-                    attributeObject.set(at.attributeName, attributeValueObject);
+                    messageAttributeObject.set(at.attributeName, messageAttributesObject);
                 }
 
-                // MD5 of message attributes
-                messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributeListDto));
-                //messageObject.set("MD5OfMessageSystemAttributes", message.md5SystemAttr);
+                // Attributes
+                Poco::JSON::Object attributeObject;
+                for (const auto &at: message.attributes) {
+                    attributeObject.set(at.first, at.second);
+                }
+                messageObject.set("Attributes", attributeObject);
 
-                messageObject.set("MessageAttributes", attributeObject);
+                // MD5 of message attributes
+                messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto));
+                messageObject.set("MessageAttributes", messageAttributeObject);
                 messageArray.add(messageObject);
             }
 
             // Add message array
             rootJson.set("Messages", messageArray);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 
     std::string ReceiveMessageResponse::ToXml() const {
 
         // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ReceiveMessageResponse");
-        pDoc->appendChild(pRoot);
+        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "ReceiveMessageResponse");
 
         // ReceiveMessageResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pResult = pDoc->createElement("ReceiveMessageResult");
-        pRoot->appendChild(pResult);
+        Poco::XML::AutoPtr<Poco::XML::Element> pResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "ReceiveMessageResult");
 
         for (auto &it: messageList) {
 
             // Message
-            Poco::XML::AutoPtr<Poco::XML::Element> pMessage = pDoc->createElement("Message");
-            pResult->appendChild(pMessage);
+            Poco::XML::AutoPtr<Poco::XML::Element> pMessage = Core::XmlUtils::CreateNode(pDoc, pResult, "Message");
 
             // MessageId
-            Poco::XML::AutoPtr<Poco::XML::Element> pMessageId = pDoc->createElement("MessageId");
-            pMessage->appendChild(pMessageId);
-            Poco::XML::AutoPtr<Poco::XML::Text> pMessageIdText = pDoc->createTextNode(it.messageId);
-            pMessageId->appendChild(pMessageIdText);
+            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "MessageId", it.messageId);
+            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "ReceiptHandle", it.receiptHandle);
+            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "Body", it.body);
+            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "MD5OfBody", it.md5Body);
+            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "MD5OfMessageAttributes", it.md5UserAttr);
 
-            // ReceiptHandle
-            Poco::XML::AutoPtr<Poco::XML::Element> pReceiptHandle = pDoc->createElement("ReceiptHandle");
-            pMessage->appendChild(pReceiptHandle);
-            Poco::XML::AutoPtr<Poco::XML::Text> pReceiptHandleText = pDoc->createTextNode(it.receiptHandle);
-            pReceiptHandle->appendChild(pReceiptHandleText);
+            // MessageAttribute
+            Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = Core::XmlUtils::CreateNode(pDoc, pMessage, "Attributes");
 
-            // MD5OfBody
-            Poco::XML::AutoPtr<Poco::XML::Element> pMd5Body = pDoc->createElement("MD5OfBody");
-            pMessage->appendChild(pMd5Body);
-            Poco::XML::AutoPtr<Poco::XML::Text> pMd5BodyText = pDoc->createTextNode(it.md5Body);
-            pMd5Body->appendChild(pMd5BodyText);
+            for (const auto &at: it.attributes) {
 
-            // MD5OfBody
-            Poco::XML::AutoPtr<Poco::XML::Element> pMd5Attr = pDoc->createElement("MD5OfMessageAttributes");
-            pMessage->appendChild(pMd5Attr);
-            Poco::XML::AutoPtr<Poco::XML::Text> pMd5AttrText = pDoc->createTextNode(it.md5UserAttr);
-            pMd5Attr->appendChild(pMd5AttrText);
+                // Nodes
+                Core::XmlUtils::CreateTextNode(pDoc, pAttribute, "Name", at.first);
+                Core::XmlUtils::CreateTextNode(pDoc, pAttribute, "Value", at.second);
+            }
 
-            // Body
-            Poco::XML::AutoPtr<Poco::XML::Element> pBody = pDoc->createElement("Body");
-            pMessage->appendChild(pBody);
-            Poco::XML::AutoPtr<Poco::XML::Text> pBodyText = pDoc->createTextNode(it.body);
-            pBody->appendChild(pBodyText);
+            // Message attributes
+            Poco::XML::AutoPtr<Poco::XML::Element> pMessageAttributes = Core::XmlUtils::CreateNode(pDoc, pMessage, "MessageAttributes");
 
-            for (auto &at: it.attributes) {
+            for (const auto &at: it.messageAttributes) {
 
                 // MessageAttribute
-                Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = pDoc->createElement("Attribute");
-                pMessage->appendChild(pAttribute);
-
-                // Name
-                Poco::XML::AutoPtr<Poco::XML::Element> pAttrName = pDoc->createElement("Name");
-                pAttribute->appendChild(pAttrName);
-                Poco::XML::AutoPtr<Poco::XML::Text> pAttrNameText = pDoc->createTextNode(at.attributeName);
-                pAttrName->appendChild(pAttrNameText);
-
-                // Value
-                Poco::XML::AutoPtr<Poco::XML::Element> pAttrValue = pDoc->createElement("Value");
-                pAttribute->appendChild(pAttrValue);
-                Poco::XML::AutoPtr<Poco::XML::Text> pAttrValueText = pDoc->createTextNode(at.attributeValue);
-                pAttrValue->appendChild(pAttrValueText);
+                Poco::XML::AutoPtr<Poco::XML::Element> pMessageAttribute = Core::XmlUtils::CreateNode(pDoc, pMessageAttributes, at.attributeName);
+                Core::XmlUtils::CreateTextNode(pDoc, pMessageAttribute, "DataType", at.attributeType);
+                Core::XmlUtils::CreateTextNode(pDoc, pMessageAttribute, "StringValue", at.attributeValue);
             }
         }
 
         // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
+        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
+        Core::XmlUtils::CreateTextNode(pDoc, pMetaData, "RequestId", requestId);
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(requestId);
-        pRequestId->appendChild(pRequestText);
-
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
-    std::string ReceiveMessageResponse::ToString() const {
+    std::string ReceiveMessageResponse::ToString() {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ReceiveMessageResponse &r) {
-        os << "ReceiveMessageResponse={resource='" << r.resource << "', requestId: '" << r.requestId << "'}";
+    std::ostream &operator<<(std::ostream &os, ReceiveMessageResponse &r) {
+        os << "ReceiveMessageResponse=" << r.ToJson();
         return os;
     }
 

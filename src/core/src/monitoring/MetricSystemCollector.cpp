@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-    MetricSystemCollector::MetricSystemCollector() : Core::JTimer("SystemCollector") {
+    MetricSystemCollector::MetricSystemCollector() : Core::Timer("SystemCollector") {
 
         _period = Core::Configuration::instance().getInt("awsmock.monitoring.period", 60);
 

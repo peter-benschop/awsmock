@@ -52,20 +52,20 @@ namespace AwsMock::Dto::SQS {
         bool systemAttribute = true;
 
         /**
-         * Returns the MD5 sum of all user attributes.
+         * Returns the MD5 sum of all attributes (system attributes).
          *
-         * @param attributes vector of user attributes
-         * @return MD5 sum of userAttributes string
+         * @param attributes map of attributes
+         * @return MD5 sum of attributes string
          */
-        static std::string GetMd5SystemAttributes(const std::map<std::string, MessageAttribute> &attributes);
+        static std::string GetMd5Attributes(const std::map<std::string, std::string> &attributes);
 
         /**
-         * Returns the MD5 sum of all user attributes.
+         * Returns the MD5 sum of all message attributes (user attributes).
          *
-         * @param attributes vector of user attributes
-         * @return MD5 sum of userAttributes string
+         * @param attributes vector of message attributes
+         * @return MD5 sum of message attributes string
          */
-        static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes);
+        static std::string GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes);
 
         /**
          * Update the MD5 hash with a given value
@@ -89,6 +89,14 @@ namespace AwsMock::Dto::SQS {
          * @param attributeObject attribute object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &attributeObject);
+
+
+        /**
+         * Convert from JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Name comparator

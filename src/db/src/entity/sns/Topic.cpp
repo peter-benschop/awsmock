@@ -56,7 +56,7 @@ namespace AwsMock::Database::Entity::SNS {
         // Subscriptions
         if (mResult.value().find("subscriptions") != mResult.value().end()) {
             bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
-            for (const bsoncxx::array::element& subscriptionElement: subscriptionsView) {
+            for (const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
                 Subscription subscription{
                         .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
                         .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
@@ -68,7 +68,7 @@ namespace AwsMock::Database::Entity::SNS {
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-            for (const bsoncxx::document::element& tagElement: tagsView) {
+            for (const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
@@ -107,6 +107,41 @@ namespace AwsMock::Database::Entity::SNS {
         }
 
         return jsonObject;
+    }
+
+    void Topic::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+        Core::JsonUtils::GetJsonValueString("topicName", jsonObject, topicName);
+        Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
+        Core::JsonUtils::GetJsonValueString("topicUrl", jsonObject, topicUrl);
+        Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
+
+        // Attributes
+        if (jsonObject->has("topicAttribute")) {
+            Poco::JSON::Object::Ptr attributeObject = jsonObject->getObject("topicAttribute");
+            topicAttribute.FromJsonObject(attributeObject);
+        }
+
+        // Subscriptions
+        if (jsonObject->has("subscriptions")) {
+            Poco::JSON::Array::Ptr subscriptionArray = jsonObject->getArray("subscriptions");
+            for (int i = 0; i < subscriptionArray->size(); i++) {
+                Poco::JSON::Object::Ptr subscriptionObject = subscriptionArray->getObject(i);
+                Subscription subscription;
+                subscription.FromJsonObject(subscriptionObject);
+                subscriptions.emplace_back(subscription);
+            }
+        }
+
+        // Tags
+        if (jsonObject->has("tags")) {
+            Poco::JSON::Array::Ptr tagsArray = jsonObject->getArray("tags");
+            for (int i = 0; i < tagsArray->size(); i++) {
+                Poco::JSON::Object::Ptr tagObject = tagsArray->getObject(i);
+                tags[tagObject->getNames().front()] = tagObject->getValue<std::string>(tagObject->getNames().front());
+            }
+        }
     }
 
     std::string Topic::ToString() const {

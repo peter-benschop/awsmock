@@ -180,7 +180,7 @@ namespace AwsMock::Database {
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
             if (!mResult->empty()) {
 
-                log_trace << "GetQueueByName succeeded, region: " << region << " name: " << name;
+                log_info << "GetQueueByName succeeded, region: " << region << " name: " << name;
                 return result.FromDocument(mResult->view());
 
             } else {

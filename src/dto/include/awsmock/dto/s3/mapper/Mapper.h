@@ -24,7 +24,10 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Maps a S3 object entity list to a list version response
          *
+         * Some values will be pulled over from the request.
+         *
          * @param objectList S3 object entity list
+         * @param request request struct
          * @return ListObjectVersionsResponse
          * @see ListObjectVersionsResponse
          */

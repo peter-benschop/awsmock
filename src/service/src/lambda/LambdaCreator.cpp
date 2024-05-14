@@ -4,21 +4,23 @@
 
 #include <awsmock/service/lambda/LambdaCreator.h>
 
+#include <utility>
+
 namespace AwsMock::Service {
 
-    [[maybe_unused]] LambdaCreator::LambdaCreator(const Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService() {
+    [[maybe_unused]] LambdaCreator::LambdaCreator(std::string functionCode, std::string functionId) : Core::Task("lambda-creator"), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(), _functionCode(std::move(functionCode)), _functionId(std::move(functionId)) {
 
         // Configuration
-        _dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data");
+        _dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
     }
 
-    void LambdaCreator::CreateLambdaFunction(const std::string &functionCode, const std::string &functionId) {
+    void LambdaCreator::Run() {
 
-        log_debug << "Start creating lambda function, oid: " << functionId;
+        log_debug << "Start creating lambda function, oid: " << _functionId;
 
         // Make local copy
-        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaById(functionId);
+        Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(_functionId);
 
         // Docker tag
         std::string dockerTag = GetDockerTag(lambdaEntity);
@@ -26,7 +28,7 @@ namespace AwsMock::Service {
 
         // Build the docker image, if not existing
         if (!_dockerService.ImageExists(lambdaEntity.function, dockerTag)) {
-            CreateDockerImage(functionCode, lambdaEntity, dockerTag);
+            CreateDockerImage(_functionCode, lambdaEntity, dockerTag);
         }
 
         // Create the container, if not existing. If existing get the current port from the docker container

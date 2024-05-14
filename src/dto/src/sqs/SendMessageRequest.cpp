@@ -28,8 +28,7 @@ namespace AwsMock::Dto::SQS {
                         std::string attributeName = attributesObject->getNames()[i];
                         MessageAttribute attributeValue;
                         attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
-                        attributeValue.systemAttribute = false;
-                        attributes[attributeName] = attributeValue;
+                        messageAttributes[attributeName] = attributeValue;
                     }
                 }
             }
@@ -41,11 +40,9 @@ namespace AwsMock::Dto::SQS {
 
                 if (!attributesObject.isNull()) {
                     for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
-                        std::string attributeName = attributesObject->getNames()[i];
-                        MessageAttribute attributeValue;
-                        attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
-                        attributeValue.systemAttribute = true;
-                        attributes[attributeName] = attributeValue;
+                        auto name = attributesObject->getNames()[i];
+                        auto value = attributesObject->get(name).convert<std::string>();
+                        attributes[name] = value;
                     }
                 }
             }
@@ -54,19 +51,45 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string SendMessageRequest::ToString() const {
+    std::string SendMessageRequest::ToJson() {
+
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("QueueUrl", queueUrl);
+            rootJson.set("MessageBody", body);
+
+            Poco::JSON::Array jsonMessageAttributeArray;
+            for (const auto &messageAttribute: messageAttributes) {
+                Poco::JSON::Object jsonAttribute;
+                jsonAttribute.set(messageAttribute.first, messageAttribute.second.ToJsonObject());
+                jsonMessageAttributeArray.add(jsonAttribute);
+            }
+            rootJson.set("MessageAttributes", jsonMessageAttributeArray);
+
+            Poco::JSON::Array jsonAttributeArray;
+            for (const auto &attribute: attributes) {
+                Poco::JSON::Object jsonAttribute;
+                jsonAttribute.set(attribute.first, attribute.second);
+                jsonMessageAttributeArray.add(jsonAttribute);
+            }
+            rootJson.set("Attributes", jsonMessageAttributeArray);
+
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message(), 500);
+        }
+    }
+
+    std::string SendMessageRequest::ToString() {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r) {
-        os << "SendMessageRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', queueName='" << r.queueName << "', queueArn='" << r.queueArn << "', body: '" << r.body << "', requestId: " << r.requestId << "', attributes=[";
-        for (const auto &a: r.attributes) {
-            os << a.first << "=" << a.second.ToString() << ", ";
-        }
-        os.seekp(-2, std::ostream::cur);
-        os << "]}";
+    std::ostream &operator<<(std::ostream &os, SendMessageRequest &r) {
+        os << "SendMessageRequest=" << r.ToJson();
         return os;
     }
 

@@ -16,7 +16,7 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
-#include "awsmock/core/ServiceException.h"
+#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::Lambda {
 

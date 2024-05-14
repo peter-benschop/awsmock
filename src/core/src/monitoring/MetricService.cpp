@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
     Poco::Mutex MetricService::_mutex;
 
-    MetricService::MetricService() : Core::JTimer("MetricServer") {
+    MetricService::MetricService() : Core::Timer("MetricServer") {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         _port = configuration.getInt("awsmock.monitoring.port", 9100);

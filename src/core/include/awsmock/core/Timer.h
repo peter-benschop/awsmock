@@ -2,14 +2,15 @@
 // Created by vogje01 on 4/12/24.
 //
 
-#ifndef AWSMOCK_CORE_TIMER_H
-#define AWSMOCK_CORE_TIMER_H
+#ifndef AWSMOCK_CORE_JTIMER_H
+#define AWSMOCK_CORE_JTIMER_H
 
 // C++ standard includes
 #include <future>
 #include <iostream>
+#include <stop_token>
 #include <thread>
-#include <utility>
+
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -17,7 +18,9 @@
 namespace AwsMock::Core {
 
     /**
-     * General asynchronous job execution class
+     * @brief General asynchronous job execution class
+     *
+     * This is supposed to stop immediately, in case a stop signal is send to the thread.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -46,14 +49,14 @@ namespace AwsMock::Core {
         void Start();
 
         /**
-         * Restart the timer
-         */
-        void Restart();
-
-        /**
          * Start the task
          */
         void Start(int timeout);
+
+        /**
+         * Restart the timer
+         */
+        void Restart();
 
         /**
          * Stop the task
@@ -84,6 +87,13 @@ namespace AwsMock::Core {
          */
         void SetTimeout(int timeout);
 
+        /**
+         * Thread main method.
+         *
+         * @param stopSource stop source variable
+         */
+        void DoWork(const std::stop_source &stopSource);
+
       private:
 
         /**
@@ -97,21 +107,11 @@ namespace AwsMock::Core {
         int _timeout{};
 
         /**
-         * Promise for stopping thread
+         * Stop source
          */
-        std::promise<void> _stop;
-
-        /**
-         * Thread handle
-         */
-        std::future<void> _thread_handle;
-
-        /**
-         * Stopped flag
-         */
-        bool _stopped = false;
+        std::stop_source _stopSource;
     };
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_TIMER_H
+#endif// AWSMOCK_CORE_JTIMER_H

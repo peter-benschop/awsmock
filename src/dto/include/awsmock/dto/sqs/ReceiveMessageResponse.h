@@ -75,6 +75,16 @@ namespace AwsMock::Dto::SQS {
         std::string requestId;
 
         /**
+         * List of attribute
+         */
+        std::map<std::string, std::string> attributes;
+
+        /**
+         * List of message attribute names
+         */
+        std::map<std::string, MessageAttribute> messageAttributes;
+
+        /**
          * Convert to a JSON string
          *
          * @return JSON string
@@ -87,19 +97,20 @@ namespace AwsMock::Dto::SQS {
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
+
         /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString();
 
         /**
          * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, ReceiveMessageResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -6,6 +6,10 @@
 
 namespace AwsMock::Service {
 
+    KMSWorker::KMSWorker(int timeout) : Core::Timer("kms-worker", timeout) {
+        Start();
+    }
+
     void KMSWorker::Initialize() {
         log_debug << "KMSWorker initialized";
         DeleteKeys();

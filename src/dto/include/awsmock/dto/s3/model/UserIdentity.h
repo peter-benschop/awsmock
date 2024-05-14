@@ -10,10 +10,10 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/JsonException.h"
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/XmlUtils.h"
+#include <awsmock/core/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -52,5 +52,7 @@ namespace AwsMock::Dto::S3 {
          */
         friend std::ostream &operator<<(std::ostream &os, const UserIdentity &r);
     };
+
 }// namespace AwsMock::Dto::S3
+
 #endif// AWSMOCK_DTO_S3_USER_IDENTITY_H

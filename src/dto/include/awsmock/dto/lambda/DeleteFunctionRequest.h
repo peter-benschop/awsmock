@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_DELETEFUNCTIONREQUEST_H
-#define AWSMOCK_DTO_LAMBDA_DELETEFUNCTIONREQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_DELETE_FUNCTION_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_DELETE_FUNCTION_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -22,20 +22,20 @@ namespace AwsMock::Dto::Lambda {
     struct DeleteFunctionRequest {
 
         /**
-     * Name of the function
-     */
+         * Name of the function
+         */
         std::string functionName;
 
         /**
-     * Qualifier
-     */
+         * Qualifier
+         */
         std::string qualifier;
 
         /**
-     * Parse a JSON stream
-     *
-     * @param jsonString JSON string
-     */
+         * Parse a JSON stream
+         *
+         * @param jsonString JSON string
+         */
         void FromJson(std::istream &jsonString) {
 
             Poco::JSON::Parser parser;
@@ -54,10 +54,10 @@ namespace AwsMock::Dto::Lambda {
         }
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
             ss << (*this);
@@ -65,10 +65,10 @@ namespace AwsMock::Dto::Lambda {
         }
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const DeleteFunctionRequest &r) {
             os << "DeleteFunctionRequest={functionName='" << r.functionName << "', qualifier: '" << r.qualifier << "'}";
             return os;
@@ -77,4 +77,4 @@ namespace AwsMock::Dto::Lambda {
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_DELETEFUNCTIONREQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_DELETE_FUNCTION_REQUEST_H

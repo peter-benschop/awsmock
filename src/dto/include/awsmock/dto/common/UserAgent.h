@@ -49,7 +49,7 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-     * HTTP user agent
+     * @brief HTTP user agent
      *
      * @author jens.vogt\@opitz-consulting.com
      */

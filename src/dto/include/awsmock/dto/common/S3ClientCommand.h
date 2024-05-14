@@ -23,6 +23,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -92,27 +93,7 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct S3ClientCommand {
-
-        /**
-         * HTTP request type
-         */
-        HttpMethod method;
-
-        /**
-         * Client region
-         */
-        std::string region;
-
-        /**
-         * HTTP URL
-         */
-        std::string url;
-
-        /**
-         * Client user
-         */
-        std::string user;
+    struct S3ClientCommand : public BaseClientCommand {
 
         /**
          * Client command
