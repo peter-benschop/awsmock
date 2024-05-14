@@ -5,7 +5,7 @@ set(LIBRARY_STATIC awsmockdto_static)
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
         src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/Infrastructure.cpp
         src/common/Services.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp)
-set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/MessageAttribute.cpp
+set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/ListQueueResponse.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/TagQueueRequest.cpp
         src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
@@ -92,7 +92,13 @@ else ()
     include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 endif ()
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/dto/s3/mapper/Mapper.h
+        src/s3/mapper/Mapper.cpp
+        include/awsmock/dto/s3/model/ObjectVersion.h
+        src/s3/model/ObjectVersion.cpp
+        include/awsmock/dto/s3/model/RestoreStatus.h
+        src/s3/model/RestoreStatus.cpp)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

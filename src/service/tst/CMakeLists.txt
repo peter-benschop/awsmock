@@ -3,7 +3,7 @@ set(STATIC_LIB awsmocksrv)
 set(AWS_CRT_SDK aws-crt-cpp aws-c-event-stream aws-c-s3 aws-c-auth aws-c-mqtt aws-c-http aws-c-sdkutils aws-checksums
         aws-c-io aws-c-cal aws-c-common aws-c-compression s2n)
 
-set(SQS_SOURCES SQSServiceTests.cpp SQSServerJavaTests.cpp SQSServerCliTest.cpp)
+set(SQS_SOURCES SQSServiceTests.cpp SQSServerJavaTests.cpp SQSServerCliTest.cpp SQSServerSpringTests.cpp)
 set(SNS_SOURCES SNSServiceTests.cpp SNSServerJavaTests.cpp SNSServerCliTest.cpp)
 set(S3_SOURCES S3ServiceTests.cpp S3ServerJavaTests.cpp S3ServerCliTest.cpp)
 set(LAMBDA_SOURCES LambdaServiceTests.cpp LambdaServerCliTest.cpp)

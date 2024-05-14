@@ -16,8 +16,13 @@ namespace AwsMock::Database::Entity::SQS {
     view_or_value<view, value> Message::ToDocument() const {
 
         auto messageAttributesDoc = bsoncxx::builder::basic::array{};
+        for (const auto &messageAttribute: messageAttributes) {
+            messageAttributesDoc.append(messageAttribute.ToDocument());
+        }
+
+        auto attributesDoc = bsoncxx::builder::basic::document{};
         for (const auto &attribute: attributes) {
-            messageAttributesDoc.append(attribute.ToDocument());
+            attributesDoc.append(kvp(attribute.first, attribute.second));
         }
 
         view_or_value<view, value> messageDoc = make_document(
@@ -31,7 +36,8 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("md5Body", md5Body),
                 kvp("md5UserAttr", md5UserAttr),
                 kvp("md5SystemAttr", md5SystemAttr),
-                kvp("attributes", messageAttributesDoc),
+                kvp("attributes", attributesDoc),
+                kvp("messageAttributes", messageAttributesDoc),
                 kvp("reset", MongoUtils::ToBson(reset)),
                 kvp("created", MongoUtils::ToBson(created)),
                 kvp("modified", MongoUtils::ToBson(modified)));
@@ -59,16 +65,25 @@ namespace AwsMock::Database::Entity::SQS {
         modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
         // Attributes
-        if (mResult.value().find("attributes") != mResult.value().end()) {
-            bsoncxx::array::view attributesView{mResult.value()["attributes"].get_array().value};
-            for (bsoncxx::array::element attributeElement: attributesView) {
+        if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+            bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value};
+            for (const bsoncxx::array::element &attributeElement: attributesView) {
                 MessageAttribute attribute{
                         .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
                         .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
                         .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
-                        .systemAttribute = attributeElement["systemAttribute"].get_bool().value,
                 };
-                attributes.push_back(attribute);
+                messageAttributes.push_back(attribute);
+            }
+        }
+
+        // Get attributes
+        if (mResult.value().find("attributes") != mResult.value().end()) {
+            bsoncxx::document::view attributesView = mResult.value()["attributes"].get_document().value;
+            for (const bsoncxx::document::element &attributeElement: attributesView) {
+                std::string key = bsoncxx::string::to_string(attributeElement.key());
+                std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);
+                attributes.emplace(key, value);
             }
         }
     }
@@ -86,18 +101,27 @@ namespace AwsMock::Database::Entity::SQS {
         jsonObject.set("md5SystemAttr", md5SystemAttr);
         jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
 
+        // Message attributes
+        if (!messageAttributes.empty()) {
+            Poco::JSON::Object jsonMessageAttributeObject;
+            for (const auto &attribute: messageAttributes) {
+                Poco::JSON::Object jsonAttributeObject;
+                jsonAttributeObject.set("StringValue", attribute.attributeValue);
+                jsonAttributeObject.set("DataType", attribute.attributeType);
+                jsonMessageAttributeObject.set(attribute.attributeName, jsonAttributeObject);
+            }
+            jsonObject.set("MessageAttributes", jsonMessageAttributeObject);
+        }
+
         // Attributes
         if (!attributes.empty()) {
             Poco::JSON::Array jsonAttributeArray;
             for (const auto &attribute: attributes) {
-                if (!attribute.systemAttribute) {
-                    Poco::JSON::Object jsonAttributeObject;
-                    jsonAttributeObject.set("name", attribute.attributeName);
-                    jsonAttributeObject.set("value", attribute.attributeValue);
-                    jsonAttributeArray.add(jsonAttributeObject);
-                }
+                Poco::JSON::Object jsonAttributeObject;
+                jsonAttributeObject.set(attribute.first, attribute.second);
+                jsonAttributeArray.add(jsonAttributeObject);
             }
-            jsonObject.set("userAttributes", jsonAttributeArray);
+            jsonObject.set("attributes", jsonAttributeArray);
         }
 
         return jsonObject;
@@ -119,14 +143,23 @@ namespace AwsMock::Database::Entity::SQS {
         status = MessageStatusFromString(statusStr);
 
         // Attributes
-        Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("userAttributes");
+        Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("attributes");
         for (int i = 0; i < jsonAttributeArray->size(); i++) {
+            std::string key, value;
+            Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+            Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, key);
+            Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, value);
+            attributes[key] = value;
+        }
+
+        // Message attributes
+        Poco::JSON::Array::Ptr jsonMessageAttributeArray = jsonObject->getArray("messageAttributes");
+        for (int i = 0; i < jsonMessageAttributeArray->size(); i++) {
             MessageAttribute messageAttribute;
             Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
             Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
             Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
-            messageAttribute.systemAttribute = false;
-            attributes.emplace_back(messageAttribute);
+            attributes[messageAttribute.attributeName] = messageAttribute.attributeValue;
         }
     }
 

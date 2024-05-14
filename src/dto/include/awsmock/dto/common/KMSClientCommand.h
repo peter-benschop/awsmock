@@ -14,6 +14,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -60,42 +61,12 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct KMSClientCommand {
-
-        /**
-         * HTTP request type
-         */
-        HttpMethod method;
-
-        /**
-         * Client region
-         */
-        std::string region;
-
-        /**
-         * HTTP URL
-         */
-        std::string url;
-
-        /**
-         * Client user
-         */
-        std::string user;
+    struct KMSClientCommand : public BaseClientCommand {
 
         /**
          * Client command
          */
-        KMSCommandType command;
-
-        /**
-         * Content type
-         */
-        std::string contentType;
-
-        /**
-         * Message body
-         */
-        std::string payload;
+        KMSCommandType command{};
 
         /**
          * Returns the command from HTTP header

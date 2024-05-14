@@ -96,6 +96,16 @@ namespace AwsMock::Dto::SQS {
         std::string requestId;
 
         /**
+         * Attributes
+         */
+        std::map<std::string, std::string> attributes;
+
+        /**
+         * Message attributes
+         */
+        MessageAttributeList messageAttributes;
+
+        /**
          * Convert to JSON representation
          *
          * @return JSON string

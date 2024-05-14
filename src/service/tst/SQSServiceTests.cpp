@@ -218,7 +218,7 @@ namespace AwsMock::Service {
         messageAttributes[messageAttribute.name] = messageAttribute;
 
         // act
-        std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+        std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -242,7 +242,7 @@ namespace AwsMock::Service {
         messageAttributes[messageAttribute2.name] = messageAttribute2;
 
         // act
-        std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+        std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

@@ -7,8 +7,7 @@ namespace AwsMock::Core {
         return new Poco::XML::Document;
     }
 
-    Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateRootNode(Poco::XML::AutoPtr<Poco::XML::Document> &document,
-                                                                    const std::string &name) {
+    Poco::XML::AutoPtr<Poco::XML::Element> XmlUtils::CreateRootNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, const std::string &name) {
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = document->createElement(name);
         document->appendChild(pRoot);
         return pRoot;

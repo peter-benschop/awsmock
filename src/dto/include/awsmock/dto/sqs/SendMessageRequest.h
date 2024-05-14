@@ -22,6 +22,68 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * Send message request
+     *
+     * Example (from Java v2 client):
+     * @code{.json}
+     * {
+     *   "QueueUrl":"http://vogje01-nuc:4566/000000000000/artikel-input",
+     *   "MessageBody":"{
+     *     "id":"94169598-3b07-4913-aa09-7bab3babd18d",
+     *     "ursprungsDatei":"SourceFile",
+     *     "ursprungsFormat":"ONIX 3.0",
+     *     "standDatum":"2024-05-13T18:19:09.340807234",
+     *     "anlieferungsDatum":"2024-05-13T18:19:09.340820701",
+     *     "lieferantenId":"DLI-0",
+     *     "l2000Datenquelle":42,
+     *     "produktId":"04ca0fe2-c999-4c7c-bacd-d40cb1b98f90",
+     *     "status":"aktiv",
+     *     "artikelNummern":[
+     *       {
+     *         "typ":"EAN",
+     *         "nummer":"2380123456785"
+     *       },
+     *       {
+     *         "typ":"Librinummer","nummer":"1234569"
+     *       },
+     *       {
+     *         "typ":"Proprietaer","nummer":"2380123456789-1"
+     *       }
+     *     ],
+     *     "produktFormAngaben":{
+     *       "produktForm":"AB",
+     *       "produktFormDetailliert":["A101"]
+     *     },
+     *     "barcode":"barcodiert",
+     *     "orgaNummer":"3332",
+     *     "lieferantenName":"Springer Verlag"
+     *   },
+     *   MessageAttributes":{
+     *     "retryContext":{
+     *       "StringValue":"[
+     *         {
+     *           "verarbeitungsschritt":"PARSEN",
+     *           "internalId":"qwhz3etz",
+     *           "queueName":"produktmeldung-retry-queue"
+     *         },
+     *         {
+     *           "verarbeitungsschritt":"ZERLEGEN",
+     *           "internalId":"pKR4aWII",
+     *           "queueName":"originalmeldung-retry-queue"
+     *         }
+     *       ]",
+     *       "DataType":"String"
+     *     },
+     *     "contentType":{
+     *       "StringValue":"application/json",
+     *       "DataType":"String"
+     *     }
+     *   },
+     *   "MessageSystemAttributes":{}
+     * }
+     * @endcode
+     */
     struct SendMessageRequest {
 
         /**
@@ -50,14 +112,24 @@ namespace AwsMock::Dto::SQS {
         std::string body;
 
         /**
-         * Message userAttributes
+         * Attributes (system attributes)
          */
-        MessageAttributeList attributes;
+        std::map<std::string, std::string> attributes;
+
+        /**
+         * Message attributes (user attributes)
+         */
+        MessageAttributeList messageAttributes;
 
         /**
          * Message ID
          */
         std::string messageId;
+
+        /**
+         * Sender ID
+         */
+        std::string senderId;
 
         /**
          * Request ID
@@ -72,18 +144,25 @@ namespace AwsMock::Dto::SQS {
         void FromJson(const std::string &jsonString);
 
         /**
+         * Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson();
+
+        /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString();
 
         /**
          * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const SendMessageRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, SendMessageRequest &r);
     };
 
 }// namespace AwsMock::Dto::SQS

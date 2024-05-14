@@ -19,6 +19,7 @@
 #include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 
 namespace AwsMock::Dto::Common {
@@ -59,41 +60,18 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-     * The SecretsManager client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
+     * @brief The SecretsManager client command is used as a standardized way of interpreting the different ways the clients are calling the REST services.
+     *
+     * Each client type is using a different way of calling the AWS REST services.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SecretsManagerClientCommand {
-
-        /**
-         * HTTP request type
-         */
-        HttpMethod method;
-
-        /**
-         * Client region
-         */
-        std::string region;
-
-        /**
-         * HTTP URL
-         */
-        std::string url;
-
-        /**
-         * Client user
-         */
-        std::string user;
+    struct SecretsManagerClientCommand : public BaseClientCommand {
 
         /**
          * Client command
          */
-        SecretsManagerCommandType command;
-
-        /**
-         * HTTP body
-         */
-        std::string payload;
+        SecretsManagerCommandType command{};
 
         /**
          * Returns the message body as string.

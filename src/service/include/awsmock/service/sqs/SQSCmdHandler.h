@@ -75,7 +75,7 @@ namespace AwsMock::Service {
          * @param payload HTTP body
          * @return list of queue userAttributes
          */
-        std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+        static std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
 
         /**
          * Get the queue tags.
@@ -83,7 +83,7 @@ namespace AwsMock::Service {
          * @param payload HTTP body
          * @return list of queue tags
          */
-        std::map<std::string, std::string> GetQueueTags(const std::string &payload);
+        static std::map<std::string, std::string> GetQueueTags(const std::string &payload);
 
         /**
          * Get the queue attribute names.
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
          * @param payload HTTP body
          * @return list of queue attribute names
          */
-        std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
+        static std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
 
         /**
          * Get the message attributes.
@@ -99,7 +99,16 @@ namespace AwsMock::Service {
          * @param payload HTTP body
          * @return list of message userAttributes
          */
-        std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+        static std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+
+        /**
+         * Converts the attributes and message attributes into HTTP headers for the receive message request
+         *
+         * @param response HTTP response
+         * @param sqsResponse Receive message response from SQS service
+         * @return
+         */
+        static std::map<std::string, std::string> AddReceiveHeaders(Poco::Net::HTTPResponse &response, const Dto::SQS::ReceiveMessageResponse &sqsResponse);
 
         /**
          * ImageHandler import configuration

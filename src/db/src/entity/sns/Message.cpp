@@ -44,7 +44,7 @@ namespace AwsMock::Database::Entity::SNS {
             if (mResult.value().find("userAttributes") != mResult.value().end()) {
                 bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
                 if (!attributesView.empty()) {
-                    for (bsoncxx::array::element attributeElement: attributesView) {
+                    for (const bsoncxx::array::element &attributeElement: attributesView) {
                         MessageAttribute attribute{
                                 .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
                                 .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
@@ -77,6 +77,28 @@ namespace AwsMock::Database::Entity::SNS {
             jsonObject.set("attributes", jsonAttributeArray);
         }
         return jsonObject;
+    }
+
+    void Message::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+        Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
+        Core::JsonUtils::GetJsonValueString("targetArn", jsonObject, targetArn);
+        Core::JsonUtils::GetJsonValueString("message", jsonObject, message);
+        Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
+        std::string statusStr;
+        Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);
+        status = MessageStatusFromString(statusStr);
+
+        // Message attributes
+        Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("messageAttributes");
+        for (int i = 0; i < jsonAttributeArray->size(); i++) {
+            MessageAttribute messageAttribute;
+            Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+            Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
+            Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
+            attributes.emplace_back(messageAttribute);
+        }
     }
 
     std::string Message::ToString() const {

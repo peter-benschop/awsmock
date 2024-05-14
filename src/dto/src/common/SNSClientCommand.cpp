@@ -15,8 +15,9 @@ namespace AwsMock::Dto::Common {
         this->region = awsRegion;
         this->user = awsUser;
         this->method = httpMethod;
-        this->contentType = userAgent.contentType;
-        this->payload = GetBodyAsString(request);
+        this->contentType = Core::HttpUtils::GetContentType(request);
+        this->contentLength = Core::HttpUtils::GetContentLength(request);
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->url = request.getURI();
 
         if (userAgent.clientCommand.empty()) {
@@ -27,13 +28,6 @@ namespace AwsMock::Dto::Common {
 
             this->command = Dto::Common::SNSCommandTypeFromString(userAgent.clientCommand);
         }
-    }
-
-    std::string SNSClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-        std::stringstream sstream;
-        sstream << request.stream().rdbuf();
-        request.stream().seekg(0, request.stream().beg);
-        return sstream.str();
     }
 
     std::string SNSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const {

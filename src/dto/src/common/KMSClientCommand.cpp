@@ -15,7 +15,8 @@ namespace AwsMock::Dto::Common {
         this->region = awsRegion;
         this->user = awsUser;
         this->method = httpMethod;
-        this->contentType = request.getContentType();
+        this->contentType = Core::HttpUtils::GetContentType(request);
+        this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->url = request.getURI();
 

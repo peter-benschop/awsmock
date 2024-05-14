@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::S3 {
         // Get metadata
         if (mResult.value().find("metadata") != mResult.value().end()) {
             bsoncxx::document::view metadataView = mResult.value()["metadata"].get_document().value;
-            for (bsoncxx::document::element metadataElement: metadataView) {
+            for (const bsoncxx::document::element &metadataElement: metadataView) {
                 std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
                 std::string metadataValue = bsoncxx::string::to_string(metadataView[metadataKey].get_string().value);
                 metadata.emplace(metadataKey, metadataValue);

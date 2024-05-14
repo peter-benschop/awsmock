@@ -32,6 +32,13 @@ namespace AwsMock::Database::Entity::SNS {
         return jsonObject;
     }
 
+    void Subscription::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("protocol", jsonObject, protocol);
+        Core::JsonUtils::GetJsonValueString("endpoint", jsonObject, endpoint);
+        Core::JsonUtils::GetJsonValueString("subscriptionArn", jsonObject, subscriptionArn);
+    }
+
     std::string Subscription::ToString() const {
         std::stringstream ss;
         ss << (*this);
