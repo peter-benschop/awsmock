@@ -21,8 +21,8 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
 namespace AwsMock::Database::Entity::SNS {

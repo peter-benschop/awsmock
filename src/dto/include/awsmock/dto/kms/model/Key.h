@@ -19,9 +19,9 @@
 #include "KeyState.h"
 #include "KeyUsage.h"
 #include "Origin.h"
-#include "awsmock/core/JsonException.h"
 #include "awsmock/core/JsonUtils.h"
 #include "awsmock/core/LogStream.h"
+#include "awsmock/core/exception/JsonException.h"
 
 namespace AwsMock::Dto::KMS {
 

@@ -41,36 +41,49 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     Poco::JSON::Object QueueAttribute::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("delaySeconds", delaySeconds);
-        jsonObject.set("maxMessageSize", maxMessageSize);
-        jsonObject.set("messageRetentionPeriod", messageRetentionPeriod);
-        jsonObject.set("policy", policy);
-        jsonObject.set("receiveMessageWaitTime", receiveMessageWaitTime);
-        jsonObject.set("visibilityTimeout", visibilityTimeout);
-        jsonObject.set("redrivePolicy", redrivePolicy.ToJsonObject());
-        jsonObject.set("redriveAllowPolicy", redriveAllowPolicy);
-        jsonObject.set("approximateNumberOfMessages", approximateNumberOfMessages);
-        jsonObject.set("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed);
-        jsonObject.set("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible);
 
-        return jsonObject;
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("delaySeconds", delaySeconds);
+            jsonObject.set("maxMessageSize", maxMessageSize);
+            jsonObject.set("messageRetentionPeriod", messageRetentionPeriod);
+            jsonObject.set("policy", policy);
+            jsonObject.set("receiveMessageWaitTime", receiveMessageWaitTime);
+            jsonObject.set("visibilityTimeout", visibilityTimeout);
+            jsonObject.set("redrivePolicy", redrivePolicy.ToJsonObject());
+            jsonObject.set("redriveAllowPolicy", redriveAllowPolicy);
+            jsonObject.set("approximateNumberOfMessages", approximateNumberOfMessages);
+            jsonObject.set("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed);
+            jsonObject.set("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     void QueueAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueInt("delaySeconds", jsonObject, delaySeconds);
-        Core::JsonUtils::GetJsonValueInt("maxMessageSize", jsonObject, maxMessageSize);
-        Core::JsonUtils::GetJsonValueInt("messageRetentionPeriod", jsonObject, messageRetentionPeriod);
-        Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
-        Core::JsonUtils::GetJsonValueInt("receiveMessageWaitTime", jsonObject, receiveMessageWaitTime);
-        Core::JsonUtils::GetJsonValueInt("visibilityTimeout", jsonObject, visibilityTimeout);
-        Core::JsonUtils::GetJsonValueString("redriveAllowPolicy", jsonObject, redriveAllowPolicy);
-        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessages", jsonObject, approximateNumberOfMessages);
-        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesDelayed", jsonObject, approximateNumberOfMessagesDelayed);
-        Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesNotVisible", jsonObject, approximateNumberOfMessagesNotVisible);
+        try {
 
-        redrivePolicy.FromJsonObject(jsonObject->getObject("redrivePolicy"));
+            Core::JsonUtils::GetJsonValueInt("delaySeconds", jsonObject, delaySeconds);
+            Core::JsonUtils::GetJsonValueInt("maxMessageSize", jsonObject, maxMessageSize);
+            Core::JsonUtils::GetJsonValueInt("messageRetentionPeriod", jsonObject, messageRetentionPeriod);
+            Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
+            Core::JsonUtils::GetJsonValueInt("receiveMessageWaitTime", jsonObject, receiveMessageWaitTime);
+            Core::JsonUtils::GetJsonValueInt("visibilityTimeout", jsonObject, visibilityTimeout);
+            Core::JsonUtils::GetJsonValueString("redriveAllowPolicy", jsonObject, redriveAllowPolicy);
+            Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessages", jsonObject, approximateNumberOfMessages);
+            Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesDelayed", jsonObject, approximateNumberOfMessagesDelayed);
+            Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesNotVisible", jsonObject, approximateNumberOfMessagesNotVisible);
+            redrivePolicy.FromJsonObject(jsonObject->getObject("redrivePolicy"));
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string QueueAttribute::ToString() const {

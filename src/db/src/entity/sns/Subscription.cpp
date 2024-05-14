@@ -25,18 +25,32 @@ namespace AwsMock::Database::Entity::SNS {
 
     Poco::JSON::Object Subscription::ToJsonObject() const {
 
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("protocol", protocol);
-        jsonObject.set("endpoint", endpoint);
-        jsonObject.set("subscriptionArn", subscriptionArn);
-        return jsonObject;
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("protocol", protocol);
+            jsonObject.set("endpoint", endpoint);
+            jsonObject.set("subscriptionArn", subscriptionArn);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     void Subscription::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("protocol", jsonObject, protocol);
-        Core::JsonUtils::GetJsonValueString("endpoint", jsonObject, endpoint);
-        Core::JsonUtils::GetJsonValueString("subscriptionArn", jsonObject, subscriptionArn);
+        try {
+
+            Core::JsonUtils::GetJsonValueString("protocol", jsonObject, protocol);
+            Core::JsonUtils::GetJsonValueString("endpoint", jsonObject, endpoint);
+            Core::JsonUtils::GetJsonValueString("subscriptionArn", jsonObject, subscriptionArn);
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string Subscription::ToString() const {

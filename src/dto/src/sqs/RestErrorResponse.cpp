@@ -9,12 +9,6 @@ namespace AwsMock::Dto::SQS {
     RestErrorResponse::RestErrorResponse(const Core::ServiceException &exc) {
         message = exc.message();
         code = exc.code();
-        if (exc.requestId()) {
-            requestId = std::string(exc.requestId());
-        }
-        if (exc.resource()) {
-            requestId = std::string(exc.resource());
-        }
     }
 
     std::string RestErrorResponse::ToJson() const {

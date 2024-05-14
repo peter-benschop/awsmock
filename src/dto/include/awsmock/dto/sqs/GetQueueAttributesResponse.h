@@ -22,9 +22,9 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 

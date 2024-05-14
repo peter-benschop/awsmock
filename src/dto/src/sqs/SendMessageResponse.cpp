@@ -22,7 +22,7 @@ namespace AwsMock::Dto::SQS {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -39,7 +39,7 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", rootObject, md5SystemAttr);
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

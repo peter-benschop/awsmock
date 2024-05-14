@@ -19,7 +19,7 @@
 #include <Poco/Timestamp.h>
 
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
+#include "awsmock/core/exception/ServiceException.h"
 
 namespace AwsMock::Dto::SNS {
 

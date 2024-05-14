@@ -217,6 +217,8 @@ namespace AwsMock::Core {
          * @return HTTP authorization header
          */
         static std::string GetAuthorizationHeader(const Configuration &configuration, const std::string &module);
+
+        static std::string SanitzeSQSUrl(const std::string &queue);
     };
 
 }// namespace AwsMock::Core

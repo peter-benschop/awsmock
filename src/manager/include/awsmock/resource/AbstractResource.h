@@ -22,11 +22,11 @@
 #include <Poco/URI.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ResourceNotFoundException.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/ForbiddenException.h>
 #include <awsmock/resource/HandlerException.h>
 
 namespace AwsMock::Manager {
@@ -34,7 +34,7 @@ namespace AwsMock::Manager {
     typedef std::vector<std::pair<std::string, std::string>> HeaderMap;
 
     /**
-     * Abstract HTTP request handler
+     * @brief Abstract HTTP request handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -144,7 +144,7 @@ namespace AwsMock::Manager {
          * @param region AWS region
          * @param user AWS user
          */
-        void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
+        static void GetRegionUser(const std::string &authorization, std::string &region, std::string &user);
 
         /**
          * Returns the payload as a string

@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SecretsManager {
             return rootJson;
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

@@ -24,6 +24,7 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/entity/sqs/Queue.h>
 
 namespace AwsMock::Dto::SQS {

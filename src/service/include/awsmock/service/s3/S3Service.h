@@ -14,9 +14,10 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/NotFoundException.h"
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
 #include <awsmock/dto/s3/CopyObjectRequest.h>

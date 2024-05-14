@@ -10,8 +10,8 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/core/exception/JsonException.h"
 #include "awsmock/dto/kms/model/Key.h"
-#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 

@@ -29,7 +29,6 @@ namespace AwsMock::Dto::Common {
 
             this->command = Dto::Common::SqsCommandTypeFromString(userAgent.clientCommand);
         }
-        log_debug << ToJson();
     }
 
     std::string SQSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const {

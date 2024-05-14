@@ -6,7 +6,7 @@
 #define AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H
 
 // AwsMock includes
-#include <awsmock/core/JsonException.h>
+#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/cognito/User.h>

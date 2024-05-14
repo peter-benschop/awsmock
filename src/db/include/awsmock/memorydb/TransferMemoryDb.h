@@ -15,8 +15,8 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>

@@ -14,6 +14,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbCmdHandler.h>
@@ -22,7 +23,7 @@
 namespace AwsMock::Service {
 
     /**
-     * AWS DynamoDB mock handler
+     * “@brief AWS DynamoDB mock handler
      *
      * <p>AWS DynamoDB HTTP request handler. All DynamoDB related REST call are ending here.<p>
      *

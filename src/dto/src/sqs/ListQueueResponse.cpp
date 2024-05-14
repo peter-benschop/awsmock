@@ -8,37 +8,28 @@ namespace AwsMock::Dto::SQS {
 
     std::string ListQueueResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListQueuesResponse");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // ListQueuesResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = pDoc->createElement("ListQueuesResult");
-        pRoot->appendChild(pListQueueResult);
+            // Root
+            Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+            Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "ListQueuesResponse");
 
-        for (auto &it: queueList) {
-            Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrl = pDoc->createElement("QueueUrl");
-            pListQueueResult->appendChild(pQueueUrl);
-            Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(it.queueUrl);
-            pQueueUrl->appendChild(pQueueUrlText);
+            // ListQueuesResult
+            Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "ListQueuesResult");
+
+            for (auto &it: queueList) {
+                Core::XmlUtils::CreateTextNode(pDoc, pListQueueResult, "QueueUrl", it.queueUrl);
+            }
+
+            // Metadata
+            Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
+            Core::XmlUtils::CreateTextNode(pDoc, pListQueueResult, "RequestId", Poco::UUIDGenerator().createRandom().toString());
+            return Core::XmlUtils::ToXmlString(pDoc);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
-
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
-
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
     }
 
     std::string ListQueueResponse::ToJson() const {
@@ -52,12 +43,11 @@ namespace AwsMock::Dto::SQS {
             Poco::JSON::Object rootJson;
             rootJson.set("QueueUrls", queuesArrayJson);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -68,11 +58,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const ListQueueResponse &r) {
-        os << "ListQueueResponse={queueList=[";
-        for (auto &l: r.queueList) {
-            os << l.ToString();
-        }
-        os << "]}";
+        os << "ListQueueResponse=" << r.ToJson();
         return os;
     }
 

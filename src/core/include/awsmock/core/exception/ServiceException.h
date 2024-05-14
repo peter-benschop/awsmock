@@ -13,7 +13,7 @@
 namespace AwsMock::Core {
 
     /**
-     * Service exception class. In case of a request failure a ServiceException is thrown.
+     * @brief Service exception class. In case of a request failure a ServiceException is thrown.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -28,7 +28,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+        explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Constructor.
@@ -38,7 +38,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit ServiceException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+        explicit ServiceException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Constructor.
@@ -49,7 +49,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        ServiceException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+        ServiceException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Constructor.
@@ -60,7 +60,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        ServiceException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+        ServiceException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Copy constructor.
@@ -108,18 +108,6 @@ namespace AwsMock::Core {
          * Rethrows the exception.
          */
         void rethrow() const override;
-
-      private:
-
-        /**
-         * Resource
-         */
-        const char *_resource;
-
-        /**
-         * Request ID
-         */
-        const char *_requestId;
     };
 
 }// namespace AwsMock::Core

@@ -17,12 +17,12 @@
 #include <Poco/RegularExpression.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/InvalidMethodCallException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MemoryMappedFile.h>
-#include <awsmock/core/ResourceNotFoundException.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/ForbiddenException.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/dto/s3/RestErrorResponse.h>
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     typedef std::map<std::string, std::string> HeaderMap;
 
     /**
-     * Abstract HTTP request handler
+     * @brief Abstract HTTP request handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -168,7 +168,7 @@ namespace AwsMock::Service {
          * @param statusCode HTTP Status Code.
          * @param reason state reason.
          */
-        static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason = nullptr);
+        static void handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const std::string &reason = {});
 
         /**
          * Send a OK response (HTTP state code 200).
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
          * @param headers HTTP headers
          * @param status HTTP status
          */
-        static void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus &status);
+        static void SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &body, const std::map<std::string, std::string> &headers, int status);
 
         /**
          * Send an error response (HTTP state code 200).
@@ -241,7 +241,7 @@ namespace AwsMock::Service {
          * @param response HTTP response object
          * @param exc exception object
          */
-        void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
+        static void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, Poco::Exception &exc);
 
         /**
          * Send an error response (HTTP state code 200).
@@ -250,7 +250,7 @@ namespace AwsMock::Service {
          * @param response HTTP response object
          * @param exc module exception object
          */
-        void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, std::exception &exc);
+        static void SendXmlErrorResponse(const std::string &service, Poco::Net::HTTPServerResponse &response, std::exception &exc);
 
         /**
          * Send an error response (HTTP state code 200).

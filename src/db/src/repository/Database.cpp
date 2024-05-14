@@ -85,9 +85,11 @@ namespace AwsMock::Database {
             mongocxx::database database = (*client)["awsmock"];
 
             database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
-                                                 make_document(kvp("name", "sqs_queueurl_status_reset_idx1")));
+                                                 make_document(kvp("name", "sqs_message_idx1")));
             database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)),
-                                                 make_document(kvp("name", "sqs_queueurl_status_retries_idx2")));
+                                                 make_document(kvp("name", "sqs_message_idx2")));
+            database["sqs_message"].create_index(make_document(kvp("receiptHandle", 1)),
+                                                 make_document(kvp("name", "sqs_message_idx3")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
                                                make_document(kvp("name", "sqs_region_name_idx1")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),

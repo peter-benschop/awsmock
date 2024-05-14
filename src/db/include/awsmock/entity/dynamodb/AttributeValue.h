@@ -21,9 +21,9 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 

@@ -15,9 +15,9 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/JsonException.h"
 #include "awsmock/dto/kms/model/Key.h"
 #include "awsmock/dto/kms/model/KeySpec.h"
-#include <awsmock/core/JsonException.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 

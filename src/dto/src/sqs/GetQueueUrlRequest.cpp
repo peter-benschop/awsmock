@@ -34,7 +34,7 @@ namespace AwsMock::Dto::SQS {
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 

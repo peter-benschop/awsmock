@@ -14,12 +14,12 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include "awsmock/dto/kms/model/Key.h"
 #include "awsmock/dto/kms/model/ListKey.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
 #include <awsmock/dto/kms/DecryptRequest.h>

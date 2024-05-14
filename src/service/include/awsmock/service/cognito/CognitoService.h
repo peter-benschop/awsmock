@@ -16,7 +16,7 @@
 // AwsMock includes
 #include "awsmock/core/CryptoUtils.h"
 #include "awsmock/core/LogStream.h"
-#include "awsmock/core/ServiceException.h"
+#include "awsmock/core/exception/ServiceException.h"
 #include "awsmock/dto/cognito/AdminCreateUserRequest.h"
 #include "awsmock/dto/cognito/AdminCreateUserResponse.h"
 #include "awsmock/dto/cognito/AdminDeleteUserRequest.h"

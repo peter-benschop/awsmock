@@ -14,8 +14,8 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>

@@ -350,8 +350,8 @@ namespace AwsMock::Service {
                 }
             }
 
-        } catch (Core::DatabaseException &exc) {
-            SendErrorResponse(response, {}, {}, Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Poco::Exception &e) {
+            SendErrorResponse(response, {}, {}, e.code());
         }
     }
 

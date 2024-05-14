@@ -10,11 +10,12 @@
 
 // Poco includes
 #include <Poco/Exception.h>
+#include <Poco/Net/HTTPResponse.h>
 
 namespace AwsMock::Core {
 
     /**
-     * Exception class. In case of a COM request failure a COMException is thrown.
+     * @brief Exception class. In case of a COM request failure a COMException is thrown.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -26,7 +27,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit CoreException(int code = 0);
+        explicit CoreException(int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Constructor.
@@ -34,7 +35,7 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit CoreException(const std::string &msg, int code = 0);
+        explicit CoreException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Constructor.
@@ -43,7 +44,7 @@ namespace AwsMock::Core {
          * @param arg exception argument, will be appended to the message, separated with a ':'.
          * @param code exception code, default: 0
          */
-        CoreException(const std::string &msg, const std::string &arg, int code = 0);
+        CoreException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Constructor.
@@ -52,7 +53,7 @@ namespace AwsMock::Core {
          * @param exc parent exception.
          * @param code exception code, default: 0
          */
-        CoreException(const std::string &msg, const Poco::Exception &exc, int code = 0);
+        CoreException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
 
         /**
          * Copy constructor.

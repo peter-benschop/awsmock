@@ -42,28 +42,43 @@ namespace AwsMock::Database::Entity::SNS {
     }
 
     Poco::JSON::Object TopicAttribute::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("deliveryPolicy", deliveryPolicy);
-        jsonObject.set("displayName", displayName);
-        jsonObject.set("fifoTopic", fifoTopic);
-        jsonObject.set("policy", policy);
-        jsonObject.set("signatureVersion", signatureVersion);
-        jsonObject.set("tracingConfig", tracingConfig);
-        jsonObject.set("kmsMasterKeyId", kmsMasterKeyId);
-        jsonObject.set("contentBasedDeduplication", contentBasedDeduplication);
-        return jsonObject;
+
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("deliveryPolicy", deliveryPolicy);
+            jsonObject.set("displayName", displayName);
+            jsonObject.set("fifoTopic", fifoTopic);
+            jsonObject.set("policy", policy);
+            jsonObject.set("signatureVersion", signatureVersion);
+            jsonObject.set("tracingConfig", tracingConfig);
+            jsonObject.set("kmsMasterKeyId", kmsMasterKeyId);
+            jsonObject.set("contentBasedDeduplication", contentBasedDeduplication);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     void TopicAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("deliveryPolicy", jsonObject, deliveryPolicy);
-        Core::JsonUtils::GetJsonValueString("displayName", jsonObject, displayName);
-        Core::JsonUtils::GetJsonValueBool("fifoTopic", jsonObject, fifoTopic);
-        Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
-        Core::JsonUtils::GetJsonValueString("signatureVersion", jsonObject, signatureVersion);
-        Core::JsonUtils::GetJsonValueString("tracingConfig", jsonObject, tracingConfig);
-        Core::JsonUtils::GetJsonValueString("kmsMasterKeyId", jsonObject, kmsMasterKeyId);
-        Core::JsonUtils::GetJsonValueBool("contentBasedDeduplication", jsonObject, contentBasedDeduplication);
+        try {
+
+            Core::JsonUtils::GetJsonValueString("deliveryPolicy", jsonObject, deliveryPolicy);
+            Core::JsonUtils::GetJsonValueString("displayName", jsonObject, displayName);
+            Core::JsonUtils::GetJsonValueBool("fifoTopic", jsonObject, fifoTopic);
+            Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
+            Core::JsonUtils::GetJsonValueString("signatureVersion", jsonObject, signatureVersion);
+            Core::JsonUtils::GetJsonValueString("tracingConfig", jsonObject, tracingConfig);
+            Core::JsonUtils::GetJsonValueString("kmsMasterKeyId", jsonObject, kmsMasterKeyId);
+            Core::JsonUtils::GetJsonValueBool("contentBasedDeduplication", jsonObject, contentBasedDeduplication);
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string TopicAttribute::ToString() const {

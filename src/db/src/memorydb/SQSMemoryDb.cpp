@@ -443,6 +443,16 @@ namespace AwsMock::Database {
         log_debug << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << count;
     }
 
+    void SQSMemoryDb::DeleteMessage(const std::string &receiptHandle) {
+        Poco::ScopedLock lock(_messageMutex);
+
+        const auto count = std::erase_if(_messages, [receiptHandle](const auto &item) {
+            auto const &[key, value] = item;
+            return value.receiptHandle == receiptHandle;
+        });
+        log_debug << "Messages deleted, receiptHandle: " << receiptHandle << " count: " << count;
+    }
+
     void SQSMemoryDb::DeleteAllMessages() {
         Poco::ScopedLock lock(_messageMutex);
 

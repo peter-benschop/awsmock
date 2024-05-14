@@ -16,8 +16,8 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 
 namespace AwsMock::Dto::SQS {

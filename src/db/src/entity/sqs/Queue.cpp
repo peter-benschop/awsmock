@@ -62,37 +62,50 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     Poco::JSON::Object Queue::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("name", name);
-        jsonObject.set("owner", owner);
-        jsonObject.set("queueUrl", queueUrl);
-        jsonObject.set("queueArn", queueArn);
-        jsonObject.set("attributes", attributes.ToJsonObject());
 
-        // Tags array
-        if (!tags.empty()) {
-            Poco::JSON::Array jsonTagArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object jsonTagObject;
-                jsonTagObject.set(tag.first, tag.second);
-                jsonTagArray.add(jsonTagObject);
+        try {
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("region", region);
+            jsonObject.set("name", name);
+            jsonObject.set("owner", owner);
+            jsonObject.set("queueUrl", queueUrl);
+            jsonObject.set("queueArn", queueArn);
+            jsonObject.set("attributes", attributes.ToJsonObject());
+
+            // Tags array
+            if (!tags.empty()) {
+                Poco::JSON::Array jsonTagArray;
+                for (const auto &tag: tags) {
+                    Poco::JSON::Object jsonTagObject;
+                    jsonTagObject.set(tag.first, tag.second);
+                    jsonTagArray.add(jsonTagObject);
+                }
+                jsonObject.set("tags", jsonTagArray);
             }
-            jsonObject.set("tags", jsonTagArray);
-        }
+            return jsonObject;
 
-        return jsonObject;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     void Queue::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
-        Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-        Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
-        Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
-        Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-        attributes.FromJsonObject(jsonObject->getObject("attributes"));
+        try {
+
+            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+            Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
+            Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
+            Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
+            Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
+            Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
+            attributes.FromJsonObject(jsonObject->getObject("attributes"));
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string Queue::ToString() const {
