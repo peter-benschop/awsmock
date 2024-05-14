@@ -1,5 +1,5 @@
 
-#include "awsmock/service/dynamodb/DynamoDbHandler.h"
+#include <awsmock/service/dynamodb/DynamoDbHandler.h>
 
 namespace AwsMock::Service {
 
@@ -15,7 +15,7 @@ namespace AwsMock::Service {
 
         } catch (Core::ServiceException &exc) {
             SendXmlErrorResponse("dynamodb", response, exc);
-        } catch (Core::ResourceNotFoundException &exc) {
+        } catch (Core::NotFoundException &exc) {
             SendXmlErrorResponse("dynamodb", response, exc);
         }
     }

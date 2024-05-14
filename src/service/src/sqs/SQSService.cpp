@@ -102,7 +102,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SQS list queues failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), 500, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -111,10 +111,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.QueueUrlExists(request.region, request.queueUrl)) {
-            throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists",
-                                         Poco::Net::HTTPResponse::HTTP_NOT_FOUND,
-                                         request.resource.c_str(),
-                                         request.requestId.c_str());
+            throw Core::NotFoundException("SQS queue '" + request.queueUrl + "' does not exists");
         }
 
         try {
@@ -124,7 +121,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SQS purge queue failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, request.resource.c_str(), request.requestId.c_str());
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -134,7 +131,7 @@ namespace AwsMock::Service {
         // Check existence
         if (!_database.QueueExists(request.region, request.queueName)) {
             log_error << "SQS queue '" << request.queueName << "' does not exist";
-            throw Core::ServiceException("SQS queue '" + request.queueName + "' does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("SQS queue '" + request.queueName + "' does not exist");
         }
 
         try {
@@ -146,7 +143,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SQS get queue failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_NOT_FOUND, request.region.c_str(), request.queueName.c_str());
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -155,10 +152,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.QueueUrlExists(request.region, request.queueUrl)) {
-            throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists",
-                                         Poco::Net::HTTPResponse::HTTP_NOT_FOUND,
-                                         request.resource.c_str(),
-                                         request.requestId.c_str());
+            throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists");
         }
 
         Database::Entity::SQS::Queue queue = _database.GetQueueByUrl(request.region, request.queueUrl);
@@ -432,7 +426,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
-        log_trace << "Receive message request: " << request.ToString();
+        log_debug << "Receive message request: " << request.ToString();
 
         try {
             Database::Entity::SQS::MessageList messageList;
@@ -512,11 +506,13 @@ namespace AwsMock::Service {
 
                 // TODO: Check existence
                 if (!_database.MessageExists(entry.receiptHandle)) {
-                    throw Core::ServiceException("Message does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+                    //throw Core::ServiceException("Message does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+                    log_warning << "Message does not exist, id: " << entry.id;
+                    return;
                 }
 
                 // Delete from database
-                _database.DeleteMessage({.queueUrl = request.queueUrl, .receiptHandle = entry.receiptHandle});
+                _database.DeleteMessage(entry.receiptHandle);
             }
             log_debug << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size();
 

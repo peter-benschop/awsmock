@@ -52,8 +52,15 @@ namespace AwsMock::Database::Entity::SQS {
 
     void RedrivePolicy::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueInt("maxReceiveCount", jsonObject, maxReceiveCount);
-        Core::JsonUtils::GetJsonValueString("deadLetterTargetArn", jsonObject, deadLetterTargetArn);
+        try {
+
+            Core::JsonUtils::GetJsonValueInt("maxReceiveCount", jsonObject, maxReceiveCount);
+            Core::JsonUtils::GetJsonValueString("deadLetterTargetArn", jsonObject, deadLetterTargetArn);
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     view_or_value<view, value> RedrivePolicy::ToDocument() const {
@@ -72,10 +79,18 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     Poco::JSON::Object RedrivePolicy::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("deadLetterTargetArn", deadLetterTargetArn);
-        jsonObject.set("maxReceiveCount", maxReceiveCount);
-        return jsonObject;
+
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("deadLetterTargetArn", deadLetterTargetArn);
+            jsonObject.set("maxReceiveCount", maxReceiveCount);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string RedrivePolicy::ToString() const {

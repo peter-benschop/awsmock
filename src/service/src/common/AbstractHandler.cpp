@@ -144,99 +144,110 @@ namespace AwsMock::Service {
 
     void AbstractHandler::handleHead([[maybe_unused]] Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
         log_trace << "Request, method: " << request.getMethod();
-        response.setStatusAndReason(
-                Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED,
-                Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED, Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
 
         std::ostream &errorStream = response.send();
         errorStream.flush();
     }
 
-    void AbstractHandler::handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const char *reason) {
+    void AbstractHandler::handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const std::string &reason) {
 
         switch (statusCode) {
 
             case 200:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_OK);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_OK : reason);
+                log_trace << "HTTP state code: 200 message: " << Poco::Net::HTTPResponse::HTTP_REASON_OK;
                 break;
 
             case 201:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_CREATED);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_CREATED : reason);
+                log_debug << "HTTP state code: 201 message: " << Poco::Net::HTTPResponse::HTTP_REASON_CREATED;
                 break;
 
             case 202:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_ACCEPTED : reason);
+                log_debug << "HTTP state code: 202 message: " << Poco::Net::HTTPResponse::HTTP_REASON_ACCEPTED;
                 break;
 
             case 204:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NO_CONTENT : reason);
+                log_debug << "HTTP state code: 204 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NO_CONTENT;
                 break;
 
             case 205:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_RESET_CONTENT : reason);
+                log_debug << "HTTP state code: 205 message: " << Poco::Net::HTTPResponse::HTTP_REASON_RESET_CONTENT;
                 break;
 
             case 206:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_PARTIAL_CONTENT : reason);
+                log_debug << "HTTP state code: 206 message: " << Poco::Net::HTTPResponse::HTTP_REASON_PARTIAL_CONTENT;
                 break;
 
             case 400:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST);
-                log_error << "HTTP state code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST;
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST : reason);
+                log_error << "HTTP state code: 400 message: " << Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST;
                 break;
 
             case 401:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED : reason);
                 log_error << "HTTP state code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED;
                 break;
 
             case 403:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN);
-                log_warning << "HTTP state code: 403 message: " << Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN;
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN : reason);
+                log_error << "HTTP state code: 403 message: " << Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN;
                 break;
 
             case 404:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND, reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND);
-                log_warning << "HTTP state code: 404 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND;
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND : reason);
+                log_error << "HTTP state code: 404 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND;
                 break;
 
             case 405:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_METHOD_NOT_ALLOWED : reason);
+                log_error << "HTTP state code: 405 message: " << Poco::Net::HTTPResponse::HTTP_REASON_METHOD_NOT_ALLOWED;
                 break;
 
             case 406:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NOT_ACCEPTABLE : reason);
+                log_error << "HTTP state code: 406 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_ACCEPTABLE;
                 break;
 
             case 409:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_CONFLICT : reason);
+                log_error << "HTTP state code: 409 message: " << Poco::Net::HTTPResponse::HTTP_REASON_CONFLICT;
                 break;
 
             case 410:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_GONE : reason);
+                log_error << "HTTP state code: 410 message: " << Poco::Net::HTTPResponse::HTTP_REASON_GONE;
                 break;
 
             case 415:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_UNSUPPORTED_MEDIA_TYPE : reason);
+                log_error << "HTTP state code: 415 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNSUPPORTED_MEDIA_TYPE;
                 break;
 
             case 500:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR,
-                                            reason != nullptr ? reason : Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR : reason);
+                log_error << "HTTP state code: 500 message: " << Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR;
                 break;
 
-            case Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
+            case 501:
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED : reason);
+                log_error << "HTTP state code: 501 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED;
                 break;
 
             case 503:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_SERVICE_UNAVAILABLE : reason);
+                log_error << "HTTP state code: 503 message: " << Poco::Net::HTTPResponse::HTTP_REASON_SERVICE_UNAVAILABLE;
                 break;
 
                 // Validating routines throw exceptions all over the program, but are not able to specify
                 // an exception code compatible with HTTP. So, the code is left zero. This routine can catch this.
             default:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST : reason);
                 break;
         }
     }
@@ -257,7 +268,7 @@ namespace AwsMock::Service {
 
         Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/[a-zA-Z0-9\-]+\/aws4_request,.*$)");
         if (!pattern.match(authorization, 0, posVec)) {
-            throw Core::ResourceNotFoundException("Could not extract region and user");
+            throw Core::ForbiddenException("Could not extract region and user");
         }
 
         user = authorization.substr(posVec[1].offset, posVec[1].length);
@@ -415,7 +426,7 @@ namespace AwsMock::Service {
         outputStream.flush();
     }
 
-    void AbstractHandler::SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &body, std::map<std::string, std::string> headers, const Poco::Net::HTTPResponse::HTTPStatus &status) {
+    void AbstractHandler::SendErrorResponse(Poco::Net::HTTPServerResponse &response, const std::string &body, const std::map<std::string, std::string> &headers, int status) {
 
         SetHeaders(response, body.length(), headers);
 

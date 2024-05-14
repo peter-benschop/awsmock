@@ -12,9 +12,9 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/dto/common/Infrastructure.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/entity/module/Module.h>

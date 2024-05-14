@@ -849,9 +849,8 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
                 session.commit_transaction();
-                log_debug << "Messages deleted, receiptHandle: "
-                          << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: "
-                          << result->deleted_count();
+                log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
@@ -861,6 +860,33 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteMessage(message);
+        }
+    }
+
+    void SQSDatabase::DeleteMessage(const std::string &receiptHandle) {
+
+        if (_useDatabase) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+                session.commit_transaction();
+                log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(receiptHandle, 0, 40) << "... count: " << result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+
+        } else {
+
+            _memoryDb.DeleteMessage(receiptHandle);
         }
     }
 

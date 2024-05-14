@@ -78,69 +78,82 @@ namespace AwsMock::Database::Entity::SNS {
 
     Poco::JSON::Object Topic::ToJsonObject() const {
 
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("topicName", topicName);
-        jsonObject.set("owner", owner);
-        jsonObject.set("topicUrl", topicUrl);
-        jsonObject.set("topicArn", topicArn);
-        jsonObject.set("topicAttribute", topicAttribute.ToJsonObject());
+        try {
 
-        // Subscription array
-        if (!subscriptions.empty()) {
-            Poco::JSON::Array jsonSubscriptionArray;
-            for (const auto &subscription: subscriptions) {
-                jsonSubscriptionArray.add(subscription.ToJsonObject());
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("region", region);
+            jsonObject.set("topicName", topicName);
+            jsonObject.set("owner", owner);
+            jsonObject.set("topicUrl", topicUrl);
+            jsonObject.set("topicArn", topicArn);
+            jsonObject.set("topicAttribute", topicAttribute.ToJsonObject());
+
+            // Subscription array
+            if (!subscriptions.empty()) {
+                Poco::JSON::Array jsonSubscriptionArray;
+                for (const auto &subscription: subscriptions) {
+                    jsonSubscriptionArray.add(subscription.ToJsonObject());
+                }
+                jsonObject.set("subscriptions", jsonSubscriptionArray);
             }
-            jsonObject.set("subscriptions", jsonSubscriptionArray);
-        }
 
-        // Tags array
-        if (!tags.empty()) {
-            Poco::JSON::Array jsonTagArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object jsonTagObject;
-                jsonTagObject.set(tag.first, tag.second);
-                jsonTagArray.add(jsonTagObject);
+            // Tags array
+            if (!tags.empty()) {
+                Poco::JSON::Array jsonTagArray;
+                for (const auto &tag: tags) {
+                    Poco::JSON::Object jsonTagObject;
+                    jsonTagObject.set(tag.first, tag.second);
+                    jsonTagArray.add(jsonTagObject);
+                }
+                jsonObject.set("tags", jsonTagArray);
             }
-            jsonObject.set("tags", jsonTagArray);
-        }
+            return jsonObject;
 
-        return jsonObject;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     void Topic::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("topicName", jsonObject, topicName);
-        Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-        Core::JsonUtils::GetJsonValueString("topicUrl", jsonObject, topicUrl);
-        Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
+        try {
 
-        // Attributes
-        if (jsonObject->has("topicAttribute")) {
-            Poco::JSON::Object::Ptr attributeObject = jsonObject->getObject("topicAttribute");
-            topicAttribute.FromJsonObject(attributeObject);
-        }
+            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+            Core::JsonUtils::GetJsonValueString("topicName", jsonObject, topicName);
+            Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
+            Core::JsonUtils::GetJsonValueString("topicUrl", jsonObject, topicUrl);
+            Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
 
-        // Subscriptions
-        if (jsonObject->has("subscriptions")) {
-            Poco::JSON::Array::Ptr subscriptionArray = jsonObject->getArray("subscriptions");
-            for (int i = 0; i < subscriptionArray->size(); i++) {
-                Poco::JSON::Object::Ptr subscriptionObject = subscriptionArray->getObject(i);
-                Subscription subscription;
-                subscription.FromJsonObject(subscriptionObject);
-                subscriptions.emplace_back(subscription);
+            // Attributes
+            if (jsonObject->has("topicAttribute")) {
+                Poco::JSON::Object::Ptr attributeObject = jsonObject->getObject("topicAttribute");
+                topicAttribute.FromJsonObject(attributeObject);
             }
-        }
 
-        // Tags
-        if (jsonObject->has("tags")) {
-            Poco::JSON::Array::Ptr tagsArray = jsonObject->getArray("tags");
-            for (int i = 0; i < tagsArray->size(); i++) {
-                Poco::JSON::Object::Ptr tagObject = tagsArray->getObject(i);
-                tags[tagObject->getNames().front()] = tagObject->getValue<std::string>(tagObject->getNames().front());
+            // Subscriptions
+            if (jsonObject->has("subscriptions")) {
+                Poco::JSON::Array::Ptr subscriptionArray = jsonObject->getArray("subscriptions");
+                for (int i = 0; i < subscriptionArray->size(); i++) {
+                    Poco::JSON::Object::Ptr subscriptionObject = subscriptionArray->getObject(i);
+                    Subscription subscription;
+                    subscription.FromJsonObject(subscriptionObject);
+                    subscriptions.emplace_back(subscription);
+                }
             }
+
+            // Tags
+            if (jsonObject->has("tags")) {
+                Poco::JSON::Array::Ptr tagsArray = jsonObject->getArray("tags");
+                for (int i = 0; i < tagsArray->size(); i++) {
+                    Poco::JSON::Object::Ptr tagObject = tagsArray->getObject(i);
+                    tags[tagObject->getNames().front()] = tagObject->getValue<std::string>(tagObject->getNames().front());
+                }
+            }
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
         }
     }
 

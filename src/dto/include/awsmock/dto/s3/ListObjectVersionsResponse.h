@@ -22,7 +22,7 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
-#include <awsmock/core/JsonException.h>
+#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/s3/model/ObjectVersion.h>

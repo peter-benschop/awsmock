@@ -24,7 +24,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::KMS {

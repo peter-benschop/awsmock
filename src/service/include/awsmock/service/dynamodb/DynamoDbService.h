@@ -17,11 +17,11 @@
 #include <Poco/StreamCopier.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/MetricServiceTimer.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>

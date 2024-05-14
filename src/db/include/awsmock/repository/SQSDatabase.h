@@ -18,9 +18,9 @@
 #include <mongocxx/options/find_one_and_update.hpp>
 
 // AwsMock includes
+#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -275,11 +275,7 @@ namespace AwsMock::Database {
          * @param count message count to receive
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &region,
-                             const std::string &queueUrl,
-                             int visibility,
-                             int count,
-                             Entity::SQS::MessageList &messageList);
+        void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int count, Entity::SQS::MessageList &messageList);
 
         /**
          * Reset expired messages
@@ -328,9 +324,7 @@ namespace AwsMock::Database {
          * @param queueUrl URL of the queue
          * @param status message state
          */
-        long CountMessagesByStatus(const std::string &region,
-                                   const std::string &queueUrl,
-                                   Entity::SQS::MessageStatus status);
+        long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status);
 
         /**
          * Converts a message object to a JSON string
@@ -356,6 +350,14 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         void DeleteMessage(const Entity::SQS::Message &message);
+
+        /**
+         * Deletes a message by receipt handle.
+         *
+         * @param receiptHandle message receipt handle
+         * @throws Core::DatabaseException
+         */
+        void DeleteMessage(const std::string &receiptHandle);
 
         /**
          * Deletes a messages.

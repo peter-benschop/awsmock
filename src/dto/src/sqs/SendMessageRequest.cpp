@@ -18,6 +18,9 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
             Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
 
+            // Sanitize
+            queueUrl = Core::AwsUtils::SanitzeSQSUrl(queueUrl);
+
             // User attributes
             if (rootObject->has("MessageAttributes")) {
 
@@ -47,7 +50,7 @@ namespace AwsMock::Dto::SQS {
                 }
             }
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -78,7 +81,7 @@ namespace AwsMock::Dto::SQS {
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

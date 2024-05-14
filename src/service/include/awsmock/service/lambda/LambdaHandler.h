@@ -11,6 +11,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
+#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
 

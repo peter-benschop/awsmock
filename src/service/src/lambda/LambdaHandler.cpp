@@ -41,7 +41,7 @@ namespace AwsMock::Service {
 
         } catch (Core::ServiceException &exc) {
             SendXmlErrorResponse("lambda", response, exc);
-        } catch (Core::ResourceNotFoundException &exc) {
+        } catch (Core::NotFoundException &exc) {
             SendXmlErrorResponse("lambda", response, exc);
         }
     }

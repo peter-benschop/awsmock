@@ -25,7 +25,7 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
-#include <awsmock/core/ServiceException.h>
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/entity/sns/Topic.h>
 
 namespace AwsMock::Dto::SNS {

@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SQS {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 

@@ -24,6 +24,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/NumberUtils.h>

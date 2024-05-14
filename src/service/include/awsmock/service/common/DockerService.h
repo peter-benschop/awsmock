@@ -14,6 +14,7 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -21,7 +22,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>

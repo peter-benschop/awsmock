@@ -500,9 +500,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::GetObject(const std::string &region,
-                                             const std::string &bucket,
-                                             const std::string &key) {
+    Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
         if (_useDatabase) {
 
@@ -513,7 +511,7 @@ namespace AwsMock::Database {
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult =
                         _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
 
-                if (!mResult->empty()) {
+                if (mResult.operator bool()) {
                     Entity::S3::Object result;
                     result.FromDocument(mResult->view());
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
-#define AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
+#ifndef AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H
+#define AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H
 
 // C++ includes
 #include <map>
@@ -23,6 +23,10 @@
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
+
+// AwsMock includes
+#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Database::Entity::SNS {
 
@@ -86,4 +90,4 @@ namespace AwsMock::Database::Entity::SNS {
 
 }// namespace AwsMock::Database::Entity::SNS
 
-#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGEATTRIBUTE_H
+#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H

@@ -11,9 +11,9 @@
 #include "Poco/DateTimeFormatter.h"
 
 // AwsMock includes
+#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonException.h>
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/core/NumberUtils.h>

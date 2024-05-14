@@ -20,20 +20,28 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueInt("WaitTimeSeconds", rootObject, waitTimeSeconds);
             Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
 
+            // Sanitize
+            queueUrl = Core::AwsUtils::SanitzeSQSUrl(queueUrl);
+
             // Attributes
-            Poco::JSON::Array::Ptr attributes = rootObject->getArray("AttributeNames");
-            for (const auto &attribute: *attributes) {
-                messageAttributeNames.emplace_back(attribute.convert<std::string>());
+            if (rootObject->has("AttributeNames")) {
+                Poco::JSON::Array::Ptr attributes = rootObject->getArray("AttributeNames");
+                for (const auto &attribute: *attributes) {
+                    messageAttributeNames.emplace_back(attribute.convert<std::string>());
+                }
             }
 
             // Message attributes
-            Poco::JSON::Array::Ptr messageAttributes = rootObject->getArray("MessageAttributeNames");
-            for (const auto &messageAttribute: *messageAttributes) {
-                messageAttributeNames.emplace_back(messageAttribute.convert<std::string>());
+            if (rootObject->has("MessageAttributeNames")) {
+                Poco::JSON::Array::Ptr messageAttributes = rootObject->getArray("MessageAttributeNames");
+                for (const auto &messageAttribute: *messageAttributes) {
+                    messageAttributeNames.emplace_back(messageAttribute.convert<std::string>());
+                }
             }
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 

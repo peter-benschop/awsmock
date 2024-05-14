@@ -18,7 +18,7 @@
 #include <Poco/Util/PropertyFileConfiguration.h>
 
 // AwsMock includes
-#include <awsmock/core/CoreException.h>
+#include "awsmock/core/exception/CoreException.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Version.h>

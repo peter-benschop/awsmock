@@ -17,10 +17,17 @@ namespace AwsMock::Database::Entity::SNS {
 
     Poco::JSON::Object MessageAttribute::ToJsonObject() const {
 
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("name", attributeName);
-        jsonObject.set("value", attributeValue);
-        return jsonObject;
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("name", attributeName);
+            jsonObject.set("value", attributeValue);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string MessageAttribute::ToString() const {

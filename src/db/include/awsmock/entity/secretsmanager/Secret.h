@@ -19,8 +19,8 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/DatabaseException.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>

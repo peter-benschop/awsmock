@@ -59,45 +59,59 @@ namespace AwsMock::Database::Entity::SNS {
     }
 
     Poco::JSON::Object Message::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("topicArn", topicArn);
-        jsonObject.set("targetArn", targetArn);
-        jsonObject.set("message", message);
-        jsonObject.set("status", MessageStatusToString(status));
-        jsonObject.set("messageId", messageId);
-        jsonObject.set("lastSend", Poco::DateTimeFormatter::format(lastSend, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-        // Attributes
-        if (!attributes.empty()) {
-            Poco::JSON::Array jsonAttributeArray;
-            for (const auto &attribute: attributes) {
-                jsonAttributeArray.add(attribute.ToJsonObject());
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("region", region);
+            jsonObject.set("topicArn", topicArn);
+            jsonObject.set("targetArn", targetArn);
+            jsonObject.set("message", message);
+            jsonObject.set("status", MessageStatusToString(status));
+            jsonObject.set("messageId", messageId);
+            jsonObject.set("lastSend", Poco::DateTimeFormatter::format(lastSend, Poco::DateTimeFormat::ISO8601_FORMAT));
+
+            // Attributes
+            if (!attributes.empty()) {
+                Poco::JSON::Array jsonAttributeArray;
+                for (const auto &attribute: attributes) {
+                    jsonAttributeArray.add(attribute.ToJsonObject());
+                }
+                jsonObject.set("attributes", jsonAttributeArray);
             }
-            jsonObject.set("attributes", jsonAttributeArray);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
         }
-        return jsonObject;
     }
 
     void Message::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
-        Core::JsonUtils::GetJsonValueString("targetArn", jsonObject, targetArn);
-        Core::JsonUtils::GetJsonValueString("message", jsonObject, message);
-        Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
-        std::string statusStr;
-        Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);
-        status = MessageStatusFromString(statusStr);
+        try {
+            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+            Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
+            Core::JsonUtils::GetJsonValueString("targetArn", jsonObject, targetArn);
+            Core::JsonUtils::GetJsonValueString("message", jsonObject, message);
+            Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
+            std::string statusStr;
+            Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);
+            status = MessageStatusFromString(statusStr);
 
-        // Message attributes
-        Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("messageAttributes");
-        for (int i = 0; i < jsonAttributeArray->size(); i++) {
-            MessageAttribute messageAttribute;
-            Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-            Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
-            Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
-            attributes.emplace_back(messageAttribute);
+            // Message attributes
+            Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("messageAttributes");
+            for (int i = 0; i < jsonAttributeArray->size(); i++) {
+                MessageAttribute messageAttribute;
+                Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+                Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
+                Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
+                attributes.emplace_back(messageAttribute);
+            }
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
         }
     }
 

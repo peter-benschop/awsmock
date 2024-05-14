@@ -67,7 +67,7 @@ namespace AwsMock::Service {
         // Check bucket existence
         if (!_database.SecretExists(request.secretId)) {
             log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
+            throw Core::NotFoundException("Secret does not exist, secretId: " + request.secretId);
         }
 
         Dto::SecretsManager::DescribeSecretResponse response;
@@ -223,7 +223,7 @@ namespace AwsMock::Service {
         // Check bucket existence
         if (!_database.SecretExists(request.secretId)) {
             log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::ResourceNotFoundException("Secret does not exist, secretId: " + request.secretId);
+            throw Core::NotFoundException("Secret does not exist, secretId: " + request.secretId);
         }
 
         try {

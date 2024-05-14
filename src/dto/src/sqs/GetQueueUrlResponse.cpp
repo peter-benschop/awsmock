@@ -63,7 +63,7 @@ namespace AwsMock::Dto::SQS {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -78,7 +78,7 @@ namespace AwsMock::Dto::SQS {
 
         } catch (Poco::Exception &exc) {
             std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

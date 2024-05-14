@@ -16,7 +16,7 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

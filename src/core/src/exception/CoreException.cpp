@@ -2,7 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#include <awsmock/core/CoreException.h>
+#include "awsmock/core/exception/CoreException.h"
 
 namespace AwsMock::Core {
 

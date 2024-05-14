@@ -297,6 +297,14 @@ namespace AwsMock::Database {
         void DeleteMessage(const Entity::SQS::Message &message);
 
         /**
+         * Deletes a message by receipt handle.
+         *
+         * @param receiptHandle message receipt handle
+         * @throws Core::DatabaseException
+         */
+        void DeleteMessage(const std::string &receiptHandle);
+
+        /**
          * Deletes a messages.
          *
          * @throws Core::DatabaseException

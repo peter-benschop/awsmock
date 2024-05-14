@@ -20,7 +20,7 @@ namespace AwsMock::Dto::SecretsManager {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 

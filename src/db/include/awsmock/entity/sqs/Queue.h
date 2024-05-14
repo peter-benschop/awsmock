@@ -17,10 +17,10 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include <awsmock/core/DatabaseException.h>
+#include "awsmock/core/exception/DatabaseException.h"
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ServiceException.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
 

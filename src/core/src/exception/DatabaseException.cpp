@@ -2,7 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#include "awsmock/core/DatabaseException.h"
+#include "awsmock/core/exception/DatabaseException.h"
 
 namespace AwsMock::Core {
 

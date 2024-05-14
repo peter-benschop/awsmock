@@ -66,13 +66,13 @@ namespace AwsMock::Service {
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
             log_info << "Bucket " << request.bucket << " does not exist";
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         if (!request.key.empty()) {
             if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
                 log_info << "Object " << request.key << " does not exist";
-                throw Core::ServiceException("Object does not exist");
+                throw Core::NotFoundException("Object does not exist");
             }
         }
 
@@ -106,13 +106,13 @@ namespace AwsMock::Service {
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
             log_error << "Bucket " << request.bucket << " does not exist";
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         if (!request.key.empty()) {
             if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
                 log_error << "Object " << request.key << " does not exist";
-                throw Core::ServiceException("Object does not exist");
+                throw Core::NotFoundException("Object does not exist");
             }
         }
 
@@ -194,7 +194,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         // Update bucket
@@ -210,7 +210,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         std::string uploadId = Core::StringUtils::GenerateRandomString(58);
@@ -307,7 +307,7 @@ namespace AwsMock::Service {
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
             log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         try {
@@ -332,13 +332,13 @@ namespace AwsMock::Service {
         // Check existence of source bucket
         if (!_database.BucketExists({.region = request.region, .name = request.sourceBucket})) {
             log_error << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket;
-            throw Core::ServiceException("Source bucket does not exist");
+            throw Core::NotFoundException("Source bucket does not exist");
         }
 
         // Check existence of source key
         if (!_database.ObjectExists({.region = request.region, .bucket = request.sourceBucket, .key = request.sourceKey})) {
             log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
-            throw Core::ServiceException("Source object does not exist");
+            throw Core::NotFoundException("Source object does not exist");
         }
 
         Dto::S3::CopyObjectResponse response;
@@ -348,7 +348,7 @@ namespace AwsMock::Service {
             // Check existence of target bucket
             if (!_database.BucketExists({.region = request.region, .name = request.targetBucket})) {
                 log_error << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket;
-                throw Core::ServiceException("Target bucket does not exist");
+                throw Core::NotFoundException("Target bucket does not exist");
             }
 
             // Get the source object from the database
@@ -403,14 +403,14 @@ namespace AwsMock::Service {
         // Check existence of source bucket
         if (!_database.BucketExists({.region = request.region, .name = request.sourceBucket})) {
             log_error << "Source bucket does not exist, region: " << request.region + " bucket: " << request.sourceBucket;
-            throw Core::ServiceException("Source bucket does not exist");
+            throw Core::NotFoundException("Source bucket does not exist");
         }
 
         // Check existence of source key
         if (!_database.ObjectExists({.region = request.region, .bucket = request.sourceBucket, .key = request.sourceKey})) {
             log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
                       << request.sourceKey;
-            throw Core::ServiceException("Source object does not exist");
+            throw Core::NotFoundException("Source object does not exist");
         }
 
         Dto::S3::CopyObjectResponse response;
@@ -474,7 +474,7 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist, bucket: " + request.bucket);
+            throw Core::NotFoundException("Bucket does not exist, bucket: " + request.bucket);
         }
 
         if (_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
@@ -508,7 +508,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         Dto::S3::DeleteObjectsResponse response;
@@ -547,13 +547,13 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         // Check notification existence
         Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
         if (bucket.HasNotification(request.event)) {
-            throw Core::ServiceException("Bucket notification exists already");
+            throw Core::NotFoundException("Bucket notification exists already");
         }
 
         try {
@@ -575,7 +575,7 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         try {
@@ -598,13 +598,13 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         // Get bucket
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
         if (!bucketEntity.IsVersioned()) {
-            throw Core::ServiceException("Bucket is not versioned");
+            throw Core::NotFoundException("Bucket is not versioned");
         }
 
         Dto::S3::ListObjectVersionsResponse response;
@@ -626,17 +626,17 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists(bucket)) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         // Check empty
         if (_database.HasObjects(bucket)) {
-            throw Core::ServiceException("Bucket is not empty");
+            throw Core::NotFoundException("Bucket is not empty");
         }
 
         // Check transfer bucket
         if (request.bucket == _transferBucket) {
-            throw Core::ServiceException("Transfer bucket cannot be deleted");
+            throw Core::NotFoundException("Transfer bucket cannot be deleted");
         }
 
         try {
@@ -752,7 +752,7 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::ServiceException("Bucket does not exist");
+            throw Core::NotFoundException("Bucket does not exist");
         }
 
         Dto::S3::PutBucketNotificationConfigurationResponse response;

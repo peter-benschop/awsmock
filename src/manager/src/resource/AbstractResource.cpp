@@ -1,5 +1,5 @@
 
-#include "awsmock/resource/AbstractResource.h"
+#include <awsmock/resource/AbstractResource.h>
 
 namespace AwsMock::Manager {
 
@@ -219,19 +219,12 @@ namespace AwsMock::Manager {
 
         Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/[a-zA-Z0-9]+\/aws4_request,.*$)");
         if (!pattern.match(authorization, 0, posVec)) {
-            throw Core::ResourceNotFoundException("Could not extract region and user");
+            throw Core::ForbiddenException("Could not extract region and user");
         }
 
         user = authorization.substr(posVec[1].offset, posVec[1].length);
         region = authorization.substr(posVec[2].offset, posVec[2].length);
         log_trace << "Found user: " << user << " region: " << region;
-    }
-
-    std::string AbstractResource::GetPayload(Poco::Net::HTTPServerRequest &request) {
-        std::string payload;
-        Poco::StreamCopier::copyToString(request.stream(), payload);
-        log_trace << "Request payload: " << payload;
-        return payload;
     }
 
     void AbstractResource::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, HeaderMap *extraHeader) {

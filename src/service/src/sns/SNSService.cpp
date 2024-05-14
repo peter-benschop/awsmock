@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "SQS", Poco::UUIDGenerator().createRandom().toString().c_str());
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
             // Check existence
             if (!_snsDatabase.TopicExists(topicArn)) {
                 log_warning << "Topic does not exist, arn: " << topicArn;
-                throw Core::ServiceException("Topic does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::NotFoundException("Topic does not exist");
             }
 
             // Update database
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS delete topic failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
         return response;
     }
@@ -86,13 +86,13 @@ namespace AwsMock::Service {
         // Check topic/target ARN
         if (request.topicArn.empty()) {
             log_error << "Either topicARN or targetArn must exist";
-            throw Core::ServiceException("Either topicARN or targetArn must exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("Either topicARN or targetArn must exist");
         }
 
         // Check existence
         if (!_snsDatabase.TopicExists(request.topicArn)) {
             log_error << "Topic does not exist: " << request.topicArn;
-            throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("SNS topic does not exists");
         }
 
         Database::Entity::SNS::Message message;
@@ -113,7 +113,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS create message failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -123,12 +123,12 @@ namespace AwsMock::Service {
 
             // Check topic/target ARN
             if (request.topicArn.empty()) {
-                throw Core::ServiceException("Topic ARN missing", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::ServiceException("Topic ARN missing");
             }
 
             // Check existence
             if (!_snsDatabase.TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::ServiceException("SNS topic does not exists");
             }
 
             // Create new subscription
@@ -152,7 +152,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -266,7 +266,7 @@ namespace AwsMock::Service {
 
             for (const auto &it: topic.subscriptions) {
 
-                if (it.protocol == SQS_PROTOCOL) {
+                if (Poco::toLower(it.protocol) == SQS_PROTOCOL) {
 
                     SendSQSMessage(it, request);
                     log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
@@ -286,8 +286,7 @@ namespace AwsMock::Service {
                 .messageId = Core::AwsUtils::CreateMessageId(),
                 .topicArn = request.topicArn,
                 .message = request.message,
-                .timestamp = static_cast<long>(Poco::Timestamp().epochMicroseconds() / 1000)
-        };
+                .timestamp = static_cast<long>(Poco::Timestamp().epochMicroseconds() / 1000)};
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest = {

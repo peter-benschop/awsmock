@@ -9,9 +9,9 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
         src/utils/MemoryMappedFile.cpp src/utils/Task.cpp src/utils/XmlUtils.cpp src/utils/Win32Utils.cpp
         src/utils/Timer.cpp src/utils/TaskPool.cpp)
 
-set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp
-        src/exception/ServiceException.cpp src/exception/ResourceNotFoundException.cpp
-        src/exception/InvalidMethodCallException.cpp src/exception/JsonException.cpp)
+set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp src/exception/ServiceException.cpp
+        src/exception/InvalidMethodCallException.cpp src/exception/JsonException.cpp src/exception/NotFoundException.cpp
+        src/exception/ForbiddenException.cpp)
 set(LOGGING_SOURCES src/logging/LogStream.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp)
 
@@ -23,8 +23,7 @@ add_subdirectory(tst)
 # Includes
 include_directories(./include)
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/core/TaskPool.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

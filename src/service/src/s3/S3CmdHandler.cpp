@@ -178,10 +178,7 @@ namespace AwsMock::Service {
                     throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));
                 }
             }
-        } catch (Core::ServiceException &exc) {
-            log_error << exc.message();
-            SendXmlErrorResponse("S3", response, exc);
-        } catch (Core::JsonException &exc) {
+        } catch (Poco::Exception &exc) {
             log_error << exc.message();
             SendXmlErrorResponse("S3", response, exc);
         } catch (std::exception &exc) {

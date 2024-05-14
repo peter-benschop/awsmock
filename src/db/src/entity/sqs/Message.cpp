@@ -89,77 +89,86 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     Poco::JSON::Object Message::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("queueUrl", queueUrl);
-        jsonObject.set("body", body);
-        jsonObject.set("status", MessageStatusToString(status));
-        jsonObject.set("messageId", messageId);
-        jsonObject.set("receiptHandle", receiptHandle);
-        jsonObject.set("md5Body", md5Body);
-        jsonObject.set("md5UserAttr", md5UserAttr);
-        jsonObject.set("md5SystemAttr", md5SystemAttr);
-        jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
+        try {
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("region", region);
+            jsonObject.set("queueUrl", queueUrl);
+            jsonObject.set("body", body);
+            jsonObject.set("status", MessageStatusToString(status));
+            jsonObject.set("messageId", messageId);
+            jsonObject.set("receiptHandle", receiptHandle);
+            jsonObject.set("md5Body", md5Body);
+            jsonObject.set("md5UserAttr", md5UserAttr);
+            jsonObject.set("md5SystemAttr", md5SystemAttr);
+            jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
 
-        // Message attributes
-        if (!messageAttributes.empty()) {
-            Poco::JSON::Object jsonMessageAttributeObject;
-            for (const auto &attribute: messageAttributes) {
-                Poco::JSON::Object jsonAttributeObject;
-                jsonAttributeObject.set("StringValue", attribute.attributeValue);
-                jsonAttributeObject.set("DataType", attribute.attributeType);
-                jsonMessageAttributeObject.set(attribute.attributeName, jsonAttributeObject);
+            // Message attributes
+            if (!messageAttributes.empty()) {
+                Poco::JSON::Object jsonMessageAttributeObject;
+                for (const auto &attribute: messageAttributes) {
+                    Poco::JSON::Object jsonAttributeObject;
+                    jsonAttributeObject.set("StringValue", attribute.attributeValue);
+                    jsonAttributeObject.set("DataType", attribute.attributeType);
+                    jsonMessageAttributeObject.set(attribute.attributeName, jsonAttributeObject);
+                }
+                jsonObject.set("MessageAttributes", jsonMessageAttributeObject);
             }
-            jsonObject.set("MessageAttributes", jsonMessageAttributeObject);
-        }
 
-        // Attributes
-        if (!attributes.empty()) {
-            Poco::JSON::Array jsonAttributeArray;
-            for (const auto &attribute: attributes) {
-                Poco::JSON::Object jsonAttributeObject;
-                jsonAttributeObject.set(attribute.first, attribute.second);
-                jsonAttributeArray.add(jsonAttributeObject);
+            // Attributes
+            if (!attributes.empty()) {
+                Poco::JSON::Array jsonAttributeArray;
+                for (const auto &attribute: attributes) {
+                    Poco::JSON::Object jsonAttributeObject;
+                    jsonAttributeObject.set(attribute.first, attribute.second);
+                    jsonAttributeArray.add(jsonAttributeObject);
+                }
+                jsonObject.set("attributes", jsonAttributeArray);
             }
-            jsonObject.set("attributes", jsonAttributeArray);
+            return jsonObject;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
         }
-
-        return jsonObject;
     }
 
     void Message::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
-        Core::JsonUtils::GetJsonValueString("body", jsonObject, body);
-        Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
-        Core::JsonUtils::GetJsonValueString("receiptHandle", jsonObject, receiptHandle);
-        Core::JsonUtils::GetJsonValueString("md5Body", jsonObject, md5Body);
-        Core::JsonUtils::GetJsonValueString("md5UserAttr", jsonObject, md5UserAttr);
-        Core::JsonUtils::GetJsonValueString("md5SystemAttr", jsonObject, md5SystemAttr);
-        Core::JsonUtils::GetJsonValueDate("reset", jsonObject, reset);
-        std::string statusStr;
-        Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);
-        status = MessageStatusFromString(statusStr);
+        try {
+            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+            Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
+            Core::JsonUtils::GetJsonValueString("body", jsonObject, body);
+            Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
+            Core::JsonUtils::GetJsonValueString("receiptHandle", jsonObject, receiptHandle);
+            Core::JsonUtils::GetJsonValueString("md5Body", jsonObject, md5Body);
+            Core::JsonUtils::GetJsonValueString("md5UserAttr", jsonObject, md5UserAttr);
+            Core::JsonUtils::GetJsonValueString("md5SystemAttr", jsonObject, md5SystemAttr);
+            Core::JsonUtils::GetJsonValueDate("reset", jsonObject, reset);
+            std::string statusStr;
+            Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);
+            status = MessageStatusFromString(statusStr);
 
-        // Attributes
-        Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("attributes");
-        for (int i = 0; i < jsonAttributeArray->size(); i++) {
-            std::string key, value;
-            Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-            Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, key);
-            Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, value);
-            attributes[key] = value;
-        }
+            // Attributes
+            Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("attributes");
+            for (int i = 0; i < jsonAttributeArray->size(); i++) {
+                std::string key, value;
+                Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+                Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, key);
+                Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, value);
+                attributes[key] = value;
+            }
 
-        // Message attributes
-        Poco::JSON::Array::Ptr jsonMessageAttributeArray = jsonObject->getArray("messageAttributes");
-        for (int i = 0; i < jsonMessageAttributeArray->size(); i++) {
-            MessageAttribute messageAttribute;
-            Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-            Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
-            Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
-            attributes[messageAttribute.attributeName] = messageAttribute.attributeValue;
+            // Message attributes
+            Poco::JSON::Array::Ptr jsonMessageAttributeArray = jsonObject->getArray("messageAttributes");
+            for (int i = 0; i < jsonMessageAttributeArray->size(); i++) {
+                MessageAttribute messageAttribute;
+                Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
+                Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, messageAttribute.attributeName);
+                Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, messageAttribute.attributeValue);
+                attributes[messageAttribute.attributeName] = messageAttribute.attributeValue;
+            }
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
         }
     }
 

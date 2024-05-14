@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Lambda {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 

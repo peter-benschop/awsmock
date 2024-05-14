@@ -62,7 +62,7 @@ namespace AwsMock::Service {
         Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9\-]+)\/aws4_request,.*$)");
         if (!pattern.match(authorization, 0, posVec)) {
             log_error << "Could not extract module, authorization: " << authorization;
-            throw Core::ResourceNotFoundException("Could not extract module", Poco::Net::HTTPServerResponse::HTTP_NOT_FOUND);
+            throw Core::NotFoundException("Could not extract module");
         }
 
         std::string service = authorization.substr(posVec[1].offset, posVec[1].length);

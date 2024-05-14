@@ -23,8 +23,8 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMoc includes
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/ServiceException.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
 

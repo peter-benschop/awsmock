@@ -32,7 +32,7 @@ namespace AwsMock::Dto::Common {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -56,7 +56,7 @@ namespace AwsMock::Dto::Common {
             }
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 }// namespace AwsMock::Dto::Common

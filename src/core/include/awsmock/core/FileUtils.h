@@ -51,7 +51,6 @@
 // AwsMock includes
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/ResourceNotFoundException.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
