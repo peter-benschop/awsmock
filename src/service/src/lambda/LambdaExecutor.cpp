@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     void LambdaExecutor::Run() {
         Poco::ScopedLock lock(_mutex);
 
-        Core::MetricServiceTimer measure(Core::MetricService::instance(), LAMBDA_INVOCATION_TIMER);
+        Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
         log_debug << "Sending lambda invocation request, endpoint: " << _url;
 

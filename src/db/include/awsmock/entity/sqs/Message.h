@@ -142,6 +142,22 @@ namespace AwsMock::Database::Entity::SQS {
         Poco::DateTime modified = Poco::DateTime();
 
         /**
+         * Checks for the existence of a attribute with the given key.
+         *
+         * @param key attribute key
+         * @return true if attribute with the given key exists
+         */
+        bool HasAttribute(const std::string &key);
+
+        /**
+         * Returns the given attribute as integer
+         *
+         * @param key attribute key
+         * @return true if attribute with the given key exists
+         */
+        int GetIntAttribute(const std::string &key);
+
+        /**
          * Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

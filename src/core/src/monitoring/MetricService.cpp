@@ -286,9 +286,22 @@ namespace AwsMock::Core {
         if (!TimerExists(name)) {
             _timerMap[name] = new Poco::Prometheus::Gauge(name);
             log_trace << "Timer added, name: " << name;
-            return;
         }
-        log_warning << "Timer exists already, name: " << name;
+    }
+
+    void MetricService::AddTimer(const std::string &name, const std::string &label) {
+        Poco::Mutex::ScopedLock lock(_mutex);
+        try {
+            if (!TimerExists(name, label)) {
+                _timerMap[name] = new Poco::Prometheus::Gauge(name, {.labelNames{"method"}});
+                log_trace << "Timer added, name: " << name << " label: " << label;
+            }
+        } catch (Poco::Exception &e) {
+            log_error << "name: " << name << " label: " << label << " error: " << e.message() << " what: " << e.what() << " size: " << _timerMap.size();
+            for (const auto &m: _timerMap) {
+                log_error << m.first;
+            }
+        }
     }
 
     void MetricService::StartTimer(const std::string &name) {
@@ -296,25 +309,50 @@ namespace AwsMock::Core {
         if (!TimerExists(name)) {
             _timerMap[name] = new Poco::Prometheus::Gauge(name);
         }
-        if (_timerStartMap.find(GetTimerKey(name)) == _timerStartMap.end()) {
-            _timerStartMap[GetTimerKey(name)] = std::chrono::high_resolution_clock::now();
+        if (_timerStartMap.find(GetTimerStartKeyName(name)) == _timerStartMap.end()) {
+            _timerStartMap[GetTimerStartKeyName(name)] = std::chrono::high_resolution_clock::now();
             log_trace << "Timer started, name: " << name;
+        }
+    }
+
+    void MetricService::StartTimer(const std::string &name, const std::string &label) {
+        Poco::Mutex::ScopedLock lock(_mutex);
+        if (!TimerExists(name, label)) {
+            _timerMap[name] = new Poco::Prometheus::Gauge(name, {.labelNames{"method"}});
+        }
+        if (_timerStartMap.find(GetTimerStartKeyLabel(name, label)) == _timerStartMap.end()) {
+            _timerStartMap[GetTimerStartKeyLabel(name, label)] = std::chrono::high_resolution_clock::now();
+            log_trace << "Timer started, name: " << name << " label: " << label;
         }
     }
 
     void MetricService::StopTimer(const std::string &name) {
         Poco::Mutex::ScopedLock lock(_mutex);
         if (TimerExists(name)) {
-            _timerMap.find(name)->second->set(TIME_DIFF(name));
+            _timerMap.find(name)->second->set(TIME_DIFF_NAME(name));
+            const auto count = std::erase_if(_timerStartMap, [name](const auto &item) {
+                return item.first == GetTimerStartKeyName(name);
+            });
+            log_trace << "Timer stopped, name: " << name << " count: " << count << " size: " << _timerStartMap.size();
         }
-        auto it = _timerStartMap.find(GetTimerKey(name));
-        if (it != _timerStartMap.end()) {
-            _timerStartMap.erase(it);
+    }
+
+    void MetricService::StopTimer(const std::string &name, const std::string &label) {
+        Poco::Mutex::ScopedLock lock(_mutex);
+        if (TimerExists(name, label)) {
+            _timerMap.find(name)->second->labels({label}).set(TIME_DIFF_LABEL(name, label));
+            const auto count = std::erase_if(_timerStartMap, [name, label](const auto &item) {
+                return item.first == GetTimerStartKeyLabel(name, label);
+            });
+            log_trace << "Timer stopped, name: " << name << " label: " << label << count << " size: " << _timerStartMap.size();
         }
-        log_trace << "Timer stopped, name: " << name;
     }
 
     bool MetricService::TimerExists(const std::string &name) {
+        return _timerMap.find(name) != _timerMap.end();
+    }
+
+    bool MetricService::TimerExists(const std::string &name, const std::string &label) {
         return _timerMap.find(name) != _timerMap.end();
     }
 
@@ -334,9 +372,20 @@ namespace AwsMock::Core {
         }
     }
 
-    std::string MetricService::GetTimerKey(const std::string &name) {
+    std::string MetricService::GetTimerKey(const std::string &name, const std::string &label) {
+        return name + "::" + label;
+    }
+
+    std::string MetricService::GetTimerStartKeyName(const std::string &name) {
         uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
         log_trace << "Timer key returned, name: " << name;
         return name + "::" + std::to_string(threadID);
     }
+
+    std::string MetricService::GetTimerStartKeyLabel(const std::string &name, const std::string &label) {
+        uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+        log_trace << "Timer key returned, name: " << name << " label: " << label;
+        return name + "::" + label + "::" + std::to_string(threadID);
+    }
+
 }// namespace AwsMock::Core

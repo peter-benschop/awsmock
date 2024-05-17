@@ -46,7 +46,7 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
         src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp src/cognito/ListUsersRequest.cpp
         src/cognito/ListUsersResponse.cpp src/cognito/LambdaConfig.cpp src/cognito/CustomEmailSender.cpp
-        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp)
+        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/common/CognitoClientCommand.cpp)
 set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp
         src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp

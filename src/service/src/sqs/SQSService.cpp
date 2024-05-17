@@ -13,6 +13,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "create_queue");
+        log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
 
         // Check existence. In case the queue exists already return the existing queue.
         if (_database.QueueExists(request.region, request.queueName)) {
@@ -90,6 +92,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "list_queues");
         log_trace << "List all queues request, region: " << region;
 
         try {
@@ -107,6 +110,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "purge_queue");
         log_trace << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
 
         // Check existence
@@ -126,6 +130,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "get_queue_url");
         log_info << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
 
         // Check existence
@@ -148,6 +153,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "get_queue_attributes");
         log_trace << "Get queue userAttributes request, request: " << request.ToString();
 
         // Check existence
@@ -215,6 +221,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
 
         // Check existence
@@ -263,6 +270,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "set_visibility_timeout");
         log_trace << "Change message visibilityTimeout request, queue: " << request.queueUrl;
 
         // Check existence
@@ -293,6 +301,8 @@ namespace AwsMock::Service {
     }
 
     void SQSService::TagQueue(const Dto::SQS::TagQueueRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "set_visibility_timeout");
+        log_trace << "Tag queue request, queue: " << request.queueUrl;
 
         try {
 
@@ -319,6 +329,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "delete_queue");
         log_trace << "Delete queue request, request: " << request.ToString();
 
         // Check existence
@@ -343,25 +354,18 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "send_message");
+        log_trace << "Send message request, queueUrl: " << request.queueUrl;
 
         if (!request.queueUrl.empty() && !_database.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, queueUrl: " << request.queueUrl;
             throw Core::ServiceException("SQS queue '" + request.queueUrl + "' does not exists");
         }
-        if (!request.queueArn.empty() && !_database.QueueArnExists(request.queueArn)) {
-            log_error << "Queue does not exist, queueArn: " << request.queueArn;
-            throw Core::ServiceException("SQS queue '" + request.queueArn + "' does not exists");
-        }
 
         try {
 
             // Get queue by URL
-            Database::Entity::SQS::Queue queue;
-            if (!request.queueUrl.empty()) {
-                queue = _database.GetQueueByUrl(request.region, request.queueUrl);
-            } else if (!request.queueArn.empty()) {
-                queue = _database.GetQueueByArn(request.queueArn);
-            }
+            Database::Entity::SQS::Queue queue = _database.GetQueueByUrl(request.region, request.queueUrl);
 
             // System attributes
             std::map<std::string, std::string> attributes = request.attributes;
@@ -381,10 +385,10 @@ namespace AwsMock::Service {
 
             // Set delay
             Poco::DateTime reset;
-            Database::Entity::SQS::MessageStatus messageStatus = Database::Entity::SQS::MessageStatus::INITIAL;
             if (queue.attributes.delaySeconds > 0) {
-                messageStatus = Database::Entity::SQS::MessageStatus::DELAYED;
                 reset += Poco::Timespan(queue.attributes.delaySeconds, 0);
+            } else {
+                reset = queue.attributes.visibilityTimeout;
             }
 
             // Set parameters
@@ -399,7 +403,7 @@ namespace AwsMock::Service {
                     {.region = request.region,
                      .queueUrl = queue.queueUrl,
                      .body = request.body,
-                     .status = messageStatus,
+                     .status = Database::Entity::SQS::MessageStatus::INITIAL,
                      .reset = reset,
                      .messageId = messageId,
                      .receiptHandle = receiptHandle,
@@ -426,6 +430,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "receive_message");
         log_debug << "Receive message request: " << request.ToString();
 
         try {
@@ -443,8 +448,7 @@ namespace AwsMock::Service {
                     break;
                 }
 
-                auto end = std::chrono::system_clock::now();
-                elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
+                elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - begin).count();
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
@@ -479,6 +483,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "delete_message");
         log_trace << "Delete message request, url: " << request.receiptHandle;
 
         try {
@@ -498,6 +503,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "delete_message_batch");
         log_trace << "Delete message batch request, size: " << request.deleteMessageBatchEntries.size();
 
         try {

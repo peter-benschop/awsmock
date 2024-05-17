@@ -1,9 +1,9 @@
 
-#include "awsmock/service/cognito/CognitoHandler.h"
+#include <awsmock/service/cognito/CognitoHandler.h>
 
 namespace AwsMock::Service {
 
-    CognitoHandler::CognitoHandler(Core::Configuration &configuration) : CognitoCliHandler(configuration), CognitoJava2Handler(configuration), _configuration(configuration), _cognitoService(configuration) {}
+    CognitoHandler::CognitoHandler(Core::Configuration &configuration) : CognitoCmdHandler(configuration), _configuration(configuration), _cognitoService(configuration) {}
 
     void CognitoHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_debug << "Cognito GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
@@ -16,6 +16,13 @@ namespace AwsMock::Service {
     void CognitoHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_debug << "Cognito POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
+
+        Dto::Common::CognitoClientCommand clientCommand;
+        clientCommand.FromRequest(Dto::Common::HttpMethod::GET, request, region, user);
+
+        CognitoCmdHandler::handlePost(request, response, clientCommand);
+
+        /*
         try {
 
             Dto::Common::UserAgent userAgent;
@@ -36,7 +43,7 @@ namespace AwsMock::Service {
         } catch (Core::ServiceException &exc) {
             log_error << "SQS module exception: " << exc.message();
             SendXmlErrorResponse("SQS", response, exc);
-        }
+        }*/
     }
 
     void CognitoHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {

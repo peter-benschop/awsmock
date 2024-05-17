@@ -31,6 +31,7 @@
 #define SQS_QUEUE_COUNT "sqs_queue_count_total"
 #define SQS_MESSAGE_COUNT "sqs_message_count_total"
 #define SQS_MESSAGE_BY_QUEUE_COUNT "sqs_message_by_queue_count"
+#define SQS_SERVICE_TIMER "sqs_service_timer"
 
 #define S3_BUCKET_COUNT "s3_bucket_count_total"
 #define S3_OBJECT_COUNT "s3_object_count_total"

@@ -12,7 +12,7 @@ namespace AwsMock::Manager {
 
         Core::MetricService &_metricService = Core::MetricService::instance();
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(_metricService, MODULE_GET_TIMER);
+        Core::MetricServiceTimer measure(MODULE_GET_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "GET");
         log_debug << "Module GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
@@ -80,7 +80,7 @@ namespace AwsMock::Manager {
 
         Core::MetricService &_metricService = Core::MetricService::instance();
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(_metricService, MODULE_PUT_TIMER);
+        Core::MetricServiceTimer measure(MODULE_PUT_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "PUT");
         log_debug << "Module PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
@@ -167,7 +167,7 @@ namespace AwsMock::Manager {
     void ModuleHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
         Core::MetricService &_metricService = Core::MetricService::instance();
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(_metricService, MODULE_POST_TIMER);
+        Core::MetricServiceTimer measure(MODULE_POST_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "POST");
         log_debug << "Module POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
         SendOkResponse(response);
@@ -176,7 +176,7 @@ namespace AwsMock::Manager {
     void ModuleHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
         Core::MetricService &_metricService = Core::MetricService::instance();
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(_metricService, MODULE_DELETE_TIMER);
+        Core::MetricServiceTimer measure(MODULE_DELETE_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "DELETE");
         log_debug << "Module DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
         SendOkResponse(response);
@@ -185,7 +185,7 @@ namespace AwsMock::Manager {
     void ModuleHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
         Core::MetricService &_metricService = Core::MetricService::instance();
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(_metricService, MODULE_HEAD_TIMER);
+        Core::MetricServiceTimer measure(MODULE_HEAD_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "HEAD");
         log_debug << "Module HEAD request, address: " << request.clientAddress().toString();
         SendOkResponse(response);
@@ -194,7 +194,7 @@ namespace AwsMock::Manager {
     void ModuleHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         Core::MetricService &_metricService = Core::MetricService::instance();
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(_metricService, MODULE_OPTIONS_TIMER);
+        Core::MetricServiceTimer measure(MODULE_OPTIONS_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "OPTIONS");
         log_debug << "Module OPTIONS request";
 

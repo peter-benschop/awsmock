@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
 
             // Sanitize
-            queueUrl = Core::AwsUtils::SanitzeSQSUrl(queueUrl);
+            queueUrl = Core::SanitzeSQSUrl(queueUrl);
 
             // Attributes
             if (rootObject->has("AttributeNames")) {
@@ -45,6 +45,39 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
+    std::string ReceiveMessageRequest::ToJson() const {
+
+        try {
+
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("QueueUrl", queueUrl);
+            rootJson.set("RequestId", requestId);
+            rootJson.set("MaxNumberOfMessages", maxMessages);
+            rootJson.set("WaitTimeSeconds", waitTimeSeconds);
+            rootJson.set("VisibilityTimeout", visibilityTimeout);
+
+            if (!attributeNames.empty()) {
+                Poco::JSON::Array jsonAttributeNamesArray;
+                for (const auto &attributeName: attributeNames) {
+                    jsonAttributeNamesArray.add(attributeName);
+                }
+            }
+
+            if (!messageAttributeNames.empty()) {
+                Poco::JSON::Array jsonMessageAttributeNamesArray;
+                for (const auto &messageAttributeName: messageAttributeNames) {
+                    jsonMessageAttributeNamesArray.add(messageAttributeName);
+                }
+            }
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     std::string ReceiveMessageRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
@@ -52,8 +85,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r) {
-        os << "ReceiveMessageRequest={region='" << r.region << "', queueUrl='" << r.queueUrl << "', queueName='" << r.queueName << "', maxMessages='" << r.maxMessages << "', visibilityTimeout='" << r.visibilityTimeout << "', waitTimeSeconds='"
-           << r.waitTimeSeconds << "', resource='" << r.resource << "', requestId: '" << r.requestId << "'}";
+        os << "ReceiveMessageRequest=" << r.ToJson();
         return os;
     }
 

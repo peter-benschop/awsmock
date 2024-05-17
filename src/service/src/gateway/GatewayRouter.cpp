@@ -58,17 +58,23 @@ namespace AwsMock::Service {
 
     std::string GatewayRouter::GetService(const std::string &authorization) {
 
-        Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9\-]+)\/aws4_request,.*$)");
-        if (!pattern.match(authorization, 0, posVec)) {
-            log_error << "Could not extract module, authorization: " << authorization;
-            throw Core::NotFoundException("Could not extract module");
+        try {
+
+            Poco::RegularExpression::MatchVec posVec;
+            Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9\-]+)\/aws4_request,.*$)");
+            if (!pattern.match(authorization, 0, posVec)) {
+                log_error << "Could not extract module, authorization: " << authorization;
+                throw Core::NotFoundException("Could not extract module");
+            }
+
+            std::string service = authorization.substr(posVec[1].offset, posVec[1].length);
+            log_trace << "Found module: " << service;
+            return service;
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
         }
-
-        std::string service = authorization.substr(posVec[1].offset, posVec[1].length);
-        log_trace << "Found module: " << service;
-
-        return service;
+        return {};
     }
 
 }// namespace AwsMock::Service

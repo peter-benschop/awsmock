@@ -284,8 +284,7 @@ namespace AwsMock::Database {
             }
         }
 
-        log_trace << "Messages received, region: " << region << " queue: " << queueUrl + " count: "
-                  << messageList.size();
+        log_trace << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size();
     }
 
     void SQSMemoryDb::ResetMessages(const std::string &queueUrl, long visibility) {
@@ -328,8 +327,7 @@ namespace AwsMock::Database {
                 count++;
             }
         }
-        log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << count
-                  << " queue: " << queueUrl;
+        log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << count << " queue: " << queueUrl;
     }
 
     void SQSMemoryDb::ResetDelayedMessages(const std::string &queueUrl, long delay) {

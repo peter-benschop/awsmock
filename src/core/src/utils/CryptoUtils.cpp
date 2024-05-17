@@ -574,6 +574,7 @@ namespace AwsMock::Core {
         char *out = OPENSSL_buf2hexstr(hash, size);
         auto sout = Poco::toLower<std::string>({out});
         sout = Poco::replace<std::string>(sout, ":", "");
+        free(out);
         return {sout};
     }
 

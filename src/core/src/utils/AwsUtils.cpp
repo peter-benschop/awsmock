@@ -82,7 +82,7 @@ namespace AwsMock::Core {
         return Poco::UUIDGenerator().createRandom().toString();
     }
 
-    std::string AwsUtils::SanitzeSQSUrl(const std::string &queue) {
+    /*std::string AwsUtils::SanitzeSQSUrl(const std::string &queue) {
         if (Core::StringUtils::ContainsIgnoreCase(queue, "http")) {
             return queue;
         }
@@ -91,5 +91,5 @@ namespace AwsMock::Core {
             return Core::AwsUtils::ConvertSQSQueueArnToUrl(Core::Configuration::instance(), queue);
         }
         return Core::AwsUtils::CreateSqsQueueUrl(Core::Configuration::instance(), queue);
-    }
+    }*/
 }// namespace AwsMock::Core
