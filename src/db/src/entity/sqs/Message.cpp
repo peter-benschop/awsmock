@@ -13,6 +13,23 @@ namespace AwsMock::Database::Entity::SQS {
     using bsoncxx::document::value;
     using bsoncxx::document::view;
 
+    bool Message::HasAttribute(const std::string &key) {
+        return find_if(attributes.begin(), attributes.end(), [key](const std::pair<std::string, std::string> &attribute) {
+                   return attribute.first == key;
+               }) != attributes.end();
+    }
+
+    int Message::GetIntAttribute(const std::string &key) {
+        if (HasAttribute(key)) {
+            auto it =
+                    find_if(attributes.begin(), attributes.end(), [key](const std::pair<std::string, std::string> &attribute) {
+                        return attribute.first == key;
+                    });
+            return std::stoi(it->second);
+        }
+        return -1;
+    }
+
     view_or_value<view, value> Message::ToDocument() const {
 
         auto messageAttributesDoc = bsoncxx::builder::basic::array{};

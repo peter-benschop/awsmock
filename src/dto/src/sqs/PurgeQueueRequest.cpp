@@ -22,6 +22,21 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
+    std::string PurgeQueueRequest::ToJson() const {
+
+        try {
+
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("QueueUrl", queueUrl);
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     std::string PurgeQueueRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
@@ -29,7 +44,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const PurgeQueueRequest &r) {
-        os << "PurgeQueueRequest={region='" << r.region << "', queueUrl: '" << r.queueUrl << "'}";
+        os << "PurgeQueueRequest=" << r.ToJson();
         return os;
     }
 

@@ -11,7 +11,13 @@
 
 namespace AwsMock::Core {
 
-    template<class M>
+    /**
+     * @brief Measures the execution time of a method.
+     *
+     * Is self-destroying, which means the timer is automatically destroyed, when the method goes out of scope.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class MetricServiceTimer {
 
       public:
@@ -26,7 +32,7 @@ namespace AwsMock::Core {
          *
          * @author jens.vogt\@opitz-consulting.com
          */
-        explicit MetricServiceTimer(M &metricService, std::string name) : _metricService(metricService), _name(std::move(name)) {
+        explicit MetricServiceTimer(std::string name) : _metricService(MetricService::instance()), _name(std::move(name)) {
             if (!_metricService.TimerExists(_name)) {
                 _metricService.AddTimer(_name);
             }
@@ -34,10 +40,31 @@ namespace AwsMock::Core {
         }
 
         /**
+         * Constructor
+         *
+         * <p>Measure a methods execution time.</p>
+         *
+         * @param metricService metric module
+         * @param name name of the underlying timer
+         *
+         * @author jens.vogt\@opitz-consulting.com
+         */
+        explicit MetricServiceTimer(std::string name, std::string label) : _metricService(MetricService::instance()), _name(std::move(name)), _label(std::move(label)) {
+            if (!_metricService.TimerExists(_name, _label)) {
+                _metricService.AddTimer(_name, _label);
+            }
+            _metricService.StartTimer(_name, _label);
+        }
+
+        /**
          * Destructor
          */
         ~MetricServiceTimer() {
-            _metricService.StopTimer(_name);
+            if (_label.empty()) {
+                _metricService.StopTimer(_name);
+            } else {
+                _metricService.StopTimer(_name, _label);
+            }
         }
 
         /**
@@ -60,12 +87,17 @@ namespace AwsMock::Core {
         /**
          * Metric module
          */
-        M &_metricService;
+        MetricService &_metricService;
 
         /**
          * Name of the timer
          */
-        const std::string _name;
+        const std::string _name{};
+
+        /**
+         * Label of the timer
+         */
+        const std::string _label{};
     };
 
 }// namespace AwsMock::Core

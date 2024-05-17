@@ -29,7 +29,8 @@
 #include <awsmock/core/MetricSystemCollector.h>
 #include <awsmock/core/Timer.h>
 
-#define TIME_DIFF(x) ((double) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerKey(x)]).count())
+#define TIME_DIFF_NAME(x) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKeyName(x)]).count())
+#define TIME_DIFF_LABEL(x, y) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKeyLabel(x, y)]).count())
 
 namespace AwsMock::Core {
 
@@ -331,8 +332,18 @@ namespace AwsMock::Core {
 
         /**
          * Add timer
+         *
+         * @param name name of the timer
          */
         void AddTimer(const std::string &name);
+
+        /**
+         * Add timer
+         *
+         * @param name name of the timer
+         * @param label timer label
+         */
+        void AddTimer(const std::string &name, const std::string &label);
 
         /**
          * Starts a timer
@@ -342,11 +353,27 @@ namespace AwsMock::Core {
         void StartTimer(const std::string &name);
 
         /**
+         * Starts a timer
+         *
+         * @param name name of the timer.
+         * @param label label name of the timer.
+         */
+        void StartTimer(const std::string &name, const std::string &label);
+
+        /**
          * Stop and fill in the duration of a timer
          *
          * @param name name of the timer.
          */
         void StopTimer(const std::string &name);
+
+        /**
+         * Stop and fill in the duration of a timer
+         *
+         * @param name name of the timer.
+         * @param label label name of the timer.
+         */
+        void StopTimer(const std::string &name, const std::string &label);
 
         /**
          * Resets a timers.
@@ -370,14 +397,39 @@ namespace AwsMock::Core {
          */
         bool TimerExists(const std::string &name);
 
+        /**
+         * Check whether a timer exists
+         *
+         * @param name name of the timer.
+         * @param label timer label
+         * @return true if timer exists.
+         */
+        bool TimerExists(const std::string &name, const std::string &label);
+
       private:
+
+        /**
+         * Returns a timer key string.
+         *
+         * @param name name of the timer.
+         * @param label timer label
+         */
+        static std::string GetTimerKey(const std::string &name, const std::string &label);
 
         /**
          * Returns a thread safe timer key string.
          *
          * @param name name of the timer.
          */
-        static std::string GetTimerKey(const std::string &name);
+        static std::string GetTimerStartKeyName(const std::string &name);
+
+        /**
+         * Returns a thread safe timer key string.
+         *
+         * @param name name of the timer.
+         * @param label timer label
+         */
+        static std::string GetTimerStartKeyLabel(const std::string &name, const std::string &label);
 
         /**
          * Metric manager for Prometheus

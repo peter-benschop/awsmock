@@ -135,7 +135,7 @@ namespace AwsMock::Core {
         /**
          * Create secrets manager ARN
          *
-         * <p>Syntax arn:aws:secretsmanager:us-west-2:123456789012:secret:MyDatabaseSecretName-a1b2c3</p>
+         * <p>Syntax arn:aws:secrets manager:us-west-2:123456789012:secret:MyDatabaseSecretName-a1b2c3</p>
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -217,9 +217,43 @@ namespace AwsMock::Core {
          * @return HTTP authorization header
          */
         static std::string GetAuthorizationHeader(const Configuration &configuration, const std::string &module);
-
-        static std::string SanitzeSQSUrl(const std::string &queue);
     };
+
+    /**
+     * Checks whether this is a queue URL
+     *
+     * @param queue queue from SPring cloud
+     * @return true if this is a URL
+     */
+    static inline bool IsSQSUrl(const std::string &queue) {
+        return Core::StringUtils::StartsWith(queue, "http");
+    }
+
+    /**
+     * Checks whether this is a queue ARN
+     *
+     * @param queue queue from SPring cloud
+     * @return true if this is a URL
+     */
+    static inline bool IsSQSArn(const std::string &queue) {
+        return Core::StringUtils::ContainsIgnoreCase(queue, "http");
+    }
+
+    /**
+     * Spring cloud sends the queueName, the queueUrl, or the queueArn.
+     *
+     * @param queue from Spring cloud request
+     * @return queue URL
+     */
+    static inline std::string SanitzeSQSUrl(const std::string &queue) {
+        if (IsSQSUrl(queue)) {
+            return queue;
+        } else if (IsSQSArn(queue)) {
+            return AwsUtils::ConvertSQSQueueArnToUrl(Configuration::instance(), queue);
+        } else {
+            return AwsUtils::CreateSqsQueueUrl(Configuration::instance(), queue);
+        }
+    }
 
 }// namespace AwsMock::Core
 

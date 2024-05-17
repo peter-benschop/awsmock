@@ -45,7 +45,7 @@ namespace AwsMock::Service {
     void GatewayHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway GET request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
-        Core::MetricServiceTimer measure(_metricService, GATEWAY_GET_TIMER);
+        Core::MetricServiceTimer measure(GATEWAY_GET_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "GET");
         log_debug << "Gateway GET request, URI: " + request.getURI() << " region: " << region << " user: " << user;
 
@@ -102,7 +102,7 @@ namespace AwsMock::Service {
     void GatewayHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway PUT request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
-        Core::MetricServiceTimer measure(_metricService, GATEWAY_PUT_TIMER);
+        Core::MetricServiceTimer measure(GATEWAY_PUT_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "PUT");
         log_debug << "Gateway PUT request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
@@ -156,7 +156,7 @@ namespace AwsMock::Service {
     void GatewayHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway POST request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
-        Core::MetricServiceTimer measure(_metricService, GATEWAY_POST_TIMER);
+        Core::MetricServiceTimer measure(GATEWAY_POST_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "POST");
         log_trace << "Gateway POST request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
@@ -212,7 +212,7 @@ namespace AwsMock::Service {
     void GatewayHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
-        Core::MetricServiceTimer measure(_metricService, GATEWAY_DELETE_TIMER);
+        Core::MetricServiceTimer measure(GATEWAY_DELETE_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "DELETE");
         log_debug << "Gateway DELETE request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
@@ -268,7 +268,7 @@ namespace AwsMock::Service {
     void GatewayHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "Gateway HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user << " remoteAddress: " << request.clientAddress().toString();
 
-        Core::MetricServiceTimer measure(_metricService, GATEWAY_HEAD_TIMER);
+        Core::MetricServiceTimer measure(GATEWAY_HEAD_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "HEAD");
         log_debug << "Gateway HEAD request, URI: " + request.getURI() << " region: " << region << " user: " + user;
 
@@ -324,7 +324,7 @@ namespace AwsMock::Service {
     void GatewayHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
         log_debug << "Gateway OPTIONS request";
 
-        Core::MetricServiceTimer measure(_metricService, GATEWAY_OPTIONS_TIMER);
+        Core::MetricServiceTimer measure(GATEWAY_OPTIONS_TIMER);
         _metricService.IncrementCounter(GATEWAY_COUNTER, "method", "OPTIONS");
         response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
         response.setContentType("text/plain; charset=utf-8");
