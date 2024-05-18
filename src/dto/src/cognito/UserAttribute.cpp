@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/11/2023.
 //
 
-#include <awsmock/dto/cognito/UserAttribute.h>
+#include <awsmock/dto/cognito/model/UserAttribute.h>
 
 namespace AwsMock::Dto::Cognito {
 

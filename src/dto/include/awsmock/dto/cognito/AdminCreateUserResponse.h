@@ -13,8 +13,8 @@
 #include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/cognito/MessageAction.h>
-#include <awsmock/dto/cognito/UserAttribute.h>
+#include <awsmock/dto/cognito/model/MessageAction.h>
+#include <awsmock/dto/cognito/model/UserAttribute.h>
 
 namespace AwsMock::Dto::Cognito {
 

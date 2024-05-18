@@ -14,7 +14,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/BaseRequest.h>
+#include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 

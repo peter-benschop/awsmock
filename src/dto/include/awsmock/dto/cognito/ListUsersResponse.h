@@ -16,14 +16,14 @@
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/entity/cognito/User.h>
 
-namespace AwsMock::Dto::Cognito : public BaseRequest {
+namespace AwsMock::Dto::Cognito {
 
     /**
-     * List user response
+     * @brief List user response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersResponse {
+    struct ListUsersResponse : public BaseRequest {
 
         /**
          * User entities

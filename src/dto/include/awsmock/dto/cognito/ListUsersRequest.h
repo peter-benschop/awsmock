@@ -15,14 +15,14 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
-namespace AwsMock::Dto::Cognito : public BaseRequest {
+namespace AwsMock::Dto::Cognito {
 
     /**
-     * List user request
+     * @brief List user request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersRequest {
+    struct ListUsersRequest : public BaseRequest {
 
         /**
          * AWS region
