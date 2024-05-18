@@ -53,6 +53,11 @@ namespace AwsMock::Dto::Common {
          * Client user
          */
         std::string user;
+
+        /**
+         * Request ID
+         */
+        std::string requestId;
     };
 
 }// namespace AwsMock::Dto::Common

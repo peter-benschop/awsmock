@@ -83,14 +83,6 @@ namespace AwsMock::Dto::Common {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Gets command type from the user agent
-         *
-         * @param httpMethod HTTP request method
-         * @param userAgent HTTP user agent
-         */
-        void GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent);
-
-        /**
          * Getś the value from the user-agent string
          *
          * @param method HTTP method

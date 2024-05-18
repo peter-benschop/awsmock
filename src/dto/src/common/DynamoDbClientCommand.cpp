@@ -15,6 +15,8 @@ namespace AwsMock::Dto::Common {
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->url = request.getURI();
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
+        this->headers = Core::HttpUtils::GetHeaders(request);
 
         // Command
         std::string action = request.get("X-Amz-Target");

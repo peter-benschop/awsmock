@@ -19,7 +19,7 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * Create user response
+     * @brief Create user response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
