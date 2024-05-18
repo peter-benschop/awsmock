@@ -18,7 +18,7 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * List user pool response
+     * @brief List user pool response
      *
      * @author jens.vogt\@opitz-consulting.com
      */

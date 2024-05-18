@@ -47,14 +47,11 @@ namespace AwsMock::Service {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "list_user_pool");
         log_debug << "List user pools request, maxResults: " << request.maxResults;
 
-        Dto::Cognito::ListUserPoolResponse response{};
-
         try {
 
             std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
-            response = Dto::Cognito::ListUserPoolResponse(userPools);
-            log_trace << "User pool list outcome: " + response.ToJson();
-            return response;
+            log_trace << "Got user pool list count: " << userPools.size();
+            return Dto::Cognito::Mapper::map(request, userPools);
 
         } catch (Poco::Exception &ex) {
             log_error << "User pool list request failed, message: " << ex.message();
