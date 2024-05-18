@@ -30,6 +30,7 @@
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListUsersRequest.h>
 #include <awsmock/dto/cognito/ListUsersResponse.h>
+#include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 

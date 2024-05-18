@@ -33,7 +33,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
         src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/model/LambdaConfiguration.cpp
         src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
-        src/s3/mapper/Mapper.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp)
+        src/s3/mapper/Mapper.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
+        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp)
 set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/Image.cpp src/docker/ListContainerResponse.cpp
         src/docker/ListImageResponse.cpp src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp
         src/docker/CreateContainerResponse.cpp)
@@ -46,7 +47,8 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
         src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp src/cognito/ListUsersRequest.cpp
         src/cognito/ListUsersResponse.cpp src/cognito/LambdaConfig.cpp src/cognito/CustomEmailSender.cpp
-        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/common/CognitoClientCommand.cpp)
+        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/common/CognitoClientCommand.cpp
+        src/cognito/mapper/Mapper.cpp)
 set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp
         src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp
@@ -92,13 +94,8 @@ else ()
     include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 endif ()
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/s3/mapper/Mapper.h
-        src/s3/mapper/Mapper.cpp
-        include/awsmock/dto/s3/model/ObjectVersion.h
-        src/s3/model/ObjectVersion.cpp
-        include/awsmock/dto/s3/model/RestoreStatus.h
-        src/s3/model/RestoreStatus.cpp)
+add_library(${LIBRARY} SHARED ${SOURCES})
+
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 
