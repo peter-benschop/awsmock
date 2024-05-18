@@ -49,6 +49,11 @@ namespace AwsMock::Dto::KMS {
         std::string keyArn;
 
         /**
+         * Key state
+         */
+        KeyState keyState;
+
+        /**
          * Convert to a JSON object
          *
          * @return JSON object
