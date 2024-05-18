@@ -17,11 +17,7 @@ namespace AwsMock::Database {
 
     bool CognitoMemoryDb::UserPoolExists(const std::string &id) {
 
-        return find_if(_userPools.begin(),
-                       _userPools.end(),
-                       [id](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                           return userPool.second.userPoolId == id;
-                       }) != _userPools.end();
+        return _userPools.find(id) != _userPools.end();
     }
 
     Entity::Cognito::UserPoolList CognitoMemoryDb::ListUserPools(const std::string &region) {

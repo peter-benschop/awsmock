@@ -59,6 +59,7 @@ namespace AwsMock::Service {
         log_debug << "Delete user pool request, userPoolId:  " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
             throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
         }
 
