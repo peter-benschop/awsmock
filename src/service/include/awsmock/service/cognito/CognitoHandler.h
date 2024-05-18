@@ -16,9 +16,7 @@
 #include <awsmock/core/MetricDefinition.h>
 #include <awsmock/core/MetricService.h>
 #include <awsmock/dto/common/CognitoClientCommand.h>
-#include <awsmock/service/cognito/CognitoCliHandler.h>
 #include <awsmock/service/cognito/CognitoCmdHandler.h>
-#include <awsmock/service/cognito/CognitoJava2Handler.h>
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 
