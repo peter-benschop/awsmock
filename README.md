@@ -89,6 +89,40 @@ manager support fully supports the FTP protocol (FTPS and SFTP are currently not
 FTP server will automatically create a S3 object in the bucket ```transfer-server```. The key of the S3 object will be
 the full path of the FTP file, including the uploaded directory.
 
+## KMS
+
+AWS Key Management Service (AWS KMS) is a managed service that makes it easy for you to create and control the
+cryptographic keys that are used to protect your data. AWS KMS uses hardware security modules (HSM) to protect and
+validate your AWS KMS keys under the FIPS 140-2 Cryptographic Module Validation Program. China (Beijing) and China
+(Ningxia) Regions do not support the FIPS 140-2 Cryptographic Module Validation Program. AWS KMS uses OSCCA certified
+HSMs to protect KMS keys in China Regions.
+
+AWS KMS integrates with most other AWS services that encrypt your data. AWS KMS also integrates with AWS CloudTrail to
+log use of your KMS keys for auditing, regulatory, and compliance needs.
+
+You can use the AWS KMS API to create and manage KMS keys and special features, such as custom key stores, and use KMS
+keys in cryptographic operations. For detailed information, see the AWS Key Management Service API Reference.
+
+See [AwsMock KMS supported commands](docs/man/awsmockkms.1.md) for a list of supported commands.
+
+## Secrets Manager
+
+AWS Secrets Manager helps you manage, retrieve, and rotate database credentials, application credentials, OAuth tokens,
+API keys, and other secrets throughout their lifecycles. Many AWS services store and use secrets in Secrets Manager.
+
+Secrets Manager helps you improve your security posture, because you no longer need hard-coded credentials in
+application
+source code. Storing the credentials in Secrets Manager helps avoid possible compromise by anyone who can inspect your
+application or the components. You replace hard-coded credentials with a runtime call to the Secrets Manager service to
+retrieve credentials dynamically when you need them.
+
+With Secrets Manager, you can configure an automatic rotation schedule for your secrets. This enables you to replace
+long-term secrets with short-term ones, significantly reducing the risk of compromise. Since the credentials are no
+longer stored with the application, rotating credentials no longer requires updating your applications and deploying
+changes to application clients.
+
+See [AwsMock SecretsManager supported commands](docs/man/awsmocksecretsmanager.1.md) for a list of supported commands.
+
 ## Getting started
 
 ### Building AwsMock
@@ -152,9 +186,18 @@ To start the docker image:
 
 This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance.
 
+### Using the docker image with an MongoDB backend
+
+As MongoDB is not supported on alpine, no MongoDB is included in the docker image. Nevertheless, you can connect
+to an external MongoDB instance running as docker container.
+
 To connect a MongoDB instance use the provided docker-compose file:
 
 ```
   cd docker
   docker-compose up
 ```
+
+This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured
+separately. See for
+instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
