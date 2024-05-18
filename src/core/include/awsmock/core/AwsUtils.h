@@ -31,7 +31,9 @@
 namespace AwsMock::Core {
 
     /**
-     * General AWS utilities.
+     * @brief General AWS utilities.
+     *
+     * AWS utilities
      *
      * @author jens.vogt\@opitz-consulting.com
      */
