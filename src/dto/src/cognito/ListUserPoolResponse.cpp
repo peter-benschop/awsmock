@@ -16,8 +16,9 @@ namespace AwsMock::Dto::Cognito {
                 Poco::JSON::Object userPoolJson;
                 userPoolJson.set("Id", userPool.userPoolId);
                 userPoolJson.set("Name", userPool.name);
-                userPoolJson.set("LastModifiedDate", std::to_string(userPool.modified.timestamp().epochTime()));
-                userPoolJson.set("CreationDate", std::to_string(userPool.modified.timestamp().epochTime()));
+                userPoolJson.set("Region", userPool.region);
+                userPoolJson.set("LastModifiedDate", std::to_string(userPool.lastModified.timestamp().epochTime()));
+                userPoolJson.set("CreationDate", std::to_string(userPool.created.timestamp().epochTime()));
                 userPoolArray.add(userPoolJson);
             }
             rootObject.set("UserPools", userPoolArray);
