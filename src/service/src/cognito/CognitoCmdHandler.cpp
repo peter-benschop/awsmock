@@ -19,7 +19,7 @@ namespace AwsMock::Service {
                 cognitoRequest.FromJson(payload);
                 cognitoRequest.region = clientCommand.region;
 
-                log_debug << "Got list user pool request, json: " << cognitoRequest.ToString();
+                log_debug << "Got create user pool request, json: " << cognitoRequest.ToString();
 
                 Dto::Cognito::CreateUserPoolResponse serviceResponse = _cognitoService.CreateUserPool(cognitoRequest);
                 SendOkResponse(response, serviceResponse.ToJson());

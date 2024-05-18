@@ -573,7 +573,6 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
                 case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
                 case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
-                    break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: DELETE clientCommand: " << Dto::Common::S3CommandTypeToString(s3ClientCommand.command);
                     throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::S3CommandTypeToString(s3ClientCommand.command));

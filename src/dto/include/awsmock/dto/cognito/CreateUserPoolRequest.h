@@ -17,7 +17,130 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * Create user pool request
+     * @brief Create user pool request
+     *
+     * Request to create a new user pool.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *     "AccountRecoverySetting": {
+     *       "RecoveryMechanisms": [
+     *          {
+     *                "Name": "string",
+     *                "Priority": number
+     *             }
+     *          ]
+     *       },
+     *       "AdminCreateUserConfig": {
+     *          "AllowAdminCreateUserOnly": boolean,
+     *          "InviteMessageTemplate": {
+     *             "EmailMessage": "string",
+     *             "EmailSubject": "string",
+     *             "SMSMessage": "string"
+     *          },
+     *          "UnusedAccountValidityDays": number
+     *       },
+     *       "AliasAttributes": [ "string" ],
+     *       "AutoVerifiedAttributes": [ "string" ],
+     *       "DeletionProtection": "string",
+     *       "DeviceConfiguration": {
+     *          "ChallengeRequiredOnNewDevice": boolean,
+     *          "DeviceOnlyRememberedOnUserPrompt": boolean
+     *       },
+     *       "EmailConfiguration": {
+     *          "ConfigurationSet": "string",
+     *          "EmailSendingAccount": "string",
+     *          "From": "string",
+     *          "ReplyToEmailAddress": "string",
+     *          "SourceArn": "string"
+     *       },
+     *       "EmailVerificationMessage": "string",
+     *       "EmailVerificationSubject": "string",
+     *       "LambdaConfig": {
+     *          "CreateAuthChallenge": "string",
+     *          "CustomEmailSender": {
+     *             "LambdaArn": "string",
+     *             "LambdaVersion": "string"
+     *          },
+     *          "CustomMessage": "string",
+     *          "CustomSMSSender": {
+     *             "LambdaArn": "string",
+     *             "LambdaVersion": "string"
+     *          },
+     *          "DefineAuthChallenge": "string",
+     *          "KMSKeyID": "string",
+     *          "PostAuthentication": "string",
+     *          "PostConfirmation": "string",
+     *          "PreAuthentication": "string",
+     *          "PreSignUp": "string",
+     *          "PreTokenGeneration": "string",
+     *          "PreTokenGenerationConfig": {
+     *             "LambdaArn": "string",
+     *             "LambdaVersion": "string"
+     *          },
+     *          "UserMigration": "string",
+     *          "VerifyAuthChallengeResponse": "string"
+     *       },
+     *       "MfaConfiguration": "string",
+     *       "Policies": {
+     *          "PasswordPolicy": {
+     *             "MinimumLength": number,
+     *             "RequireLowercase": boolean,
+     *             "RequireNumbers": boolean,
+     *             "RequireSymbols": boolean,
+     *             "RequireUppercase": boolean,
+     *             "TemporaryPasswordValidityDays": number
+     *          }
+     *       },
+     *       "PoolName": "string",
+     *       "Schema": [
+     *          {
+     *             "AttributeDataType": "string",
+     *             "DeveloperOnlyAttribute": boolean,
+     *             "Mutable": boolean,
+     *             "Name": "string",
+     *             "NumberAttributeConstraints": {
+     *                "MaxValue": "string",
+     *                "MinValue": "string"
+     *             },
+     *             "Required": boolean,
+     *             "StringAttributeConstraints": {
+     *                "MaxLength": "string",
+     *                "MinLength": "string"
+     *             }
+     *          }
+     *       ],
+     *       "SmsAuthenticationMessage": "string",
+     *       "SmsConfiguration": {
+     *          "ExternalId": "string",
+     *          "SnsCallerArn": "string",
+     *          "SnsRegion": "string"
+     *       },
+     *       "SmsVerificationMessage": "string",
+     *       "UserAttributeUpdateSettings": {
+     *          "AttributesRequireVerificationBeforeUpdate": [ "string" ]
+     *       },
+     *       "UsernameAttributes": [ "string" ],
+     *       "UsernameConfiguration": {
+     *          "CaseSensitive": boolean
+     *       },
+     *       "UserPoolAddOns": {
+     *          "AdvancedSecurityMode": "string"
+     *       },
+     *       "UserPoolTags": {
+     *          "string" : "string"
+     *       },
+     *       "VerificationMessageTemplate": {
+     *          "DefaultEmailOption": "string",
+     *          "EmailMessage": "string",
+     *          "EmailMessageByLink": "string",
+     *          "EmailSubject": "string",
+     *          "EmailSubjectByLink": "string",
+     *          "SmsMessage": "string"
+     *       }
+     *       }
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -32,6 +155,16 @@ namespace AwsMock::Dto::Cognito {
          * Name of the user pool
          */
         std::string name;
+
+        /**
+         * Domain of the user pool
+         */
+        std::string domain;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
 
         /**
          * Convert from a JSON object.

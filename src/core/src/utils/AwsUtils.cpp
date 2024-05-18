@@ -18,14 +18,14 @@ namespace AwsMock::Core {
         return CreateArn("lambda", region, accountId, "function:" + function);
     }
 
-    std::string AwsUtils::CreateSqsQueueUrl(const Configuration &configuration, const std::string &queueName) {
+    std::string AwsUtils::CreateSQSQueueUrl(const Configuration &configuration, const std::string &queueName) {
         std::string endpoint = GetEndpoint(configuration);
         std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
         log_trace << "Endpoint: " << endpoint << " accountId: " << accountId;
         return endpoint + "/" + accountId + "/" + queueName;
     }
 
-    std::string AwsUtils::CreateSqsQueueArn(const Configuration &configuration, const std::string &queueName) {
+    std::string AwsUtils::CreateSQSQueueArn(const Configuration &configuration, const std::string &queueName) {
         std::string region = configuration.getString("awsmock.region", GATEWAY_DEFAULT_REGION);
         std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
         log_trace << "Region: " << region << " accountId: " << accountId;
@@ -67,6 +67,14 @@ namespace AwsMock::Core {
         return CreateArn("kms", region, accountId, "key/" + keyId);
     }
 
+    std::string AwsUtils::CreateCognitoUserPoolId(const std::string &region) {
+        return region + "_" + Core::StringUtils::GenerateRandomString(9);
+    }
+
+    std::string AwsUtils::CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId) {
+        return CreateArn("cognito-idp", region, accountId, userPoolId);
+    }
+
     std::string AwsUtils::GetAuthorizationHeader(const Configuration &configuration, const std::string &module) {
         std::string accountId = configuration.getString("awsmock.account.userPoolId");
         std::string clientId = configuration.getString("awsmock.client.userPoolId");
@@ -90,6 +98,6 @@ namespace AwsMock::Core {
         if (Core::StringUtils::ContainsIgnoreCase(queue, "arn")) {
             return Core::AwsUtils::ConvertSQSQueueArnToUrl(Core::Configuration::instance(), queue);
         }
-        return Core::AwsUtils::CreateSqsQueueUrl(Core::Configuration::instance(), queue);
+        return Core::AwsUtils::CreateSQSQueueUrl(Core::Configuration::instance(), queue);
     }*/
 }// namespace AwsMock::Core

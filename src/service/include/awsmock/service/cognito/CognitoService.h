@@ -14,25 +14,26 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/ServiceException.h"
-#include "awsmock/dto/cognito/AdminCreateUserRequest.h"
-#include "awsmock/dto/cognito/AdminCreateUserResponse.h"
-#include "awsmock/dto/cognito/AdminDeleteUserRequest.h"
-#include "awsmock/dto/cognito/CreateUserPoolRequest.h"
-#include "awsmock/dto/cognito/CreateUserPoolResponse.h"
-#include "awsmock/dto/cognito/DeleteUserPoolRequest.h"
-#include "awsmock/dto/cognito/ListUserPoolRequest.h"
-#include "awsmock/dto/cognito/ListUserPoolResponse.h"
-#include "awsmock/dto/cognito/ListUsersRequest.h"
-#include "awsmock/dto/cognito/ListUsersResponse.h"
-#include "awsmock/repository/CognitoDatabase.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/cognito/AdminCreateUserRequest.h>
+#include <awsmock/dto/cognito/AdminCreateUserResponse.h>
+#include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolResponse.h>
+#include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/ListUserPoolRequest.h>
+#include <awsmock/dto/cognito/ListUserPoolResponse.h>
+#include <awsmock/dto/cognito/ListUsersRequest.h>
+#include <awsmock/dto/cognito/ListUsersResponse.h>
+#include <awsmock/repository/CognitoDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * Cognito service
+     * @brief Cognito service
      *
      * @author jens.vogt\@opitz-consulting.com
      */

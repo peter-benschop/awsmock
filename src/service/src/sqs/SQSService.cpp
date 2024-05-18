@@ -31,10 +31,10 @@ namespace AwsMock::Service {
 
         try {
             // Get queue ARN
-            std::string queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, request.queueName);
+            std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(_configuration, request.queueName);
 
             // Get queue URL
-            std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, request.queueName);
+            std::string queueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, request.queueName);
 
             Database::Entity::SQS::QueueAttribute attributes;
             for (auto &a: request.attributes) {
