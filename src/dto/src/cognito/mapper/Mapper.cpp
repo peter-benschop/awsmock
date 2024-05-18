@@ -9,7 +9,7 @@ namespace AwsMock::Dto::Cognito {
     Dto::Cognito::ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList) {
 
         Dto::Cognito::ListUserPoolResponse response;
-        
+
         for (const auto &userPool: userPoolList) {
             UserPool userPoolDto = {
                     .region = userPool.region,
