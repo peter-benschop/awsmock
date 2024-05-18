@@ -29,6 +29,7 @@ namespace AwsMock::Dto::KMS {
                 keyState = KeyStateFromString(tmpStr);
             }
             Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
+            Core::JsonUtils::GetJsonValueString("Arn", rootObject, arn);
             Core::JsonUtils::GetJsonValueLong("CreationDate", rootObject, creationDate);
             Core::JsonUtils::GetJsonValueBool("MultiRegion", rootObject, multiRegion);
             Core::JsonUtils::GetJsonValueBool("Enabled", rootObject, enabled);
@@ -59,6 +60,7 @@ namespace AwsMock::Dto::KMS {
             rootJson.set("KeySpec", KeySpecToString(keySpec));
             rootJson.set("KeyUsage", KeyUsageToString(keyUsage));
             rootJson.set("KeyState", KeyStateToString(keyState));
+            rootJson.set("Arn", arn);
             rootJson.set("Description", description);
             if (creationDate > 0) {
                 rootJson.set("CreationDate", creationDate);

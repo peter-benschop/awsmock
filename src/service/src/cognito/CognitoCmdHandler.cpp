@@ -4,20 +4,19 @@
 namespace AwsMock::Service {
 
     void CognitoCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::CognitoClientCommand &clientCommand) {
-        log_debug << "Cognito POST request, URI: " << request.getURI() << " region: " << clientCommand.region << " user: " << clientCommand.user;
+        log_trace << "Cognito POST request, URI: " << request.getURI() << " region: " << clientCommand.region << " user: " << clientCommand.user;
 
         try {
 
-            //DumpRequest(request);
-            std::string payload = Core::HttpUtils::GetBodyAsString(request);
             std::string action = GetActionFromHeader(request);
 
             if (action == "CreateUserPool") {
 
                 Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
-                cognitoRequest.FromJson(payload);
+                cognitoRequest.FromJson(clientCommand.payload);
                 cognitoRequest.region = clientCommand.region;
                 cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
 
                 log_debug << "Got create user pool request, json: " << cognitoRequest.ToString();
 
@@ -27,9 +26,10 @@ namespace AwsMock::Service {
             } else if (action == "ListUserPools") {
 
                 Dto::Cognito::ListUserPoolRequest cognitoRequest{};
-                cognitoRequest.FromJson(payload);
+                cognitoRequest.FromJson(clientCommand.payload);
                 cognitoRequest.region = clientCommand.region;
                 cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
 
                 log_debug << "Got list user pool request, json: " << cognitoRequest.ToString();
 
@@ -39,8 +39,10 @@ namespace AwsMock::Service {
             } else if (action == "DeleteUserPool") {
 
                 Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
-                cognitoRequest.FromJson(payload);
+                cognitoRequest.FromJson(clientCommand.payload);
                 cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
                 log_debug << "Got delete user pool request, json: " << cognitoRequest.ToString();
 
                 _cognitoService.DeleteUserPool(cognitoRequest);
@@ -49,8 +51,10 @@ namespace AwsMock::Service {
             } else if (action == "AdminCreateUser") {
 
                 Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
-                cognitoRequest.FromJson(payload);
+                cognitoRequest.FromJson(clientCommand.payload);
                 cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
                 log_debug << "Got admin create user request, json: " << cognitoRequest.ToString();
 
                 Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
@@ -59,8 +63,10 @@ namespace AwsMock::Service {
             } else if (action == "ListUsers") {
 
                 Dto::Cognito::ListUsersRequest cognitoRequest{};
-                cognitoRequest.FromJson(payload);
+                cognitoRequest.FromJson(clientCommand.payload);
                 cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
                 log_debug << "Got list users request: " << cognitoRequest.ToString();
 
                 Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
@@ -69,8 +75,10 @@ namespace AwsMock::Service {
             } else if (action == "AdminDeleteUser") {
 
                 Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
-                cognitoRequest.FromJson(payload);
+                cognitoRequest.FromJson(clientCommand.payload);
                 cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
                 log_debug << "Got admin delete user request, json: " << cognitoRequest.ToString();
 
                 _cognitoService.AdminDeleteUser(cognitoRequest);
