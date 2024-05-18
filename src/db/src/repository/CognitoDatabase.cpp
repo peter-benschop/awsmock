@@ -29,7 +29,7 @@ namespace AwsMock::Database {
         }
     }
 
-    bool CognitoDatabase::UserPoolExists(const std::string &id) {
+    bool CognitoDatabase::UserPoolExists(const std::string &userPoolId) {
 
         if (_hasDatabase) {
 
@@ -37,7 +37,7 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                int64_t count = _userPoolCollection.count_documents(make_document(kvp("userPoolId", id)));
+                int64_t count = _userPoolCollection.count_documents(make_document(kvp("userPoolId", userPoolId)));
                 log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
                 return count > 0;
 
@@ -48,7 +48,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            return _memoryDb.UserPoolExists(id);
+            return _memoryDb.UserPoolExists(userPoolId);
         }
     }
 
