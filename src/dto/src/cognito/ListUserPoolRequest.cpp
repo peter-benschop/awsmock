@@ -13,6 +13,7 @@ namespace AwsMock::Dto::Cognito {
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
+
             Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
 
         } catch (Poco::Exception &exc) {

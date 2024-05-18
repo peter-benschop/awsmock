@@ -2,8 +2,8 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_USER_POOL_H
-#define AWSMOCK_DTO_COGNITO_USER_POOL_H
+#ifndef AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
+#define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
 
 // C++ includes
 #include <sstream>
@@ -80,4 +80,4 @@ namespace AwsMock::Dto::Cognito {
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_USER_POOL_H
+#endif// AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
