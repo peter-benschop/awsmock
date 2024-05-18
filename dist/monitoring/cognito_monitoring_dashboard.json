@@ -84,7 +84,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 13,
         "w": 8,
         "x": 0,
         "y": 0
@@ -181,7 +181,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 13,
         "w": 8,
         "x": 8,
         "y": 0
@@ -278,7 +278,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 13,
         "w": 8,
         "x": 16,
         "y": 0
@@ -312,6 +312,108 @@
       ],
       "title": "Number of users per user-pool",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+      },
+      "description": "Amount of milliseconds for the different Cognito service calls",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 8,
+        "x": 0,
+        "y": 13
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "cognito_service_timer",
+          "instant": false,
+          "legendFormat": "{{method}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Service time",
+      "type": "timeseries"
     }
   ],
   "schemaVersion": 39,
@@ -320,13 +422,13 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Cognito",
   "uid": "fdjgg169upjb4c",
-  "version": 4,
+  "version": 5,
   "weekStart": ""
 }

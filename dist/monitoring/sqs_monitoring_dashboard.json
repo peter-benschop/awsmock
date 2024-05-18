@@ -84,12 +84,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 17,
+        "h": 14,
         "w": 8,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 4,
       "options": {
         "legend": {
           "calcs": [
@@ -185,7 +185,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 17,
+        "h": 14,
         "w": 8,
         "x": 8,
         "y": 0
@@ -287,7 +287,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 17,
+        "h": 14,
         "w": 8,
         "x": 16,
         "y": 0
@@ -303,7 +303,7 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "sortBy": "Min",
+          "sortBy": "Max",
           "sortDesc": true
         },
         "tooltip": {
@@ -328,6 +328,108 @@
       ],
       "title": "Messages per queue",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+      },
+      "description": "Amount of milliseconds for the deifferent service calls",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 8,
+        "x": 0,
+        "y": 14
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sqs_service_timer",
+          "instant": false,
+          "legendFormat": "{{method}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Service time",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",
@@ -344,6 +446,6 @@
   "timezone": "",
   "title": "SQS",
   "uid": "c9431625-6813-44af-8b0b-00388afc4745",
-  "version": 10,
+  "version": 13,
   "weekStart": ""
 }
