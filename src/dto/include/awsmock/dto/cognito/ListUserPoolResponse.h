@@ -13,8 +13,9 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,7 +24,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolResponse {
+    struct ListUserPoolResponse : public BaseRequest {
 
         /**
          * User pool entities

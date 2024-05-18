@@ -10,12 +10,13 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/entity/cognito/User.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace AwsMock::Dto::Cognito : public BaseRequest {
 
     /**
      * List user response

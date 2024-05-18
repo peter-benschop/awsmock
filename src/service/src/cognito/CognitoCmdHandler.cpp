@@ -9,7 +9,6 @@ namespace AwsMock::Service {
         try {
 
             //DumpRequest(request);
-            std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
             std::string payload = Core::HttpUtils::GetBodyAsString(request);
             std::string action = GetActionFromHeader(request);
 
@@ -18,6 +17,7 @@ namespace AwsMock::Service {
                 Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
                 cognitoRequest.FromJson(payload);
                 cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
 
                 log_debug << "Got create user pool request, json: " << cognitoRequest.ToString();
 
@@ -29,6 +29,8 @@ namespace AwsMock::Service {
                 Dto::Cognito::ListUserPoolRequest cognitoRequest{};
                 cognitoRequest.FromJson(payload);
                 cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+
                 log_debug << "Got list user pool request, json: " << cognitoRequest.ToString();
 
                 Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);

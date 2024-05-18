@@ -10,12 +10,13 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/BaseRequest.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace AwsMock::Dto::Cognito : public BaseRequest {
 
     /**
      * Cognito sms sender

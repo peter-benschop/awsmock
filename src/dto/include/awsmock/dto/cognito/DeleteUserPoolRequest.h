@@ -10,23 +10,19 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * Delete user pool request
+     * @brief Delete user pool request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteUserPoolRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct DeleteUserPoolRequest : public BaseRequest {
 
         /**
          * User pool userPoolId

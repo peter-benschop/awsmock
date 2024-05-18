@@ -17,7 +17,7 @@ namespace AwsMock::Dto::Cognito {
                     .userPoolId = userPool.userPoolId,
                     .created = userPool.created,
                     .lastModified = userPool.modified};
-            response.userPools.emplace_back(userPool);
+            response.userPools.emplace_back(userPoolDto);
         }
         return response;
     }

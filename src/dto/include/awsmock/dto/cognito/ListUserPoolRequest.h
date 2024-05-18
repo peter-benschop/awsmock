@@ -13,20 +13,16 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * List user pool request
+     * @brief List user pool request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct ListUserPoolRequest : public BaseRequest {
 
         /**
          * Maximal number of results

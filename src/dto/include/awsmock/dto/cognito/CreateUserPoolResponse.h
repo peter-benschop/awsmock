@@ -10,9 +10,10 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -153,12 +154,7 @@ namespace AwsMock::Dto::Cognito {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateUserPoolResponse {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct CreateUserPoolResponse : public BaseRequest {
 
         /**
          * Name of the user pool
