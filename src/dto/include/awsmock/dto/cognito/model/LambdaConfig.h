@@ -16,7 +16,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/CustomEmailSender.h>
 #include <awsmock/dto/cognito/CustomSmsSender.h>
-#include <awsmock/dto/cognito/PreTokenGenerationConfig.h>
+#include <awsmock/dto/cognito/model/PreTokenGenerationConfig.h>
 
 namespace AwsMock::Dto::Cognito {
 

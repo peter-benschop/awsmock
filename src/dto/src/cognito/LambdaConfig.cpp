@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/20/24.
 //
 
-#include <awsmock/dto/cognito/LambdaConfig.h>
+#include <awsmock/dto/cognito/model/LambdaConfig.h>
 
 namespace AwsMock::Dto::Cognito {
 

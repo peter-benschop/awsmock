@@ -14,9 +14,9 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/BaseRequest.h>
+#include <awsmock/dto/common/BaseRequest.h>
 
-namespace AwsMock::Dto::Cognito : public BaseRequest {
+namespace AwsMock::Dto::Cognito {
 
     /**
      * Cognito sms sender
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Cognito : public BaseRequest {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomSmsSender {
+    struct CustomSmsSender : public BaseRequest {
 
         /**
          * Lambda ARN
