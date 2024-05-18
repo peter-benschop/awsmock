@@ -185,7 +185,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_EQ(0, subscribeResult.status);
-        EXPECT_TRUE(subscribeResult.output.length() > 0);
+        EXPECT_FALSE(subscribeResult.output.empty());
         EXPECT_FALSE(subscriptionArn.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(subscriptionArn, "test-topic"));
     }

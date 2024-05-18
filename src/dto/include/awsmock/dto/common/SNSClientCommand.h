@@ -23,9 +23,11 @@ namespace AwsMock::Dto::Common {
     enum class SNSCommandType {
         CREATE_TOPIC,
         LIST_TOPICS,
+        GET_TOPIC_ATTRIBUTES,
         PUBLISH,
         SUBSCRIBE,
         UNSUBSCRIBE,
+        LIST_SUBSCRIPTIONS_BY_TOPIC,
         TAG_RESOURCE,
         DELETE_TOPIC,
         UNKNOWN
@@ -34,9 +36,11 @@ namespace AwsMock::Dto::Common {
     static std::map<SNSCommandType, std::string> SNSCommandTypeNames{
             {SNSCommandType::CREATE_TOPIC, "create-topic"},
             {SNSCommandType::LIST_TOPICS, "list-topics"},
+            {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
             {SNSCommandType::PUBLISH, "publish"},
             {SNSCommandType::SUBSCRIBE, "subscribe"},
             {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
+            {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
             {SNSCommandType::TAG_RESOURCE, "tag-resource"},
             {SNSCommandType::DELETE_TOPIC, "delete-topic"},
     };

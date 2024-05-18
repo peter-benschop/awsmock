@@ -33,6 +33,17 @@ namespace AwsMock::Service {
                 break;
             }
 
+            case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
+
+                std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "TopicArn");
+
+                Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes({.region = snsClientCommand.region, .topicArn = topicArn});
+                SendOkResponse(response, snsResponse.ToXml());
+                log_info << "Get topic attributes, topicArn" << topicArn;
+
+                break;
+            }
+
             case Dto::Common::SNSCommandType::PUBLISH: {
 
                 std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "TopicArn");
@@ -66,6 +77,17 @@ namespace AwsMock::Service {
                 Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region = snsClientCommand.region, .subscriptionArn = subscriptionArn});
                 SendOkResponse(response, snsResponse.ToXml());
                 log_info << "Unsubscribed from topic, subscriptionArn: " << subscriptionArn;
+
+                break;
+            }
+
+            case Dto::Common::SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC: {
+
+                std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(snsClientCommand.payload, "TopicArn");
+
+                Dto::SNS::ListSubscriptionsByTopicResponse snsResponse = _snsService.ListSubscriptionsByTopic({.region = snsClientCommand.region, .topicArn = topicArn});
+                SendOkResponse(response, snsResponse.ToXml());
+                log_info << "List subscriptions by topic, topicArn: " << topicArn << " count: " << snsResponse.subscriptions.size();
 
                 break;
             }
