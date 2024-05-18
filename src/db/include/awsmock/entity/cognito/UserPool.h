@@ -35,7 +35,7 @@ namespace AwsMock::Database::Entity::Cognito {
     using bsoncxx::document::view;
 
     /**
-     * Cognito user pool entity
+     * @brief Cognito user pool entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -65,6 +65,16 @@ namespace AwsMock::Database::Entity::Cognito {
          * Client ID
          */
         std::string clientId;
+
+        /**
+         * ARN
+         */
+        std::string arn;
+
+        /**
+         * Domain
+         */
+        std::string domain;
 
         /**
          * Creation date
@@ -102,7 +112,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @param jsonObject JSON object.
          */
-        void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * Converts the entity to a string representation.

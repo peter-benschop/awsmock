@@ -11,14 +11,18 @@ namespace AwsMock::Service {
 
         Dto::Cognito::CreateUserPoolResponse response{};
         if (_database.UserPoolExists(request.region, request.name)) {
+            log_error << "User pool exists already, region: " << request.region << " name: " << request.name;
             throw Core::ServiceException("User pool exists already, region: " + request.region + " name: " + request.name);
         }
 
         try {
+            std::string userPoolId = Core::AwsUtils::CreateCognitoUserPoolId(request.region);
             Database::Entity::Cognito::UserPool userPool = {
                     .region = request.region,
-                    .userPoolId = request.region + "_" + Core::StringUtils::GenerateRandomString(9),
-                    .name = request.name};
+                    .userPoolId = userPoolId,
+                    .name = request.name,
+                    .arn = Core::AwsUtils::CreateCognitoUserPoolArn(request.region, _accountId, userPoolId),
+            };
 
             userPool = _database.CreateUserPool(userPool);
             response = {

@@ -25,10 +25,10 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _queueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, QUEUE_NAME);
-            _queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, QUEUE_NAME);
-            _dlqueueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, DLQ_NAME);
-            _dlqueueArn = Core::AwsUtils::CreateSqsQueueArn(_configuration, DLQ_NAME);
+            _queueArn = Core::AwsUtils::CreateSQSQueueArn(_configuration, QUEUE_NAME);
+            _queueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, QUEUE_NAME);
+            _dlqueueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, DLQ_NAME);
+            _dlqueueArn = Core::AwsUtils::CreateSQSQueueArn(_configuration, DLQ_NAME);
             _region = _configuration.getString("awsmock.region");
         }
 

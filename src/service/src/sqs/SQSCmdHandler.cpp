@@ -17,7 +17,7 @@ namespace AwsMock::Service {
 
                         Dto::SQS::CreateQueueRequest sqsRequest;
                         sqsRequest.FromJson(sqsClientCommand.payload);
-                        sqsRequest.queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, sqsRequest.queueName);
+                        sqsRequest.queueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, sqsRequest.queueName);
                         sqsRequest.region = sqsClientCommand.region;
                         sqsRequest.owner = sqsClientCommand.user;
 
@@ -28,7 +28,7 @@ namespace AwsMock::Service {
                     } else {
 
                         std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(sqsClientCommand.payload, "QueueName");
-                        std::string queueUrl = Core::AwsUtils::CreateSqsQueueUrl(_configuration, queueName);
+                        std::string queueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, queueName);
                         std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(sqsClientCommand.payload);
                         std::map<std::string, std::string> tags = GetQueueTags(sqsClientCommand.payload);
 

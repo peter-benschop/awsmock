@@ -81,7 +81,7 @@ namespace AwsMock::Core {
          * @param queueName name of the queue
          * @return SQS queue URL
          */
-        static std::string CreateSqsQueueUrl(const Configuration &configuration, const std::string &queueName);
+        static std::string CreateSQSQueueUrl(const Configuration &configuration, const std::string &queueName);
 
         /**
          * Create SQS queue ARN
@@ -90,16 +90,7 @@ namespace AwsMock::Core {
          * @param queueName name of the queue
          * @return SQS queue ARN
          */
-        static std::string CreateSqsQueueArn(const Configuration &configuration, const std::string &queueName);
-
-        /**
-         * Create SNS topic ARN
-         *
-         * @param region AWS region
-         * @param accountId AWS account ID
-         * @param topicName name of the topic
-         */
-        static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
+        static std::string CreateSQSQueueArn(const Configuration &configuration, const std::string &queueName);
 
         /**
          * Converts a queue ARN to a queue URL
@@ -109,6 +100,15 @@ namespace AwsMock::Core {
          * @return URL of the queue
          */
         static std::string ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn);
+
+        /**
+         * Create SNS topic ARN
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param topicName name of the topic
+         */
+        static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
         /**
          * Create SNS subscription ARN
@@ -140,6 +140,7 @@ namespace AwsMock::Core {
          * @param region AWS region
          * @param accountId AWS account ID
          * @param secretId ID of the secret (name + 6 hex digits)
+         * @return secrets manager secrets ARN
          */
         static std::string CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId);
 
@@ -151,8 +152,31 @@ namespace AwsMock::Core {
          * @param region AWS region
          * @param accountId AWS account ID
          * @param kmsId ID of the key
+         * @return KMS key ARN
          */
         static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
+
+        /**
+         * Create Cognito user pool ID
+         *
+         * <p>region_<9-random-digit></p>
+         *
+         * @param region AWS region
+         * @param return ID of the user pool
+         */
+        static std::string CreateCognitoUserPoolId(const std::string &region);
+
+        /**
+         * Create Cognito user pool ARN
+         *
+         * <p>Syntax arn:aws:cognito:us-west-2:123456789012:userPoolId</p>
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param userPoolId ID of the user pool
+         * @return user pool ARN
+         */
+        static std::string CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId);
 
         /**
          * Returns a request ID.
@@ -251,7 +275,7 @@ namespace AwsMock::Core {
         } else if (IsSQSArn(queue)) {
             return AwsUtils::ConvertSQSQueueArnToUrl(Configuration::instance(), queue);
         } else {
-            return AwsUtils::CreateSqsQueueUrl(Configuration::instance(), queue);
+            return AwsUtils::CreateSQSQueueUrl(Configuration::instance(), queue);
         }
     }
 
