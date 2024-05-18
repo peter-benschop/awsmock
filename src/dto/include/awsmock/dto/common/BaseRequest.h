@@ -23,6 +23,11 @@ namespace AwsMock::Dto::Cognito {
          * Region
          */
         std::string region;
+
+        /**
+         * User
+         */
+        std::string user;
     };
 
 }// namespace AwsMock::Dto::Cognito
