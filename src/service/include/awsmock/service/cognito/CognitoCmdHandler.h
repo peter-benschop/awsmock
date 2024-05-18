@@ -35,7 +35,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit CognitoCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _cognitoService(configuration) {}
+        explicit CognitoCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration) {}
 
       protected:
 
