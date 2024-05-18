@@ -17,6 +17,11 @@ namespace AwsMock::Dto::KMS {
             std::string tmpStr;
             Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
             Core::JsonUtils::GetJsonValueString("KeyArn", rootObject, keyArn);
+            std::string keyStateStr;
+            Core::JsonUtils::GetJsonValueString("KeyState", rootObject, keyStateStr);
+            if (!keyStateStr.empty()) {
+                keyState = KeyStateFromString(keyStateStr);
+            }
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -31,6 +36,7 @@ namespace AwsMock::Dto::KMS {
             Poco::JSON::Object rootJson;
             rootJson.set("KeyId", keyId);
             rootJson.set("KeyArn", keyArn);
+            rootJson.set("KeyState", KeyStateToString(keyState));
             return rootJson;
 
         } catch (Poco::Exception &exc) {
