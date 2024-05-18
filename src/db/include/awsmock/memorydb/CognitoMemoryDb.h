@@ -63,11 +63,11 @@ namespace AwsMock::Database {
         /**
          * Check existence of cognito user pool
          *
-         * @param id user pool userPoolId
+         * @param userPoolId user pool userPoolId
          * @return true if cognito user pool exists
          * @throws DatabaseException
          */
-        bool UserPoolExists(const std::string &id);
+        bool UserPoolExists(const std::string &userPoolId);
 
         /**
          * Create a new cognito user pool
