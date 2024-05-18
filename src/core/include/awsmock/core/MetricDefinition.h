@@ -49,6 +49,7 @@
 #define COGNITO_USER_COUNT "cognito_user_count_total"
 #define COGNITO_USERPOOL_COUNT "cognito_userpool_count_total"
 #define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_count"
+#define COGNITO_SERVICE_TIMER "cognito_service_timer"
 
 #define TRANSFER_SERVER_COUNT "transfer_server_count_total"
 #define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_count_total"

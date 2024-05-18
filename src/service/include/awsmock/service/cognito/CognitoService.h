@@ -17,6 +17,8 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/MetricDefinition.h>
+#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
@@ -29,11 +31,14 @@
 #include <awsmock/dto/cognito/ListUsersRequest.h>
 #include <awsmock/dto/cognito/ListUsersResponse.h>
 #include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {
 
     /**
      * @brief Cognito service
+     *
+     * Handles all Cognito requests finally.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -43,10 +48,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit CognitoService(Core::Configuration &configuration) : _configuration(configuration), _database(Database::CognitoDatabase::instance()) {}
+        explicit CognitoService();
 
         /**
          * Create a new cognito user pool
@@ -95,11 +98,6 @@ namespace AwsMock::Service {
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
 
       private:
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

@@ -10,8 +10,8 @@ set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSCmdHandl
         src/sns/SNSService.cpp src/sns/SNSMonitoring.cpp)
 set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/lambda/LambdaService.cpp
         src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp src/lambda/LambdaMonitoring.cpp)
-set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cpp src/cognito/CognitoCliHandler.cpp
-        src/cognito/CognitoJava2Handler.cpp src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp
+set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cpp
+        src/cognito/CognitoService.cpp src/cognito/CognitoServer.cpp
         src/cognito/CognitoMonitoring.cpp src/cognito/CognitoCmdHandler.cpp)
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp
         src/transfer/TransferMonitoring.cpp)
