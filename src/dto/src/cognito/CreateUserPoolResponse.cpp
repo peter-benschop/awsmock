@@ -15,6 +15,7 @@ namespace AwsMock::Dto::Cognito {
             userPoolObject.set("Region", region);
             userPoolObject.set("Name", name);
             userPoolObject.set("Arn", arn);
+            userPoolObject.set("Id", userPoolId);
             rootObject.set("UserPool", userPoolObject);
 
             return Core::JsonUtils::ToJsonString(rootObject);

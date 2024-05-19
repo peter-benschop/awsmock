@@ -167,6 +167,11 @@ namespace AwsMock::Dto::Cognito {
         std::string arn;
 
         /**
+         * User pool ID
+         */
+        std::string userPoolId;
+
+        /**
          * Convert to a JSON string.
          *
          * @return json string
