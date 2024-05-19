@@ -25,7 +25,7 @@
 namespace AwsMock::Service {
 
     /**
-     * KMS async key creator
+     * @brief KMS symmetric and asymmetric key creator.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -33,14 +33,13 @@ namespace AwsMock::Service {
 
       public:
 
-
         /**
          * Constructor
          */
         [[maybe_unused]] explicit KMSCreator() = default;
 
         /**
-         * Create new KMS key
+         * @brief Create new KMS key
          *
          * @param keyId ID of the key
          */
@@ -49,15 +48,31 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Generate AES 256 key
+         * @brief Generate AES 256 key
+         *
+         * @par
+         * Key material will be hex-encoded.
          *
          * @param key key entity
          */
         [[maybe_unused]] static void GenerateAes256Key(Database::Entity::KMS::Key &key);
 
         /**
-         * Generate a public/private key pair
+         * @brief Generate HMAC key.
          *
+         * @par
+         * Key material will be hex-encoded.
+         *
+         * @param key key entity
+         * @param length key length
+         */
+        static void CreateHmacKey(Database::Entity::KMS::Key &key, int length);
+
+        /**
+         * @brief Generate a public/private key pair
+         *
+         * @par
+         * Key material will be hex-encoded.
          * @param key key
          * @param length length
          * @see AwsMock::Core::CryptoUtils
@@ -65,6 +80,6 @@ namespace AwsMock::Service {
         [[maybe_unused]] static void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length);
     };
 
-}//namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_CREATOR_H

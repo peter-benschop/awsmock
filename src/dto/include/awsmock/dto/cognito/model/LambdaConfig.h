@@ -10,12 +10,12 @@
 #include <string>
 
 // AwsMock includes
+#include "CustomEmailSender.h"
+#include "CustomSmsSender.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/CustomEmailSender.h>
-#include <awsmock/dto/cognito/CustomSmsSender.h>
 #include <awsmock/dto/cognito/model/PreTokenGenerationConfig.h>
 
 namespace AwsMock::Dto::Cognito {

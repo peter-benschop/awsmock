@@ -15,11 +15,12 @@
 #include <Poco/JSON/Parser.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/dto/kms/model/Key.h"
-#include "awsmock/dto/kms/model/KeySpec.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/kms/model/Key.h>
+#include <awsmock/dto/kms/model/KeySpec.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -74,7 +75,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateKeyResponse {
+    struct CreateKeyResponse : public Dto::Common::BaseRequest {
 
         /**
          * Key metadata

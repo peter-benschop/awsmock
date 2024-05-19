@@ -22,12 +22,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersRequest : public BaseRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct ListUsersRequest : public Dto::Common::BaseRequest {
 
         /**
          * User pool ID

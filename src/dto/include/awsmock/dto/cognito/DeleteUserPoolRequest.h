@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteUserPoolRequest : public BaseRequest {
+    struct DeleteUserPoolRequest : public Dto::Common::BaseRequest {
 
         /**
          * User pool userPoolId

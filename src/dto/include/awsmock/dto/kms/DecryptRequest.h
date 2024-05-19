@@ -10,10 +10,11 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/dto/kms/model/EncryptionAlgorithm.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -44,12 +45,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DecryptRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct DecryptRequest : public Dto::Common::BaseRequest {
 
         /**
          * Key ID

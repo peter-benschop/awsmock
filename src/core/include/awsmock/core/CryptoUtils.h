@@ -70,6 +70,7 @@
 
 #define CRYPTO_AES256_KEY_SIZE 32
 #define CRYPTO_AES256_BLOCK_SIZE 16
+#define CRYPTO_HMAC224_BLOCK_SIZE 32
 
 namespace AwsMock::Core {
 
@@ -153,7 +154,35 @@ namespace AwsMock::Core {
         static std::string GetSha256FromFile(const std::string &fileName);
 
         /**
-         * @brief Returns the hex encoded SHA256 hash of a string.
+         * @brief Returns the hex encoded HMAC SHA224 hash of a string.
+         *
+         * @param key string for hashing
+         * @param content string to hash
+         * @return hey-encoded HMAC SHA224 hash of the given string
+         */
+        static std::string GetHmacSha224FromString(const std::string &key, const std::string &content);
+
+        /**
+         * @brief Returns the hex encoded HMAC SHA384 hash of a string.
+         *
+         * @param key string for hashing
+         * @param content string to hash
+         * @param hashLen length of the hashed string
+         * @return hey-encoded HMAC SHA284 hash of the given string
+         */
+        static std::string GetHmacSha384FromString(const std::string &key, const std::string &content, unsigned int *hashLen);
+
+        /**
+         * @brief Returns the hex encoded HMAC SHA512 hash of a string.
+         *
+         * @param key string for hashing
+         * @param content string to hash
+         * @return hey-encoded HMAC SHA512 hash of the given string
+         */
+        static std::string GetHmacSha512FromString(const std::string &key, const std::string &content, unsigned int *hashLen);
+
+        /**
+         * @brief Returns the hex encoded HMAC SHA256 hash of a string.
          *
          * @param key string for hashing
          * @param content string to hash
@@ -240,6 +269,14 @@ namespace AwsMock::Core {
          * @param key encryption key
          */
         static void Aes256DecryptFile(const std::string &filename, std::string &outFilename, unsigned char *key);
+
+        /**
+         * @brief Creates a HMAC encryption key.
+         *
+         * @param key key material
+         * @param length length of the HMAC key
+         */
+        static void CreateHmacKey(unsigned char *key, int length);
 
         /**
          * Base64 encoding.
@@ -372,6 +409,9 @@ namespace AwsMock::Core {
          */
         static int Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
 
+        /**
+         * Salt values
+         */
         static unsigned int _salt[];
     };
 

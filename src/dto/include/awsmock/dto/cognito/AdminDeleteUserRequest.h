@@ -24,12 +24,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminDeleteUserRequest : public BaseRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct AdminDeleteUserRequest : public Dto::Common::BaseRequest {
 
         /**
          * ID of the user pool
