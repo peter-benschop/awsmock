@@ -116,7 +116,7 @@ namespace AwsMock::Service {
         Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
 
         // act
-        Dto::Cognito::ListUsersRequest listRequest = {.region = _region, .userPoolId = userPool.userPoolId};
+        Dto::Cognito::ListUsersRequest listRequest = {{.region = _region}, userPool.userPoolId};
         Dto::Cognito::ListUsersResponse listResponse = _service.ListUsers(listRequest);
 
         // assert
@@ -134,7 +134,7 @@ namespace AwsMock::Service {
         Dto::Cognito::AdminCreateUserResponse createUserResponse = _service.AdminCreateUser(createUserRequest);
 
         // act
-        Dto::Cognito::AdminDeleteUserRequest deleteUserRequest = {.region = _region, .userPoolId = userPool.userPoolId, .userName = USER_NAME};
+        Dto::Cognito::AdminDeleteUserRequest deleteUserRequest = {{.region = _region}, userPool.userPoolId, USER_NAME};
         _service.AdminDeleteUser(deleteUserRequest);
         long userCount = _database.CountUsers();
 

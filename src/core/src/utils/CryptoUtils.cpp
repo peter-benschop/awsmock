@@ -177,6 +177,52 @@ namespace AwsMock::Core {
         return HexEncode(md_value, static_cast<int>(md_len));
     }
 
+    std::string Crypto::GetHmacSha224FromString(const std::string &key, const std::string &msg) {
+
+        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+        unsigned int hashLen;
+
+        HMAC(EVP_sha224(),
+             msg.data(),
+             static_cast<int>(msg.size()),
+             reinterpret_cast<unsigned char const *>(key.data()),
+             static_cast<int>(key.size()),
+             hash.data(),
+             &hashLen);
+
+        return HexEncode(hash.data(), static_cast<int>(hashLen));
+    }
+
+    std::string Crypto::GetHmacSha384FromString(const std::string &key, const std::string &msg, unsigned int *hashLen) {
+
+        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+
+        HMAC(EVP_sha384(),
+             msg.data(),
+             static_cast<int>(msg.size()),
+             reinterpret_cast<unsigned char const *>(key.data()),
+             static_cast<int>(key.size()),
+             hash.data(),
+             hashLen);
+
+        return HexEncode(hash.data(), static_cast<int>(*hashLen));
+    }
+
+    std::string Crypto::GetHmacSha512FromString(const std::string &key, const std::string &msg, unsigned int *hashLen) {
+
+        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+
+        HMAC(EVP_sha512(),
+             msg.data(),
+             static_cast<int>(msg.size()),
+             reinterpret_cast<unsigned char const *>(key.data()),
+             static_cast<int>(key.size()),
+             hash.data(),
+             hashLen);
+
+        return HexEncode(hash.data(), static_cast<int>(*hashLen));
+    }
+
     std::string Crypto::GetHmacSha256FromString(const std::string &key, const std::string &msg) {
 
         std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
@@ -459,6 +505,13 @@ namespace AwsMock::Core {
         EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), nullptr, key, iv);
 
         return 0;
+    }
+
+    void Crypto::CreateHmacKey(unsigned char *key, int length) {
+
+        if (RAND_bytes(key, length) < 0) {
+            log_error << "Failed to generate HMAC random key, length: " << length;
+        }
     }
 
     std::string Crypto::Base64Encode(const std::string &inputString) {

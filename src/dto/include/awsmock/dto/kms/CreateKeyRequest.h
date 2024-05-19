@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include "awsmock/core/exception/JsonException.h"
+#include "awsmock/dto/common/BaseRequest.h"
 #include "awsmock/dto/kms/model/KeySpec.h"
 #include "awsmock/dto/kms/model/KeyUsage.h"
 #include <awsmock/core/JsonUtils.h>
@@ -45,12 +46,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateKeyRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct CreateKeyRequest : public Dto::Common::BaseRequest {
 
         /**
          * Customer key store ID

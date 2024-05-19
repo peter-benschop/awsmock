@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminCreateUserRequest : public BaseRequest {
+    struct AdminCreateUserRequest : public Dto::Common::BaseRequest {
 
         /**
          * ID of the user pool

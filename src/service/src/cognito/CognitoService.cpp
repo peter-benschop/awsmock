@@ -101,9 +101,9 @@ namespace AwsMock::Service {
 
             user = _database.CreateUser(user);
             Dto::Cognito::AdminCreateUserResponse response = {
-                    .region = user.region,
-                    .userName = user.userName,
-                    .enabled = user.enabled};
+                    {.region = user.region},
+                    user.userName,
+                    user.enabled};
             log_trace << "Create user response: " + response.ToJson();
             return response;
 

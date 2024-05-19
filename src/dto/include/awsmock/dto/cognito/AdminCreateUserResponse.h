@@ -10,11 +10,12 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
+#include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,12 +24,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminCreateUserResponse {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct AdminCreateUserResponse : public Dto::Common::BaseRequest {
 
         /**
          * Name of the user

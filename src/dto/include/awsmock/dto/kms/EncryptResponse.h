@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include "awsmock/core/exception/JsonException.h"
+#include "awsmock/dto/common/BaseRequest.h"
 #include "awsmock/dto/kms/model/EncryptionAlgorithm.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -31,12 +32,9 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EncryptResponse {
 
-        /**
-         * AWS region
-         */
-        std::string region;
+
+    struct EncryptResponse : public Dto::Common::BaseRequest {
 
         /**
          * Key ID

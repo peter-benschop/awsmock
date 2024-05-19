@@ -10,10 +10,11 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/dto/kms/model/Key.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/kms/model/Key.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -30,7 +31,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeKeyResponse {
+    struct DescribeKeyResponse : public Dto::Common::BaseRequest {
 
         /**
          * Key metadata

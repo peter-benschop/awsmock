@@ -23,7 +23,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersResponse : public BaseRequest {
+    struct ListUsersResponse : public Dto::Common::BaseRequest {
 
         /**
          * User entities

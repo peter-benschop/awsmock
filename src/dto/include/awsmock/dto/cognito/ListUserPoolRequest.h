@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolRequest : public BaseRequest {
+    struct ListUserPoolRequest : public Dto::Common::BaseRequest {
 
         /**
          * Maximal number of results

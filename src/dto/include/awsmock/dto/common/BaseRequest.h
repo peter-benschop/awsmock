@@ -2,10 +2,10 @@
 // Created by vogje01 on 5/18/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_BASEREQUEST_H
-#define AWSMOCK_DTO_COGNITO_BASEREQUEST_H
+#ifndef AWSMOCK_DTO_COMMON_BASEREQUEST_H
+#define AWSMOCK_DTO_COMMON_BASEREQUEST_H
 
-namespace AwsMock::Dto::Cognito {
+namespace AwsMock::Dto::Common {
 
     /**
      * @brief Base request
@@ -30,6 +30,6 @@ namespace AwsMock::Dto::Cognito {
         std::string user;
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace AwsMock::Dto::Common
 
-#endif// AWSMOCK_DTO_COGNITO_BASEREQUEST_H
+#endif// AWSMOCK_DTO_COMMON_BASEREQUEST_H

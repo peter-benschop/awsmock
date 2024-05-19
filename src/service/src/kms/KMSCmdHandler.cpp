@@ -97,7 +97,6 @@ namespace AwsMock::Service {
             case Dto::Common::KMSCommandType::UNKNOWN: {
                 log_error << "Unimplemented command called";
                 throw Core::ServiceException("Unimplemented command called");
-                break;
             }
         }
     }

@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/20/24.
 //
 
-#include <awsmock/dto/cognito/CustomEmailSender.h>
+#include "awsmock/dto/cognito/model/CustomEmailSender.h"
 
 namespace AwsMock::Dto::Cognito {
 

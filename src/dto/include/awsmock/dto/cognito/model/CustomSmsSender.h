@@ -2,36 +2,36 @@
 // Created by vogje01 on 4/20/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
-#define AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
+#ifndef AWSMOCK_DTO_COGNITO_CUSTOM_SMS_SENDER_H
+#define AWSMOCK_DTO_COGNITO_CUSTOM_SMS_SENDER_H
 
 // C++ standard includes
 #include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/XmlUtils.h"
+#include "awsmock/core/exception/JsonException.h"
+#include "awsmock/dto/common/BaseRequest.h"
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * Cognito custom email sender
+     * Cognito sms sender
      *
      * Example:
      * @code{.json}
-     * "CustomEmailSender": {
-     *    "LambdaArn": "string",
-     *    "LambdaVersion": "string"
-     * },
+     * "CustomSMSSender": {
+     *   "LambdaArn": "string",
+     *   "LambdaVersion": "string"
+     * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomEmailSender : public BaseRequest {
+    struct CustomSmsSender : public Dto::Common::BaseRequest {
 
         /**
          * Lambda ARN
@@ -69,9 +69,9 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const CustomEmailSender &r);
+        friend std::ostream &operator<<(std::ostream &os, const CustomSmsSender &r);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
+#endif// AWSMOCK_DTO_COGNITO_CUSTOM_SMS_SENDER_H

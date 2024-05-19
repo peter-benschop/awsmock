@@ -21,10 +21,13 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
+#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::KMS {
@@ -84,24 +87,44 @@ namespace AwsMock::Database::Entity::KMS {
         std::string description;
 
         /**
-         * Key material
+         * Key material AES 256 (hex-encoded)
          */
         std::string aes256Key;
 
         /**
-         * IV
+         * IV (hex-encoded)
          */
         std::string aes256Iv;
 
         /**
-         * RSA private key
+         * RSA private key (hex-encoded)
          */
         std::string rsaPrivateKey;
 
         /**
-         * RSA public key
+         * RSA public key (hex-encoded)
          */
         std::string rsaPublicKey;
+
+        /**
+         * Key material HMAC 224 (hex-encoded)
+         */
+        std::string hmac224Key;
+
+        /**
+         * Key material HMAC 256 (hex-encoded)
+         */
+        std::string hmac256Key;
+
+        /**
+         * Key material HMAC 384 (hex-encoded)
+         */
+        std::string hmac384Key;
+
+        /**
+         * Key material HMAC 256 (hex-encoded)
+         */
+        std::string hmac512Key;
 
         /**
          * Topic tags

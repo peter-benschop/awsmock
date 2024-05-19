@@ -154,7 +154,7 @@ namespace AwsMock::Dto::Cognito {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateUserPoolResponse : BaseRequest {
+    struct CreateUserPoolResponse : public Dto::Common::BaseRequest {
 
         /**
          * Name of the user pool

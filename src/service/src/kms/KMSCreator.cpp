@@ -40,9 +40,21 @@ namespace AwsMock::Service {
             }
 
             case Dto::KMS::KeySpec::HMAC_224:
+                CreateHmacKey(key, 224);
+                break;
+
             case Dto::KMS::KeySpec::HMAC_256:
+                CreateHmacKey(key, 256);
+                break;
+
             case Dto::KMS::KeySpec::HMAC_384:
+                CreateHmacKey(key, 384);
+                break;
+
             case Dto::KMS::KeySpec::HMAC_512:
+                CreateHmacKey(key, 512);
+                break;
+
             case Dto::KMS::KeySpec::ECC_NIST_P256:
             case Dto::KMS::KeySpec::ECC_NIST_P384:
             case Dto::KMS::KeySpec::ECC_NIST_P521:
@@ -73,6 +85,28 @@ namespace AwsMock::Service {
         key.aes256Iv = hexIv;
 
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;
+    }
+
+    void KMSCreator::CreateHmacKey(Database::Entity::KMS::Key &key, int length) {
+        log_debug << "Start creating HMAC KMS key, keyId: " << key.keyId << " length: " << length;
+
+        unsigned char keyMaterial[length];
+        Core::Crypto::CreateHmacKey(keyMaterial, length);
+
+        // Base64 hashing
+        std::string hexKey = Core::Crypto::HexEncode(keyMaterial, length);
+        log_debug << "HMAC KMS keys created, length: " << length;
+
+        if (length == 224) {
+            key.hmac224Key = hexKey;
+        } else if (length == 256) {
+            key.hmac256Key = hexKey;
+        } else if (length == 384) {
+            key.hmac384Key = hexKey;
+        } else if (length == 512) {
+            key.hmac512Key = hexKey;
+        }
+        log_debug << "HMAC KMS key created, keyId: " << key.keyId;
     }
 
     void KMSCreator::GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length) {
