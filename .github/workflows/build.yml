@@ -17,7 +17,7 @@ jobs:
         run: |
           VERSION=$(git sv cv)
           cd docker 
-          docker build --no-cache --build-arg GH_TOKEN=${GH_TOKEN} -t aws-mock:$VERSION .
+          docker build --no-cache --build-arg GH_TOKEN=${GH_TOKEN} -t awsmock:$VERSION .
 
   push_to_registry:
     name: Push Docker image to Docker Hub
