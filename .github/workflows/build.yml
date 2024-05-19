@@ -36,7 +36,7 @@ jobs:
       - name: Tag images
         run: |
           VERSION=$(git sv cv)
-          docker tag aws-mock:$VERSION ${{ secrets.DOCKER_USER }}/aws-mock:$VERSION
+          docker tag awsmock:$VERSION ${{ secrets.DOCKER_USER }}/awsmock:$VERSION
           docker push ${{ secrets.DOCKER_USER }}/aws-mock:$VERSION
-          docker tag aws-mock:$VERSION ${{ secrets.DOCKER_USER }}/aws-mock:latest
-          docker push ${{ secrets.DOCKER_USER }}/aws-mock:latest
+          docker tag awsmock:$VERSION ${{ secrets.DOCKER_USER }}/awsmock:latest
+          docker push ${{ secrets.DOCKER_USER }}/awsmock:latest
