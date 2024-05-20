@@ -6,6 +6,8 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex LambdaMemoryDb::_lambdaMutex;
+
     bool LambdaMemoryDb::LambdaExists(const std::string &function) {
 
         return find_if(_lambdas.begin(),

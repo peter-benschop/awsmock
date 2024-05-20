@@ -6,6 +6,9 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex TransferMemoryDb::_transferMutex;
+    Poco::Mutex TransferMemoryDb::_userMutex;
+
     bool TransferMemoryDb::TransferExists(const std::string &region, const std::string &serverId) {
 
         return find_if(_transfers.begin(),

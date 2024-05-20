@@ -230,12 +230,12 @@ namespace AwsMock::Database {
         /**
          * Cognito user pool mutex
          */
-        Poco::Mutex _userPoolMutex;
+        static Poco::Mutex _userPoolMutex;
 
         /**
          * Cognito user mutex
          */
-        Poco::Mutex _userMutex;
+        static Poco::Mutex _userMutex;
     };
 
 }// namespace AwsMock::Database

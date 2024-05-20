@@ -6,6 +6,8 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex ModuleMemoryDb::_moduleMutex;
+
     bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
         return find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {

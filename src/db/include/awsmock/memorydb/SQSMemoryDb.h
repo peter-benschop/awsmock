@@ -326,12 +326,12 @@ namespace AwsMock::Database {
         /**
          * Queue mutex
          */
-        Poco::Mutex _queueMutex;
+        static Poco::Mutex _queueMutex;
 
         /**
          * Message mutex
          */
-        Poco::Mutex _messageMutex;
+        static Poco::Mutex _messageMutex;
     };
 
 }// namespace AwsMock::Database

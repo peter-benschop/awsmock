@@ -6,6 +6,9 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex DynamoDbMemoryDb::_tableMutex;
+    Poco::Mutex DynamoDbMemoryDb::_itemMutex;
+
     bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
 
         if (!region.empty()) {

@@ -6,6 +6,9 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex SQSMemoryDb::_queueMutex;
+    Poco::Mutex SQSMemoryDb::_messageMutex;
+
     bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
         return find_if(_queues.begin(),
@@ -118,7 +121,7 @@ namespace AwsMock::Database {
             auto const &[key, value] = item;
             return value.region == region && value.queueUrl == queueUrl;
         });
-        log_debug << "Purged queue, count: " << count;
+        log_debug << "Purged queue, region: " << region << " queueUrl: " << queueUrl << " count: " << count;
     }
 
     Entity::SQS::Queue SQSMemoryDb::UpdateQueue(Entity::SQS::Queue &queue) {
@@ -363,7 +366,7 @@ namespace AwsMock::Database {
                 count++;
             }
         }
-        log_trace << "Nessage retention reset, deleted: " << count << " queue: " << queueUrl;
+        log_trace << "Message retention reset, deleted: " << count << " queue: " << queueUrl;
     }
 
     long SQSMemoryDb::CountMessages(const std::string &region, const std::string &queueUrl) {
@@ -403,9 +406,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    long SQSMemoryDb::CountMessagesByStatus(const std::string &region,
-                                            const std::string &queueUrl,
-                                            Entity::SQS::MessageStatus status) {
+    long SQSMemoryDb::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status) {
 
         long count = 0;
 

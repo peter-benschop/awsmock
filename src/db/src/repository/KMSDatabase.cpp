@@ -193,13 +193,13 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 auto result = _keyCollection.replace_one(make_document(kvp("keyId", key.keyId)), key.ToDocument());
-                log_trace << "Bucket updated: " << key.ToString();
+                log_trace << "Key updated: " << key.ToString();
                 session.commit_transaction();
                 return GetKeyByKeyId(key.keyId);
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
-                log_error << "Database exception " << exc.what();
+                log_error << "KMS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what(), 500);
             }
 

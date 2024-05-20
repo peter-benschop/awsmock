@@ -78,6 +78,11 @@ namespace AwsMock::Dto::Module {
         std::string dataDir = "/tmp/awsmock/data";
 
         /**
+         * Version
+         */
+        std::string version;
+
+        /**
          * Pretty print
          */
         bool prettyPrint = false;
@@ -92,7 +97,7 @@ namespace AwsMock::Dto::Module {
          *
          * @return JSON string
          */
-        std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Convert from JSON representation

@@ -212,6 +212,7 @@ namespace AwsMock::Controller {
         Dto::Module::GatewayConfig gatewayConfig = Dto::Module::GatewayConfig::FromJson(response.output);
         if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
             std::cout << "Config: " << std::endl;
+            std::cout << "  " << std::setw(16) << std::left << "Version: " << std::setw(32) << gatewayConfig.version << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "Endpoint: " << std::setw(32) << gatewayConfig.endpoint << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "Host: " << std::setw(32) << gatewayConfig.host << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "Port: " << std::setw(32) << gatewayConfig.port << std::endl;

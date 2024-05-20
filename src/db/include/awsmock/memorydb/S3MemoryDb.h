@@ -272,12 +272,12 @@ namespace AwsMock::Database {
         /**
          * Bucket mutex
          */
-        Poco::Mutex _bucketMutex;
+        static Poco::Mutex _bucketMutex;
 
         /**
          * Object mutex
          */
-        Poco::Mutex _objectMutex;
+        static Poco::Mutex _objectMutex;
     };
 
 }// namespace AwsMock::Database
