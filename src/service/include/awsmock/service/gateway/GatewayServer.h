@@ -30,7 +30,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Gateway server
+     * @brief Gateway server
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -16,7 +16,7 @@
 namespace AwsMock::Service {
 
     /**
-     * KMS request handler factory
+     * @brief KMS request handler factory
      *
      * @author jens.vogt\@opitz-consulting.com
      */

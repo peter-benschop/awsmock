@@ -18,7 +18,7 @@
 namespace AwsMock::Service {
 
     /**
-     * AWS KMS mock handler
+     * @brief KMS request handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */

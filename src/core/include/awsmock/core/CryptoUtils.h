@@ -177,6 +177,7 @@ namespace AwsMock::Core {
          *
          * @param key string for hashing
          * @param content string to hash
+         * @param hashLen length of the resulting hash
          * @return hey-encoded HMAC SHA512 hash of the given string
          */
         static std::string GetHmacSha512FromString(const std::string &key, const std::string &content, unsigned int *hashLen);

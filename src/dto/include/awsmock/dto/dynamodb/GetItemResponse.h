@@ -12,15 +12,16 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/dynamodb/TableStatus.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB Get item response
+     * @brief DynamoDB Get item response
      *
      * Example:
      * @code{.json}
@@ -41,7 +42,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemResponse {
+    struct GetItemResponse : public Dto::Common::BaseRequest {
 
         /**
          * Region

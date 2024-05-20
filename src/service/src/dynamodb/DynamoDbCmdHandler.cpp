@@ -11,17 +11,18 @@ namespace AwsMock::Service {
 
         try {
 
-            std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
-            std::string payload = Core::HttpUtils::GetBodyAsString(request);
-            std::string action = GetActionFromHeader(request, payload);
+            std::string requestId = clientCommand.requestId;
+            std::string action = GetActionFromHeader(request, clientCommand.payload);
 
             switch (clientCommand.command) {
 
                 case Dto::Common::DynamoDbCommandType::CREATE_TABLE: {
 
                     Dto::DynamoDb::CreateTableRequest tableRequest;
-                    tableRequest.FromJson(payload);
+                    tableRequest.FromJson(clientCommand.payload);
                     tableRequest.region = clientCommand.region;
+                    tableRequest.requestId = clientCommand.requestId;
+                    tableRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -43,8 +44,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::LIST_TABLES: {
 
                     Dto::DynamoDb::ListTableRequest tableRequest;
-                    tableRequest.FromJson(payload);
+                    tableRequest.FromJson(clientCommand.payload);
                     tableRequest.region = clientCommand.region;
+                    tableRequest.requestId = clientCommand.requestId;
+                    tableRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -65,8 +68,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::DESCRIBE_TABLE: {
 
                     Dto::DynamoDb::DescribeTableRequest tableRequest;
-                    tableRequest.FromJson(payload);
+                    tableRequest.FromJson(clientCommand.payload);
                     tableRequest.region = clientCommand.region;
+                    tableRequest.requestId = clientCommand.requestId;
+                    tableRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -86,8 +91,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::DELETE_TABLE: {
 
                     Dto::DynamoDb::DeleteTableRequest tableRequest;
-                    tableRequest.FromJson(payload);
+                    tableRequest.FromJson(clientCommand.payload);
                     tableRequest.region = clientCommand.region;
+                    tableRequest.requestId = clientCommand.requestId;
+                    tableRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -107,8 +114,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::GET_ITEM: {
 
                     Dto::DynamoDb::GetItemRequest itemRequest;
-                    itemRequest.FromJson(payload);
+                    itemRequest.FromJson(clientCommand.payload);
                     itemRequest.region = clientCommand.region;
+                    itemRequest.requestId = clientCommand.requestId;
+                    itemRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -128,8 +137,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
 
                     Dto::DynamoDb::PutItemRequest itemRequest;
-                    itemRequest.FromJson(payload);
+                    itemRequest.FromJson(clientCommand.payload);
                     itemRequest.region = clientCommand.region;
+                    itemRequest.requestId = clientCommand.requestId;
+                    itemRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -149,8 +160,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::QUERY: {
 
                     Dto::DynamoDb::QueryRequest queryRequest;
-                    queryRequest.FromJson(payload);
+                    queryRequest.FromJson(clientCommand.payload);
                     queryRequest.region = clientCommand.region;
+                    queryRequest.requestId = clientCommand.requestId;
+                    queryRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {
@@ -170,8 +183,10 @@ namespace AwsMock::Service {
                 case Dto::Common::DynamoDbCommandType::SCAN: {
 
                     Dto::DynamoDb::ScanRequest scanRequest;
-                    scanRequest.FromJson(payload);
+                    scanRequest.FromJson(clientCommand.payload);
                     scanRequest.region = clientCommand.region;
+                    scanRequest.requestId = clientCommand.requestId;
+                    scanRequest.user = clientCommand.user;
 
                     // Copy headers
                     for (const auto &header: request) {

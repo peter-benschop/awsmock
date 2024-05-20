@@ -17,14 +17,15 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
+#include <awsmock/entity/kms/Key.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
@@ -105,9 +106,14 @@ namespace AwsMock::Dto::Common {
         Database::Entity::DynamoDb::ItemList dynamoDbItems;
 
         /**
-         * DynamoDb items
+         * Secrets manager secrets
          */
         Database::Entity::SecretsManager::SecretList secrets;
+
+        /**
+         * Secrets manager secrets
+         */
+        Database::Entity::KMS::KeyList kmsKeys;
 
         /**
          * JSON representation

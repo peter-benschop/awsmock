@@ -2,6 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
+#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -31,25 +32,21 @@ namespace AwsMock::Dto::DynamoDb {
         body = jsonString;
         headers = headerMap;
 
-        /*Poco::JSON::Parser parser;
+        Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
-
-          Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-          Core::JsonUtils::GetJsonValueString("LastEvaluatedTableName", rootObject, lastEvaluatedTableName);
-
-          Poco::JSON::Array::Ptr jsonTableArray = rootObject->getArray("TableNames");
-          if (!jsonTableArray.isNull()) {
-            for (const auto &tableName : *jsonTableArray) {
-              tableNames.emplace_back(tableName);
+            Poco::JSON::Array::Ptr jsonTableArray = rootObject->getArray("TableNames");
+            if (!jsonTableArray.isNull()) {
+                for (const auto &tableName: *jsonTableArray) {
+                    tableNames.emplace_back(tableName);
+                }
             }
-          }
 
         } catch (Poco::Exception &exc) {
-          throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }*/
+            throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     std::string ListTableResponse::ToString() const {

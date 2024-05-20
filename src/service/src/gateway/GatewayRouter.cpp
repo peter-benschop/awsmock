@@ -9,17 +9,17 @@ namespace AwsMock::Service {
     GatewayRouter::GatewayRouter(Core::Configuration &configuration, Core::MetricService &metricService) : _configuration(configuration), _metricService(metricService) {
 
         // Add routes
-        _routingTable["s3"] = {._name = "s3", ._handlerType = HandlerType::S3};
-        _routingTable["s3api"] = {._name = "s3", ._handlerType = HandlerType::S3};
-        _routingTable["sqs"] = {._name = "sqs", ._handlerType = HandlerType::SQS};
-        _routingTable["sns"] = {._name = "sns", ._handlerType = HandlerType::SNS};
-        _routingTable["lambda"] = {._name = "lambda", ._handlerType = HandlerType::LAMBDA};
-        _routingTable["transfer"] = {._name = "transfer", ._handlerType = HandlerType::TRANSFER};
-        _routingTable["cognito-idp"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO};
-        _routingTable["cognito-identity"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO};
-        _routingTable["dynamodb"] = {._name = "dynamodb", ._handlerType = HandlerType::DYNAMODB};
-        _routingTable["secretsmanager"] = {._name = "secretsmanager", ._handlerType = HandlerType::SECRETS_MANAGER};
-        _routingTable["kms"] = {._name = "kms", ._handlerType = HandlerType::KMS};
+        _routingTable["s3"] = {._name = "s3", ._handlerType = HandlerType::S3, ._handler = new S3Handler(configuration)};
+        _routingTable["s3api"] = {._name = "s3", ._handlerType = HandlerType::S3, ._handler = new S3Handler(configuration)};
+        _routingTable["sqs"] = {._name = "sqs", ._handlerType = HandlerType::SQS, ._handler = new SQSHandler(configuration)};
+        _routingTable["sns"] = {._name = "sns", ._handlerType = HandlerType::SNS, ._handler = new SNSHandler(configuration)};
+        _routingTable["lambda"] = {._name = "lambda", ._handlerType = HandlerType::LAMBDA, ._handler = new LambdaHandler(configuration)};
+        _routingTable["transfer"] = {._name = "transfer", ._handlerType = HandlerType::TRANSFER, ._handler = new TransferHandler(configuration)};
+        _routingTable["cognito-idp"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler(configuration)};
+        _routingTable["cognito-identity"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler(configuration)};
+        _routingTable["dynamodb"] = {._name = "dynamodb", ._handlerType = HandlerType::DYNAMODB, ._handler = new DynamoDbHandler(configuration)};
+        _routingTable["secretsmanager"] = {._name = "secretsmanager", ._handlerType = HandlerType::SECRETS_MANAGER, ._handler = new SecretsManagerHandler(configuration)};
+        _routingTable["kms"] = {._name = "kms", ._handlerType = HandlerType::KMS, ._handler = new KMSHandler(configuration)};
         log_debug << "Gateway router initialized, routes: " << _routingTable.size();
     }
 

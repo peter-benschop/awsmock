@@ -16,7 +16,7 @@
 namespace AwsMock::Service {
 
     /**
-     * S3 request handler factory
+     * @brief S3 request handler factory
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -25,13 +25,11 @@
 namespace AwsMock::Service {
 
     /**
-     * AWS S3 mock handler
+     * @brief S3 request handler
      *
-     * <p>
      * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
      * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
      * are first send to the S3CmdHandler, which normalizes the commands.
-     * <p>
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -44,7 +42,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit S3Handler(Core::Configuration &configuration) : S3CmdHandler(configuration), _configuration(configuration), _s3Service(configuration) {}
+        explicit S3Handler(Core::Configuration &configuration) : S3CmdHandler(configuration) {}
 
         /**
          * HTTP GET request.
@@ -100,18 +98,6 @@ namespace AwsMock::Service {
          * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-      private:
-
-        /**
-         * Handler configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * S3 module
-         */
-        Service::S3Service _s3Service;
     };
 
 }// namespace AwsMock::Service

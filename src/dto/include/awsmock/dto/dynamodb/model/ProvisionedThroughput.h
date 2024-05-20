@@ -10,9 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
 #include "awsmock/core/exception/JsonException.h"
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -36,18 +36,17 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Last decrease time
          */
-        long lastDecreaseDateTime;
+        Poco::DateTime lastDecreaseDateTime;
 
         /**
          * Last increase time
          */
-        long lastIncreaseDateTime;
+        Poco::DateTime lastIncreaseDateTime;
 
         /**
          * NUmber of decreases
          */
         long numberOfDecreasesToday;
-
 
         /**
          * Converts the entity to a JSON object
@@ -64,11 +63,11 @@ namespace AwsMock::Dto::DynamoDb {
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Parse a JSON stream
+         * Parse a JSON object
          *
-         * @param jsonBody JSON string
+         * @param jsonObject JSON object
          */
-        void FromJson(const std::string &jsonBody);
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * Converts the DTO to a string representation.

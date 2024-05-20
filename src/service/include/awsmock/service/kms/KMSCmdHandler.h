@@ -24,7 +24,7 @@ namespace AwsMock::Service {
     typedef std::map<std::string, std::string> AttributeList;
 
     /**
-     * AWS KMS command handler
+     * @brief KMS command handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */

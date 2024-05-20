@@ -146,7 +146,7 @@ namespace AwsMock::Controller {
                       << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl;
             std::cout << "\nModules:\n"
                       << std::endl;
-            std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb." << std::endl;
+            std::cout << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb, kms secretsmanager." << std::endl;
             std::cout << "\nExport options:\n";
             std::cout << std::left << std::setw(leftIndent) << "--includeObjects"
                       << ": export objects as well" << std::endl;

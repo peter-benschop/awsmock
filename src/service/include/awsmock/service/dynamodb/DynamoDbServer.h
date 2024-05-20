@@ -17,6 +17,7 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
+#include <awsmock/service/dynamodb/DynamoDbWorker.h>
 
 #define DYNAMODB_DEFAULT_PORT 9507
 #define DYNAMODB_DEFAULT_HOST "localhost"
@@ -24,6 +25,7 @@
 #define DYNAMODB_DEFAULT_THREADS 50
 #define DYNAMODB_DEFAULT_TIMEOUT 120
 #define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
+#define DYNAMODB_DEFAULT_WORKER_PERIOD 300
 #define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
 #define DYNAMODB_DOCKER_TAG std::string("latest")
 #define DYNAMODB_INTERNAL_PORT 8000
@@ -37,7 +39,7 @@
 namespace AwsMock::Service {
 
     /**
-     * AwsMock DynamoDB server
+     * @brief AwsMock DynamoDB server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -111,6 +113,11 @@ namespace AwsMock::Service {
         std::shared_ptr<DynamoDbMonitoring> _dynamoDbMonitoring;
 
         /**
+         * Monitoring
+         */
+        std::shared_ptr<DynamoDbWorker> _dynamoDbWorker;
+
+        /**
          * AWS region
          */
         std::string _region;
@@ -149,6 +156,11 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * Worker period
+         */
+        int _workerPeriod;
 
         /**
          * Module name

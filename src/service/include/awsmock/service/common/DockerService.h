@@ -42,12 +42,12 @@
 namespace AwsMock::Service {
 
     /**
-     * The DockerService controls the connection to the docker daemon using a UNIX Domain socket.
+     * @brief Controls the connection to the docker daemon using a UNIX Domain socket.
      *
-     * <p>
      * All docker related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc. The service is using the
      * docker REST API available at the UNIX domain socket. Depending on your Linux distribution this docker socket under different directory normally its: <i>/var/run/docker.sock</i> (Debian, Ubuntu).
-     * </p>
+     *
+     * On Windows the HTTP port will be used to communicate with the docker daemon. Usually `http://localhost:2375`.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

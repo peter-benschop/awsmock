@@ -28,7 +28,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Cognito module
+     * @brief Cognito module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * DynamoDB monitoring thread
+     * @brief DynamoDB monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit DynamoDbMonitoring(int timeout) : Core::Timer("dynamodb-monitoring", timeout) {}
+        explicit DynamoDbMonitoring(int timeout);
 
         /**
          * Initialization

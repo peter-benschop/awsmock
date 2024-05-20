@@ -23,9 +23,9 @@
 namespace AwsMock::Service {
 
     /**
-     * “@brief AWS DynamoDB mock handler
+     * @brief AWS DynamoDB mock handler
      *
-     * <p>AWS DynamoDB HTTP request handler. All DynamoDB related REST call are ending here.<p>
+     * AWS DynamoDB HTTP request handler. All DynamoDB related REST call are ending here.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

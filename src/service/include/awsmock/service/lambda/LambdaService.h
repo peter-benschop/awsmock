@@ -48,7 +48,7 @@
 namespace AwsMock::Service {
 
     /**
-     * AWS lambda module. Handles all lambda related requests:
+     * @brief Lambda service module. Handles all lambda related requests:
      *
      * <ul>
      * <li>Create lambda function.</li>

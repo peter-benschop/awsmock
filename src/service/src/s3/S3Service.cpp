@@ -60,7 +60,36 @@ namespace AwsMock::Service {
         return createBucketResponse;
     }
 
-    Dto::S3::GetMetadataResponse S3Service::GetMetadata(Dto::S3::GetMetadataRequest &request) {
+    Dto::S3::GetMetadataResponse S3Service::GetBucketMetadata(Dto::S3::GetMetadataRequest &request) {
+        log_trace << "Get bucket metadata request, s3Request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+            log_info << "Bucket " << request.bucket << " does not exist";
+            throw Core::NotFoundException("Bucket does not exist");
+        }
+
+        try {
+
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+            Dto::S3::GetMetadataResponse response = {
+                    .region = bucket.region,
+                    .bucket = bucket.name,
+                    .created = bucket.created,
+                    .modified = bucket.modified};
+
+            log_trace << "S3 get bucket metadata response: " + response.ToString();
+            log_info << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
+
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_warning << "S3 get object metadata failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(Dto::S3::GetMetadataRequest &request) {
         log_trace << "Get metadata request, s3Request: " << request.ToString();
 
         // Check existence

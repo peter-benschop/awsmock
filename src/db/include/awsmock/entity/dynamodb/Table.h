@@ -16,6 +16,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
+#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
@@ -26,6 +27,8 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -58,6 +61,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * Name
          */
         std::string name;
+
+        /**
+         * Table status
+         */
+        std::string status;
 
         /**
          * Attributes

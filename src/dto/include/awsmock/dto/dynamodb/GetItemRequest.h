@@ -15,16 +15,17 @@
 #include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB get item request
+     * @brief DynamoDB get item request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemRequest {
+    struct GetItemRequest : public Dto::Common::BaseRequest {
 
         /**
          * Region

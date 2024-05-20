@@ -71,7 +71,7 @@ namespace AwsMock::Dto::DynamoDb {
             Core::JsonUtils::GetJsonValueBool("DeletionProtectionEnabled", jsonTableDescription, deleteProtectionEnabled);
             std::string tableStatusStr;
             Core::JsonUtils::GetJsonValueString("TableStatus", jsonTableDescription, tableStatusStr);
-            tableStatus = TableStatusFromString(tableStatusStr);
+            tableStatus = Dto::DynamoDb::TableStatusTypeFromString(tableStatusStr);
 
             // Key schema
             Poco::JSON::Array::Ptr jsonKeySchemaArray = jsonTableDescription->getArray("KeySchema");

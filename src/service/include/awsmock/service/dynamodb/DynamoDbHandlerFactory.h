@@ -16,7 +16,7 @@
 namespace AwsMock::Service {
 
     /**
-     * DynamoDB request handler factory
+     * @brief DynamoDB request handler factory
      *
      * @author jens.vogt\@opitz-consulting.com
      */

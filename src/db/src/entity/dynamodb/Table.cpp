@@ -8,40 +8,48 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> Table::ToDocument() const {
 
-        // Tags
-        auto tagsDoc = bsoncxx::builder::basic::document{};
-        if (!tags.empty()) {
-            for (const auto &t: tags) {
-                tagsDoc.append(kvp(t.first, t.second));
+        try {
+
+            bsoncxx::builder::basic::document tableDoc;
+            tableDoc.append(
+                    kvp("region", region),
+                    kvp("name", name),
+                    kvp("status", status),
+                    kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
+                    kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+
+            // Tags
+            if (!tags.empty()) {
+                auto tagsDoc = bsoncxx::builder::basic::document{};
+                for (const auto &t: tags) {
+                    tagsDoc.append(kvp(t.first, t.second));
+                }
+                tableDoc.append(kvp("tags", tagsDoc));
             }
-        }
 
-        // Attributes
-        auto attributesDoc = bsoncxx::builder::basic::document{};
-        if (!attributes.empty()) {
-            for (const auto &t: attributes) {
-                attributesDoc.append(kvp(t.first, t.second));
+            // Attributes
+            if (!attributes.empty()) {
+                auto attributesDoc = bsoncxx::builder::basic::document{};
+                for (const auto &t: attributes) {
+                    attributesDoc.append(kvp(t.first, t.second));
+                }
+                tableDoc.append(kvp("attributes", attributesDoc));
             }
-        }
 
-        // Key schemas
-        auto keySchemaDoc = bsoncxx::builder::basic::document{};
-        if (!keySchemas.empty()) {
-            for (const auto &t: keySchemas) {
-                keySchemaDoc.append(kvp(t.first, t.second));
+            // Key schemas
+            if (!keySchemas.empty()) {
+                auto keySchemaDoc = bsoncxx::builder::basic::document{};
+                for (const auto &t: keySchemas) {
+                    keySchemaDoc.append(kvp(t.first, t.second));
+                }
+                tableDoc.append(kvp("keySchemas", keySchemaDoc));
             }
+            return tableDoc.extract();
+
+        } catch (mongocxx::exception &e) {
+            log_error << e.what();
+            throw Core::DatabaseException(e.what());
         }
-
-        view_or_value<view, value> lambdaDoc = make_document(
-                kvp("region", region),
-                kvp("name", name),
-                kvp("tags", tagsDoc),
-                kvp("attributes", attributesDoc),
-                kvp("keySchemas", keySchemaDoc),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
-
-        return lambdaDoc;
     }
 
     void Table::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
@@ -49,13 +57,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
+        status = bsoncxx::string::to_string(mResult.value()["status"].get_string().value);
         created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
         modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-            for (bsoncxx::document::element tagElement: tagsView) {
+            for (const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
@@ -65,7 +74,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         // Get attributes
         if (mResult.value().find("attributes") != mResult.value().end()) {
             bsoncxx::document::view tagsView = mResult.value()["attributes"].get_document().value;
-            for (bsoncxx::document::element tagElement: tagsView) {
+            for (const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 attributes.emplace(key, value);
@@ -75,7 +84,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         // Key schemas
         if (mResult.value().find("keySchemas") != mResult.value().end()) {
             bsoncxx::document::view keySchemaView = mResult.value()["keySchemas"].get_document().value;
-            for (bsoncxx::document::element keySchemaElement: keySchemaView) {
+            for (const bsoncxx::document::element &keySchemaElement: keySchemaView) {
                 std::string key = bsoncxx::string::to_string(keySchemaElement.key());
                 std::string value = bsoncxx::string::to_string(keySchemaView[key].get_string().value);
                 keySchemas.emplace(key, value);
@@ -84,6 +93,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     }
 
     Poco::JSON::Object Table::ToJsonObject() const {
+
         Poco::JSON::Object jsonObject;
         jsonObject.set("region", region);
         jsonObject.set("name", name);
@@ -110,6 +120,18 @@ namespace AwsMock::Database::Entity::DynamoDb {
                 jsonAttributeArray.add(object);
             }
             jsonObject.set("attributes", jsonAttributeArray);
+        }
+
+        // Key-schemas
+        if (!keySchemas.empty()) {
+            Poco::JSON::Array jsonKeySchemasArray;
+            for (const auto &keySchema: keySchemas) {
+                Poco::JSON::Object object;
+                object.set("attributeName", keySchema.first);
+                object.set("keyType", keySchema.second);
+                jsonKeySchemasArray.add(object);
+            }
+            jsonObject.set("keySchemas", jsonKeySchemasArray);
         }
 
         jsonObject.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::ISO8601_FORMAT));
@@ -147,9 +169,21 @@ namespace AwsMock::Database::Entity::DynamoDb {
                 for (int i = 0; i < jsonAttributesArray->size(); i++) {
                     Poco::JSON::Object::Ptr attributeObject = jsonAttributesArray->getObject(i);
                     std::string keyStr, valueStr;
-                    Core::JsonUtils::GetJsonValueString("key", attributeObject, keyStr);
-                    Core::JsonUtils::GetJsonValueString("value", attributeObject, valueStr);
+                    Core::JsonUtils::GetJsonValueString("attributeName", attributeObject, keyStr);
+                    Core::JsonUtils::GetJsonValueString("attributeValue", attributeObject, valueStr);
                     attributes[keyStr] = valueStr;
+                }
+            }
+
+            // Key schemas
+            if (jsonObject->has("keySchemas")) {
+                Poco::JSON::Array::Ptr jsonAttributesArray = jsonObject->getArray("keySchemas");
+                for (int i = 0; i < jsonAttributesArray->size(); i++) {
+                    Poco::JSON::Object::Ptr attributeObject = jsonAttributesArray->getObject(i);
+                    std::string attributeNameStr, keyTypeStr;
+                    Core::JsonUtils::GetJsonValueString("attributeName", attributeObject, attributeNameStr);
+                    Core::JsonUtils::GetJsonValueString("keyType", attributeObject, keyTypeStr);
+                    keySchemas[attributeNameStr] = keyTypeStr;
                 }
             }
 

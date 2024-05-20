@@ -12,19 +12,20 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB delete item request
+     * @brief DynamoDB delete item request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteItemRequest {
+    struct DeleteItemRequest : public Dto::Common::BaseRequest {
 
         /**
          * Region
