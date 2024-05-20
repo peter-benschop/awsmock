@@ -172,7 +172,7 @@ namespace AwsMock::Database {
         /**
          * Lambda mutex
          */
-        Poco::Mutex _lambdaMutex;
+        static Poco::Mutex _lambdaMutex;
     };
 
 }// namespace AwsMock::Database

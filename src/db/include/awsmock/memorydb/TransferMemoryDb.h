@@ -173,12 +173,12 @@ namespace AwsMock::Database {
         /**
          * Transfer mutex
          */
-        Poco::Mutex _transferMutex;
+        static Poco::Mutex _transferMutex;
 
         /**
          * User mutex
          */
-        Poco::Mutex _userMutex;
+        static Poco::Mutex _userMutex;
     };
 
 }// namespace AwsMock::Database

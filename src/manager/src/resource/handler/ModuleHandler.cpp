@@ -34,6 +34,7 @@ namespace AwsMock::Manager {
                     .accessId = _configuration.getString("awsmock.account.userPoolId", "000000000000"),
                     .clientId = _configuration.getString("awsmock.client.userPoolId", "00000000"),
                     .dataDir = _configuration.getString("awsmock.data.dir", "/tmp/awsmock/data"),
+                    .version = Core::Configuration::GetVersion(),
                     .databaseActive = _configuration.getBool("awsmock.mongodb.active", false)};
             SendOkResponse(response, config.ToJson());
 

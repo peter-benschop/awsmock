@@ -6,6 +6,9 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex S3MemoryDb::_bucketMutex;
+    Poco::Mutex S3MemoryDb::_objectMutex;
+
     bool S3MemoryDb::BucketExists(const std::string &region, const std::string &name) {
 
         return find_if(_buckets.begin(),

@@ -6,6 +6,8 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex SecretsManagerMemoryDb::_secretMutex;
+
     bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
         return find_if(_secrets.begin(),
@@ -43,8 +45,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region,
-                                                                                 const std::string &name) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region, const std::string &name) {
 
         Entity::SecretsManager::Secret result;
 

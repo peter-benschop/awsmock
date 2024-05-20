@@ -176,12 +176,12 @@ namespace AwsMock::Database {
         /**
          * Table mutex
          */
-        Poco::Mutex _tableMutex;
+        static Poco::Mutex _tableMutex;
 
         /**
          * Item mutex
          */
-        Poco::Mutex _itemMutex;
+        static Poco::Mutex _itemMutex;
     };
 
 }// namespace AwsMock::Database

@@ -164,9 +164,9 @@ namespace AwsMock::Database {
         static std::map<std::string, Entity::Module::Module> _existingModules;
 
         /**
-         * Object lock
+         * Module lock
          */
-        Poco::Mutex _moduleMutex;
+        static Poco::Mutex _moduleMutex;
     };
 
 }// namespace AwsMock::Database

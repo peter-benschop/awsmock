@@ -6,6 +6,9 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex SNSMemoryDb::_topicMutex;
+    Poco::Mutex SNSMemoryDb::_messageMutex;
+
     bool SNSMemoryDb::TopicExists(const std::string &region, const std::string &name) {
 
         return find_if(_topics.begin(),

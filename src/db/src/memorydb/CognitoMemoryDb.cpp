@@ -6,6 +6,9 @@
 
 namespace AwsMock::Database {
 
+    Poco::Mutex CognitoMemoryDb::_userPoolMutex;
+    Poco::Mutex CognitoMemoryDb::_userMutex;
+
     bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
         return find_if(_userPools.begin(),

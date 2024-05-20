@@ -83,7 +83,6 @@ namespace AwsMock::Database {
     }
 
     Entity::KMS::Key KMSMemoryDb::UpdateKey(const Entity::KMS::Key &key) {
-
         Poco::ScopedLock lock(_keyMutex);
 
         std::string keyId = key.keyId;
