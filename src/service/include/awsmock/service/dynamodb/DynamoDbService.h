@@ -13,7 +13,6 @@
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
-#include <Poco/NotificationQueue.h>
 #include <Poco/StreamCopier.h>
 
 // AwsMock includes
@@ -50,7 +49,9 @@
 namespace AwsMock::Service {
 
     /**
-     * DynamoDb module. Handles all DynamoDb related requests:
+     * @brief DynamoDb module service.
+     *
+     * Handles all DynamoDb related requests:
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -38,6 +38,11 @@ namespace AwsMock::Service {
          * Type
          */
         HandlerType _handlerType;
+
+        /**
+         * Abstract handler
+         */
+        AbstractHandler *_handler;
     };
 
 }// namespace AwsMock::Service

@@ -15,6 +15,7 @@ namespace AwsMock::Service {
         _maxQueueLength = _configuration.getInt("awsmock.service.dynamodb.max.queue", DYNAMODB_DEFAULT_QUEUE);
         _maxThreads = _configuration.getInt("awsmock.service.dynamodb.max.threads", DYNAMODB_DEFAULT_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.dynamodb.timeout", DYNAMODB_DEFAULT_TIMEOUT);
+        _workerPeriod = _configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
         _monitoringPeriod = _configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
 
         // Sleeping period
@@ -28,6 +29,9 @@ namespace AwsMock::Service {
         // Monitoring
         _dynamoDbMonitoring = std::make_unique<DynamoDbMonitoring>(_monitoringPeriod);
 
+        // Worker
+        _dynamoDbWorker = std::make_unique<DynamoDbWorker>(_workerPeriod);
+
         // Start DynamoDb docker image
         StartLocalDynamoDb();
     }
@@ -40,9 +44,6 @@ namespace AwsMock::Service {
             return;
         }
         log_info << "DynamoDb server started";
-
-        // Start monitoring
-        //_dynamoDbMonitoring->Start();
 
         // Start HTTP manager
         StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new DynamoDbRequestHandlerFactory(_configuration));

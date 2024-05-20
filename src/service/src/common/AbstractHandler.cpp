@@ -150,6 +150,14 @@ namespace AwsMock::Service {
         errorStream.flush();
     }
 
+    void AbstractHandler::handleHead([[maybe_unused]] Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+        log_trace << "Request, method: " << request.getMethod();
+        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED, Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
+
+        std::ostream &errorStream = response.send();
+        errorStream.flush();
+    }
+
     void AbstractHandler::handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const std::string &reason) {
 
         switch (statusCode) {

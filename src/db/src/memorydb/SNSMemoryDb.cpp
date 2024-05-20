@@ -6,8 +6,8 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex SNSMemoryDb::_topicMutex;
-    Poco::Mutex SNSMemoryDb::_messageMutex;
+    Poco::Mutex SNSMemoryDb::_snsTopicMutex;
+    Poco::Mutex SNSMemoryDb::_snsMessageMutex;
 
     bool SNSMemoryDb::TopicExists(const std::string &region, const std::string &name) {
 
@@ -90,7 +90,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSMemoryDb::CreateTopic(const Entity::SNS::Topic &topic) {
-        Poco::ScopedLock loc(_topicMutex);
+        Poco::ScopedLock loc(_snsTopicMutex);
 
         std::string oid = Poco::UUIDGenerator().createRandom().toString();
         _topics[oid] = topic;
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSMemoryDb::UpdateTopic(const Entity::SNS::Topic &topic) {
-        Poco::ScopedLock loc(_topicMutex);
+        Poco::ScopedLock loc(_snsTopicMutex);
 
         std::string region = topic.region;
         std::string name = topic.topicName;
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteTopic(const Entity::SNS::Topic &topic) {
-        Poco::ScopedLock loc(_topicMutex);
+        Poco::ScopedLock loc(_snsTopicMutex);
 
         std::string region = topic.region;
         std::string arn = topic.topicArn;
@@ -165,7 +165,7 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteAllTopics() {
-        Poco::ScopedLock loc(_topicMutex);
+        Poco::ScopedLock loc(_snsTopicMutex);
 
         log_debug << "All topics deleted, count: " << _topics.size();
         _topics.clear();
@@ -179,7 +179,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSMemoryDb::CreateMessage(const Entity::SNS::Message &message) {
-        Poco::ScopedLock loc(_messageMutex);
+        Poco::ScopedLock loc(_snsMessageMutex);
 
         std::string oid = Poco::UUIDGenerator().createRandom().toString();
         _messages[oid] = message;
@@ -252,7 +252,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSMemoryDb::UpdateMessage(Entity::SNS::Message &message) {
-        Poco::ScopedLock lock(_messageMutex);
+        Poco::ScopedLock lock(_snsMessageMutex);
 
         std::string oid = message.oid;
         auto it =
@@ -264,7 +264,7 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
-        Poco::ScopedLock loc(_messageMutex);
+        Poco::ScopedLock loc(_snsMessageMutex);
 
         std::string messageId = message.messageId;
         const auto count = std::erase_if(_messages, [messageId](const auto &item) {
@@ -275,7 +275,7 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
-        Poco::ScopedLock loc(_messageMutex);
+        Poco::ScopedLock loc(_snsMessageMutex);
 
         long count = 0;
         for (auto &messageId: messageIds) {
@@ -288,7 +288,7 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteOldMessages(long timeout) {
-        Poco::ScopedLock loc(_messageMutex);
+        Poco::ScopedLock loc(_snsMessageMutex);
 
         auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{timeout};
 
@@ -303,7 +303,7 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteAllMessages() {
-        Poco::ScopedLock loc(_messageMutex);
+        Poco::ScopedLock loc(_snsMessageMutex);
 
         log_debug << "All messages deleted, count: " << _messages.size();
         _messages.clear();

@@ -20,6 +20,7 @@ namespace AwsMock::Dto::Module {
             gatewayConfigJson.set("dataDir", dataDir);
             gatewayConfigJson.set("prettyPrint", prettyPrint);
             gatewayConfigJson.set("databaseActive", databaseActive);
+            gatewayConfigJson.set("version", version);
 
             return Core::JsonUtils::ToJsonString(gatewayConfigJson);
 
@@ -51,6 +52,7 @@ namespace AwsMock::Dto::Module {
             Core::JsonUtils::GetJsonValueString("dataDir", rootObject, gatewayConfig.dataDir);
             Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
             Core::JsonUtils::GetJsonValueBool("databaseActive", rootObject, gatewayConfig.databaseActive);
+            Core::JsonUtils::GetJsonValueString("version", rootObject, gatewayConfig.version);
 
             // Cleanup
             parser.reset();

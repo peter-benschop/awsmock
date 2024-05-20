@@ -17,7 +17,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Lambda request handler factory
+     * @brief Lambda request handler factory
      *
      * @author jens.vogt\@opitz-consulting.com
      */

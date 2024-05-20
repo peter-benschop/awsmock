@@ -17,7 +17,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Cognito request handler factory
+     * @brief Cognito request handler factory
      *
      * @author jens.vogt\@opitz-consulting.com
      */

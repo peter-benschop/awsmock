@@ -146,6 +146,7 @@ namespace AwsMock::Service {
 
         Dto::Common::Infrastructure infrastructure;
 
+        // S3
         if (services.HasService("all") || services.HasService("s3")) {
             Database::S3Database &_s3Database = Database::S3Database::instance();
             infrastructure.s3Buckets = _s3Database.ListBuckets();
@@ -153,6 +154,8 @@ namespace AwsMock::Service {
                 infrastructure.s3Objects = _s3Database.ListObjects();
             }
         }
+
+        // SQS
         if (services.HasService("all") || services.HasService("sqs")) {
             Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             infrastructure.sqsQueues = _sqsDatabase.ListQueues();
@@ -160,6 +163,8 @@ namespace AwsMock::Service {
                 infrastructure.sqsMessages = _sqsDatabase.ListMessages();
             }
         }
+
+        // SNS
         if (services.HasService("all") || services.HasService("sns")) {
             Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
             infrastructure.snsTopics = _snsDatabase.ListTopics();
@@ -167,10 +172,14 @@ namespace AwsMock::Service {
                 infrastructure.snsMessages = _snsDatabase.ListMessages();
             }
         }
+
+        // Lambdas
         if (services.HasService("all") || services.HasService("lambda")) {
             Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
             infrastructure.lambdas = _lambdaDatabase.ListLambdas();
         }
+
+        // Cognito
         if (services.HasService("all") || services.HasService("cognito")) {
             Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
             infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
@@ -178,6 +187,8 @@ namespace AwsMock::Service {
                 infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
             }
         }
+
+        // DynamoDB
         if (services.HasService("all") || services.HasService("dynamodb")) {
             Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
             infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
@@ -185,13 +196,23 @@ namespace AwsMock::Service {
                 infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
             }
         }
+
+        // Secrets manager
         if (services.HasService("all") || services.HasService("secretsmanager")) {
             Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
             infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
         }
+
+        // Transfer manager
         if (services.HasService("all") || services.HasService("transfer")) {
             Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
             infrastructure.transferServers = _transferDatabase.ListServers();
+        }
+
+        // KMS
+        if (services.HasService("all") || services.HasService("kms")) {
+            Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+            infrastructure.kmsKeys = _kmsDatabase.ListKeys();
         }
         return infrastructure.ToJson(prettyPrint);
     }
@@ -338,9 +359,11 @@ namespace AwsMock::Service {
             _cognitoDatabase.DeleteAllUserPools();
         }
         if (services.HasService("all") || services.HasService("dynamodb")) {
-            Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-            _dynamoDbDatabase.DeleteAllItems();
-            _dynamoDbDatabase.DeleteAllTables();
+            Service::DynamoDbService _dynamoDbService(Core::Configuration::instance());
+            _dynamoDbService.DeleteAllTables();
+            //            Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+            //            _dynamoDbDatabase.DeleteAllItems();
+            //            _dynamoDbDatabase.DeleteAllTables();
         }
         if (services.HasService("all") || services.HasService("transfer")) {
             Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();

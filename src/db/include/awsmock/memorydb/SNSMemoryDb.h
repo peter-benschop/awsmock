@@ -257,12 +257,12 @@ namespace AwsMock::Database {
         /**
          * Topic mutex
          */
-        static Poco::Mutex _topicMutex;
+        static Poco::Mutex _snsTopicMutex;
 
         /**
          * Message mutex
          */
-        static Poco::Mutex _messageMutex;
+        static Poco::Mutex _snsMessageMutex;
     };
 
 }// namespace AwsMock::Database

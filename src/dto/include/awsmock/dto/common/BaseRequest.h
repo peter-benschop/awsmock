@@ -17,17 +17,17 @@ namespace AwsMock::Dto::Common {
         /**
          * Request ID
          */
-        std::string requestId;
+        std::string requestId{};
 
         /**
          * Region
          */
-        std::string region;
+        std::string region{};
 
         /**
          * User
          */
-        std::string user;
+        std::string user{};
     };
 
 }// namespace AwsMock::Dto::Common

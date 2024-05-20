@@ -276,14 +276,14 @@ namespace AwsMock::Controller {
 
     void Controller::CleanInfrastructure(const std::vector<std::string> &services) {
 
-        Dto::Common::Services exportServices;
+        Dto::Common::Services cleanServices;
         for (const auto &service: services) {
-            exportServices.serviceNames.emplace_back(service);
+            cleanServices.serviceNames.emplace_back(service);
         }
 
         std::map<std::string, std::string> headers;
         AddAuthorization(headers);
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/all/clean", headers, exportServices.ToJson());
+        Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/clean-infrastructure", headers, cleanServices.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             std::cerr << "Error: " << response.statusReason << std::endl;

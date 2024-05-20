@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Lambda monitoring thread
+     * @brief Lambda monitoring thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */

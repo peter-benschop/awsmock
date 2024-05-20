@@ -23,6 +23,7 @@ namespace AwsMock::Dto::Common {
         PUT,
         POST,
         DELETE,
+        HEAD,
         UNKNOWN
     };
 
@@ -31,6 +32,7 @@ namespace AwsMock::Dto::Common {
             {HttpMethod::PUT, "PUT"},
             {HttpMethod::POST, "POST"},
             {HttpMethod::DELETE, "DELETE"},
+            {HttpMethod::HEAD, "HEAD"},
     };
 
     [[maybe_unused]] static std::string HttpMethodToString(HttpMethod requestType) {

@@ -27,9 +27,10 @@
 namespace AwsMock::Database {
 
     /**
-     * Cognito in-memory database.
+     * @brief Cognito in-memory database.
      *
-     * <p>Provides a in-memory database using a simple hash map.</p>
+     * @par
+     * Provides a in-memory database using a simple hash map. The key is a randomly generated UUID.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

@@ -12,19 +12,20 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB get item key
+     * @brief DynamoDB get item key
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemKey {
+    struct GetItemKey : public Dto::Common::BaseRequest {
 
         /**
          * Region

@@ -17,7 +17,7 @@
 namespace AwsMock::Controller {
 
     /**
-     * AwsMock controller configuration
+     * @brief AwsMock controller configuration
      *
      * @author jens.vogt\@opitz-consulting.com
      */

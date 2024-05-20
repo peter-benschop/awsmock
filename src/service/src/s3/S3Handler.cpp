@@ -42,37 +42,9 @@ namespace AwsMock::Service {
     void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
         log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
-        try {
+        Dto::Common::S3ClientCommand clientCommand;
+        clientCommand.FromRequest(Dto::Common::HttpMethod::HEAD, request, region, user);
 
-            std::string bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
-            log_debug << "S3 HEAD request, bucket: " << bucket << " key: " << key;
-
-            Dto::S3::GetMetadataRequest s3Request = {.region = region, .bucket = bucket, .key = key};
-            Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
-
-            HeaderMap headerMap;
-            headerMap["Server"] = "awsmock";
-            headerMap["Content-Type"] = "application/octet-stream";
-            headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
-            headerMap["Content-Length"] = std::to_string(s3Response.size);
-            headerMap["ETag"] = "\"" + s3Response.md5Sum + "\"";
-            headerMap["accept-ranges"] = "bytes";
-            headerMap["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
-            headerMap["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
-            headerMap["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
-
-            // User supplied metadata
-            for (const auto &m: s3Response.metadata) {
-                headerMap["x-amz-meta-" + m.first] = m.second;
-            }
-            SendHeadResponse(response, headerMap);
-
-        } catch (Poco::Exception &exc) {
-            log_warning << exc.message();
-            SendXmlErrorResponse("S3", response, exc);
-        } catch (std::exception &exc) {
-            log_error << exc.what();
-        }
+        S3CmdHandler::handleHead(request, response, clientCommand);
     }
 }// namespace AwsMock::Service

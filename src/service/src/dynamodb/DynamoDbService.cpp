@@ -132,8 +132,7 @@ namespace AwsMock::Service {
                 request.headers["Region"] = "eu-central-1";
                 request.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
                 request.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
-                request.headers["Authorization"] =
-                        "AWS4-HMAC-SHA256 Credential=none/20240323/eu-central-1/dynamodb/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token;x-amz-target, Signature=77d8a13cb188351689c92945509bbe6963e964d21b4c07d8d0f9cc2d195d0bfd";
+                request.headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "dynamodb");
                 DeleteTable(request);
             }
 

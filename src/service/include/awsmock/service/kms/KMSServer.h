@@ -30,7 +30,7 @@
 namespace AwsMock::Service {
 
     /**
-     * KMS server thread
+     * @brief KMS HTTP server
      *
      * @author jens.vogt\@opitz-consulting.com
      */

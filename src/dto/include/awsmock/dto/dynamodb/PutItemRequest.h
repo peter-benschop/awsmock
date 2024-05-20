@@ -12,20 +12,21 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/dynamodb/AttributeValue.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB put item request
+     * @brief DynamoDB put item request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PutItemRequest {
+    struct PutItemRequest : public Dto::Common::BaseRequest {
 
         /**
          * Region

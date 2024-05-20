@@ -28,7 +28,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Gateway router
+     * @brief Gateway router
      *
      * @author jens.vogt\@opitz-consulting.com
      */

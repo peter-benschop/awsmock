@@ -154,6 +154,16 @@ namespace AwsMock::Service {
         virtual void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
         /**
+         * Handles the HTTP HEAD method.
+         *
+         * @param request HTTP request
+         * @param response HTTP response
+         * @param region AWS region
+         * @param user current user
+         */
+        virtual void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command);
+
+        /**
          * It validates required information into the Http headers.
          *
          * @param request HTTP request

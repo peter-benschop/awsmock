@@ -86,6 +86,7 @@ namespace AwsMock::Database::Entity::KMS {
                     tags.emplace(key, value);
                 }
             }
+
         } catch (mongocxx::exception &e) {
             log_error << e.what();
             throw Core::DatabaseException(e.what());

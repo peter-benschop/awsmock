@@ -16,7 +16,7 @@ set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cp
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp
         src/transfer/TransferMonitoring.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp
-        src/dynamodb/DynamoDbCmdHandler.cpp src/dynamodb/DynamoDbMonitoring.cpp)
+        src/dynamodb/DynamoDbCmdHandler.cpp src/dynamodb/DynamoDbMonitoring.cpp src/dynamodb/DynamoDbWorker.cpp)
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
         src/secretsmanager/SecretsManagerCmdHandler.cpp src/secretsmanager/SecretsManagerService.cpp
         src/secretsmanager/SecretsManagerMonitoring.cpp)

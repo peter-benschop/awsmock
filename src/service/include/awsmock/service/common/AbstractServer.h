@@ -27,7 +27,9 @@
 namespace AwsMock::Service {
 
     /**
-     * Abstract HTTP request server
+     * @brief Abstract HTTP request server
+     *
+     * Base class for all server processes.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

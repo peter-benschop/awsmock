@@ -2,7 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include <awsmock/dto/dynamodb/AttributeValue.h>
+#include "awsmock/dto/dynamodb/model/AttributeValue.h"
 
 namespace AwsMock::Dto::DynamoDb {
 

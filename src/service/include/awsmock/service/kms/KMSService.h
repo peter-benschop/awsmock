@@ -41,7 +41,7 @@
 namespace AwsMock::Service {
 
     /**
-     * KMS service
+     * @brief KMS service
      *
      * @author jens.vogt\@opitz-consulting.com
      */

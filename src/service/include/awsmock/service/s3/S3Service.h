@@ -73,7 +73,7 @@ namespace AwsMock::Service {
     typedef std::map<std::string, std::ofstream> MultiPartUploads;
 
     /**
-     * S3 service.
+     * @brief S3 service.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -89,12 +89,20 @@ namespace AwsMock::Service {
         explicit S3Service(Core::Configuration &configuration);
 
         /**
+         * Returns the meta data of an S3 bucket
+         *
+         * @param request get metadata request
+         * @return GetMetadataResponse
+         */
+        Dto::S3::GetMetadataResponse GetBucketMetadata(Dto::S3::GetMetadataRequest &request);
+
+        /**
          * Returns the meta data of an S3 object
          *
          * @param request get metadata request
-         * @return CreateBucketResponse
+         * @return GetMetadataResponse
          */
-        Dto::S3::GetMetadataResponse GetMetadata(Dto::S3::GetMetadataRequest &request);
+        Dto::S3::GetMetadataResponse GetObjectMetadata(Dto::S3::GetMetadataRequest &request);
 
         /**
          * Creates a new bucket

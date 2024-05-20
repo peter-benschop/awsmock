@@ -14,11 +14,11 @@ namespace AwsMock::Manager {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Core::MetricServiceTimer measure(MODULE_GET_TIMER);
         _metricService.IncrementCounter(MODULE_COUNTER, "method", "GET");
-        log_debug << "Module GET request, URI: " + request.getURI() << " region: " << region << " user: " + user;
+        log_debug << "Module GET request, URI: " << request.getURI() << " region: " << region << " user: " + user;
 
         std::string action = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
         std::string payload = Core::HttpUtils::GetBodyAsString(request);
-        log_debug << "Action: " + action;
+        log_debug << "Action: " << action;
 
         if (action == "config") {
 

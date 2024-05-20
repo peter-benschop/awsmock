@@ -12,20 +12,21 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
-#include <awsmock/dto/dynamodb/TableStatus.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
+#include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB describe table response
+     * @brief DynamoDB describe table response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeTableResponse {
+    struct DescribeTableResponse : public Dto::Common::BaseRequest {
 
         /**
          * Region
@@ -70,7 +71,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Table status
          */
-        TableStatus tableStatus;
+        TableStatusType tableStatus;
 
         /**
          * HTTP response body

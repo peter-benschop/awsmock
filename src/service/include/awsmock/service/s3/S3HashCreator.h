@@ -20,7 +20,18 @@
 namespace AwsMock::Service {
 
     /**
-     * Asynchronous hash creator (MD5, SHA1, SHA256)
+     * @brief Asynchronous hash creator (MD5, SHA1, SHA256)
+     *
+     * Depending on the cryptographic algorithm used, the hashing of a file or string can take some time. Therefore, the generation of the
+     * cryptographic hash is processed asynchronously. Can process several hashes sequentially.
+     *
+     * @code{.cpp}
+     * if (!request.checksumAlgorithm.empty()) {
+     *   Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({MD5, SHA1, SHA256}, object));
+     *   log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+     * }
+     * @endcode
+     * will generate MD5, SHA1 and SHA256 hashes of the object.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,7 +42,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          *
-         * @param _algorithms vector of algorithm names
+         * @param algorithms vector of algorithm names
          * @param object S3 object to hash
          */
         explicit S3HashCreator(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) : Core::Task("s3-hash-creator"), _object(object), _algorithms(algorithms) {}

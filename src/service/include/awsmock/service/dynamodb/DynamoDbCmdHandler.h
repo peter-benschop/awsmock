@@ -24,7 +24,7 @@
 namespace AwsMock::Service {
 
     /**
-     * DynamoDB command handler
+     * @brief DynamoDB command handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */

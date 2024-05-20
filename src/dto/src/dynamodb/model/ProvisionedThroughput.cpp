@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/dynamodb/ProvisionedThroughput.h>
+#include "awsmock/dto/dynamodb/model/ProvisionedThroughput.h"
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -20,6 +20,14 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string ProvisionedThroughput::ToJson() const {
         return Core::JsonUtils::ToJsonString(ToJsonObject());
+    }
+
+    void ProvisionedThroughput::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+        Core::JsonUtils::GetJsonValueInt("ReadCapacityUnits", jsonObject, readCapacityUnits);
+        Core::JsonUtils::GetJsonValueInt("WriteCapacityUnits", jsonObject, writeCapacityUnits);
+        Core::JsonUtils::GetJsonValueDate("LastDecreaseDateTime", jsonObject, lastDecreaseDateTime);
+        Core::JsonUtils::GetJsonValueDate("LastIncreaseDateTime", jsonObject, lastIncreaseDateTime);
+        Core::JsonUtils::GetJsonValueLong("NumberOfDecreasesToday", jsonObject, numberOfDecreasesToday);
     }
 
     std::string ProvisionedThroughput::ToString() const {

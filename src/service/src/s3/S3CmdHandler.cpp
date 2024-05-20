@@ -591,8 +591,8 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3CmdHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+    void S3CmdHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
+        log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
         Core::MetricServiceTimer measure(S3_SERVICE_TIMER);
 
         try {
@@ -601,8 +601,14 @@ namespace AwsMock::Service {
             std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
             log_debug << "S3 HEAD request, bucket: " << bucket << " key: " << key;
 
-            Dto::S3::GetMetadataRequest s3Request = {.region = region, .bucket = bucket, .key = key};
-            Dto::S3::GetMetadataResponse s3Response = _s3Service.GetMetadata(s3Request);
+            Dto::S3::GetMetadataResponse s3Response;
+            if (key.empty()) {
+                Dto::S3::GetMetadataRequest s3Request = {.region = s3ClientCommand.region, .bucket = bucket};
+                s3Response = _s3Service.GetBucketMetadata(s3Request);
+            } else {
+                Dto::S3::GetMetadataRequest s3Request = {.region = s3ClientCommand.region, .bucket = bucket, .key = key};
+                s3Response = _s3Service.GetObjectMetadata(s3Request);
+            }
 
             HeaderMap headerMap;
             headerMap["Server"] = "awsmock";
@@ -614,6 +620,7 @@ namespace AwsMock::Service {
             headerMap["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
             headerMap["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
             headerMap["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
+            headerMap["x-amz-bucket-region"] = s3Response.region;
 
             // User supplied metadata
             for (const auto &m: s3Response.metadata) {
