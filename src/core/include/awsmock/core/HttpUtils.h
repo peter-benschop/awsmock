@@ -173,13 +173,23 @@ namespace AwsMock::Core {
         static std::string GetQueryParameterValue(const std::string &parameter);
 
         /**
+         * @biref Returns a map of all query parameters.
+         *
+         * The resulting name/value pairs are not URL decoded.
+         *
+         * @param uri HTTP request URI
+         * @return map of query parameters
+         */
+        static std::map<std::string, std::string> GetQueryParameters(const std::string &uri);
+
+        /**
          * Returns a vector of query parameter with the given index.
          *
          * @param uri HTTP request URI
          * @param prefix HTTP parameter prefix
          * @return vector of parameters
          */
-        static std::vector<std::string> GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix);
+        static std::vector<std::string> GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix = {});
 
         /**
          * Returns the parameter value by prefix with the given index

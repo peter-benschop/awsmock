@@ -20,13 +20,12 @@ namespace AwsMock::Service {
         _region = Core::Configuration::instance().getString("awsmock.region");
 
         // Database
-
-        SynchronizeTables();
+        //SynchronizeTables();
         log_debug << "DynamoDbWorker initialized";
     }
 
     void DynamoDbWorker::Run() {
-        SynchronizeTables();
+        //SynchronizeTables();
     }
 
     void DynamoDbWorker::Shutdown() {}

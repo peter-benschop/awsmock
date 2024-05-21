@@ -39,6 +39,9 @@ namespace AwsMock::Service {
         Dto::Common::DynamoDbClientCommand clientCommand;
         clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
 
+        if (!Core::AwsUtils::VerifySignature(request, clientCommand.payload)) {
+            log_error << "Request signature could not be verified";
+        }
         DynamoDbCmdHandler::handlePost(request, response, clientCommand);
     }
 

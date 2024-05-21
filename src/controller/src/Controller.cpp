@@ -201,7 +201,7 @@ namespace AwsMock::Controller {
     void Controller::GetDefaults() {
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        //AddAuthorization(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/config/", headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -243,7 +243,7 @@ namespace AwsMock::Controller {
         url = Core::HttpUtils::AddQueryParameter(url, "includeObjects", includeObjects);
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        //AddAuthorization(headers);
 
         // Send request
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + url, headers, exportServices.ToJson());
@@ -264,7 +264,7 @@ namespace AwsMock::Controller {
         }
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        //AddAuthorization(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/all/import", headers, jsonString.str());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -282,7 +282,7 @@ namespace AwsMock::Controller {
         }
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        //AddAuthorization(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/clean-infrastructure", headers, cleanServices.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -293,6 +293,6 @@ namespace AwsMock::Controller {
     }
 
     void Controller::AddAuthorization(std::map<std::string, std::string> &headers) {
-        headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "module");
+        //headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "module");
     }
 }// namespace AwsMock::Controller

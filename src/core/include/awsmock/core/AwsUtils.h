@@ -6,15 +6,18 @@
 #define AWS_MOCK_CORE_AWS_UTILS_H
 
 // C++ standard includes
+#include <chrono>
 #include <iostream>
 #include <string>
 
 // Poco includes
+#include <Poco/Net/HTTPRequest.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 
@@ -29,6 +32,59 @@
 #define GATEWAY_DEFAULT_REGION "eu-central-1"
 
 namespace AwsMock::Core {
+
+    struct AuthorizationHeaderKeys {
+
+        /**
+         * AWS signing version, i.e: AWS4-HMAC-SHA256
+         */
+        std::string signingVersion;
+
+        /**
+         * Secret access key
+         */
+        std::string secretAccessKey;
+
+        /**
+         * Date time
+         */
+        std::string dateTime;
+
+        /**
+         * Date time
+         */
+        std::string isoDateTime;
+
+        /**
+         * Scope
+         */
+        std::string scope;
+
+        /**
+         * Region
+         */
+        std::string region;
+
+        /**
+         * Module
+         */
+        std::string module;
+
+        /**
+         * Request version
+         */
+        std::string requestVersion;
+
+        /**
+         * Signed headers
+         */
+        std::string signedHeaders;
+
+        /**
+         * Signature
+         */
+        std::string signature;
+    };
 
     /**
      * @brief General AWS utilities.
@@ -236,13 +292,70 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Returns the HTTP authorization header
+         * Add the AWS v4 signature authorization header
          *
-         * @param configuration current AwsMock configuration
+         * @param request HTTP request
          * @param module AwsMock module
-         * @return HTTP authorization header
+         * @param contentType HTTP content type
+         * @param payload HTTP payload
          */
-        static std::string GetAuthorizationHeader(const Configuration &configuration, const std::string &module);
+        static void AddAuthorizationHeader(Poco::Net::HTTPRequest &request, const std::string &module, const std::string &contentType, const std::string &payload);
+
+        /**
+         * Verify the request signature
+         *
+         * @param request HTTP request
+         * @param payload HTTP payload
+         * @return true if signature could be verified
+         */
+        static bool VerifySignature(const Poco::Net::HTTPRequest &request, const std::string &payload);
+
+      private:
+
+        static std::string GetCanonicalRequest(const Poco::Net::HTTPRequest &request, const std::string &payload, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetStringToSign(const Poco::Net::HTTPRequest &request, const std::string &canonicalRequest, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        static std::string GetCanonicalQueryParameters(const Poco::Net::HTTPRequest &request);
+        static std::string GetCanonicalHeaders(const Poco::Net::HTTPRequest &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        /**
+         * @brief Returns the hashed payload.
+         *
+         * @param payload HTTP payload
+         * @return hashed payload
+         */
+        static std::string GetHashedPayload(const std::string &payload);
+
+        /**
+         * @brief Splits the authorization header into pieces and stores the result into a struct.
+         *
+         * @param request HTTP request
+         * @return AuthorizationHeaderKeys
+         */
+        static AuthorizationHeaderKeys GetAuthorizationKeys(const Poco::Net::HTTPRequest &request);
+
+        /**
+         * @brief Returns the signature for the request
+         *
+         * @param authorizationHeaderKeys authorization header
+         * @param stringToSign string to sign
+         * @return key encoded signature
+         */
+        static std::string GetSignature(const AuthorizationHeaderKeys &authorizationHeaderKeys, const std::string &stringToSign);
+
+        /**
+         * @brief Returns the date string in format yyyyMMdd
+         *
+         * @return date string.
+         */
+        static std::string GetDateString();
+
+        /**
+         * @brief Returns the date time string in ISO8601 format
+         *
+         * @return date string.
+         */
+        static std::string GetISODateString();
     };
 
     /**

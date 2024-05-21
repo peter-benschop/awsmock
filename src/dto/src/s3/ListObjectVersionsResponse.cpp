@@ -19,6 +19,7 @@ namespace AwsMock::Dto::S3 {
             return rootJson;
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             throw Core::JsonException(exc.message());
         }
     }
@@ -79,6 +80,7 @@ namespace AwsMock::Dto::S3 {
             return os.str();
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             throw Core::JsonException(exc.message());
         }
     }

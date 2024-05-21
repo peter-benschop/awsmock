@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -71,6 +72,8 @@
 #define CRYPTO_AES256_KEY_SIZE 32
 #define CRYPTO_AES256_BLOCK_SIZE 16
 #define CRYPTO_HMAC224_BLOCK_SIZE 32
+#define CRYPTO_HMAC256_BLOCK_SIZE 32
+#define SHA256_EMPTY_STRING "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 namespace AwsMock::Core {
 
@@ -198,7 +201,7 @@ namespace AwsMock::Core {
          * @param content string to hash
          * @return SHA256 hash of the given string
          */
-        static std::string GetHmacSha256FromString(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &content);
+        static std::string GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &content);
 
         /**
          * @brief Returns the SHA256 hash of a string.
@@ -207,7 +210,7 @@ namespace AwsMock::Core {
          * @param msg string to hash
          * @return SHA256 hash of the given string
          */
-        static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg);
+        static std::vector<unsigned char> GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg);
 
         /**
          * @brief Returns the SHA256 hash of a string.
@@ -216,7 +219,7 @@ namespace AwsMock::Core {
          * @param msg string to hash
          * @return SHA256 hash of the given string
          */
-        static std::array<unsigned char, EVP_MAX_MD_SIZE> GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg);
+        static std::vector<unsigned char> GetHmacSha256FromStringRaw(const std::vector<unsigned char> &key, const std::string &msg);
 
         /**
          * @brief Creates a AES256 encryption key.
@@ -311,6 +314,15 @@ namespace AwsMock::Core {
          * @return hex encoded string
          */
         static std::string HexEncode(unsigned char *hash, int size);
+
+        /**
+         * @brief Convert of a unsigned char* array to a hex string
+         *
+         * @param hash input char array
+         * @param size input char length
+         * @return hex encoded string
+         */
+        static std::string HexEncode(const std::vector<unsigned char> &Digest);
 
         /**
          * @brief Decodes a hex string to an unsigned char array.

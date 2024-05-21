@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/CryptoUtils.h>
+#include <openssl/bio.h>
 
 namespace AwsMock::Core {
 
@@ -267,7 +268,7 @@ namespace AwsMock::Core {
         return HexEncode(md_value, static_cast<int>(md_len));
     }
 
-    std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg) {
+    std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &msg) {
 
         std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
         unsigned int hashLen;
@@ -282,34 +283,34 @@ namespace AwsMock::Core {
         return HexEncode(hash.data(), hash.size());
     }
 
-    std::array<unsigned char, EVP_MAX_MD_SIZE> Crypto::GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg) {
+    std::vector<unsigned char> Crypto::GetHmacSha256FromStringRaw(const std::string &key, const std::string &msg) {
 
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+        auto *hash = static_cast<unsigned char *>(malloc(CRYPTO_HMAC256_BLOCK_SIZE));
         unsigned int hashLen;
 
         HMAC(EVP_sha256(),
-             msg.data(),
-             static_cast<int>(msg.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
+             key.data(),
              static_cast<int>(key.size()),
-             hash.data(),
+             reinterpret_cast<unsigned char const *>(msg.data()),
+             static_cast<int>(msg.size()),
+             hash,
              &hashLen);
-        return hash;
+        return {hash, hash + hashLen};
     }
 
-    std::array<unsigned char, EVP_MAX_MD_SIZE> Crypto::GetHmacSha256FromStringRaw(const std::array<unsigned char, EVP_MAX_MD_SIZE> &key, const std::string &msg) {
+    std::vector<unsigned char> Crypto::GetHmacSha256FromStringRaw(const std::vector<unsigned char> &key, const std::string &msg) {
 
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+        auto *hash = static_cast<unsigned char *>(malloc(CRYPTO_HMAC256_BLOCK_SIZE));
         unsigned int hashLen;
 
         HMAC(EVP_sha256(),
-             msg.data(),
-             static_cast<int>(msg.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
+             key.data(),
              static_cast<int>(key.size()),
-             hash.data(),
+             reinterpret_cast<unsigned char const *>(msg.data()),
+             static_cast<int>(msg.size()),
+             hash,
              &hashLen);
-        return hash;
+        return {hash, hash + hashLen};
     }
 
     void Crypto::CreateAes256Key(unsigned char *key, unsigned char *iv) {
@@ -624,11 +625,21 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::HexEncode(unsigned char *hash, int size) {
-        char *out = OPENSSL_buf2hexstr(hash, size);
-        auto sout = Poco::toLower<std::string>({out});
-        sout = Poco::replace<std::string>(sout, ":", "");
-        free(out);
-        return {sout};
+        std::stringstream ss;
+        for (int i = 0; i < size; ++i)
+            ss << std::setfill('0') << std::setw(2) << std::right << std::hex << (int) hash[i];
+        return ss.str();
+    }
+
+    std::string Crypto::HexEncode(const std::vector<unsigned char> &Digest) {
+        std::string sResult;
+        sResult.reserve(Digest.size() * 2 + 1);
+        for (unsigned char it: Digest) {
+            static const char dec2hex[16 + 1] = "0123456789abcdef";
+            sResult += dec2hex[(it >> 4) & 15];
+            sResult += dec2hex[it & 15];
+        }
+        return sResult;
     }
 
     unsigned char *Crypto::HexDecode(const std::string &hex) {
