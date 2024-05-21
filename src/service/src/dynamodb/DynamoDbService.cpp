@@ -20,6 +20,11 @@ namespace AwsMock::Service {
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
+        for (const auto &header: request.headers) {
+            log_info << header.first << ":" << header.second;
+        }
+        log_info << request.body;
+
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
             throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
@@ -35,11 +40,16 @@ namespace AwsMock::Service {
                     .tags = request.tags,
                     .keySchemas = request.keySchemas};
 
+            std::string json = request.ToJson();
+            std::string nbody = request.body;
+
+            bool tmp = Core::StringUtils::Equals(json, nbody);
+
             // Update database
             table = _dynamoDbDatabase.CreateTable(table);
 
             // Send request to docker container
-            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
+            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.ToJson(), request.headers);
             createTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
             log_info << "DynamoDb table created, name: " << table.name;
 
@@ -126,14 +136,15 @@ namespace AwsMock::Service {
 
             // Delete all tables from DynamoDB
             for (auto &table: _dynamoDbDatabase.ListTables()) {
-                Dto::DynamoDb::DeleteTableRequest request;
-                request.tableName = table.name;
-                request.body = request.ToJson();
-                request.headers["Region"] = "eu-central-1";
-                request.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
-                request.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
-                request.headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "dynamodb");
-                DeleteTable(request);
+
+                Dto::DynamoDb::DeleteTableRequest dynamoDeleteRequest;
+                dynamoDeleteRequest.tableName = table.name;
+                dynamoDeleteRequest.body = dynamoDeleteRequest.ToJson();
+                dynamoDeleteRequest.headers["Region"] = "eu-central-1";
+                dynamoDeleteRequest.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
+                dynamoDeleteRequest.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
+
+                SendDynamoDbRequest(dynamoDeleteRequest.body, dynamoDeleteRequest.headers);
             }
 
             // Delete table in database
@@ -299,6 +310,9 @@ namespace AwsMock::Service {
         for (const auto &header: headers) {
             request.add(header.first, header.second);
         }
+
+        // Add AWS v4 authorization header
+        Core::AwsUtils::AddAuthorizationHeader(request, "dynamodb", "application/x-amz-json-1.0", body);
 
         // Send request
         std::ostream &os = session.sendRequest(request);

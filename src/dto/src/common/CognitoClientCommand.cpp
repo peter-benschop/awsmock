@@ -38,6 +38,7 @@ namespace AwsMock::Dto::Common {
             return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             throw Core::JsonException(exc.message());
         }
     }

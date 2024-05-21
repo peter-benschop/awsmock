@@ -147,6 +147,10 @@ namespace AwsMock::Core {
         return s1.starts_with(s2);
     }
 
+    bool StringUtils::StartsWithIgnoringCase(const std::string &s1, const std::string &s2) {
+        return Poco::toLower(s1).starts_with(Poco::toLower(s2));
+    }
+
     bool StringUtils::EndsWith(const std::string &s1, const std::string &s2) {
         return s1.ends_with(s2);
     }

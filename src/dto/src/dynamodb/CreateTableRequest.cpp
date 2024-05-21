@@ -26,20 +26,21 @@ namespace AwsMock::Dto::DynamoDb {
             Poco::JSON::Array jsonAttributeArray;
             for (const auto &tag: attributes) {
                 Poco::JSON::Object object;
-                object.set("attributeName", tag.first);
+                object.set("AttributeName", tag.first);
                 object.set("AttributeType", tag.second);
                 jsonAttributeArray.add(object);
             }
-            rootJson.set("Tags", jsonAttributeArray);
+            rootJson.set("AttributeDefinitions", jsonAttributeArray);
 
             Poco::JSON::Array jsonKeySchemasArray;
             for (const auto &keySchema: keySchemas) {
                 Poco::JSON::Object object;
-                object.set("attributeName", keySchema.first);
+                object.set("AttributeName", keySchema.first);
                 object.set("KeyType", keySchema.second);
                 jsonKeySchemasArray.add(object);
             }
             rootJson.set("KeySchema", jsonKeySchemasArray);
+            rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -74,8 +75,6 @@ namespace AwsMock::Dto::DynamoDb {
                     tags[key] = value;
                 }
             }
-            //
-            // "{\"AttributeDefinitions\": [{\"AttributeName\": \"orgaNr\", \"AttributeType\": \"N\"}], \"TableName\": \"pim_local_organr_zu_datenlieferant\", \"KeySchema\": [{\"AttributeName\": \"orgaNr\", \"KeyType\": \"HASH\"}], \"ProvisionedThroughput\": {\"ReadCapacityUnits\": 1, \"WriteCapacityUnits\": 1}}"
 
             // Attributes
             Poco::JSON::Array::Ptr jsonAttributeArray = rootObject->getArray("AttributeDefinitions");
@@ -100,6 +99,9 @@ namespace AwsMock::Dto::DynamoDb {
                     keySchemas[attributeName] = keyType;
                 }
             }
+
+            // Provisioned throughput
+            provisionedThroughput.FromJsonObject(rootObject->getObject("ProvisionedThroughput"));
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

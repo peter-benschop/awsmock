@@ -98,11 +98,30 @@ namespace AwsMock::Core {
 
         std::vector<std::string> namedParameters;
         for (const auto &it: parameters) {
-            if (it.starts_with(prefix)) {
+            if (!prefix.empty() && it.starts_with(prefix)) {
+                namedParameters.emplace_back(GetQueryParameterValue(it));
+            } else {
                 namedParameters.emplace_back(GetQueryParameterValue(it));
             }
         }
         return namedParameters;
+    }
+
+    std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
+
+        if (!Core::StringUtils::Contains(uri, "?")) {
+            return {};
+        }
+
+        std::string queryString = GetQueryString(uri);
+        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+
+        std::map<std::string, std::string> queryParameters;
+        for (const auto &it: parameters) {
+            std::vector<std::string> namedValues = StringUtils::Split(it, '=');
+            queryParameters[namedValues[0]] = namedValues[1];
+        }
+        return queryParameters;
     }
 
     std::string HttpUtils::GetQueryParameterValueByName(const std::string &uri, const std::string &name) {

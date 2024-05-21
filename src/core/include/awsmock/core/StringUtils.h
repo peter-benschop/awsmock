@@ -174,7 +174,7 @@ namespace AwsMock::Core {
         static bool ContainsIgnoreCase(const std::string &s1, const std::string &s2);
 
         /**
-         * Check whether the given string starts with the given prefix
+         * @brief Check whether the given string starts with the given prefix
          *
          * @param s1 string to check
          * @param s2 probe string
@@ -183,7 +183,18 @@ namespace AwsMock::Core {
         static bool StartsWith(const std::string &s1, const std::string &s2);
 
         /**
-         * Check whether the given string StartServer with the given suffix
+         * @brief Check whether the given string starts with the given prefix, ignoring the case
+         *
+         * Both string are converted to lowercase before compared.
+         *
+         * @param s1 string to check
+         * @param s2 probe string
+         * @return true if the string s1 starts with s2.
+         */
+        static bool StartsWithIgnoringCase(const std::string &s1, const std::string &s2);
+
+        /**
+         * @brief Check whether the given string StartServer with the given suffix
          *
          * @param s1 string to check
          * @param s2 probe string
@@ -192,7 +203,7 @@ namespace AwsMock::Core {
         static bool EndsWith(const std::string &s1, const std::string &s2);
 
         /**
-         * Returns a substring by index.
+         * @brief Returns a substring by index.
          *
          * @param string string to process
          * @param beginIndex begin index
@@ -202,7 +213,7 @@ namespace AwsMock::Core {
         static std::string SubString(const std::string &string, int beginIndex, int endIndex);
 
         /**
-         * Returns a substring by from 0 until a certain character.
+         * @brief Returns a substring by from 0 until a certain character.
          *
          * @param string string to process
          * @param delimiter delimiter character
@@ -211,7 +222,7 @@ namespace AwsMock::Core {
         static std::string SubStringUntil(const std::string &string, const std::string &delimiter);
 
         /**
-         * Return the substring starting at delimiter.
+         * @brief Return the substring starting at delimiter.
          *
          * @param string string to test
          * @param delimiter delimiter
@@ -220,7 +231,7 @@ namespace AwsMock::Core {
         static std::string SubStringAfter(const std::string &string, const std::string &delimiter);
 
         /**
-         * Replace in C-string.
+         * @brief Replace in C-string.
          *
          * @param original original
          * @param pattern pattern
@@ -230,7 +241,7 @@ namespace AwsMock::Core {
         static char *Replace(char const *original, char const *pattern, char const *replacement);
 
         /**
-         * Left trim a string.
+         * @brief Left trim a string.
          *
          * @param s input string
          * @return trimmed string
@@ -241,7 +252,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Right trim a string.
+         * @brief Right trim a string.
          *
          * @param s input string
          * @return trimmed string
@@ -252,7 +263,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Trim a string.
+         * @brief Trim a string.
          *
          * @param s input string
          * @return trimmed string
@@ -264,7 +275,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Returns the string in URL encoding format.
+         * @brief Returns the string in URL encoding format.
          *
          * @param input input string
          * @return URL encoded string.
@@ -272,7 +283,7 @@ namespace AwsMock::Core {
         static std::string UrlEncode(const std::string &input);
 
         /**
-         * Returns a decoded string as plain text.
+         * @brief Returns a decoded string as plain text.
          *
          * @param input input string
          * @return URL decoded string.
@@ -280,7 +291,7 @@ namespace AwsMock::Core {
         static std::string UrlDecode(const std::string &input);
 
         /**
-         * Returns a escaped string.
+         * @brief Returns a escaped string.
          *
          * @param input input string
          * @return escaped string.
@@ -288,7 +299,7 @@ namespace AwsMock::Core {
         static std::string Quoted(const std::string &input);
 
         /**
-         * Convert the given string to a hex encoded string.
+         * @brief Convert the given string to a hex encoded string.
          *
          * @param input input byte array
          * @param length length of the byte array
@@ -297,7 +308,7 @@ namespace AwsMock::Core {
         static std::string ToHexString(unsigned char *input, size_t length);
 
         /**
-         * Sanitizes the string and removes Convert the given string to a hex encoded string.
+         * @brief Sanitizes the string and removes Convert the given string to a hex encoded string.
          *
          * @param input input byte array
          * @return hex encoded string
@@ -305,7 +316,7 @@ namespace AwsMock::Core {
         static std::string SanitizeUtf8(std::string &input);
 
         /**
-         * Strip any chunk signatures from the input string
+         * @brief Strip any chunk signatures from the input string
          *
          * @param input input string
          * @return stripped input string
@@ -313,7 +324,7 @@ namespace AwsMock::Core {
         static std::string StripChunkSignature(std::string &input);
 
         /**
-         * Converts a bool variable to a string.
+         * @brief Converts a bool variable to a string.
          *
          * @param value bool value
          * @return string representation
@@ -321,7 +332,7 @@ namespace AwsMock::Core {
         static std::string ToString(bool value);
 
         /**
-         * Convert the string to snake case
+         * @brief Convert the string to snake case
          *
          * @param in in string
          * @return string in snake case
