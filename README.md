@@ -189,15 +189,28 @@ This invocation will run with the in-memory database, as the alpine image does n
 ### Using the docker image with an MongoDB backend
 
 As MongoDB is not supported on alpine, no MongoDB is included in the docker image. Nevertheless, you can connect
-to an external MongoDB instance running as docker container.
+to an external MongoDB instance running as docker container. In ```/usr/local/share/awsmock/docker``` is an example of
+a docker-compose file.
 
 To connect a MongoDB instance use the provided docker-compose file:
 
 ```
-  cd docker
+  cd /usr/local/share/awsmock/docker
   docker-compose up
 ```
 
 This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured
 separately. See for
 instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
+
+## Examples
+
+There are a couple of examples shell script available. Depending on your installation directory, there in
+```/usr/share/awsmock``` or in ```/usr/local/share/awsmock```. Each module has its own directory with bash scripts and
+resource files. The examples cover almost all AwsMock features. Simply cd to the directory and execute one of the
+example scripts:
+
+```
+cd /usr/local/share/awsmock/s3
+./create-bucket.ch
+```

@@ -49,7 +49,7 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Delete messages, which are over the retention period.
+         * Delete resources, which are over the retention period.
          */
         void DeleteOldMessages();
 

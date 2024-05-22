@@ -65,7 +65,7 @@ namespace AwsMock::Dto::SQS {
         std::string queueName;
 
         /**
-         * Maximal number of messages
+         * Maximal number of resources
          */
         int maxMessages = 10;
 

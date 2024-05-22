@@ -158,13 +158,61 @@ namespace AwsMock::Service {
                     break;
                 }
 
+                    // Delete object (rm) with recursive option, issues first a list request
+                case Dto::Common::S3CommandType::DELETE_OBJECT: {
+
+                    Dto::S3::ListBucketRequest s3Request;
+
+                    if (Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type")) {
+
+                        int listType = std::stoi(Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "list-type"));
+
+                        std::string delimiter;
+                        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "delimiter")) {
+                            delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "delimiter");
+                        }
+
+                        std::string prefix;
+                        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "prefix")) {
+                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "prefix");
+                        }
+
+                        std::string encodingType = "url";
+                        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "encoding_type")) {
+                            encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "encoding_type");
+                        }
+
+                        // Return object list
+                        s3Request = {
+                                .region = s3ClientCommand.region,
+                                .name = s3ClientCommand.bucket,
+                                .listType = listType,
+                                .prefix = prefix,
+                                .delimiter = delimiter,
+                                .encodingType = encodingType};
+
+                    } else {
+                        s3Request = {
+                                .region = s3ClientCommand.region,
+                                .name = s3ClientCommand.bucket,
+                                .listType = 1,
+                                .encodingType = "url"};
+                    }
+
+                    Dto::S3::ListBucketResponse s3Response = _s3Service.ListBucket(s3Request);
+                    SendOkResponse(response, s3Response.ToXml());
+                    log_info << "List objects, bucket: " << s3ClientCommand.bucket;
+
+
+                    break;
+                }
+
                     // Should not happen
                 case Dto::Common::S3CommandType::CREATE_BUCKET:
                 case Dto::Common::S3CommandType::PUT_OBJECT:
                 case Dto::Common::S3CommandType::COPY_OBJECT:
                 case Dto::Common::S3CommandType::MOVE_OBJECT:
                 case Dto::Common::S3CommandType::DELETE_BUCKET:
-                case Dto::Common::S3CommandType::DELETE_OBJECT:
                 case Dto::Common::S3CommandType::DELETE_OBJECTS:
                 case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
                 case Dto::Common::S3CommandType::UPLOAD_PART:

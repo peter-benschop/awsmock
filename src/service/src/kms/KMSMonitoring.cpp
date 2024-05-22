@@ -26,7 +26,7 @@ namespace AwsMock::Service {
         long keys = _kmsDatabase.CountKeys();
         _metricService.SetGauge(KMS_KEY_COUNT, keys);
 
-        // Count messages per topic
+        // Count resources per topic
         /*for (const auto &topic: _kmsDatabase.ListTopics()) {
             std::string labelValue = Poco::replace(topic.topicName, "-", "_");
             long messagesPerTopic = _kmsDatabase.CountMessages(topic.region, topic.topicArn);

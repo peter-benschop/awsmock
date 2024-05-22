@@ -516,9 +516,7 @@ namespace AwsMock::Database {
                 session.commit_transaction();
 
                 log_info << "DynamoDb item updated, oid: " << findResult.value()["_id"].get_oid().value.to_string();
-                Entity::DynamoDb::Item updatedItem;
-                updatedItem.FromDocument(findResult->view());
-                return updatedItem;
+                return Entity::DynamoDb::Item().FromDocument(findResult->view());
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -548,7 +546,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
                 auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: "
                           << result->deleted_count();
@@ -561,6 +559,28 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteItem(region, tableName, key);
+        }
+    }
+
+    void DynamoDbDatabase::DeleteItems(const std::string &region, const std::string &tableName) {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+                auto result = _itemCollection.delete_many(make_document(kvp("tableName", tableName)));
+                log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            _memoryDb.DeleteItems(region, tableName);
         }
     }
 

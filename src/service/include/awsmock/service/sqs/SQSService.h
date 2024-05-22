@@ -161,7 +161,7 @@ namespace AwsMock::Service {
         Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
         /**
-         * Receive a list of messages
+         * Receive a list of resources
          *
          * @param request receive message request
          * @return ReceiveMessageResponse

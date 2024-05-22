@@ -193,6 +193,15 @@ namespace AwsMock::Database {
         void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
 
         /**
+         * @brief Deletes all item of a table
+         *
+         * @param region AWS region.
+         * @param tableName name of the table
+         * @throws DatabaseException
+         */
+        void DeleteItems(const std::string &region, const std::string &tableName);
+
+        /**
          * Deletes all items
          */
         void DeleteAllItems();

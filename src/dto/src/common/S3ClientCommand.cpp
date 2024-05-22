@@ -32,6 +32,7 @@ namespace AwsMock::Dto::Common {
         copyRequest = request.has("x-amz-copy-source");
         uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
         encryptionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "encryption");
+        bool listType = Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type");
 
         if (!userAgent.clientCommand.empty()) {
 
@@ -95,6 +96,8 @@ namespace AwsMock::Dto::Common {
                 case HttpMethod::UNKNOWN: {
                     break;
                 }
+                case HttpMethod::HEAD:
+                    break;
             }
         }
     }

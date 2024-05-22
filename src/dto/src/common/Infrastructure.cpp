@@ -46,7 +46,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &message: sqsMessages) {
                     jsonSqsMessageArray.add(message.ToJsonObject());
                 }
-                infrastructureJson.set("sqs-messages", jsonSqsMessageArray);
+                infrastructureJson.set("sqs-resources", jsonSqsMessageArray);
             }
 
             // SNS topic array
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &message: snsMessages) {
                     jsonSnsMessageArray.add(message.ToJsonObject());
                 }
-                infrastructureJson.set("sns-messages", jsonSnsMessageArray);
+                infrastructureJson.set("sns-resources", jsonSnsMessageArray);
             }
 
             // Lambda functions
@@ -177,8 +177,8 @@ namespace AwsMock::Dto::Common {
                 }
             }
 
-            if (infrastructureObject->has("sqs-messages")) {
-                Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-messages");
+            if (infrastructureObject->has("sqs-resources")) {
+                Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-resources");
                 for (int i = 0; i < sqsMessageArray->size(); i++) {
                     Database::Entity::SQS::Message sqsMessage;
                     sqsMessage.FromJsonObject(sqsMessageArray->getObject(i));
@@ -195,8 +195,8 @@ namespace AwsMock::Dto::Common {
                 }
             }
 
-            if (infrastructureObject->has("sns-messages")) {
-                Poco::JSON::Array::Ptr snsMessageArray = infrastructureObject->getArray("sns-messages");
+            if (infrastructureObject->has("sns-resources")) {
+                Poco::JSON::Array::Ptr snsMessageArray = infrastructureObject->getArray("sns-resources");
                 for (int i = 0; i < snsMessageArray->size(); i++) {
                     Database::Entity::SNS::Message snsMessage;
                     snsMessage.FromJsonObject(snsMessageArray->getObject(i));

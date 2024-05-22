@@ -554,7 +554,7 @@ namespace AwsMock::Database {
 
     void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
 
-        // First rest messages
+        // First rest resources
         ResetMessages(queueUrl, visibility);
 
         auto reset = std::chrono::system_clock::now() + std::chrono::seconds(visibility);
@@ -771,14 +771,14 @@ namespace AwsMock::Database {
 
             if (!region.empty() && !queueUrl.empty()) {
                 count = static_cast<long>(messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl))));
-                log_trace << "Count messages, region: " << region << " url: " << queueUrl << " result: "
+                log_trace << "Count resources, region: " << region << " url: " << queueUrl << " result: "
                           << count;
             } else if (!region.empty()) {
                 count = static_cast<long>(messageCollection.count_documents(make_document(kvp("region", region))));
-                log_trace << "Count messages, region: " << region << " result: " << count;
+                log_trace << "Count resources, region: " << region << " result: " << count;
             } else {
                 count = static_cast<long>(messageCollection.count_documents({}));
-                log_trace << "Count messages, result: " << count;
+                log_trace << "Count resources, result: " << count;
             }
             return count;
 
@@ -799,7 +799,7 @@ namespace AwsMock::Database {
                                                                          kvp("queueUrl", queueUrl),
                                                                          kvp("status",
                                                                              Entity::SQS::MessageStatusToString(status))));
-            log_trace << "Count messages by status, status: " << Entity::SQS::MessageStatusToString(status)
+            log_trace << "Count resources by status, status: " << Entity::SQS::MessageStatusToString(status)
                       << " result: " << count;
             return count;
 
@@ -903,7 +903,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.delete_many({});
                 session.commit_transaction();
-                log_debug << "All messages deleted, count: " << result->deleted_count();
+                log_debug << "All resources deleted, count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

@@ -28,7 +28,7 @@ namespace AwsMock::Service {
         _metricService.SetGauge(S3_BUCKET_COUNT, buckets);
         _metricService.SetGauge(S3_OBJECT_COUNT, objects);
 
-        // Count messages per topic
+        // Count resources per topic
         for (const auto &bucket: _s3Database.ListBuckets()) {
             std::string labelValue = Poco::replace(bucket.name, "-", "_");
             long messagesPerTopic = _s3Database.ObjectCount(bucket.region, bucket.name);

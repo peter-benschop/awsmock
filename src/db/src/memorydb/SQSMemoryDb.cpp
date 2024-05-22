@@ -280,7 +280,7 @@ namespace AwsMock::Database {
                 // Update store
                 _messages[message.first] = message.second;
 
-                // Check max messages
+                // Check max resources
                 if (messageList.size() >= maxMessages) {
                     break;
                 }
@@ -402,7 +402,7 @@ namespace AwsMock::Database {
                 }
             }
         }
-        log_trace << "Count messages, result: " << count;
+        log_trace << "Count resources, result: " << count;
         return count;
     }
 
@@ -416,7 +416,7 @@ namespace AwsMock::Database {
                 count++;
             }
         }
-        log_trace << "Count messages by status, result: " << count;
+        log_trace << "Count resources by status, result: " << count;
         return count;
     }
 
@@ -455,7 +455,7 @@ namespace AwsMock::Database {
     void SQSMemoryDb::DeleteAllMessages() {
         Poco::ScopedLock lock(_sqsMessageMutex);
 
-        log_debug << "All messages deleted, count: " << _messages.size();
+        log_debug << "All resources deleted, count: " << _messages.size();
         _messages.clear();
     }
 }// namespace AwsMock::Database

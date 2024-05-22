@@ -33,7 +33,7 @@ namespace AwsMock::Dto::SQS {
      * Example:
      * @code{.json}
      * {
-     *   "messages": [
+     *   "resources": [
      *      {
      *         "Attributes": {
      *            "string" : "string"
