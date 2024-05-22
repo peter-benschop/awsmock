@@ -35,9 +35,8 @@ namespace AwsMock::Manager {
 
         Poco::URI uri = Poco::URI(request.getURI());
 
-        std::string scheme, authInfo, region, user;
-        request.getCredentials(scheme, authInfo);
-        GetRegionUser(authInfo, region, user);
+        std::string region = request["Region"];
+        std::string user = request["User"];
 
         _queryStringParameters = uri.getQueryParameters();
         uri.getPathSegments(_pathParameter);

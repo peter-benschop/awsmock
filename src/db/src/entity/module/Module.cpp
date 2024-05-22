@@ -14,12 +14,11 @@ namespace AwsMock::Database::Entity::Module {
 
         view_or_value<view, value> objectDoc = make_document(
                 kvp("name", name),
-                kvp("executable", executable),
                 kvp("port", port),
                 kvp("state", ModuleStateToString(state)),
                 kvp("status", ModuleStatusToString(status)),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
         return objectDoc;
     }
@@ -28,12 +27,11 @@ namespace AwsMock::Database::Entity::Module {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-        executable = bsoncxx::string::to_string(mResult.value()["executable"].get_string().value);
         port = mResult.value()["port"].get_int32().value;
         state = ModuleStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
         status = ModuleStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date().value));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value));
     }
 
     std::string Module::ToJson() const {

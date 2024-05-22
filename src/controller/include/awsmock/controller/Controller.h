@@ -118,7 +118,7 @@ namespace AwsMock::Controller {
          *
          * @param headers headers
          */
-        void AddAuthorization(std::map<std::string, std::string> &headers);
+        void AddStandardHeaders(std::map<std::string, std::string> &headers);
 
         /**
          * Application configuration
