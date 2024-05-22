@@ -43,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
         std::string tableName;
 
         /**
-         * Item
+         * Attributes
          *
          * <p>
          * A map of attribute name/value pairs, one for each attribute. Only the primary key attributes are required; you
@@ -54,7 +54,21 @@ namespace AwsMock::Dto::DynamoDb {
          * need to provide a value for the partition key. For a composite primary key, you must provide both values for
          * both the partition key and the sort key.
          */
-        std::map<std::string, AttributeValue> item;
+        std::map<std::string, AttributeValue> attributes;
+
+        /**
+         * Keys
+         *
+         * <p>
+         * A map of attribute name/value pairs, one for each attribute. Only the primary key attributes are required; you
+         * can optionally provide other attribute name-value pairs for the item.
+         * </p>
+         * <p>
+         * You must provide all of the attributes for the primary key. For example, with a simple primary key, you only
+         * need to provide a value for the partition key. For a composite primary key, you must provide both values for
+         * both the partition key and the sort key.
+         */
+        std::map<std::string, AttributeValue> keys;
 
         /**
          * Conditional expression

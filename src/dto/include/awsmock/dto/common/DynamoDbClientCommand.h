@@ -30,6 +30,7 @@ namespace AwsMock::Dto::Common {
         PUT_ITEM,
         QUERY,
         SCAN,
+        DELETE_ITEM,
         UNKNOWN
     };
 
@@ -42,6 +43,7 @@ namespace AwsMock::Dto::Common {
             {DynamoDbCommandType::PUT_ITEM, "PutItem"},
             {DynamoDbCommandType::QUERY, "Query"},
             {DynamoDbCommandType::SCAN, "Scan"},
+            {DynamoDbCommandType::DELETE_ITEM, "DeleteItem"},
             {DynamoDbCommandType::UNKNOWN, "Unknown"},
     };
 
@@ -71,6 +73,14 @@ namespace AwsMock::Dto::Common {
          * Client command
          */
         DynamoDbCommandType command{};
+
+        /**
+         * @brief Gets the client command from the HTTP target header.
+         *
+         * @param request HTTP request
+         * @return client command from AWS target header
+         */
+        static DynamoDbCommandType GetClientCommandFromHeader(const Poco::Net::HTTPServerRequest &request);
 
         /**
          * Getś the value from the user-agent string

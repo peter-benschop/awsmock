@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/service/dynamodb/DynamoDbService.h"
+#include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace AwsMock::Service {
 
@@ -181,6 +181,12 @@ namespace AwsMock::Service {
             // Send request to docker container
             Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
             putItemResponse = {.body = response.body, .headers = response.headers, .status = response.status};
+
+            // Convert to entity and save to database. If no exception is thrown by the HTTP call to the
+            // docker image, seems to be ok.
+            Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request);
+            _dynamoDbDatabase.CreateOrUpdateItem(item);
+
             log_info << "DynamoDb put item, name: " << request.tableName;
 
         } catch (Poco::Exception &exc) {
@@ -242,10 +248,12 @@ namespace AwsMock::Service {
     Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) {
         log_debug << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName;
 
-        /*if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName)) {
-          log_warning<< "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName;
-          throw Core::ServiceException("DynamoDb item exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-        }*/
+        Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request);
+
+        if (!_dynamoDbDatabase.ItemExists(item)) {
+            log_warning << "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName;
+            throw Core::ServiceException("DynamoDb item exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+        }
 
         Dto::DynamoDb::DeleteItemResponse deleteItemResponse;
         try {
@@ -310,7 +318,8 @@ namespace AwsMock::Service {
         Poco::Net::HTTPResponse response;
         std::istream &istream = session.receiveResponse(response);
         if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error << "HTTP error, status: " << response.getStatus() << " reason: " + response.getReason();
+            log_error << "HTTP error, status: " << response.getStatus() << " reason: " << response.getReason();
+            throw Core::ServiceException("HTTP error, status: " + std::to_string(response.getStatus()) + " reason: " + response.getReason());
         }
 
         std::stringstream bodyStream;

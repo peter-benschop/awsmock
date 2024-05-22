@@ -168,6 +168,25 @@ namespace AwsMock::Service {
                     break;
                 }
 
+                case Dto::Common::DynamoDbCommandType::DELETE_ITEM: {
+
+                    Dto::DynamoDb::DeleteItemRequest dynamoDbRequest;
+                    dynamoDbRequest.FromJson(clientCommand.payload);
+                    dynamoDbRequest.region = clientCommand.region;
+                    dynamoDbRequest.requestId = clientCommand.requestId;
+                    dynamoDbRequest.user = clientCommand.user;
+                    dynamoDbRequest.headers = clientCommand.headers;
+
+                    Dto::DynamoDb::DeleteItemResponse dynamoDbResponse = _dynamoDbService.DeleteItem(dynamoDbRequest);
+                    if (dynamoDbResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
+                        SendOkResponse(response, dynamoDbResponse.body, dynamoDbResponse.headers);
+                    } else {
+                        SendErrorResponse(response, dynamoDbResponse.body, dynamoDbResponse.headers, dynamoDbResponse.status);
+                    }
+
+                    break;
+                }
+
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
                     throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));

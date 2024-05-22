@@ -145,7 +145,16 @@ namespace AwsMock::Database {
          * @return true if database exists, otherwise false
          * @throws DatabaseException
          */
-        bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
+        //bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
+
+        /**
+         * Checks the existence of an item.
+         *
+         * @param item DynamoDB item
+         * @return true if database exists, otherwise false
+         * @throws DatabaseException
+         */
+        bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
          * Returns a list of DynamoDB items
@@ -156,6 +165,43 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
+
+
+        /**
+         * Returns a item entity by primary key
+         *
+         * @param oid item primary key
+         * @return item entity
+         * @throws DatabaseException
+         */
+        Entity::DynamoDb::Item GetItemById(bsoncxx::oid oid);
+
+        /**
+         * @brief Creates a new item
+         *
+         * @param item DynamoDB item to create
+         * @return created item
+         * @throws DatabaseException
+         */
+        Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item);
+
+        /**
+         * @brief Updates an existing item
+         *
+         * @param item DynamoDB item to update
+         * @return updated item
+         * @throws DatabaseException
+         */
+        Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item);
+
+        /**
+         * @brief Create or update item
+         *
+         * @param item DynamoDB item to create or update
+         * @return created or updated item
+         * @throws DatabaseException
+         */
+        Entity::DynamoDb::Item CreateOrUpdateItem(const Entity::DynamoDb::Item &item);
 
         /**
          * Deletes an item
@@ -190,6 +236,11 @@ namespace AwsMock::Database {
          * Table collection name
          */
         std::string _tableCollectionName;
+
+        /**
+         * Item collection name
+         */
+        std::string _itemCollectionName;
 
         /**
          * DynamoDB in-memory database

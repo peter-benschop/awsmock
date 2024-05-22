@@ -40,7 +40,7 @@ namespace AwsMock::Dto::DynamoDb {
                 for (size_t i = 0; i < jsonKeyObject->getNames().size(); i++) {
                     AttributeValue attributeValue;
                     attributeValue.FromJsonObject(jsonKeyObject->getObject(jsonKeyObject->getNames()[i]));
-                    item[jsonKeyObject->getNames()[i]] = attributeValue;
+                    attributes[jsonKeyObject->getNames()[i]] = attributeValue;
                 }
             }
         } catch (Poco::Exception &exc) {

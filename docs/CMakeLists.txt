@@ -11,12 +11,8 @@ if (BUILD_DOCUMENTATION)
     if (NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "Doxygen is needed to build the documentation.")
     endif ()
-    add_custom_target(
-            docs
-            COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMENT "Generating API documentation with Doxygen"
-            VERBATIM)
+    add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif ()
 
 foreach (m IN LISTS MAN_NAMES)

@@ -106,6 +106,14 @@ namespace AwsMock::Database {
         std::vector<Entity::DynamoDb::Table> ListTables(const std::string &region = {});
 
         /**
+         * Returns the number of DynamoDB tables
+         *
+         * @param region AWS region name
+         * @return number of DynamoDB tables
+         */
+        long CountTables(const std::string &region = {});
+
+        /**
          * Deletes an existing DynamoDB table
          *
          * @param tableName name of the table
@@ -128,7 +136,16 @@ namespace AwsMock::Database {
          * @param key primary key of the item
          * @return true if database exists, otherwise false
          */
-        bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
+        //        bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
+
+        /**
+         * Checks the existence of an item.
+         *
+         * @param item DynamoDB item
+         * @return true if database exists, otherwise false
+         * @throws DatabaseException
+         */
+        bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
          * Returns a list of DynamoDB items
@@ -140,12 +157,31 @@ namespace AwsMock::Database {
         Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
 
         /**
-         * Returns the number of DynamoDB tables
+         * Returns a item entity by primary key
          *
-         * @param region AWS region name
-         * @return number of DynamoDB tables
+         * @param oid item primary key
+         * @return item entity
+         * @throws DatabaseException
          */
-        long CountTables(const std::string &region = {});
+        Entity::DynamoDb::Item GetItemById(const std::string &oid);
+
+        /**
+         * @brief Creates a new item
+         *
+         * @param item DynamoDB item to create
+         * @return created item
+         * @throws DatabaseException
+         */
+        Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item);
+
+        /**
+         * @brief Updates an existing item
+         *
+         * @param item DynamoDB item to update
+         * @return updated item
+         * @throws DatabaseException
+         */
+        Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item);
 
         /**
          * Deletes an item

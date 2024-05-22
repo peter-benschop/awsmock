@@ -26,6 +26,7 @@
 
 // AwsMock includes
 #include <awsmock/entity/dynamodb/AttributeValue.h>
+#include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -38,7 +39,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     using bsoncxx::document::view;
 
     /**
-     * DynamoDB item entity
+     * @brief DynamoDB item entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -55,14 +56,19 @@ namespace AwsMock::Database::Entity::DynamoDb {
         std::string region;
 
         /**
-         * Name
+         * Table name
          */
-        std::string name;
+        std::string tableName;
 
         /**
-         * Item
+         * Attributes
          */
         std::map<std::string, Entity::DynamoDb::AttributeValue> attributes;
+
+        /**
+         * Keys
+         */
+        std::map<std::string, Entity::DynamoDb::AttributeValue> keys;
 
         /**
          * Creation date

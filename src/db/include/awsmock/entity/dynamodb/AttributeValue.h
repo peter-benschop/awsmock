@@ -18,12 +18,15 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
+#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -41,6 +44,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
      * @author jens.vogt\@opitz-consulting.com
      */
     struct AttributeValue {
+
+        /**
+         * Type
+         */
+        std::string type;
 
         /**
          * String value
@@ -65,12 +73,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Boolean value
          */
-        bool boolValue;
+        bool boolValue = false;
 
         /**
          * Null value
          */
-        bool nullValue;
+        bool nullValue = false;
 
         /**
          * Creation date

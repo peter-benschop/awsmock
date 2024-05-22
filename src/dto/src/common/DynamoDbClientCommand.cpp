@@ -23,38 +23,29 @@ namespace AwsMock::Dto::Common {
             throw Core::UnauthorizedException("AWS signature could not be verified");
         }
 
-        // Command
-        std::string action = request.get("X-Amz-Target");
-
         switch (method) {
             case HttpMethod::GET:
             case HttpMethod::PUT:
             case HttpMethod::DELETE:
                 break;
             case HttpMethod::POST:
-                if (Core::StringUtils::ContainsIgnoreCase(action, "CreateTable")) {
-                    command = DynamoDbCommandType::CREATE_TABLE;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "ListTables")) {
-                    command = DynamoDbCommandType::LIST_TABLES;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "DescribeTable")) {
-                    command = DynamoDbCommandType::DESCRIBE_TABLE;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "DeleteTable")) {
-                    command = DynamoDbCommandType::DELETE_TABLE;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "PutItem")) {
-                    command = DynamoDbCommandType::PUT_ITEM;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "GetItem")) {
-                    command = DynamoDbCommandType::GET_ITEM;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "Query")) {
-                    command = DynamoDbCommandType::QUERY;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "Scan")) {
-                    command = DynamoDbCommandType::SCAN;
-                }
+                command = GetClientCommandFromHeader(request);
                 break;
             case HttpMethod::HEAD:
             case HttpMethod::UNKNOWN: {
                 break;
             }
         }
+    }
+
+    DynamoDbCommandType DynamoDbClientCommand::GetClientCommandFromHeader(const Poco::Net::HTTPServerRequest &request) {
+
+        if (request.has("X-Amz-Target")) {
+            std::string headerValue = request.get("X-Amz-Target");
+            std::string action = Core::StringUtils::Split(headerValue, '.')[1];
+            return DynamoDbCommandTypeFromString(action);
+        }
+        return DynamoDbCommandType::UNKNOWN;
     }
 
     std::string DynamoDbClientCommand::ToJson() const {
