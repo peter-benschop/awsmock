@@ -17,12 +17,12 @@
 #include <Poco/RegularExpression.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>

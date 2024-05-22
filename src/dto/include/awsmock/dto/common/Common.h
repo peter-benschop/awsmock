@@ -10,8 +10,8 @@
 #include <utility>
 
 // Poco includes
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
+#include <Poco/UUID.h>
+#include <Poco/UUIDGenerator.h>
 
 namespace AwsMock::Dto {
 
