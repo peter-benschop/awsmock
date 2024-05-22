@@ -46,25 +46,25 @@ namespace AwsMock::Database::Entity::DynamoDb {
         try {
 
             for (size_t i = 0; i < jsonObject->getNames().size(); i++) {
-                std::string valueType = jsonObject->getNames()[i];
-                if (valueType == "S" && jsonObject->has(valueType)) {
-                    stringValue = jsonObject->getValue<std::string>(valueType);
-                } else if (valueType == "SS") {
+                type = jsonObject->getNames()[i];
+                if (type == "S" && jsonObject->has(type)) {
+                    stringValue = jsonObject->getValue<std::string>(type);
+                } else if (type == "SS") {
                     Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("SS");
                     for (const auto &nValue: *jsonNumberArray) {
                         stringSetValue.emplace_back(nValue.convert<std::string>());
                     }
-                } else if (valueType == "N") {
-                    numberValue = jsonObject->get(valueType).convert<std::string>();
-                } else if (valueType == "NS") {
+                } else if (type == "N") {
+                    numberValue = jsonObject->get(type).convert<std::string>();
+                } else if (type == "NS") {
                     Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("NS");
                     for (const auto &nValue: *jsonNumberArray) {
                         numberSetValue.emplace_back(nValue.convert<std::string>());
                     }
-                } else if (valueType == "BOOL") {
-                    boolValue = jsonObject->get(valueType).convert<bool>();
-                } else if (valueType == "NULL") {
-                    nullValue = jsonObject->get(valueType).convert<bool>();
+                } else if (type == "BOOL") {
+                    boolValue = jsonObject->get(type).convert<bool>();
+                } else if (type == "NULL") {
+                    nullValue = jsonObject->get(type).convert<bool>();
                 }
             }
 
@@ -76,31 +76,33 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> AttributeValue::ToDocument() const {
 
-        // Convert string set to document
-        auto stringSetDoc = bsoncxx::builder::basic::array{};
-        for (const auto &sValue: stringSetValue) {
-            stringSetDoc.append(sValue);
-        }
-
-        // Convert string set to document
-        auto numberSetDoc = bsoncxx::builder::basic::array{};
-        for (const auto &nValue: numberSetValue) {
-            numberSetDoc.append(nValue);
-        }
-
-        view_or_value<view, value> attributeDoc = make_document(
+        auto attributeDoc = bsoncxx::builder::basic::document{};
+        attributeDoc.append(
                 kvp("S", stringValue),
-                kvp("SS", stringSetDoc),
                 kvp("N", numberValue),
-                kvp("NS", numberSetDoc),
                 kvp("BOOL", boolValue),
                 kvp("NULL", nullValue),
-                kvp("created",
-                    bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified",
-                    bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", MongoUtils::ToBson(created)),
+                kvp("modified", MongoUtils::ToBson(modified)));
 
-        return attributeDoc;
+        // Convert string set to document
+        if (!stringSetValue.empty()) {
+            auto stringSetDoc = bsoncxx::builder::basic::array{};
+            for (const auto &sValue: stringSetValue) {
+                stringSetDoc.append(sValue);
+            }
+            attributeDoc.append(kvp("SS", stringSetDoc));
+        }
+
+        // Convert number set to document
+        if (!numberSetValue.empty()) {
+            auto numberSetDoc = bsoncxx::builder::basic::array{};
+            for (const auto &nValue: numberSetValue) {
+                numberSetDoc.append(nValue);
+            }
+            attributeDoc.append(kvp("NS", numberSetDoc));
+        }
+        return attributeDoc.extract();
     }
 
     std::string AttributeValue::ToString() const {

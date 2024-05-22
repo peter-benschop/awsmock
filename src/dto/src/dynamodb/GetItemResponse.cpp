@@ -31,9 +31,8 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            Poco::JSON::Object::Ptr jsonTableDescription = rootObject->getObject("Item");
+            Poco::JSON::Object::Ptr jsonItemObject = rootObject->getObject("Item");
 
-            //Core::JsonUtils::GetJsonValueString("TableName", jsonTableDescription, tableName);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

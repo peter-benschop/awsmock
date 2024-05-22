@@ -6,6 +6,7 @@
 #define AWMOCK_CORE_AWS_UTILS_TEST_H
 
 // GTest includes
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 // Poco includes
@@ -99,7 +100,7 @@ namespace AwsMock::Core {
      * x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
      * x-amz-date: 20130524T000000Z
      */
-    TEST_F(AwsUtilsTest, VerifySignatureTest) {
+    TEST_F(AwsUtilsTest, VerifySignaturePocoTest) {
 
         // arrange
         Poco::Net::HTTPRequest request;
@@ -110,13 +111,15 @@ namespace AwsMock::Core {
         request.set("Range", "bytes=0-9");
         request.set("x-amz-content-sha256", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         request.set("x-amz-date", "20130524T000000Z");
+        std::string secretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
 
         // act
-        bool result = AwsUtils::VerifySignature(request, {});
+        bool result = AwsUtils::VerifySignature(request, {}, secretAccessKey);
 
         // assert
         ASSERT_TRUE(result);
     }
+
 }// namespace AwsMock::Core
 
 #endif// AWMOCK_CORE_AWS_UTILS_TEST_H

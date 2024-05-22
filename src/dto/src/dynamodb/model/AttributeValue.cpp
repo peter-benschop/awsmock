@@ -2,7 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include "awsmock/dto/dynamodb/model/AttributeValue.h"
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -46,25 +46,25 @@ namespace AwsMock::Dto::DynamoDb {
         try {
 
             for (size_t i = 0; i < jsonObject->getNames().size(); i++) {
-                std::string valueType = jsonObject->getNames()[i];
-                if (valueType == "S" && jsonObject->has(valueType)) {
-                    stringValue = jsonObject->getValue<std::string>(valueType);
-                } else if (valueType == "SS") {
+                type = jsonObject->getNames()[i];
+                if (type == "S" && jsonObject->has(type)) {
+                    stringValue = jsonObject->getValue<std::string>(type);
+                } else if (type == "SS") {
                     Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("SS");
                     for (const auto &nValue: *jsonNumberArray) {
                         stringSetValue.emplace_back(nValue.convert<std::string>());
                     }
-                } else if (valueType == "N") {
-                    numberValue = jsonObject->get(valueType).convert<std::string>();
-                } else if (valueType == "NS") {
+                } else if (type == "N") {
+                    numberValue = jsonObject->get(type).convert<std::string>();
+                } else if (type == "NS") {
                     Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("NS");
                     for (const auto &nValue: *jsonNumberArray) {
                         numberSetValue.emplace_back(nValue.convert<std::string>());
                     }
-                } else if (valueType == "BOOL") {
-                    boolValue = jsonObject->get(valueType).convert<bool>();
-                } else if (valueType == "NULL") {
-                    nullValue = jsonObject->get(valueType).convert<bool>();
+                } else if (type == "BOOL") {
+                    boolValue = jsonObject->get(type).convert<bool>();
+                } else if (type == "NULL") {
+                    nullValue = jsonObject->get(type).convert<bool>();
                 }
             }
 

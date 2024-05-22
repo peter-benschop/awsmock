@@ -44,10 +44,10 @@ namespace AwsMock::Dto::DynamoDb {
                         if (getItemKey.type == "S") {
                             getItemKey.value = jsonGetKeyObject->getValue<std::string>(getItemKey.type);
                         } else if (getItemKey.type == "N") {
-                            getItemKey.value = jsonGetKeyObject->getValue<int>(getItemKey.type);
+                            getItemKey.value = std::to_string(jsonGetKeyObject->getValue<int>(getItemKey.type));
                         }
                     }
-                    keys[jsonKeyObject->getNames()[i]] = getItemKey;
+                    //keys[jsonKeyObject->getNames()[i]] = getItemKey;
                 }
             }
         } catch (Poco::Exception &exc) {

@@ -20,6 +20,8 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/exception/UnauthorizedException.h>
 
 #define S3_FILE_NAME_LENGTH 64
 #define S3_VERSION_ID_LENGTH 64
@@ -280,43 +282,113 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Returns the HTTP endpoint
+         * @brief Add the AWS v4 signed authorization header
          *
-         * @param configuration current AwsMock configuration
-         * @return HTTP endpoint
-         */
-        static std::string GetEndpoint(const Configuration &configuration) {
-            int port = configuration.getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
-            std::string hostname = configuration.getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
-            return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
-        }
-
-        /**
-         * Add the AWS v4 signature authorization header
+         * Adds the AWS authorization header, based on the supplied Poco HTTP request.
          *
          * @param request HTTP request
          * @param module AwsMock module
          * @param contentType HTTP content type
+         * @param signedHeaders signed header names
          * @param payload HTTP payload
          */
-        static void AddAuthorizationHeader(Poco::Net::HTTPRequest &request, const std::string &module, const std::string &contentType, const std::string &payload);
+        static void AddAuthorizationHeader(Poco::Net::HTTPRequest &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload);
 
         /**
-         * Verify the request signature
+         * @brief Add the AWS v4 signed authorization header
+         *
+         * Adds the AWS authorization header, based on the supplied Curl request HTTP request.
+         *
+         * @param request HTTP request
+         * @param module AwsMock module
+         * @param contentType HTTP content type
+         * @param signedHeaders signed header names
+         * @param payload HTTP payload
+         */
+        static void AddAuthorizationHeader(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload);
+
+        /**
+         * @brief Verify the request signature
          *
          * @param request HTTP request
          * @param payload HTTP payload
+         * @param secretAccessKey AWS secret access key
          * @return true if signature could be verified
          */
-        static bool VerifySignature(const Poco::Net::HTTPRequest &request, const std::string &payload);
+        static bool VerifySignature(const Poco::Net::HTTPRequest &request, const std::string &payload, const std::string &secretAccessKey);
 
       private:
 
+        /**
+         * @brief Returns the canonical request.
+         *
+         * @param request HTTP request
+         * @param payload HTTP payload
+         * @param authorizationHeaderKeys
+         * @return
+         */
         static std::string GetCanonicalRequest(const Poco::Net::HTTPRequest &request, const std::string &payload, const AuthorizationHeaderKeys &authorizationHeaderKeys);
-        static std::string GetStringToSign(const Poco::Net::HTTPRequest &request, const std::string &canonicalRequest, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
+        /**
+         * @brief Returns the canonical request.
+         *
+         * This is used by the Curl base request.
+         *
+         * @param method HTTP method
+         * @param path HTTP path, including query/path parameter
+         * @param headers HTTP headers
+         * @param payload HTTP payload
+         * @param authorizationHeaderKeys
+         * @return
+         */
+        static std::string GetCanonicalRequest(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &payload, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        /**
+         * @brief Creates the string to sign.
+         *
+         * @param canonicalRequest canonical request
+         * @param authorizationHeaderKeys authorization summary
+         * @return string to sign
+         */
+        static std::string GetStringToSign(const std::string &canonicalRequest, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        /**
+         * @brief Returns the canonical query parameters
+         *
+         * This is used by the Curl base request.
+         *
+         * @param request HTTP request
+         * @return canonical request parameters
+         */
+        static std::string GetCanonicalQueryParameters(const std::string &path);
+
+        /**
+         * @brief Returns the canonical query parameters
+         *
+         * @param request HTTP request
+         * @return canonical request parameters
+         */
         static std::string GetCanonicalQueryParameters(const Poco::Net::HTTPRequest &request);
+
+        /**
+         * @brief Returns the canonical header string.
+         *
+         * @param request HTTP request
+         * @param authorizationHeaderKeys authorization parameter
+         * @return canonical header string
+         */
         static std::string GetCanonicalHeaders(const Poco::Net::HTTPRequest &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        /**
+         * @brief Returns the canonical header string.
+         *
+         * This is used by the Curl base request.
+         *
+         * @param request HTTP request
+         * @param authorizationHeaderKeys authorization parameter
+         * @return canonical header string
+         */
+        static std::string GetCanonicalHeaders(std::map<std::string, std::string> &headers, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the hashed payload.
@@ -330,9 +402,10 @@ namespace AwsMock::Core {
          * @brief Splits the authorization header into pieces and stores the result into a struct.
          *
          * @param request HTTP request
+         * @param secretAccessKey AWS secret access key
          * @return AuthorizationHeaderKeys
          */
-        static AuthorizationHeaderKeys GetAuthorizationKeys(const Poco::Net::HTTPRequest &request);
+        static AuthorizationHeaderKeys GetAuthorizationKeys(const Poco::Net::HTTPRequest &request, const std::string &secretAccessKey);
 
         /**
          * @brief Returns the signature for the request
@@ -346,6 +419,8 @@ namespace AwsMock::Core {
         /**
          * @brief Returns the date string in format yyyyMMdd
          *
+         * Return the time in zone UTC
+         *
          * @return date string.
          */
         static std::string GetDateString();
@@ -353,15 +428,29 @@ namespace AwsMock::Core {
         /**
          * @brief Returns the date time string in ISO8601 format
          *
+         * Return the time in zone UTC
+         *
          * @return date string.
          */
         static std::string GetISODateString();
     };
 
     /**
+     * @brief Returns the HTTP endpoint
+     *
+     * @param configuration current AwsMock configuration
+     * @return HTTP endpoint
+     */
+    static inline std::string GetEndpoint() {
+        int port = Core::Configuration::instance().getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
+        std::string hostname = Core::Configuration::instance().getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
+        return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
+    }
+
+    /**
      * Checks whether this is a queue URL
      *
-     * @param queue queue from SPring cloud
+     * @param queue queue from Spring cloud
      * @return true if this is a URL
      */
     static inline bool IsSQSUrl(const std::string &queue) {
@@ -371,7 +460,7 @@ namespace AwsMock::Core {
     /**
      * Checks whether this is a queue ARN
      *
-     * @param queue queue from SPring cloud
+     * @param queue queue from Spring cloud
      * @return true if this is a URL
      */
     static inline bool IsSQSArn(const std::string &queue) {
@@ -384,7 +473,7 @@ namespace AwsMock::Core {
      * @param queue from Spring cloud request
      * @return queue URL
      */
-    static inline std::string SanitzeSQSUrl(const std::string &queue) {
+    static inline std::string SanitizeSQSUrl(const std::string &queue) {
         if (IsSQSUrl(queue)) {
             return queue;
         } else if (IsSQSArn(queue)) {

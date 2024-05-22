@@ -9,6 +9,15 @@ namespace AwsMock::Database {
     Poco::Mutex DynamoDbMemoryDb::_tableMutex;
     Poco::Mutex DynamoDbMemoryDb::_itemMutex;
 
+
+    template<typename Map, typename Key>
+    bool KeyCompare(Map const &lhs, Map const &rhs, Key const &keys) {
+
+        auto pred = [](auto a, auto b) { return a.first == b.first; };
+
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin(), pred);
+    }
+
     bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
 
         if (!region.empty()) {
@@ -118,19 +127,27 @@ namespace AwsMock::Database {
         _tables.clear();
     }
 
-    bool DynamoDbMemoryDb::ItemExists(const std::string &region, const std::string &tableName, const std::string &key) {
+    bool DynamoDbMemoryDb::ItemExists(const Entity::DynamoDb::Item &item) {
+
+        std::string region = item.region;
+        std::string tableName = item.tableName;
+
+        // Get table
+        Entity::DynamoDb::Table table = GetTableByRegionName(region, tableName);
 
         if (!region.empty()) {
             return find_if(_items.begin(),
                            _items.end(),
-                           [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                               return item.second.region == region && item.second.name == tableName;
+                           [table, item](const std::pair<std::string, Entity::DynamoDb::Item> &item1) {
+                               bool result = item1.second.region == table.region && item1.second.tableName == table.name;
+                               result &= KeyCompare(item.attributes, item1.second.attributes, table.keySchemas);
+                               return result;
                            }) != _items.end();
         } else {
             return find_if(_items.begin(),
                            _items.end(),
                            [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                               return item.second.name == tableName;
+                               return item.second.tableName == tableName;
                            }) != _items.end();
         }
     }
@@ -155,7 +172,7 @@ namespace AwsMock::Database {
         } else {
 
             for (const auto &item: _items) {
-                if (item.second.region == region && item.second.name == tableName) {
+                if (item.second.region == region && item.second.tableName == tableName) {
                     items.emplace_back(item.second);
                 }
             }
@@ -180,13 +197,51 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemById(const std::string &oid) {
+
+        auto it =
+                find_if(_items.begin(), _items.end(), [oid](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                    return item.first == oid;
+                });
+
+        if (it == _items.end()) {
+            log_error << "Get item by ID failed, oid: " << oid;
+            throw Core::DatabaseException("Get item by ID failed, oid: " + oid);
+        }
+
+        it->second.oid = oid;
+        return it->second;
+    }
+
+    Entity::DynamoDb::Item DynamoDbMemoryDb::CreateItem(const Entity::DynamoDb::Item &item) {
+        Poco::ScopedLock lock(_itemMutex);
+
+        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        _items[oid] = item;
+        log_trace << "Item created, oid: " << oid;
+        return GetItemById(oid);
+    }
+
+    Entity::DynamoDb::Item DynamoDbMemoryDb::UpdateItem(const Entity::DynamoDb::Item &item) {
+        Poco::ScopedLock lock(_itemMutex);
+
+        std::string region = item.region;
+        std::string tableName = item.tableName;
+        auto it = find_if(_items.begin(),
+                          _items.end(),
+                          [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                              return item.second.region == region && item.second.tableName == tableName;
+                          });
+        _items[it->first] = item;
+        return _items[it->first];
+    }
 
     void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
         Poco::ScopedLock lock(_itemMutex);
 
         const auto count = std::erase_if(_items, [region, tableName, key](const auto &item) {
             auto const &[k, v] = item;
-            return v.region == region && v.name == tableName;
+            return v.region == region && v.tableName == tableName;
         });
         log_debug << "DynamoDB items deleted, count: " << count;
     }

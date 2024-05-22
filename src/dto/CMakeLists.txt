@@ -60,7 +60,7 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp
         src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp
         src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp
-        src/dynamodb/ScanResponse.cpp)
+        src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp
         src/secretsmanager/DeleteSecretRequest.cpp src/secretsmanager/DeleteSecretResponse.cpp
         src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
@@ -82,27 +82,15 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCK
         ${MODULE_SOURCES})
 
 # Test directory
-if (NOT WIN32)
-    add_subdirectory(tst)
-endif ()
+add_subdirectory(tst)
 
 # Includes
-if (WIN32)
-    include_directories(./include ../core/include ../db/include ${AWSMOCK_WIN32_DIR}/include)
-    link_directories(${AWSMOCK_WIN32_DIR}/lib ../core/${CMAKE_BUILD_TYPE} ../db/${CMAKE_BUILD_TYPE})
-else ()
-    include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
-endif ()
+include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
 
 add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/common/BaseRequest.h)
+        include/awsmock/dto/dynamodb/model/Key.h)
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-
-if (WIN32)
-    target_link_libraries(${LIBRARY} awsmockcore.lib awsmockdb.lib libssl.lib libcrypto.lib libcurl_imp.lib archive.lib bson-1.0.lib
-            bsoncxx-v_noabi-rhb-x64-v143-md.lib mongocxx-v_noabi-rhb-x64-v143-md.lib)
-endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

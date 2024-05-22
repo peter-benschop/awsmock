@@ -12,11 +12,12 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -40,7 +41,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Keys
          */
-        std::map<std::string, GetItemKey> keys;
+        std::map<std::string, AttributeValue> keys;
 
         /**
          * Projection exception

@@ -43,6 +43,7 @@
 #include <awsmock/dto/dynamodb/QueryResponse.h>
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/common/DockerService.h>
 
@@ -51,7 +52,9 @@ namespace AwsMock::Service {
     /**
      * @brief DynamoDb module service.
      *
-     * Handles all DynamoDb related requests:
+     * Handles all DynamoDb related requests. The DynamoDB itself runs as docker container on the local host. It will started via the DynamoDB server automatically
+     * as soon as the server starts. DynamoDB commands will be send via HTTP to the DynamoDB docker container on port 8000. THe docker posrt can be configured in the
+     * AwsMock configuration properties.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -155,24 +158,9 @@ namespace AwsMock::Service {
         Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * AWS account ID
-         */
-        std::string _accountId;
-
-        /**
          * Configuration
          */
         Core::Configuration &_configuration;
-
-        /**
-         * Docker module
-         */
-        std::shared_ptr<Service::DockerService> _dockerService;
 
         /**
          * Database connection

@@ -28,12 +28,13 @@ namespace AwsMock::Dto::DynamoDb {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonBody);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
 
             Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
             Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
+            key.FromJsonObject(rootObject->getObject("Key"));
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

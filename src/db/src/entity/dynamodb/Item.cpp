@@ -8,30 +8,44 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> Item::ToDocument() const {
 
-        view_or_value<view, value> lambdaDoc = make_document(
-                kvp("region", region),
-                kvp("name", name),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+        try {
 
-        return lambdaDoc;
+            auto attributesDoc = bsoncxx::builder::basic::document{};
+            for (const auto &attribute: attributes) {
+                attributesDoc.append(kvp(attribute.first, attribute.second.ToDocument()));
+            }
+
+            auto itemDoc = bsoncxx::builder::basic::document{};
+            itemDoc.append(
+                    kvp("region", region),
+                    kvp("tableName", tableName),
+                    kvp("attributes", attributesDoc),
+                    kvp("created", MongoUtils::ToBson(created)),
+                    kvp("modified", MongoUtils::ToBson(modified)));
+
+            return itemDoc.extract();
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
     }
 
     void Item::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(
-                bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(
-                bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        tableName = bsoncxx::string::to_string(mResult.value()["tableName"].get_string().value);
+        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date().value));
+        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value));
     }
 
     Poco::JSON::Object Item::ToJsonObject() const {
+
         Poco::JSON::Object jsonObject;
         jsonObject.set("region", region);
-        jsonObject.set("name", name);
+        jsonObject.set("tableName", tableName);
+
 
         return jsonObject;
     }

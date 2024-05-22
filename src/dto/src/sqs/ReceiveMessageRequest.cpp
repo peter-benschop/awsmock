@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
 
             // Sanitize
-            queueUrl = Core::SanitzeSQSUrl(queueUrl);
+            queueUrl = Core::SanitizeSQSUrl(queueUrl);
 
             // Attributes
             if (rootObject->has("AttributeNames")) {

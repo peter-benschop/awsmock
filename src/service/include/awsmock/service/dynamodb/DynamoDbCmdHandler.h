@@ -54,15 +54,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Return the command from the header or from the payload.
-         *
-         * @param request HTTP request
-         * @param payload HTTP payload
-         * @return SQS action
-         */
-        static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload);
-
-        /**
          * S3 handler configuration
          */
         Core::Configuration &_configuration;

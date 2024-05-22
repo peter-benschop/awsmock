@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/dynamodb/model/ProvisionedThroughput.h"
+#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 

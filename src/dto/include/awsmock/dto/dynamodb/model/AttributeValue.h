@@ -56,12 +56,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Boolean value
          */
-        bool boolValue;
+        bool boolValue = false;
 
         /**
          * Null value
          */
-        bool nullValue;
+        bool nullValue = false;
 
         /**
          * Convert to JSON value

@@ -10,10 +10,12 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/UnauthorizedException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 
@@ -28,6 +30,7 @@ namespace AwsMock::Dto::Common {
         PUT_ITEM,
         QUERY,
         SCAN,
+        DELETE_ITEM,
         UNKNOWN
     };
 
@@ -40,6 +43,7 @@ namespace AwsMock::Dto::Common {
             {DynamoDbCommandType::PUT_ITEM, "PutItem"},
             {DynamoDbCommandType::QUERY, "Query"},
             {DynamoDbCommandType::SCAN, "Scan"},
+            {DynamoDbCommandType::DELETE_ITEM, "DeleteItem"},
             {DynamoDbCommandType::UNKNOWN, "Unknown"},
     };
 
@@ -71,6 +75,14 @@ namespace AwsMock::Dto::Common {
         DynamoDbCommandType command{};
 
         /**
+         * @brief Gets the client command from the HTTP target header.
+         *
+         * @param request HTTP request
+         * @return client command from AWS target header
+         */
+        static DynamoDbCommandType GetClientCommandFromHeader(const Poco::Net::HTTPServerRequest &request);
+
+        /**
          * Getś the value from the user-agent string
          *
          * @param method HTTP method
@@ -100,6 +112,13 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const DynamoDbClientCommand &i);
+
+        /**
+         * AWS secret access key
+         *
+         * @return output stream
+         */
+        std::string _secretAccessKey = Core::Configuration::instance().getString("awsmock.secret.access.key", "none");
     };
 
 }// namespace AwsMock::Dto::Common

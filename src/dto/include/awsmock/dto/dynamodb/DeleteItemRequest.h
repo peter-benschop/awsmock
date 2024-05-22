@@ -17,6 +17,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/GetItemKey.h>
+#include <awsmock/dto/dynamodb/model/Key.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -36,6 +37,11 @@ namespace AwsMock::Dto::DynamoDb {
          * Table name
          */
         std::string tableName;
+
+        /**
+         * Item key
+         */
+        Key key;
 
         /**
          * Original HTTP request body
