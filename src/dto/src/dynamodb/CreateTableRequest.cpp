@@ -10,19 +10,8 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableClass", tableClass);
-            rootJson.set("TableName", tableName);
 
-            Poco::JSON::Array jsonTagsArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object object;
-                object.set("Key", tag.first);
-                object.set("Value", tag.second);
-                jsonTagsArray.add(object);
-            }
-            rootJson.set("Tags", jsonTagsArray);
-
+            // Attributes
             Poco::JSON::Array jsonAttributeArray;
             for (const auto &tag: attributes) {
                 Poco::JSON::Object object;
@@ -32,6 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
             }
             rootJson.set("AttributeDefinitions", jsonAttributeArray);
 
+            // Key schema
             Poco::JSON::Array jsonKeySchemasArray;
             for (const auto &keySchema: keySchemas) {
                 Poco::JSON::Object object;
@@ -40,7 +30,25 @@ namespace AwsMock::Dto::DynamoDb {
                 jsonKeySchemasArray.add(object);
             }
             rootJson.set("KeySchema", jsonKeySchemasArray);
+
+            // Provisioned throughput
             rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
+
+            rootJson.set("Region", region);
+            rootJson.set("TableName", tableName);
+            if (!tableClass.empty()) {
+                rootJson.set("TableClass", tableClass);
+            }
+
+            // Tags
+            Poco::JSON::Array jsonTagsArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object object;
+                object.set("Key", tag.first);
+                object.set("Value", tag.second);
+                jsonTagsArray.add(object);
+            }
+            rootJson.set("Tags", jsonTagsArray);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

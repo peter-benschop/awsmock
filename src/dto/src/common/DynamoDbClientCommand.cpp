@@ -18,6 +18,11 @@ namespace AwsMock::Dto::Common {
         this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
 
+        if (!Core::AwsUtils::VerifySignature(request, payload, _secretAccessKey)) {
+            log_error << "AWS signature could not be verified";
+            throw Core::UnauthorizedException("AWS signature could not be verified");
+        }
+
         // Command
         std::string action = request.get("X-Amz-Target");
 
@@ -45,6 +50,7 @@ namespace AwsMock::Dto::Common {
                     command = DynamoDbCommandType::SCAN;
                 }
                 break;
+            case HttpMethod::HEAD:
             case HttpMethod::UNKNOWN: {
                 break;
             }

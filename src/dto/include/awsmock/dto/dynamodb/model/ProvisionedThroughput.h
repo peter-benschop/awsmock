@@ -26,12 +26,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Read capacity units
          */
-        int readCapacityUnits;
+        int readCapacityUnits = 0;
 
         /**
          * Write capacity units
          */
-        int writeCapacityUnits;
+        int writeCapacityUnits = 0;
 
         /**
          * Last decrease time
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * NUmber of decreases
          */
-        long numberOfDecreasesToday;
+        long numberOfDecreasesToday = 0;
 
         /**
          * Converts the entity to a JSON object

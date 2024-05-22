@@ -26,11 +26,11 @@
 #define DYNAMODB_DEFAULT_TIMEOUT 120
 #define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
 #define DYNAMODB_DEFAULT_WORKER_PERIOD 300
-#define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
+#define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local-with-logging")
 #define DYNAMODB_DOCKER_TAG std::string("latest")
 #define DYNAMODB_INTERNAL_PORT 8000
 #define DYNAMODB_EXTERNAL_PORT 8000
-#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
+#define DYNAMODB_DOCKER_FILE "FROM wernerwws/dynamodb-local-with-logging:latest\n"           \
                              "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
                              "WORKDIR /home/dynamodblocal\n"                                 \
                              "EXPOSE 8000 8000\n"                                            \

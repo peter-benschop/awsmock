@@ -1,9 +1,12 @@
 
+#include "awsmock/core/exception/UnauthorizedException.h"
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 
 namespace AwsMock::Service {
 
-    DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration) : DynamoDbCmdHandler(configuration), _configuration(configuration), _dynamoDbService(configuration) {}
+    DynamoDbHandler::DynamoDbHandler(Core::Configuration &configuration) : DynamoDbCmdHandler(configuration), _configuration(configuration), _dynamoDbService(configuration) {
+        _secretAccessKey = _configuration.getString("awsmock.secret.access.key", "none");
+    }
 
     void DynamoDbHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, [[maybe_unused]] const std::string &user) {
         log_trace << "DynamoDb GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
@@ -39,9 +42,6 @@ namespace AwsMock::Service {
         Dto::Common::DynamoDbClientCommand clientCommand;
         clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
 
-        if (!Core::AwsUtils::VerifySignature(request, clientCommand.payload)) {
-            log_error << "Request signature could not be verified";
-        }
         DynamoDbCmdHandler::handlePost(request, response, clientCommand);
     }
 

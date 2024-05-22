@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SQS {
             Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
 
             // Sanitize
-            queueUrl = Core::SanitzeSQSUrl(queueUrl);
+            queueUrl = Core::SanitizeSQSUrl(queueUrl);
 
             // User attributes
             if (rootObject->has("MessageAttributes")) {

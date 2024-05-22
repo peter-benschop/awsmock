@@ -8,10 +8,6 @@ namespace AwsMock::Service {
 
     DynamoDbService::DynamoDbService(Core::Configuration &configuration) : _configuration(configuration), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
-        // Initialize environment
-        _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
-        _dockerService = std::make_shared<Service::DockerService>();
-
         // DynamoDB docker host, port
         _dockerHost = "localhost";
         _dockerPort = _configuration.getInt("awsmock.dynamodb.port");
@@ -19,11 +15,6 @@ namespace AwsMock::Service {
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
-
-        for (const auto &header: request.headers) {
-            log_info << header.first << ":" << header.second;
-        }
-        log_info << request.body;
 
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
@@ -40,22 +31,17 @@ namespace AwsMock::Service {
                     .tags = request.tags,
                     .keySchemas = request.keySchemas};
 
-            std::string json = request.ToJson();
-            std::string nbody = request.body;
-
-            bool tmp = Core::StringUtils::Equals(json, nbody);
+            // Send request to DynamoDB docker container
+            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
+            createTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
 
             // Update database
             table = _dynamoDbDatabase.CreateTable(table);
-
-            // Send request to docker container
-            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.ToJson(), request.headers);
-            createTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
             log_info << "DynamoDb table created, name: " << table.name;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDbd create table failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDbd create table failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
         }
 
         return createTableResponse;
@@ -113,17 +99,17 @@ namespace AwsMock::Service {
         Dto::DynamoDb::DeleteTableResponse deleteTableResponse;
         try {
 
-            // Send request to docker container
+            // Send request to DynamoDB docker container
             Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
             deleteTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
-            log_info << "DynamoDb table deleted, name: " << request.tableName;
 
             // Delete table in database
             _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
+            log_info << "DynamoDb table deleted, name: " << request.tableName;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDbd delete table failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDbd delete table failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd delete table failed, error: " + exc.message());
         }
 
         return deleteTableResponse;
@@ -303,7 +289,7 @@ namespace AwsMock::Service {
 
         // Create HTTP request and set headers
         Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_1);
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, Poco::Net::HTTPMessage::HTTP_1_0);
         log_trace << "DynamoDB request defined, body: " + body;
 
         // Copy headers
@@ -312,11 +298,12 @@ namespace AwsMock::Service {
         }
 
         // Add AWS v4 authorization header
-        Core::AwsUtils::AddAuthorizationHeader(request, "dynamodb", "application/x-amz-json-1.0", body);
+        Core::AwsUtils::AddAuthorizationHeader(request, "dynamodb", "application/x-amz-json-1.0", "content-type;host;x-amz-date;x-amz-security-token;x-amz-target", body);
 
         // Send request
+        std::istringstream in(body + '\n');
         std::ostream &os = session.sendRequest(request);
-        os << body;
+        Poco::StreamCopier::copyStream(in, os);
         os.flush();
 
         // Get the response state

@@ -114,6 +114,11 @@ namespace AwsMock::Service {
          * DynamoDB module
          */
         Service::DynamoDbService _dynamoDbService;
+
+        /**
+         * AWS secret access key
+         */
+        std::string _secretAccessKey;
     };
 
 }// namespace AwsMock::Service

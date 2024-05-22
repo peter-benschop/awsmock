@@ -237,6 +237,8 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
         std::string body;
         Poco::StreamCopier::copyToString(request.stream(), body);
+        request.stream().clear(std::ios::eofbit);
+        request.stream().seekg(0, std::ios::beg);
         return body;
     }
 }// namespace AwsMock::Core

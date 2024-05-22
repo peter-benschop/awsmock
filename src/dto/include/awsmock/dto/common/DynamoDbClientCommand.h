@@ -10,10 +10,12 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/UnauthorizedException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/HttpMethod.h>
 
@@ -100,6 +102,13 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const DynamoDbClientCommand &i);
+
+        /**
+         * AWS secret access key
+         *
+         * @return output stream
+         */
+        std::string _secretAccessKey = Core::Configuration::instance().getString("awsmock.secret.access.key", "none");
     };
 
 }// namespace AwsMock::Dto::Common

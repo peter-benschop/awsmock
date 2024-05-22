@@ -11,9 +11,6 @@ namespace AwsMock::Service {
 
         try {
 
-            std::string requestId = clientCommand.requestId;
-            std::string action = GetActionFromHeader(request, clientCommand.payload);
-
             switch (clientCommand.command) {
 
                 case Dto::Common::DynamoDbCommandType::CREATE_TABLE: {
@@ -23,11 +20,7 @@ namespace AwsMock::Service {
                     tableRequest.region = clientCommand.region;
                     tableRequest.requestId = clientCommand.requestId;
                     tableRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        tableRequest.headers[header.first] = header.second;
-                    }
+                    tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
 
@@ -48,11 +41,7 @@ namespace AwsMock::Service {
                     tableRequest.region = clientCommand.region;
                     tableRequest.requestId = clientCommand.requestId;
                     tableRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        tableRequest.headers[header.first] = header.second;
-                    }
+                    tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::ListTableResponse tableResponse = _dynamoDbService.ListTables(tableRequest);
                     if (tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -72,11 +61,7 @@ namespace AwsMock::Service {
                     tableRequest.region = clientCommand.region;
                     tableRequest.requestId = clientCommand.requestId;
                     tableRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        tableRequest.headers[header.first] = header.second;
-                    }
+                    tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
                     if (tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -95,11 +80,7 @@ namespace AwsMock::Service {
                     tableRequest.region = clientCommand.region;
                     tableRequest.requestId = clientCommand.requestId;
                     tableRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        tableRequest.headers[header.first] = header.second;
-                    }
+                    tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
                     if (tableResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -118,11 +99,7 @@ namespace AwsMock::Service {
                     itemRequest.region = clientCommand.region;
                     itemRequest.requestId = clientCommand.requestId;
                     itemRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        itemRequest.headers[header.first] = header.second;
-                    }
+                    itemRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
                     if (itemResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -141,11 +118,7 @@ namespace AwsMock::Service {
                     itemRequest.region = clientCommand.region;
                     itemRequest.requestId = clientCommand.requestId;
                     itemRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        itemRequest.headers[header.first] = header.second;
-                    }
+                    itemRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
                     if (itemResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -164,11 +137,7 @@ namespace AwsMock::Service {
                     queryRequest.region = clientCommand.region;
                     queryRequest.requestId = clientCommand.requestId;
                     queryRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        queryRequest.headers[header.first] = header.second;
-                    }
+                    queryRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
                     if (queryResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -187,11 +156,7 @@ namespace AwsMock::Service {
                     scanRequest.region = clientCommand.region;
                     scanRequest.requestId = clientCommand.requestId;
                     scanRequest.user = clientCommand.user;
-
-                    // Copy headers
-                    for (const auto &header: request) {
-                        scanRequest.headers[header.first] = header.second;
-                    }
+                    scanRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
                     if (scanResponse.status == Poco::Net::HTTPResponse::HTTPStatus::HTTP_OK) {
@@ -217,21 +182,5 @@ namespace AwsMock::Service {
         } catch (Poco::Exception &exc) {
             SendJsonErrorResponse("DynamoDb", response, exc);
         }
-    }
-
-    std::string DynamoDbCmdHandler::GetActionFromHeader(Poco::Net::HTTPServerRequest &request, const std::string &payload) {
-
-        std::string action;
-        std::string contentType = request["Content-Type"];
-        if (Core::StringUtils::ContainsIgnoreCase(contentType, "application/x-www-form-urlencoded")) {
-
-            action = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
-
-        } else if (Core::StringUtils::ContainsIgnoreCase(contentType, "application/x-amz-json-1.0")) {
-
-            std::string headerValue = request["X-Amz-Target"];
-            action = Core::StringUtils::Split(headerValue, '.')[1];
-        }
-        return action;
     }
 }// namespace AwsMock::Service
