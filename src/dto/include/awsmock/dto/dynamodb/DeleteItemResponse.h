@@ -12,11 +12,11 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/dto/dynamodb/model/TableStatus.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 

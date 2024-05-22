@@ -207,10 +207,14 @@ instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www
 
 There are a couple of examples shell script available. Depending on your installation directory, there in
 ```/usr/share/awsmock``` or in ```/usr/local/share/awsmock```. Each module has its own directory with bash scripts and
-resource files. The examples cover almost all AwsMock features. Simply cd to the directory and execute one of the
-example scripts:
+resource files. The examples cover almost all AwsMock features. All examples are pretty self explaining.
+
+Some of them require the jq utility (JSON queries). You can install jq using the usual package manager of your Linux
+distribution. For Windows jq can be downloaded from [jq download site](https://jqlang.github.io/jq/download/).
+
+Simply change to the directory and execute one of the example scripts:
 
 ```
 cd /usr/local/share/awsmock/s3
-./create-bucket.ch
+./create-bucket.sh
 ```
