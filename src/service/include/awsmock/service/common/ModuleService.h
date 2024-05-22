@@ -127,7 +127,7 @@ namespace AwsMock::Service {
         /**
          * Cleans the objects from the infrastructure.
          *
-         * <p>Cleans all objects from the infrastructure. This means all SQS messages, SNS messages, S3 object keys, etc. will be deleted.</p>
+         * <p>Cleans all objects from the infrastructure. This means all SQS resources, SNS resources, S3 object keys, etc. will be deleted.</p>
          *
          * @param services service name list
          */

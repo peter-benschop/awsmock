@@ -83,7 +83,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * <p>
          * The signature version corresponds to the hashing algorithm used while creating the signature of the notifications,
-         * subscription confirmations, or unsubscribe confirmation messages sent by Amazon SNS. By default, SignatureVersion
+         * subscription confirmations, or unsubscribe confirmation resources sent by Amazon SNS. By default, SignatureVersion
          * is set to 1.
          * <p>
          */
@@ -115,7 +115,7 @@ namespace AwsMock::Database::Entity::SNS {
          * Archiving policy.
          *
          * <p>
-         * Adds or updates an inline policy document to archive messages stored in the specified Amazon SNS topic.
+         * Adds or updates an inline policy document to archive resources stored in the specified Amazon SNS topic.
          * </p>
          */
         std::string archivePolicy;

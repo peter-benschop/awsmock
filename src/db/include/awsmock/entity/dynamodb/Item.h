@@ -92,7 +92,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        Entity::DynamoDb::Item FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object

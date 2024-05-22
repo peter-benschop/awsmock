@@ -339,7 +339,7 @@ namespace AwsMock::Service {
 
         try {
 
-            // Delete all messages in queue
+            // Delete all resources in queue
             _database.DeleteMessages(request.queueUrl);
 
             // Update database
@@ -523,7 +523,7 @@ namespace AwsMock::Service {
             log_debug << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size();
 
         } catch (Poco::Exception &ex) {
-            log_error << "SQS delete batch messages failed, message: " << ex.message();
+            log_error << "SQS delete batch resources failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

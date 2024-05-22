@@ -299,13 +299,13 @@ namespace AwsMock::Database {
                 return value.created < Poco::Timestamp(reset.time_since_epoch().count() / 1000);
             }));
         }
-        log_debug << "Old messages deleted, timeout: " << timeout << " count: " << count;
+        log_debug << "Old resources deleted, timeout: " << timeout << " count: " << count;
     }
 
     void SNSMemoryDb::DeleteAllMessages() {
         Poco::ScopedLock loc(_snsMessageMutex);
 
-        log_debug << "All messages deleted, count: " << _messages.size();
+        log_debug << "All resources deleted, count: " << _messages.size();
         _messages.clear();
     }
 }// namespace AwsMock::Database

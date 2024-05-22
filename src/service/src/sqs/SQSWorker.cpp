@@ -29,7 +29,7 @@ namespace AwsMock::Service {
                 _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
             }
 
-            // Reset messages which have expired
+            // Reset resources which have expired
             _sqsDatabase.ResetMessages(queue.queueUrl, queue.attributes.visibilityTimeout);
 
             // Set counter default userAttributes

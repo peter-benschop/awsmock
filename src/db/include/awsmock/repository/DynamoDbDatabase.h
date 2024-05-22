@@ -204,7 +204,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Item CreateOrUpdateItem(const Entity::DynamoDb::Item &item);
 
         /**
-         * Deletes an item
+         * @brief Deletes an item by primary key
          *
          * @param region AWS region.
          * @param tableName name of the table
@@ -212,6 +212,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
+
+        /**
+         * @brief Deletes all item of a table
+         *
+         * @param region AWS region.
+         * @param tableName name of the table
+         * @throws DatabaseException
+         */
+        void DeleteItems(const std::string &region, const std::string &tableName);
 
         /**
          * Deletes all items

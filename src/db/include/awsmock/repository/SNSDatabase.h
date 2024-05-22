@@ -227,10 +227,10 @@ namespace AwsMock::Database {
         long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status);
 
         /**
-         * List all available messages
+         * List all available resources
          *
          * @param region AWS region
-         * @return list of SNS messages
+         * @return list of SNS resources
          * @throws DatabaseException
          */
         Entity::SNS::MessageList ListMessages(const std::string &region = {});
@@ -262,7 +262,7 @@ namespace AwsMock::Database {
         void DeleteMessage(const Entity::SNS::Message &message);
 
         /**
-         * Bulk delete of messages.
+         * Bulk delete of resources.
          *
          * @param region AWS region
          * @param topicArn topic ARN
@@ -272,7 +272,7 @@ namespace AwsMock::Database {
         void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
 
         /**
-         * Deletes old messages message.
+         * Deletes old resources message.
          *
          * @param timeout timeout in seconds
          * @throws Core::DatabaseException
@@ -280,7 +280,7 @@ namespace AwsMock::Database {
         void DeleteOldMessages(long timeout);
 
         /**
-         * Deletes a messages.
+         * Deletes a resources.
          *
          * @throws Core::DatabaseException
          */

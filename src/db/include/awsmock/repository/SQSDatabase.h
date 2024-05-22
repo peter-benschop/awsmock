@@ -258,16 +258,16 @@ namespace AwsMock::Database {
         Entity::SQS::Message CreateOrUpdateMessage(Entity::SQS::Message &message);
 
         /**
-         * List all available messages
+         * List all available resources
          *
          * @param region AWS region
-         * @return list of SQS messages
+         * @return list of SQS resources
          * @throws DatabaseException
          */
         Entity::SQS::MessageList ListMessages(const std::string &region = {});
 
         /**
-         * Receive messages from an queue.
+         * Receive resources from an queue.
          *
          * @param region AWS region
          * @param queueUrl queue URL
@@ -278,7 +278,7 @@ namespace AwsMock::Database {
         void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int count, Entity::SQS::MessageList &messageList);
 
         /**
-         * Reset expired messages
+         * Reset expired resources
          *
          * @param queueUrl URL of the queue
          * @param visibility visibilityTimeout period in seconds
@@ -286,7 +286,7 @@ namespace AwsMock::Database {
         [[maybe_unused]] void ResetMessages(const std::string &queueUrl, long visibility);
 
         /**
-         * Redrive expired messages.
+         * Redrive expired resources.
          *
          * @param queueUrl URL of the queue
          * @param redrivePolicy redrive policy
@@ -336,9 +336,9 @@ namespace AwsMock::Database {
         static std::string ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document);
 
         /**
-         * Deletes all messages of a queue
+         * Deletes all resources of a queue
          *
-         * @param queue message queue to delete messages from
+         * @param queue message queue to delete resources from
          * @throws Core::DatabaseException
          */
         void DeleteMessages(const std::string &queue);
@@ -360,7 +360,7 @@ namespace AwsMock::Database {
         void DeleteMessage(const std::string &receiptHandle);
 
         /**
-         * Deletes a messages.
+         * Deletes a resources.
          *
          * @throws Core::DatabaseException
          */

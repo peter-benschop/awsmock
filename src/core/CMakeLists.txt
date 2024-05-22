@@ -9,7 +9,7 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
         src/utils/Task.cpp src/utils/XmlUtils.cpp src/utils/Win32Utils.cpp src/utils/Timer.cpp src/utils/TaskPool.cpp)
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp src/exception/ServiceException.cpp
         src/exception/InvalidMethodCallException.cpp src/exception/JsonException.cpp src/exception/NotFoundException.cpp
-        src/exception/ForbiddenException.cpp src/exception/UnauthorizedException.cpp)
+        src/exception/ForbiddenException.cpp src/exception/UnauthorizedException.cpp src/exception/BadRequestException.cpp)
 set(LOGGING_SOURCES src/logging/LogStream.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp)
 

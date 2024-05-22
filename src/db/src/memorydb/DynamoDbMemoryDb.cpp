@@ -246,6 +246,16 @@ namespace AwsMock::Database {
         log_debug << "DynamoDB items deleted, count: " << count;
     }
 
+    void DynamoDbMemoryDb::DeleteItems(const std::string &region, const std::string &tableName) {
+        Poco::ScopedLock lock(_itemMutex);
+
+        const auto count = std::erase_if(_items, [region, tableName](const auto &item) {
+            auto const &[k, v] = item;
+            return v.region == region && v.tableName == tableName;
+        });
+        log_debug << "DynamoDB items deleted, tableName: " << tableName << " count: " << count;
+    }
+
     void DynamoDbMemoryDb::DeleteAllItems() {
         Poco::ScopedLock lock(_itemMutex);
 

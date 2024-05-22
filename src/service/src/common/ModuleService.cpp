@@ -252,7 +252,7 @@ namespace AwsMock::Service {
                     _sqsDatabase.CreateOrUpdateMessage(message);
                     log_debug << "SQS queues imported, url: " << message.queueUrl;
                 }
-                log_info << "SQS messages imported, count: " << infrastructure.sqsMessages.size();
+                log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();
             }
         }
         if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
@@ -267,7 +267,7 @@ namespace AwsMock::Service {
                 for (auto &message: infrastructure.snsMessages) {
                     _snsDatabase.CreateOrUpdateMessage(message);
                 }
-                log_info << "SNS messages imported, count: " << infrastructure.snsMessages.size();
+                log_info << "SNS resources imported, count: " << infrastructure.snsMessages.size();
             }
         }
         if (!infrastructure.lambdas.empty()) {

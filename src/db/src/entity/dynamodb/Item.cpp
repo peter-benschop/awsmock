@@ -31,13 +31,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    void Item::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    Entity::DynamoDb::Item Item::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         tableName = bsoncxx::string::to_string(mResult.value()["tableName"].get_string().value);
         created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date().value));
         modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value));
+        return *this;
     }
 
     Poco::JSON::Object Item::ToJsonObject() const {

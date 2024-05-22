@@ -1,5 +1,0 @@
-{
-  "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:eu-central-1:000000000000:file-delivery1-dlqueue\",\"maxReceiveCount\":\"3\"}",
-  "MessageRetentionPeriod": "259200",
-  "VisibilityTimeout": "90"
-}

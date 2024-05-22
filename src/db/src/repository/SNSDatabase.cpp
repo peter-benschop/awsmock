@@ -456,7 +456,7 @@ namespace AwsMock::Database {
                 } else {
                     count = _messageCollection.count_documents({});
                 }
-                log_trace << "Count messages, region: " << region << " arn: " << topicArn << " result: "
+                log_trace << "Count resources, region: " << region << " arn: " << topicArn << " result: "
                           << count;
                 return count;
 
@@ -485,7 +485,7 @@ namespace AwsMock::Database {
                                                                               kvp("topicArn", topicArn),
                                                                               kvp("status",
                                                                                   Entity::SNS::MessageStatusToString(status))));
-                log_trace << "Count messages by state, region: " << region << " arn: " << topicArn
+                log_trace << "Count resources by state, region: " << region << " arn: " << topicArn
                           << " result: " << count;
                 return count;
 
@@ -651,7 +651,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.delete_many(make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
-                log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
+                log_debug << "Old resources deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -674,7 +674,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 auto result = _messageCollection.delete_many({});
-                log_debug << "All messages deleted, count: " << result->deleted_count();
+                log_debug << "All resources deleted, count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();

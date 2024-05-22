@@ -28,7 +28,7 @@ namespace AwsMock::Service {
         _metricService.SetGauge(SNS_TOPIC_COUNT, topics);
         _metricService.SetGauge(SNS_MESSAGE_COUNT, messages);
 
-        // Count messages per topic
+        // Count resources per topic
         for (const auto &topic: _snsDatabase.ListTopics()) {
             std::string labelValue = Poco::replace(topic.topicName, "-", "_");
             long messagesPerTopic = _snsDatabase.CountMessages(topic.region, topic.topicArn);

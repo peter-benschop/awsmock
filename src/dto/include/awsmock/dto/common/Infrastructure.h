@@ -61,7 +61,7 @@ namespace AwsMock::Dto::Common {
         Database::Entity::SQS::QueueList sqsQueues;
 
         /**
-         * SQS messages
+         * SQS resources
          */
         Database::Entity::SQS::MessageList sqsMessages;
 
@@ -71,7 +71,7 @@ namespace AwsMock::Dto::Common {
         Database::Entity::SNS::TopicList snsTopics;
 
         /**
-         * SQS messages
+         * SQS resources
          */
         Database::Entity::SNS::MessageList snsMessages;
 

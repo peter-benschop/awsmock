@@ -18,7 +18,7 @@ namespace AwsMock::Service {
 
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::BadRequestException("DynamoDb table exists already");
         }
 
         Dto::DynamoDb::CreateTableResponse createTableResponse;
@@ -59,8 +59,8 @@ namespace AwsMock::Service {
             log_info << "DynamoDb list tables, region: " << request.region;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDbd create table failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDbd create table failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
         }
 
         return listTableResponse;
@@ -81,8 +81,8 @@ namespace AwsMock::Service {
             log_info << "DynamoDb describe table, name: " << request.tableName;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDb describe table failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDb describe table failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDb describe table failed, error: " + exc.message());
         }
 
         return describeTableResponse;
@@ -93,7 +93,7 @@ namespace AwsMock::Service {
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb table does not exist", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
 
         Dto::DynamoDb::DeleteTableResponse deleteTableResponse;
@@ -139,7 +139,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &exc) {
             log_error << "DynamoDbd delete table failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("DynamoDbd delete table failed, message: " + exc.message());
         }
     }
 
@@ -148,7 +148,7 @@ namespace AwsMock::Service {
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
         Dto::DynamoDb::GetItemResponse getItemResponse;
@@ -160,8 +160,8 @@ namespace AwsMock::Service {
             log_info << "DynamoDb get item, name: " << request.tableName;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDbd get item failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDbd get item failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd get item failed, , error: " + exc.message());
         }
 
         return getItemResponse;
@@ -172,7 +172,7 @@ namespace AwsMock::Service {
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
         Dto::DynamoDb::PutItemResponse putItemResponse;
@@ -185,13 +185,13 @@ namespace AwsMock::Service {
             // Convert to entity and save to database. If no exception is thrown by the HTTP call to the
             // docker image, seems to be ok.
             Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request);
-            _dynamoDbDatabase.CreateOrUpdateItem(item);
+            item = _dynamoDbDatabase.CreateOrUpdateItem(item);
 
-            log_info << "DynamoDb put item, name: " << request.tableName;
+            log_info << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDb put item failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDb put item failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDb put item failed, error: " + exc.message());
         }
 
         return putItemResponse;
@@ -202,7 +202,7 @@ namespace AwsMock::Service {
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
         Dto::DynamoDb::QueryResponse queryResponse;
@@ -214,8 +214,8 @@ namespace AwsMock::Service {
             log_info << "DynamoDb query item, name: " << request.tableName;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDb query failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDb query failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDb query failed, error: " + exc.message());
         }
 
         return queryResponse;
@@ -226,7 +226,7 @@ namespace AwsMock::Service {
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb table exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
         Dto::DynamoDb::ScanResponse scanResponse;
@@ -252,7 +252,7 @@ namespace AwsMock::Service {
 
         if (!_dynamoDbDatabase.ItemExists(item)) {
             log_warning << "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::ServiceException("DynamoDb item exists already", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
         Dto::DynamoDb::DeleteItemResponse deleteItemResponse;
@@ -268,24 +268,24 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &exc) {
             log_error << "DynamoDbd delete item failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("DynamoDbd delete item failed, message: " + exc.message());
         }
 
         return deleteItemResponse;
     }
 
-    /*void DynamoDbService::DeleteItems(const std::string &tableName) {
-      log_debug << "Deleting all items, table: " << tableName;
+    /*void DynamoDbService::DeleteItems(const std::string &region, const std::string &tableName) {
+        log_debug << "Deleting all items, table: " << tableName;
 
-      try {
-        // Delete table in database
-        _dynamoDbDatabase.DeleteAllTables();
-        log_info << "DynamoDb tables deleted";
+        try {
+            // Delete table in database
+            _dynamoDbDatabase.DeleteAllTables();
+            log_info << "DynamoDb tables deleted";
 
-      } catch (Poco::Exception &exc) {
-        log_error << "DynamoDbd delete table failed, message: " << exc.message();
-        throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-      }
+        } catch (Poco::Exception &exc) {
+            log_error << "DynamoDbd delete table failed, message: " << exc.message();
+            throw Core::ServiceException("DynamoDbd delete table failed, message: " + exc.message());
+        }
     }*/
 
     Dto::DynamoDb::DynamoDbResponse DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) {
