@@ -23,6 +23,8 @@ After you have compiled your Go lambda function, zip them together with the conf
 zip blank-go.zip config credentials bootstrap
 ```
 
+Use the ```zip``` tool on Linux (gzip does not work, as it does not preserve the directory structure).
+
 If you are running the AwsMock manager on the docker host machine you need to change the endpoint the lambda is invoking
 for AWS connections.
 
