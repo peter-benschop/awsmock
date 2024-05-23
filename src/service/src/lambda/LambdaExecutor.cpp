@@ -23,5 +23,6 @@ namespace AwsMock::Service {
             log_debug << "HTTP error, status: " << response.statusCode << " reason: " << response.output;
         }
         log_debug << "Lambda invocation finished send, status: " << response.statusCode;
+        log_info << "Lambda output: " << response.output;
     }
 }// namespace AwsMock::Service

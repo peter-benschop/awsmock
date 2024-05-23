@@ -14,15 +14,7 @@ namespace AwsMock::Manager {
     }
 
     Poco::Net::HTTPRequestHandler *Router::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
-
-        // Get the authorization header
-        std::string scheme, authInfo;
-        request.getCredentials(scheme, authInfo);
-        log_debug << "Schema: " << scheme << " Authorization: " << authInfo << "URI: " << request.getURI() << " Method: " + request.getMethod();
-
-        // Get the module from the request authorization header. Currently, no credentials checks are made.
-        std::string service = GetModule(authInfo);
-
+        std::string service = request["Target"];
         return GetResource(service, request.getURI());
     }
 
@@ -53,18 +45,4 @@ namespace AwsMock::Manager {
         _routingTable[route] = factory;
     }
 
-    std::string Router::GetModule(const std::string &authorization) {
-
-        Poco::RegularExpression::MatchVec posVec;
-        Poco::RegularExpression pattern(R"(Credential=[a-zA-Z0-9]+\/[0-9]{8}\/[a-zA-Z0-9\-]+\/([a-zA-Z0-9]+)\/aws4_request,.*$)");
-        if (!pattern.match(authorization, 0, posVec)) {
-            log_error << "Could not extract module, authorization: " << authorization;
-            throw Core::NotFoundException("Could not extract module");
-        }
-
-        std::string module = authorization.substr(posVec[1].offset, posVec[1].length);
-        log_debug << "Found module: " << module;
-
-        return module;
-    }
 }// namespace AwsMock::Manager

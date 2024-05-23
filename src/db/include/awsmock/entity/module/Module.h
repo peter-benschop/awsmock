@@ -24,6 +24,7 @@
 
 // AwsMock includes
 #include <awsmock/entity/module/ModuleState.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::Module {
 
@@ -35,7 +36,7 @@ namespace AwsMock::Database::Entity::Module {
     using bsoncxx::document::view;
 
     /**
-     * AwsMock module entity
+     * @brief AwsMock module entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -60,11 +61,6 @@ namespace AwsMock::Database::Entity::Module {
          * Status
          */
         ModuleStatus status;
-
-        /**
-         * Executable
-         */
-        std::string executable = {};
 
         /**
          * HTTP port

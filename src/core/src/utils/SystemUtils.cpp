@@ -71,4 +71,9 @@ namespace AwsMock::Core {
     int SystemUtils::GetRandomPort() {
         return Core::RandomUtils::NextInt(RANDOM_PORT_MIN, RANDOM_PORT_MAX);
     }
+
+    int SystemUtils::GetPid() {
+        return getpid();
+    }
+
 }// namespace AwsMock::Core

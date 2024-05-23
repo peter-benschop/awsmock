@@ -21,7 +21,7 @@
 #define FUNCTION_NAME std::string("test-function")
 #define ROLE std::string("arn:aws:iam::000000000000:role/lambda-role")
 #define CODE std::string("S3Bucket=lambdaBucket,S3Key=lambdaKey")
-#define RUNTIME std::string("java17")
+#define RUNTIME std::string("java11")
 
 namespace AwsMock::Service {
 

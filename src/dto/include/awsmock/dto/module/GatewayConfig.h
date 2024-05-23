@@ -9,9 +9,10 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -46,6 +47,11 @@ namespace AwsMock::Dto::Module {
          * Port
          */
         int port = 4566;
+
+        /**
+         * PID
+         */
+        int pid = Core::SystemUtils::GetPid();
 
         /**
          * User ID

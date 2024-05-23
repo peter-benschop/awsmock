@@ -73,11 +73,5 @@ dist/samples/database-data
 src/controller/awsmockctl
 src/manager/awsmockmgr
 
-# Visual Studio
-**/Debug
-**/Release
-**/*.filters
-**/*.user
-**/*.vcxproj
-**/*.sln
-.vs
+# Examples
+**/out.json

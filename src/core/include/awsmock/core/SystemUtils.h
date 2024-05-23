@@ -101,6 +101,13 @@ namespace AwsMock::Core {
          * @return random port
          */
         static int GetRandomPort();
+
+        /**
+         * @brief Returns the PID of the current process
+         *
+         * @return PID of the current process
+         */
+        static int GetPid();
     };
 
 }// namespace AwsMock::Core

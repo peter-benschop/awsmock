@@ -22,7 +22,7 @@ namespace AwsMock::Controller {
     void Controller::ListServices() {
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl, headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -43,7 +43,7 @@ namespace AwsMock::Controller {
     void Controller::StartService(const std::string &name) {
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/start", headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -75,7 +75,7 @@ namespace AwsMock::Controller {
     void Controller::RestartService(const std::string &name) {
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/restart", headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -104,7 +104,7 @@ namespace AwsMock::Controller {
     void Controller::StopService(const std::string &name) {
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/stop", headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -182,7 +182,7 @@ namespace AwsMock::Controller {
     void Controller::SetLogLevel(const std::string &level) {
 
         std::map<std::string, std::string> headers;
-        AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/manager/loglevel/" + level, headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -201,7 +201,7 @@ namespace AwsMock::Controller {
     void Controller::GetDefaults() {
 
         std::map<std::string, std::string> headers;
-        //AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/config/", headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -216,6 +216,7 @@ namespace AwsMock::Controller {
             std::cout << "  " << std::setw(16) << std::left << "Endpoint: " << std::setw(32) << gatewayConfig.endpoint << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "Host: " << std::setw(32) << gatewayConfig.host << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "Port: " << std::setw(32) << gatewayConfig.port << std::endl;
+            std::cout << "  " << std::setw(16) << std::left << "PID: " << std::setw(32) << gatewayConfig.pid << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "User: " << std::setw(32) << gatewayConfig.user << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "AccessId: " << std::setw(32) << gatewayConfig.accessId << std::endl;
             std::cout << "  " << std::setw(16) << std::left << "ClientId: " << std::setw(32) << gatewayConfig.clientId << std::endl;
@@ -243,7 +244,7 @@ namespace AwsMock::Controller {
         url = Core::HttpUtils::AddQueryParameter(url, "includeObjects", includeObjects);
 
         std::map<std::string, std::string> headers;
-        //AddAuthorization(headers);
+        AddStandardHeaders(headers);
 
         // Send request
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + url, headers, exportServices.ToJson());
@@ -264,7 +265,7 @@ namespace AwsMock::Controller {
         }
 
         std::map<std::string, std::string> headers;
-        //AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/all/import", headers, jsonString.str());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -282,7 +283,7 @@ namespace AwsMock::Controller {
         }
 
         std::map<std::string, std::string> headers;
-        //AddAuthorization(headers);
+        AddStandardHeaders(headers);
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/clean-infrastructure", headers, cleanServices.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -292,7 +293,9 @@ namespace AwsMock::Controller {
         std::cout << response.output;
     }
 
-    void Controller::AddAuthorization(std::map<std::string, std::string> &headers) {
-        //headers["Authorization"] = Core::AwsUtils::GetAuthorizationHeader(_configuration, "module");
+    void Controller::AddStandardHeaders(std::map<std::string, std::string> &headers) {
+        headers["User"] = _user;
+        headers["Region"] = _region;
+        headers["Target"] = "module";
     }
 }// namespace AwsMock::Controller

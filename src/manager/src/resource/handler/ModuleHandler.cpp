@@ -30,6 +30,7 @@ namespace AwsMock::Manager {
                     .endpoint = endpoint,
                     .host = host,
                     .port = port,
+                    .pid = getppid(),
                     .user = _configuration.getString("awsmock.user", "none"),
                     .accessId = _configuration.getString("awsmock.account.userPoolId", "000000000000"),
                     .clientId = _configuration.getString("awsmock.client.userPoolId", "00000000"),

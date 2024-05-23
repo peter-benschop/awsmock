@@ -9,6 +9,7 @@ namespace AwsMock::Dto::Lambda {
     std::string CreateFunctionRequest::ToJson() const {
 
         try {
+
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
             rootJson.set("User", user);
@@ -19,6 +20,19 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("MemorySize", memorySize);
             rootJson.set("Code", code.ToJsonObject());
             rootJson.set("Timeout", timeout);
+
+            // Tags
+            Poco::JSON::Array tagsArray;
+            for (const auto &tag: tags) {
+                Poco::JSON::Object tagObject;
+                tagObject.set(tag.first, tag.second);
+                tagsArray.add(tagObject);
+            }
+            rootJson.set("Tags", tagsArray);
+
+            // Ephemeral storage
+            Poco::JSON::Object ephemeralStorageObject;
+            rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -40,6 +54,7 @@ namespace AwsMock::Dto::Lambda {
             Core::JsonUtils::GetJsonValueString("Role", rootObject, role);
             Core::JsonUtils::GetJsonValueString("Handler", rootObject, handler);
             Core::JsonUtils::GetJsonValueInt("Timeout", rootObject, timeout);
+            Core::JsonUtils::GetJsonValueLong("MemorySize", rootObject, memorySize);
 
             // Tags
             if (rootObject->has("Tags")) {
@@ -58,7 +73,7 @@ namespace AwsMock::Dto::Lambda {
 
             // Environment
             if (rootObject->has("Environment")) {
-                environmentVariables.FromJson(rootObject->getObject("Environment"));
+                environment.FromJson(rootObject->getObject("Environment"));
             }
 
             // Code

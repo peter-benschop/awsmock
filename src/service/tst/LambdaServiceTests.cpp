@@ -19,7 +19,7 @@
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
-#define RUNTIME "java17"
+#define RUNTIME "java11"
 #define FUNCTION_NAME "test-function"
 #define HANDLER "de.jensvogt.test-lambda.handler"
 #define QUALIFIER "latest"
@@ -46,7 +46,7 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaCreateTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest request = {.region = REGION, .functionName = FUNCTION_NAME, .runtime = RUNTIME, .handler = HANDLER};
+        Dto::Lambda::CreateFunctionRequest request = {{.region = REGION}, FUNCTION_NAME, RUNTIME, HANDLER};
 
         // act
         Dto::Lambda::CreateFunctionResponse response = _service.CreateFunction(request);
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaListTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest createRequest = {.region = REGION, .functionName = FUNCTION_NAME, .runtime = RUNTIME, .handler = HANDLER};
+        Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, HANDLER};
         Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
 
         // act
@@ -75,7 +75,7 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaCreateTagsTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest createRequest = {.region = REGION, .functionName = FUNCTION_NAME, .runtime = RUNTIME, .handler = HANDLER};
+        Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, HANDLER};
         Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
         std::string functionArn = createResponse.functionArn;
 
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaDeleteTagsTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest createRequest = {.region = REGION, .functionName = FUNCTION_NAME, .runtime = RUNTIME, .handler = HANDLER};
+        Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, HANDLER};
         Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
         std::string functionArn = createResponse.functionArn;
         std::map<std::string, std::string> tags;
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaDeleteTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest createRequest = {.region = REGION, .functionName = FUNCTION_NAME, .runtime = RUNTIME, .handler = HANDLER};
+        Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, HANDLER};
         Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
 
         // act

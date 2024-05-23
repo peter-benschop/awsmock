@@ -37,6 +37,12 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
                 log_trace << "Lambda tag list";
                 SendOkResponse(response, lambdaResponse.ToJson());
+
+            } else if (action == "account-settings") {
+
+                Dto::Lambda::AccountSettingsResponse lambdaResponse = _lambdaService.GetAccountSettings();
+                log_trace << "Lambda account settings";
+                SendOkResponse(response, lambdaResponse.ToJson());
             }
 
         } catch (Core::ServiceException &exc) {
@@ -64,7 +70,8 @@ namespace AwsMock::Service {
         log_trace << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
-            std::string tmp = request.getURI();
+            std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
+
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 

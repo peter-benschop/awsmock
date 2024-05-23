@@ -106,7 +106,7 @@ namespace AwsMock::Service {
             ofs.close();
         }
 
-        int len;
+        // Base64 decode file
         std::string decoded = Core::Crypto::Base64Decode(zipFile);
 
         // Create directory

@@ -89,13 +89,8 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Code code = GetCode(lambda);
 
-            // Create create function request
-            Dto::Lambda::CreateFunctionRequest request = {
-                    .region = lambda.region,
-                    .functionName = lambda.function,
-                    .runtime = lambda.runtime,
-                    .code = code,
-                    .tags = lambda.tags};
+            // Create create function request and send to service
+            Dto::Lambda::CreateFunctionRequest request = Dto::Lambda::Mapper::map(lambda);
             lambdaService.CreateFunction(request);
             log_debug << "Lambda started, name:" << lambda.function;
         }
