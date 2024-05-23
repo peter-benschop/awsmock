@@ -270,6 +270,11 @@ namespace AwsMock::Service {
          * Docker listening socket
          */
         std::string _dockerSocket;
+
+        /**
+         * Supported runtimes
+         */
+        static std::map<std::string, std::string> _supportedRuntimes;
     };
 
 }// namespace AwsMock::Service

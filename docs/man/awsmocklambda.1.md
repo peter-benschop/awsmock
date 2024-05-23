@@ -42,13 +42,47 @@ internal queue has an arbitrary length and stores the invocation events, which w
 lambda executor thread one after the other.
 
 The lambda functions are executed inside the RIE (Runtime Interface Emulator). Lambdas run as docker container using
-port
-8080 as REST API port for invocation requests. The internal port 8080 are connected to the host via a port forwarding,
-therefore the host port is randomly chosen between 32768 and 65536. You can see the docker host port via the
+port 8080 as REST API port for invocation requests. The internal port 8080 are connected to the host via a port
+forwarding, therefore the host port is randomly chosen between 32768 and 65536. You can see the docker host port via the
 ```docker ps``` command.
+
+To see the output of the lambdas function (if its logs to standard output ), use the docker command:
+
+```
+$> docker ps
+CONTAINER ID   IMAGE                                COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+ecbb2e08c5f4   python-events:latest                 "/lambda-entrypoint.…"   47 minutes ago   Up 47 minutes   0.0.0.0:62044->8080/tcp, :::62044->8080/tcp   python-events
+$> docker logs -f ecbb2e08c5f4
+```
+
+This will show the logs online.
 
 The Lambda module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
+
+## Supported runtimes
+
+The following lambda runtimes are supported:
+
+- java8: AWS Java 8 runtime
+- java11: AWS Java 11 runtime
+- java17: AWS Java 17 runtime
+- java21: AWS Java 21 runtime
+- python 3.8: AWS Python 3.8 runtime (if possible don't use, it will be deprecated soon)
+- python 3.9: AWS Python 3.9 runtime
+- python 3.10: AWS Python 3.10 runtime
+- python 3.11: AWS Python 3.11 runtime
+- python 3.12: AWS Python 3.12 runtime
+- provided: Amazon Linux (for C++ lambdas)
+- provided.al2023: Amazon Linux 2023 (for C++ lambdas)
+- go1.x: AWS Go runtime
+- nodejs.16: AWS Node.js 16 runtime (if possible don't use, it will be deprecated soon)
+- nodejs.18: AWS Node.js 18 runtime
+- nodejs.20: AWS Node.js 20 runtime
+
+For a list of supported runtimes
+see [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html).
+Windows runtimes (.Net6, .Net8, .Net 8) are not supported yet.
 
 ## COMMANDS
 
@@ -162,11 +196,32 @@ awslocal lambda get-lambda --function-name test-function
 }
 ```
 
+To invoke a lambda:
+
+```
+aws lambda invoke \
+  --function-name python-events \
+  --payload fileb://./resources/event.json \
+  --log-type Tail \
+  --region eu-central-1 \
+  --endpoint http://localhost:4566 \
+  --profile awsmock \
+  out.json
+```
+
+See the sample directory for more details on how to invoke a lambda function.
+
 To delete a lambda function:
 
 ```
 awslocal lambda delete-function --function-name test-function
 ```
+
+This will stop the docker container and remove the image from the docker environment.
+
+## SAMPLES
+
+More example can be found in the AwsMock sample directory (```/usr/local/share/awsmock```).
 
 ## AUTHOR
 

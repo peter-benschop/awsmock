@@ -8,6 +8,8 @@ namespace AwsMock::Service {
 
         try {
 
+            std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
+
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 
@@ -81,11 +83,18 @@ namespace AwsMock::Service {
 
                 if (Core::HttpUtils::GetPathParameter(request.getURI(), 3) == "invocations") {
 
+                    std::string logType = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Log-Type");
+
                     std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
                     log_debug << "Lambda function invocation, name: " << functionName;
 
-                    _lambdaService.InvokeLambdaFunction(functionName, body, region, user);
+                    std::string output = _lambdaService.InvokeLambdaFunction(functionName, body, region, user, logType);
                     log_info << "Lambda function invoked, name: " << functionName;
+
+                    // Set output, if existing
+                    if (!output.empty()) {
+                        response.set("X-Amz-Log-Result", output);
+                    }
                     SendOkResponse(response);
 
                 } else {

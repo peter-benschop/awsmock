@@ -6,6 +6,22 @@
 
 namespace AwsMock::Service {
 
+    std::map<std::string, std::string> DockerService::_supportedRuntimes = {
+            {"java11", "public.ecr.aws/lambda/java:11"},
+            {"java17", "public.ecr.aws/lambda/java:17"},
+            {"java21", "public.ecr.aws/lambda/java:21"},
+            {"python3.8", "public.ecr.aws/lambda/python:3.8"},
+            {"python3.9", "public.ecr.aws/lambda/python:3.9"},
+            {"python3.10", "public.ecr.aws/lambda/python:3.10"},
+            {"python3.11", "public.ecr.aws/lambda/python:3.11"},
+            {"python3.12", "public.ecr.aws/lambda/python:3.12"},
+            {"nodejs20.x", "public.ecr.aws/lambda/nodejs:20"},
+            {"provided.al2", "public.ecr.aws/lambda/provided:al2"},
+            {"provided.al2023", "public.ecr.aws/lambda/provided:al2023"},
+            {"provided.latest", "public.ecr.aws/lambda/provided:latest"},
+            {"go", "public.ecr.aws/lambda/provided:al2023"},
+    };
+
     DockerService::DockerService() : _networkMode(NETWORK_DEFAULT_MODE) {
 
         // Get network mode
@@ -204,7 +220,7 @@ namespace AwsMock::Service {
         log_trace << "Response: " << curlResponse.ToString();
 
         if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_CREATED) {
-            log_warning << "Create container failed, state: " << curlResponse.statusCode;
+            log_warning << "Create container failed, state: " << curlResponse.statusCode << " error: " << curlResponse.output;
             return {};
         }
 
@@ -313,31 +329,19 @@ namespace AwsMock::Service {
 
         std::string dockerFilename = codeDir + Poco::Path::separator() + "Dockerfile";
 
-        // TODO: Fix environment
         std::ofstream ofs(dockerFilename);
-        if (Core::StringUtils::EqualsIgnoreCase(runtime, "java11")) {
-            ofs << "FROM public.ecr.aws/lambda/java:11" << std::endl;
+        if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
+
+            ofs << "FROM " << _supportedRuntimes[runtime] << std::endl;
             for (auto &env: environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
             }
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java17")) {
-            ofs << "FROM public.ecr.aws/lambda/java:17" << std::endl;
-            for (auto &env: environment) {
-                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
-            }
-            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "java21")) {
-            ofs << "FROM public.ecr.aws/lambda/java:21" << std::endl;
-            for (auto &env: environment) {
-                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
-            }
-            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "provided.al2")) {
-            ofs << "FROM public.ecr.aws/lambda/provided:al2" << std::endl;
+
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
+
+            ofs << "FROM " << _supportedRuntimes[runtime] << std::endl;
             for (auto &env: environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
             }
@@ -349,21 +353,10 @@ namespace AwsMock::Service {
             ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
-        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "provided.latest")) {
-            ofs << "FROM public.ecr.aws/lambda/provided:latest" << std::endl;
-            for (auto &env: environment) {
-                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
-            }
-            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
-            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
-            ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
-            ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
-            ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
-            ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
-        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "python3.8")) {
-            ofs << "FROM public.ecr.aws/lambda/python:3.8" << std::endl;
+
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
+
+            ofs << "FROM " << _supportedRuntimes[runtime] << std::endl;
             for (auto &env: environment) {
                 ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
             }
@@ -373,6 +366,32 @@ namespace AwsMock::Service {
             ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "RUN pip install -r requirements.txt" << std::endl;
             ofs << "COPY lambda_function.py ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "CMD [\"" + handler + "\"]" << std::endl;
+
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
+
+            ofs << "FROM " << _supportedRuntimes[runtime] << std::endl;
+            for (auto &env: environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
+            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
+            ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "COPY config /root/.aws" << std::endl;
+            ofs << "COPY credentials /root/.aws" << std::endl;
+            ofs << "CMD [\"" + handler + "\"]" << std::endl;
+
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
+
+            ofs << "FROM " << _supportedRuntimes[runtime] << std::endl;
+            for (auto &env: environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
+            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
+            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
+            ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "COPY config /root/.aws" << std::endl;
+            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         }
         ofs.close();

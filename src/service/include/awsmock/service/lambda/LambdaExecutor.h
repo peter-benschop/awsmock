@@ -62,11 +62,6 @@ namespace AwsMock::Service {
          * Lambda payload
          */
         std::string _payload;
-
-        /**
-         * Mutex
-         */
-        static Poco::Mutex _mutex;
     };
 
 }// namespace AwsMock::Service

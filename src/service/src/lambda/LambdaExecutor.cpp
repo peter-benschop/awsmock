@@ -8,10 +8,7 @@
 
 namespace AwsMock::Service {
 
-    Poco::Mutex LambdaExecutor::_mutex;
-
     void LambdaExecutor::Run() {
-        Poco::ScopedLock lock(_mutex);
 
         Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
