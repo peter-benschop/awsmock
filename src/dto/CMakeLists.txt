@@ -41,7 +41,7 @@ set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/Image
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/DeadLetterConfig.cpp
         src/lambda/model/Function.cpp src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp
         src/lambda/CreateFunctionResponse.cpp src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp
-        src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp)
+        src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp src/lambda/mapper/Mapper.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp
         src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp

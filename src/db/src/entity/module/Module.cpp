@@ -45,7 +45,7 @@ namespace AwsMock::Database::Entity::Module {
     }
 
     std::ostream &operator<<(std::ostream &os, const Module &m) {
-        os << "Module=" << bsoncxx::to_json(m.ToDocument());
+        os << "Module=" << m.ToJson();
         return os;
     }
 

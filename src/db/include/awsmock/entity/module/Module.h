@@ -63,11 +63,6 @@ namespace AwsMock::Database::Entity::Module {
         ModuleStatus status;
 
         /**
-         * Executable
-         */
-        std::string executable = {};
-
-        /**
          * HTTP port
          */
         int port = -1;

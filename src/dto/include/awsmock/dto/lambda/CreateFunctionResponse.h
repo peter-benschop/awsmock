@@ -17,13 +17,14 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * Create function response
+     * @brief Create function response
      *
      * Example:
      * @code{.json}
@@ -69,7 +70,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct CreateFunctionResponse {
+    struct CreateFunctionResponse : public Dto::Common::BaseRequest {
 
         /**
          * Name of the function

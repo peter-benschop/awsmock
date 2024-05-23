@@ -19,7 +19,7 @@
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
-#define RUNTIME "java17"
+#define RUNTIME "java11"
 #define FUNCTION_NAME "test-function"
 #define HANDLER "de.jensvogt.test-lambda.handler"
 #define QUALIFIER "latest"

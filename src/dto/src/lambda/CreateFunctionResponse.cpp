@@ -25,9 +25,7 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
             rootJson.set("MemorySize", memorySize);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message(), 500);

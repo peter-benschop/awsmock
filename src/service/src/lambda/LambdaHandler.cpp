@@ -64,7 +64,8 @@ namespace AwsMock::Service {
         log_trace << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
 
         try {
-            std::string tmp = request.getURI();
+            std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
+
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
 

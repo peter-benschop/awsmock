@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/service/lambda/LambdaService.h"
-#include "awsmock/service/lambda/LambdaExecutor.h"
+#include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
 
@@ -37,7 +36,7 @@ namespace AwsMock::Service {
 
             std::string codeFileName = _lambdaDir + Poco::Path::separator() + request.functionName + "-" + "latest" + ".zip";
             Database::Entity::Lambda::Environment environment = {
-                    .variables = request.environmentVariables.variables};
+                    .variables = request.environment.variables};
             lambdaEntity = {
                     .region = request.region,
                     .user = request.user,
@@ -66,19 +65,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
         // Create response
-        Dto::Lambda::CreateFunctionResponse response{
-                .functionArn = lambdaEntity.arn,
-                .functionName = request.functionName,
-                .runtime = request.runtime,
-                .role = request.role,
-                .handler = request.handler,
-                .environment = request.environmentVariables,
-                .memorySize = request.memorySize,
-                .codeSize = lambdaEntity.codeSize,
-                .codeSha256 = lambdaEntity.codeSha256,
-                .ephemeralStorage = request.ephemeralStorage,
-        };
-
+        Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
         log_info << "Function created, name: " << request.functionName;
 
         return response;
@@ -150,8 +137,6 @@ namespace AwsMock::Service {
         // Send invocation request
         std::string url = GetRequestUrl("localhost", lambda.hostPort);
         Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor(url, payload));
-
-        //CallAsyncInvoke(url.c_str(), payload.c_str());
         log_debug << "Lambda executor notification send, name: " + lambda.function;
 
         // Update database

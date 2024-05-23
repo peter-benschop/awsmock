@@ -33,14 +33,13 @@ namespace AwsMock::Dto::Lambda {
             Poco::JSON::Object ephemeralStorageJson;
             try {
 
-                Poco::JSON::Object errorJson;
-                errorJson.set("Size", size);
+                ephemeralStorageJson.set("Size", size);
+                return ephemeralStorageJson;
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
             }
-            return ephemeralStorageJson;
         }
 
         /**

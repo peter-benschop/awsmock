@@ -19,7 +19,6 @@
 #include <Poco/StreamCopier.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -29,6 +28,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/TaskPool.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
@@ -37,6 +37,7 @@
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>

@@ -13,26 +13,22 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/lambda/model/Code.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct CreateFunctionRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * User
-         */
-        std::string user;
+    /**
+     * @brief Create function response
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct CreateFunctionRequest : public Dto::Common::BaseRequest {
 
         /**
          * Name of the function
@@ -57,7 +53,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Environment
          */
-        EnvironmentVariables environmentVariables;
+        EnvironmentVariables environment;
 
         /**
          * Memory size in MB. Default: 128, Range: 128 - 10240 MB
