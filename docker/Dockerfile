@@ -14,7 +14,8 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
 # Cleanup
 RUN rm -rf /usr/src
 
-FROM alpine:latest
+# Stick to alpine 3.19 as 3.20 has not support for aws-cli (missing python3.12 compat)
+FROM alpine:3.19
 
 RUN apk update && apk add aws-cli
 
