@@ -24,10 +24,10 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>

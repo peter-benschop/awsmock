@@ -29,7 +29,7 @@
 namespace AwsMock::Database {
 
     /**
-     * DynamoDB in-memory database.
+     * @brief DynamoDB in-memory database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -38,12 +38,12 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         DynamoDbMemoryDb() = default;
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          *
          * @return singleton instance
          */
@@ -53,7 +53,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Check existence of DynamoDb table
+         * @brief Check existence of DynamoDb table
          *
          * @param region AWS region name
          * @param tableName table name
@@ -63,7 +63,7 @@ namespace AwsMock::Database {
         bool TableExists(const std::string &region, const std::string &tableName);
 
         /**
-         * Create a new DynamoDb table
+         * @brief Create a new DynamoDb table
          *
          * @param table DynamoDb table
          * @return created DynamoDb table.
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
 
         /**
-         * Updates a new DynamoDb table
+         * @brief Updates a new DynamoDb table
          *
          * @param table DynamoDb table
          * @return updated DynamoDb table.
@@ -79,7 +79,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
 
         /**
-         * Returns a table entity by primary key
+         * @brief Returns a table entity by primary key
          *
          * @param oid table primary key
          * @return table entity
@@ -88,7 +88,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table GetTableById(const std::string &oid);
 
         /**
-         * Returns a table entity by region and name
+         * @brief Returns a table entity by region and name
          *
          * @param region table region
          * @param name table name
@@ -98,7 +98,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
 
         /**
-         * Returns a list of DynamoDB tables
+         * @brief Returns a list of DynamoDB tables
          *
          * @param region AWS region name
          * @return list of DynamoDB tables
@@ -106,7 +106,7 @@ namespace AwsMock::Database {
         std::vector<Entity::DynamoDb::Table> ListTables(const std::string &region = {});
 
         /**
-         * Returns the number of DynamoDB tables
+         * @brief Returns the number of DynamoDB tables
          *
          * @param region AWS region name
          * @return number of DynamoDB tables
@@ -114,7 +114,7 @@ namespace AwsMock::Database {
         long CountTables(const std::string &region = {});
 
         /**
-         * Deletes an existing DynamoDB table
+         * @brief Deletes an existing DynamoDB table
          *
          * @param tableName name of the table
          * @throws DatabaseException
@@ -122,14 +122,14 @@ namespace AwsMock::Database {
         void DeleteTable(const std::string &tableName);
 
         /**
-         * Deletes all existing DynamoDB tables
+         * @brief Deletes all existing DynamoDB tables
          *
          * @throws DatabaseException
          */
         void DeleteAllTables();
 
         /**
-         * Checks the existence of an item.
+         * @brief Checks the existence of an item.
          *
          * @param region AWS region.
          * @param tableName name of the table
@@ -139,7 +139,7 @@ namespace AwsMock::Database {
         //        bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
 
         /**
-         * Checks the existence of an item.
+         * @brief Checks the existence of an item.
          *
          * @param item DynamoDB item
          * @return true if database exists, otherwise false
@@ -148,7 +148,7 @@ namespace AwsMock::Database {
         bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
-         * Returns a list of DynamoDB items
+         * @brief Returns a list of DynamoDB items
          *
          * @param region AWS region.
          * @param tableName table name
@@ -157,7 +157,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
 
         /**
-         * Returns a item entity by primary key
+         * @brief Returns a item entity by primary key
          *
          * @param oid item primary key
          * @return item entity
@@ -184,7 +184,15 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item);
 
         /**
-         * Deletes an item
+         * @brief Returns the number of DynamoDB items.
+         *
+         * @param region AWS region name
+         * @return number of DynamoDB items
+         */
+        long CountItems(const std::string &region = {});
+
+        /**
+         * @brief Deletes an item
          *
          * @param region AWS region.
          * @param tableName name of the table
@@ -202,7 +210,7 @@ namespace AwsMock::Database {
         void DeleteItems(const std::string &region, const std::string &tableName);
 
         /**
-         * Deletes all items
+         * @brief Deletes all items
          */
         void DeleteAllItems();
 

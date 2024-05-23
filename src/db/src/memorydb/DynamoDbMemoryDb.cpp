@@ -185,6 +185,7 @@ namespace AwsMock::Database {
     long DynamoDbMemoryDb::CountTables(const std::string &region) {
 
         if (!region.empty()) {
+
             long count = 0;
             for (const auto &table: _tables) {
                 if (table.second.region == region) {
@@ -192,8 +193,10 @@ namespace AwsMock::Database {
                 }
             }
             return count;
+
         } else {
-            return (long) _tables.size();
+
+            return static_cast<long>(_tables.size());
         }
     }
 
@@ -234,6 +237,23 @@ namespace AwsMock::Database {
                           });
         _items[it->first] = item;
         return _items[it->first];
+    }
+
+    long DynamoDbMemoryDb::CountItems(const std::string &region) {
+
+        if (!region.empty()) {
+            long count = 0;
+            for (const auto &table: _items) {
+                if (table.second.region == region) {
+                    count++;
+                }
+            }
+            return count;
+
+        } else {
+
+            return static_cast<long>(_items.size());
+        }
     }
 
     void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {

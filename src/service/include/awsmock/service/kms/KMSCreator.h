@@ -10,15 +10,15 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/kms/model/KeySpec.h"
-#include "awsmock/dto/kms/model/KeyState.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/dto/kms/model/KeySpec.h>
+#include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/KMSDatabase.h>
 

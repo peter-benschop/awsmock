@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 // Poco includes
-#include "Poco/Path.h"
+#include <Poco/Path.h>
 
 // Local includes
 #include <awsmock/core/DirUtils.h>

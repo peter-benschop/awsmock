@@ -19,7 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/service/gateway/GatewayHandler.h>
 #include <awsmock/service/gateway/GatewayRoute.h>
 #include <awsmock/service/lambda/LambdaCreator.h>

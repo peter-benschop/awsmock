@@ -6,9 +6,9 @@
 #define AWSMOCK_CONTROLLER_RESOURCE_NOT_FOUND_H
 
 // Poco includes
-#include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include <Poco/Net/HTTPRequestHandler.h>
 
 // AwsMock includes
 #include "awsmock/dto/common/ResourceNotFoundResponse.h"

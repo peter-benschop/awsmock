@@ -49,10 +49,10 @@ forwarding, therefore the host port is randomly chosen between 32768 and 65536. 
 To see the output of the lambdas function (if its logs to standard output ), use the docker command:
 
 ```
-$> docker ps
+shell> docker ps
 CONTAINER ID   IMAGE                                COMMAND                  CREATED          STATUS          PORTS                                         NAMES
 ecbb2e08c5f4   python-events:latest                 "/lambda-entrypoint.…"   47 minutes ago   Up 47 minutes   0.0.0.0:62044->8080/tcp, :::62044->8080/tcp   python-events
-$> docker logs -f ecbb2e08c5f4
+shell> docker logs -f ecbb2e08c5f4
 ```
 
 This will show the logs online.

@@ -539,6 +539,34 @@ namespace AwsMock::Database {
         }
     }
 
+    long DynamoDbDatabase::CountItems(const std::string &region) {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+                if (region.empty()) {
+
+                    return _itemCollection.count_documents({});
+
+                } else {
+
+                    return _itemCollection.count_documents(make_document(kvp("region", region)));
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.CountItems(region);
+        }
+    }
+
     void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
 
         if (_useDatabase) {

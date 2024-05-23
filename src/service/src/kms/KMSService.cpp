@@ -19,6 +19,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "list_keys");
         log_trace << "List keys request: " << request.ToString();
 
         try {
@@ -40,6 +41,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "create_key");
         log_trace << "Create key request: " << request.ToString();
 
         try {
@@ -81,6 +83,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::ScheduledKeyDeletionResponse KMSService::ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "schedule_key_deletion");
         log_trace << "Schedule key deletion request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -115,6 +118,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::DescribeKeyResponse KMSService::DescribeKey(const Dto::KMS::DescribeKeyRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "describe_key");
         log_trace << "Create key request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -147,6 +151,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::EncryptResponse KMSService::Encrypt(const Dto::KMS::EncryptRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "encrypt");
         log_trace << "Encrypt plaintext request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -171,6 +176,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "decrypt");
         log_trace << "Decrypt plaintext request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -320,19 +326,12 @@ namespace AwsMock::Service {
             }
 
             case Dto::KMS::KeySpec::ECC_NIST_P256:
-                break;
             case Dto::KMS::KeySpec::ECC_NIST_P384:
-                break;
             case Dto::KMS::KeySpec::ECC_NIST_P521:
-                break;
             case Dto::KMS::KeySpec::ECC_SECG_P256K1:
-                break;
             case Dto::KMS::KeySpec::HMAC_224:
-                break;
             case Dto::KMS::KeySpec::HMAC_256:
-                break;
             case Dto::KMS::KeySpec::HMAC_384:
-                break;
             case Dto::KMS::KeySpec::HMAC_512:
                 break;
         }

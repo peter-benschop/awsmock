@@ -1,5 +1,4 @@
 
-#include "awsmock/core/MetricDefinition.h"
 #include <awsmock/ftpserver/FtpSession.h>
 
 #include <utility>

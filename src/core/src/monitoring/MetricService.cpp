@@ -2,7 +2,7 @@
 // Created by vogje01 on 07/01/2023.
 //
 
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 
 namespace AwsMock::Core {
 

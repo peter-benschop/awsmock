@@ -6,12 +6,12 @@
 #define AWSMOCK_RESOURCE_IFACTORY_H
 
 // Poco includes
-#include "Poco/Net/HTTPRequestHandler.h"
+#include <Poco/Net/HTTPRequestHandler.h>
 
 // AwsMock includes
 #include "awsmock/service/common/AbstractServer.h"
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 
 namespace AwsMock::Manager {
 
