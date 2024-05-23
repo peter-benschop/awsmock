@@ -362,6 +362,18 @@ namespace AwsMock::Service {
             ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
+        } else if (Core::StringUtils::EqualsIgnoreCase(runtime, "python3.8")) {
+            ofs << "FROM public.ecr.aws/lambda/python:3.8" << std::endl;
+            for (auto &env: environment) {
+                ofs << "ENV " << env.first << "=\"" << env.second << "\"" << std::endl;
+            }
+            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "COPY config /root/.aws" << std::endl;
+            ofs << "COPY credentials /root/.aws" << std::endl;
+            ofs << "RUN pip install -r requirements.txt" << std::endl;
+            ofs << "COPY lambda_function.py ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "CMD [\"" + handler + "\"]" << std::endl;
         }
         ofs.close();
         log_debug << "Dockerfile written, filename: " << dockerFilename;
