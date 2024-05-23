@@ -30,7 +30,7 @@ The following lambda runtimes are supported:
 - python 3.12: AWS Python 3.12 runtime
 - provided: Amazon Linux (for C++ lambdas)
 - provided.al2023: Amazon Linux 2023 (for C++ lambdas)
-- go1.x: AWS Amazon Linux 2023 (see [go1.x runtime](./go1.x/README:md) for details)
+- go1.x: AWS Amazon Linux 2023 (see [go1.x runtime](./go1.x/README.md) for details)
 - nodejs.16: AWS Node.js 16 runtime (if possible don't use, it will be deprecated soon)
 - nodejs.18: AWS Node.js 18 runtime
 - nodejs.20: AWS Node.js 20 runtime
