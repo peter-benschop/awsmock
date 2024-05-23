@@ -24,10 +24,10 @@ The following lambda runtimes are supported:
 - java17: AWS Java 17 runtime
 - java21: AWS Java 21 runtime
 - python 3.8: AWS Python 3.8 runtime (if possible don't use, it will be deprecated soon)
-- python 3.9: AWS Python 3.9 runtime
-- python 3.10: AWS Python 3.10 runtime
-- python 3.11: AWS Python 3.11 runtime
-- python 3.12: AWS Python 3.12 runtime
+- python 3.9: AWS Python 3.9 runtime (see [python runtimes](./python/README.md) for details)
+- python 3.10: AWS Python 3.10 runtime (see [python runtimes](./python/README.md) for details)
+- python 3.11: AWS Python 3.11 runtime (see [python runtimes](./python/README.md) for details)
+- python 3.12: AWS Python 3.12 runtime (see [python runtimes](./python/README.md) for details)
 - provided: Amazon Linux (for C++ lambdas)
 - provided.al2023: Amazon Linux 2023 (for C++ lambdas)
 - go1.x: AWS Amazon Linux 2023 (see [go1.x runtime](./go1.x/README.md) for details)
