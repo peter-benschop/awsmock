@@ -28,7 +28,7 @@ namespace AwsMock::Service {
      * @brief S3 request handler
      *
      * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
+     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structure, the request
      * are first send to the S3CmdHandler, which normalizes the commands.
      *
      * @author jens.vogt\@opitz-consulting.com

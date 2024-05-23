@@ -47,6 +47,9 @@
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 
+// Maximal output length for a synchronous invocation call
+#define MAX_OUTPUT_LENGTH 4 * 1024
+
 namespace AwsMock::Service {
 
     /**
@@ -79,14 +82,14 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration module configuration
          */
         explicit LambdaService(const Core::Configuration &configuration);
 
         /**
-         * Create lambda function
+         * @brief Create lambda function
          *
          * @param request create lambda request
          * @return CreateFunctionResponse
@@ -94,7 +97,7 @@ namespace AwsMock::Service {
         Dto::Lambda::CreateFunctionResponse CreateFunction(Dto::Lambda::CreateFunctionRequest &request);
 
         /**
-         * List lambda functions
+         * @brief List lambda functions
          *
          * @param region AWS region name
          * @return CreateFunctionResponse
@@ -102,7 +105,7 @@ namespace AwsMock::Service {
         Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
 
         /**
-         * Invoke lambda function
+         * @brief Invoke lambda function
          *
          * @param eventNotification S3 event eventNotification
          * @param region AWS region
@@ -111,24 +114,28 @@ namespace AwsMock::Service {
         void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user);
 
         /**
-         * Invoke SQS function.
+         * @brief Invoke SQS function.
+         *
+         * If the logType is set and is equal to 'Tail', the function will be invoked synchronously and the output will be appended to the response.
          *
          * @param functionName lambda function name
          * @param payload SQS message
          * @param region AWS region
          * @param user user
+         * @param logType logging type
+         * @return output string (limited to 4kb) in case logType = 'Tail' and an synchronous invocation.
          */
-        void InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user);
+        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType = {});
 
         /**
-         * Create a new tag for a lambda functions.
+         * @brief Create a new tag for a lambda functions.
          *
          * @param request lambda create tag request
          */
         void CreateTag(const Dto::Lambda::CreateTagRequest &request);
 
         /**
-         * Returns a list of tags for a ARN.
+         * @brief Returns a list of tags for a ARN.
          *
          * @param arn lambda function ARN
          * @return ListTagsResponse
@@ -137,7 +144,7 @@ namespace AwsMock::Service {
         Dto::Lambda::ListTagsResponse ListTags(const std::string &arn);
 
         /**
-         * Gets a single lambda function
+         * @brief Gets a single lambda function
          *
          * @param region AWS region
          * @param name function name
@@ -157,9 +164,9 @@ namespace AwsMock::Service {
         Dto::Lambda::AccountSettingsResponse GetAccountSettings();
 
         /**
-         * Delete lambda function
+         * @brief Delete lambda function
          *
-         * <p>This method will also delete the corresponding container and images.
+         * This method will also delete the corresponding container and images.
          *
          * @param request delete lambda request
          * @throws ServiceException
@@ -167,7 +174,7 @@ namespace AwsMock::Service {
         void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
 
         /**
-         * Delete lambda function tags
+         * @brief Delete lambda function tags
          *
          * @param request delete tags request
          * @throws ServiceException
@@ -177,13 +184,25 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Returns the URI for the invocation request.
+         * @brief Returns the URI for the invocation request.
          *
          * @param hostName host name of the docker instance
          * @param port lambda docker external port
          * @return URI of the invocation request
          */
         static std::string GetRequestUrl(const std::string &hostName, int port);
+
+        /**
+         * @brief Invoke the lambda function synchronously.
+         *
+         * The output will be returned to the calling method.
+         *
+         * @param functionName name of the function
+         * @param payload payload for the function
+         * @param url lambda docker image URL
+         * @return output from lambda invocation call
+         */
+        static std::string InvokeLambdaSynchronously(const std::string &url, const std::string &payload);
 
         /**
          * Data directory

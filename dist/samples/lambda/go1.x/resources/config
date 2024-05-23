@@ -1,0 +1,10 @@
+[default]
+region = eu-central-1
+output = json
+endpoint_url = http://host.docker.internal:4566
+
+[profile awsmock]
+region = eu-central-1
+output = json
+endpoint_url = http://host.docker.internal:4566
+

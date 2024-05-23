@@ -6,6 +6,8 @@
 
 namespace AwsMock::Service {
 
+    Poco::Mutex LambdaService::_mutex;
+
     LambdaService::LambdaService(const Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
 
         // Initialize environment
@@ -125,25 +127,37 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user) {
-        log_debug << "Invocation lambda function, functionName: " + functionName;
+    std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType) {
+        Poco::ScopedLock lock(_mutex);
+        log_debug << "Invocation lambda function, functionName: " << functionName;
 
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, _accountId, functionName);
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
-        log_debug << "Got lambda entity, name: " + lambda.function;
+        log_debug << "Got lambda entity, name: " << lambda.function;
 
         // Send invocation request
+        std::string output;
         std::string url = GetRequestUrl("localhost", lambda.hostPort);
-        Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor(url, payload));
-        log_debug << "Lambda executor notification send, name: " + lambda.function;
+        if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
+
+            // Synchronous execution
+            output = InvokeLambdaSynchronously(url, payload);
+
+        } else {
+
+            // Asynchronous execution
+            Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor(url, payload));
+        }
+        log_debug << "Lambda executor notification send, name: " << lambda.function;
 
         // Update database
         lambda.lastInvocation = Poco::DateTime();
         lambda.state = Database::Entity::Lambda::Active;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
-        log_debug << "Lambda entity invoked, name: " + lambda.function;
+        log_debug << "Lambda entity invoked, name: " << lambda.function;
+        return output;
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
@@ -249,6 +263,22 @@ namespace AwsMock::Service {
         }
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
+    }
+
+    std::string LambdaService::InvokeLambdaSynchronously(const std::string &url, const std::string &payload) {
+
+        Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
+        Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
+        log_debug << "Sending lambda invocation request, endpoint: " << url;
+
+        Core::CurlUtils _curlUtils;
+        Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, payload);
+        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
+            log_debug << "HTTP error, status: " << response.statusCode << " reason: " << response.output;
+        }
+        log_debug << "Lambda invocation finished send, status: " << response.statusCode;
+        log_info << "Lambda output: " << response.output;
+        return response.output.substr(0, MAX_OUTPUT_LENGTH);
     }
 
     std::string LambdaService::GetRequestUrl(const std::string &hostName, int port) {
