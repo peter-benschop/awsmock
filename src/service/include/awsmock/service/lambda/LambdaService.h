@@ -29,6 +29,7 @@
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/TaskPool.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
@@ -145,6 +146,15 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::Lambda::GetFunctionResponse
          */
         Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Returns the account settings
+         *
+         * @return AccountSettingsResponse
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::AccountSettingsResponse
+         */
+        Dto::Lambda::AccountSettingsResponse GetAccountSettings();
 
         /**
          * Delete lambda function

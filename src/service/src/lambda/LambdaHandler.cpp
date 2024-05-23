@@ -37,6 +37,12 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
                 log_trace << "Lambda tag list";
                 SendOkResponse(response, lambdaResponse.ToJson());
+
+            } else if (action == "account-settings") {
+
+                Dto::Lambda::AccountSettingsResponse lambdaResponse = _lambdaService.GetAccountSettings();
+                log_trace << "Lambda account settings";
+                SendOkResponse(response, lambdaResponse.ToJson());
             }
 
         } catch (Core::ServiceException &exc) {

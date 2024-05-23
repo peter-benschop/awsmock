@@ -182,6 +182,28 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::Lambda::AccountSettingsResponse LambdaService::GetAccountSettings() {
+
+        Dto::Lambda::AccountSettingsResponse response;
+
+        // 50 MB
+        response.accountLimit.codeSizeUnzipped = 50 * 1024 * 1024L;
+        response.accountLimit.codeSizeZipped = 50 * 1024 * 1024L;
+
+        // 1000 concurrent executions (which is irrelevant in AwsMock environment)
+        response.accountLimit.concurrentExecutions = 1000;
+
+        // 75 GB
+        response.accountLimit.totalCodeSize = 75 * 1024 * 1024 * 1024L;
+        log_debug << "List account limits: " << response.ToJson();
+
+        // 75 GB
+        response.accountUsage.totalCodeSize = 10 * 1024 * 1024L;
+        response.accountUsage.functionCount = _lambdaDatabase.LambdaCount();
+
+        return response;
+    }
+
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
         log_debug << "Delete function: " + request.ToString();
 

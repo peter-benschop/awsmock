@@ -32,14 +32,14 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration configuration properties
          */
         explicit LambdaDatabase();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static LambdaDatabase &instance() {
             static Poco::SingletonHolder<LambdaDatabase> sh;
@@ -47,7 +47,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param region AWS region name
          * @param function AWS function
@@ -67,7 +67,7 @@ namespace AwsMock::Database {
         bool LambdaExists(const Entity::Lambda::Lambda &lambda);
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param function AWS function
          * @return true if lambda already exists
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
         bool LambdaExists(const std::string &function);
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param arn AWS ARN
          * @return true if lambda exists
@@ -85,7 +85,7 @@ namespace AwsMock::Database {
         bool LambdaExistsByArn(const std::string &arn);
 
         /**
-         * Create a new lambda function
+         * @brief Create a new lambda function
          *
          * @param lambda lambda entity
          * @return created lambda entity.
@@ -93,15 +93,15 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
 
         /**
-         * Count all lambdas
+         * @brief Count all lambdas
          *
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        long LambdaCount(const std::string &region = {});
+        int LambdaCount(const std::string &region = {});
 
         /**
-         * Updates an existing lambda lambda function
+         * @brief Updates an existing lambda lambda function
          *
          * @param lambda lambda entity
          * @return updated lambda entity.
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
 
         /**
-         * Created or updates an existing lambda function
+         * @brief Created or updates an existing lambda function
          *
          * @param lambda lambda entity
          * @return created or updated lambda entity.
@@ -117,7 +117,7 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda);
 
         /**
-         * Returns a lambda entity by primary key
+         * @brief Returns a lambda entity by primary key
          *
          * @param oid lambda primary key
          * @return lambda entity
@@ -126,7 +126,7 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid);
 
         /**
-         * Returns a lambda entity by primary key
+         * @brief Returns a lambda entity by primary key
          *
          * @param oid lambda primary key
          * @return lambda entity
@@ -135,7 +135,7 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda GetLambdaById(const std::string &oid);
 
         /**
-         * Returns a lambda entity by ARN
+         * @brief Returns a lambda entity by ARN
          *
          * @param arn lambda ARN
          * @return lambda entity
@@ -144,7 +144,7 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
 
         /**
-         * Returns a lambda entity by name
+         * @brief Returns a lambda entity by name
          *
          * @param region AWS region
          * @param name function name
@@ -154,7 +154,7 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name);
 
         /**
-         * Returns a list of lambda functions.
+         * @brief Returns a list of lambda functions.
          *
          * @param region AWS region name
          * @return list of lambda functions
@@ -162,7 +162,7 @@ namespace AwsMock::Database {
         std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
 
         /**
-         * Deletes an existing lambda function
+         * @brief Deletes an existing lambda function
          *
          * @param functionName lambda function name
          * @throws DatabaseException
@@ -170,7 +170,7 @@ namespace AwsMock::Database {
         void DeleteLambda(const std::string &functionName);
 
         /**
-         * Deletes all existing lambda functions
+         * @brief Deletes all existing lambda functions
          *
          * @throws DatabaseException
          */

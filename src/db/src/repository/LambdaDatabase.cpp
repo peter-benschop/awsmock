@@ -88,7 +88,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long LambdaDatabase::LambdaCount(const std::string &region) {
+    int LambdaDatabase::LambdaCount(const std::string &region) {
 
         if (_useDatabase) {
 
