@@ -22,13 +22,12 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/TaskPool.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
@@ -48,7 +47,7 @@
 #include <awsmock/service/lambda/LambdaExecutor.h>
 
 // Maximal output length for a synchronous invocation call
-#define MAX_OUTPUT_LENGTH 4 * 1024
+#define MAX_OUTPUT_LENGTH (4 * 1024)
 
 namespace AwsMock::Service {
 
@@ -184,15 +183,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Returns the URI for the invocation request.
-         *
-         * @param hostName host name of the docker instance
-         * @param port lambda docker external port
-         * @return URI of the invocation request
-         */
-        static std::string GetRequestUrl(const std::string &hostName, int port);
-
-        /**
          * @brief Invoke the lambda function synchronously.
          *
          * The output will be returned to the calling method.
@@ -254,6 +244,20 @@ namespace AwsMock::Service {
          */
         static Poco::Mutex _mutex;
     };
+
+    /**
+     * @brief Returns the URI for the invocation request.
+     *
+     * @param hostName host name of the docker instance
+     * @param port lambda docker external port
+     * @return URI of the invocation request
+     */
+    inline static std::string GetRequestUrl(const std::string &hostName, int port) {
+        if (hostName.empty()) {
+            return "http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
+        }
+        return "http://" + hostName + ":" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
+    }
 
 }// namespace AwsMock::Service
 

@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
 #define AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
 
-#include <awsmock/core/MetricService.h>
+#include "MetricService.h"
 
 #include <utility>
 

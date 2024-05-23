@@ -13,8 +13,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/sns/SNSService.h>

@@ -6,15 +6,15 @@
 #define AWSMOCK_SERVICE_COGNITO_CMD_HANDLER_H
 
 // Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+
+#include <Poco/DateTime.h>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/CognitoClientCommand.h>
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>

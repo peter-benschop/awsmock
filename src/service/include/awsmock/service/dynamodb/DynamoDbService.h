@@ -18,13 +18,14 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/dto/dynamodb/DeleteItemRequest.h>

@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
       },
-      "description": "Total number of users.",
+      "description": "Total number of user pools.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -92,12 +92,18 @@
       "id": 3,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -109,14 +115,14 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(cognito_user_count_total[5m])",
+          "expr": "avg_over_time(cognito_userpool_count_total[5m])",
           "instant": false,
           "legendFormat": "Userpools",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Number of Users",
+      "title": "Number of users pools",
       "type": "timeseries"
     },
     {
@@ -189,12 +195,18 @@
       "id": 1,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -286,12 +298,18 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -384,15 +402,17 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -405,7 +425,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "cognito_service_timer",
+          "expr": "avg_over_time(cognito_service_timer[5m])",
           "instant": false,
           "legendFormat": "{{method}}",
           "range": true,
@@ -422,13 +442,14 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "Cognito",
   "uid": "fdjgg169upjb4c",
-  "version": 5,
+  "version": 7,
   "weekStart": ""
 }

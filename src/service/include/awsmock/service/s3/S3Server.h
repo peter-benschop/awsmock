@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3HandlerFactory.h>
 #include <awsmock/service/s3/S3Monitoring.h>

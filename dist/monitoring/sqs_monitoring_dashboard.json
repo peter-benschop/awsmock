@@ -102,6 +102,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -203,6 +204,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -307,6 +309,7 @@
           "sortDesc": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -409,6 +412,7 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -421,7 +425,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sqs_service_timer",
+          "expr": "avg_over_time(sqs_service_timer[5m])",
           "instant": false,
           "legendFormat": "{{method}}",
           "range": true,
@@ -442,10 +446,11 @@
     "from": "now-6h",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "SQS",
   "uid": "c9431625-6813-44af-8b0b-00388afc4745",
-  "version": 13,
+  "version": 15,
   "weekStart": ""
 }

@@ -14,31 +14,32 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/ServiceException.h"
-#include "awsmock/dto/sns/CreateTopicRequest.h"
-#include "awsmock/dto/sns/CreateTopicResponse.h"
-#include "awsmock/dto/sns/DeleteTopicResponse.h"
-#include "awsmock/dto/sns/GetTopicAttributesRequest.h"
-#include "awsmock/dto/sns/GetTopicAttributesResponse.h"
-#include "awsmock/dto/sns/ListSubscriptionsByTopicRequest.h"
-#include "awsmock/dto/sns/ListSubscriptionsByTopicResponse.h"
-#include "awsmock/dto/sns/ListTopicsResponse.h"
-#include "awsmock/dto/sns/PublishRequest.h"
-#include "awsmock/dto/sns/PublishResponse.h"
-#include "awsmock/dto/sns/SqsNotificationRequest.h"
-#include "awsmock/dto/sns/SubscribeRequest.h"
-#include "awsmock/dto/sns/SubscribeResponse.h"
-#include "awsmock/dto/sns/TagResourceRequest.h"
-#include "awsmock/dto/sns/TagResourceResponse.h"
-#include "awsmock/dto/sns/UnsubscribeRequest.h"
-#include "awsmock/dto/sns/UnsubscribeResponse.h"
-#include "awsmock/dto/sqs/SendMessageRequest.h"
-#include "awsmock/dto/sqs/SendMessageResponse.h"
-#include "awsmock/repository/SNSDatabase.h"
-#include "awsmock/service/sqs/SQSService.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/dto/sns/CreateTopicRequest.h>
+#include <awsmock/dto/sns/CreateTopicResponse.h>
+#include <awsmock/dto/sns/DeleteTopicResponse.h>
+#include <awsmock/dto/sns/GetTopicAttributesRequest.h>
+#include <awsmock/dto/sns/GetTopicAttributesResponse.h>
+#include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
+#include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicsResponse.h>
+#include <awsmock/dto/sns/PublishRequest.h>
+#include <awsmock/dto/sns/PublishResponse.h>
+#include <awsmock/dto/sns/SqsNotificationRequest.h>
+#include <awsmock/dto/sns/SubscribeRequest.h>
+#include <awsmock/dto/sns/SubscribeResponse.h>
+#include <awsmock/dto/sns/TagResourceRequest.h>
+#include <awsmock/dto/sns/TagResourceResponse.h>
+#include <awsmock/dto/sns/UnsubscribeRequest.h>
+#include <awsmock/dto/sns/UnsubscribeResponse.h>
+#include <awsmock/dto/sqs/SendMessageRequest.h>
+#include <awsmock/dto/sqs/SendMessageResponse.h>
+#include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 #define SQS_PROTOCOL "sqs"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"

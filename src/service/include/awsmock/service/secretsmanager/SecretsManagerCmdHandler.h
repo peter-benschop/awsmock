@@ -12,13 +12,12 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/service/common/AbstractHandler.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
+#include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"

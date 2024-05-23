@@ -28,6 +28,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Win32Utils.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>

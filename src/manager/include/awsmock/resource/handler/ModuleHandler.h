@@ -16,9 +16,9 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/common/Infrastructure.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
@@ -42,7 +42,7 @@
 namespace AwsMock::Manager {
 
     /**
-     * AwsMock module handler
+     * @brief AwsMock module handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -51,7 +51,7 @@ namespace AwsMock::Manager {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param serverMap map of services
          */
@@ -60,7 +60,7 @@ namespace AwsMock::Manager {
       protected:
 
         /**
-         * HTTP GET request.
+         * @brief HTTP GET request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -71,7 +71,7 @@ namespace AwsMock::Manager {
         void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP PUT request.
+         * @brief HTTP PUT request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -82,7 +82,7 @@ namespace AwsMock::Manager {
         void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -93,7 +93,7 @@ namespace AwsMock::Manager {
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * Delete DELETE request.
+         * @brief Delete DELETE request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -104,7 +104,7 @@ namespace AwsMock::Manager {
         void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * Options request.
+         * @brief Options request.
          *
          * @param response HTTP response
          * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
@@ -112,7 +112,7 @@ namespace AwsMock::Manager {
         void handleOptions(Poco::Net::HTTPServerResponse &response) override;
 
         /**
-         * Head request.
+         * @brief Head request.
          *
          * @param request HTTP request
          * @param response HTTP response

@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/service/transfer/TransferHandler.h>
 
 namespace AwsMock::Service {

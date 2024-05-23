@@ -15,8 +15,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>

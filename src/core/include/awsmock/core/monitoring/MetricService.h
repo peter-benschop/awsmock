@@ -24,10 +24,10 @@
 #include <Poco/Util/ServerApplication.h>
 
 // AwsMock utils
-#include <awsmock/core/Configuration.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricSystemCollector.h>
-#include <awsmock/core/Timer.h>
+#include "MetricSystemCollector.h"
+#include "awsmock/core/Configuration.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/Timer.h"
 
 #define TIME_DIFF_NAME(x) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKeyName(x)]).count())
 #define TIME_DIFF_LABEL(x, y) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKeyLabel(x, y)]).count())

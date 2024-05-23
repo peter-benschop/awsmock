@@ -26,9 +26,9 @@
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 #include <awsmock/entity/lambda/Tags.h>

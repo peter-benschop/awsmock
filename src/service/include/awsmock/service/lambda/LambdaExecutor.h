@@ -13,10 +13,10 @@
 // AwsMock includes
 #include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/Task.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
 
