@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    Poco::JSON::Object Server::ToJsonObject() const {
+    Poco::JSON::Object Handler::ToJsonObject() const {
 
         try {
             Poco::JSON::Object rootJson;
@@ -27,18 +27,18 @@ namespace AwsMock::Dto::Transfer {
         }
     }
 
-    std::string Server::ToJson() const {
+    std::string Handler::ToJson() const {
         return Core::JsonUtils::ToJsonString(ToJsonObject());
     }
 
-    std::string Server::ToString() const {
+    std::string Handler::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const Server &r) {
-        os << "Server=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const Handler &r) {
+        os << "Handler=" << r.ToJson();
         return os;
     }
 

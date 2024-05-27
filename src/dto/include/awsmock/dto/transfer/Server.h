@@ -16,7 +16,7 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    struct Server {
+    struct Handler {
 
         /**
          * ARN
@@ -84,7 +84,7 @@ namespace AwsMock::Dto::Transfer {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const Server &r);
+        friend std::ostream &operator<<(std::ostream &os, const Handler &r);
     };
 
 }// namespace AwsMock::Dto::Transfer

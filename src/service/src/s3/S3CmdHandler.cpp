@@ -659,7 +659,7 @@ namespace AwsMock::Service {
             }
 
             HeaderMap headerMap;
-            headerMap["Server"] = "awsmock";
+            headerMap["Handler"] = "awsmock";
             headerMap["Content-Type"] = "application/json";
             headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
             headerMap["Content-Length"] = std::to_string(s3Response.size);

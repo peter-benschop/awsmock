@@ -64,25 +64,25 @@ RUN ln -s /usr/lib/libPocoUtil.so.103 /usr/lib/libPocoUtil.so
 RUN ln -s /usr/lib/libPocoFoundation.so.103 /usr/lib/libPocoFoundation.so
 
 # Install Mongo C/C++ driver
-COPY --from=build /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/
+COPY --from=build /usr/lib/local/libbson-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0
 RUN ln -s /usr/lib/libbson-1.0.so.0 /usr/lib/libbson-1.0.so
-COPY --from=build /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
+COPY --from=build /usr/local/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
 RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
-COPY --from=build /usr/lib/libmongocxx.so.3.10.2-pre /usr/lib/
+COPY --from=build /usr/local/lib/libmongocxx.so.3.10.2-pre /usr/lib/
 RUN ln -s /usr/lib/libmongocxx.so.3.10.2-pre /usr/lib/libmongocxx.so._noabi
-COPY --from=build /usr/lib/libbsoncxx.so.3.10.2-pre /usr/lib/
+COPY --from=build /usr/local/lib/libbsoncxx.so.3.10.2-pre /usr/lib/
 RUN ln -s /usr/lib/libbsoncxx.so.3.10.2-pre /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/
-COPY --from=build /usr/bin/awsmockmgr /usr/bin/
-COPY --from=build /usr/bin/awsmockctl /usr/bin/
-COPY --from=build /usr/lib/libawsmock* /usr/lib/
+COPY --from=build /usr/local/bin/awsmockmgr /usr/bin/
+COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
+COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
 COPY --from=build /etc/awsmock.properties /etc/
-COPY --from=build /usr/bin/awslocal /usr/bin/
+COPY --from=build /usr/local/bin/awslocal /usr/bin/
 
 # Configure awslocal
 RUN aws configure set aws_access_key_id none && \

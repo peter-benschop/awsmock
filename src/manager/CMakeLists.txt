@@ -1,8 +1,6 @@
 set(BINARY awsmockmgr)
 
-set(SOURCES src/resource/HandlerException.cpp src/resource/AbstractResource.cpp src/resource/factory/Factory.cpp
-        src/resource/factory/ModuleFactory.cpp src/resource/handler/ModuleHandler.cpp src/controller/ResourceNotFound.cpp
-        src/controller/Router.cpp src/controller/RestService.cpp src/main.cpp)
+set(SOURCES src/server/Manager.cpp src/server/Handler.cpp src/main.cpp)
 
 
 # External includes
@@ -13,6 +11,6 @@ add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx PocoPrometheus
-        PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil pthread crypto ssl z archive curl tbb)
+        PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil boost_program_options pthread crypto ssl z archive curl tbb)
 
 install(TARGETS ${BINARY} DESTINATION bin)

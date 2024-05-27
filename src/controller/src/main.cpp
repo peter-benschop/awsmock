@@ -31,7 +31,6 @@
 // AwsMock includes
 #include <awsmock/controller/Configuration.h>
 #include <awsmock/controller/Controller.h>
-#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Controller {
 
@@ -169,15 +168,39 @@ namespace AwsMock::Controller {
 
             } else if (name == "start") {
 
-                _controller.StartService(args[1]);
+                Dto::Common::Services services;
+                if (args.size() == 1) {
+                    services.serviceNames.emplace_back("all");
+                } else {
+                    for (int i = 1; i < args.size(); i++) {
+                        services.serviceNames.emplace_back(args[i]);
+                    }
+                }
+                _controller.StartService(services);
 
             } else if (name == "restart") {
 
-                _controller.RestartService(args[1]);
+                Dto::Common::Services services;
+                if (args.size() == 1) {
+                    services.serviceNames.emplace_back("all");
+                } else {
+                    for (int i = 1; i < args.size(); i++) {
+                        services.serviceNames.emplace_back(args[i]);
+                    }
+                }
+                _controller.RestartService(services);
 
             } else if (name == "stop") {
 
-                _controller.StopService(args[1]);
+                Dto::Common::Services services;
+                if (args.size() == 1) {
+                    services.serviceNames.emplace_back("all");
+                } else {
+                    for (int i = 1; i < args.size(); i++) {
+                        services.serviceNames.emplace_back(args[i]);
+                    }
+                }
+                _controller.StopService(services);
 
 #ifdef HAS_SYSTEMD
             } else if (name == "logs") {
@@ -190,7 +213,7 @@ namespace AwsMock::Controller {
 
             } else if (name == "config") {
 
-                _controller.GetDefaults();
+                _controller.GetConfig();
 
             } else if (name == "export") {
 

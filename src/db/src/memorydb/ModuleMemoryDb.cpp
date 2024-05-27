@@ -52,6 +52,17 @@ namespace AwsMock::Database {
         return it->second;
     }
 
+    std::vector<std::string> ModuleMemoryDb::GetAllModuleNames() {
+
+        std::vector<std::string> moduleNameList;
+        for (const auto &module: _modules) {
+            moduleNameList.emplace_back(module.second.name);
+        }
+
+        log_trace << "Got module name list, size: " << moduleNameList.size();
+        return moduleNameList;
+    }
+
     Entity::Module::Module ModuleMemoryDb::CreateModule(const Entity::Module::Module &module) {
         Poco::ScopedLock lock(_moduleMutex);
 

@@ -150,6 +150,33 @@ namespace AwsMock::Database {
         return {};
     }
 
+    std::vector<std::string> ModuleDatabase::GetAllModuleNames() {
+
+        if (_useDatabase) {
+
+            try {
+
+                std::vector<std::string> moduleNameList;
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+                auto serviceCursor = _moduleCollection.find({});
+                for (auto service: serviceCursor) {
+                    Entity::Module::Module result;
+                    result.FromDocument(service);
+                    moduleNameList.push_back(result.name);
+                }
+                return moduleNameList;
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Get module names, error: " << e.what();
+                return {};
+            }
+        } else {
+
+            return _memoryDb.GetAllModuleNames();
+        }
+    }
+
     Entity::Module::Module ModuleDatabase::CreateModule(const Entity::Module::Module &module) {
 
         if (_useDatabase) {

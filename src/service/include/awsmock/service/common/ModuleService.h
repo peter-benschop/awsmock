@@ -41,21 +41,21 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param serverMap module map
          */
-        explicit ModuleService(Service::ServerMap &serverMap);
+        explicit ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleDatabase(Database::ModuleDatabase::instance()){};
 
         /**
-         * Return all list of all modules
+         * @brief Return all list of all modules
          *
          * @return list of all modules
          */
         Database::Entity::Module::ModuleList ListModules();
 
         /**
-         * Returns the running state
+         * @brief Returns the running state
          *
          * @param module module name
          * @return module state
@@ -63,43 +63,21 @@ namespace AwsMock::Service {
         bool IsRunning(const std::string &module);
 
         /**
-         * Starts a module
+         * @brief Starts a module
          *
          * @param name module name
          */
-        Database::Entity::Module::Module StartService(const std::string &name);
+        void StartServices(Dto::Common::Services &name);
 
         /**
-         * Starts all services
-         */
-        void StartAllServices();
-
-        /**
-         * Restarts a module
+         * @brief Stops one or several modules
          *
-         * @param name module name
+         * @param services module list
          */
-        Database::Entity::Module::Module RestartService(const std::string &name);
+        void StopServices(Dto::Common::Services &services);
 
         /**
-         * Restarts all services
-         */
-        void RestartAllServices();
-
-        /**
-         * Stops a module
-         *
-         * @param name module name
-         */
-        Database::Entity::Module::Module StopService(const std::string &name);
-
-        /**
-         * Stops all services
-         */
-        void StopAllServices();
-
-        /**
-         * Exports the current infrastructure
+         * @brief Exports the current infrastructure
          *
          * @param services service name list
          * @param prettyPrint JSON pretty print, if true JSON indent = 4
@@ -109,14 +87,14 @@ namespace AwsMock::Service {
         static std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false, bool includeObjects = false);
 
         /**
-     * Import the infrastructure
-     *
-     * @param jsonString infrastructure JSON string
-     */
-        static void ImportInfrastructure(const std::string &jsonString);
+         * @brief Import the infrastructure
+         *
+         * @param jsonString infrastructure JSON string
+         */
+        void ImportInfrastructure(const std::string &jsonString);
 
         /**
-         * Cleans the current infrastructure.
+         * @brief Cleans the current infrastructure.
          *
          * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
          *
@@ -125,13 +103,13 @@ namespace AwsMock::Service {
         static void CleanInfrastructure(const Dto::Common::Services &services);
 
         /**
-         * Cleans the objects from the infrastructure.
+         * @brief Cleans the objects from the infrastructure.
          *
          * <p>Cleans all objects from the infrastructure. This means all SQS resources, SNS resources, S3 object keys, etc. will be deleted.</p>
          *
          * @param services service name list
          */
-        static void CleanObjects(const Dto::Common::Services &services);
+        void CleanObjects(const Dto::Common::Services &services);
 
       private:
 
@@ -144,11 +122,6 @@ namespace AwsMock::Service {
          * Module database
          */
         Database::ModuleDatabase &_moduleDatabase;
-
-        /**
-         * JSON pretty print
-         */
-        bool _prettyPrint;
     };
 
 }// namespace AwsMock::Service

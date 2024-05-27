@@ -2,15 +2,9 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include "awsmock/service/common/ModuleService.h"
-#include "awsmock/repository/CognitoDatabase.h"
+#include <awsmock/service/common/ModuleService.h>
 
 namespace AwsMock::Service {
-
-    ModuleService::ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _prettyPrint(false), _moduleDatabase(Database::ModuleDatabase::instance()) {
-
-        _prettyPrint = Core::Configuration::instance().getBool("awsmock.pretty", false);
-    }
 
     Database::Entity::Module::ModuleList ModuleService::ListModules() {
 
@@ -26,119 +20,83 @@ namespace AwsMock::Service {
         return module.state == Database::Entity::Module::ModuleState::RUNNING;
     }
 
-    Database::Entity::Module::Module ModuleService::StartService(const std::string &name) {
+    void ModuleService::StartServices(Dto::Common::Services &services) {
 
-        // Set state
-        Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(name);
-        if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
+        if (services.Contains("all")) {
+            services.serviceNames = _moduleDatabase.GetAllModuleNames();
+        }
 
-            log_info << "Module " + name + " already running";
-            throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-
-        } else {
+        for (auto const &service: services.serviceNames) {
 
             // Set state
-            module = _moduleDatabase.SetState(name, Database::Entity::Module::ModuleState::RUNNING);
+            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(service);
+            if (module.state != Database::Entity::Module::ModuleState::RUNNING) {
 
-            if (module.name == "database") {
-                _moduleDatabase.StartDatabase();
-            } else if (module.name == "s3") {
-                auto s3server = _serverMap[module.name];
-                s3server->Start();
-            } else if (module.name == "sqs") {
-                auto sqsServer = _serverMap[module.name];
-                sqsServer->Start();
-            } else if (module.name == "sns") {
-                auto snsServer = _serverMap[module.name];
-                snsServer->Start();
-            } else if (module.name == "lambda") {
-                auto lambdaServer = _serverMap[module.name];
-                lambdaServer->Start();
-            } else if (module.name == "transfer") {
-                auto transferServer = _serverMap[module.name];
-                transferServer->Start();
-            } else if (module.name == "cognito") {
-                auto cognitoServer = _serverMap[module.name];
-                cognitoServer->Start();
-            } else if (module.name == "dynamodb") {
-                auto dynamoDbServer = _serverMap[module.name];
-                dynamoDbServer->Start();
-            } else if (module.name == "kms") {
-                auto kmsServer = _serverMap[module.name];
-                kmsServer->Start();
-            } else if (module.name == "gateway") {
-                auto gatewayServer = _serverMap[module.name];
-                gatewayServer->Start();
+                // Set state
+                module = _moduleDatabase.SetState(service, Database::Entity::Module::ModuleState::RUNNING);
+
+                if (module.name == "database") {
+                    _moduleDatabase.StartDatabase();
+                } else if (module.name == "s3") {
+                    auto s3server = _serverMap[module.name];
+                    s3server->Start();
+                } else if (module.name == "sqs") {
+                    auto sqsServer = _serverMap[module.name];
+                    sqsServer->Start();
+                } else if (module.name == "sns") {
+                    auto snsServer = _serverMap[module.name];
+                    snsServer->Start();
+                } else if (module.name == "lambda") {
+                    auto lambdaServer = _serverMap[module.name];
+                    lambdaServer->Start();
+                } else if (module.name == "transfer") {
+                    auto transferServer = _serverMap[module.name];
+                    transferServer->Start();
+                } else if (module.name == "cognito") {
+                    auto cognitoServer = _serverMap[module.name];
+                    cognitoServer->Start();
+                } else if (module.name == "dynamodb") {
+                    auto dynamoDbServer = _serverMap[module.name];
+                    dynamoDbServer->Start();
+                } else if (module.name == "kms") {
+                    auto kmsServer = _serverMap[module.name];
+                    kmsServer->Start();
+                } else if (module.name == "gateway") {
+                    auto gatewayServer = _serverMap[module.name];
+                    gatewayServer->Start();
+                }
+                log_info << "Module " + service + " started";
             }
-            log_info << "Module " + name + " started";
-        }
-        return module;
-    }
-
-    void ModuleService::StartAllServices() {
-
-        Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
-        for (const auto &module: modules) {
-            StartService(module.name);
         }
     }
 
-    Database::Entity::Module::Module ModuleService::RestartService(const std::string &name) {
+    void ModuleService::StopServices(Dto::Common::Services &services) {
 
-        // Set state
-        Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(name);
-        if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
-
-            StopService(name);
-            log_info << "Module " + name + " already running";
-            throw Core::ServiceException("Module " + name + " already running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        if (services.Contains("all")) {
+            services.serviceNames = _moduleDatabase.GetAllModuleNames();
         }
 
-        log_info << "Module " + name + " restarted";
-        return StartService(name);
-    }
-
-    void ModuleService::RestartAllServices() {
-
-        Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
-        for (const auto &module: modules) {
-            RestartService(module.name);
-        }
-    }
-
-    Database::Entity::Module::Module ModuleService::StopService(const std::string &name) {
-
-        // Set state
-        Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(name);
-        if (module.state != Database::Entity::Module::ModuleState::RUNNING) {
-
-            throw Core::ServiceException("Module " + name + " not running", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-
-        } else {
+        for (auto const &service: services.serviceNames) {
 
             // Set state
-            module = _moduleDatabase.SetState(name, Database::Entity::Module::ModuleState::STOPPED);
+            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(service);
+            if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
-            // Stop module
-            if (name == "database") {
-                _moduleDatabase.StopDatabase();
-            } else {
-                for (const auto &server: _serverMap) {
-                    if (name == server.first) {
-                        server.second->Stop();
+                // Set state
+                module = _moduleDatabase.SetState(service, Database::Entity::Module::ModuleState::STOPPED);
+
+                // Stop module
+                if (service == "database") {
+                    _moduleDatabase.StopDatabase();
+                } else {
+                    for (const auto &server: _serverMap) {
+                        if (service == server.first) {
+                            server.second->Stop();
+                        }
                     }
                 }
             }
-        }
-        log_info << "Module " + name + " stopped";
-        return module;
-    }
-
-    void ModuleService::StopAllServices() {
-
-        Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
-        for (const auto &module: modules) {
-            StopService(module.name);
+            log_info << "Module " + service + " stopped";
         }
     }
 
@@ -360,10 +318,8 @@ namespace AwsMock::Service {
         }
         if (services.HasService("all") || services.HasService("dynamodb")) {
             Service::DynamoDbService _dynamoDbService(Core::Configuration::instance());
+            //_dynamoDbService.DeleteAllItems();
             _dynamoDbService.DeleteAllTables();
-            //            Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-            //            _dynamoDbDatabase.DeleteAllItems();
-            //            _dynamoDbDatabase.DeleteAllTables();
         }
         if (services.HasService("all") || services.HasService("transfer")) {
             Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();

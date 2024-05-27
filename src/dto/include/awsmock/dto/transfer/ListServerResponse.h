@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Server list
          */
-        std::vector<Server> servers;
+        std::vector<Handler> servers;
 
         /**
          * Creates a JSON string from the object.
