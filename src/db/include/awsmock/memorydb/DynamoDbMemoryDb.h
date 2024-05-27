@@ -13,17 +13,16 @@
 // Poco includes
 #include <Poco/Mutex.h>
 #include <Poco/ScopedLock.h>
-#include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
-#include "awsmock/entity/dynamodb/Table.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/dynamodb/Item.h>
+#include <awsmock/entity/dynamodb/Table.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -48,8 +47,8 @@ namespace AwsMock::Database {
          * @return singleton instance
          */
         static DynamoDbMemoryDb &instance() {
-            static Poco::SingletonHolder<DynamoDbMemoryDb> sh;
-            return *sh.get();
+            static DynamoDbMemoryDb dynamoDbMemoryDb;
+            return dynamoDbMemoryDb;
         }
 
         /**
@@ -127,16 +126,6 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteAllTables();
-
-        /**
-         * @brief Checks the existence of an item.
-         *
-         * @param region AWS region.
-         * @param tableName name of the table
-         * @param key primary key of the item
-         * @return true if database exists, otherwise false
-         */
-        //        bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
 
         /**
          * @brief Checks the existence of an item.

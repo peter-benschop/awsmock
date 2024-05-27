@@ -158,8 +158,7 @@ namespace AwsMock::Service {
          *
          * @param request HTTP request
          * @param response HTTP response
-         * @param region AWS region
-         * @param user current user
+         * @param s3Command S3 client command
          */
         virtual void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command);
 

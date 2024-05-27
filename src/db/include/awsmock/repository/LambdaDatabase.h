@@ -33,8 +33,6 @@ namespace AwsMock::Database {
 
         /**
          * @brief Constructor
-         *
-         * @param configuration configuration properties
          */
         explicit LambdaDatabase();
 
@@ -42,8 +40,8 @@ namespace AwsMock::Database {
          * @brief Singleton instance
          */
         static LambdaDatabase &instance() {
-            static Poco::SingletonHolder<LambdaDatabase> sh;
-            return *sh.get();
+            static LambdaDatabase lambdaDatabase;
+            return lambdaDatabase;
         }
 
         /**

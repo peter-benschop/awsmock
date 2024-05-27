@@ -99,30 +99,12 @@ namespace AwsMock::Core {
         static std::string GetMd5FromString(const std::string &content);
 
         /**
-         * @brief Returns the MD5 hash of a string using AWS cryptographic methods from aws-crt-cal.
-         *
-         * @param content string to hash
-         * @return MD5 hash of the given string
-         */
-        // TODO: Removed, until AWS uses openssl 3.0
-        //static std::string AWSGetMd5FromString(const std::string &content);
-
-        /**
          * @brief Returns the MD5 hash of a file.
          *
          * @param fileName file name to hash
          * @return MD5 hash of the given file
          */
         static std::string GetMd5FromFile(const std::string &fileName);
-
-        /**
-         * @brief Returns the MD5 hash of a file using AWS cryptographic methods from aws-crt-cal.
-         *
-         * @param fileName file name to hash
-         * @return MD5 hash of the given file
-         */
-        // TODO: Removed, until AWS uses openssl 3.0
-        //static std::string AwsGetMd5FromFile(const std::string &fileName);
 
         /**
          * @brief Returns the SHA1 hash of a string.
@@ -318,11 +300,10 @@ namespace AwsMock::Core {
         /**
          * @brief Convert of a unsigned char* array to a hex string
          *
-         * @param hash input char array
-         * @param size input char length
+         * @param digest input char array
          * @return hex encoded string
          */
-        static std::string HexEncode(const std::vector<unsigned char> &Digest);
+        static std::string HexEncode(const std::vector<unsigned char> &digest);
 
         /**
          * @brief Decodes a hex string to an unsigned char array.

@@ -32,14 +32,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
         CognitoHandler() = default;
 
         /**
-         * HTTP GET request.
+         * @brief HTTP GET request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -50,7 +48,7 @@ namespace AwsMock::Service {
         void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP PUT request.
+         * @brief HTTP PUT request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -61,7 +59,7 @@ namespace AwsMock::Service {
         void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -72,7 +70,7 @@ namespace AwsMock::Service {
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * Delete DELETE request.
+         * @brief Delete DELETE request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -83,7 +81,7 @@ namespace AwsMock::Service {
         void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * Options request.
+         * @brief Options request.
          *
          * @param response HTTP response
          * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
@@ -91,7 +89,7 @@ namespace AwsMock::Service {
         void handleOptions(Poco::Net::HTTPServerResponse &response) override;
 
         /**
-         * Head request.
+         * @brief Head request.
          *
          * @param request HTTP request
          * @param response HTTP response

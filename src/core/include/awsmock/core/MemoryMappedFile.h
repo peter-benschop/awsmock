@@ -17,9 +17,6 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/SingletonHolder.h>
-
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -46,8 +43,8 @@ namespace AwsMock::Core {
          * @return singleton instance
          */
         static MemoryMappedFile &instance() {
-            static Poco::SingletonHolder<MemoryMappedFile> memoryMappedFile;
-            return *memoryMappedFile.get();
+            static MemoryMappedFile memoryMappedFile;
+            return memoryMappedFile;
         }
 
         /**
@@ -81,22 +78,21 @@ namespace AwsMock::Core {
         [[nodiscard]] bool IsMapped() const { return _mapped; }
 #ifdef _WIN32
         /// tweak performance
-        enum CacheHint
-        {
-            Normal,         ///< good overall performance
-            SequentialScan, ///< read file only once with few seeks
-            RandomAccess    ///< jump around
+        enum CacheHint {
+            Normal,        ///< good overall performance
+            SequentialScan,///< read file only once with few seeks
+            RandomAccess   ///< jump around
         };
 #endif
 
       private:
 
 #ifdef _WIN32
-        typedef void* FileHandle;
+        typedef void *FileHandle;
         /// Windows handle to memory mapping of _file
-        void*       _mappedFile;
+        void *_mappedFile;
 #else
-        typedef int   FileHandle;
+        typedef int FileHandle;
 #endif
 
         /**
@@ -128,7 +124,6 @@ namespace AwsMock::Core {
          * File size
          */
         long _fileSize = 0;
-
     };
 
 }// namespace AwsMock::Core

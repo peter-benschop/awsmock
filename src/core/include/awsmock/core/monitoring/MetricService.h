@@ -56,8 +56,8 @@ namespace AwsMock::Core {
          * Singleton instance
          */
         static MetricService &instance() {
-            static Poco::SingletonHolder<MetricService> sh;
-            return *sh.get();
+            static MetricService metricService;
+            return metricService;
         }
 
         /**
@@ -381,8 +381,6 @@ namespace AwsMock::Core {
 
         /**
          * Resets all timers.
-         *
-         * @param name name of the timer.
          */
         [[maybe_unused]] void ResetAllTimer();
 

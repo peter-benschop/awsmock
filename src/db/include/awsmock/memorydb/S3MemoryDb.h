@@ -11,7 +11,6 @@
 // Poco includes
 #include <Poco/Mutex.h>
 #include <Poco/ScopedLock.h>
-#include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
@@ -43,8 +42,8 @@ namespace AwsMock::Database {
          * @return singleton instance
          */
         static S3MemoryDb &instance() {
-            static Poco::SingletonHolder<S3MemoryDb> sh;
-            return *sh.get();
+            static S3MemoryDb s3MemoryDb;
+            return s3MemoryDb;
         }
 
         /**

@@ -42,8 +42,8 @@ namespace AwsMock::Database {
          * @brief Singleton instance
          */
         static CognitoDatabase &instance() {
-            static Poco::SingletonHolder<CognitoDatabase> sh;
-            return *sh.get();
+            static CognitoDatabase cognitoDatabase;
+            return cognitoDatabase;
         }
 
         /**

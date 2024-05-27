@@ -43,8 +43,8 @@ namespace AwsMock::Database {
          * @return singleton
          */
         static ConnectionPool &instance() {
-            static Poco::SingletonHolder<ConnectionPool> instance;
-            return *instance.get();
+            static ConnectionPool connectionPool;
+            return connectionPool;
         }
 
         /**

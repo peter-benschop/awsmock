@@ -12,7 +12,6 @@
 #include <utility>
 
 // Poco includes
-#include <Poco/SingletonHolder.h>
 #include <Poco/String.h>
 #include <Poco/Util/LayeredConfiguration.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
@@ -60,8 +59,8 @@ namespace AwsMock::Core {
          * Singleton instance
          */
         static Configuration &instance() {
-            static Poco::SingletonHolder<Configuration> sh;
-            return *sh.get();
+            static Configuration configuration;
+            return configuration;
         }
 
         /**

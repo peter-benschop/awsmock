@@ -46,8 +46,8 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static S3Database &instance() {
-            static Poco::SingletonHolder<S3Database> sh;
-            return *sh.get();
+            static S3Database s3Database;
+            return s3Database;
         }
 
         /**
