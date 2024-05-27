@@ -28,5 +28,5 @@ namespace AwsMock::Dto::Cognito {
         userPoolDomain.domain = request.domain;
         return userPoolDomain;
     }
-    
+
 }// namespace AwsMock::Dto::Cognito
