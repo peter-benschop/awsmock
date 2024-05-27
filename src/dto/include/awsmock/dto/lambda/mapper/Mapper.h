@@ -40,7 +40,6 @@ namespace AwsMock::Dto::Lambda {
          * stored in the database to an CreateLambdaRequest, which ís send to the lambda service.
          *
          * @param lambdaEntity lambda entity
-         * @param request lambda create function request struct
          * @return CreateFunctionRequest
          * @see CreateFunctionRequest
          */

@@ -187,9 +187,8 @@ namespace AwsMock::Service {
          *
          * The output will be returned to the calling method.
          *
-         * @param functionName name of the function
+         * @param url URL of the lambda docker image
          * @param payload payload for the function
-         * @param url lambda docker image URL
          * @return output from lambda invocation call
          */
         static std::string InvokeLambdaSynchronously(const std::string &url, const std::string &payload);

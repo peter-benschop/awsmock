@@ -50,8 +50,8 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static KMSDatabase &instance() {
-            static Poco::SingletonHolder<KMSDatabase> sh;
-            return *sh.get();
+            static KMSDatabase kmsDatabase;
+            return kmsDatabase;
         }
 
         /**

@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         /**
          * Return all list of all modules
          *
-         * @param list of all modules
+         * @return list of all modules
          */
         Database::Entity::Module::ModuleList ListModules();
 

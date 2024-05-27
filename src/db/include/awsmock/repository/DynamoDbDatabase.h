@@ -38,8 +38,8 @@ namespace AwsMock::Database {
          * @brief Singleton instance
          */
         static DynamoDbDatabase &instance() {
-            static Poco::SingletonHolder<DynamoDbDatabase> sh;
-            return *sh.get();
+            static DynamoDbDatabase dynamoDbDatabase;
+            return dynamoDbDatabase;
         }
 
         /**
@@ -135,17 +135,6 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteAllTables();
-
-        /**
-         * @brief Checks the existence of an item.
-         *
-         * @param region AWS region.
-         * @param tableName name of the table
-         * @param key primary key of the item
-         * @return true if database exists, otherwise false
-         * @throws DatabaseException
-         */
-        //bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
 
         /**
          * @brief Checks the existence of an item.

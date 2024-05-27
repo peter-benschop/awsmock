@@ -100,7 +100,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Create Amazon Resource Names (ARNs)
+         * @brief Create Amazon Resource Names (ARNs)
          *
          * @param service AWS module name
          * @param region AWS region
@@ -110,7 +110,7 @@ namespace AwsMock::Core {
         static std::string CreateArn(const std::string &service, const std::string &region, const std::string &accountId, const std::string &resourceId);
 
         /**
-         * Create S3 Amazon bucket/key ARN
+         * @brief Create S3 Amazon bucket/key ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -120,7 +120,7 @@ namespace AwsMock::Core {
         static std::string CreateS3Arn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key);
 
         /**
-         * Create lambda function ARN
+         * @brief Create lambda function ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -129,13 +129,11 @@ namespace AwsMock::Core {
         static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
 
         /**
-         * Generate a SQS queue URL.
+         * @brief Generate a SQS queue URL.
          *
-         * <p>
          * @verbatim
          * The queue name has the format 'http://<host>:<port>/<accountId>/<queueName>'
-         * @endcode
-         * </p>
+         * @endverbatim
          *
          * @param configuration current AwsMock configuration
          * @param queueName name of the queue
@@ -144,7 +142,7 @@ namespace AwsMock::Core {
         static std::string CreateSQSQueueUrl(const Configuration &configuration, const std::string &queueName);
 
         /**
-         * Create SQS queue ARN
+         * @brief Create SQS queue ARN
          *
          * @param configuration current AwsMock configuration
          * @param queueName name of the queue
@@ -153,7 +151,7 @@ namespace AwsMock::Core {
         static std::string CreateSQSQueueArn(const Configuration &configuration, const std::string &queueName);
 
         /**
-         * Converts a queue ARN to a queue URL
+         * @brief Converts a queue ARN to a queue URL
          *
          * @param configuration current AwsMock configuration
          * @param queueArn ARN of the queue
@@ -162,7 +160,7 @@ namespace AwsMock::Core {
         static std::string ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn);
 
         /**
-         * Create SNS topic ARN
+         *@brief  Create SNS topic ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -171,7 +169,7 @@ namespace AwsMock::Core {
         static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
         /**
-         * Create SNS subscription ARN
+         * @brief Create SNS subscription ARN
          *
          * <p>Syntax arn:aws:sns:us-west-2:123456789012:MyTopic:6b0e71bd-7e97-4d97-80ce-4a0994e55286</p>
          *
@@ -182,7 +180,7 @@ namespace AwsMock::Core {
         static std::string CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
         /**
-         * Create transfer manager ARN
+         * @brief Create transfer manager ARN
          *
          * <p>Syntax arn:aws:sns:us-west-2:123456789012:serverId</p>
          *
@@ -193,7 +191,7 @@ namespace AwsMock::Core {
         static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
 
         /**
-         * Create secrets manager ARN
+         * @brief Create secrets manager ARN
          *
          * <p>Syntax arn:aws:secrets manager:us-west-2:123456789012:secret:MyDatabaseSecretName-a1b2c3</p>
          *
@@ -205,7 +203,7 @@ namespace AwsMock::Core {
         static std::string CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId);
 
         /**
-         * Create KMS key ARN
+         * @brief Create KMS key ARN
          *
          * <p>Syntax arn:aws:kms:us-west-2:123456789012:name</p>
          *
@@ -217,17 +215,17 @@ namespace AwsMock::Core {
         static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
 
         /**
-         * Create Cognito user pool ID
+         * @brief Create Cognito user pool ID
          *
          * <p>region_<9-random-digit></p>
          *
          * @param region AWS region
-         * @param return ID of the user pool
+         * @return ID of the user pool
          */
         static std::string CreateCognitoUserPoolId(const std::string &region);
 
         /**
-         * Create Cognito user pool ARN
+         * @brief Create Cognito user pool ARN
          *
          * <p>Syntax arn:aws:cognito:us-west-2:123456789012:userPoolId</p>
          *
@@ -239,14 +237,14 @@ namespace AwsMock::Core {
         static std::string CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId);
 
         /**
-         * Returns a request ID.
+         * @brief Returns a request ID.
          *
          * @return request ID
          */
         static std::string CreateRequestId();
 
         /**
-         * Returns a message ID.
+         * @brief Returns a message ID.
          *
          * <p>Used for SQS and SNS to generate a message ID, which is basically a UUID.</p>
          *
@@ -255,7 +253,7 @@ namespace AwsMock::Core {
         static std::string CreateMessageId();
 
         /**
-         * Returns a receipt handle.
+         * @brief Returns a receipt handle.
          *
          * @return receipt handle
          */
@@ -264,7 +262,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Generate a S3 file name
+         * @brief Generate a S3 file name
          *
          * @return random file name
          */
@@ -273,7 +271,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Generate a S3 version ID
+         * @brief Generate a S3 version ID
          *
          * @return random version ID
          */
@@ -299,7 +297,9 @@ namespace AwsMock::Core {
          *
          * Adds the AWS authorization header, based on the supplied Curl request HTTP request.
          *
-         * @param request HTTP request
+         * @param method HTTP method
+         * @param path HTTP path
+         * @param headers HTTP headers
          * @param module AwsMock module
          * @param contentType HTTP content type
          * @param signedHeaders signed header names
@@ -357,7 +357,7 @@ namespace AwsMock::Core {
          *
          * This is used by the Curl base request.
          *
-         * @param request HTTP request
+         * @param path HTTP query path
          * @return canonical request parameters
          */
         static std::string GetCanonicalQueryParameters(const std::string &path);
@@ -384,7 +384,7 @@ namespace AwsMock::Core {
          *
          * This is used by the Curl base request.
          *
-         * @param request HTTP request
+         * @param headers HTTP headers
          * @param authorizationHeaderKeys authorization parameter
          * @return canonical header string
          */

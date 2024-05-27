@@ -27,7 +27,7 @@
 namespace AwsMock::Database {
 
     /**
-     * MongoDB database base class.
+     * @brief MongoDB database base class.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -36,59 +36,57 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration configuration properties
+         * @brief Constructor
          */
         explicit DatabaseBase();
 
         /**
-         * Returns a MongoDB connection from the pool
+         * @brief Returns a MongoDB connection from the pool
          *
          * @return MongoDB database client
          */
         mongocxx::database GetConnection();
 
         /**
-         * Returns a MongoDB client from the pool
+         * @brief Returns a MongoDB client from the pool
          *
          * @return MongoDB database client
          */
         mongocxx::pool::entry GetClient();
 
         /**
-         * Check all indexes.
+         * @brief Check all indexes.
          *
          * <p>Normally done during manager StartServer.</p>
          */
         void CreateIndexes() const;
 
         /**
-         * Check whether we are running without database
+         * @brief Check whether we are running without database
          */
         [[nodiscard]] bool HasDatabase() const;
 
         /**
-         * Returns the database name
+         * @brief Returns the database name
          *
          * @return database name
          */
         [[nodiscard]] std::string GetDatabaseName() const;
 
         /**
-         * Start the database
+         * @brief Start the database
          */
         void StartDatabase();
 
         /**
-         * Stops the database
+         * @brief Stops the database
          */
         void StopDatabase();
 
       private:
 
         /**
-         * Update module status
+         * @brief Update module status
          */
         void UpdateModuleStatus();
 

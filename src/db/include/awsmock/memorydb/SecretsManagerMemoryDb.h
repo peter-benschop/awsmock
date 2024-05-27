@@ -14,7 +14,6 @@
 #include <Poco/Mutex.h>
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/ScopedLock.h>
-#include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
@@ -46,8 +45,8 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static SecretsManagerMemoryDb &instance() {
-            static Poco::SingletonHolder<SecretsManagerMemoryDb> sh;
-            return *sh.get();
+            static SecretsManagerMemoryDb secretsManagerMemoryDb;
+            return secretsManagerMemoryDb;
         }
 
         /**

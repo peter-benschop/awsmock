@@ -18,14 +18,14 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Docker port
+     * @brief Docker port
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct Port {
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit Port(const Poco::JSON::Object::Ptr &object);
 
@@ -45,28 +45,28 @@ namespace AwsMock::Dto::Docker {
         std::string type;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @param object JSON object
          */
         void FromJson(const Poco::JSON::Object::Ptr &object);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
-         * @param object JSON object
+         * @return object JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

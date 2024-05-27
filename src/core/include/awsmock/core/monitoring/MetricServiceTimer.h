@@ -23,14 +23,11 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * <p>Measure a methods execution time.</p>
          *
-         * @param metricService metric module
          * @param name name of the underlying timer
-         *
-         * @author jens.vogt\@opitz-consulting.com
          */
         explicit MetricServiceTimer(std::string name) : _metricService(MetricService::instance()), _name(std::move(name)) {
             if (!_metricService.TimerExists(_name)) {
@@ -40,14 +37,12 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * <p>Measure a methods execution time.</p>
          *
-         * @param metricService metric module
          * @param name name of the underlying timer
-         *
-         * @author jens.vogt\@opitz-consulting.com
+         * @param label label of the underlying timer
          */
         explicit MetricServiceTimer(std::string name, std::string label) : _metricService(MetricService::instance()), _name(std::move(name)), _label(std::move(label)) {
             if (!_metricService.TimerExists(_name, _label)) {

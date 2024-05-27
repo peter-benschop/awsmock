@@ -34,9 +34,9 @@ namespace AwsMock::Dto::Cognito {
         std::string certificateArn;
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
-         * @param payload json string object
+         * @param jsonObject json object
          */
         void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Cognito {
         }
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */

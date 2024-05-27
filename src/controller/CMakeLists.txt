@@ -4,7 +4,7 @@ set(AWS_CRT_SDK aws-crt-cpp aws-c-event-stream aws-c-s3 aws-c-auth aws-c-mqtt aw
 
 set(SOURCES src/Configuration.cpp src/Controller.cpp src/main.cpp)
 
-include_directories(include ../core/include ../dto/include ../db/include ${MONGO_INCS})
+include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
 link_directories(../core)
 
 add_executable(${BINARY} ${SOURCES})

@@ -94,7 +94,6 @@ namespace AwsMock::Database::Entity::Module {
         /**
          * Convert to JSON representation
          *
-         * @param moduleEntity module entity
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
