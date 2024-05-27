@@ -21,6 +21,8 @@ namespace AwsMock::Manager {
 
     /**
      * @brief Accepts incoming connections and launches the sessions
+     *
+     * @author jens.vogt\@opitz-consulting.com
      */
     class Listener : public std::enable_shared_from_this<Listener> {
 

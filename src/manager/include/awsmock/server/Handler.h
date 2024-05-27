@@ -24,6 +24,11 @@
 
 namespace AwsMock::Manager {
 
+    /**
+     * @brief HTTP handler
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class Handler {
 
       public:

@@ -8,23 +8,12 @@ namespace AwsMock::Manager {
 
     void Manager::Initialize() {
 
-        InitializeLogging();
         InitializeMonitoring();
         InitializeDatabase();
         InitializeCurl();
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion()
                  << " pid: " << getpid() << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
-    }
-
-    void Manager::InitializeLogging() {
-        std::string logLevel = Core::Configuration::instance().getString("awsmock.service.logging.level");
-        Core::LogStream::SetSeverity(logLevel);
-
-        std::string logfile = Core::Configuration::instance().getString("awsmock.service.logging.file");
-        if (!logfile.empty()) {
-            Core::LogStream::SetFilename(logfile);
-        }
     }
 
     void Manager::InitializeMonitoring() {

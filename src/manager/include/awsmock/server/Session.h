@@ -16,6 +16,11 @@
 
 namespace AwsMock::Manager {
 
+    /**
+     * @brief HTTP session manager
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class Session : public std::enable_shared_from_this<Session> {
 
         boost::beast::tcp_stream stream_;
