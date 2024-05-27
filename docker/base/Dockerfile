@@ -27,9 +27,9 @@ RUN cd /usr/src && \
 RUN cd /usr/src && \
     git clone https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
-    cmake -DCMAKE_CXX_STANDARD=17 . && \
+    cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
-    cmake --install .
+    cmake --install . --prefix /usr/local
 
 # Cleanup
 RUN rm -rf /usr/src

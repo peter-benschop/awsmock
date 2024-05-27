@@ -53,23 +53,23 @@ namespace AwsMock::Controller {
         /**
          * Start a module
          *
-         * @param name module name, or 'all'
+         * @param services list of service names
          */
-        void StartService(const std::string &name);
+        void StartService(Dto::Common::Services &services);
 
         /**
          * Restart a module
          *
-         * @param name module name, or 'all'
+         * @param services list of service names
          */
-        void RestartService(const std::string &name);
+        void RestartService(Dto::Common::Services &services);
 
         /**
          * Stops a module
          *
-         * @param name module name, or 'all'
+         * @param services list of service names
          */
-        void StopService(const std::string &name);
+        void StopService(Dto::Common::Services &services);
 
 #ifdef HAS_SYSTEMD
         /**
@@ -88,7 +88,7 @@ namespace AwsMock::Controller {
         /**
          * Returns the current AwsMock configuration
          */
-        void GetDefaults();
+        void GetConfig();
 
         /**
          * Dumps the current infrastructure as JSON file to stdout.
@@ -117,8 +117,9 @@ namespace AwsMock::Controller {
          * Add authorization header.
          *
          * @param headers headers
+         * @param action action to perform
          */
-        void AddStandardHeaders(std::map<std::string, std::string> &headers);
+        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action);
 
         /**
          * Application configuration

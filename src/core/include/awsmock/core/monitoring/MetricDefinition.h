@@ -14,13 +14,8 @@
 #define GATEWAY_HEAD_TIMER "gateway_head_time"
 #define GATEWAY_COUNTER "gateway_count"
 
-#define MODULE_GET_TIMER "manager_get_time"
-#define MODULE_PUT_TIMER "manager_put_time"
-#define MODULE_POST_TIMER "manager_post_time"
-#define MODULE_DELETE_TIMER "manager_delete_time"
-#define MODULE_OPTIONS_TIMER "manager_options_time"
-#define MODULE_HEAD_TIMER "manager_head_time"
-#define MODULE_COUNTER "manager_count"
+#define MODULE_HTTP_TIMER "manager_http_timer"
+#define MODULE_HTTP_COUNTER "manager_http_counter"
 
 // SNS counter, timer
 #define SNS_TOPIC_COUNT "sns_topic_count_total"

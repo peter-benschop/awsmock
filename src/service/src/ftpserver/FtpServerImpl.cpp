@@ -70,7 +70,7 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        log_debug << "FTP Server created.";
+        log_debug << "FTP Handler created.";
         log_debug << "Listening at address " << _acceptor.local_endpoint().address() << ":" << _acceptor.local_endpoint().port() << ":";
 
         _acceptor.async_accept(ftp_session->getSocket(), [this, ftp_session](auto ec) {

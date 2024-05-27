@@ -39,7 +39,7 @@ namespace AwsMock::FtpServer {
         if (ec)
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
 
-        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Server"));
+        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
         readFtpCommand();
     }
 
@@ -459,7 +459,7 @@ namespace AwsMock::FtpServer {
         // TODO: the ACTION_NOT_TAKEN reply is not RCF 959 conform. Apparently in
         // 1985 nobody anticipated that you might not want anybody uploading files
         // to your manager. We use the return code anyways, as the popular FileZilla
-        // Server also returns that code as "Permission denied"
+        // Handler also returns that code as "Permission denied"
         if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileWrite) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
@@ -576,7 +576,7 @@ namespace AwsMock::FtpServer {
         // RFC 959 conform. Apparently back in 1985 it was assumed that the RNTO
         // command will always succeed, as long as you enter a valid target file
         // name. Thus we use the two return codes anyways, the popular FileZilla
-        // FTP Server uses those as well.
+        // FTP Handler uses those as well.
         auto is_renamable_error = checkIfPathIsRenamable(_renameFromPath);
 
         if (is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
@@ -819,7 +819,7 @@ namespace AwsMock::FtpServer {
     void FtpSession::handleFtpCommandSYST(const std::string & /*param*/) {
         // Always returning "UNIX" when being asked for the operating system.
         // Some clients (Mozilla Firefox for example) may disconnect, when we
-        // return an unknown operating system here. As depending on the Server's
+        // return an unknown operating system here. As depending on the Handler's
         // operating system is a horrible feature anyways, we simply fake it.
         //
         // Unix should be the best compatible value here, as we emulate Unix-like

@@ -79,6 +79,14 @@ namespace AwsMock::Database {
         Entity::Module::Module GetModuleByName(const std::string &name);
 
         /**
+         * @brief Returns all module names
+         *
+         * @return list of module names
+         * @throws DatabaseException
+         */
+        std::vector<std::string> GetAllModuleNames();
+
+        /**
          * Creates a module
          *
          * @param module module entity

@@ -6,9 +6,9 @@
 #define AWSMOCK_RESOURCE_FACTORY_MODULE_FACTORY_H
 
 // AwsMock includes
+#include "awsmock/resource/handler/ModuleHandler.h"
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/resource/factory/IFactory.h>
-#include <awsmock/resource/handler/ModuleHandler.h>
 
 namespace AwsMock::Manager {
 

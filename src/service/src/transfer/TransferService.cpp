@@ -96,7 +96,7 @@ namespace AwsMock::Service {
             auto response = Dto::Transfer::ListServerResponse();
             response.nextToken = Poco::UUIDGenerator().createRandom().toString();
             for (const auto &s: servers) {
-                Dto::Transfer::Server server = {
+                Dto::Transfer::Handler server = {
                         .arn = s.arn,
                         .serverId = s.serverId,
                         .state = s.state,
@@ -104,11 +104,11 @@ namespace AwsMock::Service {
                 response.servers.emplace_back(server);
             }
 
-            log_trace << "Server list outcome: " + response.ToJson();
+            log_trace << "Handler list outcome: " + response.ToJson();
             return response;
 
         } catch (Poco::Exception &ex) {
-            log_error << "Server list request failed, message: " << ex.message();
+            log_error << "Handler list request failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), 500);
         }
     }
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer server;
         try {
             if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist", 500);
             }
 
             // Get the manager
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer server;
         try {
             if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist", 500);
             }
 
             // Get the manager
@@ -172,7 +172,7 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer server;
         try {
             if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Server with ID '" + request.serverId + "' does not exist", 500);
+                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist", 500);
             }
 
             // Get the manager

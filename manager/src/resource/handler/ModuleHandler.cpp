@@ -1,5 +1,5 @@
 
-#include <awsmock/resource/handler/ModuleHandler.h>
+#include "awsmock/resource/handler/ModuleHandler.h"
 
 namespace AwsMock::Manager {
 

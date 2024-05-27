@@ -36,7 +36,7 @@
 namespace AwsMock::Core {
 
     /**
-     * Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
+     * @brief Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -45,34 +45,34 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor.
+         * @brief Constructor.
          */
         explicit MetricSystemCollector();
 
         /**
-         * Destructor.
+         * @brief Destructor.
          */
         ~MetricSystemCollector();
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Runnable method
+         * @brief Runnable method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Updates the system counter
+         * @brief Updates the system counter
          */
         void CollectSystemCounter();
 

@@ -512,7 +512,7 @@ namespace AwsMock::Service {
         response.set("Content-Length", std::to_string(contentLength));
         response.set("Content-Type", contentType);
         response.set("Connection", "keep-alive");
-        response.set("Server", "awsmock");
+        response.set("Handler", "awsmock");
 
         // Extra headers
         if (!extraHeader.empty()) {

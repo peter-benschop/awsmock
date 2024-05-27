@@ -186,7 +186,7 @@ namespace AwsMock::Service {
 
             HeaderMap headerMap;
             headerMap["Connection"] = "Keep-alive: 300";
-            headerMap["Server"] = "AmazonS3";
+            headerMap["Handler"] = "AmazonS3";
 
             SendOkResponse(response, {}, headerMap);
 

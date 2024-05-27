@@ -22,7 +22,7 @@ namespace AwsMock::Controller {
     void Controller::ListServices() {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
+        AddStandardHeaders(headers, "list-services");
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl, headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -40,93 +40,75 @@ namespace AwsMock::Controller {
         }
     }
 
-    void Controller::StartService(const std::string &name) {
+    void Controller::StartService(Dto::Common::Services &services) {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/start", headers);
+        AddStandardHeaders(headers, "start-modules");
+        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl, headers, services.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             std::cerr << "Error: " << response.statusReason << std::endl;
             return;
         }
 
-        if (name == "all") {
+        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
+        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
 
-            std::cout << "All modules started" << std::endl;
+            if (module.port > 0) {
+                std::cout << "Module " << module.name << "(" << module.port << ") started" << std::endl;
+            } else {
+                std::cout << "Module " << module.name << " started" << std::endl;
+            }
 
         } else {
-
-            Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-            if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-
-                if (module.port > 0) {
-                    std::cout << "Module " << module.name << "(" << module.port << ") started" << std::endl;
-                } else {
-                    std::cout << "Module " << module.name << " started" << std::endl;
-                }
-
-            } else {
-                std::cout << "Module " << name << " could not be started: " << response.output << std::endl;
-            }
+            std::cout << "Modules could not be started: " << response.output << std::endl;
         }
     }
 
-    void Controller::RestartService(const std::string &name) {
+    void Controller::RestartService(Dto::Common::Services &services) {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/restart", headers);
+        AddStandardHeaders(headers, "restart-modules");
+        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl, headers, services.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             std::cerr << "Error: " << response.statusReason << std::endl;
             return;
         }
 
-        if (name == "all") {
-
-            std::cout << "All modules restarted" << std::endl;
-
-        } else {
-            Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-            if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-                if (module.port > 0) {
-                    std::cout << "Module " << module.name << "(" << module.port << ") restarted" << std::endl;
-                } else {
-                    std::cout << "Module " << module.name << " restarted" << std::endl;
-                }
+        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
+        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+            if (module.port > 0) {
+                std::cout << "Module " << module.name << "(" << module.port << ") restarted" << std::endl;
             } else {
-                std::cout << "Module " << name << " could not be restarted: " << response.output << std::endl;
+                std::cout << "Module " << module.name << " restarted" << std::endl;
             }
+        } else {
+            std::cout << "Modules could not be restarted: " << response.output << std::endl;
         }
     }
 
-    void Controller::StopService(const std::string &name) {
+    void Controller::StopService(Dto::Common::Services &services) {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/" + name + "/stop", headers);
+        AddStandardHeaders(headers, "stop-modules");
+
+        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl, headers, services.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
             std::cerr << "Error: " << response.statusReason << std::endl;
             return;
         }
 
-        if (name == "all") {
-
-            std::cout << "All modules stopped" << std::endl;
-
-        } else {
-            Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-            if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-                if (module.port > 0) {
-                    std::cout << "Module " << module.name << "(" << module.port << ") stopped" << std::endl;
-                } else {
-                    std::cout << "Module " << module.name << " stopped" << std::endl;
-                }
+        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
+        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+            if (module.port > 0) {
+                std::cout << "Module " << module.name << "(" << module.port << ") stopped" << std::endl;
             } else {
-                std::cout << "Module " << name << " could not be stopped: " << response.output << std::endl;
+                std::cout << "Module " << module.name << " stopped" << std::endl;
             }
+        } else {
+            std::cout << "Modules could not be stopped: " << response.output << std::endl;
         }
     }
 
@@ -182,7 +164,7 @@ namespace AwsMock::Controller {
     void Controller::SetLogLevel(const std::string &level) {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
+        AddStandardHeaders(headers, "set-log-level");
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/manager/loglevel/" + level, headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -198,10 +180,10 @@ namespace AwsMock::Controller {
         }
     }
 
-    void Controller::GetDefaults() {
+    void Controller::GetConfig() {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
+        AddStandardHeaders(headers, "config");
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/config/", headers);
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -244,7 +226,7 @@ namespace AwsMock::Controller {
         url = Core::HttpUtils::AddQueryParameter(url, "includeObjects", includeObjects);
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
+        AddStandardHeaders(headers, "export");
 
         // Send request
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + url, headers, exportServices.ToJson());
@@ -265,7 +247,7 @@ namespace AwsMock::Controller {
         }
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
+        AddStandardHeaders(headers, "import");
         Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/all/import", headers, jsonString.str());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -283,7 +265,7 @@ namespace AwsMock::Controller {
         }
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers);
+        AddStandardHeaders(headers, "clean");
         Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/clean-infrastructure", headers, cleanServices.ToJson());
 
         if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
@@ -293,9 +275,10 @@ namespace AwsMock::Controller {
         std::cout << response.output;
     }
 
-    void Controller::AddStandardHeaders(std::map<std::string, std::string> &headers) {
+    void Controller::AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) {
         headers["User"] = _user;
         headers["Region"] = _region;
         headers["Target"] = "module";
+        headers["Action"] = action;
     }
 }// namespace AwsMock::Controller
