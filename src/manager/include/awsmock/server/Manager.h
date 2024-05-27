@@ -11,6 +11,7 @@
 // MongoDB includes
 #include <mongocxx/instance.hpp>
 
+
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
