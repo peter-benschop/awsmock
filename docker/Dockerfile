@@ -1,4 +1,4 @@
-FROM jensvogt/aws-mock-base:latest as build
+FROM jensvogt/awsmock-base:latest as build
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -7,9 +7,9 @@ RUN mkdir -p /usr/src
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr . && \
+    cmake . && \
     cmake --build . --config Release -j 16 && \
-    cmake --install . --prefix /usr
+    cmake --install .
 
 # Cleanup
 RUN rm -rf /usr/src
