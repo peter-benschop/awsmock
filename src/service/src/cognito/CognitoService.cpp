@@ -15,12 +15,12 @@ namespace AwsMock::Service {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "create_user_pool");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.name;
 
-        Dto::Cognito::CreateUserPoolResponse response{};
         if (_database.UserPoolExists(request.region, request.name)) {
             log_error << "User pool exists already, region: " << request.region << " name: " << request.name;
             throw Core::ServiceException("User pool exists already, region: " + request.region + " name: " + request.name);
         }
 
+        Dto::Cognito::CreateUserPoolResponse response{};
         try {
             std::string userPoolId = Core::AwsUtils::CreateCognitoUserPoolId(request.region);
             Database::Entity::Cognito::UserPool userPool = {
@@ -33,6 +33,36 @@ namespace AwsMock::Service {
             userPool = _database.CreateUserPool(userPool);
             response = {{.requestId = request.requestId, .region = userPool.region}, userPool.name, userPool.arn, userPool.userPoolId};
             log_trace << "Create user pool outcome: " + response.ToJson();
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Create user pool request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::Cognito::CreateUserPoolDomainResponse CognitoService::CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "create_user_pool_domain");
+        log_debug << "Create user pool request, region:  " << request.region << " name: " << request.domain;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exist, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exist, userPoolId: " + request.userPoolId);
+        }
+
+        try {
+
+            // Get user pool
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+
+            // Update database
+            userPool.domain = Dto::Cognito::Mapper::Mapper::map(request);
+            userPool = _database.UpdateUserPool(userPool);
+
+            Dto::Cognito::CreateUserPoolDomainResponse response{};
+            response = {{.requestId = request.requestId, .region = userPool.region}, userPool.domain.domain};
+
+            log_trace << "Create user pool domain result: " + response.ToJson();
             return response;
 
         } catch (Poco::Exception &ex) {

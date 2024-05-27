@@ -46,11 +46,11 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp
-        src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp
+        src/cognito/DeleteUserPoolRequest.cpp src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp
         src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp src/cognito/ListUsersRequest.cpp
         src/cognito/ListUsersResponse.cpp src/cognito/LambdaConfig.cpp src/cognito/CustomEmailSender.cpp
-        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/common/CognitoClientCommand.cpp
-        src/cognito/mapper/Mapper.cpp)
+        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp
+        src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp
         src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp
@@ -87,10 +87,9 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCK
 add_subdirectory(tst)
 
 # Includes
-include_directories(include ../core/include ../db/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
+include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/dynamodb/model/Key.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})

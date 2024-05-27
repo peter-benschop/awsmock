@@ -2,11 +2,10 @@
 // Created by vogje01 on 4/12/24.
 //
 
-#ifndef AWSMOCK_CORE_JTIMER_H
-#define AWSMOCK_CORE_JTIMER_H
+#ifndef AWSMOCK_CORE_TIMER_H
+#define AWSMOCK_CORE_TIMER_H
 
 // C++ standard includes
-#include <future>
 #include <iostream>
 #include <stop_token>
 #include <thread>
@@ -114,4 +113,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_JTIMER_H
+#endif// AWSMOCK_CORE_TIMER_H

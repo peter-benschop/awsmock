@@ -102,8 +102,36 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region,
-                                                                       const std::string &name) {
+    Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByUserPoolId(const std::string &userPoolId) {
+
+        if (_hasDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
+                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("userPoolId", userPoolId)));
+                if (!mResult) {
+                    log_error << "Database exception: user pool not found ";
+                    throw Core::DatabaseException("Database exception, user pool not found ");
+                }
+
+                Entity::Cognito::UserPool result;
+                result.FromDocument(mResult->view());
+                return result;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.GetUserPoolByUserPoolId(userPoolId);
+        }
+    }
+
+    Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
 
         if (_hasDatabase) {
 

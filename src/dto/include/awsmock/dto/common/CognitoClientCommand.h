@@ -10,9 +10,6 @@
 #include <string>
 
 // Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/RegularExpression.h>
 
@@ -31,15 +28,19 @@ namespace AwsMock::Dto::Common {
 
     enum class CognitoCommandType {
         CREATE_USER_POOL,
+        CREATE_USER_POOL_DOMAIN,
         CREATE_USER,
         DELETE_USER_POOL,
+        DELETE_USER,
         UNKNOWN
     };
 
     static std::map<CognitoCommandType, std::string> CognitoCommandTypeNames{
             {CognitoCommandType::CREATE_USER_POOL, "CreateUserPool"},
+            {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "CreateUserPoolDomain"},
             {CognitoCommandType::CREATE_USER, "CreateUser"},
             {CognitoCommandType::DELETE_USER_POOL, "DeleteUserPool"},
+            {CognitoCommandType::DELETE_USER, "DeleteUser"},
     };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(CognitoCommandType commandType) {

@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_COGNITO_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
@@ -33,6 +34,15 @@ namespace AwsMock::Dto::Cognito {
          * @see ListUserPoolResponse
          */
         static Dto::Cognito::ListUserPoolResponse map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList);
+
+        /**
+         * @brief Maps a user pool domain DTO to an entity
+         *
+         * @param request CreateUserPoolDomain request struct
+         * @return UserPoolDomain
+         * @see CreateUserPoolDomainRequest
+         */
+        static Database::Entity::Cognito::UserPoolDomain map(const CreateUserPoolDomainRequest &request);
     };
 
 }// namespace AwsMock::Dto::Cognito

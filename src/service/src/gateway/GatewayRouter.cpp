@@ -15,8 +15,8 @@ namespace AwsMock::Service {
         _routingTable["sns"] = {._name = "sns", ._handlerType = HandlerType::SNS, ._handler = new SNSHandler(configuration)};
         _routingTable["lambda"] = {._name = "lambda", ._handlerType = HandlerType::LAMBDA, ._handler = new LambdaHandler(configuration)};
         _routingTable["transfer"] = {._name = "transfer", ._handlerType = HandlerType::TRANSFER, ._handler = new TransferHandler(configuration)};
-        _routingTable["cognito-idp"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler(configuration)};
-        _routingTable["cognito-identity"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler(configuration)};
+        _routingTable["cognito-idp"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler()};
+        _routingTable["cognito-identity"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler()};
         _routingTable["dynamodb"] = {._name = "dynamodb", ._handlerType = HandlerType::DYNAMODB, ._handler = new DynamoDbHandler(configuration)};
         _routingTable["secretsmanager"] = {._name = "secretsmanager", ._handlerType = HandlerType::SECRETS_MANAGER, ._handler = new SecretsManagerHandler(configuration)};
         _routingTable["kms"] = {._name = "kms", ._handlerType = HandlerType::KMS, ._handler = new KMSHandler(configuration)};
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
 
         // Get the resource factory for the module
         log_trace << "Found request handler for route: " << route;
-        return new Service::GatewayHandler(_configuration, _routingTable[service]);
+        return new Service::GatewayHandler(_routingTable[service]);
     }
 
     std::string GatewayRouter::GetService(const std::string &authorization) {

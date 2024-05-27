@@ -139,12 +139,12 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.docker.socket", "AWSMOCK_DOCKER_SOCKET", "/var/run/docker.sock");
 
         // Monitoring
-        DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9100);
-        DefineIntProperty("awsmock.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
+        DefineIntProperty("awsmock.service.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9091);
+        DefineIntProperty("awsmock.service.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
 
         // Logging
-        DefineStringProperty("awsmock.log.level", "AWSMOCK_LOG_LEVEL", "information");
-        DefineStringProperty("awsmock.log.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
+        DefineStringProperty("awsmock.service.logging.level", "AWSMOCK_LOG_LEVEL", "information");
+        DefineStringProperty("awsmock.service.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
 
         // Database
         DefineBoolProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);

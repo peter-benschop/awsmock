@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         _cognitoMonitoring->Start();
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory(_configuration));
+        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory());
     }
 
     void CognitoServer::Run() {

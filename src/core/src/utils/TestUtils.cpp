@@ -81,10 +81,10 @@ namespace AwsMock::Core {
         ofs << "awsmock.docker.default.temp.size=10240" << std::endl;
         ofs << "awsmock.docker.container.port=8080" << std::endl;
         // Monitoring configuration
-        ofs << "awsmock.monitoring.port=9100" << std::endl;
+        ofs << "awsmock.service.monitoring.port=9091" << std::endl;
         // Logging
-        ofs << "awsmock.log.level=debug" << std::endl;
-        ofs << "awsmock.log.file=/tmp/awsmock-test.log" << std::endl;
+        ofs << "awsmock.service.logging.level=debug" << std::endl;
+        ofs << "awsmock.service.logging.file=/tmp/awsmock-test.log" << std::endl;
         ofs.close();
 
         Core::Configuration &configuration = Core::Configuration::instance();
