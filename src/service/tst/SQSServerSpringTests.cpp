@@ -159,6 +159,9 @@ namespace AwsMock::Service {
     TEST_F(SQSServerSpringTest, SQSTemplateTest) {
 
         // arrange
+        Core::CurlResponse createResult = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        EXPECT_EQ(200, createResult.statusCode);
+        std::string queueUrl = createResult.output;
 
         // act
         Core::CurlResponse result = SendPostCommand("sqs/sqsTemplate", TEST_MESSAGE);

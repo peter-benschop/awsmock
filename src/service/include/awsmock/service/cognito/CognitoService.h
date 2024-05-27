@@ -23,6 +23,8 @@
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolResponse.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
@@ -48,7 +50,7 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit CognitoService();
 
@@ -61,7 +63,15 @@ namespace AwsMock::Service {
         Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request);
 
         /**
-         * List cognito user pools
+         * @brief Create a new cognito user pool
+         *
+         * @param request create user pool request
+         * @return CreateUserPoolRequest DTO
+         */
+        Dto::Cognito::CreateUserPoolDomainResponse CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief List cognito user pools
          *
          * @param request list user pool request
          * @return ListUserPoolResponse DTO
@@ -69,14 +79,14 @@ namespace AwsMock::Service {
         Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
 
         /**
-         * Delete a cognito user pool
+         * @brief Delete a cognito user pool
          *
          * @param request delete user pool request
          */
         void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request);
 
         /**
-         * Create a new cognito user
+         * @brief Create a new cognito user
          *
          * @param request create user request
          * @return AdminCreateUserResponse DTO
@@ -84,7 +94,7 @@ namespace AwsMock::Service {
         Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
 
         /**
-         * List cognito users
+         * @brief List cognito users
          *
          * @param request list user request
          * @return ListUsersResponse DTO
@@ -92,7 +102,7 @@ namespace AwsMock::Service {
         Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
 
         /**
-         * Deletes a cognito user
+         * @brief Deletes a cognito user
          *
          * @param request delete user request
          */

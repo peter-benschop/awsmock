@@ -15,6 +15,8 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolDomainResponse.h>
 #include <awsmock/dto/common/CognitoClientCommand.h>
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -31,16 +33,16 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit CognitoCmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration) {}
+        explicit CognitoCmdHandler() : AbstractHandler() {}
 
       protected:
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
+         *
+         * This is the only handler for cognito.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -52,17 +54,12 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Return the command from the header.
+         * @brief Return the command from the header.
          *
          * @param request HTTP request
          * @return SQS action
          */
         static std::string GetActionFromHeader(Poco::Net::HTTPServerRequest &request);
-
-        /**
-         * AwsMock configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Cognito service

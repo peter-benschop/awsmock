@@ -51,7 +51,7 @@ namespace AwsMock::Core {
     typedef struct ExecResult ExecResult;
 
     /**
-     * System utils for command line execution and other system routines.
+     * @brief System utils for command line execution and other system routines.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -60,7 +60,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Execute system command and capture the stdout output result.
+         * @brief Execute system command and capture the stdout output result.
          *
          * @param command command string
          * @return command output.
@@ -68,35 +68,35 @@ namespace AwsMock::Core {
         static ExecResult Exec(const std::string &command);
 
         /**
-         * Returns the current working directory.
+         * @brief Returns the current working directory.
          *
          * @return absolute path of the current work directory.
          */
         static std::string GetCurrentWorkingDir();
 
         /**
-         * Returns the home directory of the user
+         * @brief Returns the home directory of the user
          *
          * @return absolute path of the home directory.
          */
         static std::string GetHomeDir();
 
         /**
-         * Returns the node name (uname -n) of the server
+         * @brief Returns the node name (uname -n) of the server
          *
          * @return node name of the server
          */
         static std::string GetNodeName();
 
         /**
-         * Returns the DNS host name of the server
+         * @brief Returns the DNS host name of the server
          *
          * @return host name of the server
          */
         static std::string GetHostName();
 
         /**
-         * Returns a random port number between 32768 and 65536
+         * @brief Returns a random port number between 32768 and 65536
          *
          * @return random port
          */
@@ -108,6 +108,11 @@ namespace AwsMock::Core {
          * @return PID of the current process
          */
         static int GetPid();
+
+        /**
+         * @brief Starts a background process
+         */
+        static void StartBackgroundProcess(const std::string &path);
     };
 
 }// namespace AwsMock::Core

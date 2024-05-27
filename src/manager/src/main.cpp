@@ -77,7 +77,7 @@ namespace AwsMock::Manager {
             InitializeDatabase();
             InitializeCurl();
             log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion()
-                     << " pid: " << getpid() << " loglevel: " << Core::Configuration::instance().getString("awsmock.log.level");
+                     << " pid: " << getpid() << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
             log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
             Poco::Util::ServerApplication::initialize(self);
         }
@@ -150,13 +150,13 @@ namespace AwsMock::Manager {
             } else if (name == "loglevel") {
 
                 _logLevelSet = true;
-                Core::Configuration::instance().setString("awsmock.log.level", value);
+                Core::Configuration::instance().setString("awsmock.service.logging.level", value);
                 Core::LogStream::SetSeverity(value);
 
             } else if (name == "logfile") {
 
                 _logFileSet = true;
-                Core::Configuration::instance().setString("awsmock.log.file", value);
+                Core::Configuration::instance().setString("awsmock.service.logging.file", value);
                 Core::LogStream::SetFilename(value);
             }
         }
@@ -173,11 +173,11 @@ namespace AwsMock::Manager {
          */
         void InitializeLogging() const {
             if (!_logLevelSet) {
-                std::string logLevel = Core::Configuration::instance().getString("awsmock.log.level", DEFAULT_LOG_LEVEL);
+                std::string logLevel = Core::Configuration::instance().getString("awsmock.service.logging.level", DEFAULT_LOG_LEVEL);
                 Core::LogStream::SetSeverity(logLevel);
             }
             if (!_logFileSet) {
-                std::string logfile = Core::Configuration::instance().getString("awsmock.log.file");
+                std::string logfile = Core::Configuration::instance().getString("awsmock.service.logging.file");
                 if (!logfile.empty()) {
                     Core::LogStream::SetFilename(logfile);
                 }

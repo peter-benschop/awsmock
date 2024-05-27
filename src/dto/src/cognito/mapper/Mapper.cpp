@@ -22,4 +22,11 @@ namespace AwsMock::Dto::Cognito {
         return response;
     }
 
+    Database::Entity::Cognito::UserPoolDomain Mapper::map(const Dto::Cognito::CreateUserPoolDomainRequest &request) {
+
+        Database::Entity::Cognito::UserPoolDomain userPoolDomain;
+        userPoolDomain.domain = request.domain;
+        return userPoolDomain;
+    }
+
 }// namespace AwsMock::Dto::Cognito

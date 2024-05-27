@@ -11,7 +11,7 @@ namespace AwsMock::Core {
     MetricService::MetricService() : Core::Timer("MetricServer") {
 
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.monitoring.port", 9100);
+        _port = configuration.getInt("awsmock.service.monitoring.port", 9091);
     }
 
     void MetricService::Initialize() {

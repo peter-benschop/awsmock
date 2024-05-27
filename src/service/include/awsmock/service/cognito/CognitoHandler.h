@@ -36,7 +36,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit CognitoHandler(Core::Configuration &configuration);
+        CognitoHandler() = default;
 
         /**
          * HTTP GET request.
@@ -102,11 +102,6 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * AwsMock configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Cognito service

@@ -9,12 +9,9 @@
 #include <chrono>
 #include <sstream>
 #include <string>
-#ifndef _WIN32
 #include <sys/resource.h>
 #include <sys/time.h>
 #include <sys/times.h>
-#endif
-#include <thread>
 
 // Poco includes
 #include <Poco/Prometheus/Counter.h>

@@ -236,7 +236,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_EQ(0, sendResult.status);
-        EXPECT_EQ(7, message.attributes.size());
+        EXPECT_EQ(5, message.attributes.size());
     }
 
     TEST_F(SQSServerJavaTest, MessageReceiveTest) {

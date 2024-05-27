@@ -72,8 +72,24 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region,
-                                                                       const std::string &name) {
+    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByUserPoolId(const std::string &userPoolId) {
+
+        auto it = find_if(_userPools.begin(),
+                          _userPools.end(),
+                          [userPoolId](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                              return userPool.second.userPoolId == userPoolId;
+                          });
+
+        if (it == _userPools.end()) {
+            log_error << "Get cognito user pool by userPoolId failed, region: " << userPoolId;
+            throw Core::DatabaseException("Get cognito user pool by userPoolId failed, userPoolId: " + userPoolId);
+        }
+
+        it->second.oid = it->first;
+        return it->second;
+    }
+
+    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
 
         auto it = find_if(_userPools.begin(),
                           _userPools.end(),

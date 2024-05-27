@@ -27,10 +27,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration application configuration
          */
-        explicit CognitoHandlerFactory(Core::Configuration &configuration) : _configuration(configuration) {}
+        CognitoHandlerFactory() = default;
 
         /**
          * Create a new request handler instance.
@@ -42,15 +40,8 @@ namespace AwsMock::Service {
             if (request.getURI().empty()) {
                 return nullptr;
             }
-            return new CognitoHandler(_configuration);
+            return new CognitoHandler();
         }
-
-      private:
-
-        /**
-         * Cognito handler configuration
-         */
-        Core::Configuration &_configuration;
     };
 
 }// namespace AwsMock::Service

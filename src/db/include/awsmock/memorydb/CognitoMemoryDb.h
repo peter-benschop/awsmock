@@ -88,6 +88,15 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool GetUserPoolByOid(const std::string &oid);
 
         /**
+         * @brief Returns a cognito user pool entity by primary key
+         *
+         * @param userPoolId cognito user pool ID
+         * @return cognito user pool entity
+         * @throws DatabaseException
+         */
+        Entity::Cognito::UserPool GetUserPoolByUserPoolId(const std::string &userPoolId);
+
+        /**
          * Returns a cognito user pool entity by region and name
          *
          * @param region AWS region

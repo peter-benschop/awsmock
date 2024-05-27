@@ -51,10 +51,9 @@ namespace AwsMock::Service {
         /**
          * Constructor
          *
-         * @param configuration application configuration
          * @param route routing structure
          */
-        GatewayHandler(Core::Configuration &configuration, Service::GatewayRoute route);
+        GatewayHandler(Service::GatewayRoute route) : AbstractHandler(), _route(std::move(route)){};
 
       protected:
 
@@ -131,16 +130,6 @@ namespace AwsMock::Service {
          * @param user AWS user
          */
         static void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
-
-        /**
-         * S3 handler configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * Metric module
-         */
-        Core::MetricService &_metricService = Core::MetricService::instance();
 
         /**
          * Gateway route

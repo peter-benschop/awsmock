@@ -33,14 +33,9 @@ namespace AwsMock::Dto::Common {
                 clientOs = parts[2];
                 clientExecutableType = parts[3];
                 clientPrompt = parts[4] == "ON";
-                if (clientApplication == "aws-cli/2.15.55") {
-                    std::string tmp1 = Core::StringUtils::Split(parts[11], '#')[1];
-                    clientModule = Core::StringUtils::Split(tmp1, '.')[0];
-                    clientCommand = Core::StringUtils::Split(tmp1, '.')[1];
-                } else {
-                    clientModule = Core::StringUtils::Split(parts[5], '.')[0];
-                    clientCommand = Core::StringUtils::Split(parts[5], '.')[1];
-                }
+                std::string tmp1 = Core::StringUtils::Split(parts[11], '#')[1];
+                clientModule = Core::StringUtils::Split(tmp1, '.')[0];
+                clientCommand = Core::StringUtils::Split(tmp1, '.')[1];
             }
         }
         if (request.has("Content-Type")) {
