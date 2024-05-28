@@ -11,12 +11,18 @@
 // MongoDB includes
 #include <mongocxx/instance.hpp>
 
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/server/Handler.h>
 #include <awsmock/server/Listener.h>
+
+#define DEFAULT_MONGO_DBNAME "awsmock"
+#define DEFAULT_MONGO_DBUSER "admin"
+#define DEFAULT_MONGO_DBPWD "admin"
+#define DEFAULT_MONGO_DBHOST "localhost"
+#define DEFAULT_MONGO_DBPORT 27017
+#define DEFAULT_MONGO_CACHE_SIZE 256
 
 namespace AwsMock::Manager {
 

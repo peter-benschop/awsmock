@@ -16,6 +16,10 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/RegularExpression.h>
 
+// Boost includes
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
+
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
@@ -179,6 +183,8 @@ namespace AwsMock::Dto::Common {
          * @param user AWS user
          */
         void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+
+        void FromRequest(boost::beast::http::request<boost::beast::http::string_body>, const std::string &awsRegion, const std::string &awsUser);
 
         /**
          * Converts the DTO to a string representation.

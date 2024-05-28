@@ -47,7 +47,31 @@ namespace AwsMock::Dto::Module {
         }
     }
 
+    std::string Module::ToJson(const ModuleList &moduleList) {
+        try {
+            Poco::JSON::Array moduleJsonArray;
+            for (const auto &module: moduleList) {
+                Poco::JSON::Object moduleJson;
+                moduleJson.set("name", module.name);
+                moduleJson.set("port", module.port);
+                moduleJson.set("status", Database::Entity::Module::ModuleStateToString(module.status));
+                moduleJson.set("created", Poco::DateTimeFormatter::format(module.created, Poco::DateTimeFormat::HTTP_FORMAT));
+                moduleJson.set("modified", Poco::DateTimeFormatter::format(module.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+                moduleJsonArray.add(moduleJson);
+            }
+
+            std::ostringstream os;
+            moduleJsonArray.stringify(os);
+            return os.str();
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
+    }
+
     Module Module::FromJson(const std::string &payload) {
+
         if (payload.empty()) {
             return {};
         }
@@ -73,6 +97,7 @@ namespace AwsMock::Dto::Module {
     }
 
     std::vector<Module> Module::FromJsonList(const std::string &payload) {
+
         if (payload.empty()) {
             return {};
         }

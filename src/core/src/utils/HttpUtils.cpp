@@ -241,4 +241,5 @@ namespace AwsMock::Core {
         request.stream().seekg(0, std::ios::beg);
         return body;
     }
+
 }// namespace AwsMock::Core

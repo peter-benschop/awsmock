@@ -16,13 +16,14 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/gateway/GatewayRouter.h>
+#include <awsmock/service/gateway/GatewayListener.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaHandlerFactory.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define GATEWAY_DEFAULT_HOST "localhost"
+#define GATEWAY_DEFAULT_ADDRESS "0.0.0.0"
 #define GATEWAY_MAX_QUEUE 250
 #define GATEWAY_MAX_THREADS 50
 #define GATEWAY_TIMEOUT 900
@@ -106,6 +107,11 @@ namespace AwsMock::Service {
         std::string _host;
 
         /**
+         * HTTP address
+         */
+        std::string _address;
+
+        /**
          * HTTP max message queue length
          */
         int _maxQueueLength;
@@ -123,7 +129,12 @@ namespace AwsMock::Service {
         /**
          * Gateway router
          */
-        std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
+        // std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
+
+        /**
+         * Thread pool
+         */
+        std::vector<std::thread> _threads;
     };
 
 }// namespace AwsMock::Service

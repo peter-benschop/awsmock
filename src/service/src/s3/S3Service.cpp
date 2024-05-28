@@ -6,16 +6,17 @@
 
 namespace AwsMock::Service {
 
-    S3Service::S3Service(Core::Configuration &configuration) : _configuration(configuration), _database(Database::S3Database::instance()), _lambdaService(configuration) {
+    S3Service::S3Service() : _database(Database::S3Database::instance()), _lambdaService(Core::Configuration::instance()) {
 
-        _accountId = _configuration.getString("awsmock.account.userPoolId");
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _accountId = configuration.getString("awsmock.account.userPoolId");
 
         // Initialize directories
-        _user = _configuration.getString("awsmock.user", DEFAULT_USER);
-        _region = _configuration.getString("awsmock.region", DEFAULT_REGION);
-        _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
-        _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
-        _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
+        _user = configuration.getString("awsmock.user", DEFAULT_USER);
+        _region = configuration.getString("awsmock.region", DEFAULT_REGION);
+        _dataDir = configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
+        _transferDir = configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+        _transferBucket = configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
         _dataS3Dir = _dataDir + Poco::Path::separator() + "s3";
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
@@ -843,7 +844,7 @@ namespace AwsMock::Service {
 
     void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
 
-        SQSService _sqsService = SQSService(_configuration);
+        SQSService _sqsService = SQSService(Core::Configuration::instance());
         Dto::SQS::SendMessageRequest request = {.region = _region, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
         Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
@@ -851,7 +852,7 @@ namespace AwsMock::Service {
 
     void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
 
-        SNSService _snsService = SNSService(_configuration);
+        SNSService _snsService = SNSService(Core::Configuration::instance());
         Dto::SNS::PublishRequest request = {.region = _region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
         log_debug << "SNS message request send, messageId: " << response.messageId;

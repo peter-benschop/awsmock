@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
                   << std::endl
                   << "Usage: " << std::endl
                   << "  awsmockmgr [Options]" << std::endl
-                  << std::endl;
-        std::cout << desc << "\n";
+                  << std::endl
+                  << desc << std::endl;
         return 0;
     }
 

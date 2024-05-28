@@ -102,6 +102,102 @@ namespace AwsMock::Dto::Common {
         }
     }
 
+    void S3ClientCommand::FromRequest(boost::beast::http::request<boost::beast::http::string_body> request, const std::string &awsRegion, const std::string &awsUser) {
+
+        //Dto::Common::UserAgent userAgent;
+        //userAgent.FromRequest(request, "s3");
+
+        // Basic values
+        this->region = awsRegion;
+        this->user = awsUser;
+        this->method = HttpMethodFromString(to_string(request.method()));
+        //this->contentType = request.contentCore::HttpUtils::GetContentType(request);
+        request.content_length(this->contentLength);
+        this->url = request.target();
+
+        // Core values
+        bucket = Core::HttpUtils::GetPathParameter(request.target(), 0);
+        key = Core::HttpUtils::GetPathParametersFromIndex(request.target(), 1);
+
+        // Qualifiers
+        multipartRequest = Core::HttpUtils::HasQueryParameter(request.target(), "uploads") || Core::HttpUtils::HasQueryParameter(request.target(), "uploadId") || Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
+        partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        notificationRequest = Core::HttpUtils::HasQueryParameter(request.target(), "notification");
+        versionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "versioning");
+        //copyRequest = request.has("x-amz-copy-source");
+        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+        encryptionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "encryption");
+        bool listType = Core::HttpUtils::HasQueryParameter(request.target(), "list-type");
+
+        /*if (!userAgent.clientCommand.empty()) {
+
+            GetCommandFromUserAgent(method, userAgent);
+
+        } else {
+*/
+        switch (method) {
+
+            case HttpMethod::GET:
+                if (bucket.empty() && key.empty()) {
+                    command = S3CommandType::LIST_BUCKETS;
+                } else if (!bucket.empty() && key.empty()) {
+                    if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
+                        prefix = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "prefix");
+                        command = S3CommandType::LIST_OBJECT_VERSIONS;
+                    } else {
+                        command = S3CommandType::LIST_OBJECTS;
+                    }
+                } else {
+                    command = S3CommandType::GET_OBJECT;
+                }
+                break;
+
+            case HttpMethod::PUT:
+                if (multipartRequest) {
+                    command = S3CommandType::UPLOAD_PART;
+                } else if (encryptionRequest) {
+                    command = S3CommandType::PUT_BUCKET_ENCRYPTION;
+                } else if (notificationRequest) {
+                    command = S3CommandType::BUCKET_NOTIFICATION;
+                } else if (!bucket.empty() && key.empty()) {
+                    command = S3CommandType::CREATE_BUCKET;
+                } else if (!bucket.empty() && !key.empty()) {
+                    command = S3CommandType::PUT_OBJECT;
+                }
+                break;
+
+            case HttpMethod::POST:
+                if (!bucket.empty() && !key.empty()) {
+                    if (uploads) {
+                        command = S3CommandType::CREATE_MULTIPART_UPLOAD;
+                    } else if (multipartRequest) {
+                        command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
+                    }
+                } else if (!bucket.empty()) {
+                    command = S3CommandType::DELETE_OBJECTS;
+                }
+                break;
+
+            case HttpMethod::DELETE:
+                if (multipartRequest) {
+                    command = S3CommandType::ABORT_MULTIPART_UPLOAD;
+                } else if (!bucket.empty() && key.empty()) {
+                    command = S3CommandType::DELETE_BUCKET;
+                } else if (!bucket.empty() && !key.empty()) {
+                    command = S3CommandType::DELETE_OBJECT;
+                }
+                break;
+
+            case HttpMethod::UNKNOWN: {
+                break;
+            }
+            case HttpMethod::HEAD:
+                break;
+        }
+        //  }
+    }
+
     void S3ClientCommand::GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent) {
         if (userAgent.clientCommand == "mb") {
             command = S3CommandType::CREATE_BUCKET;

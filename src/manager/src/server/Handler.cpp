@@ -17,15 +17,17 @@ namespace AwsMock::Manager {
         std::string payload = request.body();
         log_debug << "Found action and target, target: " << target << " action: " << action;
 
-        if (action == "config") {
+        if (action == "get-config") {
 
             std::string host = configuration.getString("awsmock.service.gateway.http.host", "localhost");
+            std::string address = configuration.getString("awsmock.service.gateway.http.address", "0.0.0.0");
             int port = configuration.getInt("awsmock.service.gateway.http.port", 4566);
             std::string endpoint = "http://" + host + ":" + std::to_string(port);
             Dto::Module::GatewayConfig config = {
                     .region = configuration.getString("awsmock.region", "eu-central-1"),
                     .endpoint = endpoint,
                     .host = host,
+                    .address = address,
                     .port = port,
                     .pid = getppid(),
                     .user = configuration.getString("awsmock.user", "none"),
@@ -54,19 +56,12 @@ namespace AwsMock::Manager {
 
         } else if (action == "clean") {
 
-            Dto::Common::Services services;
-            services.FromJson(payload);
-            AwsMock::Service::ModuleService::CleanInfrastructure(services);
-            return SendOkResponse(request);
-
-        } else if (action == "clean-objects") {
-
-            Dto::Common::Services services;
-            services.FromJson(payload);
-            _moduleService.CleanObjects(services);
+            Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
+            AwsMock::Service::ModuleService::CleanInfrastructure(modules);
             return SendOkResponse(request);
 
         } else {
+
             // Returns a not found response
             auto const not_found =
                     [&request](boost::beast::string_view target) {
@@ -94,24 +89,22 @@ namespace AwsMock::Manager {
 
         if (action == "start-modules") {
 
-            Dto::Common::Services services;
-            services.FromJson(payload);
-            _moduleService.StartServices(services);
-            return SendOkResponse(request);
+            Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
+            modules = _moduleService.StartModules(modules);
+            return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
 
         } else if (action == "restart-modules") {
 
-            Dto::Common::Services services;
-            services.FromJson(payload);
-            _moduleService.StartServices(services);
-            return SendOkResponse(request);
+            Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
+            modules = _moduleService.StopModules(modules);
+            modules = _moduleService.StartModules(modules);
+            return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
 
         } else if (action == "stop-modules") {
 
-            Dto::Common::Services services;
-            services.FromJson(payload);
-            _moduleService.StopServices(services);
-            return SendOkResponse(request);
+            Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
+            modules = _moduleService.StopModules(modules);
+            return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
 
         } else if (action == "import") {
 
@@ -120,12 +113,18 @@ namespace AwsMock::Manager {
 
         } else if (action == "set-log-level") {
 
-            std::string level = Core::HttpUtils::GetPathParameter(request.target(), 2);
-            plog::get()->setMaxSeverity(plog::severityFromString(level.c_str()));
-            log_info << "Log level set to '" << level << "'";
+            plog::get()->setMaxSeverity(plog::severityFromString(payload.c_str()));
+            log_info << "Log level set to '" << payload << "'";
 
             // Send response
             return SendOkResponse(request);
+
+        } else if (action == "clean-objects") {
+
+            Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
+            _moduleService.CleanObjects(modules);
+            return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
+
         } else {
             // Returns a not found response
             auto const not_found =
@@ -142,6 +141,10 @@ namespace AwsMock::Manager {
         }
     }
 
+    boost::beast::http::response<boost::beast::http::string_body> Handler::HandlePostRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
+        return {};
+    }
+
     boost::beast::http::response<boost::beast::http::string_body> Handler::SendOkResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body) {
         // Prepare the response message
         boost::beast::http::response<boost::beast::http::string_body> response;
@@ -155,4 +158,5 @@ namespace AwsMock::Manager {
         // Send the response to the client
         return response;
     }
+
 }// namespace AwsMock::Manager

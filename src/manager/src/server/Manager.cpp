@@ -25,12 +25,12 @@ namespace AwsMock::Manager {
         // Get database variables
         Core::Configuration &configuration = Core::Configuration::instance();
         if (configuration.getBool("awsmock.mongodb.active")) {
-            std::string name = configuration.getString("awsmock.mongodb.name", "awsmock");
-            std::string host = configuration.getString("awsmock.mongodb.host", "localhost");
-            std::string user = configuration.getString("awsmock.mongodb.user", "admin");
-            std::string password = configuration.getString("awsmock.mongodb.password", "admin");
-            int _port = configuration.getInt("awsmock.mongodb.port", 27017);
-            int poolSize = configuration.getInt("awsmock.mongodb.pool.size", 256);
+            std::string name = configuration.getString("awsmock.mongodb.name", DEFAULT_MONGO_DBNAME);
+            std::string host = configuration.getString("awsmock.mongodb.host", DEFAULT_MONGO_DBHOST);
+            std::string user = configuration.getString("awsmock.mongodb.user", DEFAULT_MONGO_DBUSER);
+            std::string password = configuration.getString("awsmock.mongodb.password", DEFAULT_MONGO_DBPWD);
+            int _port = configuration.getInt("awsmock.mongodb.port", DEFAULT_MONGO_DBPORT);
+            int poolSize = configuration.getInt("awsmock.mongodb.pool.size", DEFAULT_MONGO_CACHE_SIZE);
 
             // MongoDB URL
             std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
@@ -95,12 +95,12 @@ namespace AwsMock::Manager {
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>(configuration);
                 _serverMap[module.name]->Start();
-                /*} else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _serverMap[module.name] = std::make_shared<Service::KMSServer>(configuration);
-                    _serverMap[module.name]->Start();
-                } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                    _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
-                    _serverMap[module.name]->Start();*/
+            } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::KMSServer>(configuration);
+                _serverMap[module.name]->Start();
+            } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
+                _serverMap[module.name]->Start();
             } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::GatewayServer>(configuration, Core::MetricService::instance());
                 _serverMap[module.name]->Start();
@@ -129,25 +129,23 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        int threads = Core::Configuration::instance().getInt("awsmock.manager.max.threads");
-        std::string hostAddress = Core::Configuration::instance().getString("awsmock.manager.host");
-        unsigned short port = Core::Configuration::instance().getInt("awsmock.manager.port");
+        int threads = Core::Configuration::instance().getInt("awsmock.manager.http.max.threads");
+        std::string hostAddress = Core::Configuration::instance().getString("awsmock.manager.http.address");
+        unsigned short port = Core::Configuration::instance().getInt("awsmock.manager.http.port");
 
         // The io_context is required for all I/O
         boost::asio::io_context ioc{threads};
 
         // Create and launch a listening port
-        // TODO:: FIx host address
-        auto address = boost::asio::ip::make_address("0.0.0.0");
-        std::make_shared<Listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, _serverMap)->run();
+        auto address = boost::asio::ip::make_address(hostAddress);
+        std::make_shared<Listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, _serverMap)->Run();
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
         signals.async_wait(
                 [&](boost::beast::error_code const &, int) {
-                    // Stop the `io_context`. This will cause `run()`
-                    // to return immediately, eventually destroying the
-                    // `io_context` and all of the sockets in it.
+                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
+                    // destroying the `io_context` and all the sockets in it.
                     ioc.stop();
                 });
 
@@ -169,6 +167,7 @@ namespace AwsMock::Manager {
 
         // Stop all services
         StopModules();
+        log_info << "So long, and thanks for all the fish!";
     }
 
 }// namespace AwsMock::Manager

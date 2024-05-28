@@ -2,8 +2,8 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_MANAGER_SESSION_H
-#define AWSMOCK_MANAGER_SESSION_H
+#ifndef AWSMOCK_SERVICES_GATEWAY_SESSION_H
+#define AWSMOCK_SERVICES_GATEWAY_SESSION_H
 
 // C++ includes
 #include <memory>
@@ -15,16 +15,22 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/server/Handler.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/gateway/GatewayHandler.h>
+#include <awsmock/service/s3/S3Handler.h>
+#include <awsmock/service/sqs/SQSHandler.h>
 
-namespace AwsMock::Manager {
+namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     /**
      * @brief HTTP session manager
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class Session : public std::enable_shared_from_this<Session> {
+    class GatewaySession : public std::enable_shared_from_this<GatewaySession> {
 
       public:
 
@@ -34,9 +40,8 @@ namespace AwsMock::Manager {
          * Takes ownership of the socket.
          *
          * @param socket
-         * @param serverMap
          */
-        Session(boost::asio::ip::tcp::socket &&socket, Service::ServerMap &serverMap);
+        explicit GatewaySession(ip::tcp::socket &&socket);
 
         /**
          * @brief Start the session
@@ -44,7 +49,7 @@ namespace AwsMock::Manager {
          * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
          * for single-threaded contexts, this example code is written to be thread-safe by default.
          */
-        void run();
+        void Run();
 
       private:
 
@@ -61,7 +66,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Queue write callback
          */
-        void QueueWrite(boost::beast::http::message_generator response);
+        void QueueWrite(http::message_generator response);
 
         /**
          * @brief Return a response for the given request.
@@ -74,7 +79,7 @@ namespace AwsMock::Manager {
          * @return
          */
         template<class Body, class Allocator>
-        boost::beast::http::message_generator HandleRequest(boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> &&req);
+        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&req);
 
         /**
          * @brief Called to start/continue the write-loop.
@@ -93,9 +98,11 @@ namespace AwsMock::Manager {
         void OnWrite(bool keep_alive, boost::beast::error_code ec, std::size_t bytes_transferred);
 
         /**
-         * @brief On close callback
+         * @brief On clas callback
          */
         void DoClose();
+
+        static Core::AuthorizationHeaderKeys GetAuthorizationKeys(const std::string &authorizationHeader, const std::string &secretAccessKey);
 
         /**
          * TCP stream
@@ -115,19 +122,26 @@ namespace AwsMock::Manager {
         /**
          * HTTP request queue
          */
-        std::queue<boost::beast::http::message_generator> response_queue_;
+        std::queue<http::message_generator> response_queue_;
 
         /**
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
          */
-        boost::optional<boost::beast::http::request_parser<boost::beast::http::string_body>> parser_;
+        boost::optional<http::request_parser<http::string_body>> parser_;
 
         /**
          * HTTP request handler
          */
-        Handler _handler;
+        GatewayHandler _handler;
+
+        /**
+         * Routine table
+         */
+        typedef std::map<std::string, std::shared_ptr<AbstractHandler>> RoutingTable;
+        static RoutingTable _routingTable;
     };
 
-}// namespace AwsMock::Manager
 
-#endif//AWSMOCK_MANAGER_SESSION_H
+}// namespace AwsMock::Service
+
+#endif// AWSMOCK_SERVICES_GATEWAY_SESSION_H

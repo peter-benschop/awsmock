@@ -6,20 +6,101 @@
 
 namespace AwsMock::Controller {
 
-    Controller::Controller(const Configuration &configuration) : _configuration(configuration) {
+    AwsMockCtl::AwsMockCtl() {
 
         // Initialize database
+        Core::Configuration &configuration = Core::Configuration::instance();
         _host = configuration.getString("awsmock.manager.host", AWSMOCKCTL_DEFAULT_HOST);
         _port = configuration.getInt("awsmock.manager.port", AWSMOCKCTL_DEFAULT_PORT);
         _baseUrl = "http://" + _host + ":" + std::to_string(_port);
 
         // Get user/clientId/region
-        _user = _configuration.getString("awsmock.user", AWSMOCKCTL_DEFAULT_USER);
-        _clientId = _configuration.getString("awsmock.client.userPoolId", AWSMOCKCTL_DEFAULT_CLIENT);
-        _region = _configuration.getString("awsmock.region", AWSMOCKCTL_DEFAULT_REGION);
+        _user = configuration.getString("awsmock.user", AWSMOCKCTL_DEFAULT_USER);
+        _clientId = configuration.getString("awsmock.client.userPoolId", AWSMOCKCTL_DEFAULT_CLIENT);
+        _region = configuration.getString("awsmock.region", AWSMOCKCTL_DEFAULT_REGION);
     }
 
-    void Controller::ListServices() {
+    void AwsMockCtl::Initialize(const std::vector<std::string> &commands) {
+        _commands = commands;
+    }
+
+    void AwsMockCtl::Run() {
+
+        if (std::find(_commands.begin(), _commands.end(), "list") != _commands.end()) {
+
+            ListServices();
+
+        } else if (std::find(_commands.begin(), _commands.end(), "config") != _commands.end()) {
+
+            GetConfig();
+
+        } else if (std::find(_commands.begin(), _commands.end(), "loglevel") != _commands.end()) {
+
+            std::string loglevel;
+            for (const auto &command: _commands) {
+                if (command != "loglevel") {
+                    loglevel = command;
+                }
+            }
+            SetLogLevel(loglevel);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "logs") != _commands.end()) {
+
+            //ShowServiceLogs();
+
+        } else if (std::find(_commands.begin(), _commands.end(), "start") != _commands.end()) {
+
+            std::vector<Dto::Module::Module> modules;
+            for (const auto &command: _commands) {
+                if (command != "start") {
+                    Dto::Module::Module module;
+                    module.name = command;
+                    module.status = Database::Entity::Module::ModuleState::RUNNING;
+                    modules.emplace_back(module);
+                }
+            }
+            StartService(modules);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "restart") != _commands.end()) {
+
+            std::vector<Dto::Module::Module> modules;
+            for (const auto &command: _commands) {
+                if (command != "restart") {
+                    Dto::Module::Module module;
+                    module.name = command;
+                    modules.emplace_back(module);
+                }
+            }
+            StartService(modules);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "stop") != _commands.end()) {
+
+            std::vector<Dto::Module::Module> modules;
+            for (const auto &command: _commands) {
+                if (command != "stop") {
+                    Dto::Module::Module module;
+                    module.name = command;
+                    module.status = Database::Entity::Module::ModuleState::STOPPED;
+                    modules.emplace_back(module);
+                }
+            }
+            StopService(modules);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "cleanobjects") != _commands.end()) {
+
+            std::vector<Dto::Module::Module> modules;
+            for (const auto &command: _commands) {
+                if (command != "cleanobjects") {
+                    Dto::Module::Module module;
+                    module.name = command;
+                    modules.emplace_back(module);
+                }
+            }
+            CleanObjects(modules);
+        }
+    }
+
+    void AwsMockCtl::ListServices() {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "list-services");
@@ -40,75 +121,63 @@ namespace AwsMock::Controller {
         }
     }
 
-    void Controller::StartService(Dto::Common::Services &services) {
+    void AwsMockCtl::StartService(std::vector<Dto::Module::Module> &modules) {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "start-modules");
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl, headers, services.ToJson());
-
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        Core::HttpSocketResult response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
-        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-
+        modules = Dto::Module::Module::FromJsonList(response.body);
+        for (const auto &module: modules) {
             if (module.port > 0) {
                 std::cout << "Module " << module.name << "(" << module.port << ") started" << std::endl;
             } else {
                 std::cout << "Module " << module.name << " started" << std::endl;
             }
-
-        } else {
-            std::cout << "Modules could not be started: " << response.output << std::endl;
         }
     }
 
-    void Controller::RestartService(Dto::Common::Services &services) {
+    void AwsMockCtl::RestartService(std::vector<Dto::Module::Module> &modules) {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "restart-modules");
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl, headers, services.ToJson());
-
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        Core::HttpSocketResult response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
-        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+        modules = Dto::Module::Module::FromJsonList(response.body);
+        for (const auto &module: modules) {
             if (module.port > 0) {
                 std::cout << "Module " << module.name << "(" << module.port << ") restarted" << std::endl;
             } else {
                 std::cout << "Module " << module.name << " restarted" << std::endl;
             }
-        } else {
-            std::cout << "Modules could not be restarted: " << response.output << std::endl;
         }
     }
 
-    void Controller::StopService(Dto::Common::Services &services) {
+    void AwsMockCtl::StopService(Dto::Module::Module::ModuleList &modules) {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "stop-modules");
-
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl, headers, services.ToJson());
-
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        Core::HttpSocketResult response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
-        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
+        modules = Dto::Module::Module::FromJsonList(response.body);
+        for (const auto &module: modules) {
             if (module.port > 0) {
                 std::cout << "Module " << module.name << "(" << module.port << ") stopped" << std::endl;
             } else {
                 std::cout << "Module " << module.name << " stopped" << std::endl;
             }
-        } else {
-            std::cout << "Modules could not be stopped: " << response.output << std::endl;
         }
     }
 
@@ -161,61 +230,50 @@ namespace AwsMock::Controller {
     }
 #endif
 
-    void Controller::SetLogLevel(const std::string &level) {
+    void AwsMockCtl::SetLogLevel(const std::string &level) {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "set-log-level");
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/manager/loglevel/" + level, headers);
-
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        Core::HttpSocketResult response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", level, headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Could not set log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
-
-        Dto::Module::Module module = Dto::Module::Module::FromJson(response.output);
-        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cout << "Log level set to " << level << std::endl;
-        } else {
-            std::cout << "Could not set log level: " << response.output << std::endl;
-        }
+        std::cout << "Log level set to " << level << std::endl;
     }
 
-    void Controller::GetConfig() {
+    void AwsMockCtl::GetConfig() {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "config");
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/config/", headers);
-
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        AddStandardHeaders(headers, "get-config");
+        Core::HttpSocketResult response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Could not set configuration, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
-        Dto::Module::GatewayConfig gatewayConfig = Dto::Module::GatewayConfig::FromJson(response.output);
-        if (response.statusCode == Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cout << "Config: " << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "Version: " << std::setw(32) << gatewayConfig.version << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "Endpoint: " << std::setw(32) << gatewayConfig.endpoint << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "Host: " << std::setw(32) << gatewayConfig.host << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "Port: " << std::setw(32) << gatewayConfig.port << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "PID: " << std::setw(32) << gatewayConfig.pid << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "User: " << std::setw(32) << gatewayConfig.user << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "AccessId: " << std::setw(32) << gatewayConfig.accessId << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "ClientId: " << std::setw(32) << gatewayConfig.clientId << std::endl;
-            std::cout << "  " << std::setw(16) << std::left << "DataDir: " << std::setw(32) << gatewayConfig.dataDir << std::endl;
-            if (gatewayConfig.databaseActive) {
-                std::cout << "  " << std::setw(16) << std::left << "Database: " << std::setw(32) << "true" << std::endl;
-            } else {
-                std::cout << "  " << std::setw(16) << std::left << "Database: " << std::setw(32) << "false" << std::endl;
-            }
+        Dto::Module::GatewayConfig gatewayConfig = Dto::Module::GatewayConfig::FromJson(response.body);
+        std::cout << "Config: " << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "Version: " << std::setw(32) << gatewayConfig.version << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "Endpoint: " << std::setw(32) << gatewayConfig.endpoint << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "Host: " << std::setw(32) << gatewayConfig.host << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "Port: " << std::setw(32) << gatewayConfig.port << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "Address: " << std::setw(32) << gatewayConfig.address << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "PID: " << std::setw(32) << gatewayConfig.pid << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "User: " << std::setw(32) << gatewayConfig.user << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "AccessId: " << std::setw(32) << gatewayConfig.accessId << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "ClientId: " << std::setw(32) << gatewayConfig.clientId << std::endl;
+        std::cout << "  " << std::setw(16) << std::left << "DataDir: " << std::setw(32) << gatewayConfig.dataDir << std::endl;
+        if (gatewayConfig.databaseActive) {
+            std::cout << "  " << std::setw(16) << std::left << "Database: " << std::setw(32) << "true" << std::endl;
         } else {
-            std::cout << "Could not set log level: " << response.output << std::endl;
+            std::cout << "  " << std::setw(16) << std::left << "Database: " << std::setw(32) << "false" << std::endl;
         }
     }
 
-    void Controller::ExportInfrastructure(const std::vector<std::string> &services, bool pretty, bool includeObjects) {
+    void AwsMockCtl::ExportInfrastructure(const std::vector<std::string> &services, bool pretty, bool includeObjects) {
 
-        Dto::Common::Services exportServices;
+        /*Dto::Common::Services exportServices;
         for (const auto &service: services) {
             exportServices.serviceNames.emplace_back(service);
         }
@@ -235,10 +293,10 @@ namespace AwsMock::Controller {
             std::cerr << "Error: " << response.statusReason << std::endl;
             return;
         }
-        std::cout << response.output;
+        std::cout << response.output;*/
     }
 
-    void Controller::ImportInfrastructure() {
+    void AwsMockCtl::ImportInfrastructure() {
 
         std::string line;
         std::stringstream jsonString;
@@ -257,9 +315,9 @@ namespace AwsMock::Controller {
         std::cout << response.output;
     }
 
-    void Controller::CleanInfrastructure(const std::vector<std::string> &services) {
+    void AwsMockCtl::CleanInfrastructure(const std::vector<std::string> &services) {
 
-        Dto::Common::Services cleanServices;
+        /*Dto::Common::Services cleanServices;
         for (const auto &service: services) {
             cleanServices.serviceNames.emplace_back(service);
         }
@@ -272,10 +330,26 @@ namespace AwsMock::Controller {
             std::cerr << "Error: " << response.statusReason << std::endl;
             return;
         }
-        std::cout << response.output;
+        std::cout << response.output;*/
     }
 
-    void Controller::AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) {
+    void AwsMockCtl::CleanObjects(Dto::Module::Module::ModuleList &modules) {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "clean-objects");
+        Core::HttpSocketResult response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
+            return;
+        }
+
+        modules = Dto::Module::Module::FromJsonList(response.body);
+        for (const auto &module: modules) {
+            std::cout << "Objects of module " << module.name << " cleaned" << std::endl;
+        }
+    }
+
+    void AwsMockCtl::AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) {
         headers["User"] = _user;
         headers["Region"] = _region;
         headers["Target"] = "module";

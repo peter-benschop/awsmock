@@ -17,14 +17,17 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Infrastructure.h>
 #include <awsmock/dto/common/Services.h>
+#include <awsmock/dto/module/Module.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/kms/KMSServer.h>
 #include <awsmock/service/lambda/LambdaServer.h>
 #include <awsmock/service/s3/S3Server.h>
+#include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 #include <awsmock/service/sns/SNSServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
@@ -55,26 +58,20 @@ namespace AwsMock::Service {
         Database::Entity::Module::ModuleList ListModules();
 
         /**
-         * @brief Returns the running state
-         *
-         * @param module module name
-         * @return module state
-         */
-        bool IsRunning(const std::string &module);
-
-        /**
          * @brief Starts a module
          *
          * @param name module name
+         * @return updated module list
          */
-        void StartServices(Dto::Common::Services &name);
+        Dto::Module::Module::ModuleList StartModules(Dto::Module::Module::ModuleList &modules);
 
         /**
          * @brief Stops one or several modules
          *
-         * @param services module list
+         * @param modules module list
+         * @return updated module list
          */
-        void StopServices(Dto::Common::Services &services);
+        Dto::Module::Module::ModuleList StopModules(Dto::Module::Module::ModuleList &modules);
 
         /**
          * @brief Exports the current infrastructure
@@ -91,25 +88,25 @@ namespace AwsMock::Service {
          *
          * @param jsonString infrastructure JSON string
          */
-        void ImportInfrastructure(const std::string &jsonString);
+        static void ImportInfrastructure(const std::string &jsonString);
 
         /**
          * @brief Cleans the current infrastructure.
          *
          * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
          *
-         * @param services service name list
+         * @param modules module list
          */
-        static void CleanInfrastructure(const Dto::Common::Services &services);
+        static void CleanInfrastructure(const Dto::Module::Module::ModuleList &modules);
 
         /**
          * @brief Cleans the objects from the infrastructure.
          *
          * <p>Cleans all objects from the infrastructure. This means all SQS resources, SNS resources, S3 object keys, etc. will be deleted.</p>
          *
-         * @param services service name list
+         * @param modules modules list
          */
-        void CleanObjects(const Dto::Common::Services &services);
+        static void CleanObjects(const Dto::Module::Module::ModuleList &modules);
 
       private:
 

@@ -41,7 +41,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit S3CmdHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _s3Service(configuration) {}
+        explicit S3CmdHandler() : AbstractHandler(), _s3Service() {}
 
       protected:
 
@@ -96,11 +96,6 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3Command) override;
 
       private:
-
-        /**
-         * Handler configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * S3 service

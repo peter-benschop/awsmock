@@ -2,8 +2,8 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_MANAGER_LISTENER_H
-#define AWSMOCK_MANAGER_LISTENER_H
+#ifndef AWSMOCK_SERVICE_GATEWAY_LISTENER_H
+#define AWSMOCK_SERVICE_GATEWAY_LISTENER_H
 
 // C++ includes
 #include <memory>
@@ -16,17 +16,17 @@
 #include <boost/beast/core/bind_handler.hpp>
 
 // AwsMock includes
-#include <awsmock/server/Session.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/gateway/GatewaySession.h>
 
-namespace AwsMock::Manager {
+namespace AwsMock::Service {
 
     /**
      * @brief Accepts incoming connections and launches the sessions
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class Listener : public std::enable_shared_from_this<Listener> {
+    class GatewayListener : public std::enable_shared_from_this<GatewayListener> {
 
       public:
 
@@ -35,9 +35,8 @@ namespace AwsMock::Manager {
          *
          * @param ioc Boost IO context
          * @param endpoint HTTP endpoint
-         * @param serverMap map of currently running modules
          */
-        Listener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint, const Service::ServerMap &serverMap);
+        GatewayListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint);
 
         /**
          * @brief Start accepting incoming connections
@@ -71,13 +70,8 @@ namespace AwsMock::Manager {
          * Boost acceptor
          */
         boost::asio::ip::tcp::acceptor acceptor_;
-
-        /**
-         * Map of currently running server
-         */
-        Service::ServerMap _serverMap;
     };
 
-}// namespace AwsMock::Manager
+}// namespace AwsMock::Service
 
-#endif// AWSMOCK_MANAGER_LISTENER_H
+#endif// AWSMOCK_SERVICE_GATEWAY_LISTENER_H

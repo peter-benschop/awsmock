@@ -6,10 +6,13 @@
 #define AWSMOCK_SERVICE_S3_HANDLER_H
 
 // Poco includes
+#include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
 
-#include <Poco/DateTime.h>
+// Boost includes
+#include <boost/beast.hpp>
+#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -25,6 +28,9 @@
 
 namespace AwsMock::Service {
 
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
+
     /**
      * @brief S3 request handler
      *
@@ -34,16 +40,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Handler : public S3CmdHandler {
+    class S3Handler : public AbstractHandler {
 
       public:
 
         /**
          * Constructor
-         *
-         * @param configuration application configuration
          */
-        explicit S3Handler(Core::Configuration &configuration) : S3CmdHandler(configuration) {}
+        explicit S3Handler() = default;
 
         /**
          * HTTP GET request.
@@ -54,7 +58,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::string_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user);
 
         /**
          * HTTP PUT request.
@@ -65,7 +69,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::string_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user);
 
         /**
          * HTTP POST request.
@@ -99,6 +103,15 @@ namespace AwsMock::Service {
          * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+
+        http::response<http::string_body> SendOkResponse(http::request<http::string_body> &request, const std::string &body);
+
+      private:
+
+        /**
+         * S3 service
+         */
+        S3Service _s3Service;
     };
 
 }// namespace AwsMock::Service

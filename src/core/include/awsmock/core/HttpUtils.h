@@ -16,12 +16,19 @@
 #include <Poco/RegularExpression.h>
 #include <Poco/StreamCopier.h>
 
+// Boost includes
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/HttpSocketResult.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Core {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief HTTP utilities.

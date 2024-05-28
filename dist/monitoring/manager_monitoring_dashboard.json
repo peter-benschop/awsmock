@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "fieldConfig": {
         "defaults": {
@@ -121,7 +121,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Real memory usage versus time",
       "fieldConfig": {
@@ -189,7 +189,12 @@
       "id": 3,
       "options": {
         "legend": {
-          "calcs": [],
+          "calcs": [
+            "last",
+            "min",
+            "max",
+            "mean"
+          ],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -219,7 +224,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Virtual memopy usage versus time",
       "fieldConfig": {
@@ -266,10 +271,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -286,8 +287,13 @@
       "id": 6,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -304,9 +310,9 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(virtual_memory_used [5m])",
+          "expr": "avg_over_time(virtual_memory_used[5m])",
           "hide": false,
-          "legendFormat": "VIrtual Memory",
+          "legendFormat": "Virtual memory",
           "range": true,
           "refId": "B"
         }
@@ -317,7 +323,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "fieldConfig": {
         "defaults": {
@@ -413,7 +419,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Number of requests per method",
       "fieldConfig": {
@@ -484,7 +490,8 @@
           "calcs": [
             "lastNotNull",
             "min",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -505,7 +512,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "rate(gateway_count[5m]) or vector(0)",
+          "expr": "increase(manager_http_counter[5m]) or vector(0)",
           "legendFormat": "{{method}}",
           "range": true,
           "refId": "A"
@@ -517,7 +524,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "fieldConfig": {
         "defaults": {
@@ -564,10 +571,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -587,7 +590,8 @@
           "calcs": [
             "lastNotNull",
             "min",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -608,70 +612,10 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "rate(gateway_get_time[5m]) or vector(0)",
-          "legendFormat": "GET",
+          "expr": "rate(manager_http_timer[5m]) or vector(0)",
+          "legendFormat": "{{method}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_put_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "PUT",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_post_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "POST",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_delete_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "DELETE",
-          "range": true,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_options_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "OPTIONS",
-          "range": true,
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_head_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "HEAD",
-          "range": true,
-          "refId": "F"
         }
       ],
       "title": "HTTP Request Time",
@@ -693,6 +637,6 @@
   "timezone": "",
   "title": "Manager",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 18,
+  "version": 5,
   "weekStart": ""
 }

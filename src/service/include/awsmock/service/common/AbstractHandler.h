@@ -16,6 +16,9 @@
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/RegularExpression.h>
 
+// Boost includes
+#include <boost/beast.hpp>
+
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/InvalidMethodCallException.h>
@@ -31,6 +34,9 @@
 namespace AwsMock::Service {
 
     typedef std::map<std::string, std::string> HeaderMap;
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     /**
      * @brief Abstract HTTP request handler
@@ -70,6 +76,8 @@ namespace AwsMock::Service {
          */
         virtual void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
 
+        virtual boost::beast::http::response<boost::beast::http::string_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string region, const std::string &user);
+
         /**
          * Handles the HTTP method GET.
          *
@@ -88,6 +96,8 @@ namespace AwsMock::Service {
          * @param user current user
          */
         virtual void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user);
+
+        virtual boost::beast::http::response<boost::beast::http::string_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string region, const std::string &user);
 
         /**
          * Handles the HTTP method PUT.

@@ -13,6 +13,7 @@ namespace AwsMock::Dto::Module {
             gatewayConfigJson.set("protocol", protocol);
             gatewayConfigJson.set("endpoint", endpoint);
             gatewayConfigJson.set("host", host);
+            gatewayConfigJson.set("address", address);
             gatewayConfigJson.set("port", port);
             gatewayConfigJson.set("accessId", accessId);
             gatewayConfigJson.set("clientId", clientId);
@@ -45,6 +46,7 @@ namespace AwsMock::Dto::Module {
             Core::JsonUtils::GetJsonValueString("protocol", rootObject, gatewayConfig.protocol);
             Core::JsonUtils::GetJsonValueString("endpoint", rootObject, gatewayConfig.endpoint);
             Core::JsonUtils::GetJsonValueString("host", rootObject, gatewayConfig.host);
+            Core::JsonUtils::GetJsonValueString("address", rootObject, gatewayConfig.address);
             Core::JsonUtils::GetJsonValueInt("port", rootObject, gatewayConfig.port);
             Core::JsonUtils::GetJsonValueString("accessId", rootObject, gatewayConfig.accessId);
             Core::JsonUtils::GetJsonValueString("clientId", rootObject, gatewayConfig.clientId);

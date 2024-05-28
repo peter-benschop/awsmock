@@ -2,65 +2,68 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_RESOURCE_MODULE_HANDLER_H
-#define AWSMOCK_RESOURCE_MODULE_HANDLER_H
+#ifndef AWSMOCK_SERVICE_GATEWAY_HANDLER_H
+#define AWSMOCK_SERVICE_GATEWAY_HANDLER_H
+
+// C++ includes
+#include <future>
+#include <string>
+#include <utility>
 
 // Poco includes
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/Task.h>
-#include <Poco/TaskManager.h>
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/Net/HTTPClientSession.h>
+
+// Boost includes
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+#include <boost/thread.hpp>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
-#include <awsmock/dto/common/Infrastructure.h>
-#include <awsmock/dto/common/Services.h>
-#include <awsmock/dto/module/GatewayConfig.h>
-#include <awsmock/dto/module/Module.h>
-#include <awsmock/entity/module/Module.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/repository/SecretsManagerDatabase.h>
-#include <awsmock/resource/AbstractResource.h>
-#include <awsmock/resource/HandlerException.h>
-#include <awsmock/service/cognito/CognitoServer.h>
-#include <awsmock/service/common/ModuleService.h>
-#include <awsmock/service/dynamodb/DynamoDbServer.h>
-#include <awsmock/service/gateway/GatewayServer.h>
-#include <awsmock/service/lambda/LambdaServer.h>
-#include <awsmock/service/s3/S3Server.h>
-#include <awsmock/service/secretsmanager/SecretsManagerServer.h>
-#include <awsmock/service/sns/SNSServer.h>
-#include <awsmock/service/sqs/SQSServer.h>
-#include <awsmock/service/transfer/TransferServer.h>
+#include <awsmock/service/cognito/CognitoHandler.h>
+#include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/dynamodb/DynamoDbHandler.h>
+#include <awsmock/service/gateway/GatewayRoute.h>
+#include <awsmock/service/gateway/GatewayRouter.h>
+#include <awsmock/service/kms/KMSHandler.h>
+#include <awsmock/service/lambda/LambdaHandler.h>
+#include <awsmock/service/s3/S3Handler.h>
+#include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
+#include <awsmock/service/sns/SNSHandler.h>
+#include <awsmock/service/sqs/SQSHandler.h>
+#include <awsmock/service/transfer/TransferHandler.h>
 
-namespace AwsMock::Manager {
+namespace AwsMock::Service {
 
     /**
-     * @brief AwsMock module handler
+     * @brief Gateway handler
+     *
+     * The gateway handler acts a as SPI gateway for thew different AwsMock services. It routes the client requests to the appropriate
+     * service port. The service will extracted from the AWS authorization header.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleHandler : public AwsMock::Manager::AbstractResource {
+    class GatewayHandlerOld : public AbstractHandler {
 
       public:
 
         /**
-         * @brief Constructor
+         * Constructor
          *
-         * @param serverMap map of services
+         * @param route routing structure
          */
-        explicit ModuleHandler(Service::ServerMap &serverMap);
+        GatewayHandlerOld(Service::GatewayRoute route) : AbstractHandler(), _route(std::move(route)){};
 
       protected:
 
         /**
-         * @brief HTTP GET request.
+         * HTTP GET request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -71,7 +74,7 @@ namespace AwsMock::Manager {
         void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * @brief HTTP PUT request.
+         * HTTP PUT request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -82,7 +85,7 @@ namespace AwsMock::Manager {
         void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * @brief HTTP POST request.
+         * HTTP POST request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -93,7 +96,7 @@ namespace AwsMock::Manager {
         void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * @brief Delete DELETE request.
+         * Delete DELETE request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -104,7 +107,7 @@ namespace AwsMock::Manager {
         void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
-         * @brief Options request.
+         * Options request.
          *
          * @param response HTTP response
          * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
@@ -112,7 +115,7 @@ namespace AwsMock::Manager {
         void handleOptions(Poco::Net::HTTPServerResponse &response) override;
 
         /**
-         * @brief Head request.
+         * Head request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -125,21 +128,20 @@ namespace AwsMock::Manager {
       private:
 
         /**
-         * Timer manager
+         * Sets extra header values
+         *
+         * @param request HTTP request
+         * @param region AWS region
+         * @param user AWS user
          */
-        Service::ServerMap &_serverMap;
+        static void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
 
         /**
-         * Module database
+         * Gateway route
          */
-        std::shared_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-        /**
-         * Module module
-         */
-        std::shared_ptr<Service::ModuleService> _moduleService;
+        Service::GatewayRoute _route;
     };
 
-}// namespace AwsMock::Manager
+}// namespace AwsMock::Service
 
-#endif// AWSMOCK_RESOURCE_MODULE_HANDLER_H
+#endif// AWSMOCK_SERVICE_GATEWAY_HANDLER_H

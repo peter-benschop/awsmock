@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/gateway/GatewayServer.h"
+#include <awsmock/service/gateway/GatewayServer.h>
 
 namespace AwsMock::Service {
 
@@ -11,6 +11,7 @@ namespace AwsMock::Service {
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.gateway.http.host", GATEWAY_DEFAULT_HOST);
+        _address = _configuration.getString("awsmock.service.gateway.http.host", GATEWAY_DEFAULT_ADDRESS);
         _maxQueueLength = _configuration.getInt("awsmock.service.gateway.http.max.queue", GATEWAY_MAX_QUEUE);
         _maxThreads = _configuration.getInt("awsmock.service.gateway.http.max.threads", GATEWAY_MAX_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.gateway.http.timeout", GATEWAY_TIMEOUT);
@@ -34,10 +35,30 @@ namespace AwsMock::Service {
         log_info << "Gateway server starting";
 
         // Start HTTP manager
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new GatewayRouter(_configuration, _metricService));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new GatewayRouter(_configuration, _metricService));
     }
 
     void GatewayServer::Run() {
+
+        int threads = Core::Configuration::instance().getInt("awsmock.service.gateway.http.max.threads");
+        std::string hostAddress = Core::Configuration::instance().getString("awsmock.service.gateway.http.address");
+        unsigned short port = Core::Configuration::instance().getInt("awsmock.service.gateway.http.port");
+
+        // The io_context is required for all I/O
+        boost::asio::io_context ioc{threads};
+
+        // Create and launch a listening port
+        auto address = boost::asio::ip::make_address(hostAddress);
+        std::make_shared<GatewayListener>(ioc, boost::asio::ip::tcp::endpoint{address, port})->Run();
+
+        // Run the I/O service on the requested number of threads
+        _threads.reserve(threads - 1);
+        for (auto i = threads - 1; i > 0; --i)
+            _threads.emplace_back(
+                    [&ioc] {
+                        ioc.run();
+                    });
+        ioc.run();
     }
 
     void GatewayServer::Shutdown() {

@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         log_info << "S3 module starting";
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
     }
 
     void S3Server::Run() {

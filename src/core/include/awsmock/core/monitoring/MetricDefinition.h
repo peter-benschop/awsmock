@@ -6,13 +6,8 @@
 #define AWSMOCK_CORE_METRIC_DEFINITION_H
 
 // HTTP timer
-#define GATEWAY_GET_TIMER "gateway_get_time"
-#define GATEWAY_PUT_TIMER "gateway_put_time"
-#define GATEWAY_POST_TIMER "gateway_post_time"
-#define GATEWAY_DELETE_TIMER "gateway_delete_time"
-#define GATEWAY_OPTIONS_TIMER "gateway_options_time"
-#define GATEWAY_HEAD_TIMER "gateway_head_time"
-#define GATEWAY_COUNTER "gateway_count"
+#define GATEWAY_HTTP_TIMER "gateway_http_timer"
+#define GATEWAY_HTTP_COUNTER "gateway_http_counter"
 
 #define MODULE_HTTP_TIMER "manager_http_timer"
 #define MODULE_HTTP_COUNTER "manager_http_counter"

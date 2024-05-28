@@ -53,7 +53,7 @@ namespace AwsMock::Service {
 
         // Get the resource factory for the module
         log_trace << "Found request handler for route: " << route;
-        return new Service::GatewayHandler(_routingTable[service]);
+        return new Service::GatewayHandlerOld(_routingTable[service]);
     }
 
     std::string GatewayRouter::GetService(const std::string &authorization) {

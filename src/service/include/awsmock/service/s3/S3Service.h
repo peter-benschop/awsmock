@@ -83,10 +83,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit S3Service(Core::Configuration &configuration);
+        explicit S3Service();
 
         /**
          * Returns the meta data of an S3 bucket
@@ -430,11 +428,6 @@ namespace AwsMock::Service {
          * Temp directory
          */
         std::string _tempDir;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

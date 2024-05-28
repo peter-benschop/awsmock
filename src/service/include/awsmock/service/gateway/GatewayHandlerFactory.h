@@ -9,7 +9,7 @@
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 
 // AwsMock includes
-#include <GatewayHandler.h>
+#include <GatewayHandlerOld.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/monitoring/MetricService.h>
 

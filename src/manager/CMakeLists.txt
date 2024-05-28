@@ -1,6 +1,6 @@
 set(BINARY awsmockmgr)
 
-set(SOURCES src/server/Manager.cpp src/server/Handler.cpp src/main.cpp)
+set(SOURCES src/server/Manager.cpp src/server/Listener.cpp src/server/Session.cpp src/server/Handler.cpp src/main.cpp)
 
 
 # External includes

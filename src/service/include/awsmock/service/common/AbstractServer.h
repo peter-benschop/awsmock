@@ -38,7 +38,7 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration AwsMock configuration
          * @param name manager name
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         explicit AbstractServer(Core::Configuration &configuration, std::string name, int timeout);
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration AwsMock configuration
          * @param name manager name
@@ -55,14 +55,14 @@ namespace AwsMock::Service {
         explicit AbstractServer(Core::Configuration &configuration, std::string name);
 
         /**
-         * Checks whether the module is active
+         * @brief Checks whether the module is active
          *
          * @param name module name
          */
         bool IsActive(const std::string &name);
 
         /**
-         * Start the HTTP manager
+         * @brief Start the HTTP manager
          *
          * @param maxQueueLength maximal request queue length
          * @param maxThreads maximal number of worker threads
@@ -74,7 +74,7 @@ namespace AwsMock::Service {
         void StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory);
 
         /**
-         * Stops the HTTP manager
+         * @brief Stops the HTTP manager
          */
         void StopHttpServer();
 

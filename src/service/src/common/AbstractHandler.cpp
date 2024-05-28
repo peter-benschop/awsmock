@@ -75,6 +75,10 @@ namespace AwsMock::Service {
         errorStream.flush();
     }
 
+    boost::beast::http::response<boost::beast::http::string_body> AbstractHandler::HandleGetRequest(http::request<http::string_body> &request, const std::string region, const std::string &user) {
+        return {};
+    }
+
     void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
         log_trace << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
         DumpRequest(request);
@@ -97,6 +101,10 @@ namespace AwsMock::Service {
         handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
         std::ostream &errorStream = response.send();
         errorStream.flush();
+    }
+
+    boost::beast::http::response<boost::beast::http::string_body> AbstractHandler::HandlePutRequest(http::request<http::string_body> &request, const std::string region, const std::string &user) {
+        return {};
     }
 
     void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {

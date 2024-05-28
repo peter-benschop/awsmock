@@ -14,17 +14,19 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/DomainSocket.h>
+#include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/ListContainerResponse.h>
@@ -40,6 +42,8 @@
 #define NETWORK_DEFAULT_MODE "bridge"
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief Controls the connection to the docker daemon using a UNIX Domain socket.
@@ -269,7 +273,12 @@ namespace AwsMock::Service {
         /**
          * Docker listening socket
          */
-        std::string _dockerSocket;
+        std::string _dockerSocketPath;
+
+        /**
+         * Docker listening socket
+         */
+        std::unique_ptr<Core::DomainSocket> _domainSocket;
 
         /**
          * Supported runtimes

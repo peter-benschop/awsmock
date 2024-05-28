@@ -2,8 +2,8 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_MANAGER_SERVER_H
-#define AWSMOCK_MANAGER_SERVER_H
+#ifndef AWSMOCK_MANAGER_HANDLER_H
+#define AWSMOCK_MANAGER_HANDLER_H
 
 // C++ includes
 #include <iostream>
@@ -59,6 +59,16 @@ namespace AwsMock::Manager {
          */
         boost::beast::http::response<boost::beast::http::string_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
 
+        /**
+         * @brief Handler HTTP POST requests.
+         *
+         * Handles all POST requests.
+         *
+         * @param request HTTP request
+         * @param socket HTTP socket
+         */
+        boost::beast::http::response<boost::beast::http::string_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
+
       private:
 
         /**
@@ -82,4 +92,4 @@ namespace AwsMock::Manager {
 
 }// namespace AwsMock::Manager
 
-#endif//AWSMOCK_MANAGER_SERVER_H
+#endif// AWSMOCK_MANAGER_HANDLER_H

@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Create bucket
-aws s3 mb s3://test-bucket \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+#aws s3 mb s3://test-bucket \
+#  --region eu-central-1 \
+#  --endpoint http://localhost:4566 \
+#  --profile awsmock
 
 # Copy image to bucket
-aws s3 cp ./resources/sample-java-events.png s3://test-bucket/inbound/sample-java-s3.png \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+#aws s3 cp ./resources/sample-java-events.png s3://test-bucket/inbound/sample-java-s3.png \
+#  --region eu-central-1 \
+#  --endpoint http://localhost:4566 \
+#  --profile awsmock
 
 # Create lambda function
 aws lambda create-function \
