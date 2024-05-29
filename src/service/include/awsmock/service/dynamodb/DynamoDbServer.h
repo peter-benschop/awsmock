@@ -15,7 +15,7 @@
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
+#include <awsmock/service/common/DockerService.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
 #include <awsmock/service/dynamodb/DynamoDbWorker.h>
 

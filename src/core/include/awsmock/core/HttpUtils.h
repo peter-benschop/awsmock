@@ -21,7 +21,7 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/HttpSocketResult.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
@@ -234,6 +234,15 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
         /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @return header value of empty string.
+         */
+        static bool HasHeader(const http::request<http::string_body> &request, const std::string &key);
+
+        /**
          * @brief Returns a header value by key.
          *
          * <p>
@@ -244,7 +253,20 @@ namespace AwsMock::Core {
          * @param key header key
          * @return header value of empty string.
          */
-        [[maybe_unused]] static std::string GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &key);
+        static std::string GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &key);
+
+        /**
+         * @brief Returns a header value by key.
+         *
+         * <p>
+         * Returns an empty string and logs a warning message, in case the request has no value for the given key.
+         * </p>
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @return header value of empty string.
+         */
+        static std::string GetHeaderValue(const http::request<http::string_body> &request, const std::string &key);
 
         /**
          * @brief Returns the headers as a map of strings
@@ -255,6 +277,22 @@ namespace AwsMock::Core {
         static std::map<std::string, std::string> GetHeaders(const Poco::Net::HTTPRequest &request);
 
         /**
+         * @brief Returns the headers as a map of strings
+         *
+         * @param request HTTP request
+         * @return map of strings
+         */
+        static std::map<std::string, std::string> GetHeaders(const http::request<http::string_body> &request);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param request HTTP request
+         * @return map of strings
+         */
+        static void DumpHeaders(const http::request<http::string_body> &request);
+
+        /**
          * @brief Returns the content type
          *
          * @param request HTTP request
@@ -263,12 +301,28 @@ namespace AwsMock::Core {
         static std::string GetContentType(const Poco::Net::HTTPRequest &request);
 
         /**
+         * @brief Returns the content type
+         *
+         * @param request HTTP request
+         * @return reduced content type, either 'json' or 'xml.
+         */
+        static std::string GetContentType(const http::request<http::string_body> &request);
+
+        /**
          * @brief Returns the content length
          *
          * @param request HTTP request
-         * @return content length on bytes
+         * @return content length in bytes
          */
         static long GetContentLength(const Poco::Net::HTTPRequest &request);
+
+        /**
+         * @brief Returns the content length
+         *
+         * @param request HTTP request
+         * @return content length in bytes
+         */
+        static long GetContentLength(const http::request<http::string_body> &request);
 
       private:
 

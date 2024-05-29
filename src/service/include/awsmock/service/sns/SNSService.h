@@ -47,7 +47,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SNS server thread
+     * @brief SNS server thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -56,14 +56,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration module configuration
+         * @brief Constructor
          */
-        explicit SNSService(Core::Configuration &configuration);
+        explicit SNSService();
 
         /**
-         * Creates a new queue
+         * @brief Creates a new queue
          *
          * <p>In case the topic exists already, return the existing topic.</p>
          *
@@ -73,7 +71,7 @@ namespace AwsMock::Service {
         Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
 
         /**
-         * Returns a list of all available queues
+         * @brief Returns a list of all available queues
          *
          * @param region AWS region
          * @return ListQueuesResponse
@@ -81,7 +79,7 @@ namespace AwsMock::Service {
         Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
 
         /**
-         * Publish a message to a SNS topic
+         * @brief Publish a message to a SNS topic
          *
          * @param request AWS region
          * @return PublishResponse
@@ -89,7 +87,7 @@ namespace AwsMock::Service {
         Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
         /**
-         * Subscribe to a topic
+         * @brief Subscribe to a topic
          *
          * @param request subscribe request DTO
          * @return SubscribeResponse DTO
@@ -97,7 +95,7 @@ namespace AwsMock::Service {
         Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
 
         /**
-         * Unsubscribe from a topic
+         * @brief Unsubscribe from a topic
          *
          * @param request unsubscribe request DTO
          * @return UnsubscribeResponse DTO
@@ -105,7 +103,7 @@ namespace AwsMock::Service {
         Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
 
         /**
-         * Sets tags for a topic
+         * @brief Sets tags for a topic
          *
          * @param request tag resource request DTO
          * @return TagResourceResponse DTO
@@ -113,7 +111,7 @@ namespace AwsMock::Service {
         Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request);
 
         /**
-         * Returns the topic attributes
+         * @brief Returns the topic attributes
          *
          * @param request get topic attributes request DTO
          * @return GetTopicAttributesResponse DTO
@@ -129,7 +127,7 @@ namespace AwsMock::Service {
         Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
 
         /**
-         * Delete a queue
+         * @brief Delete a queue
          *
          * @param region AWS region name
          * @param topicArn topic ARN
@@ -141,14 +139,14 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Checks the subscriptions.
+         * @brief Checks the subscriptions.
          *
          * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
          */
         void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
 
         /**
-         * Send a SNS message to an SQS queue
+         * @brief Send a SNS message to an SQS queue
          *
          * @param subscription SNS subscription
          * @param request SNS publish request
@@ -159,11 +157,6 @@ namespace AwsMock::Service {
          * Account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * SNS database connection
@@ -178,7 +171,7 @@ namespace AwsMock::Service {
         /**
          * SQS module
          */
-        std::unique_ptr<SQSService> _sqsService;
+        SQSService _sqsService;
     };
 
 }// namespace AwsMock::Service

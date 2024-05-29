@@ -66,10 +66,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit SQSService(Core::Configuration &configuration);
+        explicit SQSService() = default;
 
         /**
          * Creates a new queue.
@@ -200,11 +198,6 @@ namespace AwsMock::Service {
          * Account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

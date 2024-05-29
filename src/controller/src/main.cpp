@@ -358,7 +358,7 @@ int main(int argc, char *argv[]) {
 
     // Start manager
     AwsMock::Controller::AwsMockCtl awsMockCtl;
-    awsMockCtl.Initialize(commands);
+    awsMockCtl.Initialize(vm, commands);
     awsMockCtl.Run();
 
     return EXIT_SUCCESS;

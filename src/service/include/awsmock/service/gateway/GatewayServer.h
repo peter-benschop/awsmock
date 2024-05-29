@@ -30,6 +30,8 @@
 
 namespace AwsMock::Service {
 
+    namespace ip = boost::asio::ip;
+
     /**
      * @brief Gateway server
      *
@@ -40,12 +42,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration aws-mock configuration
          * @param metricService aws-mock monitoring
          */
-        explicit GatewayServer(Core::Configuration &configuration, Core::MetricService &metricService);
+        explicit GatewayServer();
 
       protected:
 
@@ -67,24 +69,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * Metric module
-         */
-        Core::MetricService &_metricService;
-
-        /**
          * Service database
          */
         std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
-
-        /**
-         * Running flag
-         */
-        bool _running;
 
         /**
          * AWS region
@@ -99,7 +86,7 @@ namespace AwsMock::Service {
         /**
          * Rest port
          */
-        int _port;
+        unsigned short _port;
 
         /**
          * Rest host
@@ -125,11 +112,6 @@ namespace AwsMock::Service {
          * HTTP request timeout
          */
         int _requestTimeout;
-
-        /**
-         * Gateway router
-         */
-        // std::shared_ptr<Service::GatewayRouter> _router = std::make_shared<Service::GatewayRouter>(_configuration, _metricService);
 
         /**
          * Thread pool

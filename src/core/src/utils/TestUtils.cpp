@@ -28,9 +28,13 @@ namespace AwsMock::Core {
         ofs << "awsmock.user=none" << std::endl;
         ofs << "awsmock.data.dir=/tmp/awsmock/data" << std::endl;
         // Rest configuration
+        ofs << "awsmock.service.gateway.active=true" << std::endl;
         ofs << "awsmock.service.gateway.http.host=" << hostName << std::endl;
         ofs << "awsmock.service.gateway.http.port=" << port << std::endl;
-        // Database configuration
+        ofs << "awsmock.service.gateway.http.address=0.0.0.0" << std::endl;
+        ofs << "awsmock.service.gateway.http.max.queue=10" << std::endl;
+        ofs << "awsmock.service.gateway.http.max.threads=10" << std::endl;
+        ofs << "awsmock.service.gateway.http.timeout=10" << std::endl;
         ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
         ofs << "awsmock.mongodb.name=test" << std::endl;
         ofs << "awsmock.mongodb.http.host=" << hostName << std::endl;

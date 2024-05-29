@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Common {
 
-    void DynamoDbClientCommand::FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
+    void DynamoDbClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
 
         // Basic values
         this->region = region;
@@ -14,34 +14,26 @@ namespace AwsMock::Dto::Common {
         this->method = method;
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->url = request.getURI();
-        this->payload = Core::HttpUtils::GetBodyAsString(request);
+        this->url = request.target();
+        this->payload = request.body();
         this->headers = Core::HttpUtils::GetHeaders(request);
 
-        if (!Core::AwsUtils::VerifySignature(request, payload, _secretAccessKey)) {
-            log_error << "AWS signature could not be verified";
-            throw Core::UnauthorizedException("AWS signature could not be verified");
-        }
-
         switch (method) {
-            case HttpMethod::GET:
-            case HttpMethod::PUT:
-            case HttpMethod::DELETE:
-                break;
-            case HttpMethod::POST:
+            case http::verb::post:
                 command = GetClientCommandFromHeader(request);
                 break;
-            case HttpMethod::HEAD:
-            case HttpMethod::UNKNOWN: {
+            case http::verb::get:
+            case http::verb::put:
+            case http::verb::delete_:
+            case http::verb::head:
                 break;
-            }
         }
     }
 
-    DynamoDbCommandType DynamoDbClientCommand::GetClientCommandFromHeader(const Poco::Net::HTTPServerRequest &request) {
+    DynamoDbCommandType DynamoDbClientCommand::GetClientCommandFromHeader(const http::request<http::string_body> &request) {
 
-        if (request.has("X-Amz-Target")) {
-            std::string headerValue = request.get("X-Amz-Target");
+        if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
+            std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
             std::string action = Core::StringUtils::Split(headerValue, '.')[1];
             return DynamoDbCommandTypeFromString(action);
         }
@@ -53,7 +45,7 @@ namespace AwsMock::Dto::Common {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
-            rootJson.set("method", HttpMethodToString(method));
+            rootJson.set("method", boost::lexical_cast<std::string>(method));
             rootJson.set("command", DynamoDbCommandTypeToString(command));
             rootJson.set("user", user);
 

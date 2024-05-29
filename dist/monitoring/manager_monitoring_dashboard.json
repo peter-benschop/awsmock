@@ -195,7 +195,7 @@
             "max",
             "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -637,6 +637,6 @@
   "timezone": "",
   "title": "Manager",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 5,
+  "version": 6,
   "weekStart": ""
 }

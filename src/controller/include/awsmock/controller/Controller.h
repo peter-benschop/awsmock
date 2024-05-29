@@ -27,7 +27,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/HttpSocket.h>
-#include <awsmock/core/HttpSocketResult.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
@@ -52,9 +52,10 @@ namespace AwsMock::Controller {
         /**
          * Initialization
          *
+         * @param vm vector of command line options
          * @param command vector of commands
          */
-        void Initialize(const std::vector<std::string> &commands);
+        void Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands);
 
         /**
          * Initialization
@@ -109,11 +110,11 @@ namespace AwsMock::Controller {
         /**
          * Dumps the current infrastructure as JSON file to stdout.
          *
-         * @param services list of services
+         * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true, bool includeObjects = false);
+        void ExportInfrastructure(Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false);
 
         /**
          * Imports the current infrastructure from stdin
@@ -137,7 +138,7 @@ namespace AwsMock::Controller {
       private:
 
         /**
-         * Add authorization header.
+         * @brief Add authorization header.
          *
          * @param headers headers
          * @param action action to perform
@@ -145,9 +146,21 @@ namespace AwsMock::Controller {
         void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action);
 
         /**
+         * @brief Get a list of all modules.
+         *
+         * @return list of all modules.
+         */
+        Dto::Module::Module::ModuleList GetAllModules();
+
+        /**
          * Commands
          */
         std::vector<std::string> _commands;
+
+        /**
+         * Command line options
+         */
+        boost::program_options::variables_map _vm;
 
         /**
          * Curl utils

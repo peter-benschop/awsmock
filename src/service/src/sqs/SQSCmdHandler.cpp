@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    void SQSCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SQSClientCommand &sqsClientCommand) {
+    /*    void SQSCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SQSClientCommand &sqsClientCommand) {
         log_debug << "SQS POST request, URI: " << request.getURI() << " region: " << sqsClientCommand.region << " user: " << sqsClientCommand.user << " command: " << Dto::Common::SqsCommandTypeToString(sqsClientCommand.command);
 
         std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
@@ -432,6 +432,6 @@ namespace AwsMock::Service {
             }
         }
         return headers;
-    }
+    }*/
 
 }// namespace AwsMock::Service

@@ -9,13 +9,6 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/RegularExpression.h>
-
 // Boost includes
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
@@ -28,10 +21,12 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
-#include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     enum class S3CommandType {
         CREATE_BUCKET,
@@ -172,19 +167,16 @@ namespace AwsMock::Dto::Common {
          * @param httpMethod HTTP request method
          * @param userAgent HTTP user agent
          */
-        void GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent);
+        void GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent);
 
         /**
          * Getś the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
-
-        void FromRequest(boost::beast::http::request<boost::beast::http::string_body>, const std::string &awsRegion, const std::string &awsUser);
+        void FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Converts the DTO to a string representation.

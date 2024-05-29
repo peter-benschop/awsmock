@@ -42,9 +42,9 @@
 
 #define SECRETSMANAGER_SECRETS_COUNT "secretsmanager_secret_count_total"
 
-#define COGNITO_USER_COUNT "cognito_user_count_total"
-#define COGNITO_USERPOOL_COUNT "cognito_userpool_count_total"
-#define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_count"
+#define COGNITO_USER_COUNT "cognito_user_counter"
+#define COGNITO_USERPOOL_COUNT "cognito_userpool_counter"
+#define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_counter"
 #define COGNITO_SERVICE_TIMER "cognito_service_timer"
 
 #define TRANSFER_SERVER_COUNT "transfer_server_count_total"

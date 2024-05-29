@@ -5,11 +5,6 @@
 #ifndef AWSMOCK_SERVICE_S3_HANDLER_H
 #define AWSMOCK_SERVICE_S3_HANDLER_H
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
 // Boost includes
 #include <boost/beast.hpp>
 #include <boost/beast/http/impl/message.hpp>
@@ -45,12 +40,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit S3Handler() = default;
 
         /**
-         * HTTP GET request.
+         * @brief HTTP GET request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -58,10 +53,10 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        boost::beast::http::response<boost::beast::http::string_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user);
+        http::response<http::string_body> HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * HTTP PUT request.
+         * @brief HTTP PUT request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -69,10 +64,10 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        boost::beast::http::response<boost::beast::http::string_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user);
+        http::response<http::string_body> HandlePutRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -80,10 +75,10 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::string_body> HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * Delete DELETE request.
+         * @brief Delete DELETE request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -91,10 +86,10 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::string_body> HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * Head request.
+         * @brief Head request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -102,9 +97,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        http::response<http::string_body> SendOkResponse(http::request<http::string_body> &request, const std::string &body);
+        http::response<http::string_body> HandleHeadRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

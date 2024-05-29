@@ -90,7 +90,7 @@ namespace AwsMock::Manager {
                 _serverMap[module.name] = std::make_shared<Service::TransferServer>(configuration);
                 _serverMap[module.name]->Start();
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::CognitoServer>(configuration);
+                _serverMap[module.name] = std::make_shared<Service::CognitoServer>();
                 _serverMap[module.name]->Start();
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>(configuration);
@@ -102,7 +102,7 @@ namespace AwsMock::Manager {
                 _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
                 _serverMap[module.name]->Start();
             } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::GatewayServer>(configuration, Core::MetricService::instance());
+                _serverMap[module.name] = std::make_shared<Service::GatewayServer>();
                 _serverMap[module.name]->Start();
             }
             log_debug << "Module " << module.name << " started";

@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/core/HttpUtils.h"
+#include <awsmock/core/HttpUtils.h>
 
 namespace AwsMock::Core {
 
@@ -198,12 +198,23 @@ namespace AwsMock::Core {
         return url;
     }
 
+    bool HttpUtils::HasHeader(const http::request<http::string_body> &request, const std::string &name) {
+        return request.base().find(name) != request.end();
+    }
+
     std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
         std::string headerValue = request.get(name);
         if (headerValue.empty()) {
             log_warning << "Header value not found, key: " << name;
         }
         return headerValue;
+    }
+
+    std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name) {
+        if (request.base().find(name) == request.end()) {
+            log_warning << "Header value not found, key: " << name;
+        }
+        return request.base()[name];
     }
 
     std::map<std::string, std::string> HttpUtils::GetHeaders(const Poco::Net::HTTPRequest &request) {
@@ -215,6 +226,20 @@ namespace AwsMock::Core {
         return headers;
     }
 
+    std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::string_body> &request) {
+
+        std::map<std::string, std::string> headers;
+        for (const auto &header: request.base()) {
+            headers[to_string(header.name())] = header.value();
+        }
+        return headers;
+    }
+
+    void HttpUtils::DumpHeaders(const http::request<http::string_body> &request) {
+        for (const auto &header: request.base()) {
+            log_info << header.name() << ": " << header.value();
+        }
+    }
     std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {
 
         return Core::StringUtils::ContainsIgnoreCase(request.getContentType(), "json") ? "json" : "xml";
@@ -223,6 +248,19 @@ namespace AwsMock::Core {
     long HttpUtils::GetContentLength(const Poco::Net::HTTPRequest &request) {
 
         return static_cast<long>(request.getContentLength64());
+    }
+
+    std::string HttpUtils::GetContentType(const http::request<http::string_body> &request) {
+
+        return Core::StringUtils::ContainsIgnoreCase(request.base()["Content-Type"], "json") ? "json" : "xml";
+    }
+
+    long HttpUtils::GetContentLength(const http::request<http::string_body> &request) {
+
+        if (request.has_content_length()) {
+            return std::stol(request.base()["Content-Length"]);
+        }
+        return 0;
     }
 
     bool HttpUtils::IsUrlEncoded(const std::string &value) {

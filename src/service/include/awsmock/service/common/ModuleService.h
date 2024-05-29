@@ -23,6 +23,7 @@
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
+#include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/kms/KMSServer.h>
 #include <awsmock/service/lambda/LambdaServer.h>
@@ -76,12 +77,12 @@ namespace AwsMock::Service {
         /**
          * @brief Exports the current infrastructure
          *
-         * @param services service name list
+         * @param modules modules name list
          * @param prettyPrint JSON pretty print, if true JSON indent = 4
          * @param includeObjects include objects in the export
          * @return JSON string
          */
-        static std::string ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint = false, bool includeObjects = false);
+        static std::string ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool prettyPrint = false, bool includeObjects = false);
 
         /**
          * @brief Import the infrastructure

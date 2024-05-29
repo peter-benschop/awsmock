@@ -8,21 +8,24 @@ namespace AwsMock::Service {
 
     GatewaySession::RoutingTable GatewaySession::_routingTable = {
             {"s3", std::make_shared<S3Handler>()},
-            {"s3api", std::make_shared<S3Handler>()}};
+            {"s3api", std::make_shared<S3Handler>()},
+            {"sqs", std::make_shared<SQSHandler>()},
+            {"sns", std::make_shared<SNSHandler>()},
+            {"lambda", std::make_shared<LambdaHandler>()},
+            {"transfer", std::make_shared<TransferHandler>()},
+            {"cognito-idp", std::make_shared<CognitoHandler>()},
+            {"cognito-identity", std::make_shared<CognitoHandler>()},
+            {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
+            {"kms", std::make_shared<KMSHandler>()},
+            {"dynamodb", std::make_shared<DynamoDbHandler>()}};
 
-    /*_routingTable["s3"] = {._name = "s3", ._handlerType = HandlerType::S3, ._handler = new S3Handler(configuration)};
-    _routingTable["s3api"] = {._name = "s3", ._handlerType = HandlerType::S3, ._handler = new S3Handler(configuration)};
-    _routingTable["sqs"] = {._name = "sqs", ._handlerType = HandlerType::SQS, ._handler = new SQSHandler(configuration)};
+    /*    _routingTable["sqs"] = {._name = "sqs", ._handlerType = HandlerType::SQS, ._handler = new SQSHandler(configuration)};
     _routingTable["sns"] = {._name = "sns", ._handlerType = HandlerType::SNS, ._handler = new SNSHandler(configuration)};
     _routingTable["lambda"] = {._name = "lambda", ._handlerType = HandlerType::LAMBDA, ._handler = new LambdaHandler(configuration)};
     _routingTable["transfer"] = {._name = "transfer", ._handlerType = HandlerType::TRANSFER, ._handler = new TransferHandler(configuration)};
-    _routingTable["cognito-idp"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler()};
-    _routingTable["cognito-identity"] = {._name = "cognito", ._handlerType = HandlerType::COGNITO, ._handler = new CognitoHandler()};
-    _routingTable["dynamodb"] = {._name = "dynamodb", ._handlerType = HandlerType::DYNAMODB, ._handler = new DynamoDbHandler(configuration)};
     _routingTable["secretsmanager"] = {._name = "secretsmanager", ._handlerType = HandlerType::SECRETS_MANAGER, ._handler = new SecretsManagerHandler(configuration)};
     _routingTable["kms"] = {._name = "kms", ._handlerType = HandlerType::KMS, ._handler = new KMSHandler(configuration)};
-    log_debug << "Gateway router initialized, routes: " << _routingTable.size();*/
-
+*/
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {
         static_assert(queue_limit > 0, "queue limit must be positive");
     };
@@ -107,6 +110,17 @@ namespace AwsMock::Service {
                     res.prepare_payload();
                     return res;
                 };
+        // Returns a bad request response
+        auto const notimplemented =
+                [&req](boost::beast::string_view why) {
+                    http::response<http::string_body> res{http::status::not_implemented, req.version()};
+                    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+                    res.set(http::field::content_type, "text/html");
+                    res.keep_alive(req.keep_alive());
+                    res.body() = std::string(why);
+                    res.prepare_payload();
+                    return res;
+                };
 
         // Make sure we can handle the method
         if (req.method() != http::verb::get && req.method() != http::verb::put &&
@@ -126,22 +140,27 @@ namespace AwsMock::Service {
             throw Core::UnauthorizedException("AWS signature could not be verified");
         }*/
 
-        Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(req["Authorization"], "none");
+        Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(req["Authorization"], {});
 
         std::shared_ptr<AbstractHandler> handler = _routingTable[authKey.module];
-        http::response<http::string_body> res;
+        if (handler) {
 
-        switch (req.method()) {
-            case http::verb::get:
-                log_debug << "Handle GET request";
-                res = handler->HandleGetRequest(req, "blah", "bluh");
-                break;
-            case http::verb::put:
-                log_debug << "Handle PUT request";
-                //res = handler->HandlsPutRequest(req, "blah", "bluh");
-                break;
+            switch (req.method()) {
+                case http::verb::get:
+                    log_debug << "Handle GET request";
+                    return handler->HandleGetRequest(req, authKey.region, "none");
+                    break;
+                case http::verb::put:
+                    log_debug << "Handle PUT request";
+                    return handler->HandlePutRequest(req, authKey.region, "none");
+                    break;
+                case http::verb::post:
+                    log_debug << "Handle POST request";
+                    return handler->HandlePostRequest(req, authKey.region, "none");
+                    break;
+            }
         }
-        return res;
+        return notimplemented("Not yet implemented");
     }
 
     // Called to start/continue the write-loop. Should not be called when

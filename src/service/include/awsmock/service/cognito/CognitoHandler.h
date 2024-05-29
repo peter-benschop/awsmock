@@ -5,29 +5,29 @@
 #ifndef AWSMOCK_SERVICE_COGNITO_HANDLER_H
 #define AWSMOCK_SERVICE_COGNITO_HANDLER_H
 
-// Poco includes
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
-#include <Poco/DateTime.h>
+// Boost includes
+#include <boost/beast.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/CognitoClientCommand.h>
-#include <awsmock/service/cognito/CognitoCmdHandler.h>
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     /**
      * @brief Cognito HTTP handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoHandler : public CognitoCmdHandler {
+    class CognitoHandler : public AbstractHandler {
 
       public:
 
@@ -35,28 +35,6 @@ namespace AwsMock::Service {
          * @brief Constructor
          */
         CognitoHandler() = default;
-
-        /**
-         * @brief HTTP GET request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * @brief HTTP PUT request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP POST request.
@@ -67,39 +45,17 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * @brief Delete DELETE request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * @brief Options request.
-         *
-         * @param response HTTP response
-         * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleOptions(Poco::Net::HTTPServerResponse &response) override;
-
-        /**
-         * @brief Head request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::string_body> HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
 
       private:
+
+        /**
+         * @brief Return the command from the header.
+         *
+         * @param request HTTP request
+         * @return Cognito action
+         */
+        static std::string GetActionFromHeader(const http::request<http::string_body> &request);
 
         /**
          * Cognito service

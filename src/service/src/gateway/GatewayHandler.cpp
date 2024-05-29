@@ -11,7 +11,7 @@ namespace AwsMock::Service {
     http::response<http::string_body> GatewayHandler::HandleGetRequest(http::request<http::string_body> &request) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "GET");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
 
         /*        ::unlink(socket_path);// Remove previous binding.
@@ -45,25 +45,25 @@ namespace AwsMock::Service {
 
     http::response<http::string_body> GatewayHandler::HandlePutRequest(http::request<http::string_body> &request) {
 
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "PUT");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
     }
 
     http::response<http::string_body> GatewayHandler::HandlePostRequest(http::request<http::string_body> &request) {
 
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "POST");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
     }
 
     http::response<http::string_body> GatewayHandler::HandleDeleteRequest(http::request<http::string_body> &request) {
 
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "DELETE");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "DELETE");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "DELETE");
     }
 
     http::response<http::string_body> GatewayHandler::HandleHeadRequest(http::request<http::string_body> &request) {
 
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "HEAD");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "HEAD");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "HEAD");
     }
 

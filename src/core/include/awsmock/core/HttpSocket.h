@@ -2,8 +2,8 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#ifndef AWSMOCK_CORE_DOMAIN_SOCKET_H
-#define AWSMOCK_CORE_DOMAIN_SOCKET_H
+#ifndef AWSMOCK_CORE_HTTP_SOCKET_H
+#define AWSMOCK_CORE_HTTP_SOCKET_H
 
 // C++ includes
 #include <cstring>
@@ -19,7 +19,7 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/HttpSocketResult.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {
@@ -48,7 +48,7 @@ namespace AwsMock::Core {
          * @param headers HTTP headers
          * @return HTTP response
          */
-        static HttpSocketResult SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+        static HttpSocketResponse SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
       private:
 
@@ -80,7 +80,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        static HttpSocketResult PrepareResult(http::response<http::string_body> response);
+        static HttpSocketResponse PrepareResult(http::response<http::string_body> response);
 
         /**
          * Domain socket path
@@ -90,4 +90,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_DOMAIN_SOCKET_H
+#endif// AWSMOCK_CORE_HTTP_SOCKET_H

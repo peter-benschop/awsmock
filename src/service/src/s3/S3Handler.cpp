@@ -226,16 +226,19 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
                     break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
-                    throw Core::ServiceException("Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(clientCommand.command));
+                    return SendBadRequestError(request, "Bad request, method: GET clientCommand: " + Dto::Common::S3CommandTypeToString(clientCommand.command));
                 }
+                default:
+                    return SendBadRequestError(request, "Unknown method");
             }
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
-            //SendXmlErrorResponse("S3", response, exc);
+            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            //SendXmlErrorResponse("S3", response, exc);
+            return SendInternalServerError(request, exc.what());
         }
+        return SendBadRequestError(request, "Unknown method");
     }
 
     boost::beast::http::response<boost::beast::http::string_body> S3Handler::HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user) {
@@ -420,8 +423,11 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Bad request, method: PUT clientCommand: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
-                    throw Core::ServiceException("Bad request, method: PUT clientCommand: " + Dto::Common::S3CommandTypeToString(clientCommand.command));
+                    return SendBadRequestError(request, "Unknown method");
                 }
+                default:
+                    log_error << "Bad request, method: PUT clientCommand: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
+                    return SendBadRequestError(request, "Unknown method");
             }
 
             if (clientCommand.versionRequest) {
@@ -443,17 +449,18 @@ namespace AwsMock::Service {
 
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            //SendXmlErrorResponse("S3", response, exc);
+            return SendInternalServerError(request, exc.message());
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
-            //SendXmlErrorResponse("S3", response, exc);
+            return SendInternalServerError(request, exc.message());
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
-            //SendXmlErrorResponse("S3", response, exc);
+            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            //SendXmlErrorResponse("S3", response, exc);
+            return SendInternalServerError(request, exc.what());
         }
+        return SendBadRequestError(request, "Unknown method");
     }
 
     void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
@@ -483,17 +490,4 @@ namespace AwsMock::Service {
         //S3CmdHandler::handleHead(request, response, clientCommand);
     }
 
-    boost::beast::http::response<boost::beast::http::string_body> S3Handler::SendOkResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body) {
-        // Prepare the response message
-        boost::beast::http::response<boost::beast::http::string_body> response;
-        response.version(request.version());
-        response.result(boost::beast::http::status::ok);
-        response.set(boost::beast::http::field::server, "awsmock");
-        response.set(boost::beast::http::field::content_type, "application/json");
-        response.body() = body;
-        response.prepare_payload();
-
-        // Send the response to the client
-        return response;
-    }
 }// namespace AwsMock::Service

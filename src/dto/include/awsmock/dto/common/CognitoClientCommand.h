@@ -13,6 +13,10 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/RegularExpression.h>
 
+// Boost includes
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
+
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
@@ -21,10 +25,12 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
-#include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     enum class CognitoCommandType {
         CREATE_USER_POOL,
@@ -86,12 +92,11 @@ namespace AwsMock::Dto::Common {
         /**
          * Getś the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Converts the DTO to a string representation.

@@ -82,10 +82,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit LambdaService(const Core::Configuration &configuration);
+        explicit LambdaService();
 
         /**
          * @brief Create lambda function
@@ -217,11 +215,6 @@ namespace AwsMock::Service {
          * AWS account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        const Core::Configuration &_configuration;
 
         /**
          * lambda database connection

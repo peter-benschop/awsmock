@@ -280,7 +280,6 @@ namespace AwsMock::Core {
         return it != _histogramMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();
     }
 
-
     void MetricService::AddTimer(const std::string &name) {
         Poco::Mutex::ScopedLock lock(_mutex);
         if (!TimerExists(name)) {
@@ -315,14 +314,14 @@ namespace AwsMock::Core {
         }
     }
 
-    void MetricService::StartTimer(const std::string &name, const std::string &label) {
+    void MetricService::StartTimer(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         Poco::Mutex::ScopedLock lock(_mutex);
-        if (!TimerExists(name, label)) {
-            _timerMap[name] = new Poco::Prometheus::Gauge(name, {.labelNames{"method"}});
+        if (!TimerExists(name, labelName)) {
+            AddTimer(name, labelName);
         }
-        if (_timerStartMap.find(GetTimerStartKeyLabel(name, label)) == _timerStartMap.end()) {
-            _timerStartMap[GetTimerStartKeyLabel(name, label)] = std::chrono::high_resolution_clock::now();
-            log_trace << "Timer started, name: " << name << " label: " << label;
+        if (_timerStartMap.find(GetTimerStartKeyLabel(name, labelValue)) == _timerStartMap.end()) {
+            _timerStartMap[GetTimerStartKeyLabel(name, labelValue)] = std::chrono::high_resolution_clock::now();
+            log_trace << "Timer started, name: " << name << " labelValue: " << labelValue;
         }
     }
 
@@ -337,14 +336,14 @@ namespace AwsMock::Core {
         }
     }
 
-    void MetricService::StopTimer(const std::string &name, const std::string &label) {
+    void MetricService::StopTimer(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         Poco::Mutex::ScopedLock lock(_mutex);
-        if (TimerExists(name, label)) {
-            _timerMap.find(name)->second->labels({label}).set(TIME_DIFF_LABEL(name, label));
-            const auto count = std::erase_if(_timerStartMap, [name, label](const auto &item) {
-                return item.first == GetTimerStartKeyLabel(name, label);
+        if (TimerExists(name, labelName)) {
+            _timerMap.find(name)->second->labels({labelValue}).set(TIME_DIFF_LABEL(name, labelValue));
+            const auto count = std::erase_if(_timerStartMap, [name, labelValue](const auto &item) {
+                return item.first == GetTimerStartKeyLabel(name, labelValue);
             });
-            log_trace << "Timer stopped, name: " << name << " label: " << label << count << " size: " << _timerStartMap.size();
+            log_trace << "Timer stopped, name: " << name << " labelValue: " << labelValue << count << " size: " << _timerStartMap.size();
         }
     }
 

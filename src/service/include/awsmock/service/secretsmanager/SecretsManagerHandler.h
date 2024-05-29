@@ -5,8 +5,10 @@
 #ifndef AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H
 #define AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H
 
-// Poco includes
-#include <Poco/Condition.h>
+// Boost includes
+#include <boost/beast.hpp>
+#include <boost/beast/http/impl/message.hpp>
+#include <boost/lexical_cast.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -19,32 +21,40 @@
 
 namespace AwsMock::Service {
 
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
+
     /**
      * AWS secrets manager mock handler.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerHandler : public SecretsManagerCmdHandler {
+    class SecretsManagerHandler : public AbstractHandler {
 
       public:
 
         /**
          * Constructor
-         *
-         * @param configuration application configuration
          */
-        explicit SecretsManagerHandler(Core::Configuration &configuration);
+        explicit SecretsManagerHandler() = default;
 
         /**
          * HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region
          * @param user AWS user
+         * @return response HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::string_body> HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
+
+      private:
+
+        /**
+         * Secrets manager module
+         */
+        Service::SecretsManagerService _secretsManagerService;
     };
 
 }// namespace AwsMock::Service

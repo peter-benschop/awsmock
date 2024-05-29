@@ -3,352 +3,98 @@
 
 namespace AwsMock::Service {
 
-    AbstractHandler::AbstractHandler() : _baseUrl(), _requestURI(), _requestHost() {}
-
-    AbstractHandler::~AbstractHandler() = default;
-
-    void AbstractHandler::handleHttpHeaders(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-
-        if (request.getMethod() != Poco::Net::HTTPRequest::HTTP_GET && request.getMethod() != Poco::Net::HTTPRequest::HTTP_PUT && request.getMethod() != Poco::Net::HTTPRequest::HTTP_POST && request.getMethod() != Poco::Net::HTTPRequest::HTTP_DELETE && request.getMethod() != Poco::Net::HTTPRequest::HTTP_OPTIONS && request.getMethod() != Poco::Net::HTTPRequest::HTTP_HEAD) {
-            log_error << "Invalid request method, method: " << request.getMethod();
-            throw Core::ServiceException("The request method is not supported by the manager and cannot be handled.", Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        }
-
-        if (request.has("Accept")) {
-            if (!request.get("Accept").empty()) {
-                response.setContentType(request.get("Accept"));
-            }
-        }
-    }
-
-    void AbstractHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-
-        try {
-            handleHttpHeaders(request, response);
-        } catch (Core::ServiceException &exception) {
-
-            log_error << "Exception: msg: " << exception.message();
-
-            handleHttpStatusCode(response, exception.code());
-            return;
-        }
-
-        Poco::URI uri = Poco::URI(request.getURI());
-
-        std::string scheme, authInfo, region, user;
-        request.getCredentials(scheme, authInfo);
-        GetRegionUser(authInfo, region, user);
-
-        _queryStringParameters = uri.getQueryParameters();
-        uri.getPathSegments(_pathParameter);
-
-        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) {
-            this->handleGet(request, response, region, user);
-        }
-
-        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT) {
-            this->handlePut(request, response, region, user);
-        }
-
-        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
-            this->handlePost(request, response, region, user);
-        }
-
-        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_DELETE) {
-            this->handleDelete(request, response, region, user);
-        }
-
-        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_OPTIONS) {
-            this->handleOptions(response);
-        }
-
-        if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_HEAD) {
-            this->handleHead(request, response, region, user);
-        }
-    }
-
-    void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
-
-    boost::beast::http::response<boost::beast::http::string_body> AbstractHandler::HandleGetRequest(http::request<http::string_body> &request, const std::string region, const std::string &user) {
+    http::response<http::string_body> AbstractHandler::HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_error << "Real method not implemented";
         return {};
     }
 
-    void AbstractHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
-
-    void AbstractHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
-
-    void AbstractHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
-
-    boost::beast::http::response<boost::beast::http::string_body> AbstractHandler::HandlePutRequest(http::request<http::string_body> &request, const std::string region, const std::string &user) {
+    http::response<http::string_body> AbstractHandler::HandlePutRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_error << "Real method not implemented";
         return {};
     }
 
-    void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
+    http::response<http::string_body> AbstractHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_error << "Real method not implemented";
+        return {};
     }
 
-    void AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
+    http::response<http::string_body> AbstractHandler::HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_error << "Real method not implemented";
+        return {};
     }
 
-    void AbstractHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << region << " user: " << user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
+    http::response<http::string_body> AbstractHandler::HandleHeadRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_error << "Real method not implemented";
+        return {};
     }
 
-    void AbstractHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
-        log_trace << "Request, method: " + request.getMethod() << " region: " << s3ClientCommand.region << " user: " << s3ClientCommand.user;
-        DumpRequest(request);
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED);
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
+    http::response<http::string_body> AbstractHandler::SendOkResponse(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-    void AbstractHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-        log_debug << "S3 OPTIONS request";
+        // Prepare the response message
+        http::response<http::string_body> response;
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.body() = body;
+        response.prepare_payload();
 
-        response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
-        response.setContentType("text/plain; charset=utf-8");
-
-        handleHttpStatusCode(response, 200);
-        std::ostream &outputStream = response.send();
-        outputStream.flush();
-    }
-
-    void AbstractHandler::handleHead([[maybe_unused]] Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-        log_trace << "Request, method: " << request.getMethod();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED, Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
-
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
-
-    void AbstractHandler::handleHead([[maybe_unused]] Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::S3ClientCommand &s3ClientCommand) {
-        log_trace << "Request, method: " << request.getMethod();
-        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED, Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED);
-
-        std::ostream &errorStream = response.send();
-        errorStream.flush();
-    }
-
-    void AbstractHandler::handleHttpStatusCode(Poco::Net::HTTPServerResponse &response, int statusCode, const std::string &reason) {
-
-        switch (statusCode) {
-
-            case 200:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_OK : reason);
-                log_trace << "HTTP state code: 200 message: " << Poco::Net::HTTPResponse::HTTP_REASON_OK;
-                break;
-
-            case 201:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CREATED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_CREATED : reason);
-                log_debug << "HTTP state code: 201 message: " << Poco::Net::HTTPResponse::HTTP_REASON_CREATED;
-                break;
-
-            case 202:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_ACCEPTED : reason);
-                log_debug << "HTTP state code: 202 message: " << Poco::Net::HTTPResponse::HTTP_REASON_ACCEPTED;
-                break;
-
-            case 204:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NO_CONTENT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NO_CONTENT : reason);
-                log_debug << "HTTP state code: 204 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NO_CONTENT;
-                break;
-
-            case 205:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_RESET_CONTENT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_RESET_CONTENT : reason);
-                log_debug << "HTTP state code: 205 message: " << Poco::Net::HTTPResponse::HTTP_REASON_RESET_CONTENT;
-                break;
-
-            case 206:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_PARTIAL_CONTENT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_PARTIAL_CONTENT : reason);
-                log_debug << "HTTP state code: 206 message: " << Poco::Net::HTTPResponse::HTTP_REASON_PARTIAL_CONTENT;
-                break;
-
-            case 400:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST : reason);
-                log_error << "HTTP state code: 400 message: " << Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST;
-                break;
-
-            case 401:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED : reason);
-                log_error << "HTTP state code: 401 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNAUTHORIZED;
-                break;
-
-            case 403:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_FORBIDDEN, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN : reason);
-                log_error << "HTTP state code: 403 message: " << Poco::Net::HTTPResponse::HTTP_REASON_FORBIDDEN;
-                break;
-
-            case 404:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_FOUND, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND : reason);
-                log_error << "HTTP state code: 404 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_FOUND;
-                break;
-
-            case 405:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_METHOD_NOT_ALLOWED : reason);
-                log_error << "HTTP state code: 405 message: " << Poco::Net::HTTPResponse::HTTP_REASON_METHOD_NOT_ALLOWED;
-                break;
-
-            case 406:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NOT_ACCEPTABLE : reason);
-                log_error << "HTTP state code: 406 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_ACCEPTABLE;
-                break;
-
-            case 409:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_CONFLICT, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_CONFLICT : reason);
-                log_error << "HTTP state code: 409 message: " << Poco::Net::HTTPResponse::HTTP_REASON_CONFLICT;
-                break;
-
-            case 410:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_GONE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_GONE : reason);
-                log_error << "HTTP state code: 410 message: " << Poco::Net::HTTPResponse::HTTP_REASON_GONE;
-                break;
-
-            case 415:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_UNSUPPORTED_MEDIA_TYPE : reason);
-                log_error << "HTTP state code: 415 message: " << Poco::Net::HTTPResponse::HTTP_REASON_UNSUPPORTED_MEDIA_TYPE;
-                break;
-
-            case 500:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR : reason);
-                log_error << "HTTP state code: 500 message: " << Poco::Net::HTTPResponse::HTTP_REASON_INTERNAL_SERVER_ERROR;
-                break;
-
-            case 501:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_IMPLEMENTED, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED : reason);
-                log_error << "HTTP state code: 501 message: " << Poco::Net::HTTPResponse::HTTP_REASON_NOT_IMPLEMENTED;
-                break;
-
-            case 503:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_SERVICE_UNAVAILABLE : reason);
-                log_error << "HTTP state code: 503 message: " << Poco::Net::HTTPResponse::HTTP_REASON_SERVICE_UNAVAILABLE;
-                break;
-
-                // Validating routines throw exceptions all over the program, but are not able to specify
-                // an exception code compatible with HTTP. So, the code is left zero. This routine can catch this.
-            default:
-                response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, reason.empty() ? Poco::Net::HTTPResponse::HTTP_REASON_BAD_REQUEST : reason);
-                break;
-        }
-    }
-
-    std::map<std::string, std::string> AbstractHandler::GetMetadata(Poco::Net::HTTPServerRequest &request) {
-        std::map<std::string, std::string> metadata;
-        for (const auto &m: request) {
-            if (Core::StringUtils::StartsWith(m.first, "x-amz-meta-")) {
-                std::string name = Core::StringUtils::StripBeginning(m.first, "x-amz-meta-");
-                metadata[name] = m.second;
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &header: headers) {
+                response.set(header.first, header.second);
             }
         }
-        return metadata;
+
+        // Send the response to the client
+        return response;
     }
 
-    void AbstractHandler::GetRegionUser(const std::string &authorization, std::string &region, std::string &user) {
-        Poco::RegularExpression::MatchVec posVec;
+    http::response<http::string_body> AbstractHandler::SendInternalServerError(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/[0-9]{8}\/([a-zA-Z0-9\-]+)\/[a-zA-Z0-9\-]+\/aws4_request,.*$)");
-        if (!pattern.match(authorization, 0, posVec)) {
-            throw Core::ForbiddenException("Could not extract region and user");
+        // Prepare the response message
+        http::response<http::string_body> response;
+        response.version(request.version());
+        response.result(http::status::internal_server_error);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.body() = body;
+        response.prepare_payload();
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &header: headers) {
+                response.set(header.first, header.second);
+            }
         }
 
-        user = authorization.substr(posVec[1].offset, posVec[1].length);
-        region = authorization.substr(posVec[2].offset, posVec[2].length);
-        log_trace << "Found user: " << user << " region: " << region;
+        // Send the response to the client
+        return response;
     }
 
-    void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &payload, const HeaderMap &extraHeader) {
-        log_trace << "Sending OK response, state: 200 payload: " << payload;
+    http::response<http::string_body> AbstractHandler::SendBadRequestError(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        // Get content length
-        unsigned long contentLength = 0;
-        if (!payload.empty()) {
-            contentLength = payload.length();
+        // Prepare the response message
+        http::response<http::string_body> response;
+        response.version(request.version());
+        response.result(http::status::bad_request);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.body() = body;
+        response.prepare_payload();
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &header: headers) {
+                response.set(header.first, header.second);
+            }
         }
 
-        // Set headers
-        SetHeaders(response, contentLength, extraHeader);
-        //DumpResponseHeaders(response);
-
-        // Send response
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
-        std::ostream &os = response.send();
-        if (!payload.empty()) {
-            os << payload;
-        }
-        os.flush();
+        // Send the response to the client
+        return response;
     }
 
-    void AbstractHandler::SendOkResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long contentLength, const HeaderMap &extraHeader) {
-        log_trace << "Sending OK response, state: 200, filename: " << fileName << " contentLength: " << contentLength;
-        try {
-
-            // Set headers
-            SetHeaders(response, contentLength, extraHeader);
-
-            // Set state
-            handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
-
-            // Send response
-            std::ostream &os = response.send();
-
-            // Send body
-            std::ifstream ifs(fileName);
-            long send = Poco::StreamCopier::copyStream(ifs, os);
-            os.flush();
-            ifs.close();
-            log_info << "Bytes send: " << send;
-
-        } catch (Poco::Exception &exc) {
-            log_error << "Exception: " << exc.message();
-        }
-    }
-
-    void AbstractHandler::SendContinueResponse(Poco::Net::HTTPServerResponse &response) {
-        log_trace << "Sending CONTINUE response, state: 100";
-
-        // Send response
-        handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_CONTINUE);
-        std::ostream &os = response.send();
-        os.flush();
-    }
-
-    void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
+    /*    void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
         log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         if (!Core::MemoryMappedFile::instance().IsMapped()) {
@@ -389,8 +135,8 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Bad request, send range response, exception: " + exc.message());
         }
     }
-
-    void AbstractHandler::SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
+*/
+    /*    void AbstractHandler::SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
         log_trace << "Sending Head response, state: 200";
         try {
 
@@ -426,8 +172,8 @@ namespace AwsMock::Service {
             log_error << "Exception: " << exc.message();
         }
     }
-
-    void AbstractHandler::SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
+*/
+    /* void AbstractHandler::SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
         log_trace << "Sending DELETE response, state: 204";
 
         // Get content length
@@ -587,5 +333,5 @@ namespace AwsMock::Service {
         std::ofstream ofs(filename);
         ofs << request.stream().rdbuf();
         ofs.close();
-    }
+    }*/
 }// namespace AwsMock::Service

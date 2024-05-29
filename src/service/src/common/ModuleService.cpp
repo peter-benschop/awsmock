@@ -87,77 +87,72 @@ namespace AwsMock::Service {
         return modules;
     }
 
-    std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint, bool includeObjects) {
+    std::string ModuleService::ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool prettyPrint, bool includeObjects) {
 
         Dto::Common::Infrastructure infrastructure;
 
-        // S3
-        if (services.HasService("all") || services.HasService("s3")) {
-            Database::S3Database &_s3Database = Database::S3Database::instance();
-            infrastructure.s3Buckets = _s3Database.ListBuckets();
-            if (includeObjects) {
-                infrastructure.s3Objects = _s3Database.ListObjects();
+        for (const auto &module: modules) {
+
+            if (module.name == "s3") {
+
+                Database::S3Database &_s3Database = Database::S3Database::instance();
+                infrastructure.s3Buckets = _s3Database.ListBuckets();
+                if (includeObjects) {
+                    infrastructure.s3Objects = _s3Database.ListObjects();
+                }
+
+            } else if (module.name == "sqs") {
+
+                Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+                infrastructure.sqsQueues = _sqsDatabase.ListQueues();
+                if (includeObjects) {
+                    infrastructure.sqsMessages = _sqsDatabase.ListMessages();
+                }
+
+            } else if (module.name == "sns") {
+
+                Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+                infrastructure.snsTopics = _snsDatabase.ListTopics();
+                if (includeObjects) {
+                    infrastructure.snsMessages = _snsDatabase.ListMessages();
+                }
+
+            } else if (module.name == "lambda") {
+
+                Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+                infrastructure.lambdas = _lambdaDatabase.ListLambdas();
+
+            } else if (module.name == "cognito") {
+
+                Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+                infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
+                if (includeObjects) {
+                    infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
+                }
+
+            } else if (module.name == "dynanomdb") {
+
+                Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+                infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
+                if (includeObjects) {
+                    infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
+                }
+
+            } else if (module.name == "secretsmanager") {
+
+                Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+                infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
+
+            } else if (module.name == "transfer") {
+
+                Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+                infrastructure.transferServers = _transferDatabase.ListServers();
+
+            } else if (module.name == "kms") {
+
+                Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+                infrastructure.kmsKeys = _kmsDatabase.ListKeys();
             }
-        }
-
-        // SQS
-        if (services.HasService("all") || services.HasService("sqs")) {
-            Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-            infrastructure.sqsQueues = _sqsDatabase.ListQueues();
-            if (includeObjects) {
-                infrastructure.sqsMessages = _sqsDatabase.ListMessages();
-            }
-        }
-
-        // SNS
-        if (services.HasService("all") || services.HasService("sns")) {
-            Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-            infrastructure.snsTopics = _snsDatabase.ListTopics();
-            if (includeObjects) {
-                infrastructure.snsMessages = _snsDatabase.ListMessages();
-            }
-        }
-
-        // Lambdas
-        if (services.HasService("all") || services.HasService("lambda")) {
-            Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-            infrastructure.lambdas = _lambdaDatabase.ListLambdas();
-        }
-
-        // Cognito
-        if (services.HasService("all") || services.HasService("cognito")) {
-            Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-            infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
-            if (includeObjects) {
-                infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
-            }
-        }
-
-        // DynamoDB
-        if (services.HasService("all") || services.HasService("dynamodb")) {
-            Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-            infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
-            if (includeObjects) {
-                infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
-            }
-        }
-
-        // Secrets manager
-        if (services.HasService("all") || services.HasService("secretsmanager")) {
-            Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-            infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
-        }
-
-        // Transfer manager
-        if (services.HasService("all") || services.HasService("transfer")) {
-            Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
-            infrastructure.transferServers = _transferDatabase.ListServers();
-        }
-
-        // KMS
-        if (services.HasService("all") || services.HasService("kms")) {
-            Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-            infrastructure.kmsKeys = _kmsDatabase.ListKeys();
         }
         return infrastructure.ToJson(prettyPrint);
     }
@@ -301,7 +296,7 @@ namespace AwsMock::Service {
                 _cognitoDatabase.DeleteAllUsers();
                 _cognitoDatabase.DeleteAllUserPools();
             } else if (m.name == "dynamodb") {
-                Service::DynamoDbService _dynamoDbService(Core::Configuration::instance());
+                Service::DynamoDbService _dynamoDbService;
                 //_dynamoDbService.DeleteAllItems();
                 _dynamoDbService.DeleteAllTables();
             } else if (m.name == "transfer") {

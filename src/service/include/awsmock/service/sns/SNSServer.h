@@ -15,7 +15,6 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/sns/SNSHandlerFactory.h>
 #include <awsmock/service/sns/SNSMonitoring.h>
 #include <awsmock/service/sns/SNSWorker.h>
 

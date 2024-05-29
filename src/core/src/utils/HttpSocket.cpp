@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-    HttpSocketResult HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
+    HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         boost::asio::io_context ctx;
 
@@ -103,12 +103,8 @@ namespace AwsMock::Core {
         return request;
     }
 
-    HttpSocketResult HttpSocket::PrepareResult(http::response<http::string_body> response) {
-
-        HttpSocketResult httpSocketResult;
-        httpSocketResult.body = response.body();
-        httpSocketResult.statusCode = response.result();
-        return httpSocketResult;
+    HttpSocketResponse HttpSocket::PrepareResult(http::response<http::string_body> response) {
+        return {.statusCode = response.result(), .body = response.body()};
     }
 
 }// namespace AwsMock::Core

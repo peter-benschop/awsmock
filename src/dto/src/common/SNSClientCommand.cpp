@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Common {
 
-    void SNSClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
+    void SNSClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
         userAgent.FromRequest(request, "sqs");
@@ -14,11 +14,11 @@ namespace AwsMock::Dto::Common {
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
-        this->method = httpMethod;
+        this->method = request.method();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->payload = Core::HttpUtils::GetBodyAsString(request);
-        this->url = request.getURI();
+        this->payload = request.body();
+        this->url = request.target();
 
         if (userAgent.clientCommand.empty()) {
 
@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    std::string SNSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const {
+    std::string SNSClientCommand::GetCommandFromHeader(const http::request<http::string_body> &request) const {
 
         std::string cmd;
         std::string cType = request["Content-Type"];
@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Common {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
-            rootJson.set("method", HttpMethodToString(method));
+            rootJson.set("method", boost::lexical_cast<std::string>(method));
             rootJson.set("command", SNSCommandTypeToString(command));
             rootJson.set("user", user);
 

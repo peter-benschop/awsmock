@@ -32,7 +32,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit LambdaHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _lambdaService(configuration) {}
+        explicit LambdaHandler() : AbstractHandler() {}
 
         /**
          * HTTP GET request.
@@ -98,11 +98,6 @@ namespace AwsMock::Service {
         void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * Lambda handler configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Lambda module

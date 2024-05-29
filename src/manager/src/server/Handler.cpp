@@ -9,7 +9,7 @@ namespace AwsMock::Manager {
     boost::beast::http::response<boost::beast::http::string_body> Handler::HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "GET");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
 
         std::string target = request.base()["Target"];
@@ -38,7 +38,7 @@ namespace AwsMock::Manager {
                     .databaseActive = configuration.getBool("awsmock.mongodb.active", false)};
             return SendOkResponse(request, config.ToJson());
 
-        } else if (action == "list-services") {
+        } else if (action == "list-modules") {
 
             Database::Entity::Module::ModuleList modules = _moduleService.ListModules();
             std::string body = Dto::Module::Module::ToJson(modules);
@@ -46,12 +46,11 @@ namespace AwsMock::Manager {
 
         } else if (action == "export") {
 
-            bool prettyPrint = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "pretty") == "true";
-            bool includeObjects = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "includeObjects") == "true";
+            bool prettyPrint = std::stoi(request["pretty"]);
+            bool includeObjects = std::stoi(request["includeObjects"]);
 
-            Dto::Common::Services services;
-            services.FromJson(payload);
-            std::string infrastructureJson = AwsMock::Service::ModuleService::ExportInfrastructure(services, prettyPrint, includeObjects);
+            Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
+            std::string infrastructureJson = AwsMock::Service::ModuleService::ExportInfrastructure(modules, prettyPrint, includeObjects);
             return SendOkResponse(request, infrastructureJson);
 
         } else if (action == "clean") {
@@ -79,7 +78,7 @@ namespace AwsMock::Manager {
 
     boost::beast::http::response<boost::beast::http::string_body> Handler::HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
 
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "PUT");
+        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
 
         std::string target = request.base()["Target"];
