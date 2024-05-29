@@ -50,6 +50,28 @@ namespace AwsMock::Service {
         return response;
     }
 
+    http::response<http::string_body> AbstractHandler::SendNoContentResponse(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
+
+        // Prepare the response message
+        http::response<http::string_body> response;
+        response.version(request.version());
+        response.result(http::status::no_content);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.body() = body;
+        response.prepare_payload();
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &header: headers) {
+                response.set(header.first, header.second);
+            }
+        }
+
+        // Send the response to the client
+        return response;
+    }
+
     http::response<http::string_body> AbstractHandler::SendInternalServerError(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         // Prepare the response message

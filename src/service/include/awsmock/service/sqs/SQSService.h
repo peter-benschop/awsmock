@@ -67,7 +67,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SQSService() = default;
+        explicit SQSService();
 
         /**
          * Creates a new queue.

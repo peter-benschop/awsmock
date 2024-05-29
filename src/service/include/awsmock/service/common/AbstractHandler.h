@@ -10,12 +10,6 @@
 #include <streambuf>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPRequestHandler.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/Net/HTTPServerResponse.h>
-#include <Poco/RegularExpression.h>
-
 // Boost includes
 #include <boost/beast.hpp>
 
@@ -41,7 +35,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class AbstractHandler : public Poco::Net::HTTPRequestHandler {
+    class AbstractHandler {
 
       public:
 
@@ -109,6 +103,15 @@ namespace AwsMock::Service {
          * @param extraHeader HTTP header map values, added to the default headers
          */
         static http::response<http::string_body> SendOkResponse(const http::request<http::string_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+
+        /**
+         * @brief Send a bad request response (HTTP state code 400).
+         *
+         * @param response HTTP response object
+         * @param payload HTTP body payload
+         * @param extraHeader HTTP header map values, added to the default headers
+         */
+        static http::response<http::string_body> SendNoContentResponse(const http::request<http::string_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
         /**
          * @brief Send a internal server error response (HTTP state code 500).

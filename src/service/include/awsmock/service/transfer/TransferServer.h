@@ -18,7 +18,6 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/transfer/TransferHandlerFactory.h>
 #include <awsmock/service/transfer/TransferMonitoring.h>
 
 #define TRANSFER_DEFAULT_PORT 9504
@@ -34,7 +33,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Transfer server HTTP server
+     * @brief Transfer server HTTP server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -43,50 +42,50 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration aws-mock configuration
          */
         explicit TransferServer(Core::Configuration &configuration);
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Starts a single transfer manager
+         * @brief Starts a single transfer manager
          *
          * @param server transfer manager entity
          */
         void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
-         * Stops a single transfer manager
+         * @brief Stops a single transfer manager
          *
          * @param server transfer manager entity
          */
         void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
-         * Start all transfer servers, if they are not existing
+         * @brief Start all transfer servers, if they are not existing
          */
         void StartTransferServers();
 
         /**
-         * Check transfer servers
+         * @brief Check transfer servers
          */
         void CheckTransferServers();
 

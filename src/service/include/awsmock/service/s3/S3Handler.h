@@ -18,7 +18,6 @@
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/s3/S3CmdHandler.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
@@ -53,7 +52,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::string_body> HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
+        http::response<http::string_body> HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP PUT request.
@@ -64,7 +63,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::string_body> HandlePutRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
+        http::response<http::string_body> HandlePutRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP POST request.

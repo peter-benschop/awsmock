@@ -102,7 +102,7 @@ namespace AwsMock::Service {
                         int count = Core::HttpUtils::CountQueryParametersByPrefix(clientCommand.payload, "Attribute") / 2;
                         log_trace << "Got attribute count, count: " << count;
 
-                        AttributeList attributes;
+                        std::map<std::string, std::string> attributes;
                         for (int i = 1; i <= count; i++) {
                             std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Attribute." + std::to_string(i) + ".Name");
                             std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Attribute." + std::to_string(i) + ".Value");

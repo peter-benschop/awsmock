@@ -49,10 +49,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit SecretsManagerService(Core::Configuration &configuration);
+        explicit SecretsManagerService();
 
         /**
          * Create a new secret
@@ -116,11 +114,6 @@ namespace AwsMock::Service {
          * Account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         _transferMonitoring->Start();
 
         // Start REST manager
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration));
 
         // Start all transfer servers
         StartTransferServers();

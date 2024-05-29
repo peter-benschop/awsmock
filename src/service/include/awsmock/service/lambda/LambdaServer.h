@@ -19,7 +19,6 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
-#include <awsmock/service/lambda/LambdaHandlerFactory.h>
 #include <awsmock/service/lambda/LambdaMonitoring.h>
 #include <awsmock/service/s3/S3Service.h>
 

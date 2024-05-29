@@ -3,89 +3,78 @@
 
 namespace AwsMock::Service {
 
-    void LambdaHandler::handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Lambda GET request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+    http::response<http::string_body> LambdaHandler::HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_trace << "Lambda GET request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
 
             std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
 
             std::string version, action;
-            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
+            Core::HttpUtils::GetVersionAction(request.target(), version, action);
 
             if (action == "functions") {
 
 
-                if (Core::HttpUtils::HasPathParameters(request.getURI(), 2)) {
+                if (Core::HttpUtils::HasPathParameters(request.target(), 2)) {
 
-                    std::string functionName = Core::HttpUtils::GetPathParameters(request.getURI())[2];
+                    std::string functionName = Core::HttpUtils::GetPathParameters(request.target())[2];
 
                     Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
                     log_trace << "Lambda function region: " << region << " name: " << functionName;
-                    SendOkResponse(response, lambdaResponse.ToJson());
+                    return SendOkResponse(request, lambdaResponse.ToJson());
 
                 } else {
 
                     Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                     log_trace << "Lambda function list";
-                    SendOkResponse(response, lambdaResponse.ToJson());
+                    return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
             } else if (action == "tags") {
 
-                std::string arn = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+                std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
 
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
                 log_trace << "Lambda tag list";
-                SendOkResponse(response, lambdaResponse.ToJson());
+                return SendOkResponse(request, lambdaResponse.ToJson());
 
             } else if (action == "account-settings") {
 
                 Dto::Lambda::AccountSettingsResponse lambdaResponse = _lambdaService.GetAccountSettings();
                 log_trace << "Lambda account settings";
-                SendOkResponse(response, lambdaResponse.ToJson());
+                return SendOkResponse(request, lambdaResponse.ToJson());
+
+            } else {
+                return SendBadRequestError(request, "Unknown method");
             }
 
         } catch (Core::ServiceException &exc) {
-            SendXmlErrorResponse("lambda", response, exc);
+            return SendInternalServerError(request, exc.message());
         } catch (Core::NotFoundException &exc) {
-            SendXmlErrorResponse("lambda", response, exc);
+            return SendInternalServerError(request, exc.message());
         }
     }
 
-    void LambdaHandler::handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response,
-                                  [[maybe_unused]] const std::string &region, [[maybe_unused]] const std::string &user) {
-        log_trace << "Lambda PUT request, URI: " << request.getURI() << " region: " << region << " user: " + user;
-
-        try {
-
-            std::string version, action;
-            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
-
-        } catch (Poco::Exception &exc) {
-            SendXmlErrorResponse("lambda", response, exc);
-        }
-    }
-
-    void LambdaHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Lambda POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+    http::response<http::string_body> LambdaHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_trace << "Lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
             std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
 
             std::string version, action;
-            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
+            Core::HttpUtils::GetVersionAction(request.target(), version, action);
 
             if (action == "functions") {
 
-                std::string body = Core::HttpUtils::GetBodyAsString(request);
+                std::string body = request.body();
 
-                if (Core::HttpUtils::GetPathParameter(request.getURI(), 3) == "invocations") {
+                if (Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations") {
 
                     std::string logType = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Log-Type");
 
-                    std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+                    std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
                     log_debug << "Lambda function invocation, name: " << functionName;
 
                     std::string output = _lambdaService.InvokeLambdaFunction(functionName, body, region, user, logType);
@@ -93,9 +82,9 @@ namespace AwsMock::Service {
 
                     // Set output, if existing
                     if (!output.empty()) {
-                        response.set("X-Amz-Log-Result", output);
+                        //  response.set("X-Amz-Log-Result", output);
                     }
-                    SendOkResponse(response);
+                    return SendOkResponse(request);
 
                 } else {
 
@@ -106,92 +95,72 @@ namespace AwsMock::Service {
 
                     Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
                     log_info << "Lambda function created, name: " << lambdaResponse.functionName;
-                    SendOkResponse(response, lambdaResponse.ToJson());
+                    return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
             } else if (action == "tags") {
 
-                std::string arn = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+                std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
 
-                std::string body = Core::HttpUtils::GetBodyAsString(request);
+                std::string body = request.body();
                 Dto::Lambda::CreateTagRequest lambdaRequest;
                 lambdaRequest.FromJson(body);
 
                 _lambdaService.CreateTag(lambdaRequest);
-                SendOkResponse(response, {}, Poco::Net::HTTPResponse::HTTP_NO_CONTENT);
+                return SendNoContentResponse(request);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
+
+            } else {
+                return SendBadRequestError(request, "Unknown method");
             }
 
         } catch (Poco::Exception &exc) {
-            SendXmlErrorResponse("lambda", response, exc);
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         }
     }
 
-    void LambdaHandler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Lambda DELETE request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+    http::response<http::string_body> LambdaHandler::HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_trace << "Lambda DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
             std::string version, action;
-            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
-            std::string body = Core::HttpUtils::GetBodyAsString(request);
+            Core::HttpUtils::GetVersionAction(request.target(), version, action);
+            std::string body = request.body();
 
             if (action == "functions") {
 
-                std::string functionName = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
-                std::string qualifier = Core::HttpUtils::GetPathParameter(request.getURI(), 3);
+                std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
+                std::string qualifier = Core::HttpUtils::GetPathParameter(request.target(), 3);
                 log_debug << "Found lambda name, name: " << functionName << " qualifier: " << qualifier;
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.functionName = functionName, .qualifier = qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
-                SendOkResponse(response);
+                return SendOkResponse(request);
 
             } else if (action == "tags") {
 
-                std::string arn = Core::HttpUtils::GetPathParameter(request.getURI(), 2);
+                std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
 
-                std::vector<std::string> tagKeys = Core::HttpUtils::GetQueryParametersByPrefix(request.getURI(),
+                std::vector<std::string> tagKeys = Core::HttpUtils::GetQueryParametersByPrefix(request.target(),
                                                                                                "tagKeys");
                 log_trace << "Got tags count: " << tagKeys.size();
 
                 Dto::Lambda::DeleteTagsRequest lambdaRequest(arn, tagKeys);
                 _lambdaService.DeleteTags(lambdaRequest);
-                SendNoContentResponse(response);
+                return SendNoContentResponse(request);
+
+            } else {
+                log_error << "Unknown method";
+                return SendBadRequestError(request, "Unknown method");
             }
 
         } catch (Core::ServiceException &exc) {
-            SendXmlErrorResponse("lambda", response, exc);
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         }
     }
 
-    void LambdaHandler::handleOptions(Poco::Net::HTTPServerResponse &response) {
-        log_trace << "Lambda OPTIONS request";
-
-        response.set("Allow", "GET, PUT, POST, DELETE, OPTIONS");
-        response.setContentType("text/plain; charset=utf-8");
-
-        handleHttpStatusCode(response, 200);
-        std::ostream &outputStream = response.send();
-        outputStream.flush();
-    }
-
-    void LambdaHandler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "Lambda HEAD request, address: " << request.clientAddress().toString();
-
-        try {
-
-            std::string version, action;
-            Core::HttpUtils::GetVersionAction(request.getURI(), version, action);
-
-            HeaderMap headerMap;
-            headerMap["Connection"] = "Keep-alive: 300";
-            headerMap["Handler"] = "AmazonS3";
-
-            SendOkResponse(response, {}, headerMap);
-
-        } catch (Poco::Exception &exc) {
-            SendXmlErrorResponse("lambda", response, exc);
-        }
-    }
 }// namespace AwsMock::Service

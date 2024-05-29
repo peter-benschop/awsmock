@@ -13,7 +13,6 @@
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/secretsmanager/SecretsManagerHandlerFactory.h>
 #include <awsmock/service/secretsmanager/SecretsManagerMonitoring.h>
 
 #define SECRETSMANAGER_DEFAULT_PORT 9507

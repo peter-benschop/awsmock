@@ -9,7 +9,6 @@ namespace AwsMock::Service {
     SNSService::SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {
 
         // Initialize environment
-        _sqsService = std::make_unique<SQSService>();
         _accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
     }
 
@@ -315,7 +314,7 @@ namespace AwsMock::Service {
                 .requestId = Core::AwsUtils::CreateRequestId(),
         };
 
-        _sqsService->SendMessage(sendMessageRequest);
+        _sqsService.SendMessage(sendMessageRequest);
     }
 
 }// namespace AwsMock::Service

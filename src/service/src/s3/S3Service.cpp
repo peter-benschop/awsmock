@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Service::S3Service() : _database(Database::S3Database::instance()), _lambdaService(Core::Configuration::instance()) {
+    S3Service::S3Service() : _database(Database::S3Database::instance()) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         _accountId = configuration.getString("awsmock.account.userPoolId");
@@ -844,7 +844,7 @@ namespace AwsMock::Service {
 
     void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
 
-        SQSService _sqsService = SQSService(Core::Configuration::instance());
+        SQSService _sqsService;
         Dto::SQS::SendMessageRequest request = {.region = _region, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
         Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
@@ -852,7 +852,7 @@ namespace AwsMock::Service {
 
     void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
 
-        SNSService _snsService = SNSService(Core::Configuration::instance());
+        SNSService _snsService;
         Dto::SNS::PublishRequest request = {.region = _region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
         log_debug << "SNS message request send, messageId: " << response.messageId;

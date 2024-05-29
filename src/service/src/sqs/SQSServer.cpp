@@ -42,7 +42,7 @@ namespace AwsMock::Service {
         _sqsWorker->Start();
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SQSRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SQSRequestHandlerFactory(_configuration));
     }
 
     void SQSServer::Run() {}

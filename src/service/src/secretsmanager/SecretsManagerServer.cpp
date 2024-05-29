@@ -39,7 +39,7 @@ namespace AwsMock::Service {
         _secretsManagerMonitoring->Start();
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration));
     }
 
     void SecretsManagerServer::Run() {

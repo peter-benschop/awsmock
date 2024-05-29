@@ -124,5 +124,7 @@ namespace AwsMock::Service {
             log_error << "ServiceException: " << exc.message();
             return SendInternalServerError(request, exc.message());
         }
+        log_error << "Unknown method";
+        return SendBadRequestError(request, "Unknown method");
     }
 }// namespace AwsMock::Service

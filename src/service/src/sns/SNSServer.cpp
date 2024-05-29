@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         _snsWorker->Start();
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration));
     }
 
     void SNSServer::Run() {}

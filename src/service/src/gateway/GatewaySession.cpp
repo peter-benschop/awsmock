@@ -19,13 +19,6 @@ namespace AwsMock::Service {
             {"kms", std::make_shared<KMSHandler>()},
             {"dynamodb", std::make_shared<DynamoDbHandler>()}};
 
-    /*    _routingTable["sqs"] = {._name = "sqs", ._handlerType = HandlerType::SQS, ._handler = new SQSHandler(configuration)};
-    _routingTable["sns"] = {._name = "sns", ._handlerType = HandlerType::SNS, ._handler = new SNSHandler(configuration)};
-    _routingTable["lambda"] = {._name = "lambda", ._handlerType = HandlerType::LAMBDA, ._handler = new LambdaHandler(configuration)};
-    _routingTable["transfer"] = {._name = "transfer", ._handlerType = HandlerType::TRANSFER, ._handler = new TransferHandler(configuration)};
-    _routingTable["secretsmanager"] = {._name = "secretsmanager", ._handlerType = HandlerType::SECRETS_MANAGER, ._handler = new SecretsManagerHandler(configuration)};
-    _routingTable["kms"] = {._name = "kms", ._handlerType = HandlerType::KMS, ._handler = new KMSHandler(configuration)};
-*/
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {
         static_assert(queue_limit > 0, "queue limit must be positive");
     };
@@ -157,6 +150,14 @@ namespace AwsMock::Service {
                 case http::verb::post:
                     log_debug << "Handle POST request";
                     return handler->HandlePostRequest(req, authKey.region, "none");
+                    break;
+                case http::verb::delete_:
+                    log_debug << "Handle DELETE request";
+                    return handler->HandleDeleteRequest(req, authKey.region, "none");
+                    break;
+                case http::verb::head:
+                    log_debug << "Handle HEAD request";
+                    return handler->HandleHeadRequest(req, authKey.region, "none");
                     break;
             }
         }

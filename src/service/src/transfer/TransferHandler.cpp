@@ -53,7 +53,13 @@ namespace AwsMock::Service {
                 transferRequest.FromJson(body);
                 _transferService.DeleteServer(transferRequest);
                 return SendOkResponse(request);
+
+            } else {
+
+                log_error << "Unknown method";
+                return SendBadRequestError(request, "Unknown method");
             }
+
 
         } catch (Poco::Exception &exc) {
             return SendInternalServerError(request, exc.message());

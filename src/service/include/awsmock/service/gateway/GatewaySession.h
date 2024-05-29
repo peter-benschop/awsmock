@@ -20,10 +20,12 @@
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 #include <awsmock/service/gateway/GatewayHandler.h>
 #include <awsmock/service/kms/KMSHandler.h>
+#include <awsmock/service/lambda/LambdaHandler.h>
 #include <awsmock/service/s3/S3Handler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
 #include <awsmock/service/sns/SNSHandler.h>
 #include <awsmock/service/sqs/SQSHandler.h>
+#include <awsmock/service/transfer/TransferHandler.h>
 
 namespace AwsMock::Service {
 

@@ -21,7 +21,6 @@
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sqs/SQSCmdHandler.h>
 #include <awsmock/service/sqs/SQSService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"

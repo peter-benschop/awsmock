@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    boost::beast::http::response<boost::beast::http::string_body> S3Handler::HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::string_body> S3Handler::HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
         Core::MetricServiceTimer measure(S3_SERVICE_TIMER);
 
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
                     // Get object
                     Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
-                    HeaderMap headerMap;
+                    std::map<std::string, std::string> headerMap;
                     headerMap["ETag"] = Core::StringUtils::Quoted(s3Response.md5sum);
                     headerMap["Content-Type"] = s3Response.contentType;
                     headerMap["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
@@ -241,7 +241,7 @@ namespace AwsMock::Service {
         return SendBadRequestError(request, "Unknown method");
     }
 
-    boost::beast::http::response<boost::beast::http::string_body> S3Handler::HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::string_body> S3Handler::HandlePutRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
         Core::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -305,7 +305,7 @@ namespace AwsMock::Service {
                                 .contentType = request["Content-Type"],
                                 //.checksumAlgorithm = checksumAlgorithm,
                                 .metadata = metadata};
-                        request.content_length(putObjectRequest.contentLength);
+                        //request.content_length(putObjectRequest.contentLength);
 
                         log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
@@ -354,7 +354,7 @@ namespace AwsMock::Service {
 
                     //std::string eTag = _s3Service.UploadPart(request.target(), std::stoi(partNumber), uploadId);
 
-                    HeaderMap headerMap;
+                    std::map<std::string, std::string> headerMap;
                     //headerMap["ETag"] = Core::StringUtils::Quoted(eTag);
                     log_debug << "Finished S3 multipart upload part: " << partNumber;
 
@@ -463,31 +463,259 @@ namespace AwsMock::Service {
         return SendBadRequestError(request, "Unknown method");
     }
 
-    void S3Handler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_debug << "S3 POST request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+    http::response<http::string_body> S3Handler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_debug << "S3 POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
-        clientCommand.FromRequest(Dto::Common::HttpMethod::POST, request, region, user);
+        clientCommand.FromRequest(request, region, user);
 
-        //S3CmdHandler::handlePost(request, response, clientCommand);
+        try {
+            switch (clientCommand.command) {
+
+                case Dto::Common::S3CommandType::COPY_OBJECT: {
+
+                    if (clientCommand.multipartRequest) {
+
+                        log_debug << "Starting multipart upload";
+
+                        Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
+                        Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
+
+                        return SendOkResponse(request, result.ToXml());
+                        log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    } else {
+
+                        std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                        log_debug << "Finish multipart upload request, uploadId: " << uploadId;
+
+                        Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
+                        Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
+
+                        std::map<std::string, std::string> headers;
+                        headers["ETag"] = Core::StringUtils::Quoted(result.etag);
+
+                        return SendOkResponse(request, result.ToXml(), headers);
+                        log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    }
+                    break;
+                }
+
+                case Dto::Common::S3CommandType::DELETE_OBJECTS: {
+
+                    //DumpRequest(request);
+                    log_debug << "Starting delete objects request";
+
+                    const std::string &payload = request.body();
+                    if (payload.empty()) {
+                        return SendNoContentResponse(request);
+                    }
+                    Dto::S3::DeleteObjectsRequest s3Request;
+                    s3Request.FromXml(payload);
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+
+                    Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
+                    return SendOkResponse(request, s3Response.ToXml());
+                    log_info << "Object deleted, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    break;
+                }
+
+                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD: {
+
+                    log_debug << "Starting multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
+                    Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
+
+                    return SendOkResponse(request, result.ToXml());
+                    log_info << "Create multi-part upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    break;
+                }
+
+                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
+
+                    log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
+
+                    std::map<std::string, std::string> headers;
+                    headers["ETag"] = Core::StringUtils::Quoted(s3Response.etag);
+
+                    return SendOkResponse(request, s3Response.ToXml(), headers);
+                    log_info << "Completed multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    break;
+                }
+
+
+                    // Should not happen
+                case Dto::Common::S3CommandType::CREATE_BUCKET:
+                case Dto::Common::S3CommandType::LIST_BUCKETS:
+                case Dto::Common::S3CommandType::DELETE_BUCKET:
+                case Dto::Common::S3CommandType::LIST_OBJECTS:
+                case Dto::Common::S3CommandType::PUT_OBJECT:
+                case Dto::Common::S3CommandType::GET_OBJECT:
+                case Dto::Common::S3CommandType::MOVE_OBJECT:
+                case Dto::Common::S3CommandType::DELETE_OBJECT:
+                case Dto::Common::S3CommandType::UPLOAD_PART:
+                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
+                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
+                    break;
+                case Dto::Common::S3CommandType::UNKNOWN: {
+                    log_error << "Bad request, method: POST clientCommand: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
+                    throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::S3CommandTypeToString(clientCommand.command));
+                }
+
+                default:
+                    log_error << "Unknown method";
+                    return SendBadRequestError(request, "Unknown method");
+            }
+
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (Core::JsonException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
+        }
+        log_error << "Unknown method";
+        return SendBadRequestError(request, "Unknown method");
     }
 
-    void S3Handler::handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_debug << "S3 DELETE request, URI: " + request.getURI() << " region: " << region << " user: " << user;
+    http::response<http::string_body> S3Handler::HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_debug << "S3 DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
-        clientCommand.FromRequest(Dto::Common::HttpMethod::DELETE, request, region, user);
+        clientCommand.FromRequest(request, region, user);
 
-        //S3CmdHandler::handleDelete(request, response, clientCommand);
+        try {
+
+            switch (clientCommand.command) {
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET: {
+
+                    Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region = clientCommand.region, .bucket = clientCommand.bucket};
+                    _s3Service.DeleteBucket(deleteBucketRequest);
+                    return SendNoContentResponse(request);
+                    log_info << "Delete bucket, bucket: " << clientCommand.bucket;
+
+                    break;
+                }
+
+                case Dto::Common::S3CommandType::MOVE_OBJECT:
+                case Dto::Common::S3CommandType::DELETE_OBJECT: {
+
+                    _s3Service.DeleteObject({.region = clientCommand.region, .user = clientCommand.user, .bucket = clientCommand.bucket, .key = clientCommand.key});
+                    return SendNoContentResponse(request);
+                    log_info << "Delete object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    break;
+                }
+
+                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD: {
+
+                    log_info << "Abort multipart upload request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    return SendNoContentResponse(request);
+
+                    break;
+                }
+
+                    // Should not happen
+                case Dto::Common::S3CommandType::CREATE_BUCKET:
+                case Dto::Common::S3CommandType::PUT_OBJECT:
+                case Dto::Common::S3CommandType::GET_OBJECT:
+                case Dto::Common::S3CommandType::COPY_OBJECT:
+                case Dto::Common::S3CommandType::LIST_BUCKETS:
+                case Dto::Common::S3CommandType::LIST_OBJECTS:
+                case Dto::Common::S3CommandType::DELETE_OBJECTS:
+                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::UPLOAD_PART:
+                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
+                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
+                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
+                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
+                case Dto::Common::S3CommandType::UNKNOWN: {
+                    log_error << "Bad request, method: DELETE clientCommand: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
+                    throw Core::ServiceException("Bad request, method: DELETE clientCommand: " + Dto::Common::S3CommandTypeToString(clientCommand.command));
+                }
+                default:
+                    log_error << "Unknown method";
+                    return SendBadRequestError(request, "Unknown method");
+            }
+
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (Core::JsonException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
+        }
+        log_error << "Unknown method";
+        return SendBadRequestError(request, "Unknown method");
     }
 
-    void S3Handler::handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) {
-        log_trace << "S3 HEAD request, URI: " << request.getURI() << " region: " << region << " user: " << user;
+    http::response<http::string_body> S3Handler::HandleHeadRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+        log_trace << "S3 HEAD request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
-        clientCommand.FromRequest(Dto::Common::HttpMethod::HEAD, request, region, user);
+        clientCommand.FromRequest(request, region, user);
 
-        //S3CmdHandler::handleHead(request, response, clientCommand);
+        try {
+
+            std::string bucket = Core::HttpUtils::GetPathParameter(request.target(), 0);
+            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.target(), 1);
+            log_debug << "S3 HEAD request, bucket: " << bucket << " key: " << key;
+
+            Dto::S3::GetMetadataResponse s3Response;
+            if (key.empty()) {
+                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = bucket};
+                s3Response = _s3Service.GetBucketMetadata(s3Request);
+            } else {
+                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = bucket, .key = key};
+                s3Response = _s3Service.GetObjectMetadata(s3Request);
+            }
+
+            std::map<std::string, std::string> headers;
+            headers["Handler"] = "awsmock";
+            headers["Content-Type"] = "application/json";
+            headers["Last-Modified"] = Poco::DateTimeFormatter::format(s3Response.modified, Poco::DateTimeFormat::HTTP_FORMAT);
+            headers["Content-Length"] = std::to_string(s3Response.size);
+            //headers["ETag"] = "\"" + s3Response.md5Sum + "\"";
+            headers["accept-ranges"] = "bytes";
+            headers["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
+            headers["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
+            headers["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
+            headers["x-amz-bucket-region"] = s3Response.region;
+
+            // User supplied metadata
+            for (const auto &m: s3Response.metadata) {
+                headers["x-amz-meta-" + m.first] = m.second;
+            }
+
+            return SendOkResponse(request, {}, headers);
+
+        } catch (Poco::Exception &exc) {
+            log_warning << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
+        }
     }
 
 }// namespace AwsMock::Service

@@ -14,7 +14,6 @@
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sns/SNSCmdHandler.h>
 #include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {
@@ -36,7 +35,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit SNSHandler() : _snsService(Core::Configuration::instance()) {}
+        explicit SNSHandler() = default;
 
         /**
          * @brief HTTP POST request.
