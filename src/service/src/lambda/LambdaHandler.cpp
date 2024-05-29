@@ -112,6 +112,7 @@ namespace AwsMock::Service {
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
             } else {
+                log_error << "Unknown method";
                 return SendBadRequestError(request, "Unknown method");
             }
 
@@ -119,6 +120,8 @@ namespace AwsMock::Service {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
         }
+        log_error << "Unknown method";
+        return SendBadRequestError(request, "Unknown method");
     }
 
     http::response<http::string_body> LambdaHandler::HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {

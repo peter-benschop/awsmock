@@ -873,11 +873,11 @@ namespace AwsMock::Service {
         // Write file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
-        std::ofstream ofs(filePath);
-        long size = Poco::StreamCopier::copyStream(stream, ofs);
+        std::ofstream ofs(filePath, std::ios::binary);
+        ofs << stream.rdbuf();
         ofs.close();
 
-        //Core::FileUtils::StripChunkSignature(filePath);
+        long size = Core::FileUtils::FileSize(filePath);
         log_debug << "File received, fileName: " << filePath << " size: " << size;
 
         // Create entity
@@ -928,8 +928,12 @@ namespace AwsMock::Service {
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
         std::ofstream ofs(filePath, std::ios::out | std::ios::trunc);
-        long size = Poco::StreamCopier::copyStream(stream, ofs);
+        ofs << stream.rdbuf();
+        //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();
+
+        // Get size
+        long size = Core::FileUtils::FileSize(filePath);
         log_debug << "File received, filePath: " << filePath << " size: " << size;
 
         Database::Entity::S3::Object object;

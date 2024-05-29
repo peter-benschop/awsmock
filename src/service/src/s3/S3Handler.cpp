@@ -307,9 +307,11 @@ namespace AwsMock::Service {
                                 .metadata = metadata};
                         //request.content_length(putObjectRequest.contentLength);
 
+                        std::istream stream((std::basic_istream<char, std::char_traits<char>>::__streambuf_type *) &request);
+
                         log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
-                        //Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, request.stream());
+                        Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream);
 
                         //log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
                         return SendOkResponse(request, {});

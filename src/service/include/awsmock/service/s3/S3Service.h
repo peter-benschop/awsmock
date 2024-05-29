@@ -8,10 +8,8 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
+// Boost includes
+#include <boost/iostreams/copy.hpp>
 
 // AwsMock includes
 #include "awsmock/core/exception/NotFoundException.h"
