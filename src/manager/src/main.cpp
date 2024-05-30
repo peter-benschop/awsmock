@@ -30,8 +30,7 @@
 #include <boost/program_options/variables_map.hpp>
 
 // AwsMOck includes
-#include "awsmock/server/Manager.h"
-#include <awsmock/core/Configuration.h>
+#include <awsmock/server/Manager.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
 
@@ -61,8 +60,8 @@ int main(int argc, char *argv[]) {
                   << std::endl
                   << "Usage: " << std::endl
                   << "  awsmockmgr [Options]" << std::endl
-                  << std::endl;
-        std::cout << desc << "\n";
+                  << std::endl
+                  << desc << std::endl;
         return 0;
     }
 

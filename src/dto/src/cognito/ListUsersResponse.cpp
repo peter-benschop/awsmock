@@ -17,8 +17,8 @@ namespace AwsMock::Dto::Cognito {
                 userJson.set("Username", user.userName);
                 userJson.set("Enabled", user.enabled);
                 userJson.set("UserStatus", Database::Entity::Cognito::UserStatusToString(user.userStatus));
-                userJson.set("LastModifiedDate", std::to_string(user.modified.timestamp().epochTime()));
-                userJson.set("CreationDate", std::to_string(user.modified.timestamp().epochTime()));
+                userJson.set("LastModifiedDate", std::to_string(user.modified.time_since_epoch().count()));
+                userJson.set("CreationDate", std::to_string(user.created.time_since_epoch().count()));
                 usersArray.add(userJson);
             }
             rootObject.set("Users", usersArray);

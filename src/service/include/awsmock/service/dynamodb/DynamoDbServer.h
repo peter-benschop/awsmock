@@ -15,7 +15,7 @@
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
+#include <awsmock/service/common/DockerService.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
 #include <awsmock/service/dynamodb/DynamoDbWorker.h>
 
@@ -48,38 +48,36 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration aws-mock configuration
+         * @brief Constructor
          */
-        explicit DynamoDbServer(Core::Configuration &configuration);
+        explicit DynamoDbServer();
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
       protected:
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Delete dangling, stopped containers
+         * @brief Delete dangling, stopped containers
          */
         void CleanupContainers();
 
         /**
-         * Start the local DynamoDB container.
+         * @brief Start the local DynamoDB container.
          *
          * <p>
          * If the AWS DynamoDb docker image does not already exists, it will be downloaded. Otherwise the local docker
@@ -89,18 +87,13 @@ namespace AwsMock::Service {
         void StartLocalDynamoDb();
 
         /**
-         * Stop the local DynamoDB container.
+         * @brief Stop the local DynamoDB container.
          *
          * <p>
          * The AWS DynamoDb docker container will be stopped.
          * </p>
          */
         void StopLocalDynamoDb();
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Docker module

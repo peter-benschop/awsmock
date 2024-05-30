@@ -12,12 +12,6 @@
 #include <string>
 #include <thread>
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Latin1Encoding.h>
-#include <Poco/TextConverter.h>
-#include <Poco/UTF8Encoding.h>
-
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
@@ -45,7 +39,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Secrets manager service.
+     * @brief Secrets manager service.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -55,10 +49,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit SecretsManagerService(Core::Configuration &configuration);
+        explicit SecretsManagerService();
 
         /**
          * Create a new secret
@@ -122,11 +114,6 @@ namespace AwsMock::Service {
          * Account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

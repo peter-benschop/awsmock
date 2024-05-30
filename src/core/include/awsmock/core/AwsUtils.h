@@ -14,6 +14,11 @@
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/UUIDGenerator.h>
 
+// Boost includes
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>

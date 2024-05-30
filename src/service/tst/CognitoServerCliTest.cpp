@@ -9,11 +9,12 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/cognito/CognitoServer.h"
-#include "awsmock/service/cognito/CognitoService.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/cognito/CognitoServer.h>
+#include <awsmock/service/cognito/CognitoService.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
@@ -24,8 +25,8 @@
 namespace AwsMock::Service {
 
     /**
-   * AwsMock cognito integration test.
-   */
+     * @brief AwsMock cognito integration test.
+     */
     class CognitoServerCliTest : public ::testing::Test {
 
       protected:
@@ -35,26 +36,25 @@ namespace AwsMock::Service {
             // Define endpoint
             std::string _port = _configuration.getString("awsmock.service.cognito.http.port", std::to_string(COGNITO_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
-            _configuration.setString("awsmock.service.gateway.port", _port);
+            _configuration.setString("awsmock.service.gateway.http.port", _port);
             _accountId = _configuration.getString("awsmock.account.userPoolId", ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
 
-            _cognitoServer = std::make_unique<CognitoServer>(_configuration);
-
             // Start HTTP manager
-            _cognitoServer->Start();
+            _gatewayServer.Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllUserPools();
-            _cognitoServer->Stop();
+            _gatewayServer.Stop();
         }
 
         std::string _endpoint, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase &_database = Database::CognitoDatabase::instance();
-        std::unique_ptr<CognitoServer> _cognitoServer;
+        CognitoServer _cognitoServer;
+        GatewayServer _gatewayServer;
     };
 
     TEST_F(CognitoServerCliTest, UserPoolCreateTest) {

@@ -9,15 +9,13 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/StreamCopier.h>
+// Boost include
+#include <boost/lexical_cast.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
@@ -65,14 +63,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration module configuration
+         * @brief Constructor
          */
-        explicit DynamoDbService(Core::Configuration &configuration);
+        explicit DynamoDbService();
 
         /**
-         * Creates a new table
+         * @brief Creates a new table
          *
          * @param request create table request DTO
          * @return CreateTableResponse
@@ -80,7 +76,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request);
 
         /**
-         * Lists all available tables
+         * @brief Lists all available tables
          *
          * @param request list table request DTO
          * @return ListTableResponse
@@ -88,7 +84,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request);
 
         /**
-         * Describes a table
+         * @brief Describes a table
          *
          * @param request describe table request DTO
          * @return DescribeTableResponse
@@ -96,7 +92,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request);
 
         /**
-         * Deletes a table
+         * @brief Deletes a table
          *
          * @param request delete table request DTO
          * @return DeleteTableResponse
@@ -104,7 +100,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request);
 
         /**
-         * Deletes all tables with all items
+         * @brief Deletes all tables with all items
          */
         void DeleteAllTables();
 
@@ -117,7 +113,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request);
 
         /**
-         * Puts an item
+         * @brief Puts an item
          *
          * @param request put item request DTO
          * @return GetItemResponse
@@ -125,7 +121,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request);
 
         /**
-         * Query the database
+         * @brief Query the database
          *
          * @param request query item request DTO
          * @return QueryResponse
@@ -133,7 +129,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request);
 
         /**
-         * Scan the database
+         * @brief Scan the database
          *
          * @param request scan request DTO
          * @return ScanResponse
@@ -141,7 +137,7 @@ namespace AwsMock::Service {
         Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request);
 
         /**
-         * Deletes a item
+         * @brief Deletes a item
          *
          * @param request delete item request DTO
          * @return DeleteItemResponse
@@ -151,18 +147,13 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Send the request to the DynamoDB container
+         * @brief Send the request to the DynamoDB container
          *
          * @param body original HTTP request body
          * @param headers original HTTP request headers
          * @return response body
          */
         Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

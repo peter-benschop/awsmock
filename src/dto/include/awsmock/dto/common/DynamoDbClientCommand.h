@@ -9,6 +9,11 @@
 #include <sstream>
 #include <string>
 
+// Boost includes
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
+#include <boost/lexical_cast.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpUtils.h>
@@ -17,9 +22,11 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/UnauthorizedException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
-#include <awsmock/dto/common/HttpMethod.h>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     enum class DynamoDbCommandType {
         CREATE_TABLE,
@@ -70,7 +77,7 @@ namespace AwsMock::Dto::Common {
     struct DynamoDbClientCommand : public BaseClientCommand {
 
         /**
-         * Client command
+         * @brief Client command
          */
         DynamoDbCommandType command{};
 
@@ -80,20 +87,19 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return client command from AWS target header
          */
-        static DynamoDbCommandType GetClientCommandFromHeader(const Poco::Net::HTTPServerRequest &request);
+        static DynamoDbCommandType GetClientCommandFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
-         * Getś the value from the user-agent string
+         * @brief Getś the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
@@ -107,14 +113,14 @@ namespace AwsMock::Dto::Common {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const DynamoDbClientCommand &i);
 
         /**
-         * AWS secret access key
+         * @brief AWS secret access key
          *
          * @return output stream
          */

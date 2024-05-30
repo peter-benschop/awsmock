@@ -6,15 +6,16 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Configuration &configuration) : AbstractServer(configuration, "s3"), _configuration(configuration), _module("s3") {
+    S3Server::S3Server() : AbstractServer(Core::Configuration::instance(), "s3"), _module("s3") {
 
         // Get HTTP configuration values
-        _port = _configuration.getInt("awsmock.service.s3.http.port", S3_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.s3.http.max.queue", S3_DEFAULT_QUEUE_SIZE);
-        _maxThreads = _configuration.getInt("awsmock.service.s3.http.max.threads", S3_DEFAULT_MAX_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.s3.http.timeout", S3_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.s3.monitoring.period", S3_DEFAULT_MONITORING_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.s3.http.port", S3_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.s3.http.max.queue", S3_DEFAULT_QUEUE_SIZE);
+        _maxThreads = configuration.getInt("awsmock.service.s3.http.max.threads", S3_DEFAULT_MAX_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.s3.http.timeout", S3_DEFAULT_TIMEOUT);
+        _monitoringPeriod = configuration.getInt("awsmock.service.s3.monitoring.period", S3_DEFAULT_MONITORING_PERIOD);
 
         // Monitoring
         _s3Monitoring = std::make_unique<S3Monitoring>(_monitoringPeriod);
@@ -31,7 +32,7 @@ namespace AwsMock::Service {
         log_info << "S3 module starting";
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
     }
 
     void S3Server::Run() {

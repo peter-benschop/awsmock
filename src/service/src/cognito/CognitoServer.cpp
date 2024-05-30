@@ -2,21 +2,20 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/cognito/CognitoServer.h"
+#include <awsmock/service/cognito/CognitoServer.h>
 
 namespace AwsMock::Service {
 
-    CognitoServer::CognitoServer(Core::Configuration &configuration)
-        : AbstractServer(configuration, "cognito", 10), _configuration(configuration), _module("cognito"), _moduleDatabase(Database::ModuleDatabase::instance()),
-          _cognitoDatabase(Database::CognitoDatabase::instance()) {
+    CognitoServer::CognitoServer() : AbstractServer(Core::Configuration::instance(), "cognito", 10), _module("cognito") {
 
         // Get HTTP configuration values
-        _port = _configuration.getInt("awsmock.service.cognito.http.port", COGNITO_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.cognito.http.max.queue", COGNITO_DEFAULT_QUEUE_SIZE);
-        _maxThreads = _configuration.getInt("awsmock.service.cognito.http.max.threads", COGNITO_DEFAULT_MAX_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.cognito.http.timeout", COGNITO_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.cognito.monitoring.period", COGNITO_DEFAULT_MONITORING_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.cognito.http.port", COGNITO_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.cognito.http.max.queue", COGNITO_DEFAULT_QUEUE_SIZE);
+        _maxThreads = configuration.getInt("awsmock.service.cognito.http.max.threads", COGNITO_DEFAULT_MAX_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.cognito.http.timeout", COGNITO_DEFAULT_TIMEOUT);
+        _monitoringPeriod = configuration.getInt("awsmock.service.cognito.monitoring.period", COGNITO_DEFAULT_MONITORING_PERIOD);
 
         // Monitoring
         _cognitoMonitoring = std::make_unique<CognitoMonitoring>(_monitoringPeriod);
@@ -37,7 +36,7 @@ namespace AwsMock::Service {
         _cognitoMonitoring->Start();
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory());
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory());
     }
 
     void CognitoServer::Run() {

@@ -8,14 +8,35 @@
 // Poco includes
 #include <Poco/DateTime.h>
 
+// Boost includes
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 // Mongo included
 #include <bsoncxx/types.hpp>
 
 namespace AwsMock::Database {
 
+    using namespace boost::posix_time;
+
     class MongoUtils {
 
       public:
+
+        /**
+         * @brief Converts a boost::ptime to a bsoncxx::date
+         *
+         * @param dateTime boost ptime
+         * @return bsoncxx::types::b_date
+         */
+        //static bsoncxx::types::b_date ToBson(const ptime &dateTime);
+
+        /**
+         * @brief Converts a boost::ptime to a bsoncxx::date
+         *
+         * @param dateTime bson datetime
+         * @return boost ptime
+         */
+        //static ptime FromBson(const bsoncxx::types::b_date &dataTime);
 
         /**
          * Converts a Poco Datetime to a bsoncxx::date
@@ -32,6 +53,11 @@ namespace AwsMock::Database {
          * @return Poco::DateTime value
          */
         static Poco::DateTime FromBson(bsoncxx::types::b_date date);
+
+        /**
+         * Epoch start
+         */
+        //static constexpr const boost::gregorian::date epoch = boost::gregorian::date(1970, 1, 1);
     };
 
 }// namespace AwsMock::Database

@@ -8,11 +8,12 @@ namespace AwsMock::Service {
 
     Poco::Mutex LambdaService::_mutex;
 
-    LambdaService::LambdaService(const Core::Configuration &configuration) : _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
+    LambdaService::LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
 
         // Initialize environment
-        _accountId = _configuration.getString("awsmock.account.userPoolId", "000000000000");
-        _dataDir = _configuration.getString("awsmock.data.dir", "/home/awsmock/data");
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _accountId = configuration.getString("awsmock.account.userPoolId", "000000000000");
+        _dataDir = configuration.getString("awsmock.data.dir", "/home/awsmock/data");
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
         _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
         _dockerService = std::make_shared<Service::DockerService>();
@@ -23,7 +24,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "create_function");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
         // Save to file
@@ -64,7 +65,7 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
         // Create lambda function asynchronously
-        Core::TaskPool::instance().Add<std::string, LambdaCreator>("lambda-creator", LambdaCreator(request.code.zipFile, lambdaEntity.oid));
+        //Core::TaskPool::instance().Add<std::string, LambdaCreator>("lambda-creator", LambdaCreator(request.code.zipFile, lambdaEntity.oid));
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
         // Create response
@@ -75,7 +76,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListFunctionResponse LambdaService::ListFunctions(const std::string &region) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "list_functions");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_functions");
         log_debug << "List functions request, region: " << region;
 
         try {
@@ -92,7 +93,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::GetFunctionResponse LambdaService::GetFunction(const std::string &region, const std::string &name) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "get_function");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_function");
         log_debug << "List functions request, region: " << region << " name: " << name;
 
         try {
@@ -110,7 +111,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "invoke_lambda_function");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
         log_debug << "Invocation event function eventNotification: " + eventNotification.ToString();
 
         for (const auto &record: eventNotification.records) {
@@ -134,7 +135,7 @@ namespace AwsMock::Service {
     }
 
     std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "invoke_lambda_function");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
         Poco::ScopedLock lock(_mutex);
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
@@ -150,12 +151,12 @@ namespace AwsMock::Service {
         if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
 
             // Synchronous execution
-            output = InvokeLambdaSynchronously(url, payload);
+            output = InvokeLambdaSynchronously("localhost", lambda.hostPort, payload);
 
         } else {
 
             // Asynchronous execution
-            Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor(url, payload));
+            Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor("localhost", lambda.hostPort, payload));
         }
         log_debug << "Lambda executor notification send, name: " << lambda.function;
 
@@ -168,7 +169,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "create_tag");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_tag");
         log_debug << "Create tag request, arn: " << request.arn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
@@ -186,7 +187,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListTagsResponse LambdaService::ListTags(const std::string &arn) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "list_tags");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_tags");
         log_debug << "List tags request, arn: " << arn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
@@ -206,7 +207,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::AccountSettingsResponse LambdaService::GetAccountSettings() {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "get_account_settings");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_account_settings");
         log_debug << "Get account settings";
 
         Dto::Lambda::AccountSettingsResponse response;
@@ -230,7 +231,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "delete_function");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
@@ -257,7 +258,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteTags(Dto::Lambda::DeleteTagsRequest &request) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "delete_tags");
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_tags");
         log_trace << "Delete tags: " + request.ToString();
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
@@ -278,19 +279,20 @@ namespace AwsMock::Service {
         log_debug << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
     }
 
-    std::string LambdaService::InvokeLambdaSynchronously(const std::string &url, const std::string &payload) {
+    std::string LambdaService::InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload) {
         Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
-        log_debug << "Sending lambda invocation request, endpoint: " << url;
+        log_debug << "Sending lambda invocation request, endpoint: " << host << ":" << port;
 
-        Core::CurlUtils _curlUtils;
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, payload);
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_debug << "HTTP error, status: " << response.statusCode << " reason: " << response.output;
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/", payload, {});
+
+        //Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, payload);
+        if (response.statusCode != http::status::ok) {
+            log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
         }
         log_debug << "Lambda invocation finished send, status: " << response.statusCode;
-        log_info << "Lambda output: " << response.output;
-        return response.output.substr(0, MAX_OUTPUT_LENGTH);
+        log_info << "Lambda output: " << response.body;
+        return response.body.substr(0, MAX_OUTPUT_LENGTH);
     }
 
 }// namespace AwsMock::Service

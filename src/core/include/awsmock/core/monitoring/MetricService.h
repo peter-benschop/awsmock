@@ -353,9 +353,10 @@ namespace AwsMock::Core {
          * Starts a timer
          *
          * @param name name of the timer.
-         * @param label label name of the timer.
+         * @param labelName label name of the timer.
+         * @param labelValue label value of the timer.
          */
-        void StartTimer(const std::string &name, const std::string &label);
+        void StartTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * Stop and fill in the duration of a timer
@@ -368,9 +369,10 @@ namespace AwsMock::Core {
          * Stop and fill in the duration of a timer
          *
          * @param name name of the timer.
-         * @param label label name of the timer.
+         * @param labelName label name of the timer.
+         * @param labelValue label value of the timer.
          */
-        void StopTimer(const std::string &name, const std::string &label);
+        void StopTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * Resets a timers.

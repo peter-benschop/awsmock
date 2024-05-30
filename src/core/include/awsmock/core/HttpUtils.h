@@ -16,12 +16,19 @@
 #include <Poco/RegularExpression.h>
 #include <Poco/StreamCopier.h>
 
+// Boost includes
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Core {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief HTTP utilities.
@@ -227,6 +234,31 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
         /**
+         * @brief Gets the body as string from a boost dynamic_body
+         *
+         * @param request HTTP serer request
+         * @return HTTP body as string
+         */
+        static std::string GetBodyAsString1(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Gets the body as input stream
+         *
+         * @param request HTTP serer request
+         * @return HTTP body as istream
+         */
+        static std::istream &GetBodyAsStream(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @return header value of empty string.
+         */
+        static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &key);
+
+        /**
          * @brief Returns a header value by key.
          *
          * <p>
@@ -237,7 +269,21 @@ namespace AwsMock::Core {
          * @param key header key
          * @return header value of empty string.
          */
-        [[maybe_unused]] static std::string GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &key);
+        static std::string GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &key);
+
+        /**
+         * @brief Returns a header value by key.
+         *
+         * <p>
+         * Returns the default value, if existent, otherwise logs a warning message, in case the request has no value for the given key.
+         * </p>
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @param defaultValue returned when the key was not found
+         * @return header value of empty string.
+         */
+        static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
          * @brief Returns the headers as a map of strings
@@ -248,6 +294,22 @@ namespace AwsMock::Core {
         static std::map<std::string, std::string> GetHeaders(const Poco::Net::HTTPRequest &request);
 
         /**
+         * @brief Returns the headers as a map of strings
+         *
+         * @param request HTTP request
+         * @return map of strings
+         */
+        static std::map<std::string, std::string> GetHeaders(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param request HTTP request
+         * @return map of strings
+         */
+        static void DumpHeaders(const http::request<http::dynamic_body> &request);
+
+        /**
          * @brief Returns the content type
          *
          * @param request HTTP request
@@ -256,12 +318,28 @@ namespace AwsMock::Core {
         static std::string GetContentType(const Poco::Net::HTTPRequest &request);
 
         /**
+         * @brief Returns the content type
+         *
+         * @param request HTTP request
+         * @return reduced content type, either 'json' or 'xml.
+         */
+        static std::string GetContentType(const http::request<http::dynamic_body> &request);
+
+        /**
          * @brief Returns the content length
          *
          * @param request HTTP request
-         * @return content length on bytes
+         * @return content length in bytes
          */
         static long GetContentLength(const Poco::Net::HTTPRequest &request);
+
+        /**
+         * @brief Returns the content length
+         *
+         * @param request HTTP request
+         * @return content length in bytes
+         */
+        static long GetContentLength(const http::request<http::dynamic_body> &request);
 
       private:
 

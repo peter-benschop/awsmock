@@ -42,7 +42,7 @@ namespace AwsMock::Service {
 
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::S3Database _database = Database::S3Database();
-        S3Service _service = S3Service(_configuration);
+        S3Service _service;
         std::string testFile;
     };
 

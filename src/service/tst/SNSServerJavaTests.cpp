@@ -60,7 +60,6 @@ namespace AwsMock::Service {
             _sqsDatabase.DeleteAllQueues();
         }
 
-        Core::CurlUtils _curlUtils;
         std::string _snsEndpoint, _sqsEndpoint, _snsBaseCommand, _sqsBaseCommand, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();

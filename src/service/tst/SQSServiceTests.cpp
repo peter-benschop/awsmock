@@ -40,7 +40,7 @@ namespace AwsMock::Service {
 
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_database = Database::SQSDatabase::instance();
-        SQSService _service = SQSService(_configuration);
+        SQSService _service;
     };
 
     TEST_F(SQSServiceTest, QueueCreateTest) {

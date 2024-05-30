@@ -15,7 +15,6 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/kms/KMSHandlerFactory.h>
 #include <awsmock/service/kms/KMSMonitoring.h>
 #include <awsmock/service/kms/KMSWorker.h>
 

@@ -13,27 +13,16 @@ namespace AwsMock::Service {
         return modules;
     }
 
-    bool ModuleService::IsRunning(const std::string &moduleName) {
+    Dto::Module::Module::ModuleList ModuleService::StartModules(Dto::Module::Module::ModuleList &modules) {
 
-        Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(moduleName);
-        log_debug << "Module state, state: " << Database::Entity::Module::ModuleStateToString(module.state);
-        return module.state == Database::Entity::Module::ModuleState::RUNNING;
-    }
-
-    void ModuleService::StartServices(Dto::Common::Services &services) {
-
-        if (services.Contains("all")) {
-            services.serviceNames = _moduleDatabase.GetAllModuleNames();
-        }
-
-        for (auto const &service: services.serviceNames) {
+        for (auto const &m: modules) {
 
             // Set state
-            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(service);
+            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name);
             if (module.state != Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
-                module = _moduleDatabase.SetState(service, Database::Entity::Module::ModuleState::RUNNING);
+                module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::RUNNING);
 
                 if (module.name == "database") {
                     _moduleDatabase.StartDatabase();
@@ -65,112 +54,105 @@ namespace AwsMock::Service {
                     auto gatewayServer = _serverMap[module.name];
                     gatewayServer->Start();
                 }
-                log_info << "Module " + service + " started";
+                log_info << "Module " << m.name << " started";
             }
         }
+        return modules;
     }
 
-    void ModuleService::StopServices(Dto::Common::Services &services) {
+    Dto::Module::Module::ModuleList ModuleService::StopModules(Dto::Module::Module::ModuleList &modules) {
 
-        if (services.Contains("all")) {
-            services.serviceNames = _moduleDatabase.GetAllModuleNames();
-        }
-
-        for (auto const &service: services.serviceNames) {
+        for (auto const &m: modules) {
 
             // Set state
-            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(service);
+            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name);
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
-                module = _moduleDatabase.SetState(service, Database::Entity::Module::ModuleState::STOPPED);
+                module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::STOPPED);
 
                 // Stop module
-                if (service == "database") {
+                if (m.name == "database") {
                     _moduleDatabase.StopDatabase();
                 } else {
                     for (const auto &server: _serverMap) {
-                        if (service == server.first) {
+                        if (m.name == server.first) {
                             server.second->Stop();
                         }
                     }
                 }
             }
-            log_info << "Module " + service + " stopped";
+            log_info << "Module " + m.name + " stopped";
         }
+        return modules;
     }
 
-    std::string ModuleService::ExportInfrastructure(const Dto::Common::Services &services, bool prettyPrint, bool includeObjects) {
+    std::string ModuleService::ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool prettyPrint, bool includeObjects) {
 
         Dto::Common::Infrastructure infrastructure;
 
-        // S3
-        if (services.HasService("all") || services.HasService("s3")) {
-            Database::S3Database &_s3Database = Database::S3Database::instance();
-            infrastructure.s3Buckets = _s3Database.ListBuckets();
-            if (includeObjects) {
-                infrastructure.s3Objects = _s3Database.ListObjects();
+        for (const auto &module: modules) {
+
+            if (module.name == "s3") {
+
+                Database::S3Database &_s3Database = Database::S3Database::instance();
+                infrastructure.s3Buckets = _s3Database.ListBuckets();
+                if (includeObjects) {
+                    infrastructure.s3Objects = _s3Database.ListObjects();
+                }
+
+            } else if (module.name == "sqs") {
+
+                Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+                infrastructure.sqsQueues = _sqsDatabase.ListQueues();
+                if (includeObjects) {
+                    infrastructure.sqsMessages = _sqsDatabase.ListMessages();
+                }
+
+            } else if (module.name == "sns") {
+
+                Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+                infrastructure.snsTopics = _snsDatabase.ListTopics();
+                if (includeObjects) {
+                    infrastructure.snsMessages = _snsDatabase.ListMessages();
+                }
+
+            } else if (module.name == "lambda") {
+
+                Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+                infrastructure.lambdas = _lambdaDatabase.ListLambdas();
+
+            } else if (module.name == "cognito") {
+
+                Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+                infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
+                if (includeObjects) {
+                    infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
+                }
+
+            } else if (module.name == "dynanomdb") {
+
+                Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+                infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
+                if (includeObjects) {
+                    infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
+                }
+
+            } else if (module.name == "secretsmanager") {
+
+                Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+                infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
+
+            } else if (module.name == "transfer") {
+
+                Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+                infrastructure.transferServers = _transferDatabase.ListServers();
+
+            } else if (module.name == "kms") {
+
+                Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+                infrastructure.kmsKeys = _kmsDatabase.ListKeys();
             }
-        }
-
-        // SQS
-        if (services.HasService("all") || services.HasService("sqs")) {
-            Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-            infrastructure.sqsQueues = _sqsDatabase.ListQueues();
-            if (includeObjects) {
-                infrastructure.sqsMessages = _sqsDatabase.ListMessages();
-            }
-        }
-
-        // SNS
-        if (services.HasService("all") || services.HasService("sns")) {
-            Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-            infrastructure.snsTopics = _snsDatabase.ListTopics();
-            if (includeObjects) {
-                infrastructure.snsMessages = _snsDatabase.ListMessages();
-            }
-        }
-
-        // Lambdas
-        if (services.HasService("all") || services.HasService("lambda")) {
-            Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-            infrastructure.lambdas = _lambdaDatabase.ListLambdas();
-        }
-
-        // Cognito
-        if (services.HasService("all") || services.HasService("cognito")) {
-            Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-            infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
-            if (includeObjects) {
-                infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
-            }
-        }
-
-        // DynamoDB
-        if (services.HasService("all") || services.HasService("dynamodb")) {
-            Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-            infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
-            if (includeObjects) {
-                infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
-            }
-        }
-
-        // Secrets manager
-        if (services.HasService("all") || services.HasService("secretsmanager")) {
-            Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-            infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
-        }
-
-        // Transfer manager
-        if (services.HasService("all") || services.HasService("transfer")) {
-            Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
-            infrastructure.transferServers = _transferDatabase.ListServers();
-        }
-
-        // KMS
-        if (services.HasService("all") || services.HasService("kms")) {
-            Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-            infrastructure.kmsKeys = _kmsDatabase.ListKeys();
         }
         return infrastructure.ToJson(prettyPrint);
     }
@@ -289,70 +271,80 @@ namespace AwsMock::Service {
         }
     }
 
-    void ModuleService::CleanInfrastructure(const Dto::Common::Services &services) {
-        log_info << "Cleaning services, length: " << services.serviceNames.size();
+    void ModuleService::CleanInfrastructure(const Dto::Module::Module::ModuleList &modules) {
+        log_info << "Cleaning services, length: " << modules.size();
 
-        if (services.HasService("all") || services.HasService("s3")) {
-            std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
-            _s3Database->DeleteAllObjects();
-            _s3Database->DeleteAllBuckets();
-        }
-        if (services.HasService("all") || services.HasService("sqs")) {
-            Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-            _sqsDatabase.DeleteAllMessages();
-            _sqsDatabase.DeleteAllQueues();
-        }
-        if (services.HasService("all") || services.HasService("sns")) {
-            Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-            _snsDatabase.DeleteAllMessages();
-            _snsDatabase.DeleteAllTopics();
-        }
-        if (services.HasService("all") || services.HasService("lambda")) {
-            Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-            _lambdaDatabase.DeleteAllLambdas();
-        }
-        if (services.HasService("all") || services.HasService("cognito")) {
-            Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-            _cognitoDatabase.DeleteAllUsers();
-            _cognitoDatabase.DeleteAllUserPools();
-        }
-        if (services.HasService("all") || services.HasService("dynamodb")) {
-            Service::DynamoDbService _dynamoDbService(Core::Configuration::instance());
-            //_dynamoDbService.DeleteAllItems();
-            _dynamoDbService.DeleteAllTables();
-        }
-        if (services.HasService("all") || services.HasService("transfer")) {
-            Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
-            _transferDatabase.DeleteAllTransfers();
-        }
-        if (services.HasService("all") || services.HasService("secretsmanager")) {
-            Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-            _secretsManagerDatabase.DeleteAllSecrets();
+        for (const auto &m: modules) {
+
+            if (m.name == "s3") {
+                std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
+                _s3Database->DeleteAllObjects();
+                _s3Database->DeleteAllBuckets();
+            } else if (m.name == "sqs") {
+                Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+                _sqsDatabase.DeleteAllMessages();
+                _sqsDatabase.DeleteAllQueues();
+            } else if (m.name == "sns") {
+                Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+                _snsDatabase.DeleteAllMessages();
+                _snsDatabase.DeleteAllTopics();
+            } else if (m.name == "lambda") {
+                Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+                _lambdaDatabase.DeleteAllLambdas();
+            } else if (m.name == "cognito") {
+                Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+                _cognitoDatabase.DeleteAllUsers();
+                _cognitoDatabase.DeleteAllUserPools();
+            } else if (m.name == "dynamodb") {
+                Service::DynamoDbService _dynamoDbService;
+                //_dynamoDbService.DeleteAllItems();
+                _dynamoDbService.DeleteAllTables();
+            } else if (m.name == "transfer") {
+                Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+                _transferDatabase.DeleteAllTransfers();
+            } else if (m.name == "secretsmanager") {
+                Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+                _secretsManagerDatabase.DeleteAllSecrets();
+            } else if (m.name == "kms") {
+                Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+                _kmsDatabase.DeleteAllKeys();
+            }
         }
     }
 
-    void ModuleService::CleanObjects(const Dto::Common::Services &services) {
-        log_info << "Cleaning objects, length: " << services.serviceNames.size();
+    void ModuleService::CleanObjects(const Dto::Module::Module::ModuleList &modules) {
+        log_info << "Cleaning objects, length: " << modules.size();
 
-        if (services.HasService("all") || services.HasService("s3")) {
-            std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
-            _s3Database->DeleteAllObjects();
-        }
-        if (services.HasService("all") || services.HasService("sqs")) {
-            Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-            _sqsDatabase.DeleteAllMessages();
-        }
-        if (services.HasService("all") || services.HasService("sns")) {
-            Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-            _snsDatabase.DeleteAllMessages();
-        }
-        if (services.HasService("all") || services.HasService("cognito")) {
-            Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-            _cognitoDatabase.DeleteAllUsers();
-        }
-        if (services.HasService("all") || services.HasService("dynamodb")) {
-            Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-            _dynamoDbDatabase.DeleteAllItems();
+        for (const auto &m: modules) {
+            if (m.name == "s3") {
+                std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
+                _s3Database->DeleteAllObjects();
+            } else if (m.name == "sqs") {
+                Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+                _sqsDatabase.DeleteAllMessages();
+            } else if (m.name == "sns") {
+                Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+                _snsDatabase.DeleteAllMessages();
+            } else if (m.name == "lambda") {
+                Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+                _lambdaDatabase.DeleteAllLambdas();
+            } else if (m.name == "cognito") {
+                Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+                _cognitoDatabase.DeleteAllUsers();
+                _cognitoDatabase.DeleteAllUserPools();
+            } else if (m.name == "dynamodb") {
+                Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+                _dynamoDbDatabase.DeleteAllItems();
+            } else if (m.name == "transfer") {
+                Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+                _transferDatabase.DeleteAllTransfers();
+            } else if (m.name == "secretsmanager") {
+                Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+                _secretsManagerDatabase.DeleteAllSecrets();
+            } else if (m.name == "kms") {
+                Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+                _kmsDatabase.DeleteAllKeys();
+            }
         }
     }
 }// namespace AwsMock::Service

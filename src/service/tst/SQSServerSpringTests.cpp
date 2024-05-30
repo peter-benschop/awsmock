@@ -9,10 +9,10 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/sqs/SQSServer.h"
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/FileUtils.h>
+#include <awsmock/core/HttpSocket.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/sqs/SQSServer.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -23,12 +23,14 @@
 
 namespace AwsMock::Service {
 
+    namespace http = boost::beast::http;
+
     /**
-   * Tests the aws-sdk-java interface to the AwsMock system.
-   *
-   * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
-   *
-   */
+     * Tests the aws-sdk-java interface to the AwsMock system.
+     *
+     * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
+     *
+     */
     class SQSServerSpringTest : public ::testing::Test {
 
       protected:
@@ -58,19 +60,18 @@ namespace AwsMock::Service {
             _sqsServer->Stop();
         }
 
-        Core::CurlResponse SendPostCommand(const std::string &url, const std::string &payload) {
-            Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _basePath + url, {}, payload);
-            log_debug << "Status: " << response.statusCode << " output: " << response.output;
+        static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, "localhost", TEST_PORT, url, payload, {});
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
             return response;
         }
 
-        Core::CurlResponse SendGetCommand(const std::string &url, const std::string &payload) {
-            Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _basePath + url, {}, payload);
-            log_debug << "Status: " << response.statusCode << " output: " << response.output;
+        static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::get, "localhost", TEST_PORT, url, payload, {});
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
             return response;
         }
 
-        Core::CurlUtils _curlUtils;
         std::string _basePath, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Core::MetricService &_metricService = Core::MetricService::instance();
@@ -83,11 +84,11 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::CurlResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
-        std::string queueUrl = result.output;
+        Core::HttpSocketResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        std::string queueUrl = result.body;
 
         // assert
-        EXPECT_TRUE(result.statusCode == 200);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_FALSE(queueUrl.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, TEST_QUEUE));
     }
@@ -95,15 +96,15 @@ namespace AwsMock::Service {
     TEST_F(SQSServerSpringTest, SQSGetQueueUrlTest) {
 
         // arrange
-        Core::CurlResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
-        EXPECT_EQ(200, result.statusCode);
+        Core::HttpSocketResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
 
         // act
-        Core::CurlResponse getUrlResult = SendGetCommand("sqs/getQueueUrl?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
-        std::string queueUrl = result.output;
+        Core::HttpSocketResponse getUrlResult = SendGetCommand("sqs/getQueueUrl?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
+        std::string queueUrl = result.body;
 
         // assert
-        EXPECT_TRUE(getUrlResult.statusCode == 200);
+        EXPECT_TRUE(getUrlResult.statusCode == http::status::ok);
         EXPECT_FALSE(queueUrl.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, TEST_QUEUE));
     }
@@ -111,64 +112,64 @@ namespace AwsMock::Service {
     TEST_F(SQSServerSpringTest, SQSGetAllQueueAttributes) {
 
         // arrange
-        Core::CurlResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
-        EXPECT_EQ(200, result.statusCode);
-        std::string queueUrl = result.output;
+        Core::HttpSocketResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
 
         // act
-        Core::CurlResponse resultQueueAttributes = SendPostCommand("sqs/getAllQueueAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), {});
-        std::string queueAttributes = resultQueueAttributes.output;
+        Core::HttpSocketResponse resultQueueAttributes = SendPostCommand("sqs/getAllQueueAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), {});
+        std::string queueAttributes = resultQueueAttributes.body;
 
         // assert
-        EXPECT_TRUE(result.statusCode == 200);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_TRUE(!queueAttributes.empty());
     }
 
     TEST_F(SQSServerSpringTest, SQSGetSingleQueueAttributes) {
 
         // arrange
-        Core::CurlResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
-        EXPECT_EQ(200, result.statusCode);
-        std::string queueUrl = result.output;
+        Core::HttpSocketResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
 
         // act
-        Core::CurlResponse resultQueueAttributes = SendGetCommand("sqs/getSingleQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeName=" + Core::StringUtils::UrlEncode("APPROXIMATE_NUMBER_OF_MESSAGES"), {});
-        std::string queueAttributes = resultQueueAttributes.output;
+        Core::HttpSocketResponse resultQueueAttributes = SendGetCommand("sqs/getSingleQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeName=" + Core::StringUtils::UrlEncode("APPROXIMATE_NUMBER_OF_MESSAGES"), {});
+        std::string queueAttributes = resultQueueAttributes.body;
 
         // assert
-        EXPECT_TRUE(result.statusCode == 200);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_TRUE(!queueAttributes.empty());
     }
 
     TEST_F(SQSServerSpringTest, SQSSendMessageTest) {
 
         // arrange
-        Core::CurlResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
-        EXPECT_EQ(200, result.statusCode);
-        std::string queueUrl = result.output;
+        Core::HttpSocketResponse result = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
 
         // act
-        Core::CurlResponse sendResult = SendPostCommand("sqs/sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), TEST_MESSAGE);
+        Core::HttpSocketResponse sendResult = SendPostCommand("sqs/sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), TEST_MESSAGE);
         Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == 200);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_EQ(1, messageList.size());
     }
 
     TEST_F(SQSServerSpringTest, SQSTemplateTest) {
 
         // arrange
-        Core::CurlResponse createResult = SendPostCommand("sqs/createQueue", TEST_QUEUE);
-        EXPECT_EQ(200, createResult.statusCode);
-        std::string queueUrl = createResult.output;
+        Core::HttpSocketResponse createResult = SendPostCommand("sqs/createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, createResult.statusCode);
+        std::string queueUrl = createResult.body;
 
         // act
-        Core::CurlResponse result = SendPostCommand("sqs/sqsTemplate", TEST_MESSAGE);
+        Core::HttpSocketResponse result = SendPostCommand("sqs/sqsTemplate", TEST_MESSAGE);
         Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == 200);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_EQ(1, messageList.size());
     }
 

@@ -9,10 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/dynamodb/DynamoDbServer.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/service/dynamodb/DynamoDbServer.h>
+#include <awsmock/service/dynamodb/DynamoDbService.h>
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"
@@ -47,8 +46,8 @@ namespace AwsMock::Service {
         std::string _endpoint, _baseCommand;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        DynamoDbServer _dynamoDbServer = DynamoDbServer(_configuration);
-        DynamoDbService _dynamoDbService = DynamoDbService(_configuration);
+        DynamoDbServer _dynamoDbServer;
+        DynamoDbService _dynamoDbService;
     };
 
     TEST_F(DynamoDbServerJavaTest, TableCreateTest) {

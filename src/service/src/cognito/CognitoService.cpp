@@ -12,7 +12,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "create_user_pool");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.name;
 
         if (_database.UserPoolExists(request.region, request.name)) {
@@ -42,7 +42,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::CreateUserPoolDomainResponse CognitoService::CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "create_user_pool_domain");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_domain");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.domain;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "list_user_pool");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
         log_debug << "List user pools request, maxResults: " << request.maxResults;
 
         try {
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "delete_user_pool");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool");
         log_debug << "Delete user pool request, userPoolId:  " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::AdminCreateUserResponse CognitoService::AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "create_user");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user");
         log_debug << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -125,8 +125,8 @@ namespace AwsMock::Service {
                     .userPoolId = request.userPoolId,
                     .userName = request.userName,
                     .enabled = true,
-                    .created = Poco::DateTime(),
-                    .modified = Poco::DateTime(),
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
             };
 
             user = _database.CreateUser(user);
@@ -144,7 +144,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUsersResponse CognitoService::ListUsers(const Dto::Cognito::ListUsersRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "list_user");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user");
         log_debug << "List users request, region: " << request.region << " userPoolId: " << request.userPoolId;
 
         Dto::Cognito::ListUsersResponse response{};
@@ -163,7 +163,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "delete_user");
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user");
         log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {

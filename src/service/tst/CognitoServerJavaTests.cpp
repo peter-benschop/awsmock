@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         std::string _endpoint, _baseCommand;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase _database = Database::CognitoDatabase();
-        CognitoServer _dynamoDbServer = CognitoServer(_configuration);
+        CognitoServer _dynamoDbServer = CognitoServer();
     };
 
     TEST_F(CognitoServerJavaTest, UserPoolCreateTest) {

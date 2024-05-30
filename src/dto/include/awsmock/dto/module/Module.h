@@ -70,6 +70,15 @@ namespace AwsMock::Dto::Module {
         static std::string ToJson(const Database::Entity::Module::ModuleList &moduleList);
 
         /**
+         * @brief Convert to JSON representation
+         *
+         * @param moduleList module entity list
+         * @return JSON string
+         */
+        typedef std::vector<Dto::Module::Module> ModuleList;
+        static std::string ToJson(const ModuleList &moduleList);
+
+        /**
          * @brief Convert from JSON representation
          *
          * @param payload JSON representation

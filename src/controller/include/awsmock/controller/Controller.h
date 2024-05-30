@@ -18,12 +18,15 @@
 #include <sstream>
 #include <string>
 
+// Boost includes
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+
 // AwsMock includes
-#include <awsmock/controller/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/CurlUtils.h>
-#include <awsmock/core/HttpUtils.h>
-#include <awsmock/dto/common/Services.h>
+#include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
@@ -36,14 +39,27 @@
 
 namespace AwsMock::Controller {
 
-    class Controller {
+    class AwsMockCtl {
 
       public:
 
         /**
          * Constructor
          */
-        explicit Controller(const Configuration &configuration);
+        explicit AwsMockCtl();
+
+        /**
+         * Initialization
+         *
+         * @param vm vector of command line options
+         * @param command vector of commands
+         */
+        void Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands);
+
+        /**
+         * Initialization
+         */
+        void Run();
 
         /**
          * List all available services
@@ -53,23 +69,23 @@ namespace AwsMock::Controller {
         /**
          * Start a module
          *
-         * @param services list of service names
+         * @param modules list of modules names
          */
-        void StartService(Dto::Common::Services &services);
+        void StartService(std::vector<Dto::Module::Module> &modules);
 
         /**
          * Restart a module
          *
-         * @param services list of service names
+         * @param modules list of modules names
          */
-        void RestartService(Dto::Common::Services &services);
+        void RestartService(std::vector<Dto::Module::Module> &modules);
 
         /**
          * Stops a module
          *
-         * @param services list of service names
+         * @param modules list of modules names
          */
-        void StopService(Dto::Common::Services &services);
+        void StopService(std::vector<Dto::Module::Module> &modules);
 
 #ifdef HAS_SYSTEMD
         /**
@@ -93,11 +109,11 @@ namespace AwsMock::Controller {
         /**
          * Dumps the current infrastructure as JSON file to stdout.
          *
-         * @param services list of services
+         * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true, bool includeObjects = false);
+        void ExportInfrastructure(Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false);
 
         /**
          * Imports the current infrastructure from stdin
@@ -105,16 +121,23 @@ namespace AwsMock::Controller {
         void ImportInfrastructure();
 
         /**
-         * Cleans the current infrastructure.
+         * @brief Cleans the current infrastructure.
          *
-         * @param services list of services
+         * @param modules list of modules
          */
-        void CleanInfrastructure(const std::vector<std::string> &services);
+        void CleanInfrastructure(Dto::Module::Module::ModuleList &modules);
+
+        /**
+         * @brief Cleans the objects of the given modules
+         *
+         * @param modules list of modules
+         */
+        void CleanObjects(Dto::Module::Module::ModuleList &modules);
 
       private:
 
         /**
-         * Add authorization header.
+         * @brief Add authorization header.
          *
          * @param headers headers
          * @param action action to perform
@@ -122,14 +145,21 @@ namespace AwsMock::Controller {
         void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action);
 
         /**
-         * Application configuration
+         * @brief Get a list of all modules.
+         *
+         * @return list of all modules.
          */
-        const Configuration &_configuration;
+        Dto::Module::Module::ModuleList GetAllModules();
 
         /**
-         * Curl utils
+         * Commands
          */
-        Core::CurlUtils _curlUtils;
+        std::vector<std::string> _commands;
+
+        /**
+         * Command line options
+         */
+        boost::program_options::variables_map _vm;
 
         /**
          * Host

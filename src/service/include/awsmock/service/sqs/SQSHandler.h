@@ -5,11 +5,9 @@
 #ifndef AWSMOCK_SERVICE_SQS_HANDLER_H
 #define AWSMOCK_SERVICE_SQS_HANDLER_H
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
+// Boost includes
+#include <boost/beast.hpp>
+#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -23,41 +21,34 @@
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/sqs/SQSCmdHandler.h>
 #include <awsmock/service/sqs/SQSService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
 
-    /**
-     * SQS handler
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    typedef std::map<std::string, std::string> AttributeList;
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     /**
-     * AWS S3 mock handler.
+     * @brief AWS SQS mock handler.
      *
      * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
      * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSHandler : public SQSCmdHandler {
+    class SQSHandler : public AbstractHandler {
 
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit SQSHandler(Core::Configuration &configuration) : SQSCmdHandler(configuration) {}
+        explicit SQSHandler() = default;
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
          * @param response HTTP response
@@ -65,7 +56,46 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
+      private:
+
+        /**
+         * Get the queue userAttributes.
+         *
+         * @param payload HTTP body
+         * @return list of queue userAttributes
+         */
+        static std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+
+        /**
+         * Get the queue tags.
+         *
+         * @param payload HTTP body
+         * @return list of queue tags
+         */
+        static std::map<std::string, std::string> GetQueueTags(const std::string &payload);
+
+        /**
+         * Get the queue attribute names.
+         *
+         * @param payload HTTP body
+         * @return list of queue attribute names
+         */
+        static std::vector<std::string> GetQueueAttributeNames(const std::string &payload);
+
+        /**
+         * Get the message attributes.
+         *
+         * @param payload HTTP body
+         * @return list of message userAttributes
+         */
+        static std::map<std::string, Dto::SQS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+
+        /**
+         * SQS service
+         */
+        SQSService _sqsService;
     };
 
 }// namespace AwsMock::Service

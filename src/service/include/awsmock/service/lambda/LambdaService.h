@@ -82,10 +82,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit LambdaService(const Core::Configuration &configuration);
+        explicit LambdaService();
 
         /**
          * @brief Create lambda function
@@ -187,11 +185,12 @@ namespace AwsMock::Service {
          *
          * The output will be returned to the calling method.
          *
-         * @param url URL of the lambda docker image
+         * @param host lambda docker container host
+         * @param port lambda docker container port
          * @param payload payload for the function
          * @return output from lambda invocation call
          */
-        static std::string InvokeLambdaSynchronously(const std::string &url, const std::string &payload);
+        static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload);
 
         /**
          * Data directory
@@ -217,11 +216,6 @@ namespace AwsMock::Service {
          * AWS account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        const Core::Configuration &_configuration;
 
         /**
          * lambda database connection

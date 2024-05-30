@@ -1,142 +1,103 @@
 //
-// Created by vogje01 on 04/01/2023.
+// Created by vogje01 on 5/27/24.
 //
 
 #ifndef AWSMOCK_SERVICE_GATEWAY_HANDLER_H
 #define AWSMOCK_SERVICE_GATEWAY_HANDLER_H
 
 // C++ includes
-#include <future>
-#include <string>
-#include <utility>
+#include <iostream>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/Net/HTTPClientSession.h>
+// Boost includes
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/service/cognito/CognitoHandler.h>
-#include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/dynamodb/DynamoDbHandler.h>
-#include <awsmock/service/gateway/GatewayRoute.h>
-#include <awsmock/service/gateway/GatewayRouter.h>
-#include <awsmock/service/kms/KMSHandler.h>
-#include <awsmock/service/lambda/LambdaHandler.h>
-#include <awsmock/service/s3/S3Handler.h>
-#include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
-#include <awsmock/service/sns/SNSHandler.h>
-#include <awsmock/service/sqs/SQSHandler.h>
-#include <awsmock/service/transfer/TransferHandler.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
 
+    namespace http = boost::beast::http;
+
     /**
-     * @brief Gateway handler
-     *
-     * The gateway handler acts a as SPI gateway for thew different AwsMock services. It routes the client requests to the appropriate
-     * service port. The service will extracted from the AWS authorization header.
+     * @brief HTTP handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class GatewayHandler : public AbstractHandler {
+    class GatewayHandler {
 
       public:
 
         /**
-         * Constructor
-         *
-         * @param route routing structure
+         * @brief Manager HTTP server
          */
-        GatewayHandler(Service::GatewayRoute route) : AbstractHandler(), _route(std::move(route)){};
-
-      protected:
+        explicit GatewayHandler() = default;
 
         /**
-         * HTTP GET request.
+         * @brief Handler HTTP GET requests.
+         *
+         * Handles all GET requests.
          *
          * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @param socket HTTP socket
+         * @return response structure
          */
-        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
         /**
-         * HTTP PUT request.
+         * @brief Handler HTTP PUT requests.
+         *
+         * Handles all PUT requests.
          *
          * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @param socket HTTP socket
          */
-        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
         /**
-         * HTTP POST request.
+         * @brief Handler HTTP POST requests.
+         *
+         * Handles all POST requests.
          *
          * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @param socket HTTP socket
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
         /**
-         * Delete DELETE request.
+         * @brief Handler HTTP DELETE requests.
+         *
+         * Handles all DELETE requests.
          *
          * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @param socket HTTP socket
          */
-        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandleDeleteRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
         /**
-         * Options request.
+         * @brief Handler HTTP HEAD requests.
          *
-         * @param response HTTP response
-         * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleOptions(Poco::Net::HTTPServerResponse &response) override;
-
-        /**
-         * Head request.
+         * Handles all HEAD requests.
          *
          * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @param socket HTTP socket
          */
-        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandleHeadRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
       private:
 
         /**
-         * Sets extra header values
+         * @brief Send a OK response (status=200)
          *
          * @param request HTTP request
-         * @param region AWS region
-         * @param user AWS user
+         * @param body HTTP body
          */
-        static void SetHeaders(Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
-
-        /**
-         * Gateway route
-         */
-        Service::GatewayRoute _route;
+        static boost::beast::http::response<boost::beast::http::dynamic_body> SendOkResponse(boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &body = {});
     };
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_GATEWAY_HANDLER_H
+#endif//AWSMOCK_SERVICE_GATEWAY_HANDLER_H

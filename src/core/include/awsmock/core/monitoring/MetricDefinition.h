@@ -6,13 +6,8 @@
 #define AWSMOCK_CORE_METRIC_DEFINITION_H
 
 // HTTP timer
-#define GATEWAY_GET_TIMER "gateway_get_time"
-#define GATEWAY_PUT_TIMER "gateway_put_time"
-#define GATEWAY_POST_TIMER "gateway_post_time"
-#define GATEWAY_DELETE_TIMER "gateway_delete_time"
-#define GATEWAY_OPTIONS_TIMER "gateway_options_time"
-#define GATEWAY_HEAD_TIMER "gateway_head_time"
-#define GATEWAY_COUNTER "gateway_count"
+#define GATEWAY_HTTP_TIMER "gateway_http_timer"
+#define GATEWAY_HTTP_COUNTER "gateway_http_counter"
 
 #define MODULE_HTTP_TIMER "manager_http_timer"
 #define MODULE_HTTP_COUNTER "manager_http_counter"
@@ -47,9 +42,9 @@
 
 #define SECRETSMANAGER_SECRETS_COUNT "secretsmanager_secret_count_total"
 
-#define COGNITO_USER_COUNT "cognito_user_count_total"
-#define COGNITO_USERPOOL_COUNT "cognito_userpool_count_total"
-#define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_count"
+#define COGNITO_USER_COUNT "cognito_user_counter"
+#define COGNITO_USERPOOL_COUNT "cognito_userpool_counter"
+#define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_counter"
 #define COGNITO_SERVICE_TIMER "cognito_service_timer"
 
 #define TRANSFER_SERVER_COUNT "transfer_server_count_total"

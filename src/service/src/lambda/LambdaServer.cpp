@@ -56,7 +56,7 @@ namespace AwsMock::Service {
         _lambdaMonitoring->Start();
 
         // Start HTTP manager
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration));
 
         // Cleanup
         CleanupContainers();
@@ -83,13 +83,13 @@ namespace AwsMock::Service {
         log_debug << "Starting lambdas";
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
-        Service::LambdaService lambdaService(_configuration);
+        Service::LambdaService lambdaService;
 
         for (auto &lambda: lambdas) {
 
             Dto::Lambda::Code code = GetCode(lambda);
 
-            // Create create function request and send to service
+            // Create function request and send to service
             Dto::Lambda::CreateFunctionRequest request = Dto::Lambda::Mapper::map(lambda);
             lambdaService.CreateFunction(request);
             log_debug << "Lambda started, name:" << lambda.function;

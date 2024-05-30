@@ -11,17 +11,19 @@
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/KMSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/kms/KMSCmdHandler.h>
 #include <awsmock/service/kms/KMSService.h>
 
 namespace AwsMock::Service {
+
+    namespace http = http;
+    namespace ip = boost::asio::ip;
 
     /**
      * @brief KMS request handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSHandler : public KMSCmdHandler {
+    class KMSHandler : public AbstractHandler {
 
       public:
 
@@ -30,35 +32,25 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit KMSHandler(Core::Configuration &configuration) : KMSCmdHandler(configuration), _configuration(configuration), _kmsService(configuration) {}
+        explicit KMSHandler() : _kmsService(Core::Configuration::instance()) {}
 
         /**
          * HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * ImageHandler import configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * KMS service
          */
         Service::KMSService _kmsService;
-
-        /**
-         * Default account ID
-         */
-        std::string _accountId;
     };
 
 }// namespace AwsMock::Service

@@ -15,7 +15,9 @@
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
 
+// AwsMock includes
 #include <awsmock/server/Session.h>
+#include <awsmock/service/common/AbstractServer.h>
 
 namespace AwsMock::Manager {
 
@@ -26,43 +28,16 @@ namespace AwsMock::Manager {
      */
     class Listener : public std::enable_shared_from_this<Listener> {
 
-        boost::asio::io_context &ioc_;
-        boost::asio::ip::tcp::acceptor acceptor_;
-
       public:
 
-        Listener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint, const Service::ServerMap &serverMap) : ioc_(ioc), acceptor_(boost::asio::make_strand(ioc)), _serverMap(std::move(serverMap)) {
-
-            boost::beast::error_code ec;
-
-            // Open the acceptor
-            ec = acceptor_.open(endpoint.protocol(), ec);
-            if (ec) {
-                log_error << ec.message();
-                return;
-            }
-
-            // Allow address reuse
-            ec = acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
-            if (ec) {
-                log_error << ec.message();
-                return;
-            }
-
-            // Bind to the server address
-            ec = acceptor_.bind(endpoint, ec);
-            if (ec) {
-                log_error << ec.message();
-                return;
-            }
-
-            // Start listening for connections
-            ec = acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
-            if (ec) {
-                log_error << ec.message();
-                return;
-            }
-        }
+        /**
+         * @brief Constructor
+         *
+         * @param ioc Boost IO context
+         * @param endpoint HTTP endpoint
+         * @param serverMap map of currently running modules
+         */
+        Listener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint, const Service::ServerMap &serverMap);
 
         /**
          * @brief Start accepting incoming connections
@@ -70,30 +45,36 @@ namespace AwsMock::Manager {
          * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
          * for single-threaded contexts, this example code is written to be thread-safe by default.
          */
-        void run() {
-            boost::asio::dispatch(acceptor_.get_executor(), boost::beast::bind_front_handler(&Listener::do_accept, this->shared_from_this()));
-        }
+        void Run();
 
       private:
 
         /**
          * @brief The new connection gets its own strand
          */
-        void do_accept() {
-            acceptor_.async_accept(boost::asio::make_strand(ioc_), boost::beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
-        }
+        void DoAccept();
 
-        void on_accept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket) {
-            if (ec) {
-                log_error << ec.message();
-            } else {
-                // Create the http session and run it
-                std::make_shared<Session>(std::move(socket), _serverMap)->run();
-            }
+        /**
+         * @brief Accept callback
+         *
+         * @param ec error code
+         * @param socket HTTP socket
+         */
+        void OnAccept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket);
 
-            // Accept another connection
-            do_accept();
-        }
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context &ioc_;
+
+        /**
+         * Boost acceptor
+         */
+        boost::asio::ip::tcp::acceptor acceptor_;
+
+        /**
+         * Map of currently running server
+         */
         Service::ServerMap _serverMap;
     };
 

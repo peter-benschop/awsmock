@@ -235,4 +235,32 @@ namespace AwsMock::Database {
             _memoryDb.DeleteKey(key);
         }
     }
+
+    void KMSDatabase::DeleteAllKeys() {
+
+        if (_useDatabase) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto delete_many_result = _bucketCollection.delete_many({});
+                session.commit_transaction();
+                log_debug << "All KMS keys deleted, count: " << delete_many_result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what(), 500);
+            }
+
+        } else {
+
+            _memoryDb.DeleteAllKeys();
+        }
+    }
+
 }// namespace AwsMock::Database

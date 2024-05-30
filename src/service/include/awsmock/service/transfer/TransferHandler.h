@@ -5,6 +5,9 @@
 #ifndef AWSMOCK_SERVICE_TRANSFER_HANDLER_H
 #define AWSMOCK_SERVICE_TRANSFER_HANDLER_H
 
+// Boost includes
+#include <boost/beast.hpp>
+#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
@@ -14,8 +17,11 @@
 
 namespace AwsMock::Service {
 
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
+
     /**
-     * AWS Transfer mock handler
+     * @brief Transfer mock handler
      *
      * <p>AWS Transfer HTTP request handler. All Transfer related REST call are ending here.<p>
      *
@@ -26,38 +32,30 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit TransferHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _transferService(configuration) {}
+        explicit TransferHandler() : AbstractHandler(), _transferService(Core::Configuration::instance()) {}
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 
         /**
-         * Get the request target.
+         * @brief Get the request target.
          *
          * @param request HTTP request
          * @return target string
          */
-        static std::string GetTarget(const Poco::Net::HTTPServerRequest &request);
-
-        /**
-         * Transfer handler configuration
-         */
-        Core::Configuration &_configuration;
+        static std::string GetTarget(const http::request<http::dynamic_body> &request);
 
         /**
          * Transfer module

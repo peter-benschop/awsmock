@@ -110,4 +110,10 @@ namespace AwsMock::Database {
         log_debug << "Key deleted, count: " << count;
     }
 
+    void KMSMemoryDb::DeleteAllKeys() {
+        Poco::ScopedLock lock(_keyMutex);
+        _keys.clear();
+        log_debug << "All KMS keys deleted";
+    }
+
 }// namespace AwsMock::Database

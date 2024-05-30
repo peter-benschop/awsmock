@@ -11,6 +11,9 @@
 #include <utility>
 #include <vector>
 
+// Boost include<
+#include <boost/beast.hpp>
+
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -20,6 +23,8 @@
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief DynamoDB describe table response
@@ -86,7 +91,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * HTTP status from docker image
          */
-        Poco::Net::HTTPResponse::HTTPStatus status;
+        http::status status;
 
         /**
          * Creates a JSON string from the object.

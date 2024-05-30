@@ -8,10 +8,8 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
+// Boost includes
+#include <boost/iostreams/copy.hpp>
 
 // AwsMock includes
 #include "awsmock/core/exception/NotFoundException.h"
@@ -83,10 +81,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit S3Service(Core::Configuration &configuration);
+        explicit S3Service();
 
         /**
          * Returns the meta data of an S3 bucket
@@ -430,11 +426,6 @@ namespace AwsMock::Service {
          * Temp directory
          */
         std::string _tempDir;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

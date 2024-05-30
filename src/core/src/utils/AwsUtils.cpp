@@ -76,11 +76,15 @@ namespace AwsMock::Core {
     }
 
     std::string AwsUtils::CreateRequestId() {
-        return Poco::UUIDGenerator().createRandom().toString();
+        std::stringstream stringstream;
+        stringstream << boost::uuids::random_generator()();
+        return stringstream.str();
     }
 
     std::string AwsUtils::CreateMessageId() {
-        return Poco::UUIDGenerator().createRandom().toString();
+        std::stringstream stringstream;
+        stringstream << boost::uuids::random_generator()();
+        return stringstream.str();
     }
 
     void AwsUtils::AddAuthorizationHeader(Poco::Net::HTTPRequest &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {

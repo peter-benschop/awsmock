@@ -6,16 +6,17 @@
 
 namespace AwsMock::Service {
 
-    S3Service::S3Service(Core::Configuration &configuration) : _configuration(configuration), _database(Database::S3Database::instance()), _lambdaService(configuration) {
+    S3Service::S3Service() : _database(Database::S3Database::instance()) {
 
-        _accountId = _configuration.getString("awsmock.account.userPoolId");
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _accountId = configuration.getString("awsmock.account.userPoolId");
 
         // Initialize directories
-        _user = _configuration.getString("awsmock.user", DEFAULT_USER);
-        _region = _configuration.getString("awsmock.region", DEFAULT_REGION);
-        _dataDir = _configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
-        _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
-        _transferBucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
+        _user = configuration.getString("awsmock.user", DEFAULT_USER);
+        _region = configuration.getString("awsmock.region", DEFAULT_REGION);
+        _dataDir = configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
+        _transferDir = configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+        _transferBucket = configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
         _dataS3Dir = _dataDir + Poco::Path::separator() + "s3";
         _tempDir = _dataDir + Poco::Path::separator() + "tmp";
 
@@ -260,13 +261,14 @@ namespace AwsMock::Service {
 
         std::string fileName = uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part);
         std::ofstream ofs(fileName);
-        long size = Poco::StreamCopier::copyStream(stream, ofs);
+        std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
+        //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();
         log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 
         // Get md5sum as ETag
         std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
-        log_info << "Upload part succeeded, part: " << part << " size: " << size << " filename: " << fileName;
+        log_info << "Upload part succeeded, part: " << part << " filename: " << fileName;
         return eTag;
     }
 
@@ -843,7 +845,7 @@ namespace AwsMock::Service {
 
     void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
 
-        SQSService _sqsService = SQSService(_configuration);
+        SQSService _sqsService;
         Dto::SQS::SendMessageRequest request = {.region = _region, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
         Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
@@ -851,7 +853,7 @@ namespace AwsMock::Service {
 
     void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
 
-        SNSService _snsService = SNSService(_configuration);
+        SNSService _snsService;
         Dto::SNS::PublishRequest request = {.region = _region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
         log_debug << "SNS message request send, messageId: " << response.messageId;
@@ -872,11 +874,11 @@ namespace AwsMock::Service {
         // Write file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
-        std::ofstream ofs(filePath);
-        long size = Poco::StreamCopier::copyStream(stream, ofs);
+        std::ofstream ofs(filePath, std::ios::binary);
+        ofs << stream.rdbuf();
         ofs.close();
 
-        //Core::FileUtils::StripChunkSignature(filePath);
+        long size = Core::FileUtils::FileSize(filePath);
         log_debug << "File received, fileName: " << filePath << " size: " << size;
 
         // Create entity
@@ -927,8 +929,12 @@ namespace AwsMock::Service {
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = _dataS3Dir + Poco::Path::separator() + fileName;
         std::ofstream ofs(filePath, std::ios::out | std::ios::trunc);
-        long size = Poco::StreamCopier::copyStream(stream, ofs);
+        ofs << stream.rdbuf();
+        //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();
+
+        // Get size
+        long size = Core::FileUtils::FileSize(filePath);
         log_debug << "File received, filePath: " << filePath << " size: " << size;
 
         Database::Entity::S3::Object object;
