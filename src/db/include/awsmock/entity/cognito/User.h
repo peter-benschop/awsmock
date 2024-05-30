@@ -15,6 +15,9 @@
 #include <Poco/DateTimeFormatter.h>
 #include <Poco/JSON/Object.h>
 
+// Boost includes
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -29,6 +32,7 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
+    using namespace std::chrono;
     using bsoncxx::to_json;
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -38,7 +42,7 @@ namespace AwsMock::Database::Entity::Cognito {
     using bsoncxx::document::view;
 
     /**
-     * Cognito user entity
+     * @brief Cognito user entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -87,12 +91,12 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * Converts the entity to a MongoDB document

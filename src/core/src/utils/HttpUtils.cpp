@@ -210,9 +210,13 @@ namespace AwsMock::Core {
         return headerValue;
     }
 
-    std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name) {
+    std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &defaultValue) {
         if (request.base().find(name) == request.end()) {
-            log_warning << "Header value not found, key: " << name;
+            if (!defaultValue.empty()) {
+                return defaultValue;
+            } else {
+                log_warning << "Header value not found, key: " << name;
+            }
         }
         return request.base()[name];
     }

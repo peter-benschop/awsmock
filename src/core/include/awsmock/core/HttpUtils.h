@@ -275,14 +275,15 @@ namespace AwsMock::Core {
          * @brief Returns a header value by key.
          *
          * <p>
-         * Returns an empty string and logs a warning message, in case the request has no value for the given key.
+         * Returns the default value, if existent, otherwise logs a warning message, in case the request has no value for the given key.
          * </p>
          *
          * @param request HTTP request
          * @param key header key
+         * @param defaultValue returned when the key was not found
          * @return header value of empty string.
          */
-        static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key);
+        static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
          * @brief Returns the headers as a map of strings

@@ -17,6 +17,7 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         switch (method) {
             case http::verb::post:

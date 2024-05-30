@@ -18,8 +18,8 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("clientId", clientId),
                 kvp("arn", arn),
                 kvp("domain", domainDoc.extract()),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
         return userPoolDocument;
     }
 
@@ -33,8 +33,8 @@ namespace AwsMock::Database::Entity::Cognito {
             name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
             clientId = bsoncxx::string::to_string(mResult.value()["clientId"].get_string().value);
             arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date().value));
-            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value));
+            created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
             // Get domain
             if (mResult.value().find("domain") != mResult.value().end()) {

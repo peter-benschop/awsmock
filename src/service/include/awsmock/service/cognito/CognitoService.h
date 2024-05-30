@@ -38,6 +38,8 @@
 
 namespace AwsMock::Service {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief Cognito service
      *

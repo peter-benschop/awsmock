@@ -125,8 +125,8 @@ namespace AwsMock::Service {
                     .userPoolId = request.userPoolId,
                     .userName = request.userName,
                     .enabled = true,
-                    .created = Poco::DateTime(),
-                    .modified = Poco::DateTime(),
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
             };
 
             user = _database.CreateUser(user);

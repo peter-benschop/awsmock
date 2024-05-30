@@ -18,9 +18,9 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->payload = Core::HttpUtils::GetBodyAsString((Poco::Net::HTTPServerRequest &) request.body());
+        this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
-        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId");
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Core values
         poolName = Core::HttpUtils::GetPathParameter(request.target(), 0);

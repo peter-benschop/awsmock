@@ -20,6 +20,7 @@ namespace AwsMock::Dto::Common {
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         if (userAgent.clientCommand.empty()) {
 

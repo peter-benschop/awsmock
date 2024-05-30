@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Common {
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->url = request.target();
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Command
         std::string action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");

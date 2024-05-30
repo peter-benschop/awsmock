@@ -17,6 +17,8 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    using std::chrono::system_clock;
+
     struct UserPool {
 
         /**
@@ -42,12 +44,12 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Created
          */
-        Poco::DateTime created;
+        system_clock::time_point created;
 
         /**
          * Last modified
          */
-        Poco::DateTime lastModified;
+        system_clock::time_point lastModified;
 
         /**
          * Convert to a JSON string

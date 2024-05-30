@@ -18,19 +18,17 @@ namespace AwsMock::Service {
 
                 Dto::SNS::CreateTopicRequest snsRequest = {.region = clientCommand.region, .topicName = name, .owner = clientCommand.user};
                 Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Topic created, name: " << name;
 
-                break;
+                log_info << "Topic created, name: " << name;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::LIST_TOPICS: {
 
                 Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(clientCommand.region);
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "List topics";
 
-                break;
+                log_info << "List topics";
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
@@ -38,10 +36,9 @@ namespace AwsMock::Service {
                 std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TopicArn");
 
                 Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes({.region = clientCommand.region, .topicArn = topicArn});
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Get topic attributes, topicArn" << topicArn;
 
-                break;
+                log_info << "Get topic attributes, topicArn" << topicArn;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::PUBLISH: {
@@ -51,10 +48,9 @@ namespace AwsMock::Service {
                 std::string message = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Message");
 
                 Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message});
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Message published, topic: " << topicArn;
 
-                break;
+                log_info << "Message published, topic: " << topicArn;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::SUBSCRIBE: {
@@ -64,10 +60,9 @@ namespace AwsMock::Service {
                 std::string endpoint = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Endpoint");
 
                 Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region = clientCommand.region, .topicArn = topicArn, .protocol = protocol, .endpoint = endpoint, .owner = clientCommand.user});
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Subscribed to topic, topicArn: " << topicArn;
 
-                break;
+                log_info << "Subscribed to topic, topicArn: " << topicArn;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::UNSUBSCRIBE: {
@@ -75,10 +70,9 @@ namespace AwsMock::Service {
                 std::string subscriptionArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "SubscriptionArn");
 
                 Dto::SNS::UnsubscribeResponse snsResponse = _snsService.Unsubscribe({.region = clientCommand.region, .subscriptionArn = subscriptionArn});
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Unsubscribed from topic, subscriptionArn: " << subscriptionArn;
 
-                break;
+                log_info << "Unsubscribed from topic, subscriptionArn: " << subscriptionArn;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC: {
@@ -86,10 +80,8 @@ namespace AwsMock::Service {
                 std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TopicArn");
 
                 Dto::SNS::ListSubscriptionsByTopicResponse snsResponse = _snsService.ListSubscriptionsByTopic({.region = clientCommand.region, .topicArn = topicArn});
-                SendOkResponse(request, snsResponse.ToXml());
                 log_info << "List subscriptions by topic, topicArn: " << topicArn << " count: " << snsResponse.subscriptions.size();
-
-                break;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
             case Dto::Common::SNSCommandType::TAG_RESOURCE: {
@@ -108,10 +100,9 @@ namespace AwsMock::Service {
                 }
                 Dto::SNS::TagResourceRequest snsRequest = {.region = clientCommand.region, .resourceArn = resourceArn, .tags = tags};
                 Dto::SNS::TagResourceResponse snsResponse = _snsService.TagResource(snsRequest);
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Topic tagged, resourceArn: " << resourceArn;
 
-                break;
+                log_info << "Topic tagged, resourceArn: " << resourceArn;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
             case Dto::Common::SNSCommandType::DELETE_TOPIC: {
 
@@ -119,15 +110,15 @@ namespace AwsMock::Service {
                 log_debug << "Topic ARN: " << topicArn;
 
                 Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(clientCommand.region, topicArn);
-                return SendOkResponse(request, snsResponse.ToXml());
-                log_info << "Topic deleted, topicArn: " << topicArn;
 
-                break;
+                log_info << "Topic deleted, topicArn: " << topicArn;
+                return SendOkResponse(request, snsResponse.ToXml());
             }
 
+            default:
             case Dto::Common::SNSCommandType::UNKNOWN: {
-                log_error << "Bad request, method: POST clientCommand: " << Dto::Common::SNSCommandTypeToString(clientCommand.command);
-                throw Core::ServiceException("Bad request, method: POST clientCommand: " + Dto::Common::SNSCommandTypeToString(clientCommand.command));
+                log_error << "Unknown method";
+                return SendBadRequestError(request, "Unknown method");
             }
         }
     }
