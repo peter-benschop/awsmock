@@ -10,23 +10,23 @@ namespace AwsMock::Core {
 
         _period = Core::Configuration::instance().getInt("awsmock.monitoring.period", 60);
 
-        _virtualMemory = new Poco::Prometheus::Gauge(VIRTUAL_MEMORY);
-        _realMemory = new Poco::Prometheus::Gauge(REAL_MEMORY);
-        _totalThreads = new Poco::Prometheus::Gauge(TOTAL_THREADS);
-        _totalCpu = new Poco::Prometheus::Gauge(TOTAL_CPU);
-        _userCpu = new Poco::Prometheus::Gauge(USER_CPU);
-        _systemCpu = new Poco::Prometheus::Gauge(SYSTEM_CPU);
+        //_virtualMemory = new Poco::Prometheus::Gauge(VIRTUAL_MEMORY);
+        // _realMemory = new Poco::Prometheus::Gauge(REAL_MEMORY);
+        // _totalThreads = new Poco::Prometheus::Gauge(TOTAL_THREADS);
+        // _totalCpu = new Poco::Prometheus::Gauge(TOTAL_CPU);
+        // _userCpu = new Poco::Prometheus::Gauge(USER_CPU);
+        // _systemCpu = new Poco::Prometheus::Gauge(SYSTEM_CPU);
 
         Start(_period);
     }
 
     MetricSystemCollector::~MetricSystemCollector() {
-        delete _virtualMemory;
-        delete _realMemory;
-        delete _totalThreads;
-        delete _totalCpu;
-        delete _userCpu;
-        delete _systemCpu;
+        //  delete _virtualMemory;
+        //  delete _realMemory;
+        //  delete _totalThreads;
+        //  delete _totalCpu;
+        //  delete _userCpu;
+        //  delete _systemCpu;
     }
 
     void MetricSystemCollector::Initialize() {
@@ -69,17 +69,17 @@ namespace AwsMock::Core {
 
             if (StringUtils::Contains(line, "VmSize:")) {
                 double value = std::stod(StringUtils::Split(line, ':')[1]);
-                _virtualMemory->set(value);
+                //_virtualMemory->set(value);
                 log_trace << "Virtual memory: " << value;
             }
             if (StringUtils::Contains(line, "VmRSS:")) {
                 double value = std::stod(StringUtils::Split(line, ':')[1]);
-                _realMemory->set(value);
+                //_realMemory->set(value);
                 log_trace << "Real Memory: " << value;
             }
             if (StringUtils::Contains(line, "Threads:")) {
                 double value = std::stod(StringUtils::Split(line, ':')[1]);
-                _totalThreads->set(value);
+                //_totalThreads->set(value);
                 log_trace << "Total Threads: " << value;
             }
         }
@@ -100,21 +100,21 @@ namespace AwsMock::Core {
             totalPercent /= (double) (now - lastCPU);
             totalPercent /= numProcessors;
             totalPercent *= 100;
-            _totalCpu->set(totalPercent);
+            //_totalCpu->set(totalPercent);
             log_trace << "Total CPU: " << totalPercent;
 
             userPercent = (double) (timeSample.tms_utime - lastUserCPU);
             userPercent /= (double) (now - lastCPU);
             userPercent /= numProcessors;
             userPercent *= 100;
-            _userCpu->set(userPercent);
+            // _userCpu->set(userPercent);
             log_trace << "User CPU: " << userPercent;
 
             systemPercent = (double) (timeSample.tms_stime - lastSysCPU);
             systemPercent /= (double) (now - lastCPU);
             systemPercent /= numProcessors;
             systemPercent *= 100;
-            _systemCpu->set(systemPercent);
+            // _systemCpu->set(systemPercent);
             log_trace << "System CPU: " << systemPercent;
         }
         lastCPU = now;

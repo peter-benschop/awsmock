@@ -14,11 +14,6 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Prometheus/Counter.h>
-#include <Poco/Prometheus/Gauge.h>
-#include <Poco/Prometheus/MetricsServer.h>
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
@@ -79,32 +74,32 @@ namespace AwsMock::Core {
         /**
          * Virtual memory gauge
          */
-        Poco::Prometheus::Gauge *_virtualMemory;
+        //Poco::Prometheus::Gauge *_virtualMemory;
 
         /**
          * Real memory gauge
          */
-        Poco::Prometheus::Gauge *_realMemory;
+        //Poco::Prometheus::Gauge *_realMemory;
 
         /**
          * Total thread gauge
          */
-        Poco::Prometheus::Gauge *_totalThreads;
+        //Poco::Prometheus::Gauge *_totalThreads;
 
         /**
          * Total CPU gauge
          */
-        Poco::Prometheus::Gauge *_totalCpu;
+        //Poco::Prometheus::Gauge *_totalCpu;
 
         /**
          * User CPU gauge
          */
-        Poco::Prometheus::Gauge *_userCpu;
+        //Poco::Prometheus::Gauge *_userCpu;
 
         /**
          * System CPU gauge
          */
-        Poco::Prometheus::Gauge *_systemCpu;
+        //Poco::Prometheus::Gauge *_systemCpu;
 
         /**
          * Number of processors

@@ -5,9 +5,7 @@
 #ifndef AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
 #define AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
 
-#include "MetricService.h"
-
-#include <utility>
+#include <awsmock/core/monitoring/MetricService.h>
 
 namespace AwsMock::Core {
 
@@ -30,9 +28,6 @@ namespace AwsMock::Core {
          * @param name name of the underlying timer
          */
         explicit MetricServiceTimer(std::string name) : _metricService(MetricService::instance()), _name(std::move(name)) {
-            if (!_metricService.TimerExists(_name)) {
-                _metricService.AddTimer(_name);
-            }
             _metricService.StartTimer(_name);
         }
 
@@ -45,9 +40,6 @@ namespace AwsMock::Core {
          * @param label label of the underlying timer
          */
         explicit MetricServiceTimer(std::string name, std::string labelName, std::string labelValue) : _metricService(MetricService::instance()), _name(std::move(name)), _labelName(std::move(labelName)), _labelValue(std::move(labelValue)) {
-            if (!_metricService.TimerExists(_name, _labelName)) {
-                _metricService.AddTimer(_name, _labelName);
-            }
             _metricService.StartTimer(_name, _labelName, _labelValue);
         }
 
