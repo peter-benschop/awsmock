@@ -18,7 +18,7 @@ namespace AwsMock::Service {
         _requestTimeout = configuration.getInt("awsmock.service.gateway.http.timeout", GATEWAY_TIMEOUT);
 
         // Sleeping period
-        _period = configuration.getInt("awsmock.worker.lambda.period", 10000);
+        _period = configuration.getInt("awsmock.worker.gateway.period", 10000);
         log_debug << "Gateway worker period: " << _period;
 
         // Create environment

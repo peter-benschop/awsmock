@@ -47,7 +47,7 @@ namespace AwsMock::Manager {
          * @param socket HTTP socket
          * @return response structure
          */
-        boost::beast::http::response<boost::beast::http::string_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
         /**
          * @brief Handler HTTP PUT requests.
@@ -57,7 +57,7 @@ namespace AwsMock::Manager {
          * @param request HTTP request
          * @param socket HTTP socket
          */
-        boost::beast::http::response<boost::beast::http::string_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
         /**
          * @brief Handler HTTP POST requests.
@@ -67,7 +67,7 @@ namespace AwsMock::Manager {
          * @param request HTTP request
          * @param socket HTTP socket
          */
-        boost::beast::http::response<boost::beast::http::string_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
+        boost::beast::http::response<boost::beast::http::dynamic_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
       private:
 
@@ -77,7 +77,7 @@ namespace AwsMock::Manager {
          * @param request HTTP request
          * @param body HTTP body
          */
-        static boost::beast::http::response<boost::beast::http::string_body> SendOkResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body = {});
+        static boost::beast::http::response<boost::beast::http::dynamic_body> SendOkResponse(boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &body = {});
 
         /**
          * Module service

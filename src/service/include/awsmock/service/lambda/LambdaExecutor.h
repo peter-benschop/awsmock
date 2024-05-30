@@ -5,13 +5,12 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
-// Poco includes
-#include <Poco/Net/HTTPClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
+// C++ include
+#include <utility>
 
 // AwsMock includes
-#include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Task.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
@@ -19,6 +18,8 @@
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief Lambda executor.
@@ -39,7 +40,7 @@ namespace AwsMock::Service {
          * @param url lambda docker URL
          * @param payload event payload
          */
-        explicit LambdaExecutor(std::string url, std::string payload) : Core::Task("lambda-executor"), _url(std::move(url)), _payload(std::move(payload)){};
+        explicit LambdaExecutor(std::string host, int port, std::string payload) : Core::Task("lambda-executor"), _host(std::move(host)), _port(port), _payload(std::move(payload)){};
 
         /**
          * Send the invocation request to the corresponding port
@@ -54,9 +55,14 @@ namespace AwsMock::Service {
         Core::MetricService &_metricService = Core::MetricService::instance();
 
         /**
-         * Lambda URL
+         * Lambda host
          */
-        std::string _url;
+        std::string _host;
+
+        /**
+         * Lambda port
+         */
+        int _port;
 
         /**
          * Lambda payload

@@ -54,7 +54,6 @@ namespace AwsMock::Service {
             _sqsServer->Stop();
         }
 
-        Core::CurlUtils _curlUtils;
         std::string _endpoint, _baseCommand, _region;
         std::map<std::string, std::string> _extraHeaders;
         Core::Configuration &_configuration = Core::Configuration::instance();

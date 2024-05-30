@@ -43,7 +43,7 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    void UserAgent::FromRequest(const http::request<http::string_body> &request) {
+    void UserAgent::FromRequest(const http::request<http::dynamic_body> &request) {
 
         if (!Core::HttpUtils::HasHeader(request, "User-Agent")) {
 
@@ -78,14 +78,6 @@ namespace AwsMock::Dto::Common {
         if (Core::HttpUtils::HasHeader(request, "Content-Type")) {
             contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
         }
-    }
-
-    void UserAgent::FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service) {
-        FromRequest(request);
-    }
-
-    void UserAgent::FromRequest(const http::request<http::string_body> &request, const std::string &service) {
-        FromRequest(request);
     }
 
     std::string UserAgent::ToJson() const {

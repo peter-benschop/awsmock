@@ -18,7 +18,6 @@
 
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
-#include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
 #include <awsmock/entity/module/ModuleState.h>

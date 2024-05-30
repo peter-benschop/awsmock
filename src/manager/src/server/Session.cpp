@@ -70,11 +70,13 @@ namespace AwsMock::Manager {
         // Returns a bad request response
         auto const bad_request =
                 [&req](boost::beast::string_view why) {
-                    boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::bad_request, req.version()};
+                    boost::beast::http::response<boost::beast::http::dynamic_body> res{boost::beast::http::status::bad_request, req.version()};
                     res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
                     res.set(boost::beast::http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
-                    res.body() = std::string(why);
+                    // Body
+                    boost::beast::net::streambuf sb;
+                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
                     res.prepare_payload();
                     return res;
                 };
@@ -89,7 +91,7 @@ namespace AwsMock::Manager {
             return bad_request("Illegal request-target");
         }
 
-        boost::beast::http::response<boost::beast::http::string_body> res;
+        boost::beast::http::response<boost::beast::http::dynamic_body> res;
 
         switch (req.method()) {
             case boost::beast::http::verb::get:
@@ -101,7 +103,7 @@ namespace AwsMock::Manager {
                 res = _handler.HandlePutRequest(req);
                 break;
             case boost::beast::http::verb::post:
-                log_debug << "Handle PUT request";
+                log_debug << "Handle POST request";
                 res = _handler.HandlePostRequest(req);
                 break;
         }

@@ -10,7 +10,6 @@ namespace AwsMock::Manager {
 
         InitializeMonitoring();
         InitializeDatabase();
-        InitializeCurl();
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion()
                  << " pid: " << getpid() << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
@@ -51,11 +50,6 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::InitializeCurl() {
-        curl_global_init(CURL_GLOBAL_ALL);
-        log_debug << "Curl library initialized";
-    }
-
     void Manager::StartModules() {
 
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -75,7 +69,7 @@ namespace AwsMock::Manager {
         // Get last module configuration
         for (const auto &module: modules) {
             if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::S3Server>(configuration);
+                _serverMap[module.name] = std::make_shared<Service::S3Server>();
                 _serverMap[module.name]->Start();
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::SQSServer>(configuration);
@@ -93,7 +87,7 @@ namespace AwsMock::Manager {
                 _serverMap[module.name] = std::make_shared<Service::CognitoServer>();
                 _serverMap[module.name]->Start();
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>(configuration);
+                _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>();
                 _serverMap[module.name]->Start();
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::KMSServer>(configuration);

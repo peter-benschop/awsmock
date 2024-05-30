@@ -198,7 +198,7 @@ namespace AwsMock::Core {
         return url;
     }
 
-    bool HttpUtils::HasHeader(const http::request<http::string_body> &request, const std::string &name) {
+    bool HttpUtils::HasHeader(const http::request<http::dynamic_body> &request, const std::string &name) {
         return request.base().find(name) != request.end();
     }
 
@@ -210,7 +210,7 @@ namespace AwsMock::Core {
         return headerValue;
     }
 
-    std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name) {
+    std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name) {
         if (request.base().find(name) == request.end()) {
             log_warning << "Header value not found, key: " << name;
         }
@@ -226,7 +226,7 @@ namespace AwsMock::Core {
         return headers;
     }
 
-    std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::string_body> &request) {
+    std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::dynamic_body> &request) {
 
         std::map<std::string, std::string> headers;
         for (const auto &header: request.base()) {
@@ -235,7 +235,7 @@ namespace AwsMock::Core {
         return headers;
     }
 
-    void HttpUtils::DumpHeaders(const http::request<http::string_body> &request) {
+    void HttpUtils::DumpHeaders(const http::request<http::dynamic_body> &request) {
         for (const auto &header: request.base()) {
             log_info << header.name() << ": " << header.value();
         }
@@ -250,12 +250,12 @@ namespace AwsMock::Core {
         return static_cast<long>(request.getContentLength64());
     }
 
-    std::string HttpUtils::GetContentType(const http::request<http::string_body> &request) {
+    std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
 
         return Core::StringUtils::ContainsIgnoreCase(request.base()["Content-Type"], "json") ? "json" : "xml";
     }
 
-    long HttpUtils::GetContentLength(const http::request<http::string_body> &request) {
+    long HttpUtils::GetContentLength(const http::request<http::dynamic_body> &request) {
 
         if (request.has_content_length()) {
             return std::stol(request.base()["Content-Length"]);
@@ -278,6 +278,23 @@ namespace AwsMock::Core {
         request.stream().clear(std::ios::eofbit);
         request.stream().seekg(0, std::ios::beg);
         return body;
+    }
+
+    std::string HttpUtils::GetBodyAsString1(const http::request<http::dynamic_body> &request) {
+
+        boost::beast::net::streambuf sb;
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+
+        return boost::beast::buffers_to_string(sb.data());
+    }
+
+    std::istream &HttpUtils::GetBodyAsStream(const http::request<http::dynamic_body> &request) {
+
+        boost::beast::net::streambuf sb;
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+
+        std::istream stream(&sb);
+        return stream;
     }
 
 }// namespace AwsMock::Core

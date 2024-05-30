@@ -45,11 +45,14 @@ namespace AwsMock::Controller {
             }
             SetLogLevel(loglevel);
 
-        } else if (std::find(_commands.begin(), _commands.end(), "logs") != _commands.end()) {
+        }
+#ifdef HAS_SYSTEMD
+        else if (std::find(_commands.begin(), _commands.end(), "logs") != _commands.end()) {
 
-            //ShowServiceLogs();
-
-        } else if (std::find(_commands.begin(), _commands.end(), "start") != _commands.end()) {
+            ShowServiceLogs();
+        }
+#endif
+        else if (std::find(_commands.begin(), _commands.end(), "start") != _commands.end()) {
 
             std::vector<Dto::Module::Module> modules;
             for (const auto &command: _commands) {
@@ -102,6 +105,10 @@ namespace AwsMock::Controller {
 
             StopService(modules);
 
+        } else if (std::find(_commands.begin(), _commands.end(), "import") != _commands.end()) {
+
+            ImportInfrastructure();
+
         } else if (std::find(_commands.begin(), _commands.end(), "export") != _commands.end()) {
 
             std::vector<Dto::Module::Module> modules;
@@ -122,6 +129,23 @@ namespace AwsMock::Controller {
             bool includeObjects = _vm.count("includeobjects") > 0;
 
             ExportInfrastructure(modules, pretty, includeObjects);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "clean") != _commands.end()) {
+
+            std::vector<Dto::Module::Module> modules;
+            for (const auto &command: _commands) {
+                if (command != "clean") {
+                    Dto::Module::Module module;
+                    module.name = command;
+                    modules.emplace_back(module);
+                }
+            }
+
+            if (modules.empty()) {
+                modules = GetAllModules();
+            }
+
+            CleanInfrastructure(modules);
 
         } else if (std::find(_commands.begin(), _commands.end(), "cleanobjects") != _commands.end()) {
 
@@ -200,6 +224,7 @@ namespace AwsMock::Controller {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "stop-modules");
+
         Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
@@ -217,7 +242,7 @@ namespace AwsMock::Controller {
     }
 
 #ifdef HAS_SYSTEMD
-    void Controller::ShowServiceLogs() {
+    void AwsMockCtl::ShowServiceLogs() {
         sd_journal *jd;
         int r = sd_journal_open(&jd, SD_JOURNAL_LOCAL_ONLY);
         if (r != 0) {
@@ -334,37 +359,32 @@ namespace AwsMock::Controller {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "import");
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("PUT", _baseUrl + "/all/import", headers, jsonString.str());
 
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", jsonString.str(), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Could not import objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
-        std::cout << response.output;
     }
 
-    void AwsMockCtl::CleanInfrastructure(const std::vector<std::string> &services) {
-
-        /*Dto::Common::Services cleanServices;
-        for (const auto &service: services) {
-            cleanServices.serviceNames.emplace_back(service);
-        }
+    void AwsMockCtl::CleanInfrastructure(Dto::Module::Module::ModuleList &modules) {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "clean");
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("GET", _baseUrl + "/clean-infrastructure", headers, cleanServices.ToJson());
+        AddStandardHeaders(headers, "import");
 
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            std::cerr << "Error: " << response.statusReason << std::endl;
+        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Could not clean infrastructure, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
-        std::cout << response.output;*/
+        std::cout << response.body;
     }
 
     void AwsMockCtl::CleanObjects(Dto::Module::Module::ModuleList &modules) {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "clean-objects");
+
         Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;

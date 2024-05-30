@@ -6,10 +6,10 @@
 
 namespace AwsMock::Dto::Common {
 
-    void SQSClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &awsRegion, const std::string &awsUser) {
+    void SQSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "sqs");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->method = request.method();
@@ -18,7 +18,7 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->payload = request.body();
+        this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
 
         if (userAgent.clientCommand.empty()) {
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    std::string SQSClientCommand::GetCommandFromHeader(const http::request<http::string_body> &request) const {
+    std::string SQSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) const {
 
         std::string cmd;
         std::string cType = request["Content-Type"];

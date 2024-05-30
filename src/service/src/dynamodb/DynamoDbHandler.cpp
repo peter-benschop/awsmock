@@ -9,7 +9,7 @@ namespace AwsMock::Service {
         _secretAccessKey = Core::Configuration::instance().getString("awsmock.secret.access.key", "none");
     }
 
-    http::response<http::string_body> DynamoDbHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> DynamoDbHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "DynamoDb POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::DynamoDbClientCommand clientCommand;
@@ -36,8 +36,6 @@ namespace AwsMock::Service {
                         return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
                     log_info << "Table created, name: " << tableRequest.tableName;
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::LIST_TABLES: {
@@ -56,8 +54,6 @@ namespace AwsMock::Service {
                         return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
                     log_info << "Table listed, region: " << tableRequest.region;
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::DESCRIBE_TABLE: {

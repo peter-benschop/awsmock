@@ -234,13 +234,29 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
         /**
+         * @brief Gets the body as string from a boost dynamic_body
+         *
+         * @param request HTTP serer request
+         * @return HTTP body as string
+         */
+        static std::string GetBodyAsString1(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Gets the body as input stream
+         *
+         * @param request HTTP serer request
+         * @return HTTP body as istream
+         */
+        static std::istream &GetBodyAsStream(const http::request<http::dynamic_body> &request);
+
+        /**
          * @brief Checks whether a header exists.
          *
          * @param request HTTP request
          * @param key header key
          * @return header value of empty string.
          */
-        static bool HasHeader(const http::request<http::string_body> &request, const std::string &key);
+        static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &key);
 
         /**
          * @brief Returns a header value by key.
@@ -266,7 +282,7 @@ namespace AwsMock::Core {
          * @param key header key
          * @return header value of empty string.
          */
-        static std::string GetHeaderValue(const http::request<http::string_body> &request, const std::string &key);
+        static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key);
 
         /**
          * @brief Returns the headers as a map of strings
@@ -282,7 +298,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @return map of strings
          */
-        static std::map<std::string, std::string> GetHeaders(const http::request<http::string_body> &request);
+        static std::map<std::string, std::string> GetHeaders(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Dumps the headers to the logger as info messages
@@ -290,7 +306,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @return map of strings
          */
-        static void DumpHeaders(const http::request<http::string_body> &request);
+        static void DumpHeaders(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Returns the content type
@@ -306,7 +322,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @return reduced content type, either 'json' or 'xml.
          */
-        static std::string GetContentType(const http::request<http::string_body> &request);
+        static std::string GetContentType(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Returns the content length
@@ -322,7 +338,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @return content length in bytes
          */
-        static long GetContentLength(const http::request<http::string_body> &request);
+        static long GetContentLength(const http::request<http::dynamic_body> &request);
 
       private:
 

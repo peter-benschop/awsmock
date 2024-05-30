@@ -29,7 +29,7 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-            _s3Server = std::make_shared<S3Server>(_configuration);
+            _s3Server = std::make_shared<S3Server>();
             _sqsServer = std::make_shared<SQSServer>(_configuration);
 
             _serverMap = {

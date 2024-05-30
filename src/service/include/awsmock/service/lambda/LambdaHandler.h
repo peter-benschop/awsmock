@@ -43,7 +43,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        http::response<http::string_body> HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP POST request.
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        http::response<http::string_body> HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP DELETE request.
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        http::response<http::string_body> HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

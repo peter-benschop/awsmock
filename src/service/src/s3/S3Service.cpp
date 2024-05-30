@@ -261,13 +261,14 @@ namespace AwsMock::Service {
 
         std::string fileName = uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part);
         std::ofstream ofs(fileName);
-        long size = Poco::StreamCopier::copyStream(stream, ofs);
+        std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
+        //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();
         log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 
         // Get md5sum as ETag
         std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
-        log_info << "Upload part succeeded, part: " << part << " size: " << size << " filename: " << fileName;
+        log_info << "Upload part succeeded, part: " << part << " filename: " << fileName;
         return eTag;
     }
 

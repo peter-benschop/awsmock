@@ -20,7 +20,9 @@ namespace AwsMock::Service {
             {"dynamodb", std::make_shared<DynamoDbHandler>()}};
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {
-        static_assert(queue_limit > 0, "queue limit must be positive");
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _queueLimit = configuration.getInt("awsmock.service.gateway.http.max.queue", DEFAULT_MAX_QUEUE_SIZE);
+        _bodyLimit = configuration.getInt("awsmock.service.gateway.http.max.body", DEFAULT_MAX_BODY_SIZE);
     };
 
     void GatewaySession::Run() {
@@ -33,10 +35,10 @@ namespace AwsMock::Service {
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
-        parser_->body_limit(10000);
+        parser_->body_limit(_bodyLimit);
 
         // Set the timeout.
-        stream_.expires_after(std::chrono::seconds(30));
+        stream_.expires_after(std::chrono::seconds(300));
 
         // Read a request using the parser-oriented interface
         http::async_read(stream_, buffer_, *parser_, boost::beast::bind_front_handler(&GatewaySession::OnRead, this->shared_from_this()));
@@ -59,7 +61,7 @@ namespace AwsMock::Service {
         QueueWrite(HandleRequest(parser_->release()));
 
         // If we aren't at the queue limit, try to pipeline another request
-        if (response_queue_.size() < queue_limit)
+        if (response_queue_.size() < _queueLimit)
             DoRead();
     }
 
@@ -83,11 +85,14 @@ namespace AwsMock::Service {
         // Returns a bad request response
         auto const bad_request =
                 [&req](boost::beast::string_view why) {
-                    http::response<http::string_body> res{http::status::bad_request, req.version()};
+                    http::response<http::dynamic_body> res{http::status::bad_request, req.version()};
                     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                     res.set(http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
-                    res.body() = std::string(why);
+
+                    // Body
+                    boost::beast::net::streambuf sb;
+                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
                     res.prepare_payload();
                     return res;
                 };
@@ -95,22 +100,28 @@ namespace AwsMock::Service {
         // Returns a bad request response
         auto const unauthorized =
                 [&req](boost::beast::string_view why) {
-                    http::response<http::string_body> res{http::status::unauthorized, req.version()};
+                    http::response<http::dynamic_body> res{http::status::unauthorized, req.version()};
                     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                     res.set(http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
-                    res.body() = std::string(why);
+
+                    // Body
+                    boost::beast::net::streambuf sb;
+                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
                     res.prepare_payload();
                     return res;
                 };
         // Returns a bad request response
         auto const notimplemented =
                 [&req](boost::beast::string_view why) {
-                    http::response<http::string_body> res{http::status::not_implemented, req.version()};
+                    http::response<http::dynamic_body> res{http::status::not_implemented, req.version()};
                     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                     res.set(http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
-                    res.body() = std::string(why);
+
+                    // Body
+                    boost::beast::net::streambuf sb;
+                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
                     res.prepare_payload();
                     return res;
                 };
@@ -187,7 +198,7 @@ namespace AwsMock::Service {
         }
 
         // Resume the read if it has been paused
-        if (response_queue_.size() == queue_limit)
+        if (response_queue_.size() == _queueLimit)
             DoRead();
 
         response_queue_.pop();

@@ -151,12 +151,12 @@ namespace AwsMock::Service {
         if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
 
             // Synchronous execution
-            output = InvokeLambdaSynchronously(url, payload);
+            output = InvokeLambdaSynchronously("localhost", lambda.hostPort, payload);
 
         } else {
 
             // Asynchronous execution
-            Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor(url, payload));
+            Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor("localhost", lambda.hostPort, payload));
         }
         log_debug << "Lambda executor notification send, name: " << lambda.function;
 
@@ -279,19 +279,20 @@ namespace AwsMock::Service {
         log_debug << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
     }
 
-    std::string LambdaService::InvokeLambdaSynchronously(const std::string &url, const std::string &payload) {
+    std::string LambdaService::InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload) {
         Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
-        log_debug << "Sending lambda invocation request, endpoint: " << url;
+        log_debug << "Sending lambda invocation request, endpoint: " << host << ":" << port;
 
-        Core::CurlUtils _curlUtils;
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, payload);
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_debug << "HTTP error, status: " << response.statusCode << " reason: " << response.output;
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/", payload, {});
+
+        //Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, payload);
+        if (response.statusCode != http::status::ok) {
+            log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
         }
         log_debug << "Lambda invocation finished send, status: " << response.statusCode;
-        log_info << "Lambda output: " << response.output;
-        return response.output.substr(0, MAX_OUTPUT_LENGTH);
+        log_info << "Lambda output: " << response.body;
+        return response.body.substr(0, MAX_OUTPUT_LENGTH);
     }
 
 }// namespace AwsMock::Service

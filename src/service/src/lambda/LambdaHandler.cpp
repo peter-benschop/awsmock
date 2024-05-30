@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    http::response<http::string_body> LambdaHandler::HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> LambdaHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda GET request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::string_body> LambdaHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
 
             if (action == "functions") {
 
-                std::string body = request.body();
+                std::string body = Core::HttpUtils::GetBodyAsString1(request);
 
                 if (Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations") {
 
@@ -103,7 +103,7 @@ namespace AwsMock::Service {
                 std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
 
-                std::string body = request.body();
+                std::string body = Core::HttpUtils::GetBodyAsString1(request);
                 Dto::Lambda::CreateTagRequest lambdaRequest;
                 lambdaRequest.FromJson(body);
 
@@ -124,13 +124,13 @@ namespace AwsMock::Service {
         return SendBadRequestError(request, "Unknown method");
     }
 
-    http::response<http::string_body> LambdaHandler::HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> LambdaHandler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.target(), version, action);
-            std::string body = request.body();
+            std::string body = Core::HttpUtils::GetBodyAsString1(request);
 
             if (action == "functions") {
 

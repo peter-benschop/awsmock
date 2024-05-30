@@ -44,8 +44,8 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSService _snsService = SNSService(_configuration);
-        SQSService _sqsService = SQSService(_configuration);
+        SNSService _snsService;
+        SQSService _sqsService;
     };
 
     TEST_F(SNSServiceTest, TopicCreateTest) {

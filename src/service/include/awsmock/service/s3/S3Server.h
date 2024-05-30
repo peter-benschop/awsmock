@@ -5,10 +5,6 @@
 #ifndef AWSMOCK_SERVICE_S3_SERVER_H
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
-// Poco includes
-#include <Poco/Net/HTTPRequestHandlerFactory.h>
-#include <Poco/Net/HTTPServer.h>
-
 // AwsMock includes
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
@@ -38,24 +34,22 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit S3Server(Core::Configuration &configuration);
+        explicit S3Server();
 
         /**
-         * Timer initialization
+         * @brief Timer initialization
          */
         void Initialize() override;
 
         /**
-         * Timer main method
+         * @brief Timer main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
@@ -70,11 +64,6 @@ namespace AwsMock::Service {
          * Rest host
          */
         std::string _host;
-
-        /**
-        * Application configuration
-        */
-        Core::Configuration &_configuration;
 
         /**
          * HTTP manager instance

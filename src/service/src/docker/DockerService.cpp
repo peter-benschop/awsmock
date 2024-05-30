@@ -105,13 +105,8 @@ namespace AwsMock::Service {
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/build?t=" + name + ":" + tag);
-        /*
-        Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag, imageFile);
-        log_debug << "Docker image build, image: " << name << ":" << tag;
-        log_trace << "Response: " << curlResponse.ToString();
-*/
         if (domainSocketResponse.statusCode != http::status::ok) {
-            log_error << "Build image failed, httpStatus: " << domainSocketResponse.statusCode;
+            log_error << "Build image failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
         }
         return imageFile;
     }
@@ -127,12 +122,11 @@ namespace AwsMock::Service {
         ofs.close();
         std::string imageFile = BuildImageFile(codeDir, name);
 
-        Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag, imageFile, {});
-        log_debug << "Docker image build, image: " << name << ":" << tag;
-        log_trace << "Response: " << curlResponse.ToString();
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendBinary(http::verb::post, "http://localhost/build?t=" + name + ":" + tag, imageFile, {});
 
-        if (curlResponse.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_error << "Build image failed, state: " << curlResponse.statusCode;
+        //Core::CurlResponse curlResponse = _curlUtils.SendUnixSocketFileRequest("POST", "http://localhost/build?t=" + name + ":" + tag, imageFile, {});
+        if (domainSocketResponse.statusCode != http::status::ok) {
+            log_error << "Build image failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
         }
         return dockerFile;
     }

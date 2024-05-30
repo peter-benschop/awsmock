@@ -6,10 +6,10 @@
 
 namespace AwsMock::Dto::Common {
 
-    void KMSClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &awsRegion, const std::string &awsUser) {
+    void KMSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "kms");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = awsRegion;
@@ -17,7 +17,7 @@ namespace AwsMock::Dto::Common {
         this->method = request.method();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->payload = request.body();
+        this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->url = request.target();
 
         if (userAgent.clientCommand.empty()) {
@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    std::string KMSClientCommand::GetCommandFromHeader(const http::request<http::string_body> &request) {
+    std::string KMSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) {
 
         std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
         std::string cmd = Core::StringUtils::Split(headerValue, '.')[1];

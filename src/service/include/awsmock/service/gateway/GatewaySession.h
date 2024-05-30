@@ -27,6 +27,10 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
 
+// Maximal body size (10MB)
+#define DEFAULT_MAX_BODY_SIZE (10 * 1024 * 1024)
+#define DEFAULT_MAX_QUEUE_SIZE 250
+
 namespace AwsMock::Service {
 
     namespace http = boost::beast::http;
@@ -124,7 +128,12 @@ namespace AwsMock::Service {
         /**
          * Queue limit
          */
-        static constexpr std::size_t queue_limit = 8;
+        std::size_t _queueLimit;
+
+        /**
+         * Mox body size
+         */
+        long _bodyLimit;
 
         /**
          * HTTP request queue
@@ -134,7 +143,7 @@ namespace AwsMock::Service {
         /**
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
          */
-        boost::optional<http::request_parser<http::string_body>> parser_;
+        boost::optional<http::request_parser<http::dynamic_body>> parser_;
 
         /**
          * HTTP request handler

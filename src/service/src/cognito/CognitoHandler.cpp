@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    http::response<http::string_body> CognitoHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> CognitoHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Cognito POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::CognitoClientCommand clientCommand;
@@ -110,7 +110,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string CognitoHandler::GetActionFromHeader(const http::request<http::string_body> &request) {
+    std::string CognitoHandler::GetActionFromHeader(const http::request<http::dynamic_body> &request) {
 
         if (!Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
             log_error << "Could not extract action";

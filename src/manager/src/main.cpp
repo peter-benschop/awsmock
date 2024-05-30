@@ -30,8 +30,7 @@
 #include <boost/program_options/variables_map.hpp>
 
 // AwsMOck includes
-#include "awsmock/server/Manager.h"
-#include <awsmock/core/Configuration.h>
+#include <awsmock/server/Manager.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
 

@@ -83,7 +83,7 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return command string
          */
-        std::string GetCommandFromHeader(const http::request<http::string_body> &request) const;
+        std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
 
         /**
          * Getś the value from the user-agent string
@@ -93,7 +93,7 @@ namespace AwsMock::Dto::Common {
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Convert to a JSON string

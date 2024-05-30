@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    boost::beast::http::response<boost::beast::http::string_body> KMSHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    boost::beast::http::response<boost::beast::http::dynamic_body> KMSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "KMS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::KMSClientCommand clientCommand;
@@ -19,10 +19,8 @@ namespace AwsMock::Service {
 
                 Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
 
-                return SendOkResponse(request, kmsResponse.ToJson());
                 log_info << "Key created, keyId: " << kmsResponse.key.keyId;
-
-                break;
+                return SendOkResponse(request, kmsResponse.ToJson());
             }
 
             case Dto::Common::KMSCommandType::SCHEDULE_KEY_DELETION: {
@@ -33,10 +31,8 @@ namespace AwsMock::Service {
 
                 Dto::KMS::ScheduledKeyDeletionResponse kmsResponse = _kmsService.ScheduleKeyDeletion(kmsRequest);
 
-                return SendOkResponse(request, kmsResponse.ToJson());
                 log_info << "Key deletion scheduled, keyId: " << kmsResponse.keyId;
-
-                break;
+                return SendOkResponse(request, kmsResponse.ToJson());
             }
 
             case Dto::Common::KMSCommandType::LIST_KEYS: {
@@ -47,10 +43,8 @@ namespace AwsMock::Service {
 
                 Dto::KMS::ListKeysResponse kmsResponse = _kmsService.ListKeys(kmsRequest);
 
-                return SendOkResponse(request, kmsResponse.ToJson());
                 log_info << "List keys received, count: " << kmsResponse.keys.size();
-
-                break;
+                return SendOkResponse(request, kmsResponse.ToJson());
             }
 
             case Dto::Common::KMSCommandType::DESCRIBE_KEY: {
@@ -61,10 +55,8 @@ namespace AwsMock::Service {
 
                 Dto::KMS::DescribeKeyResponse kmsResponse = _kmsService.DescribeKey(kmsRequest);
 
-                return SendOkResponse(request, kmsResponse.ToJson());
                 log_info << "Describe key received, count: " << kmsResponse.key.keyId;
-
-                break;
+                return SendOkResponse(request, kmsResponse.ToJson());
             }
 
             case Dto::Common::KMSCommandType::ENCRYPT: {
@@ -75,10 +67,8 @@ namespace AwsMock::Service {
 
                 Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(kmsRequest);
 
-                return SendOkResponse(request, kmsResponse.ToJson());
                 log_info << "Encrypt received, size: " << kmsResponse.ciphertext.length();
-
-                break;
+                return SendOkResponse(request, kmsResponse.ToJson());
             }
 
             case Dto::Common::KMSCommandType::DECRYPT: {
@@ -89,12 +79,11 @@ namespace AwsMock::Service {
 
                 Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(kmsRequest);
 
-                return SendOkResponse(request, kmsResponse.ToJson());
                 log_info << "Decrypt received, size: " << kmsResponse.plaintext.length();
-
-                break;
+                return SendOkResponse(request, kmsResponse.ToJson());
             }
 
+            default:
             case Dto::Common::KMSCommandType::UNKNOWN: {
                 log_error << "Unimplemented command called";
                 throw Core::ServiceException("Unimplemented command called");

@@ -25,7 +25,6 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/dto/module/GatewayConfig.h>
@@ -70,23 +69,23 @@ namespace AwsMock::Controller {
         /**
          * Start a module
          *
-         * @param services list of service names
+         * @param modules list of modules names
          */
-        void StartService(std::vector<Dto::Module::Module> &nmodules);
+        void StartService(std::vector<Dto::Module::Module> &modules);
 
         /**
          * Restart a module
          *
-         * @param services list of service names
+         * @param modules list of modules names
          */
-        void RestartService(std::vector<Dto::Module::Module> &nmodules);
+        void RestartService(std::vector<Dto::Module::Module> &modules);
 
         /**
          * Stops a module
          *
-         * @param services list of service names
+         * @param modules list of modules names
          */
-        void StopService(std::vector<Dto::Module::Module> &nmodules);
+        void StopService(std::vector<Dto::Module::Module> &modules);
 
 #ifdef HAS_SYSTEMD
         /**
@@ -124,9 +123,9 @@ namespace AwsMock::Controller {
         /**
          * @brief Cleans the current infrastructure.
          *
-         * @param services list of services
+         * @param modules list of modules
          */
-        void CleanInfrastructure(const std::vector<std::string> &services);
+        void CleanInfrastructure(Dto::Module::Module::ModuleList &modules);
 
         /**
          * @brief Cleans the objects of the given modules
@@ -161,11 +160,6 @@ namespace AwsMock::Controller {
          * Command line options
          */
         boost::program_options::variables_map _vm;
-
-        /**
-         * Curl utils
-         */
-        Core::CurlUtils _curlUtils;
 
         /**
          * Host

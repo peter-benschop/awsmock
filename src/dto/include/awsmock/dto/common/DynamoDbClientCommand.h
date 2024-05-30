@@ -87,7 +87,7 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return client command from AWS target header
          */
-        static DynamoDbCommandType GetClientCommandFromHeader(const http::request<http::string_body> &request);
+        static DynamoDbCommandType GetClientCommandFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Getś the value from the user-agent string
@@ -96,7 +96,7 @@ namespace AwsMock::Dto::Common {
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Convert to a JSON string

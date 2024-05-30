@@ -1,42 +1,45 @@
 
+#include <asio/buffer.hpp>
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
 
-    http::response<http::string_body> AbstractHandler::HandleGetRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
     }
 
-    http::response<http::string_body> AbstractHandler::HandlePutRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
     }
 
-    http::response<http::string_body> AbstractHandler::HandlePostRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
     }
 
-    http::response<http::string_body> AbstractHandler::HandleDeleteRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
     }
 
-    http::response<http::string_body> AbstractHandler::HandleHeadRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
     }
 
-    http::response<http::string_body> AbstractHandler::SendOkResponse(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendOkResponse(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         // Prepare the response message
-        http::response<http::string_body> response;
+        http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.body() = body;
+
+        // Body
+        boost::beast::ostream(response.body()) << body;
         response.prepare_payload();
 
         // Copy headers
@@ -50,16 +53,43 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::string_body> AbstractHandler::SendNoContentResponse(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendOkResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long contentLength, const std::map<std::string, std::string> &headers) {
 
         // Prepare the response message
-        http::response<http::string_body> response;
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, std::to_string(contentLength));
+
+        // Body
+        std::ifstream ifs(fileName);
+        boost::beast::ostream(response.body()) << ifs.rdbuf();
+        ifs.close();
+        response.prepare_payload();
+
+        log_info << response.body().size();
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &header: headers) {
+                response.set(header.first, header.second);
+            }
+        }
+
+        // Send the response to the client
+        return response;
+    }
+
+    http::response<http::dynamic_body> AbstractHandler::SendNoContentResponse(const http::request<http::dynamic_body> &request, const std::map<std::string, std::string> &headers) {
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.body() = body;
-        response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
@@ -72,15 +102,17 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::string_body> AbstractHandler::SendInternalServerError(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendInternalServerError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         // Prepare the response message
-        http::response<http::string_body> response;
+        http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::internal_server_error);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.body() = body;
+
+        // Body
+        boost::beast::ostream(response.body()) << body;
         response.prepare_payload();
 
         // Copy headers
@@ -94,15 +126,17 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::string_body> AbstractHandler::SendBadRequestError(const http::request<http::string_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendBadRequestError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         // Prepare the response message
-        http::response<http::string_body> response;
+        http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.body() = body;
+
+        // Body
+        boost::beast::ostream(response.body()) << body;
         response.prepare_payload();
 
         // Copy headers
@@ -116,7 +150,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    /*    void AbstractHandler::SendRangeResponse(Poco::Net::HTTPServerResponse &response, const std::string &fileName, long min, long max, long size, const HeaderMap &extraHeader) {
+    http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, const std::map<std::string, std::string> &headers) {
         log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         if (!Core::MemoryMappedFile::instance().IsMapped()) {
@@ -132,32 +166,42 @@ namespace AwsMock::Service {
             if (contentLength > size) {
                 contentLength = size - min;
             }
-            SetHeaders(response, contentLength, extraHeader);
 
-            // Set state
-            handleHttpStatusCode(response, Poco::Net::HTTPResponse::HTTP_OK);
+            // Prepare the response message
+            http::response<http::dynamic_body> response;
+            response.version(request.version());
+            response.result(http::status::bad_request);
+            response.set(http::field::server, "awsmock");
+            response.set(http::field::content_type, "application/json");
 
-            // Send response
-            std::ostream &os = response.send();
-
-            // Send body
+            // Body
             char *buffer = new char[contentLength + 1];
             Core::MemoryMappedFile::instance().ReadChunk(min, contentLength, (char *) buffer);
-            os.write(buffer, contentLength);
-            os.flush();
+            boost::beast::ostream(response.body()) << buffer;
             delete[] buffer;
+            response.prepare_payload();
+
+            // Copy headers
+            if (!headers.empty()) {
+                for (const auto &header: headers) {
+                    response.set(header.first, header.second);
+                }
+            }
 
             // Close file
             if (max >= size) {
                 Core::MemoryMappedFile::instance().CloseFile();
             }
 
+            // Send the response to the client
+            return response;
+
         } catch (Poco::Exception &exc) {
-            log_error << "Exception: " << exc.message();
-            throw Core::ServiceException("Bad request, send range response, exception: " + exc.message());
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         }
     }
-*/
+
     /*    void AbstractHandler::SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader) {
         log_trace << "Sending Head response, state: 200";
         try {

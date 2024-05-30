@@ -92,7 +92,7 @@ namespace AwsMock::Dto::Common {
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Convert to a JSON string

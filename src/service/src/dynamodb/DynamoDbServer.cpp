@@ -6,20 +6,21 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::Configuration &configuration) : AbstractServer(configuration, "dynamodb", 10), _configuration(configuration), _module("dynamodb") {
+    DynamoDbServer::DynamoDbServer() : AbstractServer(Core::Configuration::instance(), "dynamodb", 10), _module("dynamodb") {
 
         // Get HTTP configuration values
-        _region = _configuration.getString("awsmock.region");
-        _port = _configuration.getInt("awsmock.service.dynamodb.port", DYNAMODB_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.dynamodb.max.queue", DYNAMODB_DEFAULT_QUEUE);
-        _maxThreads = _configuration.getInt("awsmock.service.dynamodb.max.threads", DYNAMODB_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.dynamodb.timeout", DYNAMODB_DEFAULT_TIMEOUT);
-        _workerPeriod = _configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _region = configuration.getString("awsmock.region");
+        _port = configuration.getInt("awsmock.service.dynamodb.port", DYNAMODB_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.dynamodb.max.queue", DYNAMODB_DEFAULT_QUEUE);
+        _maxThreads = configuration.getInt("awsmock.service.dynamodb.max.threads", DYNAMODB_DEFAULT_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.dynamodb.timeout", DYNAMODB_DEFAULT_TIMEOUT);
+        _workerPeriod = configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
+        _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
 
         // Sleeping period
-        _period = _configuration.getInt("awsmock.worker.dynamodb.period", 10000);
+        _period = configuration.getInt("awsmock.worker.dynamodb.period", 10000);
         log_debug << "DynamoDB server period: " << _period;
 
         // Docker module

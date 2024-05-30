@@ -124,23 +124,7 @@ namespace AwsMock::Dto::Common {
          *
          * @param request HTTP server request
          */
-        void FromRequest(const http::request<http::string_body> &request);
-
-        /**
-         * Gets the value from the user-agent string
-         *
-         * @param request HTTP server request
-         * @param service AWS service name
-         */
-        void FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service);
-
-        /**
-         * Gets the value from the user-agent string
-         *
-         * @param request HTTP server request
-         * @param service AWS service name
-         */
-        void FromRequest(const http::request<http::string_body> &request, const std::string &service);
+        void FromRequest(const http::request<http::dynamic_body> &request);
 
         /**
          * Converts the DTO to a string representation.

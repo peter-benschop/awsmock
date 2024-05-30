@@ -6,10 +6,10 @@
 
 namespace AwsMock::Dto::Common {
 
-    void CognitoClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &awsRegion, const std::string &awsUser) {
+    void CognitoClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "cognito");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = awsRegion;
@@ -18,7 +18,7 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->payload = request.body();
+        this->payload = Core::HttpUtils::GetBodyAsString((Poco::Net::HTTPServerRequest &) request.body());
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId");
 

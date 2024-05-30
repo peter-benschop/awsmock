@@ -17,7 +17,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
@@ -244,11 +243,6 @@ namespace AwsMock::Service {
          * @return return docker file path
          */
         static std::string BuildImageFile(const std::string &codeDir, const std::string &name);
-
-        /**
-         * Curl utilities
-         */
-        Core::CurlUtils _curlUtils;
 
         /**
          * Docker version

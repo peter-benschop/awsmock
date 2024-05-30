@@ -117,37 +117,37 @@ namespace AwsMock::Dto::Common {
         /**
          * Versioning
          */
-        bool versionRequest;
+        bool versionRequest = false;
 
         /**
          * Notification
          */
-        bool notificationRequest;
+        bool notificationRequest = false;
 
         /**
          * Multipart upload/download
          */
-        bool multipartRequest;
+        bool multipartRequest = false;
 
         /**
          * Multipart uploads
          */
-        bool uploads;
+        bool uploads = false;
 
         /**
          * Multipart part number
          */
-        bool partNumber;
+        bool partNumber = false;
 
         /**
          * Multipart upload/download
          */
-        bool copyRequest;
+        bool copyRequest = false;
 
         /**
          * SSE encryption
          */
-        bool encryptionRequest;
+        bool encryptionRequest = false;
 
         /**
          * Multipart upload ID
@@ -176,7 +176,7 @@ namespace AwsMock::Dto::Common {
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Converts the DTO to a string representation.

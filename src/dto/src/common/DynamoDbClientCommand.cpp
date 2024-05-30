@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Common {
 
-    void DynamoDbClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &region, const std::string &user) {
+    void DynamoDbClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         // Basic values
         this->region = region;
@@ -15,7 +15,7 @@ namespace AwsMock::Dto::Common {
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->url = request.target();
-        this->payload = request.body();
+        this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
 
         switch (method) {
@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    DynamoDbCommandType DynamoDbClientCommand::GetClientCommandFromHeader(const http::request<http::string_body> &request) {
+    DynamoDbCommandType DynamoDbClientCommand::GetClientCommandFromHeader(const http::request<http::dynamic_body> &request) {
 
         if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
             std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");

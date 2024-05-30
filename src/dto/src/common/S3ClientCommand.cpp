@@ -6,10 +6,10 @@
 
 namespace AwsMock::Dto::Common {
 
-    void S3ClientCommand::FromRequest(const http::request<http::string_body> &request, const std::string &awsRegion, const std::string &awsUser) {
+    void S3ClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "s3");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = awsRegion;

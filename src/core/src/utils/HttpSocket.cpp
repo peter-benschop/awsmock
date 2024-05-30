@@ -55,7 +55,7 @@ namespace AwsMock::Core {
 
         boost::beast::flat_buffer buffer;
         boost::system::error_code ec;
-        http::response<http::string_body> response;
+        http::response<http::dynamic_body> response;
         read(socket, buffer, response, ec);
         if (!ec && ec.message() != "Success") {
             log_error << "Send to docker daemon failed, error: " << ec.message();
