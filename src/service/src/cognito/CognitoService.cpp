@@ -118,6 +118,27 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::DescribeUserPoolResponse CognitoService::DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool");
+        log_debug << "Describe user pool request, userPoolId: " << request.userPoolId;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        try {
+
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+            log_trace << "Got user pool userPoolId: " << request.userPoolId;
+            return Dto::Cognito::Mapper::map(request, userPool);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "User pool list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void CognitoService::DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool");
         log_debug << "Delete user pool request, userPoolId:  " << request.userPoolId;

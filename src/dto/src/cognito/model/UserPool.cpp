@@ -26,8 +26,9 @@ namespace AwsMock::Dto::Cognito {
             rootJson.set("Region", region);
             rootJson.set("Name", name);
             rootJson.set("UserPoolId", userPoolId);
+            rootJson.set("Arn", arn);
             rootJson.set("CreationDate", Core::DateTimeUtils::ISO8601(created));
-            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+            rootJson.set("LastModifiedDate", Core::DateTimeUtils::ISO8601(modified));
 
             return rootJson;
 

@@ -42,6 +42,16 @@ namespace AwsMock::Dto::Cognito {
         std::string userPoolId;
 
         /**
+         * User pool ARN
+         */
+        std::string arn;
+
+        /**
+         * User pool domain
+         */
+        std::string domain;
+
+        /**
          * Created
          */
         system_clock::time_point created;
@@ -49,7 +59,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Last modified
          */
-        system_clock::time_point lastModified;
+        system_clock::time_point modified;
 
         /**
          * Convert to a JSON string

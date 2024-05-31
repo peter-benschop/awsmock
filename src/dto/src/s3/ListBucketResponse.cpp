@@ -50,7 +50,7 @@ namespace AwsMock::Dto::S3 {
                 for (auto &it: contents) {
                     Poco::JSON::Object jsonObject;
                     jsonObject.set("key", it.key);
-                    jsonObject.set("lastModified", it.lastModified);
+                    jsonObject.set("modified", it.lastModified);
                     jsonObject.set("etag", it.etag);
                     jsonObject.set("owner", it.owner);
                     jsonObject.set("displayName", it.owner.displayName);

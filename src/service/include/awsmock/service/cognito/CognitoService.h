@@ -29,6 +29,8 @@
 #include <awsmock/dto/cognito/CreateUserPoolResponse.h>
 #include <awsmock/dto/cognito/DeleteGroupRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
@@ -90,6 +92,14 @@ namespace AwsMock::Service {
          * @return ListUserPoolResponse DTO
          */
         Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
+
+        /**
+         * @brief Describes a user pool
+         *
+         * @param request describe user pool request
+         * @return DescribeUserPoolResponse DTO
+         */
+        Dto::Cognito::DescribeUserPoolResponse DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request);
 
         /**
          * @brief Delete a cognito user pool

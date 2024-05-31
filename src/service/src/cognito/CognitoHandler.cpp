@@ -65,6 +65,19 @@ namespace AwsMock::Service {
                 Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
                 return SendOkResponse(request, serviceResponse.ToJson());
 
+            } else if (action == "DescribeUserPool") {
+
+                Dto::Cognito::DescribeUserPoolRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Describe user pool request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::DescribeUserPoolResponse serviceResponse = _cognitoService.DescribeUserPool(cognitoRequest);
+                return SendOkResponse(request, serviceResponse.ToJson());
+
             } else if (action == "DeleteUserPool") {
 
                 Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
