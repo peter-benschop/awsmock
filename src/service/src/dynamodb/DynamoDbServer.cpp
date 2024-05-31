@@ -54,7 +54,6 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbServer::Run() {
-        log_trace << "DynamoDB processing started";
     }
 
     void DynamoDbServer::Shutdown() {

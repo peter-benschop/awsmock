@@ -40,7 +40,6 @@ namespace AwsMock::Service {
     }
 
     void CognitoServer::Run() {
-        log_trace << "Cognito processing started";
     }
 
     void CognitoServer::Shutdown() {

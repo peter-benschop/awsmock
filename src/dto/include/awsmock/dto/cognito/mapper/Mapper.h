@@ -6,10 +6,13 @@
 #define AWSMOCK_DTO_COGNITO_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/cognito/CreateGroupRequest.h>
+#include <awsmock/dto/cognito/CreateGroupResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
+#include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -28,6 +31,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * Some values will be pulled over from the request.
          *
+         * @param request original request
          * @param userPoolList cognito user pool entity list
          * @param request request struct
          * @return ListUserPoolResponse
@@ -43,6 +47,25 @@ namespace AwsMock::Dto::Cognito {
          * @see CreateUserPoolDomainRequest
          */
         static Database::Entity::Cognito::UserPoolDomain map(const CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Maps a create group DTO request to an entity
+         *
+         * @param request CreateGroupRequest struct
+         * @return Group entity
+         * @see CreateGroupRequest
+         */
+        static Database::Entity::Cognito::Group map(const CreateGroupRequest &request);
+
+        /**
+         * @brief Maps a group entity to a CreateGroupResponse
+         *
+         * @param request original request
+         * @param group group entity
+         * @return CreateGroupResponse
+         * @see CreateGroupResponse
+         */
+        static Dto::Cognito::CreateGroupResponse map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group);
     };
 
 }// namespace AwsMock::Dto::Cognito

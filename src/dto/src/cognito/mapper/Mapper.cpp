@@ -29,4 +29,20 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDomain;
     }
 
+    Database::Entity::Cognito::Group Mapper::map(const Dto::Cognito::CreateGroupRequest &request) {
+        Database::Entity::Cognito::Group group = {
+                .region = request.region,
+                .userPoolId = request.userPoolId,
+                .groupName = request.groupName,
+                .description = request.description,
+                .precedence = request.precedence};
+        return group;
+    }
+
+    Dto::Cognito::CreateGroupResponse Mapper::map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group) {
+        Dto::Cognito::Group groupDto = {group.groupName, group.userPoolId, group.description, group.roleArn, group.precedence, group.created, group.modified};
+        Dto::Cognito::CreateGroupResponse response = {{.requestId = request.requestId, .region = group.region, .user = request.user}, groupDto};
+        return response;
+    }
+
 }// namespace AwsMock::Dto::Cognito

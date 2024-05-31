@@ -49,8 +49,10 @@ namespace AwsMock::Core {
         ~MetricServiceTimer() {
             if (_labelName.empty()) {
                 _metricService.StopTimer(_name);
+                log_trace << "Timer deleted, name: " << _name;
             } else {
                 _metricService.StopTimer(_name, _labelName, _labelValue);
+                log_trace << "Timer deleted, name: " << _name << " labelName: " << _labelName << " labelValue: " << _labelValue;
             }
         }
 

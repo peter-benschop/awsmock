@@ -17,8 +17,11 @@ namespace AwsMock::Service {
     void LambdaMonitoring::Shutdown() {}
 
     void LambdaMonitoring::UpdateCounter() {
+        log_trace << "Lambda monitoring starting";
+
         long lambdas = _lambdaDatabase.LambdaCount();
         _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, lambdas);
-        log_trace << "Lambda update counter finished";
+
+        log_trace << "Lambda monitoring finished";
     }
 }// namespace AwsMock::Service

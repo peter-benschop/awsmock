@@ -8,6 +8,7 @@ namespace AwsMock::Database {
 
     Poco::Mutex CognitoMemoryDb::_userPoolMutex;
     Poco::Mutex CognitoMemoryDb::_userMutex;
+    Poco::Mutex CognitoMemoryDb::_groupMutex;
 
     bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
@@ -305,6 +306,24 @@ namespace AwsMock::Database {
 
         log_debug << "All cognito users deleted, count: " << _userPools.size();
         _users.clear();
+    }
+
+    bool CognitoMemoryDb::GroupExists(const std::string &region, const std::string &groupName) {
+
+        return find_if(_groups.begin(),
+                       _groups.end(),
+                       [region, groupName](const std::pair<std::string, Entity::Cognito::Group> &group) {
+                           return group.second.region == region && group.second.groupName == groupName;
+                       }) != _groups.end();
+    }
+
+    Entity::Cognito::Group CognitoMemoryDb::CreateGroup(const Entity::Cognito::Group &group) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        _groups[oid] = group;
+        log_trace << "Cognito user pool created, oid: " << oid;
+        return _groups[oid];
     }
 
 }// namespace AwsMock::Database

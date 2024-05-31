@@ -100,6 +100,19 @@ namespace AwsMock::Service {
                 _cognitoService.AdminDeleteUser(cognitoRequest);
                 return SendOkResponse(request);
 
+            } else if (action == "CreateGroup") {
+
+                Dto::Cognito::CreateGroupRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got create group request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::CreateGroupResponse serviceResponse = _cognitoService.CreateGroup(cognitoRequest);
+                return SendOkResponse(request, serviceResponse.ToJson());
+
             } else {
 
                 return SendBadRequestError(request, "Unknown function");

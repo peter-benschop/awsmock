@@ -36,7 +36,8 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(DatabaseBase::HasDatabase()), _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"){};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(DatabaseBase::HasDatabase()), _userpoolCollectionName("cognito_userpool"),
+                                     _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"){};
 
         /**
          * @brief Singleton instance
@@ -247,6 +248,33 @@ namespace AwsMock::Database {
          */
         void DeleteAllUsers();
 
+        /**
+         * @brief Check existence of cognito group
+         *
+         * @param region AWS region name
+         * @param groupName group name
+         * @return true if cognito group exists
+         * @throws DatabaseException
+         */
+        bool GroupExists(const std::string &region, const std::string &groupName);
+
+        /**
+         * @brief Returns a cognito group entity by primary key
+         *
+         * @param oid cognito group primary key
+         * @return cognito group entity
+         * @throws DatabaseException
+         */
+        Entity::Cognito::Group GetGroupById(bsoncxx::oid oid);
+
+        /**
+         * @brief Create a new cognito group
+         *
+         * @param userPool cognito group entity to create
+         * @return created cognito group entity.
+         */
+        Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);
+
       private:
 
         /**
@@ -268,6 +296,11 @@ namespace AwsMock::Database {
          * User pool collection name
          */
         std::string _userCollectionName;
+
+        /**
+         * Group collection name
+         */
+        std::string _groupCollectionName;
 
         /**
          * S3 in-memory database

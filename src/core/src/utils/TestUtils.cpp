@@ -35,6 +35,7 @@ namespace AwsMock::Core {
         ofs << "awsmock.service.gateway.http.max.queue=10" << std::endl;
         ofs << "awsmock.service.gateway.http.max.threads=10" << std::endl;
         ofs << "awsmock.service.gateway.http.timeout=10" << std::endl;
+        // Mongo DB
         ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
         ofs << "awsmock.mongodb.name=test" << std::endl;
         ofs << "awsmock.mongodb.http.host=" << hostName << std::endl;

@@ -21,6 +21,7 @@ namespace AwsMock::Service {
     void SQSMonitoring::Shutdown() {}
 
     void SQSMonitoring::UpdateCounter() {
+        log_trace << "SQS monitoring starting";
 
         // Get total counts
         long queues = _sqsDatabase.CountQueues();
@@ -34,6 +35,6 @@ namespace AwsMock::Service {
             long messagesPerQueue = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
             _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "queue", labelValue, messagesPerQueue);
         }
-        log_trace << "SQS update counter finished";
+        log_trace << "SQS monitoring finished";
     }
 }// namespace AwsMock::Service

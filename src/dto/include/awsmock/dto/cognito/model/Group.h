@@ -1,9 +1,10 @@
 //
-// Created by vogje01 on 12/18/23.
+// Created by vogje01 on 5/31/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
-#define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
+#ifndef AWSMOCK_DTO_COGNITO_GROUP_H
+#define AWSMOCK_DTO_COGNITO_GROUP_H
+
 
 // C++ includes
 #include <sstream>
@@ -19,27 +20,32 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
-    struct UserPool {
+    struct Group {
 
         /**
-         * ID
+         * GroupName
          */
-        std::string id;
+        std::string groupName;
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Name
-         */
-        std::string name;
-
-        /**
-         * User pool ID
-         */
+          * User pool Id
+          */
         std::string userPoolId;
+
+        /**
+         * Description
+         */
+        std::string description;
+
+        /**
+         * Role ARN
+         */
+        std::string roleArn;
+
+        /**
+         * Precedence
+         */
+        int precedence;
 
         /**
          * Created
@@ -77,9 +83,9 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const UserPool &r);
+        friend std::ostream &operator<<(std::ostream &os, const Group &r);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
+#endif// AWSMOCK_DTO_COGNITO_GROUP_H

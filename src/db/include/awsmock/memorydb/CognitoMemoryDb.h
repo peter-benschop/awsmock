@@ -16,9 +16,10 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/repository/Database.h>
@@ -224,6 +225,24 @@ namespace AwsMock::Database {
          */
         void DeleteAllUsers();
 
+        /**
+         * @brief Check existence of cognito group
+         *
+         * @param region AWS region name
+         * @param groupName group name
+         * @return true if cognito group exists
+         * @throws DatabaseException
+         */
+        bool GroupExists(const std::string &region, const std::string &groupName);
+
+        /**
+         * @brief Create a new cognito group
+         *
+         * @param userPool cognito group entity to create
+         * @return created cognito group entity.
+         */
+        Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);
+
       private:
 
         /**
@@ -237,6 +256,11 @@ namespace AwsMock::Database {
         std::map<std::string, Entity::Cognito::User> _users{};
 
         /**
+         * Cognito group map
+         */
+        std::map<std::string, Entity::Cognito::Group> _groups{};
+
+        /**
          * Cognito user pool mutex
          */
         static Poco::Mutex _userPoolMutex;
@@ -245,6 +269,11 @@ namespace AwsMock::Database {
          * Cognito user mutex
          */
         static Poco::Mutex _userMutex;
+
+        /**
+         * Cognito user mutex
+         */
+        static Poco::Mutex _groupMutex;
     };
 
 }// namespace AwsMock::Database

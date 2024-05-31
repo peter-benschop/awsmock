@@ -32,7 +32,6 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-    using namespace std::chrono;
     using bsoncxx::to_json;
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -40,6 +39,7 @@ namespace AwsMock::Database::Entity::Cognito {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * @brief Cognito user entity
@@ -49,7 +49,7 @@ namespace AwsMock::Database::Entity::Cognito {
     struct User {
 
         /**
-         * MongoDB POD
+         * MongoDB OID
          */
         std::string oid;
 

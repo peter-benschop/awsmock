@@ -13,32 +13,29 @@
 #include <sys/time.h>
 #include <sys/times.h>
 
-// Prometheus includes
-#include <prometheus/counter.h>
-#include <prometheus/exposer.h>
-#include <prometheus/gauge.h>
-#include <prometheus/histogram.h>
-#include <prometheus/registry.h>
+// Poco includes
+#include <Poco/Prometheus/Counter.h>
+#include <Poco/Prometheus/Gauge.h>
+#include <Poco/Prometheus/Histogram.h>
+#include <Poco/Prometheus/MetricsServer.h>
 
-// Boost includes
+// Boost include
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 // AwsMock utils
-#include "MetricSystemCollector.h"
-#include "awsmock/core/Configuration.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/Timer.h"
+#include <awsmock/core/Configuration.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Timer.h>
 
 #define TIME_DIFF_NAME(x) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKey(x)]).count())
 #define TIME_DIFF_LABEL(x, y, z) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKey(x, y, z)]).count())
 
 namespace AwsMock::Core {
 
-    typedef std::map<std::string, prometheus::Family<prometheus::Counter> &> CounterMap;
-    typedef std::map<std::string, prometheus::Family<prometheus::Gauge> &> GaugeMap;
-    typedef std::map<std::string, prometheus::Family<prometheus::Histogram> &> HistogramMap;
-    typedef std::map<std::string, prometheus::Family<prometheus::Gauge> &> TimerMap;
+    typedef std::map<std::string, Poco::Prometheus::Counter *> CounterMap;
+    typedef std::map<std::string, Poco::Prometheus::Gauge *> GaugeMap;
+    typedef std::map<std::string, Poco::Prometheus::Histogram *> HistogramMap;
+    typedef std::map<std::string, Poco::Prometheus::Gauge *> TimerMap;
     typedef std::map<std::string, std::chrono::time_point<std::chrono::high_resolution_clock>> TimerStartMap;
 
     /**
@@ -87,58 +84,6 @@ namespace AwsMock::Core {
         void Shutdown() override;
 
         /**
-         * @brief Adds a counter to the map.
-         *
-         * @param name name of the counter
-         */
-        void AddCounter(const std::string &name);
-
-        /**
-         * @brief Adds a counter to the map.
-         *
-         * @param name name of the counter
-         * @param labelName label name of the counter
-         * @param labelValue label value of the counter
-         */
-        void AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Check whether a counter exists
-         *
-         * @param name name of the counter.
-         * @return true if counter exists.
-         */
-        bool CounterExists(const std::string &name);
-
-        /**
-         * @brief Check whether a counter exists
-         *
-         * @param name name of the counter.
-         * @param labelName label name of the counter
-         * @param labelValue label value of the counter
-         * @return true if counter exists.
-         */
-        bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Get a specific metric
-         *
-         * @param name name of the metric
-         * @return metric if existing.
-         */
-        prometheus::Family<prometheus::Counter> &GetCounter(const std::string &name);
-
-        /**
-         * @brief Get a specific metric by name, labelName and labelValue
-         *
-         * @param name name of the metric
-         * @param labelName name of the metric label
-         * @param labelValue value of the metric label
-         * @return metric if existing.
-         */
-        prometheus::Family<prometheus::Counter> &GetCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
          * @brief Increments a counter.
          *
          * @param name of the counter
@@ -173,40 +118,6 @@ namespace AwsMock::Core {
         void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
-         * @brief Adds a gauge to the map.
-         *
-         * @param name name of the gauge
-         */
-        void AddGauge(const std::string &name);
-
-        /**
-         * @brief Adds a gauge to the map.
-         *
-         * @param name name of the gauge
-         * @param labelName name of the label
-         * @param labelValue label value of the counter
-         */
-        void AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Check whether a gauge exists
-         *
-         * @param name name of the gauge.
-         * @return true if gauge exists.
-         */
-        bool GaugeExists(const std::string &name);
-
-        /**
-         * @brief Check whether a gauge exists
-         *
-         * @param name name of the gauge.
-         * @param labelName name of the label
-         * @param labelValue label value of the counter
-         * @return true if gauge exists.
-         */
-        bool GaugeExists(const std::string &name, const std::string &label, const std::string &labelValue);
-
-        /**
          * @brief Sets a double gauge value in the map.
          *
          * @param name name of the gauge
@@ -223,89 +134,6 @@ namespace AwsMock::Core {
          * @param value value of the gauge
          */
         void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
-
-        /**
-         * @brief Increments a gauge.
-         *
-         * @param name of the gauge
-         * @param value value for the incrementation (default: 1), can be negative
-         */
-        void IncrementGauge(const std::string &name, double value = 1);
-
-        /**
-         * @brief Increments a gauge.
-         *
-         * @param name of the gauge
-         * @param labelName label name of the gauge
-         * @param labelValue label value of the gauge
-         * @param value value for the incrementation (default: 1), can be negative
-         */
-        void IncrementGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value = 1);
-
-        /**
-         * @brief Adds a histogram to the map.
-         *
-         * @param name name of the histogram
-         */
-        void AddHistogram(const std::string &name);
-
-        /**
-         * @brief Adds a histogram to the map.
-         *
-         * @param name name of the histogram
-         * @param label label of the histogram
-         */
-        void AddHistogram(const std::string &name, const std::string &label);
-
-        /**
-         * @brief Check whether a histogram exists
-         *
-         * @param name name of the histogram.
-         * @return true if histogram exists.
-         */
-        bool HistogramExists(const std::string &name);
-
-        /**
-         * @brief Check whether a histogram exists
-         *
-         * @param name name of the histogram.
-         * @param label label of the histogram.
-         * @return true if histogram exists.
-         */
-        bool HistogramExists(const std::string &name, const std::string &label);
-
-        /**
-         * @brief Add timer
-         *
-         * @param name name of the timer
-         */
-        void AddTimer(const std::string &name);
-
-        /**
-         * @brief Add timer
-         *
-         * @param name name of the timer
-         * @param label timer label
-         */
-        void AddTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Get a specific metric
-         *
-         * @param name name of the metric
-         * @return metric if existing.
-         */
-        prometheus::Family<prometheus::Gauge> &GetTimer(const std::string &name);
-
-        /**
-         * @brief Get a specific metric by name, labelName and labelValue
-         *
-         * @param name name of the metric
-         * @param labelName name of the metric label
-         * @param labelValue value of the metric label
-         * @return metric if existing.
-         */
-        prometheus::Family<prometheus::Gauge> &GetTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * @brief Starts a timer
@@ -351,25 +179,59 @@ namespace AwsMock::Core {
          */
         [[maybe_unused]] void ResetAllTimer();
 
-        /**
-         * @brief Check whether a timer exists
-         *
-         * @param name name of the timer.
-         * @return true if timer exists.
-         */
-        bool TimerExists(const std::string &name);
-
-        /**
-         * @brief Check whether a timer exists
-         *
-         * @param name name of the timer.
-         * @param labelName label name of the timer.
-         * @param labelValue label value of the timer.
-         * @return true if timer exists.
-         */
-        bool TimerExists(const std::string &name, const std::string &label, const std::string &labelValue);
-
       private:
+
+        /**
+         * @brief Adds a counter to the map.
+         *
+         * @param name name of the counter
+         */
+        void AddCounter(const std::string &name);
+
+        /**
+         * @brief Adds a counter to the map.
+         *
+         * @param name name of the counter
+         * @param labelName label name of the counter
+         * @param labelValue label value of the counter
+         */
+        void AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
+
+        /**
+         * @brief Check whether a counter exists
+         *
+         * @param name name of the counter.
+         * @return true if counter exists.
+         */
+        bool CounterExists(const std::string &name);
+
+        /**
+         * @brief Check whether a counter exists
+         *
+         * @param name name of the counter.
+         * @param labelName label name of the counter
+         * @param labelValue label value of the counter
+         * @return true if counter exists.
+         */
+        bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue);
+
+        /**
+         * @brief Get a specific metric
+         *
+         * @param name name of the metric
+         * @return metric if existing.
+         */
+        Poco::Prometheus::Counter *GetCounter(const std::string &name);
+
+        /**
+         * @brief Get a specific metric by name, labelName and labelValue
+         *
+         * @param name name of the metric
+         * @param labelName name of the metric label
+         * @param labelValue value of the metric label
+         * @return metric if existing.
+         */
+        Poco::Prometheus::Counter *GetCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * @brief Returns a timer key string.
@@ -396,22 +258,113 @@ namespace AwsMock::Core {
          */
         static std::string GetTimerStartKey(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
-      private:
+        /**
+         * @brief Adds a gauge to the map.
+         *
+         * @param name name of the gauge
+         */
+        void AddGauge(const std::string &name);
 
         /**
-         * Registry
+         * @brief Adds a gauge to the map.
+         *
+         * @param name name of the gauge
+         * @param labelName name of the label
+         * @param labelValue label value of the counter
          */
-        std::shared_ptr<prometheus::Registry> _registry;
+        void AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
-         * Exposer
+         * @brief Check whether a gauge exists
+         *
+         * @param name name of the gauge.
+         * @return true if gauge exists.
          */
-        std::shared_ptr<prometheus::Exposer> _exposer;
+        bool GaugeExists(const std::string &name);
 
         /**
-         * System monitoring thread
+         * @brief Check whether a gauge exists
+         *
+         * @param name name of the gauge.
+         * @param labelName name of the label
+         * @param labelValue label value of the counter
+         * @return true if gauge exists.
          */
-        std::shared_ptr<MetricSystemCollector> _metricSystemCollector{};
+        bool GaugeExists(const std::string &name, const std::string &label, const std::string &labelValue);
+
+        /**
+         * @brief Get a specific metric
+         *
+         * @param name name of the metric
+         * @return metric if existing.
+         */
+        Poco::Prometheus::Gauge *GetGauge(const std::string &name);
+
+        /**
+         * @brief Get a specific metric by name, labelName and labelValue
+         *
+         * @param name name of the metric
+         * @param labelName name of the metric label
+         * @param labelValue value of the metric label
+         * @return metric if existing.
+         */
+        Poco::Prometheus::Gauge *GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
+        
+        /**
+         * @brief Check whether a timer exists
+         *
+         * @param name name of the timer.
+         * @return true if timer exists.
+         */
+        bool TimerExists(const std::string &name);
+
+        /**
+         * @brief Check whether a timer exists
+         *
+         * @param name name of the timer.
+         * @param labelName label name of the timer.
+         * @param labelValue label value of the timer.
+         * @return true if timer exists.
+         */
+        bool TimerExists(const std::string &name, const std::string &label, const std::string &labelValue);
+
+        /**
+         * @brief Add timer
+         *
+         * @param name name of the timer
+         */
+        void AddTimer(const std::string &name);
+
+        /**
+         * @brief Add timer
+         *
+         * @param name name of the timer
+         * @param label timer label
+         */
+        void AddTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
+
+        /**
+         * @brief Get a specific metric
+         *
+         * @param name name of the metric
+         * @return metric if existing.
+         */
+        Poco::Prometheus::Gauge *GetTimer(const std::string &name);
+
+        /**
+         * @brief Get a specific metric by name, labelName and labelValue
+         *
+         * @param name name of the metric
+         * @param labelName name of the metric label
+         * @param labelValue value of the metric label
+         * @return metric if existing.
+         */
+        Poco::Prometheus::Gauge *GetTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
+
+        /**
+         * Metric manager for Prometheus
+         */
+        std::shared_ptr<Poco::Prometheus::MetricsServer> _server;
 
         /**
          * Counter map

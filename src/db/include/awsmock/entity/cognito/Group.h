@@ -2,11 +2,21 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
+#ifndef AWSMOCK_DB_ENTITY_COGNITO_GROUP_H
+#define AWSMOCK_DB_ENTITY_COGNITO_GROUP_H
 
 // C++ includes
+#include <map>
 #include <string>
+
+// Poco includes
+#include <Poco/DateTime.h>
+#include <Poco/DateTimeFormat.h>
+#include <Poco/DateTimeFormatter.h>
+#include <Poco/JSON/Object.h>
+
+// Boost includes
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -16,12 +26,9 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/entity/cognito/UserPoolDomain.h>
-#include <awsmock/utils/MongoUtils.h>
+#include <awsmock/entity/cognito/UserAttribute.h>
+#include <awsmock/entity/cognito/UserStatus.h>
 
 namespace AwsMock::Database::Entity::Cognito {
 
@@ -35,19 +42,19 @@ namespace AwsMock::Database::Entity::Cognito {
     using std::chrono::system_clock;
 
     /**
-     * @brief Cognito user pool entity
+     * @brief Cognito group entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserPool {
+    struct Group {
 
         /**
-         * MongoDB POD
+         * MongoDB OID
          */
         std::string oid;
 
         /**
-         * AWS region
+         * Aws region
          */
         std::string region;
 
@@ -57,24 +64,24 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string userPoolId;
 
         /**
-         * Name
+         * Group name
          */
-        std::string name;
+        std::string groupName;
 
         /**
-         * Client ID
+         * Description
          */
-        std::string clientId;
+        std::string description;
 
         /**
-         * ARN
+         * Role ARN
          */
-        std::string arn;
+        std::string roleArn;
 
         /**
-         * Domain
+         * Precedence
          */
-        UserPoolDomain domain;
+        int precedence;
 
         /**
          * Creation date
@@ -87,52 +94,52 @@ namespace AwsMock::Database::Entity::Cognito {
         system_clock::time_point modified = system_clock::now();
 
         /**
-         * @brief Converts the entity to a MongoDB document
+         * Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the MongoDB document to an entity
+         * Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * @brief Converts the entity to a JSON object
+         * Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * @brief Converts the entity to a JSON object
+         * Converts the entity to a JSON object
          *
          * @param jsonObject JSON object.
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-         * @brief Converts the entity to a string representation.
+         * Converts the entity to a string representation.
          *
          * @return entity as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Stream provider.
+         * Stream provider.
          *
          * @param os output stream
-         * @param userPool userPool entity
+         * @param user user entity
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
+        friend std::ostream &operator<<(std::ostream &os, const Group &group);
     };
 
-    typedef std::vector<Entity::Cognito::UserPool> UserPoolList;
+    typedef std::vector<Group> GroupList;
 
 }// namespace AwsMock::Database::Entity::Cognito
 
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
+#endif// AWSMOCK_DB_ENTITY_COGNITO_GROUP_H

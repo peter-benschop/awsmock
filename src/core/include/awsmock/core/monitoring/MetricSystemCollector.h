@@ -19,19 +19,17 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/Timer.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
 
 // System counter
-#define VIRTUAL_MEMORY "virtual_memory_used"
-#define REAL_MEMORY "real_memory_used"
-#define TOTAL_THREADS "total_threads"
-#define TOTAL_CPU "total_cpu"
-#define USER_CPU "user_cpu"
-#define SYSTEM_CPU "system_cpu"
 
 namespace AwsMock::Core {
 
     /**
-     * @brief Collect system information like CPU and Memory. Runs as background thread with a given timeout in ms.
+     * @brief Collect system information like CPU and Memory.
+     *
+     * Runs as background thread with a given timeout in ms.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -42,12 +40,15 @@ namespace AwsMock::Core {
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector();
+        explicit MetricSystemCollector() : Core::Timer("SystemCollector") {}
 
         /**
-         * @brief Destructor.
+         * @brief Singleton instance
          */
-        ~MetricSystemCollector();
+        static MetricSystemCollector &instance() {
+            static MetricSystemCollector metricSystemCollector;
+            return metricSystemCollector;
+        }
 
         /**
          * @brief Initialization
@@ -70,36 +71,6 @@ namespace AwsMock::Core {
          * @brief Updates the system counter
          */
         void CollectSystemCounter();
-
-        /**
-         * Virtual memory gauge
-         */
-        //Poco::Prometheus::Gauge *_virtualMemory;
-
-        /**
-         * Real memory gauge
-         */
-        //Poco::Prometheus::Gauge *_realMemory;
-
-        /**
-         * Total thread gauge
-         */
-        //Poco::Prometheus::Gauge *_totalThreads;
-
-        /**
-         * Total CPU gauge
-         */
-        //Poco::Prometheus::Gauge *_totalCpu;
-
-        /**
-         * User CPU gauge
-         */
-        //Poco::Prometheus::Gauge *_userCpu;
-
-        /**
-         * System CPU gauge
-         */
-        //Poco::Prometheus::Gauge *_systemCpu;
 
         /**
          * Number of processors

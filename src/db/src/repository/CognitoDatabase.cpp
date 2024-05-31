@@ -616,4 +616,76 @@ namespace AwsMock::Database {
         }
     }
 
+    bool CognitoDatabase::GroupExists(const std::string &region, const std::string &groupName) {
+
+        if (_hasDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+                int64_t count = _groupCollection.count_documents(make_document(kvp("region", region), kvp("groupName", groupName)));
+                log_trace << "Cognito group exists: " << (count > 0 ? "true" : "false");
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.GroupExists(region, groupName);
+        }
+    }
+
+    Entity::Cognito::Group CognitoDatabase::GetGroupById(bsoncxx::oid oid) {
+
+        try {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _groupCollection.find_one(make_document(kvp("_id", oid)));
+            if (!mResult) {
+                log_error << "Database exception: Cognito not found ";
+                throw Core::DatabaseException("Database exception, Cognito not found ");
+            }
+
+            Entity::Cognito::Group result;
+            result.FromDocument(mResult->view());
+            return result;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    Entity::Cognito::Group CognitoDatabase::CreateGroup(const Entity::Cognito::Group &group) {
+
+        if (_hasDatabase) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto result = _groupCollection.insert_one(group.ToDocument());
+                session.commit_transaction();
+                log_trace << "Cognito group created, oid: " << result->inserted_id().get_oid().value.to_string();
+                return GetGroupById(result->inserted_id().get_oid().value);
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.CreateGroup(group);
+        }
+    }
 }// namespace AwsMock::Database

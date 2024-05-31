@@ -2,11 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/cognito/model/UserPool.h>
+#include <awsmock/dto/cognito/model/Group.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string UserPool::ToJson() const {
+    std::string Group::ToJson() const {
 
         try {
 
@@ -18,17 +18,16 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    Poco::JSON::Object UserPool::ToJsonObject() const {
+    Poco::JSON::Object Group::ToJsonObject() const {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("Region", region);
-            rootJson.set("Name", name);
+            rootJson.set("GroupName", groupName);
             rootJson.set("UserPoolId", userPoolId);
+            rootJson.set("Description", description);
+            rootJson.set("Precedence", precedence);
             rootJson.set("CreationDate", Core::DateTimeUtils::ISO8601(created));
             rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
-
             return rootJson;
 
         } catch (Poco::Exception &exc) {
@@ -37,14 +36,14 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string UserPool::ToString() const {
+    std::string Group::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const UserPool &o) {
-        os << "UserPool=" << o.ToJson();
+    std::ostream &operator<<(std::ostream &os, const Group &o) {
+        os << "Group=" << o.ToJson();
         return os;
     }
 

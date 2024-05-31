@@ -15,57 +15,51 @@ namespace AwsMock::Core {
     }
 
     void MetricService::Initialize() {
-
-        // create an http server running on port 8080
-        _exposer = std::make_shared<prometheus::Exposer>("127.0.0.1:" + std::to_string(_port));
-
-        // create a metrics registry
-        // @note it's the users responsibility to keep the object alive
-        _registry = std::make_shared<prometheus::Registry>();
-
-        _metricSystemCollector = std::make_shared<MetricSystemCollector>();
+        _server = std::make_shared<Poco::Prometheus::MetricsServer>(static_cast<Poco::UInt16>(_port));
         log_debug << "Prometheus manager initialized, port: " << _port;
 
-        _exposer->RegisterCollectable(_registry);
+        if (_server != nullptr) {
+            _server->start();
+        }
         log_info << "Monitoring manager started, port: " << _port;
     }
 
     void MetricService::Run() {
+        log_trace << "Monitoring alive";
     }
 
     void MetricService::Shutdown() {
-        _metricSystemCollector->Stop();
+        _server->stop();
         log_info << "Metric module has been shutdown";
     }
 
     void MetricService::AddCounter(const std::string &name) {
         //boost::mutex::scoped_lock lock(_mutex);
-        if (!CounterExists(name)) {
-            prometheus::Family<prometheus::Counter> &counter = prometheus::BuildCounter()
-                                                                       .Name(name)
-                                                                       .Help(name)
-                                                                       .Register(*_registry);
-            _counterMap.emplace(name, counter);
-            log_trace << "Counter added, name: " << name;
-            return;
+        try {
+            if (!CounterExists(name)) {
+                _counterMap[name] = new Poco::Prometheus::Counter(name);
+                _counterMap[name]->clear();
+                log_trace << "Counter added, name: " << name;
+                return;
+            }
+            log_error << "Gauge exists already, name: " << name;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
         }
-        log_error << "Counter exists already, name: " << name;
     }
 
     void MetricService::AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         //boost::mutex::scoped_lock lock(_mutex);
-
-        if (!CounterExists(name, labelName, labelValue)) {
-            prometheus::Family<prometheus::Counter> &counter = prometheus::BuildCounter()
-                                                                       .Name(name)
-                                                                       .Help(name)
-                                                                       .Register(*_registry);
-            counter.Add({{labelName, labelValue}});
-            _counterMap.emplace(name, counter);
-            log_trace << "Counter added, name: " << name;
-            return;
+        try {
+            if (!CounterExists(name, labelName, labelValue)) {
+                _counterMap[name] = new Poco::Prometheus::Counter(name, {.labelNames{labelName}});
+                log_trace << "Counter added, name: " << name;
+                return;
+            }
+            log_error << "Counter exists already, name: " << name;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
         }
-        log_error << "Counter exists already, name: " << name;
     }
 
     bool MetricService::CounterExists(const std::string &name) {
@@ -73,34 +67,34 @@ namespace AwsMock::Core {
     }
 
     bool MetricService::CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        return std::find_if(_counterMap.begin(), _counterMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, prometheus::Family<prometheus::Counter> &> obj) {
-                   auto &counter = reinterpret_cast<prometheus::Family<prometheus::Counter> &>(obj.second);
-                   return obj.first == name && counter.Has({{labelName, labelValue}});
+        return std::find_if(_counterMap.begin(), _counterMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Counter *> obj) {
+                   return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
                }) != _counterMap.end();
     }
 
-    prometheus::Family<prometheus::Counter> &MetricService::GetCounter(const std::string &name) {
+    Poco::Prometheus::Counter *MetricService::GetCounter(const std::string &name) {
         auto it = _counterMap.find(name);
         if (it != _counterMap.end()) {
             return it->second;
         }
+        return nullptr;
     }
 
-    prometheus::Family<prometheus::Counter> &MetricService::GetCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        auto it = std::find_if(_counterMap.begin(), _counterMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, prometheus::Family<prometheus::Counter> &> obj) {
-            auto &counter = reinterpret_cast<prometheus::Family<prometheus::Counter> &>(obj.second);
-            return obj.first == name && counter.Has({{labelName, labelValue}});
+    Poco::Prometheus::Counter *MetricService::GetCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        auto it = std::find_if(_counterMap.begin(), _counterMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Counter *> obj) {
+            return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
         });
         if (it != _counterMap.end()) {
             return it->second;
         }
+        return nullptr;
     }
 
     void MetricService::ClearCounter(const std::string &name) {
         boost::mutex::scoped_lock lock(_mutex);
         if (CounterExists(name)) {
-            auto &counter = reinterpret_cast<prometheus::Counter &>(GetCounter(name));
-            counter.Reset();
+            auto counter = GetCounter(name);
+            counter->clear();
             log_trace << "Counter cleared, name: " << name;
             return;
         }
@@ -110,8 +104,8 @@ namespace AwsMock::Core {
     void MetricService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         boost::mutex::scoped_lock lock(_mutex);
         if (CounterExists(name, labelName, labelValue)) {
-            auto &counter = reinterpret_cast<prometheus::Counter &>(GetCounter(name, labelName, labelValue));
-            counter.Reset();
+            auto counter = GetCounter(name);
+            counter->clear();
             log_trace << "Counter cleared, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
             return;
         }
@@ -123,9 +117,8 @@ namespace AwsMock::Core {
         if (!CounterExists(name)) {
             AddCounter(name);
         }
-
-        auto &counter = reinterpret_cast<prometheus::Counter &>(GetCounter(name));
-        counter.Increment(value);
+        auto counter = GetCounter(name);
+        counter->inc(value);
         log_trace << "Counter incremented, name: " << name;
     }
 
@@ -134,47 +127,63 @@ namespace AwsMock::Core {
         if (!CounterExists(name, labelName, labelValue)) {
             AddCounter(name, labelName, labelValue);
         }
-        auto &counter = reinterpret_cast<prometheus::Family<prometheus::Counter> &>(GetCounter(name, labelName, labelValue));
-        counter.Add({{labelName, labelValue}}).Increment(value);
+        _counterMap[name]->labels({labelValue}).inc((double) value);
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
     }
 
     void MetricService::AddGauge(const std::string &name) {
-        /*   boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
             _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
+            _gaugeMap[name]->clear();
             log_trace << "Gauge added, name: " << name;
             return;
         }
-        log_error << "Gauge exists already, name: " << name;*/
+        log_error << "Gauge exists already, name: " << name;
     }
 
     void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        /*  boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
-            _gaugeMap[name] = new Poco::Prometheus::Gauge(name, {.labelNames{label}});
+            _gaugeMap[name] = new Poco::Prometheus::Gauge(name, {.labelNames{labelName}});
             log_trace << "Gauge added, name: " << name;
             return;
         }
-        log_error << "Gauge exists already, name: " << name;*/
+        log_error << "Gauge exists already, name: " << name;
+    }
+
+    Poco::Prometheus::Gauge *MetricService::GetGauge(const std::string &name) {
+        auto it = _gaugeMap.find(name);
+        if (it != _gaugeMap.end()) {
+            return it->second;
+        }
+        return nullptr;
+    }
+
+    Poco::Prometheus::Gauge *MetricService::GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        auto it = std::find_if(_gaugeMap.begin(), _gaugeMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> obj) {
+            return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
+        });
+        if (it != _gaugeMap.end()) {
+            return it->second;
+        }
+        return nullptr;
     }
 
     void MetricService::SetGauge(const std::string &name, double value) {
-        /*boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
             AddGauge(name);
         }
-        _gaugeMap[name]->set(value);
-        log_trace << "Gauge value set, name: " << name;*/
+        _gaugeMap[name]->set((double) value);
+        log_trace << "Gauge value set, name: " << name;
     }
 
     void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) {
-        /* boost::mutex::scoped_lock lock(_mutex);
-        if (!GaugeExists(name, labelName)) {
-            AddGauge(name);
+        boost::mutex::scoped_lock lock(_mutex);
+        if (!GaugeExists(name, labelName, labelValue)) {
+            AddGauge(name, labelName, labelValue);
         }
-        _gaugeMap[name]->labels({labelValue}).set(value);
-        log_trace << "Gauge value set, name: " << name;*/
+        _gaugeMap[name]->labels({labelValue}).inc((double) value);
+        log_trace << "Gauge value set, name: " << name;
     }
 
     bool MetricService::GaugeExists(const std::string &name) {
@@ -182,85 +191,54 @@ namespace AwsMock::Core {
     }
 
     bool MetricService::GaugeExists(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        return std::find_if(_gaugeMap.begin(), _gaugeMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, prometheus::Family<prometheus::Gauge> &> obj) {
-                   auto &gauge = reinterpret_cast<prometheus::Family<prometheus::Gauge> &>(obj.second);
-                   return obj.first == name && gauge.Has({{labelName, labelValue}});
+        return std::find_if(_gaugeMap.begin(), _gaugeMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> &obj) {
+                   return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
                }) != _gaugeMap.end();
     }
 
-    void MetricService::AddHistogram(const std::string &name) {
-        /*boost::mutex::scoped_lock lock(_mutex);
-        if (!HistogramExists(name)) {
-            _histogramMap[name] = new Poco::Prometheus::Histogram(name);
-            log_trace << "Gauge added, name: " << name;
-            return;
-        }
-        log_error << "Gauge exists already, name: " << name;*/
-    }
-
-    void MetricService::AddHistogram(const std::string &name, const std::string &label) {
-        /* boost::mutex::scoped_lock lock(_mutex);
-        if (!HistogramExists(name)) {
-            _histogramMap[name] = new Poco::Prometheus::Histogram(name, {.labelNames{label}});
-            log_trace << "Histogram added, name: " << name;
-            return;
-        }
-        log_error << "Histogram exists already, name: " << name;*/
-    }
-
-    bool MetricService::HistogramExists(const std::string &name) {
-        //return _histogramMap.find(name) != _histogramMap.end();
-    }
-
-    bool MetricService::HistogramExists(const std::string &name, const std::string &label) {
-        /*auto it = _histogramMap.find(name);
-        return it != _histogramMap.end() && std::find(it->second->labelNames().begin(), it->second->labelNames().end(), label) != it->second->labelNames().end();*/
-    }
-
     void MetricService::AddTimer(const std::string &name) {
-        //boost::mutex::scoped_lock lock(_mutex);
-        if (!TimerExists(name)) {
-            prometheus::Family<prometheus::Gauge> &timer = prometheus::BuildGauge()
-                                                                   .Name(name)
-                                                                   .Help(name)
-                                                                   .Register(*_registry);
-            _timerMap.emplace(name, timer);
-            log_trace << "Timer added, name: " << name;
-            return;
+        try {
+            if (!TimerExists(name)) {
+                _timerMap[name] = new Poco::Prometheus::Gauge(name);
+                _timerMap[name]->clear();
+                log_trace << "Timer added, name: " << name;
+                return;
+            }
+            log_error << "Timer exists already, name: " << name;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
         }
-        log_error << "Timer exists already, name: " << name;
     }
 
     void MetricService::AddTimer(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        //boost::mutex::scoped_lock lock(_mutex);
-        if (!TimerExists(name, labelName, labelValue)) {
-            prometheus::Family<prometheus::Gauge> &timer = prometheus::BuildGauge()
-                                                                   .Name(name)
-                                                                   .Help(name)
-                                                                   .Register(*_registry);
-            timer.Add({{labelName, labelValue}});
-            _timerMap.emplace(name, timer);
-            log_trace << "Timer added, name: " << name;
-            return;
+        try {
+            if (!TimerExists(name, labelName, labelValue)) {
+                _timerMap[GetTimerKey(name, labelName, labelValue)] = new Poco::Prometheus::Gauge(name, {.labelNames{labelName, labelValue}});
+                log_trace << "Timer added, name: " << name;
+                return;
+            }
+            log_error << "Timer exists already, name: " << name;
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
         }
-        log_error << "Timer exists already, name: " << name;
     }
 
-    prometheus::Family<prometheus::Gauge> &MetricService::GetTimer(const std::string &name) {
+    Poco::Prometheus::Gauge *MetricService::GetTimer(const std::string &name) {
         auto it = _timerMap.find(name);
         if (it != _timerMap.end()) {
             return it->second;
         }
+        return nullptr;
     }
 
-    prometheus::Family<prometheus::Gauge> &MetricService::GetTimer(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        auto it = std::find_if(_timerMap.begin(), _timerMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, prometheus::Family<prometheus::Gauge> &> obj) {
-            auto &gauge = reinterpret_cast<prometheus::Family<prometheus::Gauge> &>(obj.second);
-            return obj.first == name && gauge.Has({{labelName, labelValue}});
+    Poco::Prometheus::Gauge *MetricService::GetTimer(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        auto it = std::find_if(_timerMap.begin(), _timerMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> &obj) {
+            return obj.first == GetTimerKey(name, labelName, labelValue);
         });
         if (it != _timerMap.end()) {
             return it->second;
         }
+        return nullptr;
     }
 
     void MetricService::StartTimer(const std::string &name) {
@@ -289,13 +267,15 @@ namespace AwsMock::Core {
         boost::mutex::scoped_lock lock(_mutex);
         if (TimerExists(name)) {
 
-            auto &timer = reinterpret_cast<prometheus::Gauge &>(GetTimer(name));
-            timer.Set(TIME_DIFF_NAME(name));
+            Poco::Prometheus::Gauge *timer = GetTimer(name);
+            timer->set(TIME_DIFF_NAME(name));
 
             const auto count = std::erase_if(_timerStartMap, [name](const auto &item) {
                 return item.first == GetTimerStartKey(name);
             });
             log_trace << "Timer stopped, name: " << name << " count: " << count << " size: " << _timerStartMap.size();
+        } else {
+            log_warning << "Timer not found, name: " << name;
         }
     }
 
@@ -303,15 +283,16 @@ namespace AwsMock::Core {
         boost::mutex::scoped_lock lock(_mutex);
         if (TimerExists(name, labelName, labelValue)) {
 
-            auto &timer = reinterpret_cast<prometheus::Gauge &>(GetTimer(name, labelName, labelValue));
-            timer.Set(TIME_DIFF_LABEL(name, labelName, labelValue));
+            Poco::Prometheus::Gauge *timer = GetTimer(name, labelName, labelValue);
+            timer->set(TIME_DIFF_LABEL(name, labelName, labelValue));
 
             std::erase_if(_timerStartMap, [name, labelName, labelValue](const auto &item) {
-                auto const &[key, value] = item;
-                return key == GetTimerStartKey(name, labelName, labelValue);
+                return item.first == GetTimerStartKey(name, labelName, labelValue);
             });
 
-            log_trace << "Timer stopped, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue << " size: " << _timerStartMap.size();
+            log_trace << "Timer stopped, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
+        } else {
+            log_trace << "Timer not found, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
         }
     }
 
@@ -320,17 +301,16 @@ namespace AwsMock::Core {
     }
 
     bool MetricService::TimerExists(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        return std::find_if(_timerMap.begin(), _timerMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, prometheus::Family<prometheus::Gauge> &> obj) {
-                   auto &gauge = reinterpret_cast<prometheus::Family<prometheus::Gauge> &>(obj.second);
-                   return obj.first == name && gauge.Has({{labelName, labelValue}});
+        return std::find_if(_timerMap.begin(), _timerMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> &obj) {
+                   return obj.first == GetTimerKey(name, labelName, labelValue);
                }) != _timerMap.end();
     }
 
     void MetricService::ResetTimer(const std::string &name) {
         boost::mutex::scoped_lock lock(_mutex);
         if (TimerExists(name)) {
-            auto &timer = reinterpret_cast<prometheus::Gauge &>(GetTimer(name));
-            timer.Set(0);
+            Poco::Prometheus::Gauge *timer = GetTimer(name);
+            timer->set(0.0);
         }
         log_trace << "Timer cleared, name: " << name;
     }
@@ -338,8 +318,10 @@ namespace AwsMock::Core {
     void MetricService::ResetAllTimer() {
         boost::mutex::scoped_lock lock(_mutex);
         for (const auto &t: _timerMap) {
-            auto &timer = reinterpret_cast<prometheus::Gauge &>(GetTimer(t.first));
-            timer.Set(0);
+            Poco::Prometheus::Gauge *timer = GetTimer(t.first);
+            if (timer) {
+                timer->set(.0);
+            }
         }
     }
 
