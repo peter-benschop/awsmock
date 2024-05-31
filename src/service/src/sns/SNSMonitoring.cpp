@@ -21,6 +21,7 @@ namespace AwsMock::Service {
     void SNSMonitoring::Shutdown() {}
 
     void SNSMonitoring::UpdateCounter() {
+        log_trace << "SNS Monitoring starting";
 
         // Get total counts
         long topics = _snsDatabase.CountTopics();
@@ -34,6 +35,6 @@ namespace AwsMock::Service {
             long messagesPerTopic = _snsDatabase.CountMessages(topic.region, topic.topicArn);
             _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, messagesPerTopic);
         }
-        log_trace << "SNS update counter finished";
+        log_trace << "SNS monitoring finished";
     }
 }// namespace AwsMock::Service

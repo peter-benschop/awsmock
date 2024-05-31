@@ -150,26 +150,36 @@ namespace AwsMock::Service {
         if (handler) {
 
             switch (req.method()) {
-                case http::verb::get:
+                case http::verb::get: {
                     log_debug << "Handle GET request";
+                    Core::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
+                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
                     return handler->HandleGetRequest(req, authKey.region, "none");
-                    break;
-                case http::verb::put:
+                }
+                case http::verb::put: {
                     log_debug << "Handle PUT request";
+                    Core::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
+                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
                     return handler->HandlePutRequest(req, authKey.region, "none");
-                    break;
-                case http::verb::post:
+                }
+                case http::verb::post: {
                     log_debug << "Handle POST request";
+                    Core::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
+                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
                     return handler->HandlePostRequest(req, authKey.region, "none");
-                    break;
-                case http::verb::delete_:
+                }
+                case http::verb::delete_: {
                     log_debug << "Handle DELETE request";
+                    Core::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
+                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
                     return handler->HandleDeleteRequest(req, authKey.region, "none");
-                    break;
-                case http::verb::head:
+                }
+                case http::verb::head: {
                     log_debug << "Handle HEAD request";
+                    Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
+                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
                     return handler->HandleHeadRequest(req, authKey.region, "none");
-                    break;
+                }
             }
         }
         return notimplemented("Not yet implemented");

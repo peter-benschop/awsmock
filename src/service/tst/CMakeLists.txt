@@ -18,7 +18,7 @@ link_directories(../../core ../../db ../../dto ${LIB_BSON_CXX} ${LIB_MONGO_CXX})
 
 add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${MAIN_SOURCES})
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoUtil
-        PocoFoundation PocoNet PocoJSON PocoXML PocoZip PocoPrometheus gtest pthread ssl crypto z archive tbb)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus
+        PocoUtil PocoFoundation PocoNet PocoJSON PocoXML PocoZip gtest pthread ssl crypto z archive tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})

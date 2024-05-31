@@ -14,4 +14,9 @@ namespace AwsMock::Core {
         Poco::DateTime now;
         return Poco::DateTimeFormatter::format(now, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT);
     }
+
+    std::string DateTimeUtils::ISO8601(const system_clock::time_point &timePoint) {
+        return std::format("{:%FT%TZ}", timePoint);
+    }
+
 };// namespace AwsMock::Core

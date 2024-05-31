@@ -256,13 +256,13 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
 
-        return Core::StringUtils::ContainsIgnoreCase(request.base()["Content-Type"], "json") ? "json" : "xml";
+        return Core::StringUtils::ContainsIgnoreCase(request.base()[http::field::content_type], "json") ? "json" : "xml";
     }
 
     long HttpUtils::GetContentLength(const http::request<http::dynamic_body> &request) {
 
         if (request.has_content_length()) {
-            return std::stol(request.base()["Content-Length"]);
+            return std::stol(request.base()[http::field::content_length]);
         }
         return 0;
     }
@@ -290,15 +290,6 @@ namespace AwsMock::Core {
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
 
         return boost::beast::buffers_to_string(sb.data());
-    }
-
-    std::istream &HttpUtils::GetBodyAsStream(const http::request<http::dynamic_body> &request) {
-
-        boost::beast::net::streambuf sb;
-        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
-
-        std::istream stream(&sb);
-        return stream;
     }
 
 }// namespace AwsMock::Core

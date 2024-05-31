@@ -11,7 +11,7 @@ namespace AwsMock::Service {
     }
 
     void KMSMonitoring::Initialize() {
-        UpdateCounter();
+        //UpdateCounter();
     }
 
     void KMSMonitoring::Run() {
@@ -21,11 +21,12 @@ namespace AwsMock::Service {
     void KMSMonitoring::Shutdown() {}
 
     void KMSMonitoring::UpdateCounter() {
+        log_trace << "KMS monitoring starting";
 
         // Get total counts
         long keys = _kmsDatabase.CountKeys();
         _metricService.SetGauge(KMS_KEY_COUNT, keys);
 
-        log_trace << "KMS update counter finished";
+        log_trace << "KMS monitoring finished";
     }
 }// namespace AwsMock::Service

@@ -94,18 +94,27 @@ namespace AwsMock::Manager {
         boost::beast::http::response<boost::beast::http::dynamic_body> res;
 
         switch (req.method()) {
-            case boost::beast::http::verb::get:
+            case boost::beast::http::verb::get: {
                 log_debug << "Handle GET request";
+                Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
+                Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
                 res = _handler.HandleGetRequest(req);
                 break;
-            case boost::beast::http::verb::put:
+            }
+            case boost::beast::http::verb::put: {
                 log_debug << "Handle PUT request";
+                Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
+                Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
                 res = _handler.HandlePutRequest(req);
                 break;
-            case boost::beast::http::verb::post:
+            }
+            case boost::beast::http::verb::post: {
                 log_debug << "Handle POST request";
+                Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
+                Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
                 res = _handler.HandlePostRequest(req);
                 break;
+            }
         }
         return res;
     }

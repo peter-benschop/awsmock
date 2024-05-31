@@ -23,11 +23,16 @@
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
+#include <awsmock/dto/cognito/CreateGroupRequest.h>
+#include <awsmock/dto/cognito/CreateGroupResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolResponse.h>
+#include <awsmock/dto/cognito/DeleteGroupRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/ListGroupsRequest.h>
+#include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListUsersRequest.h>
@@ -57,7 +62,7 @@ namespace AwsMock::Service {
         explicit CognitoService();
 
         /**
-         * Create a new cognito user pool
+         * @brief Create a new cognito user pool
          *
          * @param request create user pool request
          * @return CreateUserPoolRequest DTO
@@ -109,6 +114,29 @@ namespace AwsMock::Service {
          * @param request delete user request
          */
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
+
+        /**
+         * @brief Create a new cognito user pool
+         *
+         * @param request create user pool request
+         * @return CreateUserPoolResponse DTO
+         */
+        Dto::Cognito::CreateGroupResponse CreateGroup(const Dto::Cognito::CreateGroupRequest &request);
+
+        /**
+         * @brief Lists all available groups
+         *
+         * @param request list groups request
+         * @return ListGroupsResponse DTO
+         */
+        Dto::Cognito::ListGroupsResponse ListGroups(const Dto::Cognito::ListGroupsRequest &request);
+
+        /**
+         * @brief Delete a cognito group
+         *
+         * @param request delete group request
+         */
+        void DeleteGroup(const Dto::Cognito::DeleteGroupRequest &request);
 
       private:
 

@@ -8,6 +8,7 @@ namespace AwsMock::Database {
 
     Poco::Mutex CognitoMemoryDb::_userPoolMutex;
     Poco::Mutex CognitoMemoryDb::_userMutex;
+    Poco::Mutex CognitoMemoryDb::_groupMutex;
 
     bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
@@ -239,8 +240,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region,
-                                                                  const std::string &userPoolId) {
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region, const std::string &userPoolId) {
 
         Entity::Cognito::UserList userList;
         if (!region.empty() && !userPoolId.empty()) {
@@ -305,6 +305,63 @@ namespace AwsMock::Database {
 
         log_debug << "All cognito users deleted, count: " << _userPools.size();
         _users.clear();
+    }
+
+    bool CognitoMemoryDb::GroupExists(const std::string &region, const std::string &groupName) {
+
+        return find_if(_groups.begin(),
+                       _groups.end(),
+                       [region, groupName](const std::pair<std::string, Entity::Cognito::Group> &group) {
+                           return group.second.region == region && group.second.groupName == groupName;
+                       }) != _groups.end();
+    }
+
+    Entity::Cognito::Group CognitoMemoryDb::CreateGroup(const Entity::Cognito::Group &group) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        _groups[oid] = group;
+        log_trace << "Cognito user pool created, oid: " << oid;
+        return _groups[oid];
+    }
+
+    std::vector<Entity::Cognito::Group> CognitoMemoryDb::ListGroups(const std::string &region, const std::string &userPoolId) {
+
+        Entity::Cognito::GroupList groupList;
+        if (!region.empty() && !userPoolId.empty()) {
+
+            for (const auto &group: _groups) {
+                if (group.second.region == region && group.second.userPoolId == userPoolId) {
+                    groupList.emplace_back(group.second);
+                }
+            }
+
+        } else if (!region.empty()) {
+
+            for (const auto &group: _groups) {
+                if (group.second.region == region) {
+                    groupList.emplace_back(group.second);
+                }
+            }
+
+        } else {
+
+            for (const auto &group: _groups) {
+                groupList.emplace_back(group.second);
+            }
+        }
+
+        log_trace << "Got group list, size: " << groupList.size();
+        return groupList;
+    }
+
+    void CognitoMemoryDb::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        const auto count = std::erase_if(_groups, [region, userPoolId, groupName](const std::pair<std::string, Entity::Cognito::Group> &g) {
+            return g.second.region == region && g.second.userPoolId == userPoolId && g.second.groupName == groupName;
+        });
+        log_debug << "Cognito group deleted, groupName: " << groupName << " count: " << count;
     }
 
 }// namespace AwsMock::Database

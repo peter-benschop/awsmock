@@ -9,13 +9,8 @@ namespace AwsMock::Dto::Cognito {
     std::string UserPool::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("id", id);
-            rootJson.set("region", region);
-            rootJson.set("displayName", name);
-            rootJson.set("userPoolId", userPoolId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::JsonUtils::ToJsonString(ToJsonObject());
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -31,9 +26,13 @@ namespace AwsMock::Dto::Cognito {
             rootJson.set("Region", region);
             rootJson.set("Name", name);
             rootJson.set("UserPoolId", userPoolId);
+            rootJson.set("CreationDate", Core::DateTimeUtils::ISO8601(created));
+            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+
             return rootJson;
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             throw Core::JsonException(exc.message());
         }
     }

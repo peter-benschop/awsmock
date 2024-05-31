@@ -242,14 +242,6 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString1(const http::request<http::dynamic_body> &request);
 
         /**
-         * @brief Gets the body as input stream
-         *
-         * @param request HTTP serer request
-         * @return HTTP body as istream
-         */
-        static std::istream &GetBodyAsStream(const http::request<http::dynamic_body> &request);
-
-        /**
          * @brief Checks whether a header exists.
          *
          * @param request HTTP request

@@ -21,9 +21,6 @@ namespace AwsMock::Dto::Common {
         this->payload = Core::HttpUtils::GetBodyAsString1(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
-
-        // Core values
-        poolName = Core::HttpUtils::GetPathParameter(request.target(), 0);
     }
 
     std::string CognitoClientCommand::ToJson() const {
@@ -34,6 +31,11 @@ namespace AwsMock::Dto::Common {
             rootJson.set("region", region);
             rootJson.set("user", user);
             rootJson.set("command", Dto::Common::CognitoCommandTypeToString(command));
+            rootJson.set("url", url);
+            rootJson.set("contentType", contentType);
+            rootJson.set("contentLength", contentLength);
+            rootJson.set("payload", payload);
+            rootJson.set("requestId", requestId);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

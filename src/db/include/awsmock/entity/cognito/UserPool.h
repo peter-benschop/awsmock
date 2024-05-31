@@ -16,6 +16,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -24,7 +25,6 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-    using namespace std::chrono;
     using bsoncxx::to_json;
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -32,6 +32,7 @@ namespace AwsMock::Database::Entity::Cognito {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * @brief Cognito user pool entity
