@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_LIST_USERS_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_LIST_USERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_COGNITO_LIST_GROUPS_RESPONSE_H
+#define AWSMOCK_DTO_COGNITO_LIST_GROUPS_RESPONSE_H
 
 // C++ standard includes
 #include <sstream>
@@ -13,22 +13,22 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/model/Group.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief List users response
+     * @brief List groups response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersResponse : public Dto::Common::BaseRequest {
+    struct ListGroupsResponse : public Dto::Common::BaseRequest {
 
         /**
-         * User entities
+         * Group entities
          */
-        Database::Entity::Cognito::UserList users;
+        std::vector<Dto::Cognito::Group> groups{};
 
         /**
          * @brief Convert to a JSON string.
@@ -49,9 +49,9 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListUsersResponse &i);
+        friend std::ostream &operator<<(std::ostream &os, const ListGroupsResponse &i);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_LIST_USERS_RESPONSE_H
+#endif// AWSMOCK_DTO_COGNITO_LIST_GROUPS_RESPONSE_H

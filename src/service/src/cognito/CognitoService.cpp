@@ -208,4 +208,40 @@ namespace AwsMock::Service {
             throw Core::ServiceException(ex.message());
         }
     }
+
+    Dto::Cognito::ListGroupsResponse CognitoService::ListGroups(const Dto::Cognito::ListGroupsRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_groups");
+        log_debug << "List groups request, userPoolId: " << request.userPoolId << " maxResults: " << request.limit;
+
+        try {
+
+            std::vector<Database::Entity::Cognito::Group> groups = _database.ListGroups(request.region);
+            log_trace << "Got groups list count: " << groups.size();
+            return Dto::Cognito::Mapper::map(request, groups);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Group list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void CognitoService::DeleteGroup(const Dto::Cognito::DeleteGroupRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_group");
+        log_debug << "Delete group request, region:  " << request.region << " name: " << request.groupName;
+
+        if (!_database.GroupExists(request.region, request.groupName)) {
+            log_error << "Group does not exist, region: " << request.region << " name: " << request.groupName;
+            throw Core::ServiceException("Group does not exist, region: " + request.region + " name: " + request.groupName);
+        }
+
+        try {
+
+            _database.DeleteGroup(request.region, request.userPoolId, request.groupName);
+            log_trace << "Cognito group deleted, group: " + request.ToJson();
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Delete group request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
 }// namespace AwsMock::Service

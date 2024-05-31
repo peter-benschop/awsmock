@@ -113,6 +113,32 @@ namespace AwsMock::Service {
                 Dto::Cognito::CreateGroupResponse serviceResponse = _cognitoService.CreateGroup(cognitoRequest);
                 return SendOkResponse(request, serviceResponse.ToJson());
 
+            } else if (action == "ListGroups") {
+
+                Dto::Cognito::ListGroupsRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got list groups request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::ListGroupsResponse serviceResponse = _cognitoService.ListGroups(cognitoRequest);
+                return SendOkResponse(request, serviceResponse.ToJson());
+
+            } else if (action == "DeleteGroup") {
+
+                Dto::Cognito::DeleteGroupRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got delete group request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.DeleteGroup(cognitoRequest);
+                return SendOkResponse(request);
+
             } else {
 
                 return SendBadRequestError(request, "Unknown function");

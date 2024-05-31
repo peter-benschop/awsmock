@@ -5,13 +5,11 @@
 #ifndef AWSMOCK_CORE_METRIC_SERVICE_H
 #define AWSMOCK_CORE_METRIC_SERVICE_H
 
+// C includes
 // C++ Standard includes
 #include <chrono>
 #include <sstream>
 #include <string>
-#include <sys/resource.h>
-#include <sys/time.h>
-#include <sys/times.h>
 
 // Poco includes
 #include <Poco/Prometheus/Counter.h>
@@ -27,16 +25,14 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
 
-#define TIME_DIFF_NAME(x) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKey(x)]).count())
-#define TIME_DIFF_LABEL(x, y, z) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _timerStartMap[GetTimerStartKey(x, y, z)]).count())
-
 namespace AwsMock::Core {
+
+    using std::chrono::high_resolution_clock;
+    using std::chrono::time_point;
 
     typedef std::map<std::string, Poco::Prometheus::Counter *> CounterMap;
     typedef std::map<std::string, Poco::Prometheus::Gauge *> GaugeMap;
     typedef std::map<std::string, Poco::Prometheus::Histogram *> HistogramMap;
-    typedef std::map<std::string, Poco::Prometheus::Gauge *> TimerMap;
-    typedef std::map<std::string, std::chrono::time_point<std::chrono::high_resolution_clock>> TimerStartMap;
 
     /**
      * @brief Monitoring server
@@ -134,50 +130,6 @@ namespace AwsMock::Core {
          * @param value value of the gauge
          */
         void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
-
-        /**
-         * @brief Starts a timer
-         *
-         * @param name name of the timer.
-         */
-        void StartTimer(const std::string &name);
-
-        /**
-         * @brief Starts a timer
-         *
-         * @param name name of the timer.
-         * @param labelName label name of the timer.
-         * @param labelValue label value of the timer.
-         */
-        void StartTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Stop and fill in the duration of a timer
-         *
-         * @param name name of the timer.
-         */
-        void StopTimer(const std::string &name);
-
-        /**
-         * @brief Stop and fill in the duration of a timer
-         *
-         * @param name name of the timer.
-         * @param labelName label name of the timer.
-         * @param labelValue label value of the timer.
-         */
-        void StopTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * Resets a timers.
-         *
-         * @param name name of the timer.
-         */
-        [[maybe_unused]] void ResetTimer(const std::string &name);
-
-        /**
-         * @brief Resets all timers.
-         */
-        [[maybe_unused]] void ResetAllTimer();
 
       private:
 
@@ -309,57 +261,6 @@ namespace AwsMock::Core {
          * @return metric if existing.
          */
         Poco::Prometheus::Gauge *GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
-        
-        /**
-         * @brief Check whether a timer exists
-         *
-         * @param name name of the timer.
-         * @return true if timer exists.
-         */
-        bool TimerExists(const std::string &name);
-
-        /**
-         * @brief Check whether a timer exists
-         *
-         * @param name name of the timer.
-         * @param labelName label name of the timer.
-         * @param labelValue label value of the timer.
-         * @return true if timer exists.
-         */
-        bool TimerExists(const std::string &name, const std::string &label, const std::string &labelValue);
-
-        /**
-         * @brief Add timer
-         *
-         * @param name name of the timer
-         */
-        void AddTimer(const std::string &name);
-
-        /**
-         * @brief Add timer
-         *
-         * @param name name of the timer
-         * @param label timer label
-         */
-        void AddTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Get a specific metric
-         *
-         * @param name name of the metric
-         * @return metric if existing.
-         */
-        Poco::Prometheus::Gauge *GetTimer(const std::string &name);
-
-        /**
-         * @brief Get a specific metric by name, labelName and labelValue
-         *
-         * @param name name of the metric
-         * @param labelName name of the metric label
-         * @param labelValue value of the metric label
-         * @return metric if existing.
-         */
-        Poco::Prometheus::Gauge *GetTimer(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * Metric manager for Prometheus
@@ -380,16 +281,6 @@ namespace AwsMock::Core {
          * Counter map
          */
         HistogramMap _histogramMap;
-
-        /**
-         * Timer map
-         */
-        TimerMap _timerMap;
-
-        /**
-         * Timer StartServer map
-         */
-        TimerStartMap _timerStartMap;
 
         /**
          * Port for the monitoring manager

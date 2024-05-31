@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_LIST_USERS_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_LIST_USERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_COGNITO_LIST_GROUPS_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_LIST_GROUPS_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -14,26 +14,42 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief List users response
+     * @brief List groups request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersResponse : public Dto::Common::BaseRequest {
+    struct ListGroupsRequest : public Dto::Common::BaseRequest {
 
         /**
-         * User entities
+         * User pool ID
          */
-        Database::Entity::Cognito::UserList users;
+        std::string userPoolId;
 
         /**
-         * @brief Convert to a JSON string.
+         * Limit
+         */
+        int limit;
+
+        /**
+         * Next token
+         */
+        std::string nextToken;
+
+        /**
+         * @brief Convert from a JSON object.
          *
-         * @return user pools json string
+         * @param payload json string object
+         */
+        void FromJson(const std::string &payload);
+
+        /**
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
@@ -49,9 +65,9 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListUsersResponse &i);
+        friend std::ostream &operator<<(std::ostream &os, const ListGroupsRequest &i);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_LIST_USERS_RESPONSE_H
+#endif// AWSMOCK_DTO_COGNITO_LIST_GROUPS_REQUEST_H

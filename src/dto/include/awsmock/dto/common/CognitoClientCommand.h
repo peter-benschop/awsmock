@@ -40,6 +40,7 @@ namespace AwsMock::Dto::Common {
         DELETE_USER_POOL,
         DELETE_USER,
         CREATE_GROUP,
+        DELETE_GROUP,
         UNKNOWN
     };
 
@@ -50,6 +51,7 @@ namespace AwsMock::Dto::Common {
             {CognitoCommandType::DELETE_USER_POOL, "DeleteUserPool"},
             {CognitoCommandType::DELETE_USER, "DeleteUser"},
             {CognitoCommandType::CREATE_GROUP, "CreateGroup"},
+            {CognitoCommandType::DELETE_GROUP, "DeleteGroup"},
     };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(CognitoCommandType commandType) {

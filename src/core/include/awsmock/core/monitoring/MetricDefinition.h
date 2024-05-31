@@ -55,9 +55,10 @@
 #define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_counter"
 #define COGNITO_SERVICE_TIMER "cognito_service_timer"
 
-#define TRANSFER_SERVER_COUNT "transfer_server_count_total"
-#define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_count_total"
-#define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_count_total"
+#define TRANSFER_SERVER_COUNT "transfer_server_counter"
+#define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_counter"
+#define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_counter"
+#define TRANSFER_SERVICE_TIMER "transfer_service_timer"
 
 // KMS counter, timer
 #define KMS_KEY_COUNT "kms_key_counter"

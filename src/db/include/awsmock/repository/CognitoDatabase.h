@@ -275,6 +275,25 @@ namespace AwsMock::Database {
          */
         Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);
 
+        /**
+         * @brief Returns a list of cognito groups.
+         *
+         * @param region AWS region name
+         * @param userPoolId user pool ID
+         * @return list of cognito groups
+         */
+        std::vector<Entity::Cognito::Group> ListGroups(const std::string &region = {}, const std::string &userPoolId = {});
+
+        /**
+         * @brief Deletes an existing cognito user pool
+         *
+         * @param region AWS region
+         * @param userPoolId cognito user pool ID
+         * @param groupName name of the group
+         * @throws DatabaseException
+         */
+        void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
+
       private:
 
         /**

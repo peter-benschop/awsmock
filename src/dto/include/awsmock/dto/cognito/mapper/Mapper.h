@@ -9,6 +9,8 @@
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
+#include <awsmock/dto/cognito/ListGroupsRequest.h>
+#include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
@@ -66,6 +68,19 @@ namespace AwsMock::Dto::Cognito {
          * @see CreateGroupResponse
          */
         static Dto::Cognito::CreateGroupResponse map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group);
+
+        /**
+         * @brief Maps a list of cognito groups to a list group response
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param request original request
+         * @param groupList cognito user pool entity list
+         * @param request request struct
+         * @return ListGroupResponse
+         * @see ListGroupResponse
+         */
+        static Dto::Cognito::ListGroupsResponse map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList);
     };
 
 }// namespace AwsMock::Dto::Cognito

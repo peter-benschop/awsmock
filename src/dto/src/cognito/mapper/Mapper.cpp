@@ -45,4 +45,15 @@ namespace AwsMock::Dto::Cognito {
         return response;
     }
 
+    Dto::Cognito::ListGroupsResponse Mapper::map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList) {
+
+        Dto::Cognito::ListGroupsResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
+
+        for (const auto &group: groupList) {
+            Group groupDto = {group.groupName, group.userPoolId, group.description, group.roleArn, group.precedence, group.created, group.modified};
+            response.groups.emplace_back(groupDto);
+        }
+        return response;
+    }
+
 }// namespace AwsMock::Dto::Cognito

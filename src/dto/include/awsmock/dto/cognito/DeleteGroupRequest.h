@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_LIST_USERS_REQUEST_H
-#define AWSMOCK_DTO_COGNITO_LIST_USERS_REQUEST_H
+#ifndef AWSMOCK_DTO_COGNITO_DELETE_GROUP_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_DELETE_GROUP_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -18,46 +18,51 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief List users request
+     * @brief Delete group request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersRequest : public Dto::Common::BaseRequest {
+    struct DeleteGroupRequest : public Dto::Common::BaseRequest {
 
         /**
-         * User pool ID
+         * Group name
+         */
+        std::string groupName;
+
+        /**
+         * User pool userPoolId
          */
         std::string userPoolId;
 
         /**
-         * @brief Convert from a JSON object.
+         * Convert from a JSON object.
          *
          * @param payload json string object
          */
         void FromJson(const std::string &payload);
 
         /**
-         * @brief Convert to a JSON string
+         * Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Stream provider.
+         * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListUsersRequest &i);
+        friend std::ostream &operator<<(std::ostream &os, const DeleteGroupRequest &i);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_LIST_USERS_REQUEST_H
+#endif// AWSMOCK_DTO_COGNITO_DELETE_GROUP_REQUEST_H
