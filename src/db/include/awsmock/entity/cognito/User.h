@@ -27,6 +27,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
@@ -89,6 +90,11 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string password;
 
         /**
+         * Groups
+         */
+        std::vector<Group> groups;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -97,6 +103,14 @@ namespace AwsMock::Database::Entity::Cognito {
          * Last modification date
          */
         system_clock::time_point modified = system_clock::now();
+
+        /**
+         * @brief Checks whther the user has alrady a group
+         *
+         * @param userPoolId user pool ID
+         * @param groupName name of the group
+         */
+        bool HasGroup(const std::string &userPoolId, const std::string &GroupName);
 
         /**
          * Converts the entity to a MongoDB document

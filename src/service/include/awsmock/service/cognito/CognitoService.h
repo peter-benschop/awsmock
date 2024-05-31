@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -20,17 +15,22 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/dto/cognito/AdminAddUserToGroupRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
+#include <awsmock/dto/cognito/CreateUserPoolClientRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolClientResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolResponse.h>
 #include <awsmock/dto/cognito/DeleteGroupRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
@@ -70,12 +70,20 @@ namespace AwsMock::Service {
         Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request);
 
         /**
-         * @brief Create a new cognito user pool
+         * @brief Create a new cognito user pool domain
          *
-         * @param request create user pool request
-         * @return CreateUserPoolRequest DTO
+         * @param request create user pool domain request
+         * @return CreateUserPoolDomainResponse DTO
          */
         Dto::Cognito::CreateUserPoolDomainResponse CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Create a new cognito user pool client
+         *
+         * @param request create user pool client request
+         * @return CreateUserPoolClientResponse DTO
+         */
+        Dto::Cognito::CreateUserPoolClientResponse CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request);
 
         /**
          * @brief List cognito user pools
@@ -84,6 +92,14 @@ namespace AwsMock::Service {
          * @return ListUserPoolResponse DTO
          */
         Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
+
+        /**
+         * @brief Describes a user pool
+         *
+         * @param request describe user pool request
+         * @return DescribeUserPoolResponse DTO
+         */
+        Dto::Cognito::DescribeUserPoolResponse DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request);
 
         /**
          * @brief Delete a cognito user pool
@@ -107,6 +123,13 @@ namespace AwsMock::Service {
          * @return ListUsersResponse DTO
          */
         Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
+
+        /**
+         * @brief Adds a user to a group
+         *
+         * @param request add user to group request
+         */
+        void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request);
 
         /**
          * @brief Deletes a cognito user

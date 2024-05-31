@@ -120,7 +120,7 @@ namespace AwsMock::Manager {
         /**
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
          */
-        boost::optional<boost::beast::http::request_parser<boost::beast::http::dynamic_body>> parser_;
+        boost::optional<boost::beast::http::request_parser<boost::beast::http::string_body>> parser_;
 
         /**
          * HTTP request handler

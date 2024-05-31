@@ -9,11 +9,6 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -34,6 +29,7 @@ namespace AwsMock::Database::Entity::Module {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * @brief AwsMock module entity
@@ -70,12 +66,11 @@ namespace AwsMock::Database::Entity::Module {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
-
+        system_clock::time_point created = system_clock::now();
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * Converts the entity to a MongoDB document

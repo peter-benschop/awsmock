@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -16,6 +17,8 @@
 #include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Dto::Module {
+
+    using std::chrono::system_clock;
 
     /**
      * AwsMock module
@@ -47,12 +50,12 @@ namespace AwsMock::Dto::Module {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * @brief Convert to JSON representation

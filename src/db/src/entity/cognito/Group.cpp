@@ -22,7 +22,10 @@ namespace AwsMock::Database::Entity::Cognito {
 
     void Group::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
+        // Could be null, in case the group is part of a user
+        if (mResult.value().find("_id") != mResult.value().end()) {
+            oid = mResult.value()["_id"].get_oid().value.to_string();
+        }
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         groupName = bsoncxx::string::to_string(mResult.value()["groupName"].get_string().value);
         userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);

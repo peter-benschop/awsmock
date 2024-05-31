@@ -6,15 +6,20 @@
 #define AWSMOCK_DTO_COGNITO_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
+#include <awsmock/dto/cognito/CreateUserPoolClientRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/entity/cognito/Group.h>
+#include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -27,6 +32,14 @@ namespace AwsMock::Dto::Cognito {
     class Mapper {
 
       public:
+
+        /**
+         * @brief Maps a user pool entity to a user Poll DTO
+         *
+         * @param userPoolEntity user pool entity
+         * @return UserPool DTO
+         */
+        static Dto::Cognito::UserPool map(const Database::Entity::Cognito::UserPool &userPoolEntity);
 
         /**
          * @brief Maps a list of cognito user pools a list user pool response
@@ -49,6 +62,15 @@ namespace AwsMock::Dto::Cognito {
          * @see CreateUserPoolDomainRequest
          */
         static Database::Entity::Cognito::UserPoolDomain map(const CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Maps a user pool client DTO to an entity
+         *
+         * @param request CreateUserPoolClientRequest request struct
+         * @return UserPoolClient
+         * @see CreateUserPoolClientRequest
+         */
+        static Database::Entity::Cognito::UserPoolClient map(const Dto::Cognito::CreateUserPoolClientRequest &request);
 
         /**
          * @brief Maps a create group DTO request to an entity
@@ -81,6 +103,19 @@ namespace AwsMock::Dto::Cognito {
          * @see ListGroupResponse
          */
         static Dto::Cognito::ListGroupsResponse map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList);
+
+        /**
+         * @brief Maps a user pool to a describe user pool response
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param request original request
+         * @param userPool cognito user pool entity
+         * @param request request struct
+         * @return DescribeUserPoolResponse
+         * @see DescribeUserPoolResponse
+         */
+        static Dto::Cognito::DescribeUserPoolResponse map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool);
     };
 
 }// namespace AwsMock::Dto::Cognito

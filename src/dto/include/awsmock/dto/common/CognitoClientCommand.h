@@ -36,22 +36,28 @@ namespace AwsMock::Dto::Common {
     enum class CognitoCommandType {
         CREATE_USER_POOL,
         CREATE_USER_POOL_DOMAIN,
-        CREATE_USER,
+        DESCRIBE_USER_POOL,
         DELETE_USER_POOL,
+        CREATE_USER,
         DELETE_USER,
         CREATE_GROUP,
         DELETE_GROUP,
+        ADD_USER_TO_GROUP,
+        CREATE_USER_POOL_CLIENT,
         UNKNOWN
     };
 
     static std::map<CognitoCommandType, std::string> CognitoCommandTypeNames{
             {CognitoCommandType::CREATE_USER_POOL, "CreateUserPool"},
             {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "CreateUserPoolDomain"},
-            {CognitoCommandType::CREATE_USER, "CreateUser"},
+            {CognitoCommandType::DESCRIBE_USER_POOL, "DescribeUserPool"},
             {CognitoCommandType::DELETE_USER_POOL, "DeleteUserPool"},
+            {CognitoCommandType::CREATE_USER, "CreateUser"},
             {CognitoCommandType::DELETE_USER, "DeleteUser"},
             {CognitoCommandType::CREATE_GROUP, "CreateGroup"},
             {CognitoCommandType::DELETE_GROUP, "DeleteGroup"},
+            {CognitoCommandType::ADD_USER_TO_GROUP, "AdminAddUserToGroup"},
+            {CognitoCommandType::CREATE_USER_POOL_CLIENT, "CreateUserPoolClient"},
     };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(CognitoCommandType commandType) {

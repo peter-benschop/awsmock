@@ -193,9 +193,7 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region,
-                                                             const std::string &userPoolId,
-                                                             const std::string &userName) {
+    Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
 
         auto it = find_if(_users.begin(),
                           _users.end(),
@@ -314,6 +312,23 @@ namespace AwsMock::Database {
                        [region, groupName](const std::pair<std::string, Entity::Cognito::Group> &group) {
                            return group.second.region == region && group.second.groupName == groupName;
                        }) != _groups.end();
+    }
+
+    Entity::Cognito::Group CognitoMemoryDb::GetGroupByGroupName(const std::string &region, const std::string &groupPoolId, const std::string &groupName) {
+
+        auto it = find_if(_groups.begin(),
+                          _groups.end(),
+                          [region, groupPoolId, groupName](const std::pair<std::string, Entity::Cognito::Group> &group) {
+                              return group.second.region == region && group.second.userPoolId == groupPoolId && group.second.groupName == groupName;
+                          });
+
+        if (it == _groups.end()) {
+            log_error << "Get cognito group by group name failed, groupName: " << groupName;
+            throw Core::DatabaseException("Get cognito group by group name failed, groupName: " + groupName);
+        }
+
+        it->second.oid = it->first;
+        return it->second;
     }
 
     Entity::Cognito::Group CognitoMemoryDb::CreateGroup(const Entity::Cognito::Group &group) {

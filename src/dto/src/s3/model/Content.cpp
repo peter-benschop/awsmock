@@ -15,7 +15,7 @@ namespace AwsMock::Dto::S3 {
             rootJson.set("owner", owner);
             rootJson.set("size", size);
             rootJson.set("storageClass", storageClass);
-            rootJson.set("lastModified", lastModified);
+            rootJson.set("modified", lastModified);
             rootJson.set("checksumAlgorithms", Core::JsonUtils::GetJsonStringArray(checksumAlgorithms));
 
             return Core::JsonUtils::ToJsonString(rootJson);

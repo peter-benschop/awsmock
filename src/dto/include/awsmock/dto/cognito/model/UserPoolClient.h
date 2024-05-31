@@ -2,8 +2,8 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
-#define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
+#ifndef AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_CLIENT_H
+#define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_CLIENT_H
 
 // C++ includes
 #include <sstream>
@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
-    struct UserPool {
+    struct UserPoolClient {
 
         /**
          * ID
@@ -32,24 +32,24 @@ namespace AwsMock::Dto::Cognito {
         std::string region;
 
         /**
-         * Name
-         */
-        std::string name;
-
-        /**
          * User pool ID
          */
         std::string userPoolId;
 
         /**
-         * User pool ARN
+         * Client ID
          */
-        std::string arn;
+        std::string clientId;
 
         /**
-         * User pool domain
+         * Client name
          */
-        std::string domain;
+        std::string clientName;
+
+        /**
+         * Client secret
+         */
+        std::string clientSecret;
 
         /**
          * Created
@@ -59,7 +59,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Last modified
          */
-        system_clock::time_point modified;
+        system_clock::time_point lastModified;
 
         /**
          * Convert to a JSON string
@@ -87,9 +87,9 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const UserPool &r);
+        friend std::ostream &operator<<(std::ostream &os, const UserPoolClient &r);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
+#endif// AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_CLIENT_H

@@ -68,7 +68,7 @@ namespace AwsMock::Service {
 
             if (action == "functions") {
 
-                std::string body = Core::HttpUtils::GetBodyAsString1(request);
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
 
                 if (Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations") {
 
@@ -103,7 +103,7 @@ namespace AwsMock::Service {
                 std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
 
-                std::string body = Core::HttpUtils::GetBodyAsString1(request);
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
                 Dto::Lambda::CreateTagRequest lambdaRequest;
                 lambdaRequest.FromJson(body);
 
@@ -130,7 +130,7 @@ namespace AwsMock::Service {
         try {
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.target(), version, action);
-            std::string body = Core::HttpUtils::GetBodyAsString1(request);
+            std::string body = Core::HttpUtils::GetBodyAsString(request);
 
             if (action == "functions") {
 

@@ -221,6 +221,17 @@ namespace AwsMock::Core {
         return request.base()[name];
     }
 
+    std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name, const std::string &defaultValue) {
+        if (request.base().find(name) == request.end()) {
+            if (!defaultValue.empty()) {
+                return defaultValue;
+            } else {
+                log_warning << "Header value not found, key: " << name;
+            }
+        }
+        return request.base()[name];
+    }
+
     std::map<std::string, std::string> HttpUtils::GetHeaders(const Poco::Net::HTTPRequest &request) {
 
         std::map<std::string, std::string> headers;
@@ -276,20 +287,17 @@ namespace AwsMock::Core {
         action = GetPathParameters(uri)[1];
     }
 
-    std::string HttpUtils::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-        std::string body;
-        Poco::StreamCopier::copyToString(request.stream(), body);
-        request.stream().clear(std::ios::eofbit);
-        request.stream().seekg(0, std::ios::beg);
-        return body;
-    }
-
-    std::string HttpUtils::GetBodyAsString1(const http::request<http::dynamic_body> &request) {
+    std::string HttpUtils::GetBodyAsString(const http::request<http::dynamic_body> &request) {
 
         boost::beast::net::streambuf sb;
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
 
         return boost::beast::buffers_to_string(sb.data());
+    }
+
+    std::string HttpUtils::GetBodyAsString(const http::request<http::string_body> &request) {
+
+        return request.body();
     }
 
 }// namespace AwsMock::Core

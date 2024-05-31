@@ -11,13 +11,7 @@ namespace AwsMock::Dto::Cognito {
         Dto::Cognito::ListUserPoolResponse response;
 
         for (const auto &userPool: userPoolList) {
-            UserPool userPoolDto = {
-                    .region = userPool.region,
-                    .name = userPool.name,
-                    .userPoolId = userPool.userPoolId,
-                    .created = userPool.created,
-                    .lastModified = userPool.modified};
-            response.userPools.emplace_back(userPoolDto);
+            response.userPools.emplace_back(Mapper::map(userPool));
         }
         return response;
     }
@@ -27,6 +21,19 @@ namespace AwsMock::Dto::Cognito {
         Database::Entity::Cognito::UserPoolDomain userPoolDomain;
         userPoolDomain.domain = request.domain;
         return userPoolDomain;
+    }
+
+    Database::Entity::Cognito::UserPoolClient Mapper::map(const Dto::Cognito::CreateUserPoolClientRequest &request) {
+
+        Database::Entity::Cognito::UserPoolClient userPoolClient;
+        userPoolClient.userPoolId = request.userPoolId;
+        userPoolClient.clientId = Core::StringUtils::GenerateRandomString(26);
+        userPoolClient.clientName = request.clientName;
+        if (request.generateSecret) {
+            userPoolClient.clientSecret = Core::StringUtils::GenerateRandomString(52);
+        }
+        userPoolClient.generateSecret = request.generateSecret;
+        return userPoolClient;
     }
 
     Database::Entity::Cognito::Group Mapper::map(const Dto::Cognito::CreateGroupRequest &request) {
@@ -54,6 +61,25 @@ namespace AwsMock::Dto::Cognito {
             response.groups.emplace_back(groupDto);
         }
         return response;
+    }
+
+    Dto::Cognito::DescribeUserPoolResponse Mapper::map(const Dto::Cognito::DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool) {
+        DescribeUserPoolResponse response = {{request.requestId, request.region, request.user}};
+        response.userPool = Mapper::map(userPool);
+        return response;
+    }
+
+    Dto::Cognito::UserPool Mapper::map(const Database::Entity::Cognito::UserPool &userPoolEntity) {
+        UserPool userPoolDto = {
+                .id = userPoolEntity.userPoolId,
+                .region = userPoolEntity.region,
+                .name = userPoolEntity.name,
+                .userPoolId = userPoolEntity.userPoolId,
+                .arn = userPoolEntity.arn,
+                .domain = userPoolEntity.domain.domain,
+                .created = userPoolEntity.created,
+                .modified = userPoolEntity.modified};
+        return userPoolDto;
     }
 
 }// namespace AwsMock::Dto::Cognito

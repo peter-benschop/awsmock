@@ -363,7 +363,7 @@ namespace AwsMock::Service {
                     log_debug << "Bucket notification request, bucket: " << clientCommand.bucket;
 
                     // S3 notification setup
-                    std::string body = Core::HttpUtils::GetBodyAsString1(request);
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
                     Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, clientCommand.region, clientCommand.bucket);
 
                     _s3Service.PutBucketNotification(s3Request);
@@ -376,7 +376,7 @@ namespace AwsMock::Service {
                     log_debug << "Put bucket notification configuration request, bucket: " << clientCommand.bucket;
 
                     // S3 notification setup
-                    std::string body = Core::HttpUtils::GetBodyAsString1(request);
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
                     Dto::S3::PutBucketNotificationConfigurationRequest s3Request;
                     s3Request.FromXml(body);
                     s3Request.region = clientCommand.region;
@@ -429,7 +429,7 @@ namespace AwsMock::Service {
 
                 log_debug << "Bucket versioning request, bucket: " << clientCommand.bucket;
 
-                std::string body = Core::HttpUtils::GetBodyAsString1(request);
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
 
                 Dto::S3::PutBucketVersioningRequest s3Request(body);
                 s3Request.user = clientCommand.user;
@@ -497,7 +497,7 @@ namespace AwsMock::Service {
 
                     log_debug << "Starting delete objects request";
 
-                    const std::string &payload = Core::HttpUtils::GetBodyAsString1(request);
+                    const std::string &payload = Core::HttpUtils::GetBodyAsString(request);
                     if (payload.empty()) {
                         return SendNoContentResponse(request);
                     }
