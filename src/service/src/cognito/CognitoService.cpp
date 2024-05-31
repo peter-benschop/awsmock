@@ -71,6 +71,37 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::CreateUserPoolClientResponse CognitoService::CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "createUser_pool-client");
+        log_debug << "Create user pool client request, clientName: " << request.clientName;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exist, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exist, userPoolId: " + request.userPoolId);
+        }
+
+        try {
+
+            // Get user pool
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+
+            // Update database
+            userPool.userPoolClients.emplace_back(Dto::Cognito::Mapper::Mapper::map(request));
+            userPool = _database.UpdateUserPool(userPool);
+
+            Dto::Cognito::CreateUserPoolClientResponse response{};
+            response = {{.requestId = request.requestId, .region = userPool.region}, userPool.domain.domain};
+
+            log_trace << "Create user pool client result: " + response.ToJson();
+            return response;
+
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Create user pool client request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
         log_debug << "List user pools request, maxResults: " << request.maxResults;

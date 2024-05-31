@@ -13,8 +13,8 @@ namespace AwsMock::Dto::Module {
             moduleJson.set("executable", executable);
             moduleJson.set("port", port);
             moduleJson.set("state", Database::Entity::Module::ModuleStateToString(status));
-            moduleJson.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::HTTP_FORMAT));
-            moduleJson.set("modified", Poco::DateTimeFormatter::format(modified, Poco::DateTimeFormat::HTTP_FORMAT));
+            moduleJson.set("created", Core::DateTimeUtils::ISO8601(created));
+            moduleJson.set("modified", Core::DateTimeUtils::ISO8601(modified));
 
             return Core::JsonUtils::ToJsonString(moduleJson);
 
@@ -32,14 +32,12 @@ namespace AwsMock::Dto::Module {
                 serviceJson.set("name", service.name);
                 serviceJson.set("port", service.port);
                 serviceJson.set("state", Database::Entity::Module::ModuleStateToString(service.state));
-                serviceJson.set("created", Poco::DateTimeFormatter::format(service.created, Poco::DateTimeFormat::HTTP_FORMAT));
-                serviceJson.set("modified", Poco::DateTimeFormatter::format(service.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+                serviceJson.set("created", Core::DateTimeUtils::ISO8601(service.created));
+                serviceJson.set("modified", Core::DateTimeUtils::ISO8601(service.modified));
                 moduleJsonArray.add(serviceJson);
             }
 
-            std::ostringstream os;
-            moduleJsonArray.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(moduleJsonArray);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -55,14 +53,12 @@ namespace AwsMock::Dto::Module {
                 moduleJson.set("name", module.name);
                 moduleJson.set("port", module.port);
                 moduleJson.set("status", Database::Entity::Module::ModuleStateToString(module.status));
-                moduleJson.set("created", Poco::DateTimeFormatter::format(module.created, Poco::DateTimeFormat::HTTP_FORMAT));
-                moduleJson.set("modified", Poco::DateTimeFormatter::format(module.modified, Poco::DateTimeFormat::HTTP_FORMAT));
+                moduleJson.set("created", Core::DateTimeUtils::ISO8601(module.created));
+                moduleJson.set("modified", Core::DateTimeUtils::ISO8601(module.modified));
                 moduleJsonArray.add(moduleJson);
             }
 
-            std::ostringstream os;
-            moduleJsonArray.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(moduleJsonArray);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

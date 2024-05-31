@@ -35,6 +35,7 @@ namespace AwsMock::Core {
         }
 
         // Cleanup
+        std::string tmp = response.body();
         stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         return PrepareResult(response);
     }

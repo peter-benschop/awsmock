@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -26,6 +21,8 @@
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
+#include <awsmock/dto/cognito/CreateUserPoolClientRequest.h>
+#include <awsmock/dto/cognito/CreateUserPoolClientResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolRequest.h>
@@ -71,12 +68,20 @@ namespace AwsMock::Service {
         Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request);
 
         /**
-         * @brief Create a new cognito user pool
+         * @brief Create a new cognito user pool domain
          *
-         * @param request create user pool request
-         * @return CreateUserPoolRequest DTO
+         * @param request create user pool domain request
+         * @return CreateUserPoolDomainResponse DTO
          */
         Dto::Cognito::CreateUserPoolDomainResponse CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Create a new cognito user pool client
+         *
+         * @param request create user pool client request
+         * @return CreateUserPoolClientResponse DTO
+         */
+        Dto::Cognito::CreateUserPoolClientResponse CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request);
 
         /**
          * @brief List cognito user pools

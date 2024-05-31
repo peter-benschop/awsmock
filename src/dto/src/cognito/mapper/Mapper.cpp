@@ -29,6 +29,19 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDomain;
     }
 
+    Database::Entity::Cognito::UserPoolClient Mapper::map(const Dto::Cognito::CreateUserPoolClientRequest &request) {
+
+        Database::Entity::Cognito::UserPoolClient userPoolClient;
+        userPoolClient.userPoolId = request.userPoolId;
+        userPoolClient.clientId = Core::StringUtils::GenerateRandomString(26);
+        userPoolClient.clientName = request.clientName;
+        if (request.generateSecret) {
+            userPoolClient.clientSecret = Core::StringUtils::GenerateRandomString(52);
+        }
+        userPoolClient.generateSecret = request.generateSecret;
+        return userPoolClient;
+    }
+
     Database::Entity::Cognito::Group Mapper::map(const Dto::Cognito::CreateGroupRequest &request) {
         Database::Entity::Cognito::Group group = {
                 .region = request.region,

@@ -47,6 +47,15 @@ namespace AwsMock::Core {
         }
     }
 
+    void JsonUtils::GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::chrono::system_clock::time_point &attribute) {
+        if (jsonObject->has(name)) {
+            auto stringValue = jsonObject->get(name).convert<std::string>();
+            std::tm t = {};
+            strptime(stringValue.c_str(), "%FT%T%z", &t);
+            attribute = std::chrono::system_clock::from_time_t(mktime(&t));
+        }
+    }
+
     Poco::JSON::Array JsonUtils::GetJsonStringArray(const std::vector<std::string> &values) {
 
         Poco::JSON::Array jsonArray;

@@ -39,6 +39,19 @@ namespace AwsMock::Service {
                 Dto::Cognito::CreateUserPoolDomainResponse serviceResponse = _cognitoService.CreateUserPoolDomain(cognitoRequest);
                 return SendOkResponse(request, serviceResponse.ToJson());
 
+            } else if (action == "CreateUserPoolClient") {
+
+                Dto::Cognito::CreateUserPoolClientRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got create user pool client request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::CreateUserPoolClientResponse serviceResponse = _cognitoService.CreateUserPoolClient(cognitoRequest);
+                return SendOkResponse(request, serviceResponse.ToJson());
+
             } else if (action == "ListUserPools") {
 
                 Dto::Cognito::ListUserPoolRequest cognitoRequest{};

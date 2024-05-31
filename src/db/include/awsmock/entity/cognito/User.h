@@ -31,7 +31,6 @@
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
-struct Group;
 namespace AwsMock::Database::Entity::Cognito {
 
     using bsoncxx::to_json;

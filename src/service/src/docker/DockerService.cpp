@@ -221,7 +221,7 @@ namespace AwsMock::Service {
         std::string jsonBody = request.ToJson();
 
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + name, jsonBody);
-        if (domainSocketResponse.statusCode != http::status::ok) {
+        if (domainSocketResponse.statusCode != http::status::created) {
             log_warning << "Create container failed, httpStatus: " << domainSocketResponse.statusCode << " body " << domainSocketResponse.body;
             return {};
         }
@@ -235,7 +235,7 @@ namespace AwsMock::Service {
     void DockerService::StartDockerContainer(const std::string &id) {
 
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/start");
-        if (domainSocketResponse.statusCode != http::status::ok && domainSocketResponse.statusCode != http::status::not_modified) {
+        if (domainSocketResponse.statusCode != http::status::ok && domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Start container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
         }
     }

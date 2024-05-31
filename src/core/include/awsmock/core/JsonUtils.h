@@ -13,9 +13,14 @@
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 
+// Boost includes
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #define JSON_DEFAULT_INDENT 4
 
 namespace AwsMock::Core {
+
+    using namespace boost::posix_time;
 
     /**
      * @brief JSON utilities.
@@ -88,6 +93,15 @@ namespace AwsMock::Core {
          * @param attribute JSON attribute
          */
         static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute);
+
+        /**
+         * Extracts the supplied JSON value from the object.
+         *
+         * @param name name of the JSON attribute
+         * @param jsonObject JSON object
+         * @param attribute JSON attribute
+         */
+        static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::chrono::system_clock::time_point &attribute);
 
         /**
          * Creates a JSON string array.

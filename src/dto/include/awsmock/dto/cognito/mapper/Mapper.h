@@ -6,18 +6,19 @@
 #define AWSMOCK_DTO_COGNITO_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
+#include <awsmock/dto/cognito/CreateUserPoolClientRequest.h>
 #include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
-#include <awsmock/entity/cognito/UserPool.h>
-//#pragma once
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
+#include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -26,8 +27,6 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct User;
-    struct Group;
     class Mapper {
 
       public:
@@ -53,6 +52,15 @@ namespace AwsMock::Dto::Cognito {
          * @see CreateUserPoolDomainRequest
          */
         static Database::Entity::Cognito::UserPoolDomain map(const CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Maps a user pool client DTO to an entity
+         *
+         * @param request CreateUserPoolClientRequest request struct
+         * @return UserPoolClient
+         * @see CreateUserPoolClientRequest
+         */
+        static Database::Entity::Cognito::UserPoolClient map(const Dto::Cognito::CreateUserPoolClientRequest &request);
 
         /**
          * @brief Maps a create group DTO request to an entity

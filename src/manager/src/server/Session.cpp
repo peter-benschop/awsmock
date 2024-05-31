@@ -91,7 +91,7 @@ namespace AwsMock::Manager {
             return bad_request("Illegal request-target");
         }
 
-        boost::beast::http::response<boost::beast::http::dynamic_body> res;
+        boost::beast::http::response<boost::beast::http::string_body> res;
 
         switch (req.method()) {
             case boost::beast::http::verb::get: {

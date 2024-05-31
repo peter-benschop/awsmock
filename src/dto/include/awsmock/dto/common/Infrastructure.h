@@ -21,6 +21,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 #include <awsmock/entity/dynamodb/Item.h>
@@ -94,6 +95,11 @@ namespace AwsMock::Dto::Common {
          * Cognito users
          */
         Database::Entity::Cognito::UserList cognitoUsers;
+
+        /**
+         * Cognito user groups
+         */
+        Database::Entity::Cognito::GroupList cognitoUserGroups;
 
         /**
          * DynamoDb tables

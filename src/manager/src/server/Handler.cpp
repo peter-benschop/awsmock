@@ -6,7 +6,7 @@
 
 namespace AwsMock::Manager {
 
-    boost::beast::http::response<boost::beast::http::dynamic_body> Handler::HandleGetRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request) {
+    boost::beast::http::response<boost::beast::http::string_body> Handler::HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
@@ -14,7 +14,7 @@ namespace AwsMock::Manager {
 
         std::string target = request.base()["Target"];
         std::string action = request.base()["Action"];
-        std::string payload = Core::HttpUtils::GetBodyAsString1(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         log_debug << "Found action and target, target: " << target << " action: " << action;
 
         if (action == "get-config") {
@@ -46,8 +46,9 @@ namespace AwsMock::Manager {
 
         } else if (action == "export") {
 
-            bool prettyPrint = std::stoi(request["pretty"]);
-            bool includeObjects = std::stoi(request["includeObjects"]);
+            std::string tmp = Core::HttpUtils::GetHeaderValue(request, "pretty");
+            bool prettyPrint = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "pretty"));
+            bool includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "includeObjects"));
 
             Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
             std::string infrastructureJson = AwsMock::Service::ModuleService::ExportInfrastructure(modules, prettyPrint, includeObjects);
@@ -64,7 +65,7 @@ namespace AwsMock::Manager {
             // Returns a not found response
             auto const not_found =
                     [&request](boost::beast::string_view target) {
-                        boost::beast::http::response<boost::beast::http::dynamic_body> res{boost::beast::http::status::not_found, request.version()};
+                        boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::not_found, request.version()};
                         res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
                         res.set(boost::beast::http::field::content_type, "text/html");
                         res.keep_alive(request.keep_alive());
@@ -76,14 +77,14 @@ namespace AwsMock::Manager {
         }
     }
 
-    boost::beast::http::response<boost::beast::http::dynamic_body> Handler::HandlePutRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request) {
+    boost::beast::http::response<boost::beast::http::string_body> Handler::HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
 
         Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
         Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
 
         std::string target = request.base()["Target"];
         std::string action = request.base()["Action"];
-        std::string payload = Core::HttpUtils::GetBodyAsString1(request);
+        std::string payload = Core::HttpUtils::GetBodyAsString(request);
         log_debug << "Found action and target, target: " << target << " action: " << action;
 
         if (action == "start-modules") {
@@ -128,35 +129,34 @@ namespace AwsMock::Manager {
             // Returns a not found response
             auto const not_found =
                     [&request](boost::beast::string_view target) {
-                        boost::beast::http::response<boost::beast::http::dynamic_body> res{boost::beast::http::status::not_found, request.version()};
-                        res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-                        res.set(boost::beast::http::field::content_type, "text/html");
-                        res.keep_alive(request.keep_alive());
+                        boost::beast::http::response<boost::beast::http::string_body> response{boost::beast::http::status::not_found, request.version()};
+                        response.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
+                        response.set(boost::beast::http::field::content_type, "text/html");
+                        response.keep_alive(request.keep_alive());
                         // Body
-                        boost::beast::net::streambuf sb;
-                        sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
-                        res.prepare_payload();
-                        return res;
+                        response.body() = target;
+                        response.prepare_payload();
+                        return response;
                     };
             return not_found("Action unknown");
         }
     }
 
-    boost::beast::http::response<boost::beast::http::dynamic_body> Handler::HandlePostRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request) {
+    boost::beast::http::response<boost::beast::http::string_body> Handler::HandlePostRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
         return {};
     }
 
-    boost::beast::http::response<boost::beast::http::dynamic_body> Handler::SendOkResponse(boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &body) {
+    boost::beast::http::response<boost::beast::http::string_body> Handler::SendOkResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body) {
         // Prepare the response message
-        boost::beast::http::response<boost::beast::http::dynamic_body> response;
+        boost::beast::http::response<boost::beast::http::string_body> response;
         response.version(request.version());
         response.result(boost::beast::http::status::ok);
         response.set(boost::beast::http::field::server, "awsmock");
         response.set(boost::beast::http::field::content_type, "application/json");
+        response.set(boost::beast::http::field::content_length, std::to_string(body.size()));
 
         // Body
-        boost::beast::net::streambuf sb;
-        sb.commit(boost::beast::net::buffer_copy(sb.prepare(response.body().size()), response.body().cdata()));
+        response.body() = body;
         response.prepare_payload();
 
         // Send the response to the client

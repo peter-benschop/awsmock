@@ -65,7 +65,9 @@ namespace AwsMock::Core {
         request.target(path);
         request.body() = body;
         request.prepare_payload();
-        request.base().set("Host", "localhost");
+        request.base().set(http::field::host, "localhost");
+        request.base().set(http::field::content_type, "application/json");
+        request.base().set(http::field::content_length, std::to_string(body.size()));
 
         if (!headers.empty()) {
             for (const auto &header: headers) {

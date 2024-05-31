@@ -7,7 +7,7 @@ namespace AwsMock::Service {
         log_trace << "lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
-            std::string body = Core::HttpUtils::GetBodyAsString1(request);
+            std::string body = Core::HttpUtils::GetBodyAsString(request);
             std::string target = GetTarget(request);
 
             if (target == "TransferService.CreateServer") {

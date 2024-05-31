@@ -8,16 +8,24 @@ namespace AwsMock::Database::Entity::Cognito {
 
     view_or_value<view, value> UserPool::ToDocument() const {
 
+        // Domain
         bsoncxx::builder::basic::document domainDoc{};
         domainDoc.append(kvp("domain", domain.domain));
+
+        // Clients
+        auto userPoolClientsDoc = bsoncxx::builder::basic::array{};
+        for (const auto &userPoolClient: userPoolClients) {
+            userPoolClientsDoc.append(userPoolClient.ToDocument());
+        }
 
         view_or_value<view, value> userPoolDocument = make_document(
                 kvp("region", region),
                 kvp("userPoolId", userPoolId),
                 kvp("name", name),
-                kvp("clientId", clientId),
                 kvp("arn", arn),
+                kvp("clientId", clientId),
                 kvp("domain", domainDoc.extract()),
+                kvp("userPoolClients", userPoolClientsDoc),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userPoolDocument;
@@ -42,6 +50,16 @@ namespace AwsMock::Database::Entity::Cognito {
                 domain.domain = bsoncxx::string::to_string(domainView["domain"].get_string().value);
             }
 
+            // Get clients
+            if (mResult.value().find("userPoolClients") != mResult.value().end()) {
+                bsoncxx::array::view userPoolClientView{mResult.value()["userPoolClients"].get_array().value};
+                for (const bsoncxx::array::element &userPoolClientElement: userPoolClientView) {
+                    UserPoolClient userPoolClient;
+                    userPoolClient.FromDocument(userPoolClientElement.get_document().view());
+                    userPoolClients.push_back(userPoolClient);
+                }
+            }
+
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
@@ -57,6 +75,8 @@ namespace AwsMock::Database::Entity::Cognito {
         jsonObject.set("clientId", clientId);
         jsonObject.set("arn", arn);
         jsonObject.set("domain", domain.domain);
+        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
 
         return jsonObject;
     }

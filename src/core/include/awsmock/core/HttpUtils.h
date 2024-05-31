@@ -231,7 +231,7 @@ namespace AwsMock::Core {
          * @param request HTTP serer request
          * @return HTTP body as string
          */
-        static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
+        static std::string GetBodyAsString(const http::request<http::string_body> &request);
 
         /**
          * @brief Gets the body as string from a boost dynamic_body
@@ -239,7 +239,7 @@ namespace AwsMock::Core {
          * @param request HTTP serer request
          * @return HTTP body as string
          */
-        static std::string GetBodyAsString1(const http::request<http::dynamic_body> &request);
+        static std::string GetBodyAsString(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Checks whether a header exists.
@@ -276,6 +276,20 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
+
+        /**
+         * @brief Returns a header value by key.
+         *
+         * <p>
+         * Returns the default value, if existent, otherwise logs a warning message, in case the request has no value for the given key.
+         * </p>
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @param defaultValue returned when the key was not found
+         * @return header value of empty string.
+         */
+        static std::string GetHeaderValue(const http::request<http::string_body> &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
          * @brief Returns the headers as a map of strings

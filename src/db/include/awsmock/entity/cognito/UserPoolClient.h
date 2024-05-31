@@ -1,9 +1,9 @@
 //
-// Created by vogje01 on 11/25/23.
+// Created by vogje01 on 5/31/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
+#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_CLIENT_H
+#define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_CLIENT_H
 
 // C++ includes
 #include <string>
@@ -20,7 +20,6 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/entity/cognito/UserPoolClient.h>
 #include <awsmock/entity/cognito/UserPoolDomain.h>
 #include <awsmock/utils/MongoUtils.h>
 
@@ -36,31 +35,16 @@ namespace AwsMock::Database::Entity::Cognito {
     using std::chrono::system_clock;
 
     /**
-     * @brief Cognito user pool entity
+     * @brief Cognito user pool client entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserPool {
+    struct UserPoolClient {
 
         /**
-         * MongoDB POD
-         */
-        std::string oid;
-
-        /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
-         * User pool ID
+         * UserPoolId
          */
         std::string userPoolId;
-
-        /**
-         * Name
-         */
-        std::string name;
 
         /**
          * Client ID
@@ -68,19 +52,19 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string clientId;
 
         /**
-         * ARN
+         * Client name
          */
-        std::string arn;
+        std::string clientName;
 
         /**
-         * Domain
+         * Client secret
          */
-        UserPoolDomain domain;
+        std::string clientSecret;
 
         /**
-         * Clients
+         * Generate secret flag
          */
-        std::vector<UserPoolClient> userPoolClients;
+        bool generateSecret;
 
         /**
          * Creation date
@@ -109,16 +93,12 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * @brief Converts the entity to a JSON object
          *
-         * Basically only used for the infrastructure export.
-         *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * @brief Converts the entity to a JSON object
-         *
-         * Basically only used for the infrastructure import.
          *
          * @param jsonObject JSON object.
          */
@@ -138,11 +118,9 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param userPool userPool entity
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
+        friend std::ostream &operator<<(std::ostream &os, const UserPoolClient &userPoolClient);
     };
-
-    typedef std::vector<Entity::Cognito::UserPool> UserPoolList;
 
 }// namespace AwsMock::Database::Entity::Cognito
 
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
+#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_CLIENT_H

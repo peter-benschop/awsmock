@@ -126,9 +126,8 @@ namespace AwsMock::Service {
 
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
                 infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
-                if (includeObjects) {
-                    infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
-                }
+                infrastructure.cognitoUserGroups = _cognitoDatabase.ListGroups();
+                infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
 
             } else if (module.name == "dynanomdb") {
 

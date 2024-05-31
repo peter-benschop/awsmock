@@ -17,8 +17,8 @@ namespace AwsMock::Database::Entity::Module {
                 kvp("port", port),
                 kvp("state", ModuleStateToString(state)),
                 kvp("status", ModuleStatusToString(status)),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return objectDoc;
     }
@@ -30,8 +30,8 @@ namespace AwsMock::Database::Entity::Module {
         port = mResult.value()["port"].get_int32().value;
         state = ModuleStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
         status = ModuleStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
-        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date().value));
-        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
     }
 
     std::string Module::ToJson() const {
