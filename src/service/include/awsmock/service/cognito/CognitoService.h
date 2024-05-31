@@ -20,6 +20,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/dto/cognito/AdminAddUserToGroupRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
@@ -107,6 +108,13 @@ namespace AwsMock::Service {
          * @return ListUsersResponse DTO
          */
         Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
+
+        /**
+         * @brief Adds a user to a group
+         *
+         * @param request add user to group request
+         */
+        void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request);
 
         /**
          * @brief Deletes a cognito user

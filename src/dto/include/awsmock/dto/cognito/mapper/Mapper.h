@@ -14,8 +14,10 @@
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
-#include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/UserPool.h>
+//#pragma once
+#include <awsmock/entity/cognito/Group.h>
+#include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -24,6 +26,8 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
+    struct User;
+    struct Group;
     class Mapper {
 
       public:

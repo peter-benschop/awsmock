@@ -30,6 +30,7 @@
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
+struct User;
 namespace AwsMock::Database::Entity::Cognito {
 
     using bsoncxx::to_json;
@@ -43,6 +44,8 @@ namespace AwsMock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito group entity
+     *
+     * This class contains the users in the group.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -82,6 +85,11 @@ namespace AwsMock::Database::Entity::Cognito {
          * Precedence
          */
         int precedence;
+
+        /**
+         * Users
+         */
+        //std::vector<User *&> users;
 
         /**
          * Creation date

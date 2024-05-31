@@ -330,7 +330,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
+                mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
                 int64_t count = _userCollection.count_documents(make_document(kvp("region", region),
                                                                               kvp("userPoolId", userPoolId),
                                                                               kvp("userName", userName)));
@@ -353,7 +353,7 @@ namespace AwsMock::Database {
         if (_hasDatabase) {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
+            mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
             auto session = client->start_session();
 
             try {
@@ -381,7 +381,7 @@ namespace AwsMock::Database {
         try {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
+            mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value>
                     mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
@@ -406,7 +406,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
+                mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
                 auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
                 if (!mResult) {
                     log_error << "Database exception: user not found ";
@@ -448,7 +448,7 @@ namespace AwsMock::Database {
 
                 long count = 0;
                 auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _userCollection = (*client)[_databaseName]["cognito_user"];
+                mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
                 if (!region.empty() && !userPoolId.empty()) {
                     count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId)));
                 } else if (!region.empty()) {
@@ -657,6 +657,35 @@ namespace AwsMock::Database {
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    Entity::Cognito::Group CognitoDatabase::GetGroupByGroupName(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+
+        if (_hasDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userCollection = (*client)[_databaseName][_groupCollectionName];
+                auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
+                if (!mResult) {
+                    log_error << "Database exception: group not found ";
+                    throw Core::DatabaseException("Database exception, group not found ");
+                }
+
+                Entity::Cognito::Group result;
+                result.FromDocument(mResult->view());
+                return result;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.GetGroupByGroupName(region, userPoolId, groupName);
         }
     }
 

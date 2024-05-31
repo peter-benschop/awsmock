@@ -268,6 +268,17 @@ namespace AwsMock::Database {
         Entity::Cognito::Group GetGroupById(bsoncxx::oid oid);
 
         /**
+         * @brief Returns a cognito group entity by region, userPoolId and groupName.
+         *
+         * @param region AWS region.
+         * @param userPoolId user pool ID
+         * @param groupName group name
+         * @return cognito group entity
+         * @throws DatabaseException
+         */
+        Entity::Cognito::Group GetGroupByGroupName(const std::string &region, const std::string &userPoolId, const std::string &groupName);
+
+        /**
          * @brief Create a new cognito group
          *
          * @param userPool cognito group entity to create

@@ -143,6 +143,41 @@ namespace AwsMock::Service {
         }
     }
 
+    void CognitoService::AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "add_user_to_group");
+        log_debug << "Admin add user to group request, request: " << request.ToString();
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            log_error << "User pool does not exists, userName: " << request.userName << " userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User does not exists, userName: " + request.userName + " userPoolId: " + request.userPoolId);
+        }
+
+        if (!_database.GroupExists(request.region, request.groupName)) {
+            log_error << "Group does not exist, groupName: " << request.groupName << " userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("Group does not exist, groupName: " + request.groupName + " userPoolId: " + request.userPoolId);
+        }
+
+        try {
+            Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
+            Database::Entity::Cognito::Group group = _database.GetGroupByGroupName(request.region, request.userPoolId, request.groupName);
+
+            if (!user.HasGroup(request.userPoolId, request.groupName)) {
+                user.groups.emplace_back(group);
+                user = _database.UpdateUser(user);
+                log_debug << "Group added to user, userName: " << user.userName << " groupName: " << group.groupName;
+            }
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Create user request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::Cognito::ListUsersResponse CognitoService::ListUsers(const Dto::Cognito::ListUsersRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user");
         log_debug << "List users request, region: " << request.region << " userPoolId: " << request.userPoolId;

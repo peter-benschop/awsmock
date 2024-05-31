@@ -6,11 +6,25 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
+    bool User::HasGroup(const std::string &userPoolIdIn, const std::string &groupNameIn) {
+
+        return std::find_if(groups.begin(), groups.end(), [&userPoolIdIn, &groupNameIn](const Group &g) {
+                   return g.userPoolId == userPoolIdIn && g.groupName == groupNameIn;
+               }) != groups.end();
+    }
+
     view_or_value<view, value> User::ToDocument() const {
 
+        // Attributes
         auto userAttributesDoc = bsoncxx::builder::basic::array{};
         for (const auto &attribute: userAttributes) {
             userAttributesDoc.append(make_document(kvp(attribute.name, attribute.value)));
+        }
+
+        // Groups
+        auto groupsDoc = bsoncxx::builder::basic::array{};
+        for (const auto &group: groups) {
+            groupsDoc.append(group.ToDocument());
         }
 
         view_or_value<view, value> userDocument = make_document(
@@ -18,6 +32,7 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("userName", userName),
                 kvp("userPoolId", userPoolId),
                 kvp("enabled", enabled),
+                kvp("groups", groupsDoc),
                 kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
                 kvp("userAttributes", userAttributesDoc),
                 kvp("created", bsoncxx::types::b_date(created)),
@@ -44,6 +59,15 @@ namespace AwsMock::Database::Entity::Cognito {
                         .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
                         .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};
                 userAttributes.push_back(attribute);
+            }
+        }
+        // Groups
+        if (mResult.value().find("groups") != mResult.value().end()) {
+            bsoncxx::array::view groupsView{mResult.value()["groups"].get_array().value};
+            for (const bsoncxx::array::element &groupElement: groupsView) {
+                Group group;
+                group.FromDocument(groupElement.get_document().view());
+                groups.push_back(group);
             }
         }
     }
