@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <algorithm>
 #include <array>
+#include <iconv.h>
 #include <iomanip>
 #include <iterator>
 #include <random>
@@ -16,15 +17,13 @@
 #include <string>
 #include <vector>
 
-// Iconv includes
-#ifndef _WIN32
-#include <iconv.h>
-#endif
-
 // Poco includes
 #include <Poco/RegularExpression.h>
 #include <Poco/String.h>
 #include <Poco/URI.h>
+
+// Boost includes
+#include <boost/algorithm/string/case_conv.hpp>
 
 namespace AwsMock::Core {
 

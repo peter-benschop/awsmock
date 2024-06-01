@@ -313,8 +313,13 @@ namespace AwsMock::Service {
 
         // Calculate the hashes asynchronously
         if (!request.checksumAlgorithm.empty()) {
-            Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
+
+            S3HashCreator s3HashCreator;
+            std::vector<std::string> algorithms = {request.checksumAlgorithm};
+            boost::thread t(boost::ref(s3HashCreator), algorithms, object);
+            t.detach();
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+            //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
         }
 
         // Cleanup
@@ -896,7 +901,11 @@ namespace AwsMock::Service {
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
         log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
         if (!request.checksumAlgorithm.empty()) {
-            Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
+            S3HashCreator s3HashCreator;
+            std::vector<std::string> algorithms = {request.checksumAlgorithm};
+            boost::thread t(boost::ref(s3HashCreator), algorithms, object);
+            t.detach();
+            //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
         }
 
@@ -970,7 +979,11 @@ namespace AwsMock::Service {
 
             // Checksums
             if (!request.checksumAlgorithm.empty()) {
-                Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
+                S3HashCreator s3HashCreator;
+                std::vector<std::string> algorithms = {request.checksumAlgorithm};
+                boost::thread t(boost::ref(s3HashCreator), algorithms, object);
+                t.detach();
+                //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
             }
 

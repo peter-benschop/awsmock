@@ -10,6 +10,7 @@
 
 // Boost includes
 #include <boost/iostreams/copy.hpp>
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include "awsmock/core/exception/NotFoundException.h"

@@ -34,7 +34,7 @@ namespace AwsMock::Service {
         for (const auto &bucket: _s3Database.ListBuckets()) {
             std::string labelValue = Poco::replace(bucket.name, "-", "_");
             long messagesPerTopic = _s3Database.ObjectCount(bucket.region, bucket.name);
-            _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, messagesPerTopic);
+            _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(messagesPerTopic));
         }
         log_trace << "S3 monitoring finished";
     }

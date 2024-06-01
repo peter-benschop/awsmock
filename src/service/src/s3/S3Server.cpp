@@ -18,7 +18,7 @@ namespace AwsMock::Service {
         _monitoringPeriod = configuration.getInt("awsmock.service.s3.monitoring.period", S3_DEFAULT_MONITORING_PERIOD);
 
         // Monitoring
-        _s3Monitoring = std::make_unique<S3Monitoring>(_monitoringPeriod);
+        _s3Monitoring = std::make_shared<S3Monitoring>(_monitoringPeriod);
         log_debug << "S3 module initialized, endpoint: " << _host << ":" << _port;
     }
 

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer() : AbstractServer(Core::Configuration::instance(), "dynamodb", 10), _module("dynamodb") {
+    DynamoDbServer::DynamoDbServer() : AbstractServer(Core::Configuration::instance(), "dynamodb", 10), _module("dynamodb"), _dockerService(DockerService::instance()) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -24,14 +24,14 @@ namespace AwsMock::Service {
         log_debug << "DynamoDB server period: " << _period;
 
         // Docker module
-        _dockerService = std::make_unique<Service::DockerService>();
+        _dockerService = DockerService::instance();
         log_debug << "DynamoDbServer initialized";
 
         // Monitoring
-        _dynamoDbMonitoring = std::make_unique<DynamoDbMonitoring>(_monitoringPeriod);
+        _dynamoDbMonitoring = std::make_shared<DynamoDbMonitoring>(_monitoringPeriod);
 
         // Worker
-        _dynamoDbWorker = std::make_unique<DynamoDbWorker>(_workerPeriod);
+        _dynamoDbWorker = std::make_shared<DynamoDbWorker>(_workerPeriod);
 
         // Start DynamoDb docker image
         StartLocalDynamoDb();
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbServer::CleanupContainers() {
-        _dockerService->PruneContainers();
+        _dockerService.PruneContainers();
         log_debug << "Docker containers cleaned up";
     }
 
@@ -70,21 +70,21 @@ namespace AwsMock::Service {
         log_debug << "Starting DynamoDB docker image";
 
         // Check docker image
-        if (!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            _dockerService->BuildImage(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_DOCKER_FILE);
+        if (!_dockerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+            _dockerService.BuildImage(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_DOCKER_FILE);
         }
 
         // Check container image
-        if (!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            _dockerService->CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_EXTERNAL_PORT, DYNAMODB_INTERNAL_PORT);
+        if (!_dockerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+            _dockerService.CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_EXTERNAL_PORT, DYNAMODB_INTERNAL_PORT);
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService->GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+        Dto::Docker::Container container = _dockerService.GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
-            _dockerService->StartDockerContainer(container.id);
+            _dockerService.StartDockerContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
             log_info << "Docker containers for DynamoDB already running";
@@ -95,21 +95,21 @@ namespace AwsMock::Service {
         log_debug << "Starting DynamoDB docker image";
 
         // Check docker image
-        if (!_dockerService->ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+        if (!_dockerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
             throw Core::ServiceException("Image does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Check container image
-        if (!_dockerService->ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+        if (!_dockerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
             throw Core::ServiceException("Container does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService->GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+        Dto::Docker::Container container = _dockerService.GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
 
         // Stop docker container, in case it is running.
         if (container.state == "running") {
-            _dockerService->StopContainer(container);
+            _dockerService.StopContainer(container);
             log_info << "Docker containers for DynamoDB stopped";
         } else {
             log_info << "Docker containers for DynamoDB not running";

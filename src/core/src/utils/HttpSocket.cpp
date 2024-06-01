@@ -8,6 +8,7 @@ namespace AwsMock::Core {
 
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
+        boost::system::error_code ec;
         boost::asio::io_context ctx;
 
         boost::asio::ip::tcp::resolver resolver(ctx);
@@ -17,53 +18,73 @@ namespace AwsMock::Core {
         auto const results = resolver.resolve(host, std::to_string(port));
 
         // Connect
-        stream.connect(results);
+        stream.connect(results, ec);
+        if (ec) {
+            log_error << "Connect to " << host << ":" << port << " failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+        }
 
         // Prepare message
         http::request<http::string_body> request = PrepareJsonMessage(method, host, path, body, headers);
 
         // Write to TCP socket
-        http::write(stream, request);
+        http::write(stream, request, ec);
+        if (ec) {
+            log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+        }
 
         boost::beast::flat_buffer buffer;
-        boost::system::error_code ec;
         http::response<http::string_body> response;
 
         http::read(stream, buffer, response);
-        if (!ec && ec.message() != "Success") {
-            log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
+        if (ec) {
+            log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
         }
 
         // Cleanup
-        std::string tmp = response.body();
-        stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if (ec) {
+            log_error << "Shutdown socket failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+        }
         return PrepareResult(response);
     }
 
-    // TODO:: test the solution, once the boost is finiahed.
-    /*DomainSocketResult DomainSocket::SendBinary(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
+    HttpSocketResponse HttpSocket::SendBinary(http::verb method, const std::string &host, int port, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
 
+        boost::system::error_code ec;
         boost::asio::io_context ctx;
-        boost::asio::local::stream_protocol::endpoint endpoint(_path);
-        boost::asio::local::stream_protocol::socket socket(ctx);
-        socket.connect(endpoint);
+
+        boost::asio::ip::tcp::resolver resolver(ctx);
+        boost::beast::tcp_stream stream(ctx);
 
         // Prepare message
         http::request<http::file_body> request = PrepareBinaryMessage(method, path, filename, headers);
 
-        // Write to unix socket
-        boost::beast::http::write(socket, request);
+        // Write to socket
+        boost::beast::http::write(stream, request);
+        if (ec) {
+            log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+        }
 
         boost::beast::flat_buffer buffer;
-        boost::system::error_code ec;
         http::response<http::dynamic_body> response;
-        read(socket, buffer, response, ec);
-        if (!ec && ec.message() != "Success") {
-            log_error << "Send to docker daemon failed, error: " << ec.message();
+        read(stream, buffer, response, ec);
+        if (ec) {
+            log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
         }
-        socket.close();
+
+        ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if (ec) {
+            log_error << "Shutdown socket failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+        }
         return PrepareResult(response);
-    }*/
+    }
 
     http::request<http::string_body> HttpSocket::PrepareJsonMessage(http::verb method, const std::string &host, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
@@ -106,6 +127,13 @@ namespace AwsMock::Core {
 
     HttpSocketResponse HttpSocket::PrepareResult(http::response<http::string_body> response) {
         return {.statusCode = response.result(), .body = response.body()};
+    }
+
+    HttpSocketResponse HttpSocket::PrepareResult(http::response<http::dynamic_body> response) {
+        boost::beast::net::streambuf sb;
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(response.body().size()), response.body().cdata()));
+
+        return {.statusCode = response.result(), .body = boost::beast::buffers_to_string(sb.data())};
     }
 
 }// namespace AwsMock::Core

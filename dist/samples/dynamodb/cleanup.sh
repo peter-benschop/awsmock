@@ -2,5 +2,6 @@
 
 alias awslocal="aws --region eu-central-1 --endpoint --endpoint http://localhost:4566 --profile awsmock"
 
-# Create a user-pool
-awslocal cognito-idp create-user-pool --pool-name test-user-pool
+# Delete the table
+awslocal dynamodb delete-table \
+  --table-name MusicCollection

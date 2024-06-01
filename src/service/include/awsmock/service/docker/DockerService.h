@@ -10,8 +10,10 @@
 #include <iostream>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPResponse.h>
+// Boost includes
+#include <boost/filesystem/path.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -43,6 +45,7 @@
 namespace AwsMock::Service {
 
     namespace http = boost::beast::http;
+    using namespace std::chrono_literals;
 
     /**
      * @brief Controls the connection to the docker daemon using a UNIX Domain socket.
@@ -59,12 +62,20 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        DockerService();
+        explicit DockerService();
 
         /**
-         * Creates a simple image
+         * @brief Singleton instance
+         */
+        static DockerService &instance() {
+            static DockerService dockerService;
+            return dockerService;
+        }
+
+        /**
+         * @brief Creates a simple image
          *
          * @param name image name
          * @param tag image tags
@@ -73,7 +84,7 @@ namespace AwsMock::Service {
         void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
 
         /**
-         * Checks whether a image exists.
+         * @brief Checks whether a image exists.
          *
          * @param name image name
          * @param tag image tags
@@ -82,7 +93,7 @@ namespace AwsMock::Service {
         bool ImageExists(const std::string &name, const std::string &tag);
 
         /**
-         * Returns a image by name/tags.
+         * @brief Returns a image by name/tags.
          *
          * @param name container name
          * @param tag container tags
@@ -91,7 +102,7 @@ namespace AwsMock::Service {
         Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag);
 
         /**
-         * Build a docker image for a lambda
+         * @brief Build a docker image for a lambda
          *
          * @param codeDir code directory
          * @param name lambda function name, used as image name
@@ -104,7 +115,7 @@ namespace AwsMock::Service {
         std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
         /**
-         * Build a docker image from a docker file
+         * @brief Build a docker image from a docker file
          *
          * @param name lambda function name, used as image name
          * @param tag image tags
@@ -114,14 +125,14 @@ namespace AwsMock::Service {
         std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile);
 
         /**
-         * Delete an image by name/tags.
+         * @brief Delete an image by name/tags.
          *
          * @param id image ID
          */
         void DeleteImage(const std::string &id);
 
         /**
-         * Checks whether a container exists.
+         * @brief Checks whether a container exists.
          *
          * @param name container name
          * @param tag container tags
@@ -130,14 +141,14 @@ namespace AwsMock::Service {
         bool ContainerExists(const std::string &name, const std::string &tag);
 
         /**
-         * List all docker images
+         * @brief List all docker images
          *
          * @return CreateFunctionResponse
          */
         // Dto::Docker::ListImageResponse ListImages();
 
         /**
-         * Creates a container
+         * @brief Creates a container
          *
          * @param name image name
          * @param tag image tags
@@ -148,7 +159,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
 
         /**
-         * Creates a container for a predefined image.
+         * @brief Creates a container for a predefined image.
          *
          * @param name image name
          * @param tag image tags
@@ -159,7 +170,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, int hostPort, int containerPort);
 
         /**
-         * Returns a container by name/tags.
+         * @brief Returns a container by name/tags.
          *
          * @param name container name
          * @param tag container tags
@@ -168,64 +179,49 @@ namespace AwsMock::Service {
         Dto::Docker::Container GetContainerByName(const std::string &name, const std::string &tag);
 
         /**
-         * Returns a container by name/tags.
-         *
-         * @param id container ID
-         * @return Container
-         */
-        Dto::Docker::Container GetContainerById(const std::string &id);
-
-        /**
-         * Start the container
+         * @brief Start the container
          *
          * @param id container ID
          */
         void StartDockerContainer(const std::string &id);
 
         /**
-         * Start the container
-         *
-         * @param container container
-         */
-        void StartContainer(const Dto::Docker::Container &container);
-
-        /**
-         * Restart the container
+         * @brief Restart the container
          *
          * @param id container ID
          */
         void RestartDockerContainer(const std::string &id);
 
         /**
-         * Restart the container
+         * @brief Restart the container
          *
          * @param container container
          */
         void RestartContainer(const Dto::Docker::Container &container);
 
         /**
-         * Stops the container
+         * @brief Stops the container
          *
          * @param container container
          */
         void StopContainer(const Dto::Docker::Container &container);
 
         /**
-         * Deletes the container
+         * @brief Deletes the container
          *
          * @param container container DTO
          */
         void DeleteContainer(const Dto::Docker::Container &container);
 
         /**
-         * Deletes all stopped containers.
+         * @brief Deletes all stopped containers.
          */
         void PruneContainers();
 
       private:
 
         /**
-         * Write the docker file.
+         * @brief Write the docker file.
          *
          * @param codeDir code directory
          * @param handler handler function
@@ -236,7 +232,7 @@ namespace AwsMock::Service {
         static std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
         /**
-         * Write the compressed docker imagefile.
+         * @brief Write the compressed docker imagefile.
          *
          * @param codeDir code directory
          * @param name function name
@@ -272,12 +268,17 @@ namespace AwsMock::Service {
         /**
          * Docker listening socket
          */
-        std::unique_ptr<Core::DomainSocket> _domainSocket;
+        std::shared_ptr<Core::DomainSocket> _domainSocket;
 
         /**
          * Supported runtimes
          */
         static std::map<std::string, std::string> _supportedRuntimes;
+
+        /**
+         * Mutex
+         */
+        static boost::mutex _dockerServiceMutex;
     };
 
 }// namespace AwsMock::Service

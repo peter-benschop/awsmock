@@ -2,7 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include <awsmock/service/common/ModuleService.h>
+#include "awsmock/service/module/ModuleService.h"
 
 namespace AwsMock::Service {
 

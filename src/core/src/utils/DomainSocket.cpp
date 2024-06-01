@@ -38,7 +38,6 @@ namespace AwsMock::Core {
         return PrepareResult(response);
     }
 
-    // TODO:: test the solution, once the boost is finiahed.
     DomainSocketResult DomainSocket::SendBinary(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
 
         boost::system::error_code ec;
@@ -61,10 +60,14 @@ namespace AwsMock::Core {
         boost::beast::flat_buffer buffer;
         http::response<http::string_body> response;
         read(socket, buffer, response, ec);
-        if (!ec && ec.message() != "Success") {
+        if (ec) {
             log_error << "Send to docker daemon failed, error: " << ec.message();
         }
         socket.close();
+        if (ec) {
+            log_error << "Shutdown socket failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+        }
         return PrepareResult(response);
     }
 

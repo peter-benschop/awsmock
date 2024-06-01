@@ -1,16 +1,9 @@
 #!/bin/bash
 
-# Create a single user-pool
-userpoolid=$(aws cognito-idp create-user-pool \
-  --pool-name test-user-pool \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock | jq -r '.UserPool.Id')
+alias awslocal="aws --region eu-central-1 --endpoint --endpoint http://localhost:4566 --profile awsmock"
 
-# Create a single user-pool domain
-aws cognito-idp create-user-pool-domain \
-  --domain test-domain \
-  --user-pool-id $userpoolid \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+# Create a user-pool
+userPoolId=$(awslocal cognito-idp create-user-pool --pool-name test-user-pool | jq -r '.UserPool.Id')
+
+# Create a user-pool domain
+awslocal cognito-idp create-user-pool-domain --domain test-domain --user-pool-id $userPoolId

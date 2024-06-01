@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/common/DockerService.h"
+#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/Configuration.h>
 
 // Test includes

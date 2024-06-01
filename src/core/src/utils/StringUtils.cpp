@@ -140,7 +140,7 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::ContainsIgnoreCase(const std::string &s1, const std::string &s2) {
-        return Poco::toLower(s1).find(Poco::toLower(s2)) != std::string::npos;
+        return boost::algorithm::to_lower_copy(s1).find(Poco::toLower(s2)) != std::string::npos;
     }
 
     bool StringUtils::StartsWith(const std::string &s1, const std::string &s2) {
@@ -148,7 +148,7 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::StartsWithIgnoringCase(const std::string &s1, const std::string &s2) {
-        return Poco::toLower(s1).starts_with(Poco::toLower(s2));
+        return boost::algorithm::to_lower_copy(s1).starts_with(boost::algorithm::to_lower_copy(s2));
     }
 
     bool StringUtils::EndsWith(const std::string &s1, const std::string &s2) {

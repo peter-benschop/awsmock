@@ -6,6 +6,8 @@
 
 namespace AwsMock::Core {
 
+    boost::mutex Configuration::_configurationMutex;
+
     Configuration::Configuration() {
         Initialize();
     }

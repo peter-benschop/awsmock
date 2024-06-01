@@ -35,34 +35,22 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3HashCreator : public Core::Task {
+    class S3HashCreator {
 
       public:
 
         /**
          * Constructor
+         */
+        explicit S3HashCreator(){};
+
+        /**
+         * Work method
          *
          * @param algorithms vector of algorithm names
          * @param object S3 object to hash
          */
-        explicit S3HashCreator(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) : Core::Task("s3-hash-creator"), _object(object), _algorithms(algorithms) {}
-
-        /**
-         * Work method
-         */
-        void Run() override;
-
-      private:
-
-        /**
-         * Hash algorithm
-         */
-        std::vector<std::string> _algorithms;
-
-        /**
-         * S3 object
-         */
-        Database::Entity::S3::Object _object;
+        void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object);
     };
 
 }// namespace AwsMock::Service
