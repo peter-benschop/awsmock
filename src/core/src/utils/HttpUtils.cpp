@@ -244,8 +244,9 @@ namespace AwsMock::Core {
     std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::dynamic_body> &request) {
 
         std::map<std::string, std::string> headers;
-        for (const auto &header: request.base()) {
-            headers[to_string(header.name())] = header.value();
+        for (const auto &header: request) {
+            headers[header.name_string()] = header.value();
+            log_trace << header.name_string() << ": " << header.value();
         }
         return headers;
     }

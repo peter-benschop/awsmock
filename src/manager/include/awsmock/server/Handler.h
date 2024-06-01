@@ -13,6 +13,7 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
+#include "awsmock/service/module/ModuleService.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
@@ -20,7 +21,6 @@
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
-#include <awsmock/service/common/ModuleService.h>
 
 namespace AwsMock::Manager {
 

@@ -1,29 +1,15 @@
 #!/bin/bash
 
+alias awslocal="aws --region eu-central-1 --endpoint --endpoint http://localhost:4566 --profile awsmock"
+
 # Create a single user-pool
-aws cognito-idp create-user-pool \
-  --pool-name test-user-pool \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+awslocal cognito-idp create-user-pool --pool-name test-user-pool
 
 # List all available
-userpoolid=$(aws cognito-idp list-user-pools \
-  --max-results 10 \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock | jq -r '.UserPools[0].Id')
+userPoolId=$(awslocal cognito-idp list-user-pools --max-results 10 | jq -r '.UserPools[0].Id')
 
-# Delete a single user-pool
-aws cognito-idp delete-user-pool \
-  --user-pool-id $userpoolid \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+# Delete the user-pool
+awslocal cognito-idp delete-user-pool --user-pool-id $userPoolId
 
 # List all available
-aws cognito-idp list-user-pools \
-  --max-results 10 \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+awslocal cognito-idp list-user-pools --max-results 10

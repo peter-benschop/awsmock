@@ -18,7 +18,7 @@ set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSWorker.c
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp)
 set(DOCKER_SOURCES src/docker/DockerService.cpp)
-set(MODULE_SOURCES src/common/ModuleService.cpp)
+set(MODULE_SOURCES src/module/ModuleService.cpp)
 
 set(SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES}
         ${TRANSFER_SOURCES} ${FTP_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES}

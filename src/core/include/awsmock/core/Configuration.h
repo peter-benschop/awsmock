@@ -16,6 +16,10 @@
 #include <Poco/Util/LayeredConfiguration.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -51,12 +55,12 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         Configuration();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static Configuration &instance() {
             static Configuration configuration;
@@ -64,14 +68,14 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param basename basename of the configuration file.
          */
         explicit Configuration(const std::string &basename);
 
         /**
-         * Define a new configuration property.
+         * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
          * key, the key is preserved, otherwise the default value is taken. </p>
@@ -83,7 +87,7 @@ namespace AwsMock::Core {
         void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
         /**
-         * Define a new configuration property.
+         * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
          * key, the key is preserved, otherwise the default value is taken. </p>
@@ -95,7 +99,7 @@ namespace AwsMock::Core {
         void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
 
         /**
-         * Define a new configuration property.
+         * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
          * key, the key is preserved, otherwise the default value is taken. </p>
@@ -107,21 +111,21 @@ namespace AwsMock::Core {
         void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
 
         /**
-         * Returns the file name of the configuration file.
+         * @brief Returns the file name of the configuration file.
          *
          * @return file name of the configuration file.
          */
         std::string GetFilename() const;
 
         /**
-         * Sets the file name of the configuration file.
+         * @brief Sets the file name of the configuration file.
          *
          * @param filename file name of the configuration file.
          */
         void SetFilename(const std::string &filename);
 
         /**
-         * Sets a string configuration value
+         * @brief Sets a string configuration value
          *
          * @param key property key
          * @param value configuration value
@@ -129,7 +133,7 @@ namespace AwsMock::Core {
         void SetValue(const std::string &key, const std::string &value);
 
         /**
-         * Sets a bool configuration value
+         * @brief Sets a bool configuration value
          *
          * @param key property key
          * @param value configuration value
@@ -137,7 +141,7 @@ namespace AwsMock::Core {
         void SetValue(const std::string &key, bool value);
 
         /**
-         * Sets an integer configuration value
+         * @brief Sets an integer configuration value
          *
          * @param key property key
          * @param value configuration value
@@ -145,28 +149,28 @@ namespace AwsMock::Core {
         void SetValue(const std::string &key, int value);
 
         /**
-         * Returns the application name
+         * @brief Returns the application name
          *
          * @return application name
          */
         static std::string GetAppName();
 
         /**
-         * Returns the version of the library.
+         * @brief Returns the version of the library.
          *
          * @return library version
          */
         static std::string GetVersion();
 
         /**
-         * Writes the current configuration the given file
+         * @brief Writes the current configuration the given file
          *
          * @param filename name of the configuration file
          */
         void WriteFile(const std::string &filename);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -175,7 +179,7 @@ namespace AwsMock::Core {
       private:
 
         /**
-         * Initialize the base properties
+         * @brief Initialize the base properties
          */
         void Initialize();
 
@@ -215,6 +219,8 @@ namespace AwsMock::Core {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &, const Configuration &);
+
+        static boost::mutex _configurationMutex;
     };
 
 }// namespace AwsMock::Core

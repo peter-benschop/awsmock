@@ -9,16 +9,11 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/Notification.h>
-#include <Poco/NotificationQueue.h>
-#include <Poco/RecursiveDirectoryIterator.h>
-#include <Poco/StreamCopier.h>
+// Boost includes
+#include <boost/thread.hpp>
 
 // AwsMock includes
+#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -42,7 +37,6 @@
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
-#include <awsmock/service/common/DockerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 

@@ -65,7 +65,11 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
         // Create lambda function asynchronously
-        //Core::TaskPool::instance().Add<std::string, LambdaCreator>("lambda-creator", LambdaCreator(request.code.zipFile, lambdaEntity.oid));
+        LambdaCreator lambdaCreator;
+        boost::thread t(boost::ref(lambdaCreator), request.code.zipFile, lambdaEntity.oid);
+        t.detach();
+
+        //Core::TaskPool::instance().Add<std::string, LambdaCreator>;
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
         // Create response

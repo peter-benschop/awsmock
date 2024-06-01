@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/common/ModuleService.h"
+#include "awsmock/service/module/ModuleService.h"
 #include <awsmock/core/Configuration.h>
 #include <awsmock/repository/ModuleDatabase.h>
 

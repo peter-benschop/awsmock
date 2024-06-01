@@ -11,10 +11,9 @@
 
 // Poco includes
 #include <Poco/Base64Decoder.h>
-#include <Poco/NotificationQueue.h>
-#include <Poco/StreamCopier.h>
 
 // AwsMock includes
+#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
@@ -24,7 +23,6 @@
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/service/common/DockerService.h>
 
 namespace AwsMock::Service {
 
@@ -33,29 +31,27 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaCreator : public Core::Task {
+    class LambdaCreator {
 
       public:
 
         /**
          * @brief Constructor.
-         *
-         * Will start itself as background thread,
+         */
+        explicit LambdaCreator() = default;
+
+        /**
+         * @brief Create new lambda function
          *
          * @param functionCode zipped and BASE64 encoded function code
          * @param functionId lambda function OID
          */
-        [[maybe_unused]] explicit LambdaCreator(std::string functionCode, std::string functionId);
-
-        /**
-         * Create new lambda function
-         */
-        void Run() override;
+        void operator()(std::string &functionCode, std::string &functionId);
 
       private:
 
         /**
-         * Save the ZIP file and unpack it in a temporary folder
+         * @brief Save the ZIP file and unpack it in a temporary folder
          *
          * @param zipFile Base64 encoded ZIP file
          * @param lambdaEntity lambda entity
@@ -64,7 +60,7 @@ namespace AwsMock::Service {
         void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
-         * Creates an new docker container, in case the container does not exists inside the docker daemon.
+         * @brief Creates an new docker container, in case the container does not exists inside the docker daemon.
          *
          * @param lambdaEntity lambda entity.
          * @param dockerTag docker tag.
@@ -72,7 +68,7 @@ namespace AwsMock::Service {
         void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
-         * Converts the lambda environment to a vector of string, which is needed by the docker API
+         * @brief Converts the lambda environment to a vector of string, which is needed by the docker API
          *
          * @param lambdaEnvironment lambda environment
          * @return vector of strings containing the runtime environment
@@ -80,7 +76,7 @@ namespace AwsMock::Service {
         static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
 
         /**
-         * Unpack the provided ZIP file.
+         * @brief Unpack the provided ZIP file.
          *
          * <p>Needed only when the lambda function is provided as zipped request body.</p>
          *
@@ -92,14 +88,14 @@ namespace AwsMock::Service {
         std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
 
         /**
-         * Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
+         * @brief Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
          *
          * @return random port between 32768 and 65536
          */
         static int GetHostPort();
 
         /**
-         * Returns the docker tag.
+         * @brief Returns the docker tag.
          *
          * <p>The method returns the docker tags in that order:
          * <ul>
@@ -114,36 +110,6 @@ namespace AwsMock::Service {
          * @return random port between 32768 and 65536
          */
         static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
-
-        /**
-         * Database connection
-         */
-        Database::LambdaDatabase &_lambdaDatabase;
-
-        /**
-         * Data directory
-         */
-        std::string _dataDir;
-
-        /**
-         * Temp directory
-         */
-        std::string _tempDir;
-
-        /**
-         * Docker module
-         */
-        Service::DockerService _dockerService;
-
-        /**
-         * Function code
-         */
-        std::string _functionCode;
-
-        /**
-         * Function ID
-         */
-        std::string _functionId;
     };
 
 }//namespace AwsMock::Service

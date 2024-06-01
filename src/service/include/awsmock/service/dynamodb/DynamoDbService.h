@@ -13,6 +13,7 @@
 #include <boost/lexical_cast.hpp>
 
 // AwsMock includes
+#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
@@ -45,7 +46,6 @@
 #include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
-#include <awsmock/service/common/DockerService.h>
 
 namespace AwsMock::Service {
 

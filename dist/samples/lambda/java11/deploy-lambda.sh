@@ -15,7 +15,7 @@ aws s3 cp ./resources/sample-java-events.png s3://test-bucket/inbound/sample-jav
 # Create lambda function
 aws lambda create-function \
   --function-name java-events \
-  --runtime Java11 \
+  --runtime java11 \
   --timeout 120 \
   --memory-size 2024 \
   --tags tag=latest,version=latest \
