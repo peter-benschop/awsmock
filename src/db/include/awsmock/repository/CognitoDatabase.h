@@ -217,6 +217,16 @@ namespace AwsMock::Database {
         std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
 
         /**
+         * @brief Returns a list of cognito users in given group.
+         *
+         * @param region AWS region name
+         * @param userPoolId user pool ID
+         * @param groupName name of the group
+         * @return list of cognito users
+         */
+        std::vector<Entity::Cognito::User> ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
+
+        /**
          * @brief Updates an existing cognito user
          *
          * @param user user entity

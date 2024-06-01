@@ -17,6 +17,9 @@
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
+#include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
+#include <awsmock/dto/cognito/ListUsersInGroupResponse.h>
+#include <awsmock/dto/cognito/model/User.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
@@ -34,12 +37,28 @@ namespace AwsMock::Dto::Cognito {
       public:
 
         /**
-         * @brief Maps a user pool entity to a user Poll DTO
+         * @brief Maps a user pool entity to a user pool DTO
          *
          * @param userPoolEntity user pool entity
          * @return UserPool DTO
          */
         static Dto::Cognito::UserPool map(const Database::Entity::Cognito::UserPool &userPoolEntity);
+
+        /**
+         * @brief Maps a user entity to a user DTO
+         *
+         * @param userEntity user entity
+         * @return User DTO
+         */
+        static Dto::Cognito::User map(const Database::Entity::Cognito::User &userEntity);
+
+        /**
+         * @brief Maps a group entity to a group DTO
+         *
+         * @param groupEntity group entity
+         * @return Group DTO
+         */
+        static Dto::Cognito::Group map(const Database::Entity::Cognito::Group &groupEntity);
 
         /**
          * @brief Maps a list of cognito user pools a list user pool response
@@ -97,12 +116,23 @@ namespace AwsMock::Dto::Cognito {
          * Some values will be pulled over from the request.
          *
          * @param request original request
-         * @param groupList cognito user pool entity list
-         * @param request request struct
+         * @param groupList cognito user group entity list
          * @return ListGroupResponse
          * @see ListGroupResponse
          */
         static Dto::Cognito::ListGroupsResponse map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList);
+
+        /**
+         * @brief Maps a list of cognito users in a group to a list user in group response
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param request original request
+         * @param userList cognito user entity list
+         * @return ListUsersInGroupResponse
+         * @see ListUsersInGroupResponse
+         */
+        static Dto::Cognito::ListUsersInGroupResponse map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList);
 
         /**
          * @brief Maps a user pool to a describe user pool response

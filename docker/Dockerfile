@@ -70,14 +70,15 @@ RUN ln -s /usr/lib/libbson-1.0.so.0 /usr/lib/libbson-1.0.so
 COPY --from=build /usr/local/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
 RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
-COPY --from=build /usr/local/lib/libmongocxx.so.3.11.0-pre /usr/lib/
-RUN ln -s /usr/lib/libmongocxx.so.3.11.0-pre /usr/lib/libmongocxx.so._noabi
-COPY --from=build /usr/local/lib/libbsoncxx.so.3.11.0-pre /usr/lib/
-RUN ln -s /usr/lib/libbsoncxx.so.3.11.0-pre /usr/lib/libbsoncxx.so._noabi
+COPY --from=build /usr/local/lib/libmongocxx.so.3.10.2-pre /usr/lib/
+RUN ln -s /usr/lib/libmongocxx.so.3.10.2-pre /usr/lib/libmongocxx.so._noabi
+COPY --from=build /usr/local/lib/libbsoncxx.so.3.10.2-pre /usr/lib/
+RUN ln -s /usr/lib/libbsoncxx.so.3.10.2-pre /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
 
 # Install boost
-COPY --from=build /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/
+COPY --from=build /usr/lib/libboost_program_options.so.1.84.0 /usr/lib/
+RUN ln -s /usr/lib/libboost_program_options.so.1.84.0 /usr/lib/libboost_program_options.so
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/

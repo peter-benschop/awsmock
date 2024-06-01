@@ -249,6 +249,32 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::ListUsersInGroupResponse CognitoService::ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_users_in_group");
+        log_debug << "Admin add user to group request, request: " << request.ToString();
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        if (!_database.GroupExists(request.region, request.groupName)) {
+            log_error << "Group does not exist, groupName: " << request.groupName << " userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("Group does not exist, groupName: " + request.groupName + " userPoolId: " + request.userPoolId);
+        }
+
+        try {
+
+            Database::Entity::Cognito::UserList users = _database.ListUsersInGroup(request.region, request.userPoolId, request.groupName);
+
+            return Dto::Cognito::Mapper::map(request, users);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Create user request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user");
         log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;

@@ -23,13 +23,18 @@ namespace AwsMock::Dto::Cognito {
     struct Group {
 
         /**
-         * GroupName
+         * AWS region
+         */
+        std::string region;
+
+        /**
+         * Group name
          */
         std::string groupName;
 
         /**
-          * User pool Id
-          */
+         * User pool Id
+         */
         std::string userPoolId;
 
         /**
@@ -55,7 +60,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Last modified
          */
-        system_clock::time_point lastModified;
+        system_clock::time_point modified;
 
         /**
          * Convert to a JSON string

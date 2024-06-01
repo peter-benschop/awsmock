@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Cognito {
             rootJson.set("Description", description);
             rootJson.set("Precedence", precedence);
             rootJson.set("CreationDate", Core::DateTimeUtils::ISO8601(created));
-            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(modified));
             return rootJson;
 
         } catch (Poco::Exception &exc) {

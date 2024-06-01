@@ -268,6 +268,22 @@ namespace AwsMock::Database {
         return userList;
     }
 
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+
+        Entity::Cognito::UserList userList;
+
+        for (const auto &user: _users) {
+            if (user.second.region == region && user.second.userPoolId == userPoolId && std::find_if(user.second.groups.begin(), user.second.groups.end(), [&groupName](const Entity::Cognito::Group &g) {
+                                                                                            return g.groupName == groupName;
+                                                                                        }) != user.second.groups.end()) {
+                userList.emplace_back(user.second);
+            }
+        }
+
+        log_trace << "Got user in group list, size: " << userList.size();
+        return userList;
+    }
+
     Entity::Cognito::User CognitoMemoryDb::UpdateUser(const Entity::Cognito::User &user) {
 
         Poco::ScopedLock lock(_userMutex);
