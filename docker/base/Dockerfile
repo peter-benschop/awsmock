@@ -16,7 +16,7 @@ RUN cd /usr/src && \
 
 # Install Poco framework
 RUN cd /usr/src && \
-    git clone https://github.com/pocoproject/poco.git && \
+    git clone -b poco-1.13.3 https://github.com/pocoproject/poco.git && \
     cd poco && \
     cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF  \
     -DENABLE_DATA_MYSQL=OFF -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DENABLE_JWT=OFF -DENABLE_DATA=OFF  \
@@ -26,7 +26,7 @@ RUN cd /usr/src && \
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
-    git clone https://github.com/mongodb/mongo-cxx-driver.git && \
+    git clone -b releases/v3.10 https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \

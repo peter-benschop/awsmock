@@ -23,7 +23,7 @@
 namespace AwsMock::Database {
 
     /**
-     * Module in-memory database.
+     * @brief Module in-memory database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -32,12 +32,12 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit ModuleMemoryDb() = default;
 
         /**
-         * Singleton instance
+         * @briefSingleton instance
          */
         static ModuleMemoryDb &instance() {
             static ModuleMemoryDb moduleMemoryDb;
@@ -45,7 +45,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Checks the active flag.
+         * @brief Checks the active flag.
          *
          * @param name module name
          * @return true if active
@@ -53,7 +53,7 @@ namespace AwsMock::Database {
         bool IsActive(const std::string &name);
 
         /**
-         * Check existence of name
+         * @briefCheck existence of name
          *
          * @param name name name
          * @return created name
@@ -61,7 +61,7 @@ namespace AwsMock::Database {
         bool ModuleExists(const std::string &name);
 
         /**
-         * Returns the module by userPoolId
+         * @brief Returns the module by userPoolId
          *
          * @param oid module oid
          * @return module, if existing
@@ -70,7 +70,7 @@ namespace AwsMock::Database {
         Entity::Module::Module GetModuleById(const std::string &oid);
 
         /**
-         * Returns the module by userPoolId
+         * @brief Returns the module by userPoolId
          *
          * @param name module name
          * @return module, if existing
@@ -87,7 +87,7 @@ namespace AwsMock::Database {
         std::vector<std::string> GetAllModuleNames();
 
         /**
-         * Creates a module
+         * @brief Creates a module
          *
          * @param module module entity
          * @return created module
@@ -95,7 +95,7 @@ namespace AwsMock::Database {
         Entity::Module::Module CreateModule(const Entity::Module::Module &module);
 
         /**
-         * Updates a module
+         * @brief Updates a module
          *
          * @param module module entity
          * @return updated module
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
         Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
 
         /**
-         * Sets the state of module.
+         * @brief Sets the state of module.
          *
          * <p>State can be one of STARTING, RUNNING, STOPPED, UNKNOWN.</p>
          *
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
         Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
         /**
-         * Sets the status of module.
+         * @brief Sets the status of module.
          *
          * <p>Status can be one of UNKNOWN, ACTIVE, INACTIVE.</p>
          *
@@ -126,7 +126,7 @@ namespace AwsMock::Database {
         void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
 
         /**
-         * Sets the port of module.
+         * @brief Sets the port of module.
          *
          * @param name module name
          * @param port module port
@@ -134,7 +134,7 @@ namespace AwsMock::Database {
         void SetPort(const std::string &name, int port);
 
         /**
-         * Counts the number of modules
+         * @brief Counts the number of modules
          *
          * @return total number of modules
          */
@@ -148,7 +148,7 @@ namespace AwsMock::Database {
         Entity::Module::ModuleList ListModules();
 
         /**
-         * Deletes module
+         * @brief Deletes module
          *
          * @param module module entity
          */

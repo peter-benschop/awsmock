@@ -35,6 +35,8 @@
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
+#include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
+#include <awsmock/dto/cognito/ListUsersInGroupResponse.h>
 #include <awsmock/dto/cognito/ListUsersRequest.h>
 #include <awsmock/dto/cognito/ListUsersResponse.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
@@ -130,6 +132,13 @@ namespace AwsMock::Service {
          * @param request add user to group request
          */
         void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request);
+
+        /**
+         * @brief Lists the users in a group
+         *
+         * @param request list user in group request
+         */
+        Dto::Cognito::ListUsersInGroupResponse ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request);
 
         /**
          * @brief Deletes a cognito user

@@ -165,6 +165,19 @@ namespace AwsMock::Service {
                 _cognitoService.AdminAddUserToGroup(cognitoRequest);
                 return SendOkResponse(request);
 
+            } else if (action == "ListUsersInGroup") {
+
+                Dto::Cognito::ListUsersInGroupRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "List users in group request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::ListUsersInGroupResponse serviceResponse = _cognitoService.ListUsersInGroup(cognitoRequest);
+                return SendOkResponse(request, serviceResponse.ToJson());
+
             } else if (action == "DeleteGroup") {
 
                 Dto::Cognito::DeleteGroupRequest cognitoRequest{};

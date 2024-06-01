@@ -24,7 +24,7 @@
 #define DEFAULT_MONGO_DBPWD "admin"
 #define DEFAULT_MONGO_DBHOST "localhost"
 #define DEFAULT_MONGO_DBPORT 27017
-#define DEFAULT_MONGO_CACHE_SIZE 256
+#define DEFAULT_MONGO_POOL_SIZE 256
 
 namespace AwsMock::Manager {
 

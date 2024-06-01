@@ -47,8 +47,7 @@ namespace AwsMock::Dto::Cognito {
     }
 
     Dto::Cognito::CreateGroupResponse Mapper::map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group) {
-        Dto::Cognito::Group groupDto = {group.groupName, group.userPoolId, group.description, group.roleArn, group.precedence, group.created, group.modified};
-        Dto::Cognito::CreateGroupResponse response = {{.requestId = request.requestId, .region = group.region, .user = request.user}, groupDto};
+        Dto::Cognito::CreateGroupResponse response = {{.requestId = request.requestId, .region = group.region, .user = request.user}, Mapper::map(group)};
         return response;
     }
 
@@ -57,8 +56,17 @@ namespace AwsMock::Dto::Cognito {
         Dto::Cognito::ListGroupsResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
 
         for (const auto &group: groupList) {
-            Group groupDto = {group.groupName, group.userPoolId, group.description, group.roleArn, group.precedence, group.created, group.modified};
-            response.groups.emplace_back(groupDto);
+            response.groups.emplace_back(Mapper::map(group));
+        }
+        return response;
+    }
+
+    Dto::Cognito::ListUsersInGroupResponse Mapper::map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList) {
+
+        Dto::Cognito::ListUsersInGroupResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
+
+        for (const auto &user: userList) {
+            response.users.emplace_back(Mapper::map(user));
         }
         return response;
     }
@@ -80,6 +88,34 @@ namespace AwsMock::Dto::Cognito {
                 .created = userPoolEntity.created,
                 .modified = userPoolEntity.modified};
         return userPoolDto;
+    }
+
+    Dto::Cognito::User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
+        User userDto = {
+                .region = userEntity.region,
+                .userPoolId = userEntity.userPoolId,
+                .userName = userEntity.userName,
+                .enabled = userEntity.enabled,
+                .created = userEntity.created,
+                .modified = userEntity.modified,
+        };
+
+        for (const auto &group: userEntity.groups) {
+            userDto.groups.emplace_back(Mapper::map(group));
+        }
+
+        return userDto;
+    }
+
+    Dto::Cognito::Group Mapper::map(const Database::Entity::Cognito::Group &groupEntity) {
+        Group groupDto = {
+                .region = groupEntity.region,
+                .groupName = groupEntity.groupName,
+                .userPoolId = groupEntity.userPoolId,
+                .precedence = groupEntity.precedence,
+                .created = groupEntity.created,
+                .modified = groupEntity.modified};
+        return groupDto;
     }
 
 }// namespace AwsMock::Dto::Cognito

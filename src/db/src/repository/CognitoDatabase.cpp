@@ -521,6 +521,37 @@ namespace AwsMock::Database {
         return users;
     }
 
+    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+
+        std::vector<Entity::Cognito::User> users;
+        if (_hasDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
+
+                auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groups.groupName", groupName)));
+                for (auto user: userCursor) {
+                    Entity::Cognito::User result;
+                    result.FromDocument(user);
+                    users.push_back(result);
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            users = _memoryDb.ListUsersInGroup(region, userPoolId, groupName);
+        }
+
+        log_trace << "Got users in group, size:" << users.size();
+        return users;
+    }
+
     Entity::Cognito::User CognitoDatabase::UpdateUser(const Entity::Cognito::User &user) {
 
         if (_hasDatabase) {
