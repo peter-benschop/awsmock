@@ -17,7 +17,7 @@ RUN rm -rf /usr/src
 # Stick to alpine 3.19 as 3.20 has not support for aws-cli (missing python3.12 compat)
 FROM alpine:3.19
 
-RUN apk update && apk add aws-cli
+RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread
 
 # Make dirctories
 RUN mkdir -p /tmp/awsmock/data/s3 && \
@@ -71,10 +71,13 @@ COPY --from=build /usr/local/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
 RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
 COPY --from=build /usr/local/lib/libmongocxx.so.3.11.0-pre /usr/lib/
-RUN ln -s /usr/lib/libmongocxx.so.3.10.2-pre /usr/lib/libmongocxx.so._noabi
+RUN ln -s /usr/lib/libmongocxx.so.3.11.0-pre /usr/lib/libmongocxx.so._noabi
 COPY --from=build /usr/local/lib/libbsoncxx.so.3.11.0-pre /usr/lib/
 RUN ln -s /usr/lib/libbsoncxx.so.3.11.0-pre /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
+
+# Install boost
+COPY --from=build /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/
