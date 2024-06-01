@@ -143,7 +143,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
 
         // Logging
-        DefineStringProperty("awsmock.service.logging.level", "AWSMOCK_LOG_LEVEL", "information");
+        DefineStringProperty("awsmock.service.logging.level", "AWSMOCK_LOG_LEVEL", "info");
         DefineStringProperty("awsmock.service.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
 
         // Database

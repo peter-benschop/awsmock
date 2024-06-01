@@ -8,10 +8,16 @@ namespace AwsMock::Core {
 
     DomainSocketResult DomainSocket::SendJson(http::verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
+        boost::system::error_code ec;
+
         boost::asio::io_context ctx;
         boost::asio::local::stream_protocol::endpoint endpoint(_path);
         boost::asio::local::stream_protocol::socket socket(ctx);
-        socket.connect(endpoint);
+        socket.connect(endpoint, ec);
+        if (ec) {
+            log_error << "Could not connect to docker UNIX domain socket, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket, error: " + ec.message()};
+        }
 
         // Prepare message
         http::request<http::string_body> request = PrepareJsonMessage(method, path, body, headers);
@@ -22,11 +28,11 @@ namespace AwsMock::Core {
         boost::asio::write(socket, boost::asio::buffer(oss.str()), boost::asio::transfer_all());
 
         boost::beast::flat_buffer buffer;
-        boost::system::error_code ec;
         http::response<http::string_body> response;
         read(socket, buffer, response, ec);
-        if (!ec && ec.message() != "Success") {
-            log_error << "Send to docker daemon failed, error: " << ec.message();
+        if (ec) {
+            log_error << "Read from docker daemon failed, error: " << ec.message();
+            return {.statusCode = http::status::internal_server_error, .body = "Read from docker daemon failed, error: " + ec.message()};
         }
         socket.close();
         return PrepareResult(response);
@@ -35,10 +41,16 @@ namespace AwsMock::Core {
     // TODO:: test the solution, once the boost is finiahed.
     DomainSocketResult DomainSocket::SendBinary(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
 
+        boost::system::error_code ec;
+
         boost::asio::io_context ctx;
         boost::asio::local::stream_protocol::endpoint endpoint(_path);
         boost::asio::local::stream_protocol::socket socket(ctx);
-        socket.connect(endpoint);
+        socket.connect(endpoint, ec);
+        if (ec) {
+            log_error << "Could not connect to docker UNIX domain socket";
+            return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
+        }
 
         // Prepare message
         http::request<http::file_body> request = PrepareBinaryMessage(method, path, filename, headers);
@@ -47,7 +59,6 @@ namespace AwsMock::Core {
         boost::beast::http::write(socket, request);
 
         boost::beast::flat_buffer buffer;
-        boost::system::error_code ec;
         http::response<http::string_body> response;
         read(socket, buffer, response, ec);
         if (!ec && ec.message() != "Success") {
