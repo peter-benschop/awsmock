@@ -87,7 +87,7 @@ namespace AwsMock::Service {
             _dockerService->StartDockerContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
-            log_warning << "Docker containers for DynamoDB already running";
+            log_info << "Docker containers for DynamoDB already running";
         }
     }
 
@@ -112,7 +112,7 @@ namespace AwsMock::Service {
             _dockerService->StopContainer(container);
             log_info << "Docker containers for DynamoDB stopped";
         } else {
-            log_warning << "Docker containers for DynamoDB not running";
+            log_info << "Docker containers for DynamoDB not running";
         }
     }
 

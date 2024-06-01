@@ -531,7 +531,9 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
 
-                auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groups.groupName", groupName)));
+                auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId),
+                                                                     kvp("groups",
+                                                                         make_document(kvp("$elemMatch", make_document(kvp("groupName", groupName)))))));
                 for (auto user: userCursor) {
                     Entity::Cognito::User result;
                     result.FromDocument(user);
@@ -804,13 +806,13 @@ namespace AwsMock::Database {
         if (_hasDatabase) {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _groupPoolCollection = (*client)[_databaseName][_groupCollectionName];
+            mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto result = _groupPoolCollection.delete_many(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
+                auto result = _groupCollection.delete_many(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
                 session.commit_transaction();
                 log_debug << "Group deleted, groupName: " << groupName << " count: " << result->deleted_count();
 
