@@ -18,7 +18,7 @@ namespace AwsMock::Dto::Transfer {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
             rootJson.set("ServerId", serverId);
-            rootJson.set("NextToken", nextToken);
+            //rootJson.set("NextToken", nextToken);
             rootJson.set("Users", usersJsonArray);
 
             return Core::JsonUtils::ToJsonString(rootJson);

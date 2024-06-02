@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
     boost::program_options::options_description desc("Options");
     desc.add_options()("pretty", "produce JSON pretty output");
     desc.add_options()("include-objects", "include objects in export");
-    desc.add_options()("show-ftp-users", "show current ftp users");
     desc.add_options()("help", "produce help message");
     desc.add_options()("version", "application version");
     desc.add_options()("config", boost::program_options::value<std::string>(), "set configuration file");

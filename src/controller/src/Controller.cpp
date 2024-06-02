@@ -161,7 +161,12 @@ namespace AwsMock::Controller {
 
         } else if (std::find(_commands.begin(), _commands.end(), "show-ftp-users") != _commands.end()) {
 
-            std::string serverId = _vm["serverId"].as<std::string>();
+            if (_commands.size() != 2) {
+                std::cerr << "ServerId missing!";
+                return;
+            }
+
+            std::string serverId = _commands[1];
             ShowFtpUsers(serverId);
         }
     }
@@ -409,7 +414,7 @@ namespace AwsMock::Controller {
 
         Dto::Transfer::Server server = {.serverId = serverId};
 
-        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", server.ToJson(), headers);
+        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", server.ToJson(), headers);
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
             return;

@@ -30,7 +30,14 @@ namespace AwsMock::Service {
                 Dto::Transfer::ListServerRequest transferRequest = {.region = region};
                 transferRequest.FromJson(body);
                 Dto::Transfer::ListServerResponse transferResponse = _transferService.ListServers(transferRequest);
-                std::string tmp = transferResponse.ToJson();
+                return SendOkResponse(request, transferResponse.ToJson());
+
+            } else if (target == "TransferService.ListUsers") {
+
+                std::string serverId;
+                Dto::Transfer::ListUsersRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+                Dto::Transfer::ListUsersResponse transferResponse = _transferService.ListUsers(transferRequest);
                 return SendOkResponse(request, transferResponse.ToJson());
 
             } else if (target == "TransferService.StartServer") {

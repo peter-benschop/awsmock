@@ -69,6 +69,11 @@ namespace AwsMock::Dto::Transfer {
         std::string nextToken;
 
         /**
+         * Password
+         */
+        std::string password;
+
+        /**
          * @brief Creates a JSON string from the object.
          *
          * @return JSON string

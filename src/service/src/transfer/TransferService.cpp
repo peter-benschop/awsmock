@@ -64,12 +64,13 @@ namespace AwsMock::Service {
             }
 
             // Add user
-            // TODO: Find a way to list the user/password, in case we're running in a docker container and using the
-            // in-memory database.
+            std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId");
+            std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
             Database::Entity::Transfer::User user = {
                     .userName = request.userName,
-                    .password = request.userName,//Core::StringUtils::GenerateRandomPassword(8),
-                    .homeDirectory = request.homeDirectory};
+                    .password = Core::StringUtils::GenerateRandomPassword(8),
+                    .homeDirectory = request.homeDirectory,
+                    .arn = userArn};
             transferEntity.users.emplace_back(user);
 
             // Update database

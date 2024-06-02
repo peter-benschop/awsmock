@@ -170,6 +170,7 @@ namespace AwsMock::Core {
          * @param region AWS region
          * @param accountId AWS account ID
          * @param topicName name of the topic
+         * @return SNS topic ARN
          */
         static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
@@ -181,6 +182,7 @@ namespace AwsMock::Core {
          * @param region AWS region
          * @param accountId AWS account ID
          * @param topicName name of the topic
+         * @return SNS topic subscription ARN
          */
         static std::string CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
@@ -192,8 +194,22 @@ namespace AwsMock::Core {
          * @param region AWS region
          * @param accountId AWS account ID
          * @param serverId ID of the transfer manager
+         * @return transfer server ARN
          */
         static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
+
+        /**
+         * @brief Create transfer manager ARN
+         *
+         * <p>Syntax arn:aws:sns:us-west-2:123456789012:userName</p>
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param serverId ID of the transfer manager
+         * @param userName user name
+         * @return transfer user ARN
+         */
+        static std::string CreateTransferUserArn(const std::string &region, const std::string &accountId, const std::string &serverId, const std::string &userName);
 
         /**
          * @brief Create secrets manager ARN

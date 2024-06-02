@@ -30,7 +30,7 @@ as well as to show the current configuration.
 
 ## OPTIONS
 
-```--includeObjects```:  
+```--include-objects```:  
 adds objects to the export. By default, only the infrastructure elements are export (SQS queues,
 SNS topic, S3 buckets etc.). Settings this option will export also all object (S3 objects, SQS messages, SNS messages,
 etc.). Exporting also the objects will result in a rather huge output file, depending on your objects in the different
@@ -81,12 +81,17 @@ warning, error, fatal or none.
 ```config```  
 shows the configuration of the AwsMock API gateway.
 
-```export [modules] [--includeObjects] [--pretty]```  
-export the current infrastructure to stdout in JSON format. ```modules``` can be space separated
-list of AwsMock modules. If no modules are given or the module list contains ```all```, all modules will be exported.
+```export [modules] [--include-objects] [--pretty]```  
+export the current infrastructure to stdout in JSON format. ```modules``` can be space separated list of AwsMock
+modules. If no modules are given or the module list contains ```all```, all modules will be exported. IF oyu include
+the ```--include-objects``` also all object will be exported (SQS messages, SNS messages, S3 objects, etc.)
 
 ```import```  
 import the infrastructure from stdin in JSON format.
+
+```show-ftp-users```  
+shows the current FTP user (AWS Transfer Family) and their passwords. As AWS does not have the ability to see the
+password of a user (specially when you use the in-memory database, this provides a way to see the user passwords.
 
 ```clean```  
 cleans the infrastructure. This means all SQS queues plus messages, SNS topics plus messages, S3 buckets with all
@@ -159,6 +164,12 @@ Export the S3 infrastructure to a file ```infrastrcture.json```:
 
 ```
 /usr/bin/awsmockctl export s3 sqs > infrastrcture.json
+```
+
+Show a list of FTP users of server ```s-ed5ce1b1898c146f13e5```:
+
+```
+/usr/bin/awsmockctl show-ftp-user s-ed5ce1b1898c146f13e5
 ```
 
 ## AUTHOR

@@ -54,6 +54,16 @@ namespace AwsMock::Database::Entity::Transfer {
         std::string homeDirectory;
 
         /**
+         * ARN
+         */
+        std::string arn;
+
+        /**
+         * Role
+         */
+        std::string role;
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

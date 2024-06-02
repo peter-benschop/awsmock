@@ -36,6 +36,7 @@ namespace AwsMock::Dto::Transfer {
         Core::JsonUtils::GetJsonValueString("Arn", jsonObject, arn);
         Core::JsonUtils::GetJsonValueString("Role", jsonObject, role);
         Core::JsonUtils::GetJsonValueString("UserName", jsonObject, userName);
+        Core::JsonUtils::GetJsonValueString("Password", jsonObject, password);
         Core::JsonUtils::GetJsonValueString("HomeDirectory", jsonObject, homeDirectory);
         Core::JsonUtils::GetJsonValueInt("SshPublicKeyCount", jsonObject, sshPublicKeyCount);
     }
