@@ -134,7 +134,7 @@ namespace AwsMock::Service {
             server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::START_FAILED);
             server = _transferDatabase.UpdateTransfer(server);
 
-            log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message();
+            log_error << "Start transfer server request failed, serverId: " << server.serverId << " message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
     }

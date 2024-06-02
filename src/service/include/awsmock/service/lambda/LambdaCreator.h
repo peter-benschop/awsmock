@@ -16,9 +16,9 @@
 #include <boost/beast/core/detail/base64.hpp>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>

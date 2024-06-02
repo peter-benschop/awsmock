@@ -127,11 +127,13 @@ namespace AwsMock::Service {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it == _transferServerList.end()) {
                     StartTransferServer(transfer);
+                    log_info << "Transfer server started, serverId: " << transfer.serverId;
                 }
             } else if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE)) {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it != _transferServerList.end()) {
                     StopTransferServer(transfer);
+                    log_info << "Transfer server stopped, serverId: " << transfer.serverId;
                 }
             }
         }
@@ -140,6 +142,7 @@ namespace AwsMock::Service {
             if (!_transferDatabase.TransferExists(transfer.first)) {
                 Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(transfer.first);
                 StopTransferServer(server);
+                log_info << "Transfer server stopped, serverId: " << transfer.first;
             }
         }
     }

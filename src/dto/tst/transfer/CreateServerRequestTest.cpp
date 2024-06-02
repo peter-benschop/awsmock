@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 
 // Test includes

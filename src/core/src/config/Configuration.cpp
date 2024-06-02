@@ -2,7 +2,7 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 
 namespace AwsMock::Core {
 

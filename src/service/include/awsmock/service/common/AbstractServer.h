@@ -17,7 +17,7 @@
 #include <Poco/Task.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
 #include <awsmock/entity/module/ModuleState.h>

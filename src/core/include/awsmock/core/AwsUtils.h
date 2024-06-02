@@ -20,7 +20,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>

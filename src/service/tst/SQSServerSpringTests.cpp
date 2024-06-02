@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/sqs/SQSServer.h>

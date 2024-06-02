@@ -18,9 +18,9 @@
 #include <mongocxx/options/find_one_and_update.hpp>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>

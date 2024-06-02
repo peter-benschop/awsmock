@@ -21,7 +21,7 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
 

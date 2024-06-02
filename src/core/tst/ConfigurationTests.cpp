@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 // Local includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {

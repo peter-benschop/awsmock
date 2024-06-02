@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>

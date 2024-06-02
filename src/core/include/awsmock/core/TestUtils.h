@@ -10,7 +10,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/SystemUtils.h>
 
 #define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"
