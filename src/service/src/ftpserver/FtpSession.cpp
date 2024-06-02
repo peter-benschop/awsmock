@@ -767,10 +767,12 @@ namespace AwsMock::FtpServer {
                 }
             } else {
                 // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
+                log_error << "Not a directory, directory: " << local_path;
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
                 return;
             }
         } else {
+            log_error << "Path does not exist, directory: " << local_path;
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path does not exist");
             return;
         }

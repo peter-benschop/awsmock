@@ -36,7 +36,7 @@ namespace AwsMock::FtpServer {
 
         {
             asio::error_code ec;
-            _acceptor.open(endpoint.protocol(), ec);
+            ec = _acceptor.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening acceptor: " << ec.message();
                 return false;
@@ -45,7 +45,7 @@ namespace AwsMock::FtpServer {
 
         {
             asio::error_code ec;
-            _acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true), ec);
+            ec = _acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true), ec);
             if (ec) {
                 log_error << "Error setting reuse_address option: " << ec.message();
                 return false;
@@ -54,7 +54,7 @@ namespace AwsMock::FtpServer {
 
         {
             asio::error_code ec;
-            _acceptor.bind(endpoint, ec);
+            ec = _acceptor.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding acceptor: " << ec.message();
                 return false;
@@ -63,7 +63,7 @@ namespace AwsMock::FtpServer {
 
         {
             asio::error_code ec;
-            _acceptor.listen(asio::socket_base::max_listen_connections, ec);
+            ec = _acceptor.listen(asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on acceptor: " << ec.message();
                 return false;
@@ -71,7 +71,7 @@ namespace AwsMock::FtpServer {
         }
 
         log_debug << "FTP Handler created.";
-        log_debug << "Listening at address " << _acceptor.local_endpoint().address() << ":" << _acceptor.local_endpoint().port() << ":";
+        log_info << "Listening at address " << _acceptor.local_endpoint().address() << ":" << _acceptor.local_endpoint().port();
 
         _acceptor.async_accept(ftp_session->getSocket(), [this, ftp_session](auto ec) {
             _openConnectionCount++;
@@ -82,6 +82,7 @@ namespace AwsMock::FtpServer {
         for (size_t i = 0; i < thread_count; i++) {
             _threadPool.emplace_back([this] { _ioService.run(); });
         }
+        log_info << "Listening threads started, count: " << thread_count;
 
         return true;
     }

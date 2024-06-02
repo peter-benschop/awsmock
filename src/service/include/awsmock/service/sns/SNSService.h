@@ -58,7 +58,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService();
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
 
         /**
          * @brief Creates a new queue
@@ -152,11 +152,6 @@ namespace AwsMock::Service {
          * @param request SNS publish request
          */
         void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
-
-        /**
-         * Account ID
-         */
-        std::string _accountId;
 
         /**
          * SNS database connection

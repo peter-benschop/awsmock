@@ -77,7 +77,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService();
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Create lambda function
@@ -94,15 +94,6 @@ namespace AwsMock::Service {
          * @return CreateFunctionResponse
          */
         Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
-
-        /**
-         * @brief Invoke lambda function
-         *
-         * @param eventNotification S3 event eventNotification
-         * @param region AWS region
-         * @param user user
-         */
-        void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user);
 
         /**
          * @brief Invoke SQS function.
@@ -187,44 +178,9 @@ namespace AwsMock::Service {
         static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload);
 
         /**
-         * Data directory
-         */
-        std::string _dataDir;
-
-        /**
-         * lambda directory
-         */
-        std::string _lambdaDir;
-
-        /**
-         * Temp directory
-         */
-        std::string _tempDir;
-
-        /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * AWS account ID
-         */
-        std::string _accountId;
-
-        /**
          * lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
-
-        /**
-         * S3 database connection
-         */
-        Database::S3Database &_s3Database;
-
-        /**
-         * Docker module
-         */
-        std::shared_ptr<Service::DockerService> _dockerService;
 
         /**
          * Mutex

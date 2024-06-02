@@ -6,12 +6,6 @@
 
 namespace AwsMock::Service {
 
-    SQSService::SQSService() : _database(Database::SQSDatabase::instance()) {
-
-        // Initialize environment
-        _accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
-    }
-
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
         Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;

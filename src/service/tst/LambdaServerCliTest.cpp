@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/lambda/LambdaServer.h"
 #include "awsmock/service/lambda/LambdaService.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
 

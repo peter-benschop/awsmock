@@ -23,6 +23,8 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 #include <awsmock/dto/transfer/CreateServerResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
@@ -39,7 +41,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Transfer family service
+     * @brief Transfer family service
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -48,14 +50,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration module configuration
+         * @brief Constructor
          */
-        explicit TransferService(Core::Configuration &configuration);
+        explicit TransferService() : _transferDatabase(Database::TransferDatabase::instance()){};
 
         /**
-         * Create transfer server request
+         * @brief Create transfer server request
          *
          * @param request create server request
          * @return CreateServerResponse
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
         Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request);
 
         /**
-         * Create a user for the transfer manager.
+         * @brief Create a user for the transfer manager.
          *
          * @param request create user request
          * @return CreateUserResponse
@@ -73,7 +73,7 @@ namespace AwsMock::Service {
         Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
 
         /**
-         * Returns a list of available servers
+         * @brief Returns a list of available servers
          *
          * @param request list manager request
          * @return ListServerResponse
@@ -82,21 +82,21 @@ namespace AwsMock::Service {
         Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
 
         /**
-         * Starts an manager.
+         * @brief Starts an manager.
          *
          * @param request StartServer manager request
          */
         void StartServer(const Dto::Transfer::StartServerRequest &request);
 
         /**
-         * Stops an manager.
+         * @brief Stops an manager.
          *
          * @param request stop manager request
          */
         void StopServer(const Dto::Transfer::StopServerRequest &request);
 
         /**
-         * Deleted an manager.
+         * @brief Deleted an manager.
          *
          * @param request delete manager request
          */
@@ -105,29 +105,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * AWS account ID
-         */
-        std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * Transfer database connection
          */
         Database::TransferDatabase &_transferDatabase;
-
-        /**
-         * FTP port
-         */
-        int _ftpPort;
     };
 
 }// namespace AwsMock::Service

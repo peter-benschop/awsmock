@@ -10,7 +10,7 @@
 #include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/transfer/TransferService.h>
@@ -34,7 +34,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferHandler() : AbstractHandler(), _transferService(Core::Configuration::instance()) {}
+        explicit TransferHandler() = default;
 
         /**
          * @brief HTTP POST request.

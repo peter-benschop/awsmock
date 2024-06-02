@@ -10,7 +10,7 @@
 #include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>

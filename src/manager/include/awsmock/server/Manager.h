@@ -12,7 +12,7 @@
 #include <mongocxx/instance.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/core/monitoring/MetricSystemCollector.h>

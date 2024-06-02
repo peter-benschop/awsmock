@@ -21,7 +21,7 @@
 #include <mongocxx/uri.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Database {

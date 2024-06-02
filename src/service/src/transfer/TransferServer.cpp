@@ -19,7 +19,6 @@ namespace AwsMock::Service {
         // Create environment
         _region = _configuration.getString("awsmock.region");
         _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-        _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
 
         // S3 module connection
         _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
@@ -28,8 +27,8 @@ namespace AwsMock::Service {
         log_debug << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort;
 
         // Ensure base directory exists
-        Core::DirUtils::EnsureDirectory(_baseDir);
-        log_debug << "Using baseDir: " << _baseDir;
+        //Core::DirUtils::EnsureDirectory(_baseDir);
+        //log_debug << "Using baseDir: " << _baseDir;
 
         // Monitoring
         _transferMonitoring = std::make_unique<TransferMonitoring>(_monitoringPeriod);
@@ -57,6 +56,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::Run() {
+        CheckTransferServers();
     }
 
     void TransferServer::Shutdown() {
@@ -70,14 +70,17 @@ namespace AwsMock::Service {
         _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId, server.port, server.listenAddress);
         _transferServerList[server.serverId] = _ftpServer;
 
+        // Get base dir
+        std::string baseDir = Core::Configuration::instance().getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
+
         // Add users
         for (const auto &user: server.users) {
 
-            std::string homeDir = _baseDir + Poco::Path::separator() + user.homeDirectory;
+            std::string homeDir = baseDir + Poco::Path::separator() + user.homeDirectory;
 
             // Ensure the home directory exists
             Core::DirUtils::EnsureDirectory(homeDir);
-            log_debug << "Using homeDir: " << homeDir;
+            log_debug << "User creates, userId: " << user.userName << " homeDir: " << homeDir;
 
             // Add to FTP manager
             _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
@@ -124,11 +127,13 @@ namespace AwsMock::Service {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it == _transferServerList.end()) {
                     StartTransferServer(transfer);
+                    log_info << "Transfer server started, serverId: " << transfer.serverId;
                 }
             } else if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE)) {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it != _transferServerList.end()) {
                     StopTransferServer(transfer);
+                    log_info << "Transfer server stopped, serverId: " << transfer.serverId;
                 }
             }
         }
@@ -137,6 +142,7 @@ namespace AwsMock::Service {
             if (!_transferDatabase.TransferExists(transfer.first)) {
                 Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(transfer.first);
                 StopTransferServer(server);
+                log_info << "Transfer server stopped, serverId: " << transfer.first;
             }
         }
     }

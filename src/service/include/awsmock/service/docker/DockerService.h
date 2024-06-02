@@ -16,8 +16,8 @@
 #include <boost/thread/thread.hpp>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
