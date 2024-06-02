@@ -29,8 +29,6 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param configuration application configuration
          */
         explicit LambdaHandler() : AbstractHandler() {}
 

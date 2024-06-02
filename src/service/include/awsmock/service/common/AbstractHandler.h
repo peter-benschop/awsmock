@@ -61,7 +61,6 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param user current user
          * @return HTTP response
-         * @return HTTP response
          */
         virtual http::response<http::dynamic_body> HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
@@ -69,8 +68,8 @@ namespace AwsMock::Service {
          * @brief Handles the HTTP method POST.
          *
          * @param request HTTP request
-         * @param response HTTP response
-         * @param s3Command S3 client command
+         * @param region AWS region
+         * @param user current user
          * @return HTTP response
          */
         virtual http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
@@ -111,7 +110,7 @@ namespace AwsMock::Service {
          * @param request HTTP request object
          * @param fileName file to send
          * @param contentLength content length of the stream in bytes
-         * @param extraHeader HTTP header map values, added to the default headers
+         * @param headers HTTP header map values, added to the default headers
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendOkResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long contentLength, const std::map<std::string, std::string> &headers = {});
@@ -131,7 +130,7 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @param body HTTP body payload
          * @param headers HTTP header map values, added to the default headers
-         * @param response HTTP response
+         * @return HTTP response
          */
         static http::response<http::dynamic_body> SendInternalServerError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 

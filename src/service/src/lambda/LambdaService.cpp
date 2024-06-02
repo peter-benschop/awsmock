@@ -38,30 +38,15 @@ namespace AwsMock::Service {
 
         } else {
 
-            std::string codeFileName = _lambdaDir + Poco::Path::separator() + request.functionName + "-" + "latest" + ".zip";
-            Database::Entity::Lambda::Environment environment = {
-                    .variables = request.environment.variables};
-            lambdaEntity = {
-                    .region = request.region,
-                    .user = request.user,
-                    .function = request.functionName,
-                    .runtime = request.runtime,
-                    .role = request.role,
-                    .handler = request.handler,
-                    .tags = request.tags,
-                    .arn = lambdaArn,
-                    .timeout = request.timeout,
-                    .environment = environment,
-                    .state = Database::Entity::Lambda::LambdaState::Pending,
-                    .stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating,
-                    .fileName = codeFileName,
-            };
+            Database::Entity::Lambda::Environment environment = {.variables = request.environment.variables};
+            lambdaEntity = Dto::Lambda::Mapper::map(request);
+            lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(request.region, _accountId, lambdaEntity.function);
         }
 
         // Update database
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Pending;
         lambdaEntity.stateReason = "Initializing";
-        lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Idle;
+        lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
         // Create lambda function asynchronously
@@ -165,7 +150,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda executor notification send, name: " << lambda.function;
 
         // Update database
-        lambda.lastInvocation = Poco::DateTime();
+        lambda.lastInvocation = std::chrono::system_clock::now();
         lambda.state = Database::Entity::Lambda::Active;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
         log_debug << "Lambda entity invoked, name: " << lambda.function;

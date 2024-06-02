@@ -151,23 +151,23 @@ namespace AwsMock::Manager {
                 });
 
         // Run the I/O service on the requested number of threads
-        std::vector<std::thread> v;
-        v.reserve(threads - 1);
+        std::vector<std::thread> worker;
+        worker.reserve(threads - 1);
         for (auto i = threads - 1; i > 0; --i)
-            v.emplace_back(
+            worker.emplace_back(
                     [&ioc] {
                         ioc.run();
                     });
         ioc.run();
 
-        // (If we get here, it means we got a SIGINT or SIGTERM)
-
-        // Block until all the threads exit
-        for (auto &t: v)
-            t.join();
-
         // Stop all services
         StopModules();
+
+        // Block until all the threads exit
+        for (auto &t: worker) {
+            t.join();
+        }
+
         log_info << "So long, and thanks for all the fish!";
     }
 

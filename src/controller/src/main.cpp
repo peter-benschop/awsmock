@@ -34,7 +34,8 @@
 /**
  * Main routine.
  *
- * @param args command line arguments.
+ * @param argc number of command line arguments.
+ * @param argv command line arguments.
  * @return system exit code.
  */
 int main(int argc, char *argv[]) {

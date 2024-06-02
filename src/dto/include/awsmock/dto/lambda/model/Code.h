@@ -21,49 +21,47 @@
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * Lambda code DTO
+     * @brief Lambda code DTO
      *
      * Example:
      * @code{.json}
      * "Code": {
-     *    "ImageUri": "string",
-     *    "Location": "string",
-     *    "RepositoryType": "string",
-     *    "ResolvedImageUri": "string"
-     * }
+     *   "ImageUri": "string",
+     *   "S3Bucket": "string",
+     *   "S3Key": "string",
+     *   "S3ObjectVersion": "string",
+     *   "ZipFile": blob
+     * },
      * @endcode
+     *
      */
     struct Code {
 
         /**
-         * Image URI
+         * URI of a container image in the Amazon ECR registry.
          */
         std::string imageUri;
 
         /**
-         * Location
-         */
-        std::string location;
-
-        /**
-         * S3 bucket
+         * An Amazon S3 bucket in the same AWS Region as your function. The bucket can be in a different AWS account.
          */
         std::string s3Bucket;
 
         /**
-         * S3 key
+         * The Amazon S3 key of the deployment package.
          */
         std::string s3Key;
 
         /**
-         * S3 object version
+         * For versioned objects, the version of the deployment package object to use.
          */
         std::string s3ObjectVersion;
 
         /**
          * Zipped function code.
          *
-         * <p>The base64-encoded contents of the deployment package. AWS SDK and AWS CLI clients handle the encoding for you.</p>
+         * @par
+         * The base64-encoded contents of the deployment package. AWS SDK and AWS CLI clients handle the encoding for you.
          */
         std::string zipFile;
 
@@ -78,35 +76,35 @@ namespace AwsMock::Dto::Lambda {
         std::string resolvedImageUri;
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @param jsonObject json object
          */
         void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

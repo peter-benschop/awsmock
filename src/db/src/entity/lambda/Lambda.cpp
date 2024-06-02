@@ -56,13 +56,14 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("concurrency", concurrency),
                 kvp("codeSha256", codeSha256),
                 kvp("environment", varDoc),
+                kvp("code", code.ToDocument()),
                 kvp("state", LambdaStateToString(state)),
                 kvp("stateReason", stateReason),
                 kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
-                kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
-                kvp("lastInvocation", bsoncxx::types::b_date(std::chrono::milliseconds(lastInvocation.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
+                kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
         return lambdaDoc;
     }
 
@@ -90,10 +91,10 @@ namespace AwsMock::Database::Entity::Lambda {
         state = LambdaStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
         stateReason = bsoncxx::string::to_string(mResult.value()["stateReason"].get_string().value);
         stateReasonCode = LambdaStateReasonCodeFromString(bsoncxx::string::to_string(mResult.value()["stateReasonCode"].get_string().value));
-        lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-        lastInvocation = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value) / 1000));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value);
+        lastInvocation = bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value);
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
@@ -103,6 +104,11 @@ namespace AwsMock::Database::Entity::Lambda {
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
             }
+        }
+
+        // Get code
+        if (mResult.value().find("code") != mResult.value().end()) {
+            code.FromDocument(mResult.value()["code"].get_document().value);
         }
     }
 
@@ -131,8 +137,8 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("environment", environment.ToJsonObject());
             jsonObject.set("state", LambdaStateToString(state));
             jsonObject.set("stateReason", stateReason);
-            jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
-            jsonObject.set("lastInvocation", Poco::DateTimeFormatter::format(lastInvocation, Poco::DateTimeFormat::ISO8601_FORMAT));
+            jsonObject.set("lastStarted", Core::DateTimeUtils::ISO8601(lastStarted));
+            jsonObject.set("lastInvocation", Core::DateTimeUtils::ISO8601(lastInvocation));
 
             // Tags
             if (!tags.empty()) {

@@ -61,7 +61,7 @@ namespace AwsMock::Service {
         /**
          * @brief Starts a module
          *
-         * @param name module name
+         * @param modules list of modules
          * @return updated module list
          */
         Dto::Module::Module::ModuleList StartModules(Dto::Module::Module::ModuleList &modules);

@@ -6,11 +6,6 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    /**
-     * Convert from a JSON object.
-     *
-     * @param jsonObject json object
-     */
     void Code::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
         try {
@@ -35,15 +30,12 @@ namespace AwsMock::Dto::Lambda {
 
         Poco::JSON::Object rootObject;
         try {
+
             rootObject.set("ZipFile", zipFile);
             rootObject.set("S3Bucket", s3Bucket);
             rootObject.set("S3Key", s3Key);
             rootObject.set("S3ObjectVersion", s3ObjectVersion);
             rootObject.set("ImageUri", imageUri);
-            rootObject.set("ImageUri", imageUri);
-            rootObject.set("Location", location);
-            rootObject.set("RepositoryType", repositoryType);
-            rootObject.set("ResolvedImageUri", resolvedImageUri);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

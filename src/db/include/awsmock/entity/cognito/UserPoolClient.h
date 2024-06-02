@@ -115,7 +115,7 @@ namespace AwsMock::Database::Entity::Cognito {
          * @brief Stream provider.
          *
          * @param os output stream
-         * @param userPool userPool entity
+         * @param userPoolClient userPool client entity
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const UserPoolClient &userPoolClient);

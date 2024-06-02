@@ -37,7 +37,8 @@ namespace AwsMock::Service {
         /**
          * Constructor
          *
-         * @param url lambda docker URL
+         * @param host lambda docker host name
+         * @param port lambda docker port
          * @param payload event payload
          */
         explicit LambdaExecutor(std::string host, int port, std::string payload) : Core::Task("lambda-executor"), _host(std::move(host)), _port(port), _payload(std::move(payload)){};

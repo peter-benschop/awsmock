@@ -35,15 +35,14 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit DynamoDbHandler();
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
          * @return HTTP response

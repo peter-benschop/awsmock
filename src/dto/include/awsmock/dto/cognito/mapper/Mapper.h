@@ -67,7 +67,6 @@ namespace AwsMock::Dto::Cognito {
          *
          * @param request original request
          * @param userPoolList cognito user pool entity list
-         * @param request request struct
          * @return ListUserPoolResponse
          * @see ListUserPoolResponse
          */
@@ -141,7 +140,6 @@ namespace AwsMock::Dto::Cognito {
          *
          * @param request original request
          * @param userPool cognito user pool entity
-         * @param request request struct
          * @return DescribeUserPoolResponse
          * @see DescribeUserPoolResponse
          */

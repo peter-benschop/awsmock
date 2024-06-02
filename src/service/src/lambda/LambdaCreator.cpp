@@ -42,7 +42,7 @@ namespace AwsMock::Service {
 
         // Update database
         lambdaEntity.containerId = container.id;
-        lambdaEntity.lastStarted = Poco::DateTime();
+        lambdaEntity.lastStarted = std::chrono::system_clock::now();
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
         lambdaEntity.stateReason = "Activated";
         Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
@@ -52,13 +52,40 @@ namespace AwsMock::Service {
 
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
-        if (zipFile.empty()) {
-            log_error << "Empty lambda zip file";
-            return;
+        std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+        std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
+        std::string s3DataDir = dataDir + Poco::Path::separator() + "s3";
+        std::string lambdaDir = dataDir + Poco::Path::separator() + "lambda";
+
+        std::string zFile;
+        std::string base64File = lambdaDir + Poco::Path::separator() + lambdaEntity.function + "-" + dockerTag + ".zip";
+
+        // Write base64 zip file, either from S3 bucket/key or from supplied string
+        if (lambdaEntity.code.zipFilename.empty()) {
+
+            // Get internal name of S3 object
+            Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambdaEntity.region, lambdaEntity.code.s3Bucket, lambdaEntity.code.s3Key);
+            std::string fullFilename = s3DataDir + Poco::Path::separator() + s3Object.internalName;
+
+            // Write Base64 ZIP file
+            zFile = WriteBase64File(fullFilename, base64File);
+
+            Core::FileUtils::CopyTo(base64File, codeDir + Poco::Path::separator() + lambdaEntity.function + "-" + dockerTag + ".zip");
+            lambdaEntity.fileName = lambdaDir + Poco::Path::separator() + lambdaEntity.function + "-" + dockerTag + ".zip";
+
+        } else {
+
+            // If we do not have a local file already, write the Base64 encoded file to lambda dir
+            if (!Core::FileUtils::FileExists(base64File)) {
+                std::ofstream ofs(base64File);
+                ofs << zipFile;
+                ofs.close();
+            }
+            zFile = zipFile;
         }
 
         // Unzip provided zip-file into a temporary directory
-        std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName);
+        codeDir = UnpackZipFile(codeDir, zFile, lambdaEntity.runtime, lambdaEntity.fileName);
         log_debug << "Lambda file unzipped, codeDir: " << codeDir;
 
         // Build the docker image using the docker module
@@ -80,34 +107,27 @@ namespace AwsMock::Service {
     void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         try {
+
             std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-            Dto::Docker::CreateContainerResponse
-                    containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
+            Dto::Docker::CreateContainerResponse containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
             log_debug << "Lambda container created, hostPort: " << lambdaEntity.hostPort;
+
         } catch (std::exception &exc) {
             log_error << exc.what();
         }
     }
 
-    std::string LambdaCreator::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName) {
+    std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime, const std::string &fileName) {
 
         std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
         std::string tempDir = dataDir + Poco::Path::separator() + "tmp";
 
-        // If we do not have a local file already, write the Base64 encoded file to lambda dir
-        if (!Core::FileUtils::FileExists(fileName)) {
-            std::ofstream ofs(fileName);
-            ofs << zipFile;
-            ofs.flush();
-            ofs.close();
-        }
-
-        // Base64 decode file
+        // Decode Base64 file
         std::string decoded = Core::Crypto::Base64Decode(zipFile);
 
-        // Create directory
         try {
-            std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+
+            // Save zip file
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create classes directory
@@ -122,9 +142,6 @@ namespace AwsMock::Service {
                 log_debug << "ZIP file unpacked, dir: " << codeDir;
 
             } else {
-
-                // Create directory
-                Core::DirUtils::EnsureDirectory(codeDir);
 
                 // Write to temp file
                 std::ofstream ofs(tempDir + "/zipfile.zip");
@@ -169,5 +186,39 @@ namespace AwsMock::Service {
             return lambda.GetTagValue("tag");
         }
         return "latest";
+    }
+
+    template<typename Out>
+    Out load_file(std::string const &filename, Out out) {
+        std::ifstream ifs(filename, std::ios::binary);
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
+        return std::copy(std::istreambuf_iterator<char>(ifs), {}, out);
+    }
+
+    std::string LambdaCreator::WriteBase64File(const std::string &filename, const std::string &base64Filename) {
+
+        // If it does not exist already
+        if (!Core::FileUtils::FileExists(base64Filename)) {
+
+            // Load file
+            std::vector<char> input;
+            load_file(filename, back_inserter(input));
+
+            // Allocate "enough" space, using an upperbound prediction:
+            std::string encoded(boost::beast::detail::base64::encoded_size(input.size()), '\0');
+
+            // Encode returns the actual encoded_size
+            auto encoded_size = boost::beast::detail::base64::encode(encoded.data(), input.data(), input.size());
+            encoded.resize(encoded_size);
+            std::ofstream(base64Filename) << encoded;
+            return encoded;
+
+        } else {
+
+            std::ifstream ifs(base64Filename);
+            std::stringstream ss;
+            ss << ifs.rdbuf();
+            return ss.str();
+        }
     }
 }// namespace AwsMock::Service

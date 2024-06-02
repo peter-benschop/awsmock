@@ -42,8 +42,7 @@ namespace AwsMock::Service {
          * Handles all GET requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
-         * @return response structure
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::dynamic_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
@@ -53,7 +52,7 @@ namespace AwsMock::Service {
          * Handles all PUT requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::dynamic_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
@@ -63,7 +62,7 @@ namespace AwsMock::Service {
          * Handles all POST requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::dynamic_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
@@ -73,7 +72,7 @@ namespace AwsMock::Service {
          * Handles all DELETE requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::dynamic_body> HandleDeleteRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
@@ -83,7 +82,7 @@ namespace AwsMock::Service {
          * Handles all HEAD requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::dynamic_body> HandleHeadRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
 
@@ -94,6 +93,7 @@ namespace AwsMock::Service {
          *
          * @param request HTTP request
          * @param body HTTP body
+         * @return HTTP response
          */
         static boost::beast::http::response<boost::beast::http::dynamic_body> SendOkResponse(boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &body = {});
     };

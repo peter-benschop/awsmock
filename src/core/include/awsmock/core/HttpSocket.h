@@ -32,8 +32,6 @@ namespace AwsMock::Core {
 
         /**
          * @brief Constructor
-         *
-         * @param path domain socket path
          */
         explicit HttpSocket() = default;
 
@@ -58,8 +56,8 @@ namespace AwsMock::Core {
          * @param method HTTP method
          * @param host HTTP host
          * @param port HTTP port
-         * @param path URL path
          * @param filename name of the local file
+         * @param body message body
          * @param headers HTTP headers
          * @return HTTP response
          */
@@ -91,8 +89,8 @@ namespace AwsMock::Core {
         /**
          * @brief Prepare HTTP response
          *
-         * @param result HTTP response
-         * @return result struct
+         * @param response HTTP response
+         * @return response struct
          * @see Core::DomainSocketResult
          */
         static HttpSocketResponse PrepareResult(http::response<http::string_body> response);
@@ -100,8 +98,8 @@ namespace AwsMock::Core {
         /**
          * @brief Prepare HTTP response
          *
-         * @param result HTTP response
-         * @return result struct
+         * @param response HTTP response
+         * @return response struct
          * @see Core::DomainSocketResult
          */
         static HttpSocketResponse PrepareResult(http::response<http::dynamic_body> response);

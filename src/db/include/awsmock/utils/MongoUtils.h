@@ -23,23 +23,7 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * @brief Converts a boost::ptime to a bsoncxx::date
-         *
-         * @param dateTime boost ptime
-         * @return bsoncxx::types::b_date
-         */
-        //static bsoncxx::types::b_date ToBson(const ptime &dateTime);
-
-        /**
-         * @brief Converts a boost::ptime to a bsoncxx::date
-         *
-         * @param dateTime bson datetime
-         * @return boost ptime
-         */
-        //static ptime FromBson(const bsoncxx::types::b_date &dataTime);
-
-        /**
-         * Converts a Poco Datetime to a bsoncxx::date
+         * @brief Converts a Poco Datetime to a bsoncxx::date
          *
          * @param date Poco::DateTime value
          * @return bsoncxx::types::b_date
@@ -47,17 +31,12 @@ namespace AwsMock::Database {
         static bsoncxx::types::b_date ToBson(const Poco::DateTime &date);
 
         /**
-         * Converts a bsoncxx::date to a Poco Datetime
+         * @brief Converts a bsoncxx::date to a Poco Datetime
          *
          * @param date bsoncxx::types::b_date
          * @return Poco::DateTime value
          */
         static Poco::DateTime FromBson(bsoncxx::types::b_date date);
-
-        /**
-         * Epoch start
-         */
-        //static constexpr const boost::gregorian::date epoch = boost::gregorian::date(1970, 1, 1);
     };
 
 }// namespace AwsMock::Database

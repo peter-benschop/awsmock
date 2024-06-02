@@ -52,7 +52,7 @@ namespace AwsMock::Controller {
          * Initialization
          *
          * @param vm vector of command line options
-         * @param command vector of commands
+         * @param commands vector of commands
          */
         void Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands);
 

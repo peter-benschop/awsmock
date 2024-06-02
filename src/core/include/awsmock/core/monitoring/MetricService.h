@@ -242,7 +242,7 @@ namespace AwsMock::Core {
          * @param labelValue label value of the counter
          * @return true if gauge exists.
          */
-        bool GaugeExists(const std::string &name, const std::string &label, const std::string &labelValue);
+        bool GaugeExists(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * @brief Get a specific metric

@@ -404,29 +404,9 @@ namespace AwsMock::Service {
         static void GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
 
         /**
-         * Data directory
-         */
-        std::string _dataDir;
-
-        /**
-         * Data S3 dir
-         */
-        std::string _dataS3Dir;
-
-        /**
-         * Transfer manager base directory
-         */
-        std::string _transferDir;
-
-        /**
          * Transfer manager bucket
          */
         std::string _transferBucket;
-
-        /**
-         * Temp directory
-         */
-        std::string _tempDir;
 
         /**
          * Database connection
