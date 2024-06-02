@@ -67,7 +67,7 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::startSendingMessages() {
 
-        log_debug << "FTP >> " << command_output_queue_.front();
+        log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
         asio::async_write(command_socket_, asio::buffer(command_output_queue_.front()), command_write_strand_.wrap([me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
             if (!ec) {
                 me->command_output_queue_.pop_front();

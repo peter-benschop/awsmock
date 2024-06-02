@@ -33,8 +33,7 @@ namespace AwsMock::Service {
         transferEntity = _transferDatabase.CreateTransfer(transferEntity);
 
         // Create response
-        Dto::Transfer::CreateServerResponse
-                response{.region = transferEntity.region, .serverId = serverId, .arn = transferArn};
+        Dto::Transfer::CreateServerResponse response{.region = transferEntity.region, .serverId = serverId, .arn = transferArn};
 
         return response;
     }
