@@ -6,12 +6,6 @@
 
 namespace AwsMock::Service {
 
-    SNSService::SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {
-
-        // Initialize environment
-        _accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
-    }
-
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {
         Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
@@ -30,7 +24,8 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, _accountId, request.topicName);
+            std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
+            std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn});
             log_trace << "SNS topic created: " << topic.ToString();
 
@@ -84,7 +79,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
+        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "publish");
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
@@ -129,17 +124,20 @@ namespace AwsMock::Service {
 
             // Check topic/target ARN
             if (request.topicArn.empty()) {
+                log_error << "Topic ARN missing";
                 throw Core::ServiceException("Topic ARN missing");
             }
 
             // Check existence
             if (!_snsDatabase.TopicExists(request.topicArn)) {
+                log_error << "SNS topic does not exists";
                 throw Core::ServiceException("SNS topic does not exists");
             }
 
             // Create new subscription
+            std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, _accountId, topic.topicName);
+            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
             Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint};
             if (!topic.HasSubscription(subscription)) {
@@ -170,7 +168,8 @@ namespace AwsMock::Service {
 
             // Check topic/target ARN
             if (request.subscriptionArn.empty()) {
-                throw Core::ServiceException("Subscription ARN missing", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+                log_error << "Subscription ARN missing";
+                throw Core::ServiceException("Subscription ARN missing");
             }
 
             // Create new subscription
@@ -178,11 +177,11 @@ namespace AwsMock::Service {
 
             for (auto &topic: topics) {
 
-                // Add subscription
-                topic.subscriptions.erase(std::remove_if(topic.subscriptions.begin(), topic.subscriptions.end(), [&request](const auto &item) {
-                                              return item.subscriptionArn == request.subscriptionArn;
-                                          }),
-                                          end(topic.subscriptions));
+                // Remove subscription
+                const auto count = std::erase_if(topic.subscriptions, [request](const auto &item) {
+                    return item.subscriptionArn == request.subscriptionArn;
+                });
+                log_debug << "Subscription removed, count" << count;
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
@@ -193,29 +192,6 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    Dto::SNS::GetTopicAttributesResponse SNSService::GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_attributes");
-        log_trace << "Get topic attributes request: " << request.ToString();
-
-        try {
-
-            // Check existence
-            if (!_snsDatabase.TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-            return {
-                    .region = topic.region,
-                    .topicArn = topic.topicArn,
-                    .owner = topic.owner};
-
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS get topic attributes failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -246,6 +222,47 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::GetTopicAttributesResponse SNSService::GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) {
+        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_attributes");
+        log_trace << "Get topic attributes request: " << request.ToString();
+
+        try {
+
+            // Check existence
+            if (!_snsDatabase.TopicExists(request.topicArn)) {
+                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            return {
+                    .region = topic.region,
+                    .topicArn = topic.topicArn,
+                    .owner = topic.owner};
+
+        } catch (Poco::Exception &ex) {
+            log_error << "SNS get topic attributes failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
+        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscriptions");
+        log_trace << "Check subscriptions request: " << request.ToString();
+
+        Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+        if (!topic.subscriptions.empty()) {
+
+            for (const auto &it: topic.subscriptions) {
+
+                if (Poco::toLower(it.protocol) == SQS_PROTOCOL) {
+
+                    SendSQSMessage(it, request);
+                    log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
+                }
+            }
+        }
+    }
+
     Dto::SNS::TagResourceResponse SNSService::TagResource(const Dto::SNS::TagResourceRequest &request) {
         Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "tag_topic");
         log_trace << "Tag topic request: " << request.ToString();
@@ -270,24 +287,6 @@ namespace AwsMock::Service {
         } catch (Poco::Exception &ex) {
             log_error << "SNS tag resource failed, message: " << ex.message();
             throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscription");
-        log_trace << "Check subscriptions request: " << request.ToString();
-
-        Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-        if (!topic.subscriptions.empty()) {
-
-            for (const auto &it: topic.subscriptions) {
-
-                if (Poco::toLower(it.protocol) == SQS_PROTOCOL) {
-
-                    SendSQSMessage(it, request);
-                    log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
-                }
-            }
         }
     }
 

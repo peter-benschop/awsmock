@@ -40,12 +40,14 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit S3HashCreator(){};
+        explicit S3HashCreator() = default;
 
         /**
-         * Work method
+         * @brief Work method
+         *
+         * Generated several hashes for the S3 object (SHA1, SHA256, etc.)
          *
          * @param algorithms vector of algorithm names
          * @param object S3 object to hash

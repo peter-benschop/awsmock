@@ -6,22 +6,12 @@
 
 namespace AwsMock::Service {
 
-    S3Service::S3Service() : _database(Database::S3Database::instance()) {
-
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _accountId = configuration.getString("awsmock.account.userPoolId");
-
-        // Initialize directories
-        _user = configuration.getString("awsmock.user", DEFAULT_USER);
-        _region = configuration.getString("awsmock.region", DEFAULT_REGION);
-        _transferBucket = configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
-    }
-
     Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) {
         log_trace << "Create bucket request, s3Request: " << s3Request.ToString();
 
         // Get region
         std::string region = s3Request.region;
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId");
 
         // Check existence
         if (_database.BucketExists({.region = region, .name = s3Request.name})) {
@@ -30,8 +20,7 @@ namespace AwsMock::Service {
             log_debug << "Got bucket: " << s3Request.name;
             return {
                     .location = bucket.region,
-                    .arn = Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.name)};
-            //      throw Core::ServiceException("Bucket exists already");
+                    .arn = Core::AwsUtils::CreateArn("s3", region, accountId, s3Request.name)};
         }
 
         Dto::S3::CreateBucketResponse createBucketResponse;
@@ -41,7 +30,7 @@ namespace AwsMock::Service {
             // Update database
             _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner});
 
-            createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, _accountId, s3Request.name));
+            createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, accountId, s3Request.name));
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
             log_info << "Bucket created, bucket: " << s3Request.name;
 
@@ -254,7 +243,6 @@ namespace AwsMock::Service {
         std::string fileName = uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part);
         std::ofstream ofs(fileName);
         std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
-        //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();
         log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 
@@ -675,7 +663,8 @@ namespace AwsMock::Service {
         }
 
         // Check transfer bucket
-        if (request.bucket == _transferBucket) {
+        std::string transferBucket = Core::Configuration::instance().getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
+        if (request.bucket == transferBucket) {
             throw Core::NotFoundException("Transfer bucket cannot be deleted");
         }
 
@@ -781,8 +770,7 @@ namespace AwsMock::Service {
         return _database.CreateBucketNotification(bucket, bucketNotification);
     }
 
-    Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket,
-                                                                      const Dto::S3::PutBucketNotificationRequest &request) {
+    Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
 
         Database::Entity::S3::BucketNotification bucketNotification = {.event = request.event, .notificationId = request.notificationId, .lambdaArn = request.lambdaArn};
         return _database.CreateBucketNotification(bucket, bucketNotification);
@@ -838,7 +826,8 @@ namespace AwsMock::Service {
         Core::FileUtils::DeleteFile(filename);
         log_debug << "File system object deleted, filename: " << filename;
 
-        if (bucket == _transferBucket) {
+        std::string transferBucket = Core::Configuration::instance().getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
+        if (bucket == transferBucket) {
             filename = transferDir + Poco::Path::separator() + key;
             Core::FileUtils::DeleteFile(filename);
             log_debug << "Transfer file system object deleted, filename: " << filename;
@@ -867,27 +856,34 @@ namespace AwsMock::Service {
 
     void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
 
+        std::string region = Core::Configuration::instance().getString("awsmock.region", DEFAULT_REGION);
+
         SQSService _sqsService;
-        Dto::SQS::SendMessageRequest request = {.region = _region, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
+        Dto::SQS::SendMessageRequest request = {.region = region, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
         Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
     }
 
     void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
 
+        std::string region = Core::Configuration::instance().getString("awsmock.region", DEFAULT_REGION);
+
         SNSService _snsService;
-        Dto::SNS::PublishRequest request = {.region = _region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
+        Dto::SNS::PublishRequest request = {.region = region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
         log_debug << "SNS message request send, messageId: " << response.messageId;
     }
 
     void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) {
 
+        std::string region = Core::Configuration::instance().getString("awsmock.region", DEFAULT_REGION);
+        std::string user = Core::Configuration::instance().getString("awsmock.user", DEFAULT_USER);
+
         std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
         std::string functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), _region, _user);
+        _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), region, user);
         log_debug << "Lambda invocation finished send";
     }
 

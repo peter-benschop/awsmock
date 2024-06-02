@@ -120,7 +120,7 @@ namespace AwsMock::FtpServer {
         permission_string[6] = ((file_status_.st_mode & S_IREAD) != 0) ? 'r' : '-';
         permission_string[7] = ((file_status_.st_mode & S_IWRITE) != 0) ? 'w' : '-';
         permission_string[8] = ((file_status_.st_mode & S_IEXEC) != 0) ? 'x' : '-';
-#else   // WIN32 \
+#else // WIN32 \
         // Root
         permission_string[0] = ((file_status_.st_mode & S_IRUSR) != 0) ? 'r' : '-';
         permission_string[1] = ((file_status_.st_mode & S_IWUSR) != 0) ? 'w' : '-';
@@ -133,7 +133,7 @@ namespace AwsMock::FtpServer {
         permission_string[6] = ((file_status_.st_mode & S_IROTH) != 0) ? 'r' : '-';
         permission_string[7] = ((file_status_.st_mode & S_IWOTH) != 0) ? 'w' : '-';
         permission_string[8] = ((file_status_.st_mode & S_IXOTH) != 0) ? 'x' : '-';
-#endif  // WIN32
+#endif// WIN32
         return permission_string;
     }
 

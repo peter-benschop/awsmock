@@ -56,7 +56,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SQS service
+     * @brief SQS service
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -65,9 +65,9 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit SQSService();
+        explicit SQSService() : _database(Database::SQSDatabase::instance()){};
 
         /**
          * Creates a new queue.
@@ -80,7 +80,7 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request);
 
         /**
-         * Returns a list of all available queues
+         * @brief Returns a list of all available queues
          *
          * @param region AWS region
          * @return ListQueuesResponse
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
 
         /**
-         * Purge a queue.
+         * @brief Purge a queue.
          *
          * @param request purge queue request
          * @throws ServiceException
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
         /**
-         * Return the queue userAttributes
+         * @brief Return the queue userAttributes
          *
          * @param request get queue sqs request
          * @return GetQueueAttributesResponse
@@ -105,7 +105,7 @@ namespace AwsMock::Service {
         Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
 
         /**
-         * Return the queue userAttributes
+         * @brief Return the queue userAttributes
          *
          * @param request get queue sqs request
          * @return GetQueueAttributesResponse
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
         Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
 
         /**
-         * Set queue userAttributes
+         * @brief Set queue userAttributes
          *
          * @param request put queue sqs request
          * @return SetQueueAttributesResponse
@@ -123,7 +123,7 @@ namespace AwsMock::Service {
         Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
 
         /**
-         * Sets the message visibility timeout timeout.
+         * @brief Sets the message visibility timeout timeout.
          *
          * @param request set visibility timeout request
          * @throws ServiceException
@@ -131,7 +131,7 @@ namespace AwsMock::Service {
         void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request);
 
         /**
-         * Sets tags for a queue.
+         * @brief Sets tags for a queue.
          *
          * <p>
          * Existing tags will be updates, and not existing tags will be created.
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
         void TagQueue(const Dto::SQS::TagQueueRequest &request);
 
         /**
-         * Delete a queue
+         * @brief Delete a queue
          *
          * @param request delete request DTO
          * @return SQSQueueResponse
@@ -151,7 +151,7 @@ namespace AwsMock::Service {
         Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 
         /**
-         * Creates a new queue
+         * @brief Creates a new queue
          *
          * @param request create message request
          * @return SendMessageResponse
@@ -160,7 +160,7 @@ namespace AwsMock::Service {
         Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
         /**
-         * Receive a list of resources
+         * @brief Receive a list of resources
          *
          * @param request receive message request
          * @return ReceiveMessageResponse
@@ -169,7 +169,7 @@ namespace AwsMock::Service {
         Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
 
         /**
-         * Deletes a message
+         * @brief Deletes a message
          *
          * @param request delete message request DTO
          * @throws ServiceException
@@ -177,7 +177,7 @@ namespace AwsMock::Service {
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
         /**
-         * Deletes a message in a batch
+         * @brief Deletes a message in a batch
          *
          * @param request delete message batch request DTO
          * @throws ServiceException
@@ -187,17 +187,12 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Checks the attributes for a entry with 'all'. The search is case insensitive.
+         * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
          *
          * @param attributes vector of attributes.
          * @param value value to check for.
          */
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
-
-        /**
-         * Account ID
-         */
-        std::string _accountId;
 
         /**
          * Database connection

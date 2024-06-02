@@ -8,28 +8,15 @@ namespace AwsMock::Service {
 
     Poco::Mutex LambdaService::_mutex;
 
-    LambdaService::LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
-
-        // Initialize environment
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _accountId = configuration.getString("awsmock.account.userPoolId", "000000000000");
-        _dataDir = configuration.getString("awsmock.data.dir", "/home/awsmock/data");
-        _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-        _lambdaDir = _dataDir + Poco::Path::separator() + "lambda";
-        _dockerService = std::make_shared<Service::DockerService>();
-
-        // Create temp directory
-        Core::DirUtils::EnsureDirectory(_tempDir);
-        log_trace << "Lambda module initialized";
-    }
-
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", "000000000000");
+
         // Save to file
         Database::Entity::Lambda::Lambda lambdaEntity;
-        std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, _accountId, request.functionName);
+        std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 
@@ -40,7 +27,7 @@ namespace AwsMock::Service {
 
             Database::Entity::Lambda::Environment environment = {.variables = request.environment.variables};
             lambdaEntity = Dto::Lambda::Mapper::map(request);
-            lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(request.region, _accountId, lambdaEntity.function);
+            lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, lambdaEntity.function);
         }
 
         // Update database
@@ -53,8 +40,6 @@ namespace AwsMock::Service {
         LambdaCreator lambdaCreator;
         boost::thread t(boost::ref(lambdaCreator), request.code.zipFile, lambdaEntity.oid);
         t.detach();
-
-        //Core::TaskPool::instance().Add<std::string, LambdaCreator>;
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
         // Create response
@@ -99,36 +84,14 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user) {
-        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
-        log_debug << "Invocation event function eventNotification: " + eventNotification.ToString();
-
-        for (const auto &record: eventNotification.records) {
-
-            // Get the bucket eventNotification
-            Database::Entity::S3::Bucket bucket = _s3Database.GetBucketByRegionName(record.region, record.s3.bucket.name);
-            if (bucket.HasNotification(record.eventName)) {
-
-                Database::Entity::S3::BucketNotification notification = bucket.GetNotification(record.eventName);
-                log_debug << "Got bucket eventNotification: " << notification.ToString();
-
-                // Get the lambda entity
-                Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(notification.lambdaArn);
-                log_debug << "Got lambda entity eventNotification: " + lambda.ToString();
-
-                // Send invocation request
-                //_invokeQueue.enqueueNotification(new Dto::Lambda::InvocationNotification(lambda.function, eventNotification.ToJson(), region, user, "localhost", lambda.hostPort));
-                log_debug << "Lambda executor notification send, name: " + lambda.function;
-            }
-        }
-    }
-
     std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType) {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
         Poco::ScopedLock lock(_mutex);
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, _accountId, functionName);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", "000000000000");
+
+        std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
@@ -223,22 +186,24 @@ namespace AwsMock::Service {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();
 
+        DockerService &dockerService = DockerService::instance();
+
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
             throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
         // Delete the container, if existing
-        if (_dockerService->ContainerExists(request.functionName, "latest")) {
-            Dto::Docker::Container container = _dockerService->GetContainerByName(request.functionName, "latest");
-            _dockerService->DeleteContainer(container);
+        if (dockerService.ContainerExists(request.functionName, "latest")) {
+            Dto::Docker::Container container = dockerService.GetContainerByName(request.functionName, "latest");
+            dockerService.DeleteContainer(container);
             log_debug << "Docker container deleted, function: " + request.functionName;
         }
 
         // Delete the image, if existing
-        if (_dockerService->ImageExists(request.functionName, "latest")) {
-            Dto::Docker::Image image = _dockerService->GetImageByName(request.functionName, "latest");
-            _dockerService->DeleteImage(image.id);
+        if (dockerService.ImageExists(request.functionName, "latest")) {
+            Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, "latest");
+            dockerService.DeleteImage(image.id);
             log_debug << "Docker image deleted, function: " + request.functionName;
         }
 
