@@ -16,20 +16,6 @@ namespace AwsMock::Service {
         _requestTimeout = _configuration.getInt("awsmock.service.transfer.http.timeout", TRANSFER_DEFAULT_TIMEOUT);
         _monitoringPeriod = _configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
 
-        // Create environment
-        _region = _configuration.getString("awsmock.region");
-        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-
-        // S3 module connection
-        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
-        _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
-        log_debug << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort;
-
-        // Ensure base directory exists
-        //Core::DirUtils::EnsureDirectory(_baseDir);
-        //log_debug << "Using baseDir: " << _baseDir;
-
         // Monitoring
         _transferMonitoring = std::make_unique<TransferMonitoring>(_monitoringPeriod);
 

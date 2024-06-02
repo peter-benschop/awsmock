@@ -33,6 +33,9 @@ namespace AwsMock::Service {
 
         // Start REST module
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
+
+        // Create transfer bucket
+        CreateTransferBucket();
     }
 
     void S3Server::Run() {
@@ -42,5 +45,34 @@ namespace AwsMock::Service {
         log_debug << "Shutdown initiated, s3";
         _s3Monitoring->Stop();
         StopHttpServer();
+    }
+
+    void S3Server::CreateTransferBucket() {
+        if (Core::Configuration::instance().has("awsmock.service.transfer.bucket")) {
+
+            std::string region = Core::Configuration::instance().getString("awsmock.region");
+            std::string owner = Core::Configuration::instance().getString("awsmock.user");
+            std::string transferBucketName = Core::Configuration::instance().getString("awsmock.service.transfer.bucket");
+
+            if (!BucketExists(region, transferBucketName)) {
+                Dto::S3::CreateBucketRequest request = {.region = Core::Configuration::instance().getString("awsmock.region"), .name = transferBucketName, .owner = owner};
+                Dto::S3::CreateBucketResponse response = _s3Service.CreateBucket(request);
+                log_info << "Transfer bucket created, arn: " << response.arn;
+            }
+        }
+    }
+
+    bool S3Server::BucketExists(const std::string &region, const std::string &bucketName) {
+
+        try {
+
+            Dto::S3::GetMetadataRequest metaRequest = {.region = region, .bucket = bucketName};
+            Dto::S3::GetMetadataResponse metaResponse = _s3Service.GetBucketMetadata(metaRequest);
+            log_debug << "Transfer bucket exists, bucket: " << metaResponse.bucket;
+            return true;
+
+        } catch (Core::NotFoundException &ex) {
+            return false;
+        }
     }
 }// namespace AwsMock::Service

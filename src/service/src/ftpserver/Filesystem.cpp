@@ -22,6 +22,7 @@
 
 #else// WIN32
 
+#include "awsmock/core/LogStream.h"
 #include <cstring>
 #include <dirent.h>
 
@@ -39,7 +40,11 @@ namespace AwsMock::FtpServer {
         const int error_code = _wstat64(w_path_.c_str(), &file_status_);
 #else // WIN32
         const int error_code = stat(path.c_str(), &file_status_);
+        if (error_code) {
+            //log_error << "Cannot stat, file: " << path_ << " error: " << error_code;
+        }
 #endif// WIN32
+        is_ok_ = (error_code == 0);
     }
 
     bool FileStatus::isOk() const {

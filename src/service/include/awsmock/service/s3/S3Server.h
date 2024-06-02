@@ -8,9 +8,11 @@
 // AwsMock includes
 #include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3Monitoring.h>
+#include <awsmock/service/s3/S3Service.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
@@ -56,6 +58,19 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * @brief Create FTP transfer bucket
+         */
+        void CreateTransferBucket();
+
+        /**
+         * @brief Checks whether a bucket exists
+         *
+         * @param region AWS region
+         * @param bucketName name of the bucket
+         */
+        bool BucketExists(const std::string &region, const std::string &bucketName);
+
+        /**
          * Rest port
          */
         int _port;
@@ -74,6 +89,11 @@ namespace AwsMock::Service {
          * S3 monitoring
          */
         std::shared_ptr<S3Monitoring> _s3Monitoring;
+
+        /**
+         * S3 service
+         */
+        S3Service _s3Service;
 
         /**
          * HTTP max message queue length
