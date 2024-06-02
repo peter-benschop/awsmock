@@ -151,6 +151,15 @@ namespace AwsMock::Database {
         std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {});
 
         /**
+         * @brief Returns a list of transfer users.
+         *
+         * @param region AWS region name
+         * @param serverId AWS server ID
+         * @return list of transfer users
+         */
+        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId);
+
+        /**
          * @brief Returns the total number of servers.
          *
          * @param region AWS region name

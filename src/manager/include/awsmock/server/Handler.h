@@ -21,6 +21,7 @@
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/service/transfer/TransferService.h>
 
 namespace AwsMock::Manager {
 

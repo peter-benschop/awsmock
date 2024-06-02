@@ -59,6 +59,8 @@
 #define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_counter"
 #define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_counter"
 #define TRANSFER_SERVICE_TIMER "transfer_service_timer"
+#define TRANSFER_SERVER_FILESIZE_UPLAOD "transfer_upload_filesize"
+#define TRANSFER_SERVER_FILESIZE_DOWNLOAD "transfer_download_filesize"
 
 // KMS counter, timer
 #define KMS_KEY_COUNT "kms_key_counter"

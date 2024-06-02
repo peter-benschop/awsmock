@@ -23,6 +23,7 @@ namespace AwsMock::Service {
         Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.getInt("awsmock.service.gateway.http.max.queue", DEFAULT_MAX_QUEUE_SIZE);
         _bodyLimit = configuration.getInt("awsmock.service.gateway.http.max.body", DEFAULT_MAX_BODY_SIZE);
+        _timeout = configuration.getInt("awsmock.service.gateway.http.timeout", DEFAULT_TIMEOUT);
     };
 
     void GatewaySession::Run() {
@@ -30,6 +31,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoRead() {
+
         // Construct a new parser for each message
         parser_.emplace();
 
@@ -38,7 +40,7 @@ namespace AwsMock::Service {
         parser_->body_limit(_bodyLimit);
 
         // Set the timeout.
-        stream_.expires_after(std::chrono::seconds(300));
+        stream_.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
         http::async_read(stream_, buffer_, *parser_, boost::beast::bind_front_handler(&GatewaySession::OnRead, this->shared_from_this()));

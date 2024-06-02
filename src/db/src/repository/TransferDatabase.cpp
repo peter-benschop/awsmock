@@ -216,6 +216,36 @@ namespace AwsMock::Database {
         return transfers;
     }
 
+    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId) {
+
+        std::vector<Entity::Transfer::Transfer> transfers;
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
+
+                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("region", region), kvp("serverId", serverId)));
+                if (mResult.has_value()) {
+                    Entity::Transfer::Transfer result;
+                    result.FromDocument(mResult->view());
+                    log_trace << "Got transfer server, serverId:" << serverId;
+                    return result.users;
+                }
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "List servers failed, error: " << e.what();
+            }
+
+        } else {
+
+            return _memoryDb.ListUsers(region, serverId);
+        }
+        return {};
+    }
+
     long TransferDatabase::CountServers(const std::string &region) {
 
         long count = 0;

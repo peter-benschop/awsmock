@@ -63,6 +63,16 @@ namespace AwsMock::Database {
         return transferList;
     }
 
+    std::vector<Entity::Transfer::User> TransferMemoryDb::ListUsers(const std::string &region, const std::string &serverId) {
+
+        Entity::Transfer::Transfer server = GetTransferByServerId(serverId);
+        if (!server.users.empty()) {
+            log_trace << "Got user list, size: " << server.users.size();
+            return server.users;
+        }
+        return {};
+    }
+
     Entity::Transfer::Transfer TransferMemoryDb::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
         Poco::ScopedLock lock(_transferMutex);
 

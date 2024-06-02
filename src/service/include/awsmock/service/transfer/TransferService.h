@@ -32,6 +32,8 @@
 #include <awsmock/dto/transfer/DeleteServerRequest.h>
 #include <awsmock/dto/transfer/ListServerRequest.h>
 #include <awsmock/dto/transfer/ListServerResponse.h>
+#include <awsmock/dto/transfer/ListUsersRequest.h>
+#include <awsmock/dto/transfer/ListUsersResponse.h>
 #include <awsmock/dto/transfer/StartServerRequest.h>
 #include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/repository/TransferDatabase.h>
@@ -80,6 +82,15 @@ namespace AwsMock::Service {
          * @see Dto::Transfer::ListServerResponse
          */
         Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
+
+        /**
+         * @brief Returns a list of available servers
+         *
+         * @param request list manager request
+         * @return ListServerResponse
+         * @see Dto::Transfer::ListServerResponse
+         */
+        Dto::Transfer::ListUsersResponse ListUsers(const Dto::Transfer::ListUsersRequest &request);
 
         /**
          * @brief Starts an manager.

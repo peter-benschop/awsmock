@@ -30,6 +30,7 @@
 // Maximal body size (10MB)
 #define DEFAULT_MAX_BODY_SIZE (10 * 1024 * 1024)
 #define DEFAULT_MAX_QUEUE_SIZE 250
+#define DEFAULT_TIMEOUT 300
 
 namespace AwsMock::Service {
 
@@ -134,6 +135,11 @@ namespace AwsMock::Service {
          * Mox body size
          */
         long _bodyLimit;
+
+        /**
+         * Request timeout
+         */
+        int _timeout;
 
         /**
          * HTTP request queue

@@ -84,7 +84,7 @@ namespace AwsMock::Service {
     }// namespace AwsMock::Service
 
     Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) {
-        Core::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server");
+        Core::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_servers");
 
         try {
             std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region);
@@ -92,12 +92,37 @@ namespace AwsMock::Service {
             auto response = Dto::Transfer::ListServerResponse();
             response.nextToken = Poco::UUIDGenerator().createRandom().toString();
             for (const auto &s: servers) {
-                Dto::Transfer::Handler server = {
+                Dto::Transfer::Server server = {
                         .arn = s.arn,
                         .serverId = s.serverId,
                         .state = s.state,
                         .userCount = static_cast<int>(s.users.size())};
                 response.servers.emplace_back(server);
+            }
+
+            log_trace << "Handler list outcome: " + response.ToJson();
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Handler list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message(), 500);
+        }
+    }
+
+    Dto::Transfer::ListUsersResponse TransferService::ListUsers(const Dto::Transfer::ListUsersRequest &request) {
+        Core::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
+
+        try {
+            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId);
+
+            auto response = Dto::Transfer::ListUsersResponse();
+            response.nextToken = Poco::UUIDGenerator().createRandom().toString();
+            for (const auto &u: users) {
+                Dto::Transfer::User user = {
+                        .userName = u.userName,
+                        .homeDirectory = u.homeDirectory,
+                        .password = u.password};
+                response.users.emplace_back(user);
             }
 
             log_trace << "Handler list outcome: " + response.ToJson();

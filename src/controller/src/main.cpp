@@ -45,7 +45,14 @@ int main(int argc, char *argv[]) {
 
     // Declare the supported options.
     boost::program_options::options_description desc("Options");
-    desc.add_options()("pretty", "produce JSON pretty output")("includeobjects", "include objects in export")("help", "produce help message")("version", "application version")("config", boost::program_options::value<std::string>(), "set configuration file")("loglevel", boost::program_options::value<std::string>(), "set log level")("logfile", boost::program_options::value<std::string>(), "set log file");
+    desc.add_options()("pretty", "produce JSON pretty output");
+    desc.add_options()("include-objects", "include objects in export");
+    desc.add_options()("show-ftp-users", "show current ftp users");
+    desc.add_options()("help", "produce help message");
+    desc.add_options()("version", "application version");
+    desc.add_options()("config", boost::program_options::value<std::string>(), "set configuration file");
+    desc.add_options()("loglevel", boost::program_options::value<std::string>(), "set log level");
+    desc.add_options()("logfile", boost::program_options::value<std::string>(), "set log file");
 
     // Get command line options
     boost::program_options::variables_map vm;
@@ -81,12 +88,13 @@ int main(int argc, char *argv[]) {
                   << std::left << std::setw(leftIndent) << "  export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl
                   << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
                   << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
-                  << std::left << std::setw(leftIndent) << "  cleanobjects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
+                  << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
+                  << std::left << std::setw(leftIndent) << "  show-ftp-users [serverId]" << ": shows the current ftp users of the given server." << std::endl
                   << "\nModules:\n"
                   << std::endl
                   << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb, kms secretsmanager." << std::endl
                   << "\nExport options:\n"
-                  << std::left << std::setw(leftIndent) << "  --includeObjects" << ": export objects as well" << std::endl
+                  << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
                   << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl;
         return EXIT_SUCCESS;
     }
@@ -118,9 +126,9 @@ int main(int argc, char *argv[]) {
 
     // Set log file
     if (vm.count("logfile")) {
-        std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
-        AwsMock::Core::LogStream::SetSeverity(value);
+        std::string value = vm["logfile"].as<std::string>();
+        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.file", value);
+        AwsMock::Core::LogStream::SetFilename(value);
     }
 
     // Start manager

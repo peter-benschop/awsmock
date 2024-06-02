@@ -2,7 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include <awsmock/dto/transfer/Tag.h>
+#include "awsmock/dto/transfer/model/Tag.h"
 
 namespace AwsMock::Dto::Transfer {
 
