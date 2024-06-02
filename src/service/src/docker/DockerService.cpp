@@ -91,6 +91,7 @@ namespace AwsMock::Service {
                 log_warning << "More than one docker image found, name: " << name << ":" << tag;
                 return {};
             }
+            log_info << "Image found, name: " << name << ":" << tag;
             return response.imageList[0];
 
         } else {

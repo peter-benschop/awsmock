@@ -51,9 +51,9 @@ namespace AwsMock::Service {
          * @brief HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;

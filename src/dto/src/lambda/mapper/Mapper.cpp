@@ -51,4 +51,20 @@ namespace AwsMock::Dto::Lambda {
         return request;
     }
 
+    Database::Entity::Lambda::Lambda Mapper::map(const Dto::Lambda::CreateFunctionRequest &request) {
+        Database::Entity::Lambda::Lambda lambda;
+        lambda.region = request.region;
+        lambda.user = request.user;
+        lambda.function = request.functionName;
+        lambda.handler = request.handler;
+        lambda.role = request.role;
+        //lambda.environment = request.environment;
+        lambda.runtime = request.runtime;
+        lambda.code.zipFilename = request.code.zipFile;
+        lambda.code.s3Bucket = request.code.s3Bucket;
+        lambda.code.s3Key = request.code.s3Key;
+        lambda.code.s3Version = request.code.s3ObjectVersion;
+        return lambda;
+    }
+
 }// namespace AwsMock::Dto::Lambda

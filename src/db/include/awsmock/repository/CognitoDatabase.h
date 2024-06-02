@@ -291,7 +291,7 @@ namespace AwsMock::Database {
         /**
          * @brief Create a new cognito group
          *
-         * @param userPool cognito group entity to create
+         * @param group cognito group entity to create
          * @return created cognito group entity.
          */
         Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);

@@ -73,12 +73,12 @@ namespace AwsMock::Dto::Common {
     struct SecretsManagerClientCommand : public BaseClientCommand {
 
         /**
-         * Client command
+         * @brief Client command
          */
         SecretsManagerCommandType command{};
 
         /**
-         * Returns the message body as string.
+         * @brief Returns the message body as string.
          *
          * @param request HTTP request
          * @return message body as string
@@ -86,9 +86,8 @@ namespace AwsMock::Dto::Common {
         static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
 
         /**
-         * Getś the value from the user-agent string
+         * @brief Gets the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
@@ -96,21 +95,21 @@ namespace AwsMock::Dto::Common {
         void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -42,26 +42,23 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param configuration aws-mock configuration
-         * @param metricService aws-mock monitoring
          */
         explicit GatewayServer();
 
       protected:
 
         /**
-         * Timer initialization
+         * @brief Timer initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 

@@ -28,14 +28,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
         explicit KMSHandler() : _kmsService(Core::Configuration::instance()) {}
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
          * @param region AWS region

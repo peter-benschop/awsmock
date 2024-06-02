@@ -110,7 +110,7 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param userPoolId user pool ID
          * @param groupName name of the group
          */
-        bool HasGroup(const std::string &userPoolId, const std::string &GroupName);
+        bool HasGroup(const std::string &userPoolId, const std::string &groupName);
 
         /**
          * Converts the entity to a MongoDB document

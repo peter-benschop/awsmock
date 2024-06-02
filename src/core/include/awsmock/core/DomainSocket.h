@@ -60,7 +60,7 @@ namespace AwsMock::Core {
          *
          * @param method HTTP method
          * @param path URL path
-         * @param body optional HTTP body
+         * @param fileName filename to send
          * @param headers optional HTTP headers
          * @return result struct
          * @see Core::DomainSocketResult
@@ -92,8 +92,8 @@ namespace AwsMock::Core {
         /**
          * @brief Prepare HTTP message
          *
-         * @param result HTTP response
-         * @return result struct
+         * @param response HTTP response
+         * @return response struct
          * @see Core::DomainSocketResult
          */
         static DomainSocketResult PrepareResult(http::response<http::string_body> response);

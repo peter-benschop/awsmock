@@ -37,7 +37,9 @@ namespace AwsMock::Database {
         explicit ModuleMemoryDb() = default;
 
         /**
-         * @briefSingleton instance
+         * @brief Singleton instance
+         *
+         * @return singleton instance
          */
         static ModuleMemoryDb &instance() {
             static ModuleMemoryDb moduleMemoryDb;
@@ -53,7 +55,7 @@ namespace AwsMock::Database {
         bool IsActive(const std::string &name);
 
         /**
-         * @briefCheck existence of name
+         * @brief Check existence of name
          *
          * @param name name name
          * @return created name

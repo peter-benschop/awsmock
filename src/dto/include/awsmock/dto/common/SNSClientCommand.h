@@ -67,19 +67,19 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-     * The S3 client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
+     * @brief The SNS client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of calling the AWS REST services.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct SNSClientCommand : public BaseClientCommand {
 
         /**
-         * Client command
+         * @brief Client command
          */
         SNSCommandType command{};
 
         /**
-         * Returns the command from HTTP header
+         * @brief Returns the command from HTTP header
          *
          * @param request HTTP request
          * @return command string
@@ -87,9 +87,8 @@ namespace AwsMock::Dto::Common {
         std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
 
         /**
-         * Getś the value from the user-agent string
+         * @brief Getś the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
@@ -97,21 +96,21 @@ namespace AwsMock::Dto::Common {
         void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

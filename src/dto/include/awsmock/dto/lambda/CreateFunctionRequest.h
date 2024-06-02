@@ -26,6 +26,74 @@ namespace AwsMock::Dto::Lambda {
     /**
      * @brief Create function response
      *
+     * Example:
+     * @code{.json}
+     * {
+     *   "Architectures": [ "string" ],
+     *   "Code": {
+     *      "ImageUri": "string",
+     *      "S3Bucket": "string",
+     *      "S3Key": "string",
+     *      "S3ObjectVersion": "string",
+     *      "ZipFile": blob
+     *   },
+     *   "CodeSigningConfigArn": "string",
+     *   "DeadLetterConfig": {
+     *      "TargetArn": "string"
+     *   },
+     *   "Description": "string",
+     *   "Environment": {
+     *      "Variables": {
+     *         "string" : "string"
+     *      }
+     *   },
+     *   "EphemeralStorage": {
+     *      "Size": number
+     *   },
+     *   "FileSystemConfigs": [
+     *      {
+     *         "Arn": "string",
+     *         "LocalMountPath": "string"
+     *      }
+     *   ],
+     *   "FunctionName": "string",
+     *   "Handler": "string",
+     *   "ImageConfig": {
+     *      "Command": [ "string" ],
+     *      "EntryPoint": [ "string" ],
+     *      "WorkingDirectory": "string"
+     *   },
+     *   "KMSKeyArn": "string",
+     *   "Layers": [ "string" ],
+     *   "LoggingConfig": {
+     *      "ApplicationLogLevel": "string",
+     *      "LogFormat": "string",
+     *      "LogGroup": "string",
+     *      "SystemLogLevel": "string"
+     *   },
+     *   "MemorySize": number,
+     *   "PackageType": "string",
+     *   "Publish": boolean,
+     *   "Role": "string",
+     *   "Runtime": "string",
+     *   "SnapStart": {
+     *      "ApplyOn": "string"
+     *   },
+     *   "Tags": {
+     *      "string" : "string"
+     *   },
+     *   "Timeout": number,
+     *   "TracingConfig": {
+     *      "Mode": "string"
+     *   },
+     *   "VpcConfig": {
+     *      "Ipv6AllowedForDualStack": boolean,
+     *      "SecurityGroupIds": [ "string" ],
+     *      "SubnetIds": [ "string" ]
+     *   }
+     * }
+     * @endcode
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct CreateFunctionRequest : public Dto::Common::BaseRequest {

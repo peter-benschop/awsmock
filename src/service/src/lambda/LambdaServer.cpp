@@ -99,15 +99,15 @@ namespace AwsMock::Service {
     Dto::Lambda::Code LambdaServer::GetCode(const Database::Entity::Lambda::Lambda &lambda) {
 
         Dto::Lambda::Code code;
-        if (Core::FileUtils::FileExists(lambda.fileName)) {
-            std::stringstream ss;
-            std::ifstream ifs(lambda.fileName);
-            ss << ifs.rdbuf();
-            ifs.close();
 
-            code = {.zipFile = ss.str()};
-            log_debug << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName);
-        }
+        // Load file
+        std::stringstream ss;
+        std::ifstream ifs(lambda.fileName);
+        ss << ifs.rdbuf();
+        ifs.close();
+
+        code = {.zipFile = ss.str()};
+        log_debug << "Loaded lambda from file: " << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName);
         return code;
     }
 

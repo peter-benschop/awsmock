@@ -44,6 +44,15 @@ namespace AwsMock::Dto::Lambda {
          * @see CreateFunctionRequest
          */
         static Dto::Lambda::CreateFunctionRequest map(const Database::Entity::Lambda::Lambda &lambdaEntity);
+
+        /**
+         * @brief Maps a lambda create request to a lambda entity
+         *
+         * @param request create lambda request
+         * @return Lambda entity
+         * @see CreateFunctionRequest
+         */
+        static Database::Entity::Lambda::Lambda map(const Dto::Lambda::CreateFunctionRequest &request);
     };
 
 }// namespace AwsMock::Dto::Lambda

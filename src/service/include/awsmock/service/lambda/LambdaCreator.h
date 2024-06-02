@@ -12,6 +12,9 @@
 // Poco includes
 #include <Poco/Base64Decoder.h>
 
+// Boost includes
+#include <boost/beast/core/detail/base64.hpp>
+
 // AwsMock includes
 #include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
@@ -28,6 +31,30 @@ namespace AwsMock::Service {
 
     /**
      * @brief Lambda async creator
+     *
+     * @par
+     * First it writes a base64 encoded file to the lambda directory (<i>/home/awsmock/data/lambda</i>). If the lambda code comes from the AWS CLI it is already a base64 encoded
+     * zip-file, so we only write the base64 encoded code to the lambda directory. In case the lambda code comes from S3 bucket/key we need to encode the file and write it
+     * to the lambda directory. This is needed, as the lambda server runs through all lambda entity in the database and starts the lambdas from the lambda directory.
+     *
+     * @par
+     * Once the lambdas re written to the lambda directory, the creator decodes the lambda and check for a existing image in the docker registry. If it find a image, it will
+     * create a docker container and starts it. Otherwise a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
+     * Dockerfile for that runtime. Then a container is creates and started.
+     *
+     * @par
+     * To see the running container simply issue a 'docker ps'. The container has a name of 'lambda-function-name:version. The docker tag is taken from the lambda function
+     * tags. If a 'version' or 'dockerTag' exists in the lambda function, this is taken as the docker tag. Otherwise 'latest' is used. If it is a function, which is loaded
+     * from a versioned S3 bucket/key, the version tag of the S3 object is taken.
+     *
+     * @par
+     * The docker container port is random and maps internally to the AWS runtime port (8080). The port is mapped to the host and saved in the database. The port will be
+     * between 32768 and 65536. You can see the chosen port in the MongoDB or in the in-memory database. The outside port (<i><&lt;randomPort&gt;0</i>) is used for the invocation
+     * request.
+     *
+     * @par
+     * The docker creator runs asynchronously. Therefore the lambda function is in 'pending' state as long as the asynchronous thread runs. Afterwards state status will be
+     * set to 'active'. This means you need to wait until the state is 'active' before you can invoke the lambda function.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -57,7 +84,7 @@ namespace AwsMock::Service {
          * @param lambdaEntity lambda entity
          * @param dockerTag docker tag to use
          */
-        void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+        static void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
          * @brief Creates an new docker container, in case the container does not exists inside the docker daemon.
@@ -65,7 +92,7 @@ namespace AwsMock::Service {
          * @param lambdaEntity lambda entity.
          * @param dockerTag docker tag.
          */
-        void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+        static void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API
@@ -80,12 +107,13 @@ namespace AwsMock::Service {
          *
          * <p>Needed only when the lambda function is provided as zipped request body.</p>
          *
+         * @param codeDir temporary data directory
          * @param zipFile Base64 encoded zip file.
          * @param runtime AWS lambda runtime name
          * @param fileName filename of the Base64 encoded and zipped code file
          * @return code directory
          */
-        std::string UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName);
+        static std::string UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime, const std::string &fileName);
 
         /**
          * @brief Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
@@ -110,6 +138,15 @@ namespace AwsMock::Service {
          * @return random port between 32768 and 65536
          */
         static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Write Base64 encoded file to lambda dir
+         *
+         * @param filename name of the file to write (input)
+         * @param base64Filename name of the base64 file name (output)
+         * @return base64 string
+         */
+        static std::string WriteBase64File(const std::string &filename, const std::string &base64Filename);
     };
 
 }//namespace AwsMock::Service

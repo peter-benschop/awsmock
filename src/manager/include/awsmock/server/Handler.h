@@ -35,6 +35,8 @@ namespace AwsMock::Manager {
 
         /**
          * @brief Manager HTTP server
+         *
+         * @param serverMap currently running servers
          */
         explicit Handler(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleService(serverMap){};
 
@@ -44,8 +46,7 @@ namespace AwsMock::Manager {
          * Handles all GET requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
-         * @return response structure
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::string_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
 
@@ -55,7 +56,7 @@ namespace AwsMock::Manager {
          * Handles all PUT requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::string_body> HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
 
@@ -65,7 +66,7 @@ namespace AwsMock::Manager {
          * Handles all POST requests.
          *
          * @param request HTTP request
-         * @param socket HTTP socket
+         * @return HTTP response structure
          */
         boost::beast::http::response<boost::beast::http::string_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::string_body> &request);
 
@@ -76,6 +77,7 @@ namespace AwsMock::Manager {
          *
          * @param request HTTP request
          * @param body HTTP body
+         * @return HTTP response structure
          */
         static boost::beast::http::response<boost::beast::http::string_body> SendOkResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body = {});
 

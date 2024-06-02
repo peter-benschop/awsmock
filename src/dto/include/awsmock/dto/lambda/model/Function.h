@@ -6,10 +6,12 @@
 #define AWSMOCK_DTO_LAMBDA_FUNCTION_H
 
 // C++ standard includes
+#include <chrono>
 #include <string>
 #include <vector>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -17,6 +19,8 @@
 #include <awsmock/dto/lambda/model/Environment.h>
 
 namespace AwsMock::Dto::Lambda {
+
+    using std::chrono::system_clock;
 
     struct Function {
 
@@ -71,7 +75,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Last modification datetime
          */
-        Poco::DateTime lastModified = {};
+        system_clock::time_point lastModified = {};
 
         /**
          * Last update state
