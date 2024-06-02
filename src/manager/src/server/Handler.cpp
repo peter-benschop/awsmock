@@ -48,7 +48,7 @@ namespace AwsMock::Manager {
 
             std::string tmp = Core::HttpUtils::GetHeaderValue(request, "pretty");
             bool prettyPrint = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "pretty"));
-            bool includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "includeObjects"));
+            bool includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "include-objects"));
 
             Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
             std::string infrastructureJson = AwsMock::Service::ModuleService::ExportInfrastructure(modules, prettyPrint, includeObjects);
@@ -59,6 +59,18 @@ namespace AwsMock::Manager {
             Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
             AwsMock::Service::ModuleService::CleanInfrastructure(modules);
             return SendOkResponse(request);
+
+        } else if (action == "show-ftp-users") {
+
+            std::string region = Core::Configuration::instance().getString("awsmock.region", "eu-central-1");
+
+            Dto::Transfer::Server server;
+            server.FromJson(payload);
+
+            Dto::Transfer::ListUsersRequest transferRequest = {.region = region, .serverId = server.serverId};
+            Service::TransferService transferService;
+            Dto::Transfer::ListUsersResponse transferResponse = transferService.ListUsers(transferRequest);
+            return SendOkResponse(request, transferResponse.ToJson());
 
         } else {
 
@@ -108,7 +120,7 @@ namespace AwsMock::Manager {
 
         } else if (action == "import") {
 
-            _moduleService.ImportInfrastructure(payload);
+            AwsMock::Service::ModuleService::ImportInfrastructure(payload);
             return SendOkResponse(request);
 
         } else if (action == "set-log-level") {
@@ -122,7 +134,7 @@ namespace AwsMock::Manager {
         } else if (action == "clean-objects") {
 
             Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
-            _moduleService.CleanObjects(modules);
+            AwsMock::Service::ModuleService::CleanObjects(modules);
             return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
 
         } else {

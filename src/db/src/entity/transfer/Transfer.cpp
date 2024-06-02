@@ -27,9 +27,7 @@ namespace AwsMock::Database::Entity::Transfer {
 
         auto usersDoc = bsoncxx::builder::basic::array{};
         for (const auto &user: users) {
-            usersDoc.append(make_document(kvp("userName", user.userName),
-                                          kvp("password", user.password),
-                                          kvp("homeDirectory", user.homeDirectory)));
+            usersDoc.append(user.ToDocument());
         }
 
         view_or_value<view, value> transferDoc = make_document(

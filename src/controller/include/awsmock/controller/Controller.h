@@ -29,6 +29,8 @@
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/dto/transfer/model/Server.h>
+#include <awsmock/dto/transfer/model/User.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
 #define AWSMOCKCTL_DEFAULT_HOST "localhost"
@@ -133,6 +135,16 @@ namespace AwsMock::Controller {
          * @param modules list of modules
          */
         void CleanObjects(Dto::Module::Module::ModuleList &modules);
+
+        /**
+         * @brief Show FTP users.
+         *
+         * As the AWS CLI does not allow to see the users password, this is a workaround. It will send a FTP user list
+         * request to the server and shows the currently defined FTP users.
+         *
+         * @param serverID ID of the FTP server.
+         */
+        void ShowFtpUsers(const std::string &serverId);
 
       private:
 

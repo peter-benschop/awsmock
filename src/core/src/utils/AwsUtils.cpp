@@ -59,6 +59,10 @@ namespace AwsMock::Core {
         return CreateArn("transfer", region, accountId, "manager/" + serverId);
     }
 
+    std::string AwsUtils::CreateTransferUserArn(const std::string &region, const std::string &accountId, const std::string &serverId, const std::string &userName) {
+        return CreateArn("transfer", region, accountId, serverId + "/" + userName);
+    }
+
     std::string AwsUtils::CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId) {
         return CreateArn("secretsmanager", region, accountId, "secret:" + secretId);
     }

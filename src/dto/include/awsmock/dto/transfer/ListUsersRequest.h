@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_LIST_SERVER_RESPONSE_H
-#define AWSMOCK_DTO_TRANSFER_LIST_SERVER_RESPONSE_H
+#ifndef AWSMOCK_DTO_TRANSFER_LIST_USER_REQUEST_H
+#define AWSMOCK_DTO_TRANSFER_LIST_USER_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -14,11 +14,24 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/transfer/model/Server.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListServerResponse {
+    /**
+     * @brief Lisr FTP user request
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "MaxResults": 100,
+     *   "NextToken": "eyJNYXJrZXIiOiBudWxsLCAiYm90b1X0cnVuU2F0ZV9hbW91bnQiOiAyfQ==",
+     *   "ServerId": "s-01234567890abcdef"
+     * }
+     * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct ListUsersRequest {
 
         /**
          * Region
@@ -26,14 +39,26 @@ namespace AwsMock::Dto::Transfer {
         std::string region;
 
         /**
-         * Next token ID
+         * Server ID
+         */
+        std::string serverId;
+
+        /**
+         * Maximal number of results
+         */
+        int maxResults;
+
+        /**
+         * Token
          */
         std::string nextToken;
 
         /**
-         * Server list
+         * @brief Parse a JSON stream
+         *
+         * @param body json input stream
          */
-        std::vector<Server> servers;
+        void FromJson(const std::string &body);
 
         /**
          * @brief Creates a JSON string from the object.
@@ -54,9 +79,9 @@ namespace AwsMock::Dto::Transfer {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListServerResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListUsersRequest &r);
     };
 
 }// namespace AwsMock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_TRANSFER_LIST_SERVER_RESPONSE_H
+#endif// AWSMOCK_DTO_TRANSFER_LIST_USER_REQUEST_H

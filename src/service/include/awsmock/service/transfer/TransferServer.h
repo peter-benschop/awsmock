@@ -105,11 +105,6 @@ namespace AwsMock::Service {
         std::shared_ptr<TransferMonitoring> _transferMonitoring;
 
         /**
-         * Sleeping period in ms
-         */
-        int _period;
-
-        /**
          * Rest port
          */
         int _port;
@@ -178,16 +173,6 @@ namespace AwsMock::Service {
          * Actual FTP manager
          */
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
-
-        /**
-         * S3 module host
-         */
-        std::string _s3ServiceHost;
-
-        /**
-         * S3 module port
-         */
-        int _s3ServicePort;
 
         /**
          * Module name

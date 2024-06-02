@@ -66,7 +66,7 @@ namespace AwsMock::Service {
 
             // Ensure the home directory exists
             Core::DirUtils::EnsureDirectory(homeDir);
-            log_debug << "User creates, userId: " << user.userName << " homeDir: " << homeDir;
+            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
 
             // Add to FTP manager
             _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
 
-        log_info << "Transfer manager " << server.serverId << " started ";
+        log_info << "Transfer         log_debug << \"Transfer server \" << server.serverId << \" stopped \"; " << server.serverId << " started ";
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
 
-        log_debug << "Transfer manager " << server.serverId << " stopped ";
+        log_debug << "Transfer server " << server.serverId << " stopped ";
     }
 
     void TransferServer::StartTransferServers() {

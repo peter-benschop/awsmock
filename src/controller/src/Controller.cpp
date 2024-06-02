@@ -126,7 +126,7 @@ namespace AwsMock::Controller {
             }
 
             bool pretty = _vm.count("pretty") > 0;
-            bool includeObjects = _vm.count("includeobjects") > 0;
+            bool includeObjects = _vm.count("include-objects") > 0;
 
             ExportInfrastructure(modules, pretty, includeObjects);
 
@@ -147,17 +147,27 @@ namespace AwsMock::Controller {
 
             CleanInfrastructure(modules);
 
-        } else if (std::find(_commands.begin(), _commands.end(), "cleanobjects") != _commands.end()) {
+        } else if (std::find(_commands.begin(), _commands.end(), "clean-objects") != _commands.end()) {
 
             std::vector<Dto::Module::Module> modules;
             for (const auto &command: _commands) {
-                if (command != "cleanobjects") {
+                if (command != "clean-objects") {
                     Dto::Module::Module module;
                     module.name = command;
                     modules.emplace_back(module);
                 }
             }
             CleanObjects(modules);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "show-ftp-users") != _commands.end()) {
+
+            if (_commands.size() != 2) {
+                std::cerr << "ServerId missing!";
+                return;
+            }
+
+            std::string serverId = _commands[1];
+            ShowFtpUsers(serverId);
         }
     }
 
@@ -394,6 +404,25 @@ namespace AwsMock::Controller {
         modules = Dto::Module::Module::FromJsonList(response.body);
         for (const auto &module: modules) {
             std::cout << "Objects of module " << module.name << " cleaned" << std::endl;
+        }
+    }
+
+    void AwsMockCtl::ShowFtpUsers(const std::string &serverId) {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "show-ftp-users");
+
+        Dto::Transfer::Server server = {.serverId = serverId};
+
+        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", server.ToJson(), headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
+            return;
+        }
+
+        std::vector<Dto::Transfer::User> users = Dto::Transfer::User::FromJsonList(response.body);
+        for (const auto &user: users) {
+            std::cout << "FTP user: " << user.userName << " password: " << user.password << std::endl;
         }
     }
 

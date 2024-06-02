@@ -10,13 +10,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/exception/JsonException.h"
 
 namespace AwsMock::Dto::Transfer {
 
-    struct Handler {
+    struct Server {
 
         /**
          * ARN
@@ -59,32 +59,39 @@ namespace AwsMock::Dto::Transfer {
         int userCount;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @param body DTO as JSON string
+         */
+        void FromJson(const std::string &body);
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const Handler &r);
+        friend std::ostream &operator<<(std::ostream &os, const Server &r);
     };
 
 }// namespace AwsMock::Dto::Transfer
