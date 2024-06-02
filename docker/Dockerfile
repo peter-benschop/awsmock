@@ -78,7 +78,11 @@ RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
 
 # Install boost
 COPY --from=build /usr/lib/libboost_program_options.so.1.84.0 /usr/lib/
+COPY --from=build /usr/lib/libboost_thread.so.1.84.0 /usr/lib/
+COPY --from=build /usr/lib/libboost_filesystem.so.1.84.0 /usr/lib/
 RUN ln -s /usr/lib/libboost_program_options.so.1.84.0 /usr/lib/libboost_program_options.so
+RUN ln -s /usr/lib/libboost_thread.so.1.84.0 /usr/lib/libboost_thread.so
+RUN ln -s /usr/lib/libboost_filesystem.so.1.84.0 /usr/lib/libboost_filesystem.so
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/

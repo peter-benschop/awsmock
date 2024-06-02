@@ -65,9 +65,11 @@ namespace AwsMock::Service {
             }
 
             // Add user
+            // TODO: Find a way to list the user/password, in case we're running in a docker container and using the
+            // in-memory database.
             Database::Entity::Transfer::User user = {
                     .userName = request.userName,
-                    .password = Core::StringUtils::GenerateRandomPassword(8),
+                    .password = request.userName,//Core::StringUtils::GenerateRandomPassword(8),
                     .homeDirectory = request.homeDirectory};
             transferEntity.users.emplace_back(user);
 
@@ -80,7 +82,7 @@ namespace AwsMock::Service {
         Dto::Transfer::CreateUserResponse response{.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = request.userName};
 
         return response;
-    }
+    }// namespace AwsMock::Service
 
     Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) {
         Core::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server");
