@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractServer(configuration, "lambda"), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
+    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractServer("lambda"), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
 
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
@@ -40,6 +40,10 @@ namespace AwsMock::Service {
 
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_dataDir);
+
+        // Set running
+        SetRunning();
+
         log_debug << "Lambda server initialized";
     }
 

@@ -116,15 +116,9 @@ namespace AwsMock::Service {
         try {
             std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId);
 
-            auto response = Dto::Transfer::ListUsersResponse();
+
+            Dto::Transfer::ListUsersResponse response = Dto::Transfer::Mapper::map(request, users);
             response.nextToken = Poco::UUIDGenerator().createRandom().toString();
-            for (const auto &u: users) {
-                Dto::Transfer::User user = {
-                        .userName = u.userName,
-                        .homeDirectory = u.homeDirectory,
-                        .password = u.password};
-                response.users.emplace_back(user);
-            }
 
             log_trace << "Handler list outcome: " + response.ToJson();
             return response;

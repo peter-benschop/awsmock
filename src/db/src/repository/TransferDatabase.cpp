@@ -119,10 +119,14 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
+
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId)));
-            Entity::Transfer::Transfer result;
-            result.FromDocument(mResult->view());
-            return result;
+            if (mResult.has_value()) {
+                Entity::Transfer::Transfer result;
+                result.FromDocument(mResult->view());
+                return result;
+            }
+            return {};
 
         } else {
 

@@ -157,7 +157,7 @@ namespace AwsMock::Database {
         void DeleteModule(const Entity::Module::Module &module);
 
         /**
-         * Deletes all modules
+         * @brief Deletes all modules
          */
         void DeleteAllModules();
 

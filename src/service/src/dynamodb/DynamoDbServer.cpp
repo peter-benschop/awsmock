@@ -2,11 +2,11 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include "awsmock/service/dynamodb/DynamoDbServer.h"
+#include <awsmock/service/dynamodb/DynamoDbServer.h>
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer() : AbstractServer(Core::Configuration::instance(), "dynamodb", 10), _module("dynamodb"), _dockerService(DockerService::instance()) {
+    DynamoDbServer::DynamoDbServer() : AbstractServer("dynamodb", 10), _module("dynamodb"), _dockerService(DockerService::instance()) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -51,6 +51,9 @@ namespace AwsMock::Service {
 
         // Cleanup
         CleanupContainers();
+
+        // Set running
+        SetRunning();
     }
 
     void DynamoDbServer::Run() {

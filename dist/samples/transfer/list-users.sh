@@ -15,6 +15,6 @@ awslocal transfer create-user \
   --user-name $userId \
   --home-directory $userId
 
-# Start transfer server
-awslocal transfer start-server \
+# List users
+awslocal transfer list-users \
   --server-id $serverId

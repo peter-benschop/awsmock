@@ -18,6 +18,7 @@
 #include <awsmock/core/monitoring/MetricSystemCollector.h>
 #include <awsmock/server/Handler.h>
 #include <awsmock/server/Listener.h>
+#include <awsmock/server/Monitoring.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
 #define DEFAULT_MONGO_DBUSER "admin"

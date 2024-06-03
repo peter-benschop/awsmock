@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewayServer::GatewayServer() : AbstractServer(Core::Configuration::instance(), "gateway") {
+    GatewayServer::GatewayServer() : AbstractServer("gateway") {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -41,6 +41,9 @@ namespace AwsMock::Service {
 
     void GatewayServer::Run() {
 
+        // Set running
+        SetRunning();
+        
         // The io_context is required for all I/O
         boost::asio::io_context ioc{_maxThreads};
 

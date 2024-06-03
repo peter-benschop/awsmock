@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::Configuration &configuration) : AbstractServer(configuration, "sns", 10), _configuration(configuration), _snsDatabase(Database::SNSDatabase::instance()) {
+    SNSServer::SNSServer(Core::Configuration &configuration) : AbstractServer("sns", 10), _configuration(configuration), _snsDatabase(Database::SNSDatabase::instance()) {
 
         // HTTP manager configuration
         _port = _configuration.getInt("awsmock.service.sns.http.port", KMS_DEFAULT_PORT);
@@ -41,6 +41,9 @@ namespace AwsMock::Service {
 
         // Start monitoring
         _snsWorker->Start();
+
+        // Set running
+        SetRunning();
 
         // Start REST module
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SNSRequestHandlerFactory(_configuration));
