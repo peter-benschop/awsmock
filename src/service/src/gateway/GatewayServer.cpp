@@ -43,7 +43,7 @@ namespace AwsMock::Service {
 
         // Set running
         SetRunning();
-        
+
         // The io_context is required for all I/O
         boost::asio::io_context ioc{_maxThreads};
 
