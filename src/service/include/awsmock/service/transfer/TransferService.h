@@ -36,6 +36,7 @@
 #include <awsmock/dto/transfer/ListUsersResponse.h>
 #include <awsmock/dto/transfer/StartServerRequest.h>
 #include <awsmock/dto/transfer/StopServerRequest.h>
+#include <awsmock/dto/transfer/mapper/Mapper.h>
 #include <awsmock/repository/TransferDatabase.h>
 
 #define TRANSFER_DEFAULT_FTP_PORT 21

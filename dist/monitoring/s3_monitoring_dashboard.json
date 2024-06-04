@@ -18,14 +18,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of all buckets",
       "fieldConfig": {
@@ -49,14 +49,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -66,6 +66,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -93,11 +94,12 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -114,7 +116,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(s3_bucket_count_total[5m])",
+          "expr": "avg_over_time(s3_bucket_counter[5m])",
           "instant": false,
           "legendFormat": "Buckets",
           "range": true,
@@ -127,7 +129,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of objects",
       "fieldConfig": {
@@ -151,14 +153,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -168,6 +170,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -185,7 +188,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 17,
+        "h": 14,
         "w": 8,
         "x": 8,
         "y": 0
@@ -194,11 +197,12 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -215,7 +219,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(s3_object_count_total[5m])",
+          "expr": "avg_over_time(s3_object_counter[5m])",
           "instant": false,
           "legendFormat": "Objects",
           "range": true,
@@ -228,7 +232,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of objects",
       "fieldConfig": {
@@ -252,14 +256,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -269,6 +273,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -281,12 +286,13 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 17,
+        "h": 14,
         "w": 8,
         "x": 16,
         "y": 0
@@ -297,7 +303,8 @@
           "calcs": [
             "lastNotNull",
             "min",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -318,7 +325,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(s3_object_by_bucket_count[5m])",
+          "expr": "avg_over_time(s3_object_by_bucket_counter[5m])",
           "instant": false,
           "legendFormat": "{{bucket}}",
           "range": true,
@@ -331,7 +338,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "S3 service timer",
       "fieldConfig": {
@@ -355,7 +362,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -372,6 +379,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -390,7 +398,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 14,
         "w": 8,
         "x": 0,
         "y": 14
@@ -401,9 +409,10 @@
           "calcs": [
             "lastNotNull",
             "min",
-            "max"
+            "max",
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
@@ -420,9 +429,9 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(s3_service_time[5m])",
+          "expr": "avg_over_time(s3_service_timer[5m])",
           "instant": false,
-          "legendFormat": "Service time",
+          "legendFormat": "{{method}}",
           "range": true,
           "refId": "A"
         }
@@ -438,7 +447,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
@@ -446,6 +455,6 @@
   "timezone": "",
   "title": "S3",
   "uid": "fefe4481-e1b3-430e-88bb-cf49d22f25e9",
-  "version": 12,
+  "version": 3,
   "weekStart": ""
 }

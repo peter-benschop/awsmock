@@ -11,7 +11,7 @@ namespace AwsMock::Dto::Common {
         // Basic values
         this->region = region;
         this->user = user;
-        this->method = method;
+        this->method = request.method();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->url = request.target();

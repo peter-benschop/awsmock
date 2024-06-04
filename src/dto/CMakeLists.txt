@@ -56,7 +56,7 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
-        src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp src/transfer/model/User.cpp)
+        src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp src/transfer/model/User.cpp src/transfer/mapper/Mapper.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp
         src/dynamodb/DeleteTableRequest.cpp src/dynamodb/DeleteTableResponse.cpp src/dynamodb/model/ProvisionedThroughput.cpp
         src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
@@ -91,7 +91,8 @@ add_subdirectory(tst)
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/dto/transfer/mapper/Mapper.h)
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})

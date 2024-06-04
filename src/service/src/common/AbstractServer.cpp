@@ -6,25 +6,22 @@
 
 namespace AwsMock::Service {
 
-    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name, int timeout) : Timer(name, timeout), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
-
-        // Create environment
-        log_debug << "AbstractServer initialized, name: " << _name;
+    AbstractServer::AbstractServer(std::string name, int timeout) : Timer(name, timeout), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)) {
     }
 
-    AbstractServer::AbstractServer(Core::Configuration &configuration, std::string name) : Timer(name), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)), _running(false) {
-
-        // Create environment
-        log_debug << "AbstractServer initialized, name: " << _name;
+    AbstractServer::AbstractServer(std::string name) : Timer(name), _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)) {
     }
 
     bool AbstractServer::IsActive(const std::string &name) {
         return _moduleDatabase.IsActive(name);
     }
 
+    void AbstractServer::SetRunning() {
+        _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
+    }
+
     void AbstractServer::Shutdown() {
         StopHttpServer();
-        log_debug << "Stop broadcast";
     }
 
     void AbstractServer::StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory) {
@@ -42,7 +39,6 @@ namespace AwsMock::Service {
         _httpServer->start();
 
         // Set running, now that the HTTP server is running
-        _running = true;
         _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
 
         log_info << "HTTP server " << _name << " started, endpoint: http://" << host << ":" << port;

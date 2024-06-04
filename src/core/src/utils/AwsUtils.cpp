@@ -6,30 +6,12 @@
 
 namespace AwsMock::Core {
 
-    std::string AwsUtils::CreateArn(const std::string &service, const std::string &region, const std::string &accountId, const std::string &resourceId) {
-        return "arn:aws:" + service + ":" + region + ":" + accountId + ":" + resourceId;
-    }
-
     std::string AwsUtils::CreateS3Arn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key) {
         return CreateArn("s3", region, accountId, bucket + "/" + key);
     }
 
     std::string AwsUtils::CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function) {
         return CreateArn("lambda", region, accountId, "function:" + function);
-    }
-
-    std::string AwsUtils::CreateSQSQueueUrl(const Configuration &configuration, const std::string &queueName) {
-        std::string endpoint = GetEndpoint();
-        std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
-        log_trace << "Endpoint: " << endpoint << " accountId: " << accountId;
-        return endpoint + "/" + accountId + "/" + queueName;
-    }
-
-    std::string AwsUtils::CreateSQSQueueArn(const Configuration &configuration, const std::string &queueName) {
-        std::string region = configuration.getString("awsmock.region", GATEWAY_DEFAULT_REGION);
-        std::string accountId = configuration.getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
-        log_trace << "Region: " << region << " accountId: " << accountId;
-        return CreateArn("sqs", region, accountId, queueName);
     }
 
     std::string AwsUtils::ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn) {

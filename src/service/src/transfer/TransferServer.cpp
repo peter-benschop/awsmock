@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer(configuration, "transfer"), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
+    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer("transfer"), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
 
         // REST manager configuration
         _port = _configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
@@ -39,6 +39,10 @@ namespace AwsMock::Service {
 
         // Start all transfer servers
         StartTransferServers();
+
+        // Set running
+        SetRunning();
+        log_debug << "All online transfer servers started";
     }
 
     void TransferServer::Run() {
@@ -76,7 +80,7 @@ namespace AwsMock::Service {
         // Update database
         server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
 
-        log_info << "Transfer         log_debug << \"Transfer server \" << server.serverId << \" stopped \"; " << server.serverId << " started ";
+        log_debug << "Transfer server started, serverId: " << server.serverId;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {

@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
                   << std::left << std::setw(leftIndent) << "  stop [<module>]" << ": stops the given module. If no argument is given, stops all services" << std::endl
                   << std::left << std::setw(leftIndent) << "  restart [<module>]" << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
 #ifdef HAS_SYSTEMD
-        std::cout << std::left << std::setw(leftIndent) << "logs" << ": shows the manager logs" << std::endl;
+        std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
 #endif
         std::cout << std::left << std::setw(leftIndent) << "  loglevel <level>" << ": sets the manager log to level" << std::endl
                   << std::left << std::setw(leftIndent) << "  config" << ": shows the gateway configuration" << std::endl

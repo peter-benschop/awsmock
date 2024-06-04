@@ -18,7 +18,6 @@
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
-#include <awsmock/service/gateway/GatewayHandler.h>
 #include <awsmock/service/kms/KMSHandler.h>
 #include <awsmock/service/lambda/LambdaHandler.h>
 #include <awsmock/service/s3/S3Handler.h>
@@ -28,7 +27,7 @@
 #include <awsmock/service/transfer/TransferHandler.h>
 
 // Maximal body size (10MB)
-#define DEFAULT_MAX_BODY_SIZE (10 * 1024 * 1024)
+#define DEFAULT_MAX_BODY_SIZE (100 * 1024 * 1024)
 #define DEFAULT_MAX_QUEUE_SIZE 250
 #define DEFAULT_TIMEOUT 300
 
@@ -150,11 +149,6 @@ namespace AwsMock::Service {
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
          */
         boost::optional<http::request_parser<http::dynamic_body>> parser_;
-
-        /**
-         * HTTP request handler
-         */
-        GatewayHandler _handler;
 
         /**
          * Routine table

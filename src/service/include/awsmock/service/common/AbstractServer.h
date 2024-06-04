@@ -14,12 +14,11 @@
 // Poco includes
 #include <Poco/Net/HTTPServer.h>
 #include <Poco/Net/HTTPServerResponse.h>
-#include <Poco/Task.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
@@ -39,26 +38,17 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          *
-         * @param configuration AwsMock configuration
          * @param name manager name
          * @param timeout run timeout in seconds
          */
-        explicit AbstractServer(Core::Configuration &configuration, std::string name, int timeout);
+        explicit AbstractServer(std::string name, int timeout);
 
         /**
          * @brief Constructor
          *
-         * @param configuration AwsMock configuration
          * @param name manager name
          */
-        explicit AbstractServer(Core::Configuration &configuration, std::string name);
-
-        /**
-         * @brief Checks whether the module is active
-         *
-         * @param name module name
-         */
-        bool IsActive(const std::string &name);
+        explicit AbstractServer(std::string name);
 
         /**
          * @brief Start the HTTP manager
@@ -80,22 +70,29 @@ namespace AwsMock::Service {
       protected:
 
         /**
-         * Main loop
+         * @brief Checks whether the module is active
+         *
+         * @param name module name
+         */
+        bool IsActive(const std::string &name);
+
+        /**
+         * @brief Sets the running status in the module database
+         */
+        void SetRunning();
+
+        /**
+         * @brief Main loop
          */
         void Run() override = 0;
 
 
         /**
-         * Stop the server
+         * @brief Stop the server
          */
         void Shutdown() override;
 
       private:
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Service name
@@ -111,11 +108,6 @@ namespace AwsMock::Service {
          * Shutdown mutex
          */
         Poco::Mutex _mutex;
-
-        /**
-         * Running flag
-         */
-        bool _running;
 
         /**
          * HTTP manager instance

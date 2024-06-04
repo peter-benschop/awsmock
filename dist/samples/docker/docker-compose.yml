@@ -19,7 +19,7 @@ services:
   # AwsMock
   awsmock:
     container_name: awsmock
-    image: jensvogt/aws-mock:latest
+    image: jensvogt/awsmock:latest
     hostname: awsmock
     depends_on:
       - mongodb

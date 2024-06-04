@@ -19,6 +19,7 @@
 
 #define MODULE_HTTP_TIMER "manager_http_timer"
 #define MODULE_HTTP_COUNTER "manager_http_counter"
+#define MODULE_UPDOWN_GAUGE "manager_updown_gauge"
 
 // SNS counter, timer
 #define SNS_TOPIC_COUNT "sns_topic_counter"
@@ -36,7 +37,7 @@
 #define S3_BUCKET_COUNT "s3_bucket_counter"
 #define S3_OBJECT_COUNT "s3_object_counter"
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_counter"
-#define S3_SERVICE_TIMER "s3_service_timeer"
+#define S3_SERVICE_TIMER "s3_service_timer"
 
 // Lambda counter, timer
 #define LAMBDA_FUNCTION_COUNT "lambda_function_counter"

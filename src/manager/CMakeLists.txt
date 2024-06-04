@@ -1,7 +1,6 @@
 set(BINARY awsmockmgr)
 
-set(SOURCES src/server/Manager.cpp src/server/Listener.cpp src/server/Session.cpp src/server/Handler.cpp src/main.cpp)
-
+set(SOURCES src/server/Manager.cpp src/server/Listener.cpp src/server/Session.cpp src/server/Handler.cpp src/server/Monitoring.cpp src/main.cpp)
 
 # External includes
 include_directories(./include ../core/include ../db/include ../dto/include ../service/include ${INC_BSON_CXX} ${INC_MONGO_CXX})

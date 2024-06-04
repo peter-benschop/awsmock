@@ -30,4 +30,5 @@ namespace AwsMock::Service {
 
         log_trace << "DynamoDb monitoring finished";
     }
+
 }// namespace AwsMock::Service

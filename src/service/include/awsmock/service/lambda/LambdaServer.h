@@ -84,7 +84,7 @@ namespace AwsMock::Service {
          * @param lambda lambda to get the code from.
          * @return Dto::lambda::Code
          */
-        static Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
+        Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * Configuration
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
         /**
          * Data dir
          */
-        std::string _dataDir;
+        std::string _lambdaDir;
 
         /**
          * AWS region

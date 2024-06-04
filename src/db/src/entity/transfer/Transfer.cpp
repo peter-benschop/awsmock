@@ -73,10 +73,11 @@ namespace AwsMock::Database::Entity::Transfer {
         if (mResult.value().find("users") != mResult.value().end()) {
             bsoncxx::array::view usersView{mResult.value()["users"].get_array().value};
             for (const bsoncxx::array::element &userElement: usersView) {
-                User user{
+                User user = {
                         .userName = bsoncxx::string::to_string(userElement["userName"].get_string().value),
                         .password = bsoncxx::string::to_string(userElement["password"].get_string().value),
-                        .homeDirectory = bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value)};
+                        .homeDirectory = bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value),
+                        .arn = bsoncxx::string::to_string(userElement["arn"].get_string().value)};
                 users.push_back(user);
             }
         }

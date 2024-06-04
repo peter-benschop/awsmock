@@ -32,6 +32,10 @@
 #include <Poco/RegularExpression.h>
 #include <Poco/String.h>
 
+// Boost includes
+#include <boost/asio/detail/config.hpp>
+#include <boost/asio/ip/host_name.hpp>
+
 // AwsMock includes
 #include "awsmock/core/exception/CoreException.h"
 #include <awsmock/core/FileUtils.h>
@@ -108,11 +112,6 @@ namespace AwsMock::Core {
          * @return PID of the current process
          */
         static int GetPid();
-
-        /**
-         * @brief Starts a background process
-         */
-        static void StartBackgroundProcess(const std::string &path);
     };
 
 }// namespace AwsMock::Core

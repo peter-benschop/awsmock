@@ -63,7 +63,7 @@ namespace AwsMock::Dto::Lambda {
          * @par
          * The base64-encoded contents of the deployment package. AWS SDK and AWS CLI clients handle the encoding for you.
          */
-        std::string zipFile;
+        std::string zipFile{};
 
         /**
          * Repository

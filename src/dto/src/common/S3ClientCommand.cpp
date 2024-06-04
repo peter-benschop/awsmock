@@ -131,17 +131,17 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::DELETE_BUCKET;
         } else if (userAgent.clientCommand == "rm") {
             command = S3CommandType::DELETE_OBJECT;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "create-multipart-upload") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "create-multipart-upload") {
             command = S3CommandType::CREATE_MULTIPART_UPLOAD;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "upload-part") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "upload-part") {
             command = S3CommandType::UPLOAD_PART;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "complete-multipart-upload") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "complete-multipart-upload") {
             command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-notification-configuration") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-notification-configuration") {
             command = S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-encryption") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-encryption") {
             command = S3CommandType::PUT_BUCKET_ENCRYPTION;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "list-object-versions") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "list-object-versions") {
             command = S3CommandType::LIST_OBJECT_VERSIONS;
         }
     }

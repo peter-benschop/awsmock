@@ -46,7 +46,6 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("memorySize", static_cast<bsoncxx::types::b_int64>(memorySize)),
                 kvp("ephemeralStorage", ephemeralStorageDoc),
                 kvp("codeSize", static_cast<bsoncxx::types::b_int64>(codeSize)),
-                kvp("fileName", fileName),
                 kvp("imageId", imageId),
                 kvp("containerId", containerId),
                 kvp("tags", tagsDoc),
@@ -79,7 +78,6 @@ namespace AwsMock::Database::Entity::Lambda {
         memorySize = mResult.value()["memorySize"].get_int64().value;
         ephemeralStorage.FromDocument(mResult.value()["ephemeralStorage"].get_document().value);
         codeSize = mResult.value()["codeSize"].get_int64().value;
-        fileName = bsoncxx::string::to_string(mResult.value()["fileName"].get_string().value);
         imageId = bsoncxx::string::to_string(mResult.value()["imageId"].get_string().value);
         containerId = bsoncxx::string::to_string(mResult.value()["containerId"].get_string().value);
         arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
@@ -126,7 +124,6 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("memorySize", memorySize);
             jsonObject.set("ephemeralStorage", ephemeralStorage.ToJsonObject());
             jsonObject.set("codeSize", codeSize);
-            jsonObject.set("fileName", fileName);
             jsonObject.set("imageId", imageId);
             jsonObject.set("containerId", containerId);
             jsonObject.set("arn", arn);
@@ -135,6 +132,7 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("timeout", timeout);
             jsonObject.set("concurrency", concurrency);
             jsonObject.set("environment", environment.ToJsonObject());
+            jsonObject.set("code", code.ToJsonObject());
             jsonObject.set("state", LambdaStateToString(state));
             jsonObject.set("stateReason", stateReason);
             jsonObject.set("lastStarted", Core::DateTimeUtils::ISO8601(lastStarted));

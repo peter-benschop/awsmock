@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server() : AbstractServer(Core::Configuration::instance(), "s3"), _module("s3") {
+    S3Server::S3Server() : AbstractServer("s3"), _module("s3") {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -34,8 +34,8 @@ namespace AwsMock::Service {
         // Start REST module
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
 
-        // Create transfer bucket
-        CreateTransferBucket();
+        // Set running
+        SetRunning();
     }
 
     void S3Server::Run() {

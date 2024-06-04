@@ -11,8 +11,8 @@
 #include <thread>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/Task.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
 

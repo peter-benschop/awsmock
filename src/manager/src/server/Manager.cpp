@@ -10,8 +10,8 @@ namespace AwsMock::Manager {
 
         InitializeMonitoring();
         InitializeDatabase();
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion()
-                 << " pid: " << getpid() << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
+        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
+                 << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
     }
 
@@ -62,7 +62,7 @@ namespace AwsMock::Manager {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::instance().GetExisting();
+        std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting();
         for (const auto &module: existingModules) {
             if (!moduleDatabase.ModuleExists(module.first)) {
                 moduleDatabase.CreateModule({.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE});
@@ -149,6 +149,8 @@ namespace AwsMock::Manager {
                     // destroying the `io_context` and all the sockets in it.
                     ioc.stop();
                 });
+
+        ManagerMonitoring managerMonitoring(60);
 
         // Run the I/O service on the requested number of threads
         std::vector<std::thread> worker;

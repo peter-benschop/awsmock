@@ -257,11 +257,6 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string codeSha256;
 
         /**
-         * Filename of the code
-         */
-        std::string fileName;
-
-        /**
          * Code
          */
         Code code;

@@ -33,6 +33,7 @@
 
 #define SQS_RECEIPT_HANDLE_LENGTH 512
 #define SQS_DEFAULT_ACCOUNT_ID "000000000000"
+#define SQS_DEFAULT_REGION "eu-central-1"
 
 #define GATEWAY_DEFAULT_PORT 4566
 #define GATEWAY_DEFAULT_PROTOCOL std::string("http")
@@ -105,16 +106,6 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * @brief Create Amazon Resource Names (ARNs)
-         *
-         * @param service AWS module name
-         * @param region AWS region
-         * @param accountId AWS accountId
-         * @param resourceId AWS resourceId
-         */
-        static std::string CreateArn(const std::string &service, const std::string &region, const std::string &accountId, const std::string &resourceId);
-
-        /**
          * @brief Create S3 Amazon bucket/key ARN
          *
          * @param region AWS region
@@ -132,28 +123,6 @@ namespace AwsMock::Core {
          * @param function lambda function name
          */
         static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
-
-        /**
-         * @brief Generate a SQS queue URL.
-         *
-         * @verbatim
-         * The queue name has the format 'http://<host>:<port>/<accountId>/<queueName>'
-         * @endverbatim
-         *
-         * @param configuration current AwsMock configuration
-         * @param queueName name of the queue
-         * @return SQS queue URL
-         */
-        static std::string CreateSQSQueueUrl(const Configuration &configuration, const std::string &queueName);
-
-        /**
-         * @brief Create SQS queue ARN
-         *
-         * @param configuration current AwsMock configuration
-         * @param queueName name of the queue
-         * @return SQS queue ARN
-         */
-        static std::string CreateSQSQueueArn(const Configuration &configuration, const std::string &queueName);
 
         /**
          * @brief Converts a queue ARN to a queue URL
@@ -462,10 +431,54 @@ namespace AwsMock::Core {
      * @param configuration current AwsMock configuration
      * @return HTTP endpoint
      */
-    static inline std::string GetEndpoint() {
+    inline std::string GetEndpoint() {
         int port = Core::Configuration::instance().getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
         std::string hostname = Core::Configuration::instance().getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
         return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
+    }
+
+    /**
+     * @brief Create Amazon Resource Names (ARNs)
+     *
+     * @param service AWS module name
+     * @param region AWS region
+     * @param accountId AWS accountId
+     * @param resourceId AWS resourceId
+     */
+    inline std::string CreateArn(const std::string &service, const std::string &region, const std::string &accountId, const std::string &resourceId) {
+        return "arn:aws:" + service + ":" + region + ":" + accountId + ":" + resourceId;
+    }
+
+    /**
+     * @brief Generate a SQS queue URL.
+     *
+     * The queue name has the format <i>'http://sqs.<region<.<host>:<port>/<accountId>/<queueName>'</i>
+     *
+     * @param queueName name of the queue
+     * @return SQS queue URL
+     */
+    inline std::string CreateSQSQueueUrl(const std::string &queueName) {
+        std::string hostname = Core::SystemUtils::GetHostName();
+        std::string port = Core::Configuration::instance().getString("awsmock.service.gateway.http.port");
+        std::string region = Core::Configuration::instance().getString("awsmock.region", SQS_DEFAULT_REGION);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
+        std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+        log_trace << "queueUrl: " << queueUrl;
+        return queueUrl;
+    }
+
+    /**
+     * @brief Create SQS queue ARN
+     *
+     * @param configuration current AwsMock configuration
+     * @param queueName name of the queue
+     * @return SQS queue ARN
+     */
+    inline std::string CreateSQSQueueArn(const std::string &queueName) {
+        std::string region = Core::Configuration::instance().getString("awsmock.region", GATEWAY_DEFAULT_REGION);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
+        log_trace << "Region: " << region << " accountId: " << accountId;
+        return CreateArn("sqs", region, accountId, queueName);
     }
 
     /**
@@ -474,7 +487,7 @@ namespace AwsMock::Core {
      * @param queue queue from Spring cloud
      * @return true if this is a URL
      */
-    static inline bool IsSQSUrl(const std::string &queue) {
+    inline bool IsSQSUrl(const std::string &queue) {
         return Core::StringUtils::StartsWith(queue, "http");
     }
 
@@ -484,7 +497,7 @@ namespace AwsMock::Core {
      * @param queue queue from Spring cloud
      * @return true if this is a URL
      */
-    static inline bool IsSQSArn(const std::string &queue) {
+    inline bool IsSQSArn(const std::string &queue) {
         return Core::StringUtils::ContainsIgnoreCase(queue, "http");
     }
 
@@ -494,13 +507,13 @@ namespace AwsMock::Core {
      * @param queue from Spring cloud request
      * @return queue URL
      */
-    static inline std::string SanitizeSQSUrl(const std::string &queue) {
+    inline std::string SanitizeSQSUrl(const std::string &queue) {
         if (IsSQSUrl(queue)) {
             return queue;
         } else if (IsSQSArn(queue)) {
             return AwsUtils::ConvertSQSQueueArnToUrl(Configuration::instance(), queue);
         } else {
-            return AwsUtils::CreateSQSQueueUrl(Configuration::instance(), queue);
+            return CreateSQSQueueUrl(queue);
         }
     }
 

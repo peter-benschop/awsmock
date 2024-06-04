@@ -251,6 +251,15 @@ namespace AwsMock::Core {
         static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &key);
 
         /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @return header value of empty string.
+         */
+        static bool HasHeader(const http::request<http::string_body> &request, const std::string &key);
+
+        /**
          * @brief Returns a header value by key.
          *
          * <p>

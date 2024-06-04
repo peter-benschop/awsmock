@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    CognitoServer::CognitoServer() : AbstractServer(Core::Configuration::instance(), "cognito", 10), _module("cognito") {
+    CognitoServer::CognitoServer() : AbstractServer("cognito", 10), _module("cognito") {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -37,6 +37,9 @@ namespace AwsMock::Service {
 
         // Start REST module
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory());
+
+        // Set running
+        SetRunning();
     }
 
     void CognitoServer::Run() {

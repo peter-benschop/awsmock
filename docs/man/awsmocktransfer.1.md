@@ -32,11 +32,20 @@ corresponding man page ```awslocal(1)```.
 ```awslocal transfer list-servers```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available transfer servers
 
+```awslocal transfer create-user --server-id <server-id> --role <role> --user-name <user-name> --home-directory <home-dir>```  
+&nbsp;&nbsp;&nbsp;&nbsp;creates a new user
+
 ```awslocal transfer list-users```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available transfer servers
 
 ```awslocal transfer delete-server --server-id <server-id>```  
 &nbsp;&nbsp;&nbsp;&nbsp;deletes a transfer server
+
+```awslocal transfer start-server --server-id <server-id>```  
+&nbsp;&nbsp;&nbsp;&nbsp;starts a server
+
+```awslocal transfer stop-server --server-id <server-id>```  
+&nbsp;&nbsp;&nbsp;&nbsp;stops a server
 
 ## EXAMPLES
 
@@ -79,6 +88,7 @@ awslocal transfer delete-server --server-userPoolId s-27134679b31c0a9833ee
 Show a list of all users
 
 ```
+awslocal transfer list-users --server-id 27134679b31c0a9833ee
 {
     "Users": [
         {

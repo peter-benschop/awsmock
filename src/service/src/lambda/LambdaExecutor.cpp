@@ -12,7 +12,7 @@ namespace AwsMock::Service {
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
         log_debug << "Sending lambda invocation request, endpoint: " << _host << ":" << _port;
 
-        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, _host, _port, "/", _payload, {});
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, _host, _port, "/2015-03-31/functions/function/invocations", _payload, {});
         if (response.statusCode != http::status::ok) {
             log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
         }

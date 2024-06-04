@@ -110,10 +110,9 @@ namespace AwsMock::Service {
          * @param codeDir temporary data directory
          * @param zipFile Base64 encoded zip file.
          * @param runtime AWS lambda runtime name
-         * @param fileName filename of the Base64 encoded and zipped code file
          * @return code directory
          */
-        static std::string UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime, const std::string &fileName);
+        static std::string UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime);
 
         /**
          * @brief Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
@@ -142,13 +141,15 @@ namespace AwsMock::Service {
         /**
          * @brief Write Base64 encoded file to lambda dir
          *
-         * @param filename name of the file to write (input)
-         * @param base64Filename name of the base64 file name (output)
+         * @param zipFile base64 encoded code from AWS CLI
+         * @param lambda lambda entity
+         * @param dockerTag docker tag to use
+         * @param dataDir data directoyr
          * @return base64 string
          */
-        static std::string WriteBase64File(const std::string &filename, const std::string &base64Filename);
+        static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir);
     };
 
-}//namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_CREATOR_H
