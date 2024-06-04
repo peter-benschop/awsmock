@@ -20,7 +20,7 @@ namespace AwsMock::Service {
             log_debug << "Got bucket: " << s3Request.name;
             return {
                     .location = bucket.region,
-                    .arn = Core::AwsUtils::CreateArn("s3", region, accountId, s3Request.name)};
+                    .arn = Core::CreateArn("s3", region, accountId, s3Request.name)};
         }
 
         Dto::S3::CreateBucketResponse createBucketResponse;
@@ -30,7 +30,7 @@ namespace AwsMock::Service {
             // Update database
             _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner});
 
-            createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::AwsUtils::CreateArn("s3", region, accountId, s3Request.name));
+            createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::CreateArn("s3", region, accountId, s3Request.name));
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
             log_info << "Bucket created, bucket: " << s3Request.name;
 

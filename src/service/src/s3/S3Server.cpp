@@ -34,9 +34,6 @@ namespace AwsMock::Service {
         // Start REST module
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
 
-        // Create transfer bucket
-        CreateTransferBucket();
-
         // Set running
         SetRunning();
     }

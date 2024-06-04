@@ -100,20 +100,6 @@ namespace AwsMock::Service {
                 };
 
         // Returns a bad request response
-        auto const unauthorized =
-                [&req](boost::beast::string_view why) {
-                    http::response<http::dynamic_body> res{http::status::unauthorized, req.version()};
-                    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-                    res.set(http::field::content_type, "text/html");
-                    res.keep_alive(req.keep_alive());
-
-                    // Body
-                    boost::beast::net::streambuf sb;
-                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
-                    res.prepare_payload();
-                    return res;
-                };
-        // Returns a bad request response
         auto const notimplemented =
                 [&req](boost::beast::string_view why) {
                     http::response<http::dynamic_body> res{http::status::not_implemented, req.version()};

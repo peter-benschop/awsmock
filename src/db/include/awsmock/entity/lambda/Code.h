@@ -10,6 +10,9 @@
 #include <string>
 #include <vector>
 
+// Poco includes
+#include <Poco/JSON/Object.h>
+
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -34,9 +37,15 @@ namespace AwsMock::Database::Entity::Lambda {
     struct Code {
 
         /**
-         * Zip filename
+         * Filename of the code. This is the filename of the base64 encoded ZIP file, which is saved in the
+         * lambda directory, usually /home/awsmock/data/lambda. This file is loaded by the server during
+         * startup. All lambdas, which are saved in the database and found in the lambda directory get
+         * automatically started.
+         *
+         * In case the lambda does not exist and the lambda is created by the AWS CLI, zipFile contains the
+         * base64 encoded lambda code.
          */
-        std::string zipFilename;
+        std::string zipFile;
 
         /**
          * S3 bucket
@@ -51,7 +60,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * S3 version
          */
-        std::string s3Version;
+        std::string s3ObjectVersion;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -66,6 +75,13 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @param Converts the entity to a JSON object
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * @brief Converts the DTO to a string representation.

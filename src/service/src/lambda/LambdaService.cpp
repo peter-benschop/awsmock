@@ -18,6 +18,7 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambdaEntity;
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
+        std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 
             // Get the existing entity
@@ -27,7 +28,13 @@ namespace AwsMock::Service {
 
             Database::Entity::Lambda::Environment environment = {.variables = request.environment.variables};
             lambdaEntity = Dto::Lambda::Mapper::map(request);
-            lambdaEntity.arn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, lambdaEntity.function);
+            lambdaEntity.arn = lambdaArn;
+
+            // Remove code
+            if (!request.code.zipFile.empty()) {
+                zippedCode = std::move(request.code.zipFile);
+                lambdaEntity.code.zipFile.clear();
+            }
         }
 
         // Update database
@@ -38,7 +45,7 @@ namespace AwsMock::Service {
 
         // Create lambda function asynchronously
         LambdaCreator lambdaCreator;
-        boost::thread t(boost::ref(lambdaCreator), request.code.zipFile, lambdaEntity.oid);
+        boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid);
         t.detach();
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 

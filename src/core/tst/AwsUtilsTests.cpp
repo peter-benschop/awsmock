@@ -55,7 +55,7 @@ namespace AwsMock::Core {
         std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act
-        std::string result = AwsUtils::CreateSQSQueueArn(_configuration, queueName);
+        std::string result = Core::CreateSQSQueueArn(queueName);
 
         // assert
         EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());

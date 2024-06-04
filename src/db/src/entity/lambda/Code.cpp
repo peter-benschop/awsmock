@@ -8,26 +8,42 @@ namespace AwsMock::Database::Entity::Lambda {
 
     void Code::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        if (mResult.value().find("zipFilename") != mResult.value().end()) {
-            zipFilename = bsoncxx::string::to_string(mResult.value()["zipFilename"].get_string().value);
-        } else if (mResult.value().find("s3Bucket") != mResult.value().end()) {
+        if (mResult.value().find("zipFile") != mResult.value().end()) {
+            zipFile = bsoncxx::string::to_string(mResult.value()["zipFile"].get_string().value);
+        }
+        if (mResult.value().find("s3Bucket") != mResult.value().end()) {
             s3Bucket = bsoncxx::string::to_string(mResult.value()["s3Bucket"].get_string().value);
             s3Key = bsoncxx::string::to_string(mResult.value()["s3Key"].get_string().value);
-            s3Version = bsoncxx::string::to_string(mResult.value()["s3Version"].get_string().value);
+            s3ObjectVersion = bsoncxx::string::to_string(mResult.value()["s3ObjectVersion"].get_string().value);
         }
     }
 
     view_or_value<view, value> Code::ToDocument() const {
 
         bsoncxx::builder::basic::document codeDoc{};
-        if (!zipFilename.empty()) {
-            codeDoc.append(kvp("zipFilename", zipFilename));
-        } else if (!s3Bucket.empty()) {
+        if (!s3Bucket.empty()) {
             codeDoc.append(kvp("s3Bucket", s3Bucket));
             codeDoc.append(kvp("s3Key", s3Key));
-            codeDoc.append(kvp("s3Version", s3Version));
+            codeDoc.append(kvp("s3ObjectVersion", s3ObjectVersion));
+        }
+        if (!zipFile.empty()) {
+            codeDoc.append(kvp("zipFile", zipFile));
         }
         return codeDoc.extract();
+    }
+
+    Poco::JSON::Object Code::ToJsonObject() const {
+
+        Poco::JSON::Object jsonObject;
+        if (!zipFile.empty()) {
+            jsonObject.set("zipFile", zipFile);
+        }
+        if (!s3Bucket.empty()) {
+            jsonObject.set("s3Bucket", s3Bucket);
+            jsonObject.set("s3Key", s3Key);
+            jsonObject.set("s3ObjectVersion", s3ObjectVersion);
+        }
+        return jsonObject;
     }
 
     [[nodiscard]] std::string Code::ToString() const {

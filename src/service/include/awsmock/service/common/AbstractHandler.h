@@ -11,6 +11,7 @@
 #include <string>
 
 // Boost includes
+#include <asio/buffer.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes

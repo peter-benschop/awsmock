@@ -52,20 +52,7 @@ namespace AwsMock::Core {
     }
 
     std::string SystemUtils::GetHostName() {
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
-        char *temp = 0;
-        std::string computerName;
-        temp = getenv("COMPUTERNAME");
-        if (temp != 0) {
-            computerName = temp;
-            temp = 0;
-        }
-        return computerName;
-#else
-        char buffer[128];
-        gethostname(buffer, 128);
-        return {buffer};
-#endif
+        return boost::asio::ip::host_name();
     }
 
     int SystemUtils::GetRandomPort() {

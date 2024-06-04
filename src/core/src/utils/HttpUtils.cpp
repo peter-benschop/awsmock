@@ -198,6 +198,10 @@ namespace AwsMock::Core {
         return url;
     }
 
+    bool HttpUtils::HasHeader(const http::request<http::string_body> &request, const std::string &name) {
+        return request.base().find(name) != request.end();
+    }
+
     bool HttpUtils::HasHeader(const http::request<http::dynamic_body> &request, const std::string &name) {
         return request.base().find(name) != request.end();
     }

@@ -46,10 +46,18 @@ namespace AwsMock::Manager {
 
         } else if (action == "export") {
 
+            // Get options
             std::string tmp = Core::HttpUtils::GetHeaderValue(request, "pretty");
-            bool prettyPrint = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "pretty"));
-            bool includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "include-objects"));
+            bool prettyPrint = false;
+            if (Core::HttpUtils::HasHeader(request, "pretty")) {
+                prettyPrint = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "pretty"));
+            }
+            bool includeObjects = false;
+            if (Core::HttpUtils::HasHeader(request, "include-objects")) {
+                includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "include-objects"));
+            }
 
+            // Get modules
             Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
             std::string infrastructureJson = AwsMock::Service::ModuleService::ExportInfrastructure(modules, prettyPrint, includeObjects);
             return SendOkResponse(request, infrastructureJson);

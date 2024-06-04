@@ -13,7 +13,7 @@ namespace AwsMock::Core {
         boost::asio::io_context ctx;
         boost::asio::local::stream_protocol::endpoint endpoint(_path);
         boost::asio::local::stream_protocol::socket socket(ctx);
-        socket.connect(endpoint, ec);
+        ec = socket.connect(endpoint, ec);
         if (ec) {
             log_error << "Could not connect to docker UNIX domain socket, error: " << ec.message();
             return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket, error: " + ec.message()};
@@ -45,7 +45,7 @@ namespace AwsMock::Core {
         boost::asio::io_context ctx;
         boost::asio::local::stream_protocol::endpoint endpoint(_path);
         boost::asio::local::stream_protocol::socket socket(ctx);
-        socket.connect(endpoint, ec);
+        ec = socket.connect(endpoint, ec);
         if (ec) {
             log_error << "Could not connect to docker UNIX domain socket";
             return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
