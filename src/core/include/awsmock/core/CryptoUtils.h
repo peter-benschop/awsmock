@@ -84,6 +84,7 @@ namespace AwsMock::Core {
      *
      * @par
      * This class contains AWS cryptographic method as well as OpenSSL methods. AWS cryptographic methods a are denoted with a preceding 'AWS'.
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     class Crypto {

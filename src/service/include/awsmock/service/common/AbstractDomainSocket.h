@@ -28,10 +28,14 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          *
+         * @param ioc boost IO context
          * @param socketPath
          */
         explicit AbstractDomainSocket(boost::asio::io_context &ioc, const std::string &socketPath);
 
+        /**
+         * @brief Main method
+         */
         void Run();
 
       private:
@@ -40,11 +44,6 @@ namespace AwsMock::Service {
          * Socket path
          */
         std::string _socketPath;
-
-        /**
-         * IO service
-         */
-        //boost::asio::io_service &_ioService;
 
         /**
          * Socket acceptor

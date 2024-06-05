@@ -97,7 +97,7 @@ namespace AwsMock::Service {
             Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(request.keyId);
 
             key.pendingWindowInDays = request.pendingWindowInDays;
-            key.scheduledDeletion = Poco::DateTime(Poco::DateTime().timestamp() + Poco::Timespan(request.pendingWindowInDays * 24 * 60 * 60, 0));
+            key.scheduledDeletion = system_clock::now() + std::chrono::days(request.pendingWindowInDays);
             key.keyState = Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION);
 
             // Store in database
@@ -107,7 +107,7 @@ namespace AwsMock::Service {
             return {
                     .keyId = request.keyId,
                     .keyState = key.keyState,
-                    .deletionDate = static_cast<long>(key.scheduledDeletion.timestamp().epochMicroseconds() / 1000),
+                    .deletionDate = key.scheduledDeletion.time_since_epoch().count(),
                     .pendingWindowInDays = request.pendingWindowInDays,
             };
 
@@ -138,8 +138,8 @@ namespace AwsMock::Service {
                     .keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage),
                     .keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState),
                     .description = keyEntity.description,
-                    .creationDate = static_cast<long>(keyEntity.created.timestamp().epochTime()),
-                    .deletionDate = static_cast<long>(keyEntity.scheduledDeletion.timestamp().epochTime()),
+                    .creationDate = keyEntity.created.time_since_epoch().count(),
+                    .deletionDate = keyEntity.scheduledDeletion.time_since_epoch().count(),
                     .enabled = Core::StringUtils::Equals(keyEntity.keyState, Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED))};
             Dto::KMS::DescribeKeyResponse response = {.key = key};
             return response;

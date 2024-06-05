@@ -46,12 +46,16 @@ namespace AwsMock::Controller {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
+         *
+         * AwsMock controller, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
+         *
+         * @author jens.vogt\@opitz-consulting.com
          */
         explicit AwsMockCtl();
 
         /**
-         * Initialization
+         * @brief Initialization
          *
          * @param vm vector of command line options
          * @param commands vector of commands
@@ -59,31 +63,31 @@ namespace AwsMock::Controller {
         void Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands);
 
         /**
-         * Initialization
+         * @brief Main method
          */
         void Run();
 
         /**
-         * List all available services
+         * @brief List all available services
          */
         void ListServices();
 
         /**
-         * Start a module
+         * @brief Start a module
          *
          * @param modules list of modules names
          */
         void StartService(std::vector<Dto::Module::Module> &modules);
 
         /**
-         * Restart a module
+         * @brief Restart a module
          *
          * @param modules list of modules names
          */
         void RestartService(std::vector<Dto::Module::Module> &modules);
 
         /**
-         * Stops a module
+         * @brief Stops a module
          *
          * @param modules list of modules names
          */
@@ -91,25 +95,25 @@ namespace AwsMock::Controller {
 
 #ifdef HAS_SYSTEMD
         /**
-         * Show the logs
+         * @brief Show the logs
          */
         static void ShowServiceLogs();
 #endif
 
         /**
-         * Sets the managers log level
+         * @brief Sets the managers log level
          *
          * @param level log level
          */
         void SetLogLevel(const std::string &level);
 
         /**
-         * Returns the current AwsMock configuration
+         * @brief Returns the current AwsMock configuration
          */
         void GetConfig();
 
         /**
-         * Dumps the current infrastructure as JSON file to stdout.
+         * @brief Dumps the current infrastructure as JSON file to stdout.
          *
          * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
@@ -118,7 +122,7 @@ namespace AwsMock::Controller {
         void ExportInfrastructure(Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false);
 
         /**
-         * Imports the current infrastructure from stdin
+         * @brief Imports the current infrastructure from stdin
          */
         void ImportInfrastructure();
 
@@ -142,7 +146,7 @@ namespace AwsMock::Controller {
          * As the AWS CLI does not allow to see the users password, this is a workaround. It will send a FTP user list
          * request to the server and shows the currently defined FTP users.
          *
-         * @param serverID ID of the FTP server.
+         * @param serverId ID of the FTP server.
          */
         void ShowFtpUsers(const std::string &serverId);
 
