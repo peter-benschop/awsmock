@@ -26,7 +26,7 @@
 namespace AwsMock::Core {
 
     /**
-     * TAR compresion utilities
+     * @brief TAR compresion utilities
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -35,22 +35,22 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         TarUtils() = default;
 
         /**
-           * Archive a whole directory tree to a tar file.
-           *
-           * @param tarFile name of the tar file
-           * @param directory directory name
-           */
+         * @brief Archive a whole directory tree to a tar file.
+         *
+         * @param tarFile name of the tar file
+         * @param directory directory name
+         */
         static void TarDirectory(const std::string &tarFile, const std::string &directory);
 
       private:
 
         /**
-         * Writes archive single file to the Tar archive.
+         * @brief Writes archive single file to the Tar archive.
          *
          * @param archive tar archive.
          * @param fileName name of the file to write
@@ -58,10 +58,10 @@ namespace AwsMock::Core {
          * @param isDir directory flag
          * @param isLink link flag, needed to preserve links
          */
-        static void WriteFile(struct archive *archive,const std::string &fileName,const std::string &removeDir,bool isDir,bool isLink);
+        static void WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink);
 
         /**
-         * Read a symbolic link.
+         * @brief Read a symbolic link.
          *
          * @param path path to link.
          * @return target path.

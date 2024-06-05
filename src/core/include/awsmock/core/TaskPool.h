@@ -21,12 +21,12 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         TaskPool();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static TaskPool &instance() {
             static TaskPool taskPool;
@@ -34,7 +34,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Adds a new thread
+         * @brief Adds a new thread
          *
          * @param name name of task
          * @param task task object

@@ -40,7 +40,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Returns the base path of the URI.
+         * @brief Returns the base path of the URI.
          *
          * @brief <p>Removes leading '/'.</p>
          *

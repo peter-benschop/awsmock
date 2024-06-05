@@ -24,7 +24,7 @@
 namespace AwsMock::Core {
 
     /**
-     * Memory mapped file utility.
+     * @brief Memory mapped file utility.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -33,12 +33,12 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
 
         /**
-         * Singleton
+         * @brief Singleton
          *
          * @return singleton instance
          */
@@ -48,7 +48,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Opens a file and prepares the memory map
+         * @brief Opens a file and prepares the memory map
          *
          * @param filename name of the file.
          * @return true on success
@@ -56,12 +56,12 @@ namespace AwsMock::Core {
         bool OpenFile(const std::string &filename);
 
         /**
-         * Release all resources
+         * @brief Release all resources
          */
         void CloseFile();
 
         /**
-         * Copy a chunk of data from the memory mapped file the provided output buffer
+         * @brief Copy a chunk of data from the memory mapped file the provided output buffer
          *
          * @param start start index
          * @param end end index
@@ -71,7 +71,7 @@ namespace AwsMock::Core {
         long ReadChunk(long start, long end, char *buffer);
 
         /**
-         * Returns true in case the file is mapped already.
+         * @brief Returns true in case the file is mapped already.
          *
          * @return true, in case file is already mapped.
          */

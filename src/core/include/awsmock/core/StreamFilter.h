@@ -15,7 +15,7 @@ namespace AwsMock::Core {
                                        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f};
 
     /**
-     * Input stream filter class.
+     * @brief Input stream filter class.
      *
      * <p>Can be used with the standard filter classes as described in https://en.cppreference.com/w/cpp/header/cctype</p>
      * <p>Usage:
@@ -40,7 +40,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Filters all non-XML characters from the supplied input stream.
+         * @brief Filters all non-XML characters from the supplied input stream.
          *
          * <p>Non-XML characters are all characters < 0x20, except 0x09 (TAB), 0x0A (LF), 0x0D (CR)</p>
          *
@@ -53,7 +53,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Filters all character which are not recognized by the given standard filter.
+         * @brief Filters all character which are not recognized by the given standard filter.
          *
          * <p> Standard filters are defined in &lt;cctype&gt; like std::isdigit, std::isalpha etc.</p>
          *
@@ -74,7 +74,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Filters all character which are not recognized by the given standard filter.
+         * @brief Filters all character which are not recognized by the given standard filter.
          *
          * <p> Standard filters are defined in &lt;cctype&gt; like std::isdigit, std::isalpha etc.</p>
          *
@@ -93,7 +93,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Filters all character which are not recognized by the given standard filter.
+         * @brief Filters all character which are not recognized by the given standard filter.
          *
          * <p> Standard filters are defined in &lt;cctype&gt; like std::isdigit, std::isalpha etc.</p>
          *
@@ -114,7 +114,7 @@ namespace AwsMock::Core {
       private:
 
         /**
-         * Non-XML character filter.
+         * @brief Non-XML character filter.
          *
          * <p>Non-XML characters are all characters < 0x20, except 0x09 (TAB), 0x0A (LF), 0x0D (CR)</p>
          *

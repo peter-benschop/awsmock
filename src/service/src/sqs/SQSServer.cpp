@@ -35,9 +35,6 @@ namespace AwsMock::Service {
         }
         log_info << "SQS server starting, port: " << _port;
 
-        // Start monitoring
-        //_sqsMonitoring->Start();
-
         // Start worker thread
         _sqsWorker->Start();
 

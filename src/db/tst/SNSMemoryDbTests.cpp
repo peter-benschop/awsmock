@@ -5,6 +5,9 @@
 #ifndef AWMOCK_CORE_SNSMEMORYDBTEST_H
 #define AWMOCK_CORE_SNSMEMORYDBTEST_H
 
+// C++ includes
+#include <chrono>
+
 // GTest includes
 #include <gtest/gtest.h>
 
@@ -25,6 +28,8 @@
 #define OWNER "test-owner"
 
 namespace AwsMock::Database {
+
+    using std::chrono::system_clock;
 
     class SNSMemoryDbTest : public ::testing::Test {
 

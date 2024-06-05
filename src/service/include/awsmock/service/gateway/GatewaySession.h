@@ -86,11 +86,11 @@ namespace AwsMock::Service {
          *
          * @tparam Body HTTP body
          * @tparam Allocator allocator
-         * @param req HTTP request
+         * @param request HTTP request
          * @return
          */
         template<class Body, class Allocator>
-        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&req);
+        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
 
         /**
          * @brief Called to start/continue the write-loop.

@@ -20,8 +20,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
                     kvp("region", region),
                     kvp("tableName", tableName),
                     kvp("attributes", attributesDoc),
-                    kvp("created", MongoUtils::ToBson(created)),
-                    kvp("modified", MongoUtils::ToBson(modified)));
+                    kvp("created", bsoncxx::types::b_date(created)),
+                    kvp("modified", bsoncxx::types::b_date(modified)));
 
             return itemDoc.extract();
 
@@ -36,8 +36,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         tableName = bsoncxx::string::to_string(mResult.value()["tableName"].get_string().value);
-        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date().value));
-        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
         return *this;
     }
 

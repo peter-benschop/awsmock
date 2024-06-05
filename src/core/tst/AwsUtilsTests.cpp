@@ -82,7 +82,7 @@ namespace AwsMock::Core {
         std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act
-        std::string result = AwsUtils::ConvertSQSQueueArnToUrl(_configuration, sqsQueueArn);
+        std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn);
 
         // assert
         EXPECT_STREQ(result.c_str(), sqsQueueUrl.c_str());
@@ -103,18 +103,18 @@ namespace AwsMock::Core {
     TEST_F(AwsUtilsTest, VerifySignaturePocoTest) {
 
         // arrange
-        Poco::Net::HTTPRequest request;
-        request.setMethod("GET");
-        request.setURI("/test.txt");
-        request.setHost("examplebucket.s3.amazonaws.com");
-        request.set("Authorization", "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request,SignedHeaders=host;range;x-amz-content-sha256;x-amz-date,Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41");
-        request.set("Range", "bytes=0-9");
+        http::request<http::dynamic_body> request;
+        request.method(http::verb::get);
+        request.target() = "/test.txt";
+        request.set(http::field::host, "examplebucket.s3.amazonaws.com");
+        request.set(http::field::authorization, "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20130524/us-east-1/s3/aws4_request,SignedHeaders=host;range;x-amz-content-sha256;x-amz-date,Signature=f0e8bdb87c964420e857bd35b5d6ed310bd44f0170aba48dd91039c6036bdb41");
+        request.set(http::field::range, "bytes=0-9");
         request.set("x-amz-content-sha256", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         request.set("x-amz-date", "20130524T000000Z");
         std::string secretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
 
         // act
-        bool result = AwsUtils::VerifySignature(request, {}, secretAccessKey);
+        bool result = AwsUtils::VerifySignature(request, secretAccessKey);
 
         // assert
         ASSERT_TRUE(result);

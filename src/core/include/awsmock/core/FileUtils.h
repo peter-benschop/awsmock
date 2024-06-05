@@ -56,7 +56,7 @@
 namespace AwsMock::Core {
 
     /**
-     * File utilities.
+     * @brief File utilities.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -65,12 +65,15 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Extracts the base name (without extension) from the given file name.
+         * @brief Extracts the base name (without extension) from the given file name.
+         *
+         * @param fileName
+         * @return base name of the filename
          */
         static std::string GetBasename(const std::string &fileName);
 
         /**
-         * Returns the file extension.
+         * @brief Returns the file extension.
          *
          * @param fileName name fo the file
          * @return file extension in lower case letters
@@ -78,7 +81,7 @@ namespace AwsMock::Core {
         static std::string GetExtension(const std::string &fileName);
 
         /**
-         * Returns the parent directory name.
+         * @brief Returns the parent directory name.
          *
          * @param fileName name fo the file
          * @return parent directory name
@@ -86,7 +89,7 @@ namespace AwsMock::Core {
         static std::string GetParentPath(const std::string &fileName);
 
         /**
-         * Check whether the file has the given pattern
+         * @brief Check whether the file has the given pattern
          *
          * @param fileName file name to check
          * @param pattern file name pattern
@@ -95,7 +98,7 @@ namespace AwsMock::Core {
         static bool FileNameContainsString(const std::string &fileName, const std::string &pattern);
 
         /**
-         * Returns a thread safe temp file name.
+         * @brief Returns a thread safe temp file name.
          *
          * @param extension desired file extension
          * @return thread safe temp file name
@@ -103,7 +106,7 @@ namespace AwsMock::Core {
         static std::string GetTempFile(const std::string &extension);
 
         /**
-         * Returns a thread safe temp file name.
+         * @brief Returns a thread safe temp file name.
          *
          * @param dir directory to create the file
          * @param extension desired file extension
@@ -112,7 +115,7 @@ namespace AwsMock::Core {
         static std::string GetTempFile(const std::string &dir, const std::string &extension);
 
         /**
-         * Creates an temporary file containing an random string
+         * @brief Creates an temporary file containing an random string
          *
          * @param extension file name extension
          * @return file name
@@ -120,7 +123,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &extension);
 
         /**
-         * Creates an temporary file containing an specific content string
+         * @brief Creates an temporary file containing an specific content string
          *
          * @param extension file name extension
          * @param content content of the file
@@ -129,7 +132,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &extension, const std::string &content);
 
         /**
-         * Creates an temporary file containing a numBytes long random string
+         * @brief Creates an temporary file containing a numBytes long random string
          *
          * @param extension file name extension
          * @param numBytes length of the file
@@ -138,7 +141,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &extension, int numBytes);
 
         /**
-         * Creates an temporary file containing a numBytes long random string in the given directory.
+         * @brief Creates an temporary file containing a numBytes long random string in the given directory.
          *
          * @param dirName name of the directory
          * @param extension file name extension
@@ -148,7 +151,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &dirName, const std::string &extension, int numBytes);
 
         /**
-         * Check whether a file exists.
+         * @brief Check whether a file exists.
          *
          * @param fileName name of the file.
          * @return true, if file exists otherwise false.
@@ -156,7 +159,7 @@ namespace AwsMock::Core {
         static bool FileExists(const std::string &fileName);
 
         /**
-         * Returns the size of the given in bytes.
+         * @brief Returns the size of the given in bytes.
          *
          * @param fileName name of the file.
          * @return size of the in bytes.
@@ -164,7 +167,7 @@ namespace AwsMock::Core {
         static long FileSize(const std::string &fileName);
 
         /**
-         * Moves a file to a new directory.
+         * @brief Moves a file to a new directory.
          *
          * @param sourceFileName name of the source file.
          * @param targetFileName name of the target file.
@@ -173,7 +176,7 @@ namespace AwsMock::Core {
         static void MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir = true);
 
         /**
-         * Copies a file to a new directory.
+         * @brief Copies a file to a new directory.
          *
          * @param sourceFileName name of the source file.
          * @param targetFileName name of the target file.
@@ -182,7 +185,7 @@ namespace AwsMock::Core {
         static void CopyTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir = true);
 
         /**
-         * Append several binary files to a single output file.
+         * @brief Append several binary files to a single output file.
          *
          * <p>The out file will be truncated, before its used </p>
          *
@@ -193,7 +196,7 @@ namespace AwsMock::Core {
         static void AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
 
         /**
-         * Append several text files to a single output file.
+         * @brief Append several text files to a single output file.
          *
          * <p>The out file will be truncated, before its used </p>
          *
@@ -205,7 +208,7 @@ namespace AwsMock::Core {
         static long AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
 
         /**
-         * Strips the path from the filename
+         * @brief Strips the path from the filename
          *
          * @param fileName name of the file
          * @return file name without base path
@@ -213,21 +216,21 @@ namespace AwsMock::Core {
         static std::string StripBasePath(const std::string &fileName);
 
         /**
-         * Returns the file owner.
+         * @brief Returns the file owner.
          *
          * @param fileName name of the file to delete
          */
         static std::string GetOwner(const std::string &fileName);
 
         /**
-         * Delete the file with the given file name
+         * @brief Delete the file with the given file name
          *
          * @param fileName name of the file to delete
          */
         static void DeleteFile(const std::string &fileName);
 
         /**
-         * Unzip the given file to the given directory.
+         * @brief Unzip the given file to the given directory.
          *
          * @param zipFile zip file to decompress.
          * @param dirName output directory.
@@ -235,7 +238,7 @@ namespace AwsMock::Core {
         static void UnzipFiles(const std::string &zipFile, const std::string &dirName);
 
         /**
-         * Unzip the given file to the given directory.
+         * @brief Unzip the given file to the given directory.
          *
          * @param zipFile zip file to decompress.
          * @param dirName directory to zip.
@@ -243,14 +246,14 @@ namespace AwsMock::Core {
         static void ZipFiles(const std::string &zipFile, const std::string &dirName);
 
         /**
-         * Touch an existing file
+         * @brief Touch an existing file
          *
          * @param fileName absolute file name of the file
          */
         static bool Touch(const std::string &fileName);
 
         /**
-         * Strip chunk signatures from file
+         * @brief Strip chunk signatures from file
          *
          * @param path absolute file path
          */

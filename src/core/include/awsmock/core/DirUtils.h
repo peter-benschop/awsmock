@@ -38,7 +38,7 @@ namespace AwsMock::Core {
     };
 
     /**
-     * Directory utilities.
+     * @brief Directory utilities.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -47,14 +47,14 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Returns a thread safe temp directory name.
+         * @brief Returns a thread safe temp directory name.
          *
          * @return thread safe temp directory name
          */
         static std::string GetTempDir();
 
         /**
-         * Returns relative path for the given directory.
+         * @brief Returns relative path for the given directory.
          *
          * @param dir directory name
          * @return relative path to dir
@@ -62,14 +62,14 @@ namespace AwsMock::Core {
         static std::string RelativePath(const std::string &dir);
 
         /**
-         * Creates an empty temporary directory
+         * @brief Creates an empty temporary directory
          *
          * @return name of the directory
          */
         static std::string CreateTempDir();
 
         /**
-         * Creates an empty temporary directory within the given parent directory
+         * @brief Creates an empty temporary directory within the given parent directory
          *
          * @param parent parent directory for the temporary directory
          * @return thread safe temp directory name
@@ -77,7 +77,7 @@ namespace AwsMock::Core {
         static std::string CreateTempDir(const std::string &parent);
 
         /**
-         * Checks the existence of a directory
+         * @brief Checks the existence of a directory
          *
          * @param dirName name of the directory.
          * @return true, if directory exists otherwise false.
@@ -85,7 +85,7 @@ namespace AwsMock::Core {
         static bool DirectoryExists(const std::string &dirName);
 
         /**
-         * Count the number of files in the geven directory.
+         * @brief Count the number of files in the geven directory.
          *
          * @param dirName name of the directory.
          * @return toal number of files.
@@ -93,7 +93,7 @@ namespace AwsMock::Core {
         static long DirectoryCountFiles(const std::string &dirName);
 
         /**
-         * Checks whether the directory is empty.
+         * @brief Checks whether the directory is empty.
          *
          * @param dirName name of the directory.
          * @return true, if directory is empty.
@@ -101,7 +101,7 @@ namespace AwsMock::Core {
         static bool DirectoryEmpty(const std::string &dirName);
 
         /**
-         * Creates an directory tree recursively
+         * @brief Creates an directory tree recursively
          *
          * @param dirName name of the directory.
          * @param recursive if true, create also all parent directories.
@@ -109,7 +109,7 @@ namespace AwsMock::Core {
         static void MakeDirectory(const std::string &dirName, bool recursive = true);
 
         /**
-         * Ensures that a directory exists.
+         * @brief Ensures that a directory exists.
          *
          * <p>If it does not exist, it will be created.</p>
          *
@@ -118,7 +118,7 @@ namespace AwsMock::Core {
         static void EnsureDirectory(const std::string &dirName);
 
         /**
-         * Checks whether the given file name is a directory.
+         * @brief Checks whether the given file name is a directory.
          *
          * @param dirName name of the directory.
          * @return true if the supplied file name is actually a directory.
@@ -126,7 +126,7 @@ namespace AwsMock::Core {
         static bool IsDirectory(const std::string &dirName);
 
         /**
-         * Get list of files
+         * @brief Get list of files
          *
          * @param dirName name of the directory
          * @param recursive recursively list files
@@ -135,7 +135,7 @@ namespace AwsMock::Core {
         static std::vector<std::string> ListFiles(const std::string &dirName, bool recursive = true);
 
         /**
-         * Get a sorted list of files with the given prefix.
+         * @brief Get a sorted list of files with the given prefix.
          *
          * @param dirName name of the directory
          * @param prefix regular expression which must match the filename
@@ -144,7 +144,7 @@ namespace AwsMock::Core {
         static std::vector<std::string> ListFilesByPrefix(const std::string &dirName, const std::string &prefix);
 
         /**
-         * Get a list of files with the given pattern.
+         * @brief Get a list of files with the given pattern.
          *
          * @param dirName name of the directory
          * @param pattern regular expression which must match the filename
@@ -154,7 +154,7 @@ namespace AwsMock::Core {
         static std::vector<std::string> ListFilesByPattern(const std::string &dirName, const std::string &pattern, bool recursive = true);
 
         /**
-         * Deletes an whole directory tree.
+         * @brief Deletes an whole directory tree.
          *
          * @param dirName directory name.
          * @param recursive if true deletes also all files in all directories recursively.
@@ -162,7 +162,7 @@ namespace AwsMock::Core {
         static void DeleteDirectory(const std::string &dirName, bool recursive = true);
 
         /**
-         * Deletes all files in the directory, but not the directory itself.
+         * @brief Deletes all files in the directory, but not the directory itself.
          *
          * @param dirName directory name.
          */

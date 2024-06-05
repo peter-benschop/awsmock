@@ -45,6 +45,7 @@ namespace AwsMock::Database::Entity::SQS {
         view_or_value<view, value> messageDoc = make_document(
                 kvp("region", region),
                 kvp("queueUrl", queueUrl),
+                kvp("queueName", queueName),
                 kvp("body", body),
                 kvp("status", MessageStatusToString(status)),
                 kvp("retries", retries),
@@ -55,9 +56,9 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("md5SystemAttr", md5SystemAttr),
                 kvp("attributes", attributesDoc),
                 kvp("messageAttributes", messageAttributesDoc),
-                kvp("reset", MongoUtils::ToBson(reset)),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("reset", bsoncxx::types::b_date(reset)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return messageDoc;
     }
@@ -67,6 +68,7 @@ namespace AwsMock::Database::Entity::SQS {
         oid = mResult.value()["_id"].get_oid().value.to_string();
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
+        queueName = bsoncxx::string::to_string(mResult.value()["queueName"].get_string().value);
         body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
         status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
         retries = mResult.value()["retries"].get_int32().value;
@@ -76,10 +78,10 @@ namespace AwsMock::Database::Entity::SQS {
         md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
         md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
         if (mResult.value()["reset"].type() != bsoncxx::type::k_null) {
-            reset = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["reset"].get_date()));
+            reset = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
         }
-        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
         // Attributes
         if (mResult.value().find("messageAttributes") != mResult.value().end()) {
@@ -106,10 +108,13 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     Poco::JSON::Object Message::ToJsonObject() const {
+
         try {
+
             Poco::JSON::Object jsonObject;
             jsonObject.set("region", region);
             jsonObject.set("queueUrl", queueUrl);
+            jsonObject.set("queueName", queueName);
             jsonObject.set("body", body);
             jsonObject.set("status", MessageStatusToString(status));
             jsonObject.set("messageId", messageId);
@@ -117,7 +122,9 @@ namespace AwsMock::Database::Entity::SQS {
             jsonObject.set("md5Body", md5Body);
             jsonObject.set("md5UserAttr", md5UserAttr);
             jsonObject.set("md5SystemAttr", md5SystemAttr);
-            jsonObject.set("reset", Poco::DateTimeFormatter::format(reset, Poco::DateTimeFormat::ISO8601_FORMAT));
+            jsonObject.set("reset", Core::DateTimeUtils::ISO8601(reset));
+            jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
+            jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
 
             // Message attributes
             if (!messageAttributes.empty()) {
@@ -142,6 +149,7 @@ namespace AwsMock::Database::Entity::SQS {
                 jsonObject.set("attributes", jsonAttributeArray);
             }
             return jsonObject;
+
         } catch (Poco::Exception &e) {
             log_error << e.message();
             throw Core::JsonException(e.message());
@@ -153,6 +161,7 @@ namespace AwsMock::Database::Entity::SQS {
         try {
             Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
             Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
+            Core::JsonUtils::GetJsonValueString("queueName", jsonObject, queueName);
             Core::JsonUtils::GetJsonValueString("body", jsonObject, body);
             Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
             Core::JsonUtils::GetJsonValueString("receiptHandle", jsonObject, receiptHandle);
