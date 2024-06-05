@@ -25,7 +25,7 @@
 namespace AwsMock::Core {
 
     /**
-     * XML utilities.
+     * @brief XML utilities.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -34,14 +34,14 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Creates a new XML document
+         * @brief Creates a new XML document
          *
          * @return XML document pointer
          */
         static Poco::XML::AutoPtr<Poco::XML::Document> CreateDocument();
 
         /**
-         * Create root node.
+         * @brief Create root node.
          *
          * @param document XML document
          * @param name root node name
@@ -49,7 +49,7 @@ namespace AwsMock::Core {
         static Poco::XML::AutoPtr<Poco::XML::Element> CreateRootNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, const std::string &name);
 
         /**
-         * Create node.
+         * @brief Create node.
          *
          * @param document XML document
          * @param parent XML node parent
@@ -58,7 +58,7 @@ namespace AwsMock::Core {
         static Poco::XML::AutoPtr<Poco::XML::Element> CreateNode(Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name);
 
         /**
-         * Creates a new text node, from a string value.
+         * @brief Creates a new text node, from a string value.
          *
          * @code{.xml}
          * <parent>
@@ -74,7 +74,7 @@ namespace AwsMock::Core {
         static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const std::string &value);
 
         /**
-         * Creates a new text node from a integer value.
+         * @brief Creates a new text node from a integer value.
          *
          * @code{.xml}
          * <parent>
@@ -90,7 +90,7 @@ namespace AwsMock::Core {
         static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, int value);
 
         /**
-         * Creates a new text node from a long integer value.
+         * @brief Creates a new text node from a long integer value.
          *
          * @code{.xml}
          * <parent>
@@ -106,7 +106,7 @@ namespace AwsMock::Core {
         static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, long value);
 
         /**
-         * Creates a new text node from a date time value.
+         * @brief Creates a new text node from a date time value.
          *
          * <p>
          * The value will be formatted as a ISO-8601 datetime string
@@ -126,7 +126,7 @@ namespace AwsMock::Core {
         static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, const Poco::DateTime &value);
 
         /**
-         * Creates a new text node from a boolean value.
+         * @brief Creates a new text node from a boolean value.
          *
          * @code{.xml}
          * <parent>
@@ -142,7 +142,7 @@ namespace AwsMock::Core {
         static void CreateTextNode(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &name, bool value);
 
         /**
-         * Creates a simple XML string array.
+         * @brief Creates a simple XML string array.
          *
          * Example:
          * @code{.xml}
@@ -161,7 +161,7 @@ namespace AwsMock::Core {
         static void CreateTextArray(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &parentName, const std::string &elementName, const std::vector<std::string> &elements);
 
         /**
-         * Check existence of specific child node
+         * @brief Check existence of specific child node
          *
          * @param node XML node
          * @param name child name
@@ -170,7 +170,7 @@ namespace AwsMock::Core {
         static bool HasChild(const Poco::XML::AutoPtr<Poco::XML::Node> &node, const std::string &name);
 
         /**
-         * Returns the XML string for the document.
+         * @brief Returns the XML string for the document.
          *
          * @param document XML document
          * @return XML string

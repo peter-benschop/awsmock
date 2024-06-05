@@ -7,10 +7,8 @@
 
 // C++ standard includes
 #include <chrono>
-#include <ctime>
 #include <map>
 #include <string>
-#include <thread>
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -55,6 +53,8 @@
 
 namespace AwsMock::Service {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief SQS service
      *
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
         explicit SQSService() : _database(Database::SQSDatabase::instance()){};
 
         /**
-         * Creates a new queue.
+         * @brief Creates a new queue.
          *
          * <p>In case the queue exists already, return the existing queue.</p>
          *

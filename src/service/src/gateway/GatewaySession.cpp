@@ -82,15 +82,15 @@ namespace AwsMock::Service {
     // The concrete type of the response message (which depends on the
     // request), is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&req) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
 
         // Returns a bad request response
         auto const bad_request =
-                [&req](boost::beast::string_view why) {
-                    http::response<http::dynamic_body> res{http::status::bad_request, req.version()};
+                [&request](boost::beast::string_view why) {
+                    http::response<http::dynamic_body> res{http::status::bad_request, request.version()};
                     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                     res.set(http::field::content_type, "text/html");
-                    res.keep_alive(req.keep_alive());
+                    res.keep_alive(request.keep_alive());
 
                     // Body
                     boost::beast::net::streambuf sb;
@@ -101,11 +101,11 @@ namespace AwsMock::Service {
 
         // Returns a bad request response
         auto const notimplemented =
-                [&req](boost::beast::string_view why) {
-                    http::response<http::dynamic_body> res{http::status::not_implemented, req.version()};
+                [&request](boost::beast::string_view why) {
+                    http::response<http::dynamic_body> res{http::status::not_implemented, request.version()};
                     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
                     res.set(http::field::content_type, "text/html");
-                    res.keep_alive(req.keep_alive());
+                    res.keep_alive(request.keep_alive());
 
                     // Body
                     boost::beast::net::streambuf sb;
@@ -115,58 +115,58 @@ namespace AwsMock::Service {
                 };
 
         // Make sure we can handle the method
-        if (req.method() != http::verb::get && req.method() != http::verb::put &&
-            req.method() != http::verb::post && req.method() != http::verb::delete_ &&
-            req.method() != http::verb::head) {
+        if (request.method() != http::verb::get && request.method() != http::verb::put &&
+            request.method() != http::verb::post && request.method() != http::verb::delete_ &&
+            request.method() != http::verb::head) {
             return bad_request("Unknown HTTP-method");
         }
 
         // Request path must be absolute and not contain "..".
-        if (req.target().empty() || req.target()[0] != '/' || req.target().find("..") != boost::beast::string_view::npos) {
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
             return bad_request("Illegal request-target");
         }
 
-        /*if (!Core::AwsUtils::VerifySignature(request, req.body(), "none")) {
+        if (!Core::AwsUtils::VerifySignature(request, "none")) {
             log_error << "AWS signature could not be verified";
             throw Core::UnauthorizedException("AWS signature could not be verified");
-        }*/
+        }
 
-        Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(req["Authorization"], {});
+        Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request["Authorization"], {});
 
         std::shared_ptr<AbstractHandler> handler = _routingTable[authKey.module];
         if (handler) {
 
-            switch (req.method()) {
+            switch (request.method()) {
                 case http::verb::get: {
                     log_debug << "Handle GET request";
                     Core::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
                     Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                    return handler->HandleGetRequest(req, authKey.region, "none");
+                    return handler->HandleGetRequest(request, authKey.region, "none");
                 }
                 case http::verb::put: {
                     log_debug << "Handle PUT request";
                     Core::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
                     Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                    return handler->HandlePutRequest(req, authKey.region, "none");
+                    return handler->HandlePutRequest(request, authKey.region, "none");
                 }
                 case http::verb::post: {
                     log_debug << "Handle POST request";
                     Core::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
                     Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                    return handler->HandlePostRequest(req, authKey.region, "none");
+                    return handler->HandlePostRequest(request, authKey.region, "none");
                 }
                 case http::verb::delete_: {
                     log_debug << "Handle DELETE request";
                     Core::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
                     Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                    return handler->HandleDeleteRequest(req, authKey.region, "none");
+                    return handler->HandleDeleteRequest(request, authKey.region, "none");
                 }
                 case http::verb::head: {
                     log_debug << "Handle HEAD request";
                     Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
                     Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                    return handler->HandleHeadRequest(req, authKey.region, "none");
+                    return handler->HandleHeadRequest(request, authKey.region, "none");
                 }
             }
         }

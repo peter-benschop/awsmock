@@ -6,6 +6,7 @@
 #define AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
 
 // C++ includes
+#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -20,12 +21,10 @@
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -39,6 +38,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * DynamoDB table entity
@@ -85,57 +85,57 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the entity to a JSON string
+         * @brief Converts the entity to a JSON string
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts an JSON object to an entity
+         * @brief Converts an JSON object to an entity
          *
          * @param jsonObject JSON object.
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param d DynamoDB  entity

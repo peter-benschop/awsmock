@@ -5,6 +5,9 @@
 #ifndef AWMOCK_CORE_SQSMEMORYDBTEST_H
 #define AWMOCK_CORE_SQSMEMORYDBTEST_H
 
+// C++ includes
+#include <chrono>
+
 // GTest includes
 #include <gtest/gtest.h>
 
@@ -19,6 +22,8 @@
 #define DLQ_NAME "test-dlqueue"
 
 namespace AwsMock::Database {
+
+    using std::chrono::system_clock;
 
     class SQSMemoryDbTest : public ::testing::Test {
 
@@ -326,14 +331,12 @@ namespace AwsMock::Database {
         // arrange
         Entity::SQS::QueueAttribute queueAttribute;
         queueAttribute.delaySeconds = 1;
-        Entity::SQS::Queue
-                queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .attributes = queueAttribute};
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .attributes = queueAttribute};
         queue = _sqsDatabase.CreateQueue(queue);
 
-        Poco::DateTime reset;
-        reset += Poco::Timespan(queueAttribute.delaySeconds, 0);
-        Entity::SQS::Message message =
-                {.region = _region, .queueUrl = _queueUrl, .body = BODY, .status = Entity::SQS::MessageStatus::DELAYED, .reset = reset};
+        system_clock::time_point reset = system_clock::now();
+        reset += std::chrono::seconds(queueAttribute.delaySeconds);
+        Entity::SQS::Message message = {.region = _region, .queueUrl = _queueUrl, .body = BODY, .status = Entity::SQS::MessageStatus::DELAYED, .reset = reset};
         _sqsDatabase.CreateMessage(message);
 
         Entity::SQS::MessageList messageList;

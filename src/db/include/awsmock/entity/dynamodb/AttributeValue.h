@@ -6,6 +6,7 @@
 #define AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_VALUE_H
 
 // C++ includes
+#include <chrono>
 #include <map>
 #include <string>
 
@@ -37,9 +38,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
-     * DynamoDB attribute value entity
+     * @brief DynamoDB attribute value entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -83,50 +85,50 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Convert to JSON value
+         * @brief Convert to JSON value
          *
          * @return JSON object
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Convert from JSON object.
+         * @brief Convert from JSON object.
          *
          * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

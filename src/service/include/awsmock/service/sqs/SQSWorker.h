@@ -12,11 +12,9 @@
 namespace AwsMock::Service {
 
     /**
-     * SQS worker thread
+     * @brief SQS worker thread
      *
-     * <p>
      * Used as background thread to do maintenance work, like resetting resources, deleted old message etc.
-     * </p>
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -25,32 +23,35 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit SQSWorker(int timeout) : Core::Timer("sqs-worker", timeout) {}
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Reset resources
+         * @brief Reset resources
          *
-         * <p>Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.</p>
-         * <p>Checks also the expiration date and removed the resources, which are older than the max retention period.</>
+         * @par
+         * Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.
+         *
+         * @par
+         * Checks also the expiration date and removed the resources, which are older than the max retention period.
          */
         [[maybe_unused]] void ResetMessages();
 

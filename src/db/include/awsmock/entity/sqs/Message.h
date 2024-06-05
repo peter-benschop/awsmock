@@ -7,13 +7,11 @@
 
 // C++ includes
 #include <algorithm>
+#include <chrono>
 #include <string>
 #include <vector>
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
 #include <Poco/JSON/Parser.h>
 
 // MongoDB includes
@@ -24,13 +22,13 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core//DateTimeUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
-#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -40,9 +38,10 @@ namespace AwsMock::Database::Entity::SQS {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
-     * SQS message entity
+     * @brief SQS message entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -64,6 +63,11 @@ namespace AwsMock::Database::Entity::SQS {
         std::string queueUrl;
 
         /**
+         * Queue name
+         */
+        std::string queueName;
+
+        /**
          * Message body
          */
         std::string body;
@@ -76,7 +80,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Last send datetime
          */
-        Poco::DateTime reset;
+        system_clock::time_point reset;
 
         /**
          * Send retries
@@ -134,15 +138,15 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = std::chrono::system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = std::chrono::system_clock::now();
 
         /**
-         * Checks for the existence of a attribute with the given key.
+         * @brief Checks for the existence of a attribute with the given key.
          *
          * @param key attribute key
          * @return true if attribute with the given key exists
@@ -150,7 +154,7 @@ namespace AwsMock::Database::Entity::SQS {
         bool HasAttribute(const std::string &key);
 
         /**
-         * Returns the given attribute as integer
+         * @brief Returns the given attribute as integer
          *
          * @param key attribute key
          * @return true if attribute with the given key exists
@@ -158,42 +162,42 @@ namespace AwsMock::Database::Entity::SQS {
         int GetIntAttribute(const std::string &key);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @param jsonObject JSON object
          */
         void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param m message

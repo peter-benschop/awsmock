@@ -25,6 +25,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/memorydb/SQSMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -332,6 +333,14 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         static std::string ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document);
+
+        /**
+         * @brief Returns the average waiting time for messages in the given queue
+         *
+         * @return map of average message waiting time per queue
+         * @throws Core::DatabaseException
+         */
+        Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime();
 
         /**
          * @brief Deletes all resources of a queue

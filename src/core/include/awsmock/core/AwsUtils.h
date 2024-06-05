@@ -131,7 +131,7 @@ namespace AwsMock::Core {
          * @param queueArn ARN of the queue
          * @return URL of the queue
          */
-        static std::string ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn);
+        static std::string ConvertSQSQueueArnToUrl(const std::string &queueArn);
 
         /**
          *@brief  Create SNS topic ARN
@@ -280,7 +280,7 @@ namespace AwsMock::Core {
          * @param signedHeaders signed header names
          * @param payload HTTP payload
          */
-        static void AddAuthorizationHeader(Poco::Net::HTTPRequest &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload);
+        static void AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload);
 
         /**
          * @brief Add the AWS v4 signed authorization header
@@ -305,7 +305,7 @@ namespace AwsMock::Core {
          * @param secretAccessKey AWS secret access key
          * @return true if signature could be verified
          */
-        static bool VerifySignature(const Poco::Net::HTTPRequest &request, const std::string &payload, const std::string &secretAccessKey);
+        static bool VerifySignature(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
 
       private:
 
@@ -317,7 +317,7 @@ namespace AwsMock::Core {
          * @param authorizationHeaderKeys
          * @return
          */
-        static std::string GetCanonicalRequest(const Poco::Net::HTTPRequest &request, const std::string &payload, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetCanonicalRequest(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the canonical request.
@@ -367,7 +367,7 @@ namespace AwsMock::Core {
          * @param authorizationHeaderKeys authorization parameter
          * @return canonical header string
          */
-        static std::string GetCanonicalHeaders(const Poco::Net::HTTPRequest &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetCanonicalHeaders(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the canonical header string.
@@ -395,7 +395,7 @@ namespace AwsMock::Core {
          * @param secretAccessKey AWS secret access key
          * @return AuthorizationHeaderKeys
          */
-        static AuthorizationHeaderKeys GetAuthorizationKeys(const Poco::Net::HTTPRequest &request, const std::string &secretAccessKey);
+        static AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
 
         /**
          * @brief Returns the signature for the request
@@ -470,7 +470,6 @@ namespace AwsMock::Core {
     /**
      * @brief Create SQS queue ARN
      *
-     * @param configuration current AwsMock configuration
      * @param queueName name of the queue
      * @return SQS queue ARN
      */
@@ -479,6 +478,17 @@ namespace AwsMock::Core {
         std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
+    }
+
+
+    /**
+     * @brief Get the name from a queue URL
+     *
+     * @param queueName name of the queue
+     * @return SQS queue ARN
+     */
+    inline std::string GetSQSQueueNameFromUrl(const std::string &queueUrl) {
+        return queueUrl.substr(queueUrl.find_last_of('/'));
     }
 
     /**
@@ -511,7 +521,7 @@ namespace AwsMock::Core {
         if (IsSQSUrl(queue)) {
             return queue;
         } else if (IsSQSArn(queue)) {
-            return AwsUtils::ConvertSQSQueueArnToUrl(Configuration::instance(), queue);
+            return AwsUtils::ConvertSQSQueueArnToUrl(queue);
         } else {
             return CreateSQSQueueUrl(queue);
         }

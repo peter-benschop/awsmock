@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/repository/SQSDatabase.h"
+#include <awsmock/repository/SQSDatabase.h>
 
 namespace AwsMock::Database {
 
@@ -661,8 +661,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                std::string dlqQueueUrl =
-                        Core::AwsUtils::ConvertSQSQueueArnToUrl(Core::Configuration::instance(), redrivePolicy.deadLetterTargetArn);
+                std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
                 auto result = messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
                                                                           kvp("status",
                                                                               Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
@@ -792,20 +791,54 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            try {
 
-            long count = messageCollection.count_documents(make_document(kvp("region", region),
-                                                                         kvp("queueUrl", queueUrl),
-                                                                         kvp("status",
-                                                                             Entity::SQS::MessageStatusToString(status))));
-            log_trace << "Count resources by status, status: " << Entity::SQS::MessageStatusToString(status)
-                      << " result: " << count;
-            return count;
+                auto client = ConnectionPool::instance().GetConnection();
+                auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
+                long count = messageCollection.count_documents(make_document(kvp("region", region),
+                                                                             kvp("queueUrl", queueUrl),
+                                                                             kvp("status",
+                                                                                 Entity::SQS::MessageStatusToString(status))));
+                log_trace << "Count resources by status, status: " << Entity::SQS::MessageStatusToString(status)
+                          << " result: " << count;
+                return count;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
         } else {
 
             return _memoryDb.CountMessagesByStatus(region, queueUrl, status);
+        }
+    }
+
+    Entity::SQS::MessageWaitTime SQSDatabase::GetAverageMessageWaitingTime() {
+
+        auto client = ConnectionPool::instance().GetConnection();
+        auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+
+        try {
+            mongocxx::pipeline p{};
+            //p.match(make_document(kvp("queueName", queueName)));
+            p.group(make_document(kvp("_id", "$queueName"),
+                                  kvp("averageTime",
+                                      make_document(kvp("$avg",
+                                                        make_document(kvp("$subtract",
+                                                                          make_array("$$NOW", "$created"))))))));
+            p.project(make_document(kvp("_id", "$_id"), kvp("millis", make_document(kvp("$trunc", make_array("$averageTime", 2))))));
+
+            Entity::SQS::MessageWaitTime waitTime;
+            auto waitingTimeCursor = messageCollection.aggregate(p, mongocxx::options::aggregate{});
+            for (const auto &waitingTime: waitingTimeCursor) {
+                waitTime.waitTime[bsoncxx::string::to_string(waitingTime["_id"].get_string().value)] = waitingTime["millis"].get_double().value;
+            }
+            return waitTime;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
     }
 

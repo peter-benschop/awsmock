@@ -32,6 +32,7 @@
 #define SQS_MESSAGE_COUNT "sqs_message_counter"
 #define SQS_MESSAGE_BY_QUEUE_COUNT "sqs_message_by_queue_counter"
 #define SQS_SERVICE_TIMER "sqs_service_timer"
+#define SQS_MESSAGE_WAIT_TIME "sqs_message_wait_time"
 
 // S3 counter, timer
 #define S3_BUCKET_COUNT "s3_bucket_counter"

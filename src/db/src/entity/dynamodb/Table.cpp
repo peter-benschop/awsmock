@@ -15,8 +15,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
                     kvp("region", region),
                     kvp("name", name),
                     kvp("status", status),
-                    kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                    kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                    kvp("created", bsoncxx::types::b_date(created)),
+                    kvp("modified", bsoncxx::types::b_date(modified)));
 
             // Tags
             if (!tags.empty()) {
@@ -58,8 +58,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
         status = bsoncxx::string::to_string(mResult.value()["status"].get_string().value);
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
@@ -134,8 +134,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
             jsonObject.set("keySchemas", jsonKeySchemasArray);
         }
 
-        jsonObject.set("created", Poco::DateTimeFormatter::format(created, Poco::DateTimeFormat::ISO8601_FORMAT));
-        jsonObject.set("modified", Poco::DateTimeFormatter::format(modified, Poco::DateTimeFormat::ISO8601_FORMAT));
+        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
 
         return jsonObject;
     }
