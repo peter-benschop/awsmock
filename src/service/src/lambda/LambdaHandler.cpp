@@ -51,7 +51,7 @@ namespace AwsMock::Service {
             }
 
         } catch (Core::ServiceException &exc) {
-            return SendInternalServerError(request, exc.message());
+            return Core::HttpUtils::InternalServerError(request, exc.message());
         } catch (Core::NotFoundException &exc) {
             return SendInternalServerError(request, exc.message());
         }

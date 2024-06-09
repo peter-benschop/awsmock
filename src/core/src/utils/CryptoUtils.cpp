@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/CryptoUtils.h>
-#include <openssl/bio.h>
 
 namespace AwsMock::Core {
 
@@ -18,9 +17,24 @@ namespace AwsMock::Core {
         unsigned char md_value[EVP_MAX_MD_SIZE];
         unsigned int md_len;
 
-        EVP_DigestInit(context, md);
-        EVP_DigestUpdate(context, reinterpret_cast<const unsigned char *>(content.c_str()), content.length());
-        EVP_DigestFinal(context, md_value, &md_len);
+        EVP_DigestInit_ex(context, md, nullptr);
+        EVP_DigestUpdate(context, reinterpret_cast<const unsigned char *>(content.data()), content.length());
+        EVP_DigestFinal_ex(context, md_value, &md_len);
+        EVP_MD_CTX_free(context);
+
+        return HexEncode(md_value, static_cast<int>(md_len));
+    }
+
+    std::string Crypto::GetMd5FromString(const unsigned char *content) {
+
+        EVP_MD_CTX *context = EVP_MD_CTX_new();
+        const EVP_MD *md = EVP_md5();
+        unsigned char md_value[EVP_MAX_MD_SIZE];
+        unsigned int md_len;
+
+        EVP_DigestInit_ex(context, md, nullptr);
+        EVP_DigestUpdate(context, content, sizeof(content));
+        EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 
         return HexEncode(md_value, static_cast<int>(md_len));
@@ -67,7 +81,7 @@ namespace AwsMock::Core {
         unsigned int md_len;
         std::string output;
 
-        EVP_DigestInit(context, md);
+        EVP_DigestInit_ex(context, md, nullptr);
 
         std::ifstream ifs(fileName, std::ios::binary);
         while (ifs.good()) {
@@ -76,7 +90,7 @@ namespace AwsMock::Core {
         }
         ifs.close();
 
-        EVP_DigestFinal(context, md_value, &md_len);
+        EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
         delete[] buffer;
 

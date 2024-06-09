@@ -24,6 +24,7 @@ namespace AwsMock::Service {
         _queueLimit = configuration.getInt("awsmock.service.gateway.http.max.queue", DEFAULT_MAX_QUEUE_SIZE);
         _bodyLimit = configuration.getInt("awsmock.service.gateway.http.max.body", DEFAULT_MAX_BODY_SIZE);
         _timeout = configuration.getInt("awsmock.service.gateway.http.timeout", DEFAULT_TIMEOUT);
+        _verifySignature = configuration.getBool("awsmock.verifysignature", false);
     };
 
     void GatewaySession::Run() {
@@ -84,52 +85,22 @@ namespace AwsMock::Service {
     template<class Body, class Allocator>
     http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
 
-        // Returns a bad request response
-        auto const bad_request =
-                [&request](boost::beast::string_view why) {
-                    http::response<http::dynamic_body> res{http::status::bad_request, request.version()};
-                    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-                    res.set(http::field::content_type, "text/html");
-                    res.keep_alive(request.keep_alive());
-
-                    // Body
-                    boost::beast::net::streambuf sb;
-                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
-                    res.prepare_payload();
-                    return res;
-                };
-
-        // Returns a bad request response
-        auto const notimplemented =
-                [&request](boost::beast::string_view why) {
-                    http::response<http::dynamic_body> res{http::status::not_implemented, request.version()};
-                    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-                    res.set(http::field::content_type, "text/html");
-                    res.keep_alive(request.keep_alive());
-
-                    // Body
-                    boost::beast::net::streambuf sb;
-                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
-                    res.prepare_payload();
-                    return res;
-                };
-
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
             request.method() != http::verb::head) {
-            return bad_request("Unknown HTTP-method");
+            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
         // Request path must be absolute and not contain "..".
         if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
-            return bad_request("Illegal request-target");
+            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
-        if (!Core::AwsUtils::VerifySignature(request, "none")) {
-            log_error << "AWS signature could not be verified";
-            throw Core::UnauthorizedException("AWS signature could not be verified");
+        if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
+            log_warning << "AWS signature could not be verified";
+            return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
         }
 
         Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request["Authorization"], {});
@@ -170,7 +141,7 @@ namespace AwsMock::Service {
                 }
             }
         }
-        return notimplemented("Not yet implemented");
+        return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
     }
 
     // Called to start/continue the write-loop. Should not be called when

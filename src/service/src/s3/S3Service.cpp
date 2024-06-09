@@ -756,7 +756,7 @@ namespace AwsMock::Service {
                 eventNotification.records.push_back(record);
                 log_debug << "Found notification records, count: " << eventNotification.records.size();
 
-                // lambda notification
+                // Lambda notification
                 SendLambdaInvocationRequest(eventNotification, notification);
                 log_trace << "lambda function invoked, eventNotification: " + eventNotification.ToString();
                 log_debug << "lambda function invoked, lambdaArn:" << notification.lambdaArn;

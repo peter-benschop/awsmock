@@ -299,6 +299,11 @@ namespace AwsMock::Core {
         /**
          * @brief Verify the request signature
          *
+         * Examples:
+         * https://github.com/aws-samples/sigv4-signing-examples
+         * https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html#code-signing-examples
+         * https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+         *
          * @param request HTTP request
          * @param secretAccessKey AWS secret access key
          * @return true if signature could be verified
@@ -504,7 +509,7 @@ namespace AwsMock::Core {
      * @return true if this is a URL
      */
     inline bool IsSQSArn(const std::string &queue) {
-        return Core::StringUtils::ContainsIgnoreCase(queue, "http");
+        return Core::StringUtils::ContainsIgnoreCase(queue, "arn");
     }
 
     /**

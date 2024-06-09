@@ -114,8 +114,12 @@ namespace AwsMock::Service {
 
         } else {
 
+            LambdaExecutor lambdaExecutor;
+            boost::thread t(boost::ref(lambdaExecutor), "localHost", lambda.hostPort, payload);
+            t.detach();
+
             // Asynchronous execution
-            Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor("localhost", lambda.hostPort, payload));
+            //Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor("localhost", lambda.hostPort, payload));
         }
         log_debug << "Lambda executor notification send, name: " << lambda.function;
 

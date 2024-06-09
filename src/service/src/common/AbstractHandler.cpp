@@ -104,26 +104,7 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> AbstractHandler::SendInternalServerError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        // Prepare the response message
-        http::response<http::dynamic_body> response;
-        response.version(request.version());
-        response.result(http::status::internal_server_error);
-        response.set(http::field::server, "awsmock");
-        response.set(http::field::content_type, "application/json");
-
-        // Body
-        boost::beast::ostream(response.body()) << body;
-        response.prepare_payload();
-
-        // Copy headers
-        if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
-            }
-        }
-
-        // Send the response to the client
-        return response;
+        return Core::HttpUtils::InternalServerError(request, body);
     }
 
     http::response<http::dynamic_body> AbstractHandler::SendBadRequestError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {

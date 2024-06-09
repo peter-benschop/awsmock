@@ -141,6 +141,11 @@ namespace AwsMock::Service {
         int _timeout;
 
         /**
+         * Verify signature flag
+         */
+        bool _verifySignature;
+
+        /**
          * HTTP request queue
          */
         std::queue<http::message_generator> response_queue_;

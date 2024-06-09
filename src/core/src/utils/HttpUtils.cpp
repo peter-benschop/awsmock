@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/HttpUtils.h>
+#include <fstream>
 
 namespace AwsMock::Core {
 
@@ -190,11 +191,7 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::AddQueryDelimiter(std::string &url) {
-        if (Core::StringUtils::Contains(url, "?")) {
-            url += "&";
-        } else {
-            url += "?";
-        }
+        url += Core::StringUtils::Contains(url, "?") ? "&" : "?";
         return url;
     }
 
@@ -226,7 +223,7 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name, const std::string &defaultValue) {
-        if (request.base().find(name) == request.end()) {
+        if (!HasHeader(request, name)) {
             if (!defaultValue.empty()) {
                 return defaultValue;
             } else {
@@ -257,7 +254,7 @@ namespace AwsMock::Core {
 
     void HttpUtils::DumpHeaders(const http::request<http::dynamic_body> &request) {
         for (const auto &header: request.base()) {
-            log_info << header.name() << ": " << header.value();
+            log_info << header.name_string() << ": " << header.value();
         }
     }
     std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {
@@ -303,6 +300,50 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetBodyAsString(const http::request<http::string_body> &request) {
 
         return request.body();
+    }
+
+    http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::bad_request, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::Unauthorized(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::unauthorized, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::InternalServerError(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::internal_server_error, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::NotImplemented(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::not_implemented, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
     }
 
 }// namespace AwsMock::Core

@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
         lambda.function = request.functionName;
         lambda.handler = request.handler;
         lambda.role = request.role;
-        //lambda.environment = request.environment;
+        lambda.environment.variables = request.environment.variables;
         lambda.runtime = request.runtime;
         lambda.code.zipFile = request.code.zipFile;
         lambda.code.s3Bucket = request.code.s3Bucket;

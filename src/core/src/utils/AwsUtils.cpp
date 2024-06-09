@@ -137,7 +137,6 @@ namespace AwsMock::Core {
 
         std::string canonicalRequest = GetCanonicalRequest(request, authorizationHeaderKeys);
         std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
-
         std::string signature = GetSignature(authorizationHeaderKeys, stringToSign);
 
         if (!Core::StringUtils::Equals(signature, authorizationHeaderKeys.signature)) {
