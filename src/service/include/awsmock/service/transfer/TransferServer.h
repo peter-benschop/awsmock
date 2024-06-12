@@ -66,6 +66,11 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * @brief Creates the transfer server bucket
+         */
+        void CreateTransferBucket();
+
+        /**
          * @brief Starts a single transfer manager
          *
          * @param server transfer manager entity

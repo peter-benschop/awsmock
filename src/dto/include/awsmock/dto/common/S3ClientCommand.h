@@ -42,6 +42,7 @@ namespace AwsMock::Dto::Common {
         DELETE_OBJECTS,
         CREATE_MULTIPART_UPLOAD,
         UPLOAD_PART,
+        UPLOAD_PART_COPY,
         COMPLETE_MULTIPART_UPLOAD,
         ABORT_MULTIPART_UPLOAD,
         LIST_OBJECT_VERSIONS,
@@ -64,6 +65,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::DELETE_OBJECTS, "DeleteObjects"},
             {S3CommandType::CREATE_MULTIPART_UPLOAD, "CreateMultipartUpload"},
             {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
+            {S3CommandType::UPLOAD_PART_COPY, "PartMultipartUploadCopy"},
             {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
             {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
             {S3CommandType::LIST_OBJECT_VERSIONS, "ListObjectVersions"},
@@ -134,6 +136,11 @@ namespace AwsMock::Dto::Common {
          * Multipart uploads
          */
         bool uploads = false;
+
+        /**
+         * Multipart upload part copy
+         */
+        bool uploadPartCopy = false;
 
         /**
          * Multipart part number

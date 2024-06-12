@@ -26,6 +26,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/s3/BucketEncryption.h>
 #include <awsmock/entity/s3/BucketNotification.h>
@@ -39,7 +40,11 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::view_or_value;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
+    /**
+     * @brief Versioning status
+     */
     enum BucketVersionStatus {
         ENABLED,
         SUSPENDED,
@@ -66,7 +71,7 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     /**
-     * S3 bucket entity
+     * @brief S3 bucket entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -130,15 +135,15 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Creation date
          */
-        Poco::DateTime created;
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified;
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Checks whether a notification with the given event name exists.
+         * @brief Checks whether a notification with the given event name exists.
          *
          * @param eventName name of the event
          * @return true if notification with the given event name exists.
@@ -147,7 +152,7 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasNotification(const std::string &eventName);
 
         /**
-         * Checks whether a notification with the given ID exists.
+         * @brief Checks whether a notification with the given ID exists.
          *
          * @param id other queue notification id.
          * @return true if notification with the given ID exists.
@@ -155,7 +160,7 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasQueueNotificationId(const std::string &id);
 
         /**
-         * Checks whether a topic notification with the given ID exists.
+         * @brief Checks whether a topic notification with the given ID exists.
          *
          * @param id other topic notification id.
          * @return true if notification with the given ID exists.
@@ -163,7 +168,7 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasTopicNotificationId(const std::string &id);
 
         /**
-         * Checks whether a lambda notification with the given ID exists.
+         * @brief Checks whether a lambda notification with the given ID exists.
          *
          * @param id other lambda notification ID.
          * @return true if notification with the given ID exists.
@@ -171,7 +176,7 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasLambdaNotificationId(const std::string &id);
 
         /**
-         * Checks whether a SQS queue notification with the given event name exists.
+         * @brief Checks whether a SQS queue notification with the given event name exists.
          *
          * @param eventName name of the event
          * @return true if notification with the given event name exists.
@@ -179,7 +184,7 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasQueueNotification(const std::string &eventName);
 
         /**
-         * Checks whether a SNS topic notification with the given event name exists.
+         * @brief Checks whether a SNS topic notification with the given event name exists.
          *
          * @param eventName name of the event
          * @return true if notification with the given event name exists.
@@ -187,7 +192,7 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasTopicNotification(const std::string &eventName);
 
         /**
-         * Checks whether a lambda notification with the given event name exists.
+         * @brief Checks whether a lambda notification with the given event name exists.
          *
          * @param eventName name of the event
          * @return true if notification with the given event name exists.
@@ -195,14 +200,14 @@ namespace AwsMock::Database::Entity::S3 {
         bool HasLambdaNotification(const std::string &eventName);
 
         /**
-         * Checks whether a the bucket has encryption enabled.
+         * @brief Checks whether a the bucket has encryption enabled.
          *
          * @return true if encryption is enabled for the bucket.
          */
         bool HasEncryption() const;
 
         /**
-         * Returns a given notification by name
+         * @brief Returns a given notification by name
          *
          * @param eventName name of the event
          * @return found notification or notifications.end().
@@ -211,7 +216,7 @@ namespace AwsMock::Database::Entity::S3 {
         BucketNotification GetNotification(const std::string &eventName);
 
         /**
-         * Returns a given SQS queue notification by name
+         * @brief Returns a given SQS queue notification by name
          *
          * @param eventName name of the event
          * @return found notification or notifications.end().
@@ -219,7 +224,7 @@ namespace AwsMock::Database::Entity::S3 {
         QueueNotification GetQueueNotification(const std::string &eventName);
 
         /**
-         * Returns a given SNS queue notification by name
+         * @brief Returns a given SNS queue notification by name
          *
          * @param eventName name of the event
          * @return found notification or notifications.end().
@@ -227,7 +232,7 @@ namespace AwsMock::Database::Entity::S3 {
         TopicNotification GetTopicNotification(const std::string &eventName);
 
         /**
-         * Returns a given lambda notification by name
+         * @brief Returns a given lambda notification by name
          *
          * @param eventName name of the event
          * @return found notification or notifications.end().
@@ -235,47 +240,47 @@ namespace AwsMock::Database::Entity::S3 {
         LambdaNotification GetLambdaNotification(const std::string &eventName);
 
         /**
-         * Returns a boolean indicating the versioinig state
+         * @brief Returns a boolean indicating the versioinig state
          */
         [[nodiscard]] bool IsVersioned() const;
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
         [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @param jsonObject JSON object.
          */
         void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param bucket bucket entity
@@ -288,4 +293,4 @@ namespace AwsMock::Database::Entity::S3 {
 
 }// namespace AwsMock::Database::Entity::S3
 
-#endif//AWSMOCK_DB_ENTITY_S3_BUCKET_H
+#endif// AWSMOCK_DB_ENTITY_S3_BUCKET_H

@@ -78,6 +78,7 @@ namespace AwsMock::Dto::Common {
         if (Core::HttpUtils::HasHeader(request, "Content-Type")) {
             contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
         }
+        log_trace << "UserAgent: " << ToString();
     }
 
     std::string UserAgent::ToJson() const {

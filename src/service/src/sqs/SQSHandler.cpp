@@ -334,10 +334,8 @@ namespace AwsMock::Service {
             }
 
         } catch (Poco::Exception &e) {
-            Core::HttpUtils::InternalServerError(request, e.message());
+            return Core::HttpUtils::InternalServerError(request, e.message());
         }
-        log_error << "Unknown method";
-        return Core::HttpUtils::BadRequest(request, "Unknown method");
     }
 
     std::vector<Dto::SQS::QueueAttribute> SQSHandler::GetQueueAttributes(const std::string &payload) {

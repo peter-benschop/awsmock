@@ -17,6 +17,7 @@
 #include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
 #include <awsmock/dto/s3/CopyObjectRequest.h>
@@ -47,6 +48,8 @@
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/dto/s3/UploadPartCopyRequest.h>
+#include <awsmock/dto/s3/UploadPartCopyResponse.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -84,6 +87,15 @@ namespace AwsMock::Service {
          * @brief Constructor
          */
         explicit S3Service() : _database(Database::S3Database::instance()){};
+
+        /**
+         * @brief Checks wether a bucket exists
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @return true if bucket exists
+         */
+        bool BucketExists(const std::string &region, const std::string bucket);
 
         /**
          * @brief Returns the meta data of an S3 bucket
@@ -148,6 +160,18 @@ namespace AwsMock::Service {
          * @return ETag
          */
         std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
+
+        /**
+         * @brief Upload a partial file copy.
+         *
+         * @par
+         * This request does not have a body. The header contains the source bucket/key and the range to copy.
+         *
+         * @param request upload part copy request
+         * @return UploadPartCopyResponse
+         * @see Dto::S3::UploadPartCopyResponse
+         */
+        Dto::S3::UploadPartCopyResponse UploadPartCopy(const Dto::S3::UploadPartCopyRequest &request);
 
         /**
          * @brief Completes a multipart upload.
@@ -262,7 +286,7 @@ namespace AwsMock::Service {
          * @param eventNotification S3 event notification.
          * @param queueNotification queue notification.
          */
-        void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
+        static void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
 
         /**
          * @brief Sends a message to the corresponding SNS topic.

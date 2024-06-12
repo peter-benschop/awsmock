@@ -34,7 +34,7 @@ namespace AwsMock::Dto::S3 {
 
             pCreated = pDoc->createElement("CreationDate");
             pBucket->appendChild(pCreated);
-            pCreatedText = pDoc->createTextNode(Poco::DateTimeFormatter::format(it.created, Poco::DateTimeFormat::ISO8601_FORMAT));
+            pCreatedText = pDoc->createTextNode(Core::DateTimeUtils::ISO8601(it.created));
             pCreated->appendChild(pCreatedText);
         }
 

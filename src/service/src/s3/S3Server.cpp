@@ -16,9 +16,14 @@ namespace AwsMock::Service {
         _maxThreads = configuration.getInt("awsmock.service.s3.http.max.threads", S3_DEFAULT_MAX_THREADS);
         _requestTimeout = configuration.getInt("awsmock.service.s3.http.timeout", S3_DEFAULT_TIMEOUT);
         _monitoringPeriod = configuration.getInt("awsmock.service.s3.monitoring.period", S3_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = configuration.getInt("awsmock.service.s3.worker.period", S3_DEFAULT_WORKER_PERIOD);
 
         // Monitoring
         _s3Monitoring = std::make_shared<S3Monitoring>(_monitoringPeriod);
+
+        // Worker thread
+        _s3Worker = std::make_shared<S3Worker>(_workerPeriod);
+
         log_debug << "S3 module initialized, endpoint: " << _host << ":" << _port;
     }
 
@@ -30,6 +35,9 @@ namespace AwsMock::Service {
             return;
         }
         log_info << "S3 module starting";
+
+        // Start worker thread
+        _s3Worker->Start();
 
         // Start REST module
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));

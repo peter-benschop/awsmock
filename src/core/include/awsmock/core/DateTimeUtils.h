@@ -50,6 +50,15 @@ namespace AwsMock::Core {
          * @return time_point in ISO 8601 format
          */
         static std::string ISO8601(const system_clock::time_point &timePoint);
+
+        /**
+         * @brief Returns the time_point in HTTP format
+         *
+         * HTTP format is 'Tue, 15 Nov 2010 08:12:31 GMT'.
+         *
+         * @return time_point in HTTP format
+         */
+        static std::string HttpFormat(const system_clock::time_point &timePoint);
     };
 
 }// namespace AwsMock::Core

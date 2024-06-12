@@ -19,6 +19,7 @@ namespace AwsMock::Core {
         std::string endpoint = GetEndpoint();
         std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
         if (parts.size() < 6) {
+            log_error << "Could not convert SQS arn to url, arn: " << queueArn;
             return {};
         }
 
@@ -26,7 +27,11 @@ namespace AwsMock::Core {
         std::string queueName = parts[5];
         parts.clear();
 
-        return endpoint + "/" + accountId + "/" + queueName;
+        std::string region = Core::Configuration::instance().getString("awsmock.region");
+        std::string port = Core::Configuration::instance().getString("awsmock.service.gateway.http.port");
+        std::string hostname = Core::Configuration::instance().getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
+
+        return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }
 
     std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {

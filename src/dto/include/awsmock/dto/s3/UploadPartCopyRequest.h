@@ -2,70 +2,66 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
-#define AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
+#ifndef AWSMOCK_CORE_DTO_UPLOAD_PART_COPY_REQUEST_H
+#define AWSMOCK_CORE_DTO_UPLOAD_PART_COPY_REQUEST_H
 
 // C++ standard includes
-#include <chrono>
 #include <sstream>
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
-    using std::chrono::system_clock;
-
-    struct GetMetadataResponse {
+    struct UploadPartCopyRequest {
 
         /**
-         * AWS region
+         * Region
          */
         std::string region;
 
         /**
-         * Bucket
+         * Upload ID
          */
-        std::string bucket;
+        std::string uploadId;
 
         /**
-         * Key
+         * Part number
          */
-        std::string key;
+        int partNumber;
 
         /**
-         * MD5 sum
+         * Source bucket
          */
-        std::string md5Sum;
+        std::string sourceBucket;
 
         /**
-         * Content type
+         * Source key
          */
-        std::string contentType;
+        std::string sourceKey;
 
         /**
-         * Size
+         * Target bucket
          */
-        long size;
+        std::string targetBucket;
 
         /**
-         * Metadata
+         * Target key
          */
-        std::map<std::string, std::string> metadata;
+        std::string targetKey;
 
         /**
-         * Created
+         * Min byte from range
          */
-        system_clock::time_point created;
+        long min;
 
         /**
-         * Last modified
+         * Max byte from range
          */
-        system_clock::time_point modified;
+        long max;
 
         /**
          * Convert to a JSON string
@@ -86,9 +82,9 @@ namespace AwsMock::Dto::S3 {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const GetMetadataResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const UploadPartCopyRequest &r);
     };
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
+#endif// AWSMOCK_CORE_DTO_UPLOAD_PART_COPY_REQUEST_H
