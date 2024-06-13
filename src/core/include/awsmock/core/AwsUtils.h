@@ -127,7 +127,6 @@ namespace AwsMock::Core {
         /**
          * @brief Converts a queue ARN to a queue URL
          *
-         * @param configuration current AwsMock configuration
          * @param queueArn ARN of the queue
          * @return URL of the queue
          */
@@ -300,8 +299,12 @@ namespace AwsMock::Core {
         /**
          * @brief Verify the request signature
          *
+         * Examples:
+         * https://github.com/aws-samples/sigv4-signing-examples
+         * https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html#code-signing-examples
+         * https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+         *
          * @param request HTTP request
-         * @param payload HTTP payload
          * @param secretAccessKey AWS secret access key
          * @return true if signature could be verified
          */
@@ -313,7 +316,6 @@ namespace AwsMock::Core {
          * @brief Returns the canonical request.
          *
          * @param request HTTP request
-         * @param payload HTTP payload
          * @param authorizationHeaderKeys
          * @return
          */
@@ -428,7 +430,6 @@ namespace AwsMock::Core {
     /**
      * @brief Returns the HTTP endpoint
      *
-     * @param configuration current AwsMock configuration
      * @return HTTP endpoint
      */
     inline std::string GetEndpoint() {
@@ -452,7 +453,7 @@ namespace AwsMock::Core {
     /**
      * @brief Generate a SQS queue URL.
      *
-     * The queue name has the format <i>'http://sqs.<region<.<host>:<port>/<accountId>/<queueName>'</i>
+     * The queue name has the format <i>'http://sqs.&lt;region&gt;.&lt;host&lt;port&gt;/&lt;accountId&gt;/&lt;queueName&gt;'</i>
      *
      * @param queueName name of the queue
      * @return SQS queue URL
@@ -484,7 +485,7 @@ namespace AwsMock::Core {
     /**
      * @brief Get the name from a queue URL
      *
-     * @param queueName name of the queue
+     * @param queueUrl URL of the queue
      * @return SQS queue ARN
      */
     inline std::string GetSQSQueueNameFromUrl(const std::string &queueUrl) {
@@ -508,7 +509,7 @@ namespace AwsMock::Core {
      * @return true if this is a URL
      */
     inline bool IsSQSArn(const std::string &queue) {
-        return Core::StringUtils::ContainsIgnoreCase(queue, "http");
+        return Core::StringUtils::ContainsIgnoreCase(queue, "arn");
     }
 
     /**

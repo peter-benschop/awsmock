@@ -292,8 +292,8 @@ namespace AwsMock::Service {
 
     void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
 
-        // Get queue URL
-        Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByUrl(request.region, subscription.endpoint);
+        // Get queue by ARN
+        Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByArn(subscription.endpoint);
 
         // Create a SQS notification request
         AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {

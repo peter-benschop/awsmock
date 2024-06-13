@@ -7,21 +7,14 @@
 
 // Standard C includes
 #include <fcntl.h>
-#ifndef _WIN32
 #include <grp.h>
 #include <pwd.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <utime.h>
-#else
-#include "accctrl.h"
-#include "aclapi.h"
-#include <stdio.h>
-#include <tchar.h>
-#include <windows.h>
-#endif
-#include <sys/stat.h>
-#include <sys/types.h>
 
 // Standard C++ includes
 #include <cstdio>
@@ -52,6 +45,8 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+
+#define BUFFER_LEN 8092
 
 namespace AwsMock::Core {
 
@@ -193,7 +188,7 @@ namespace AwsMock::Core {
          * @param inDir input directory
          * @param files string vector of binary files to append to output file
          */
-        static void AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
+        static long AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
 
         /**
          * @brief Append several text files to a single output file.

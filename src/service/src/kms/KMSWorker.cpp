@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         log_trace << "Starting delete keys";
 
         for (const auto &key: _kmsDatabase.ListKeys()) {
-            if (key.keyState == Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION) && key.scheduledDeletion.timestamp() < (Poco::DateTime().timestamp())) {
+            if (key.keyState == Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION) && key.scheduledDeletion < system_clock::now()) {
                 _kmsDatabase.DeleteKey(key);
                 log_debug << "Key deleted, keyId: " << key.keyId;
             }

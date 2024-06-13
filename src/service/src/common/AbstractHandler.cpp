@@ -1,5 +1,4 @@
 
-#include <asio/buffer.hpp>
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
@@ -69,8 +68,6 @@ namespace AwsMock::Service {
         ifs.close();
         response.prepare_payload();
 
-        log_info << response.body().size();
-
         // Copy headers
         if (!headers.empty()) {
             for (const auto &header: headers) {
@@ -104,26 +101,7 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> AbstractHandler::SendInternalServerError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        // Prepare the response message
-        http::response<http::dynamic_body> response;
-        response.version(request.version());
-        response.result(http::status::internal_server_error);
-        response.set(http::field::server, "awsmock");
-        response.set(http::field::content_type, "application/json");
-
-        // Body
-        boost::beast::ostream(response.body()) << body;
-        response.prepare_payload();
-
-        // Copy headers
-        if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
-            }
-        }
-
-        // Send the response to the client
-        return response;
+        return Core::HttpUtils::InternalServerError(request, body);
     }
 
     http::response<http::dynamic_body> AbstractHandler::SendBadRequestError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
@@ -150,36 +128,32 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const std::map<std::string, std::string> &headers) {
         log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         if (!Core::MemoryMappedFile::instance().IsMapped()) {
             if (!Core::MemoryMappedFile::instance().OpenFile(fileName)) {
-                throw Core::ServiceException("Could not open memory mapped file");
+                log_error << "Could not open memory mapped file, filename: " << fileName;
+                throw Core::ServiceException("Could not open memory mapped file, filename: " + fileName);
             }
         }
 
         try {
 
-            // Set headers
-            long contentLength = max - min;
-            if (contentLength > size) {
-                contentLength = size - min;
-            }
-
             // Prepare the response message
             http::response<http::dynamic_body> response;
+            response.content_length(size);
             response.version(request.version());
-            response.result(http::status::bad_request);
+            response.result(http::status::partial_content);
             response.set(http::field::server, "awsmock");
-            response.set(http::field::content_type, "application/json");
+            response.set(http::field::content_type, "application/octet-stream");
 
             // Body
-            char *buffer = new char[contentLength + 1];
-            Core::MemoryMappedFile::instance().ReadChunk(min, contentLength, (char *) buffer);
+            char *buffer = new char[size];
+            Core::MemoryMappedFile::instance().ReadChunk(min, size, (char *) buffer);
             boost::beast::ostream(response.body()) << buffer;
-            delete[] buffer;
             response.prepare_payload();
+            delete[] buffer;
 
             // Copy headers
             if (!headers.empty()) {
@@ -189,8 +163,9 @@ namespace AwsMock::Service {
             }
 
             // Close file
-            if (max >= size) {
+            if (max == totalSize - 1) {
                 Core::MemoryMappedFile::instance().CloseFile();
+                log_debug << "Memory mapped file closed, filename: " << fileName;
             }
 
             // Send the response to the client

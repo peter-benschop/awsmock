@@ -151,11 +151,12 @@ namespace AwsMock::Service {
          * @param fileName file to send
          * @param min minimum position
          * @param max minimum position
-         * @param size total size of the file
+         * @param size current part size
+         * @param totalSize total size of the file
          * @param headers HTTP header map values, added to the default headers
          * @return HTTP response
          */
-        static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, const std::map<std::string, std::string> &headers = {});
+        static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const std::map<std::string, std::string> &headers = {});
 
         /**
          * Send a HEAD response (HTTP state code 200)

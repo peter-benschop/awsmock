@@ -6,10 +6,12 @@
 #define AWSMOCK_DTO_S3_OBJECT_VERSION_H
 
 // C++ includes
+#include <chrono>
 #include <sstream>
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
@@ -19,6 +21,7 @@
 
 namespace AwsMock::Dto::S3 {
 
+    using std::chrono::system_clock;
 
     struct ObjectVersion {
 
@@ -60,7 +63,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Is latest
          */
-        Poco::DateTime lastModified;
+        system_clock::time_point lastModified;
 
         /**
          * Owner

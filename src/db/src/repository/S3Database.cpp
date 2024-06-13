@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/repository/S3Database.h"
+#include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database {
 
@@ -394,6 +394,22 @@ namespace AwsMock::Database {
 
         } else {
             return _memoryDb.ObjectExists(object);
+        }
+    }
+
+    bool S3Database::ObjectExists(const std::string &filename) {
+
+        if (_useDatabase) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+            int64_t count = _objectCollection.count_documents(make_document(kvp("internalName", filename)));
+            log_trace << "Object exists: " << (count > 0 ? "true" : "false");
+            return count > 0;
+
+        } else {
+
+            return _memoryDb.ObjectExists(filename);
         }
     }
 

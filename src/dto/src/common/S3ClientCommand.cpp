@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Common {
         copyRequest = Core::HttpUtils::HasHeader(request, "x-amz-copy-source");
         uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
         encryptionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "encryption");
-        bool listType = Core::HttpUtils::HasQueryParameter(request.target(), "list-type");
+        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
 
         if (!userAgent.clientCommand.empty()) {
 
@@ -60,7 +60,11 @@ namespace AwsMock::Dto::Common {
 
                 case http::verb::put:
                     if (multipartRequest) {
-                        command = S3CommandType::UPLOAD_PART;
+                        if (uploadPartCopy) {
+                            command = S3CommandType::UPLOAD_PART_COPY;
+                        } else {
+                            command = S3CommandType::UPLOAD_PART;
+                        }
                     } else if (encryptionRequest) {
                         command = S3CommandType::PUT_BUCKET_ENCRYPTION;
                     } else if (notificationRequest) {
@@ -98,6 +102,7 @@ namespace AwsMock::Dto::Common {
                     break;
             }
         }
+        log_info << "Client command: " << ToString();
     }
 
     void S3ClientCommand::GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent) {
@@ -150,13 +155,15 @@ namespace AwsMock::Dto::Common {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("method", method);
+            rootJson.set("method", std::string(to_string(method)));
             rootJson.set("region", region);
             rootJson.set("user", user);
             rootJson.set("command", Dto::Common::S3CommandTypeToString(command));
             rootJson.set("bucket", bucket);
             rootJson.set("key", key);
             rootJson.set("prefix", prefix);
+            rootJson.set("contentType", contentType);
+            rootJson.set("contentLength", contentLength);
             rootJson.set("versionRequest", versionRequest);
             rootJson.set("notificationRequest", notificationRequest);
             rootJson.set("multipartRequest", multipartRequest);

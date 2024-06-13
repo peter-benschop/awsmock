@@ -13,6 +13,7 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3Monitoring.h>
 #include <awsmock/service/s3/S3Service.h>
+#include <awsmock/service/s3/S3Worker.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
@@ -20,6 +21,7 @@
 #define S3_DEFAULT_MAX_THREADS 50
 #define S3_DEFAULT_TIMEOUT 900
 #define S3_DEFAULT_MONITORING_PERIOD 300
+#define S3_DEFAULT_WORKER_PERIOD 3600
 
 namespace AwsMock::Service {
 
@@ -91,6 +93,11 @@ namespace AwsMock::Service {
         std::shared_ptr<S3Monitoring> _s3Monitoring;
 
         /**
+         * S3 worker
+         */
+        std::shared_ptr<S3Worker> _s3Worker;
+
+        /**
          * S3 service
          */
         S3Service _s3Service;
@@ -124,6 +131,11 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * Worker period
+         */
+        int _workerPeriod;
     };
 
 }// namespace AwsMock::Service

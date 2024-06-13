@@ -70,6 +70,11 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string handler = {};
 
+        /**
+         * Function runtime
+         */
+        std::string runtime = {};
+
         // TODO: ImageConfigResponse
 
         /**

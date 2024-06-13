@@ -27,7 +27,7 @@ namespace AwsMock::Database::Entity::Lambda {
     using bsoncxx::document::view;
 
     /**
-     * Lambda tags entity
+     * @brief Lambda tags entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -39,7 +39,7 @@ namespace AwsMock::Database::Entity::Lambda {
         std::vector<std::pair<std::string, std::string>> tags;
 
         /**
-         * Checks whether a tags with the given tags key exists.
+         * @brief Checks whether a tags with the given tags key exists.
          *
          * @param key key of the tags
          * @return true if tags with the given key exists.
@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::Lambda {
         bool HasTag(const std::string &key);
 
         /**
-         * Returns a given tags value by key
+         * @brief Returns a given tags value by key
          *
          * @param key name of the tag
          * @return found notification or notifications.end().
@@ -55,28 +55,28 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string GetTagValue(const std::string &key);
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document view.
          */
         [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param tag tag entity

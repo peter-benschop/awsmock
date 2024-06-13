@@ -6,16 +6,18 @@
 #define AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 
 // C includes
-#include <fcntl.h>
-#include <sys/stat.h>
-#ifndef _WIN32
 #include <cerrno>
+#include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
-#endif
 
 // C++ includes
 #include <string>
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
@@ -76,24 +78,10 @@ namespace AwsMock::Core {
          * @return true, in case file is already mapped.
          */
         [[nodiscard]] bool IsMapped() const { return _mapped; }
-#ifdef _WIN32
-        /// tweak performance
-        enum CacheHint {
-            Normal,        ///< good overall performance
-            SequentialScan,///< read file only once with few seeks
-            RandomAccess   ///< jump around
-        };
-#endif
 
       private:
 
-#ifdef _WIN32
-        typedef void *FileHandle;
-        /// Windows handle to memory mapping of _file
-        void *_mappedFile;
-#else
         typedef int FileHandle;
-#endif
 
         /**
          * Start pointer
@@ -124,6 +112,11 @@ namespace AwsMock::Core {
          * File size
          */
         long _fileSize = 0;
+
+        /**
+         * Mutex
+         */
+        static boost::mutex _mutex;
     };
 
 }// namespace AwsMock::Core

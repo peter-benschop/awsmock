@@ -12,7 +12,7 @@ set(SOURCES CryptoTests.cpp FileUtilsTests.cpp DirUtilsTests.cpp StringUtilsTest
 
 add_executable(${BINARY} ${SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} PocoUtil PocoFoundation PocoNet PocoJSON PocoXML PocoZip
-        PocoPrometheus gtest pthread ssl crypto z archive tbb)
+        PocoPrometheus boost_locale gtest pthread ssl crypto z archive tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 

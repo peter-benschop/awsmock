@@ -26,12 +26,12 @@ namespace AwsMock::Database::Entity::KMS {
                     kvp("rsaPrivateKey", rsaPrivateKey),
                     kvp("rsaPublicKey", rsaPublicKey),
                     kvp("pendingWindowInDays", pendingWindowInDays),
-                    kvp("created", MongoUtils::ToBson(created)),
-                    kvp("modified", MongoUtils::ToBson(modified)));
+                    kvp("created", bsoncxx::types::b_date(created)),
+                    kvp("modified", bsoncxx::types::b_date(modified)));
 
             // Scheduled deletion
-            if (scheduledDeletion.timestamp() > 0) {
-                keyDoc.append(kvp("scheduledDeletion", MongoUtils::ToBson(scheduledDeletion)));
+            if (scheduledDeletion.time_since_epoch().count() > 0) {
+                keyDoc.append(kvp("scheduledDeletion", bsoncxx::types::b_date(scheduledDeletion)));
             } else {
                 keyDoc.append(kvp("scheduledDeletion", bsoncxx::types::b_null()));
             }
@@ -72,10 +72,10 @@ namespace AwsMock::Database::Entity::KMS {
             rsaPublicKey = bsoncxx::string::to_string(mResult.value()["rsaPublicKey"].get_string().value);
             pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
             if (mResult.value()["scheduledDeletion"].type() != bsoncxx::type::k_null) {
-                scheduledDeletion = MongoUtils::FromBson(mResult.value()["scheduledDeletion"].get_date());
+                scheduledDeletion = mResult.value()["scheduledDeletion"].get_date();
             }
-            created = MongoUtils::FromBson(mResult.value()["created"].get_date());
-            modified = MongoUtils::FromBson(mResult.value()["modified"].get_date());
+            created = mResult.value()["created"].get_date();
+            modified = mResult.value()["modified"].get_date();
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
@@ -111,12 +111,12 @@ namespace AwsMock::Database::Entity::KMS {
         jsonObject.set("rsaPrivateKey", rsaPrivateKey);
         jsonObject.set("rsaPublicKey", rsaPublicKey);
         jsonObject.set("pendingWindowInDays", pendingWindowInDays);
-        jsonObject.set("created", created);
-        jsonObject.set("modified", modified);
+        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
 
         // Scheduled deletion
-        if (scheduledDeletion.timestamp().epochTime() > 0) {
-            jsonObject.set("scheduledDeletion", scheduledDeletion);
+        if (scheduledDeletion.time_since_epoch().count() > 0) {
+            jsonObject.set("scheduledDeletion", Core::DateTimeUtils::ISO8601(scheduledDeletion));
         }
 
         // Tags array

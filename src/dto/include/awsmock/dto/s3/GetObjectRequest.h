@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_GETOBJECTREQUEST_H
-#define AWSMOCK_DTO_S3_GETOBJECTREQUEST_H
+#ifndef AWSMOCK_DTO_S3_GET_OBJECT_REQUEST_H
+#define AWSMOCK_DTO_S3_GET_OBJECT_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -17,6 +17,11 @@
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief Get object request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct GetObjectRequest {
 
         /**
@@ -73,4 +78,4 @@ namespace AwsMock::Dto::S3 {
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_GETOBJECTREQUEST_H
+#endif// AWSMOCK_DTO_S3_GET_OBJECT_REQUEST_H

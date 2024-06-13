@@ -22,7 +22,7 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     /**
-     * @param Lambda environment entity
+     * @brief Lambda environment entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -34,14 +34,14 @@ namespace AwsMock::Database::Entity::Lambda {
         std::map<std::string, std::string> variables;
 
         /**
-         * C@param onverts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult database view.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * @param Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */

@@ -5,14 +5,18 @@
 #ifndef AWSMOCK_SERVICE_S3_HANDLER_H
 #define AWSMOCK_SERVICE_S3_HANDLER_H
 
+// C*+ includes
+#include <chrono>
+
 // Boost includes
 #include <boost/beast.hpp>
 #include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
@@ -99,6 +103,16 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
+
+        /**
+         * @brief Get the range for a range request
+         *
+         * @param request HTTP request
+         * @param min minimum byte
+         * @param max maximum byte
+         * @param size content length
+         */
+        static void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size);
 
         /**
          * S3 service

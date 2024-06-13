@@ -30,23 +30,29 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaExecutor : public Core::Task {
+    class LambdaExecutor {
 
       public:
 
         /**
-         * Constructor
-         *
-         * @param host lambda docker host name
-         * @param port lambda docker port
-         * @param payload event payload
+         * @brief Constructor
          */
-        explicit LambdaExecutor(std::string host, int port, std::string payload) : Core::Task("lambda-executor"), _host(std::move(host)), _port(port), _payload(std::move(payload)){};
+        explicit LambdaExecutor() = default;
+
 
         /**
-         * Send the invocation request to the corresponding port
+         * @brief Executes a lambda function
+         *
+         * @param host lambda docker host
+         * @param port lambda docker port
+         * @param payload lambda payload
          */
-        void Run() override;
+        void operator()(std::string host, int port, std::string payload);
+
+        /**
+         * @brief Send the invocation request to the corresponding port
+         */
+        //        void Run() override;
 
       private:
 
@@ -54,21 +60,6 @@ namespace AwsMock::Service {
          * Metric module
          */
         Core::MetricService &_metricService = Core::MetricService::instance();
-
-        /**
-         * Lambda host
-         */
-        std::string _host;
-
-        /**
-         * Lambda port
-         */
-        int _port;
-
-        /**
-         * Lambda payload
-         */
-        std::string _payload;
     };
 
 }// namespace AwsMock::Service

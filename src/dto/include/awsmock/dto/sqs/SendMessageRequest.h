@@ -133,6 +133,11 @@ namespace AwsMock::Dto::SQS {
         std::string senderId;
 
         /**
+         * MD5 of request body
+         */
+        std::string md5sum;
+
+        /**
          * Request ID
          */
         std::string requestId;

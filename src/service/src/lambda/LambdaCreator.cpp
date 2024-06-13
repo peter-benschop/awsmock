@@ -97,7 +97,12 @@ namespace AwsMock::Service {
         std::string tempDir = dataDir + Poco::Path::separator() + "tmp";
 
         // Decode Base64 file
-        std::string decoded = Core::Crypto::Base64Decode(zipFile);
+        std::stringstream strstream;
+        std::ifstream ifs(zipFile);
+        strstream << ifs.rdbuf();
+        ifs.close();
+
+        std::string decoded = Core::Crypto::Base64Decode(strstream.str());
 
         try {
 
@@ -176,9 +181,10 @@ namespace AwsMock::Service {
 
         std::string base64Path = lambdaDir + Poco::Path::separator();
         std::string base64File = lambdaEntity.function + "-" + dockerTag + ".zip";
+        std::string base64FullFile = base64Path + base64File;
 
         // Write Base64 ZIP file
-        if (!Core::FileUtils::FileExists(base64File)) {
+        if (!Core::FileUtils::FileExists(base64FullFile)) {
 
             // Write base64 zip file, either from S3 bucket/key or from supplied string
             if (zipFile.empty()) {
@@ -202,12 +208,12 @@ namespace AwsMock::Service {
             } else {
 
                 // If we do not have a local file already, write the Base64 encoded file to lambda dir
-                std::ofstream ofs(base64Path + base64File);
+                std::ofstream ofs(base64FullFile);
                 ofs << zipFile;
                 ofs.close();
             }
         }
         lambdaEntity.code.zipFile = base64File;
-        return base64Path + base64File;
+        return base64FullFile;
     }
 }// namespace AwsMock::Service

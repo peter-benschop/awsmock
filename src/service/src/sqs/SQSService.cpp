@@ -121,8 +121,10 @@ namespace AwsMock::Service {
         Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_url");
         log_info << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
 
+        std::string queueUrl = Core::SanitizeSQSUrl(request.queueName);
+
         // Check existence
-        if (!_database.QueueExists(request.region, request.queueName)) {
+        if (!_database.QueueUrlExists(request.region, queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueName: " << request.queueName;
             throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueName: " + request.queueName);
         }
@@ -130,7 +132,7 @@ namespace AwsMock::Service {
         try {
 
             // Get queue
-            Database::Entity::SQS::Queue queue = _database.GetQueueByName(request.region, request.queueName);
+            Database::Entity::SQS::Queue queue = _database.GetQueueByUrl(request.region, queueUrl);
             log_info << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
             return {.queueUrl = queue.queueUrl};
 
@@ -403,7 +405,7 @@ namespace AwsMock::Service {
                      .md5SystemAttr = md5SystemAttr,
                      .attributes = attributes,
                      .messageAttributes = messageAttributes});
-            log_info << "Message send, queueName: " << queue.name << " messageId: " << request.messageId << " md5Body: " << md5Body;
+            log_info << "Message send, queueName: " << queue.name << " messageId: " << request.messageId << " md5Body: " << request.md5sum;
 
             return {
                     .queueUrl = message.queueUrl,

@@ -2,6 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
+#include "awsmock/service/s3/S3Service.h"
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
@@ -37,6 +38,9 @@ namespace AwsMock::Service {
         // Start REST manager
         //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration));
 
+        // Create transfer bucket
+        CreateTransferBucket();
+
         // Start all transfer servers
         StartTransferServers();
 
@@ -52,6 +56,19 @@ namespace AwsMock::Service {
     void TransferServer::Shutdown() {
         _transferMonitoring->Stop();
         StopHttpServer();
+    }
+
+    void TransferServer::CreateTransferBucket() {
+
+        Service::S3Service s3Service;
+
+        Dto::S3::CreateBucketRequest request;
+        request.name = "transfer-server";
+        request.owner = Core::Configuration::instance().getString("awsmock.user");
+        request.region = Core::Configuration::instance().getString("awsmock.region");
+        if (!s3Service.BucketExists(request.region, request.name)) {
+            s3Service.CreateBucket(request);
+        }
     }
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {

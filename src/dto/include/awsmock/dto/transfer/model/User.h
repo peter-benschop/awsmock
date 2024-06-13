@@ -85,14 +85,14 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Converts a JSON string to a user
          *
-         * @param JSON object
+         * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * @brief Converts a JSON string to a list of users
          *
-         * @param JSON string
+         * @param payload JSON string
          * @return list of users
          */
         static std::vector<User> FromJsonList(const std::string &payload);

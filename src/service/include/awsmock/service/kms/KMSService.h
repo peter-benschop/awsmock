@@ -42,6 +42,8 @@
 
 namespace AwsMock::Service {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief KMS service
      *

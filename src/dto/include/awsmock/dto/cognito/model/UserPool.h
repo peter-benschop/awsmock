@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
 
 // C++ includes
+#include <chrono>
 #include <sstream>
 #include <string>
 
@@ -62,28 +63,28 @@ namespace AwsMock::Dto::Cognito {
         system_clock::time_point modified;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

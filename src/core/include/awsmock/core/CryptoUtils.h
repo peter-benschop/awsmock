@@ -84,6 +84,7 @@ namespace AwsMock::Core {
      *
      * @par
      * This class contains AWS cryptographic method as well as OpenSSL methods. AWS cryptographic methods a are denoted with a preceding 'AWS'.
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     class Crypto {
@@ -97,6 +98,14 @@ namespace AwsMock::Core {
          * @return MD5 hash of the given string
          */
         static std::string GetMd5FromString(const std::string &content);
+
+        /**
+         * @brief Returns the MD5 hash of a string.
+         *
+         * @param content string to hash
+         * @return MD5 hash of the given string
+         */
+        static std::string GetMd5FromString(const unsigned char *content);
 
         /**
          * @brief Returns the MD5 hash of a file.

@@ -77,7 +77,7 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @param Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */

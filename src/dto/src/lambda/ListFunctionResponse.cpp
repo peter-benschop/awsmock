@@ -15,6 +15,7 @@ namespace AwsMock::Dto::Lambda {
                     .functionArn = lambda.arn,
                     .functionName = lambda.function,
                     .handler = lambda.handler,
+                    .runtime = lambda.runtime,
                     .lastModified = lambda.modified};
             function.environment.variables = lambda.environment.variables;
             functions.push_back(function);
@@ -28,11 +29,10 @@ namespace AwsMock::Dto::Lambda {
             }
             rootJson.set("Functions", recordsJsonArray);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             throw Core::ServiceException(exc.message());
         }
     }
