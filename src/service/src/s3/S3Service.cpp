@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    bool S3Service::BucketExists(const std::string &region, const std::string bucket) {
+    bool S3Service::BucketExists(const std::string &region, const std::string &bucket) {
         return _database.BucketExists({.region = region, .name = bucket});
     }
 
@@ -22,9 +22,7 @@ namespace AwsMock::Service {
             log_warning << "Bucket exists already, region: " << region << " name: " << s3Request.name;
             Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, s3Request.name);
             log_debug << "Got bucket: " << s3Request.name;
-            return {
-                    .location = bucket.region,
-                    .arn = Core::CreateArn("s3", region, accountId, s3Request.name)};
+            return {.location = bucket.region, .arn = Core::CreateArn("s3", region, accountId, s3Request.name)};
         }
 
         Dto::S3::CreateBucketResponse createBucketResponse;
@@ -265,32 +263,23 @@ namespace AwsMock::Service {
         std::string s3DataDir = dataDir + "/s3/";
         Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
-        std::string filename = s3DataDir + sourceObject.internalName;
-        if (!Core::MemoryMappedFile::instance().IsMapped()) {
-            if (!Core::MemoryMappedFile::instance().OpenFile(filename)) {
-                log_error << "Could not open memory mapped file, filename: " << filename;
-                throw Core::ServiceException("Could not open memory mapped file, filename: " + filename);
-            }
-        }
-
+        std::string sourceFile = s3DataDir + sourceObject.internalName;
         std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
         log_trace << "Using uploadDir: " << uploadDir;
 
+        long start = request.min;
         long length = request.max - request.min + 1;
-        std::string fileName = uploadDir + Poco::Path::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
-        std::ofstream ofs(fileName);
-        char *buffer = new char[length];
-        Core::MemoryMappedFile::instance().ReadChunk(request.min, length, (char *) buffer);
-        ofs << buffer;
-        ofs.close();
-        delete[] buffer;
-        log_trace << "Part uploaded, part: " << request.partNumber << " dir: " << uploadDir;
+        std::string destFile = uploadDir + Poco::Path::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
+        int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        int source = open(sourceFile.c_str(), O_RDONLY, 0);
+        long copied = sendfile(dest, source, &start, length);
+        close(source);
+        close(dest);
 
         // Get md5sum as ETag
         Dto::S3::UploadPartCopyResponse response;
-        response.eTag = Core::Crypto::GetMd5FromFile(fileName);
-        response.lastModified = system_clock::now();
-        log_info << "Upload part copy succeeded, part: " << request.partNumber << " filename: " << fileName << " length: " << length;
+        response.eTag = Core::Crypto::GetMd5FromFile(destFile);
+        log_info << "Upload part copy succeeded, part: " << request.partNumber << " filename: " << destFile << " length: " << length;
 
         return response;
     }
@@ -315,7 +304,7 @@ namespace AwsMock::Service {
         long fileSize = 0;
         try {
 
-            fileSize = Core::FileUtils::AppendTextFiles(outFile, uploadDir, files);
+            fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
             log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
 
         } catch (Poco::Exception &exc) {
@@ -346,7 +335,6 @@ namespace AwsMock::Service {
             boost::thread t(boost::ref(s3HashCreator), algorithms, object);
             t.detach();
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-            //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
         }
 
         // Cleanup
@@ -618,7 +606,8 @@ namespace AwsMock::Service {
 
         // Check bucket existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::NotFoundException("Bucket does not exist");
+            log_error << "Bucket does not exist, name: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist, name: " + request.bucket);
         }
 
         // Check notification existence
@@ -706,13 +695,6 @@ namespace AwsMock::Service {
             log_error << "Bucket is not empty";
             throw Core::NotFoundException("Bucket is not empty");
         }
-
-        // Check transfer bucket
-        /*        std::string transferBucket = Core::Configuration::instance().getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
-        if (request.bucket == transferBucket) {
-            log_error << "Transfer bucket cannot be deleted";
-            throw Core::NotFoundException("Transfer bucket cannot be deleted");
-        }*/
 
         try {
 
@@ -1006,7 +988,8 @@ namespace AwsMock::Service {
         // Write file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = dataS3Dir + Poco::Path::separator() + fileName;
-        std::ofstream ofs(filePath, std::ios::out | std::ios::trunc);
+
+        std::ofstream ofs(filePath, std::ios::out | std::ios::trunc | std::ios::binary);
         ofs << stream.rdbuf();
         //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();

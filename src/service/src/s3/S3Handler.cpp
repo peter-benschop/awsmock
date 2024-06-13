@@ -377,8 +377,6 @@ namespace AwsMock::Service {
                         s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
                         log_info << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max);
                     }
-
-                    std::string range = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source-range");
                     log_debug << "S3 multipart upload part copy: " << partNumber;
 
                     Dto::S3::UploadPartCopyResponse s3Response = _s3Service.UploadPartCopy(s3Request);

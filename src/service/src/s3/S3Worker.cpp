@@ -55,7 +55,6 @@ namespace AwsMock::Service {
             }
         }
         log_debug << "Bucket synchronized, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
-        log_trace << "S3 worker finished, bucketCount: " << buckets.size();
     }
 
 }// namespace AwsMock::Service
