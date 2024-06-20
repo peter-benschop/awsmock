@@ -3,36 +3,21 @@
 //
 
 #include <awsmock/repository/Database.h>
-#include <mongocxx/instance.hpp>
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::array;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_document;
 
-    // TODO: Remove as connection pool take over
-    DatabaseBase::DatabaseBase() : _configuration(Core::Configuration::instance()), _useDatabase(false) {
+    DatabaseBase::DatabaseBase() : _useDatabase(false) {
 
-        _useDatabase = _configuration.getBool("awsmock.mongodb.active", false);
-        _name = _configuration.getString("awsmock.mongodb.name", "awsmock");
-        _host = _configuration.getString("awsmock.mongodb.host", "localhost");
-        _port = _configuration.getInt("awsmock.mongodb.port", 27017);
-        _user = _configuration.getString("awsmock.mongodb.user", "admin");
-        _password = _configuration.getString("awsmock.mongodb.password", "admin");
-        _poolSize = _configuration.getInt("awsmock.mongodb.pool.size", 256);
+        _useDatabase = Core::Configuration::instance().getBool("awsmock.mongodb.active", false);
+        _name = Core::Configuration::instance().getString("awsmock.mongodb.name", "awsmock");
     }
 
     mongocxx::database DatabaseBase::GetConnection() {
         mongocxx::pool::entry _client = _pool->acquire();
         return (*_client)[_name];
-    }
-
-    mongocxx::pool::entry DatabaseBase::GetClient() {
-        if (!_pool) {
-            log_fatal << "Pool is NULL";
-        }
-        return _pool->acquire();
     }
 
     bool DatabaseBase::HasDatabase() const {
@@ -46,18 +31,18 @@ namespace AwsMock::Database {
     void DatabaseBase::StartDatabase() {
 
         _useDatabase = true;
-        _configuration.SetValue("awsmock.mongodb.active", true);
+        Core::Configuration::instance().SetValue("awsmock.mongodb.active", true);
 
         // Update module database
         mongocxx::pool::entry _client = _pool->acquire();
         (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-        log_info << "Database module started, poolSize: " << _poolSize;
+        log_info << "Database module started";
     }
 
     void DatabaseBase::StopDatabase() {
 
         // Update module database
-        _configuration.SetValue("awsmock.mongodb.active", false);
+        Core::Configuration::instance().SetValue("awsmock.mongodb.active", false);
         mongocxx::pool::entry _client = _pool->acquire();
         (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
                                                make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
@@ -71,8 +56,9 @@ namespace AwsMock::Database {
         if (_useDatabase) {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::database database = (*client)["awsmock"];
+            mongocxx::database database = (*client)[_name];
 
+            // SQS
             database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
                                                  make_document(kvp("name", "sqs_message_idx1")));
             database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)),
@@ -80,34 +66,35 @@ namespace AwsMock::Database {
             database["sqs_message"].create_index(make_document(kvp("receiptHandle", 1)),
                                                  make_document(kvp("name", "sqs_message_idx3")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
-                                               make_document(kvp("name", "sqs_region_name_idx1")));
+                                               make_document(kvp("name", "sqs_queue_idx1")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),
-                                               make_document(kvp("name", "sqs_region_url_idx2")));
+                                               make_document(kvp("name", "sqs_queue_idx2")));
+
+            // SNS
             database["sns_topic"].create_index(make_document(kvp("region", 1), kvp("arn", 1)),
-                                               make_document(kvp("name", "sns_region_arn_idx1")));
+                                               make_document(kvp("name", "sns_topic_idx1")));
             database["sns_message"].create_index(make_document(kvp("region", 1), kvp("topicArn", 1)),
-                                                 make_document(kvp("name", "sns_region_topicarn_idx1")));
+                                                 make_document(kvp("name", "sns_message_idx2")));
+
+            // S3
             database["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
-                                               make_document(kvp("name", "s3_region_name_idx1")));
-            database["s3_object"].create_index(make_document(kvp("bucket", 1)),
-                                               make_document(kvp("name", "s3_object_bucket_idx1")));
+                                               make_document(kvp("name", "s3_idx1")));
+            database["s3_object"].create_index(make_document(kvp("region", 1), kvp("bucket", 1), kvp("key", 1)),
+                                               make_document(kvp("name", "s3_idx2")));
+
+            // Module
             database["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)),
-                                            make_document(kvp("name", "module_name_status_idx1")));
+                                            make_document(kvp("name", "module_idx1")));
+
+            // KMS
             database["kms_key"].create_index(make_document(kvp("region", 1)),
-                                             make_document(kvp("name", "kms_key_region_idx1")));
+                                             make_document(kvp("name", "kms_idx1")));
             database["kms_key"].create_index(make_document(kvp("keyId", 1)),
-                                             make_document(kvp("name", "kms_key_keyid_idx1")));
+                                             make_document(kvp("name", "kms_idx2")));
             database["kms_key"].create_index(make_document(kvp("keyState", 1)),
-                                             make_document(kvp("name", "kms_key_keystate_idx1")));
+                                             make_document(kvp("name", "kms_idx3")));
             log_debug << "SQS indexes created";
         }
-    }
-
-    void DatabaseBase::UpdateModuleStatus() {
-        /*    auto session = GetSession();
-    session.start_transaction();
-    session.client()[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-    session.commit_transaction();*/
     }
 
 }// namespace AwsMock::Database

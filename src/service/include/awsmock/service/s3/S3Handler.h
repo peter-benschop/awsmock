@@ -115,6 +115,17 @@ namespace AwsMock::Service {
         static void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size);
 
         /**
+         * @brief Returns the metadata has string key/value map.
+         *
+         * @par
+         * Only headers with keys starting with x-amz-meta are included in the map.
+         *
+         * @param request HTTP request
+         * @return hash map of key/value pairs.
+         */
+        static std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request);
+
+        /**
          * S3 service
          */
         S3Service _s3Service;

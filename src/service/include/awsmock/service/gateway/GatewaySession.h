@@ -153,7 +153,7 @@ namespace AwsMock::Service {
         /**
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
          */
-        boost::optional<http::request_parser<http::dynamic_body>> parser_;
+        boost::optional<http::request_parser<http::dynamic_body>> _parser;
 
         /**
          * Routine table

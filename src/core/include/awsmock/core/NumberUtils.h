@@ -11,6 +11,9 @@
 // Poco includes
 #include <Poco/String.h>
 
+// Boost includes
+#include <boost/lexical_cast.hpp>
+
 namespace AwsMock::Core {
 
     /**
@@ -62,6 +65,14 @@ namespace AwsMock::Core {
          * @param offset offset
          */
         static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+
+        /**
+         * @brief Returns a integer from a hex string
+         *
+         * @param hex hex string
+         * @return converted integer
+         */
+        static int HexToInt(const std::string &hex);
     };
 
 }// namespace AwsMock::Core

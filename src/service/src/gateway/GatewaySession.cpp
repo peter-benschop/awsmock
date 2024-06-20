@@ -34,17 +34,17 @@ namespace AwsMock::Service {
     void GatewaySession::DoRead() {
 
         // Construct a new parser for each message
-        parser_.emplace();
+        _parser.emplace();
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
-        parser_->body_limit(_bodyLimit);
+        _parser->body_limit(_bodyLimit);
 
         // Set the timeout.
         stream_.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
-        http::async_read(stream_, buffer_, *parser_, boost::beast::bind_front_handler(&GatewaySession::OnRead, this->shared_from_this()));
+        http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, this->shared_from_this()));
     }
 
     void GatewaySession::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
         }
 
         // Send the response
-        QueueWrite(HandleRequest(parser_->release()));
+        QueueWrite(HandleRequest(_parser->release()));
 
         // If we aren't at the queue limit, try to pipeline another request
         if (response_queue_.size() < _queueLimit)

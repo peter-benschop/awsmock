@@ -31,13 +31,6 @@ namespace AwsMock::Dto::Docker {
         std::vector<Image> imageList;
 
         /**
-         * @brief Constructor
-         *
-         * @param body HTTP response body
-         */
-        explicit ListImageResponse(const std::string &body);
-
-        /**
          * @brief Convert to a JSON string
          *
          * @param jsonString JSON string

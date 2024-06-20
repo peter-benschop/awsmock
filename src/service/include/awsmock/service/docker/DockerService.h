@@ -16,7 +16,6 @@
 #include <boost/thread/thread.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DomainSocket.h>
@@ -27,6 +26,7 @@
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
@@ -50,10 +50,16 @@ namespace AwsMock::Service {
     /**
      * @brief Controls the connection to the docker daemon using a UNIX Domain socket.
      *
-     * All docker related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc. The service is using the
-     * docker REST API available at the UNIX domain socket. Depending on your Linux distribution this docker socket under different directory normally its: <i>/var/run/docker.sock</i> (Debian, Ubuntu).
+     * All docker related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc.
      *
-     * On Windows the HTTP port will be used to communicate with the docker daemon. Usually `http://localhost:2375`.
+     * @par Linux
+     * On Linux the service is using the docker REST API available at the UNIX domain socket. Depending on your Linux distribution the docker socket is located under
+     * different directory normally its: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If you lLinux distribution is using another location set the full path to the
+     * docker socket in the awsmock configuration file.
+     *
+     * @par Windows
+     * On Windows the HTTP port will be used to communicate with the docker daemon. Usually `http://localhost:2375`, if the port is not accessible make the port accessible
+     * in Docker Desktop for Windows.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -141,11 +147,12 @@ namespace AwsMock::Service {
         bool ContainerExists(const std::string &name, const std::string &tag);
 
         /**
-         * @brief List all docker images
+         * @brief List all docker images, with the given name and different tags.
          *
-         * @return CreateFunctionResponse
+         * @param name name of the image
+         * @return ListImageResponse
          */
-        // Dto::Docker::ListImageResponse ListImages();
+        Dto::Docker::ListImageResponse ListImages(const std::string &name);
 
         /**
          * @brief Creates a container
@@ -232,7 +239,7 @@ namespace AwsMock::Service {
         static std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
         /**
-         * @brief Write the compressed docker imagefile.
+         * @brief Write the compressed docker image file.
          *
          * @param codeDir code directory
          * @param name function name
@@ -244,11 +251,6 @@ namespace AwsMock::Service {
          * Docker version
          */
         std::string _dockerVersion;
-
-        /**
-         * Docker network mode, bridge or host
-         */
-        std::string _networkMode;
 
         /**
          * Docker internal network name

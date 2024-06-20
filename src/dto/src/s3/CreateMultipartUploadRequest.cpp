@@ -16,6 +16,12 @@ namespace AwsMock::Dto::S3 {
             rootJson.set("user", user);
             rootJson.set("uploadId", uploadId);
 
+            Poco::JSON::Object jsonMetadata;
+            for (const auto &meta: metadata) {
+                jsonMetadata.set(meta.first, meta.second);
+            }
+            rootJson.set("metadata", jsonMetadata);
+
             return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {

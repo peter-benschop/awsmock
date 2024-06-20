@@ -11,6 +11,7 @@ namespace AwsMock::Service {
     }
 
     void S3Worker::Run() {
+        //TODO: fix, there seems to be some confusion when services are running.
         SyncObjects();
     }
 
@@ -47,7 +48,7 @@ namespace AwsMock::Service {
         boost::filesystem::path p(s3DataDir);
         if (is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
-                if (!_s3Database.ObjectExists(entry.path().string())) {
+                if (!_s3Database.ObjectExists(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::DeleteFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
                     filesDeleted++;

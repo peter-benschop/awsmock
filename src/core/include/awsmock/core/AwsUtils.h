@@ -310,7 +310,68 @@ namespace AwsMock::Core {
          */
         static bool VerifySignature(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
 
+        /**
+         * @brief Returns the bucket name from the request.
+         *
+         * @par
+         * Distinguishes between host-style and path-style requests.
+         *
+         * @param request HTTP request
+         * @return bucket name.
+         */
+        static std::string GetS3BucketName(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Returns the object key name from the request.
+         *
+         * @par
+         * Distinguishes between host-style and path-style requests.
+         *
+         * @param request HTTP request
+         * @return bucket name.
+         */
+        static std::string GetS3ObjectKey(const http::request<http::dynamic_body> &request);
+
       private:
+
+        /**
+         * @brief Checks whether this is a host-style or path-style S3 request
+         *
+         * @param request HTTP request.
+         */
+        static bool IsS3HostStyle(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the bucket name for a S3 host-style request
+          *
+          * @param request HTTP request
+          * @return bucket name
+          */
+        static std::string GetS3HostStyleBucket(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the bucket name for a S3 path-style request
+          *
+          * @param request HTTP request
+          * @return bucket name
+          */
+        static std::string GetS3PathStyleBucket(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the object key for a S3 host-style request
+          *
+          * @param request HTTP request
+          * @return object key
+          */
+        static std::string GetS3HostStyleObjectKey(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the bucket name for a S3 path-style request
+          *
+          * @param request HTTP request
+          * @return object key
+          */
+        static std::string GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Returns the canonical request.
