@@ -248,8 +248,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::PUT_OBJECT: {
 
+                    //Core::HttpUtils::DumpHeaders(request);
+
                     // Get the user metadata
-                    std::map<std::string, std::string> metadata = {};
+                    std::map<std::string, std::string> metadata = GetMetadata(request);
 
                     if (clientCommand.copyRequest) {
 
@@ -276,6 +278,7 @@ namespace AwsMock::Service {
 
                         // Checksum
                         std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
+                        bool chunckedEncoding = Core::StringUtils::ContainsIgnoreCase(Core::HttpUtils::GetHeaderValue(request, "Content-Encoding"), "aws-chunked");
 
                         // S3 put object request
                         Dto::S3::PutObjectRequest putObjectRequest = {
@@ -294,7 +297,7 @@ namespace AwsMock::Service {
 
                         log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
-                        Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream);
+                        Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream, chunckedEncoding);
                         stream.clear();
 
                         log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
@@ -375,13 +378,13 @@ namespace AwsMock::Service {
                         std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
                         s3Request.min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
                         s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
-                        log_info << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max);
+                        log_debug << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max);
                     }
                     log_debug << "S3 multipart upload part copy: " << partNumber;
 
                     Dto::S3::UploadPartCopyResponse s3Response = _s3Service.UploadPartCopy(s3Request);
 
-                    log_debug << "Finished S3 multipart upload part copy: " << partNumber;
+                    log_info << "Finished S3 multipart upload part copy: " << partNumber;
 
                     return SendOkResponse(request, s3Response.ToXml());
                 }
@@ -541,8 +544,11 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD: {
 
                     log_debug << "Starting multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    //Core::HttpUtils::DumpHeaders(request);
 
                     Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
+                    s3Request.metadata = GetMetadata(request);
+
                     Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
                     log_info << "Create multi-part upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
@@ -553,6 +559,7 @@ namespace AwsMock::Service {
 
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
+                    //Core::HttpUtils::DumpHeaders(request);
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
                     Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
@@ -682,21 +689,17 @@ namespace AwsMock::Service {
 
         try {
 
-            std::string bucket = Core::HttpUtils::GetPathParameter(request.target(), 0);
-            std::string key = Core::HttpUtils::GetPathParametersFromIndex(request.target(), 1);
-            log_debug << "S3 HEAD request, bucket: " << bucket << " key: " << key;
-
             Dto::S3::GetMetadataResponse s3Response;
-            if (key.empty()) {
+            if (clientCommand.key.empty()) {
 
                 // Bucket metadata
-                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = bucket};
+                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket};
                 s3Response = _s3Service.GetBucketMetadata(s3Request);
 
             } else {
 
                 // Object metadata
-                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = bucket, .key = key};
+                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
                 s3Response = _s3Service.GetObjectMetadata(s3Request);
             }
 
@@ -711,6 +714,7 @@ namespace AwsMock::Service {
             headers["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
             headers["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
             headers["x-amz-bucket-region"] = s3Response.region;
+            headers["x-amz-location-name"] = s3Response.region;
 
             // User supplied metadata
             for (const auto &m: s3Response.metadata) {
@@ -738,6 +742,19 @@ namespace AwsMock::Service {
         max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
         size = max - min + 1;
         log_info << "Requested range: " << std::to_string(min) << "-" << std::to_string(max);
+    }
+
+    std::map<std::string, std::string> S3Handler::GetMetadata(const http::request<http::dynamic_body> &request) {
+
+        std::map<std::string, std::string> metadata;
+        for (const auto &meta: request.base()) {
+            if (Core::StringUtils::StartsWith(meta.name_string(), "x-amz-meta")) {
+                std::string name = meta.name_string().substr(sizeof("x-amz-meta-") - 1);
+                metadata[name] = meta.value();
+            }
+        }
+        log_info << "Get user metadata, size: " << metadata.size();
+        return metadata;
     }
 
 }// namespace AwsMock::Service

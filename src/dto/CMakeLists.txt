@@ -25,8 +25,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
         src/s3/UploadPartCopyResponse.cpp)
-set(DOCKER_SOURCES src/docker/Port.cpp src/docker/Container.cpp src/docker/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
-        src/docker/CreateContainerRequest.cpp src/docker/Filters.cpp src/docker/CreateContainerResponse.cpp)
+set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
+        src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp src/lambda/model/DeadLetterConfig.cpp
         src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
         src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp

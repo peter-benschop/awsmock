@@ -1199,7 +1199,7 @@ namespace AwsMock::FtpServer {
         Dto::S3::PutObjectRequest request = {.region = _region, .bucket = _bucket, .key = key, .owner = user, .metadata = metadata};
 
         std::ifstream ifs(fileName, std::ios::binary);
-        _s3Service->PutObject(request, ifs);
+        _s3Service->PutObject(request, ifs, false);
         ifs.close();
 
         _metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);

@@ -14,7 +14,8 @@ namespace AwsMock::Service {
         _maxQueueLength = _configuration.getInt("awsmock.service.lambda.http.max.queue", LAMBDA_DEFAULT_QUEUE);
         _maxThreads = _configuration.getInt("awsmock.service.lambda.http.max.threads", LAMBDA_DEFAULT_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.lambda.http.timeout", LAMBDA_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.sns.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
+        _monitoringPeriod = _configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = _configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
 
         // Directories
         _lambdaDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
@@ -38,6 +39,9 @@ namespace AwsMock::Service {
         // Monitoring
         _lambdaMonitoring = std::make_unique<LambdaMonitoring>(_monitoringPeriod);
 
+        // Worker thread
+        _lambdaWorker = std::make_unique<LambdaWorker>(_workerPeriod);
+
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
 
@@ -59,14 +63,14 @@ namespace AwsMock::Service {
         // Start monitoring
         _lambdaMonitoring->Start();
 
-        // Start HTTP manager
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration));
+        // Start monitoring
+        _lambdaWorker->Start();
 
         // Cleanup
         CleanupContainers();
 
         // Start all lambda functions
-        StartLambdaFunctions();
+        // StartLambdaFunctions();
     }
 
     void LambdaServer::Run() {
@@ -74,7 +78,8 @@ namespace AwsMock::Service {
 
     void LambdaServer::Shutdown() {
         _lambdaMonitoring->Stop();
-        StopHttpServer();
+        _lambdaWorker->Stop();
+        //       StopHttpServer();
     }
 
     void LambdaServer::CleanupContainers() {

@@ -16,6 +16,7 @@
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/repository/LambdaDatabase.h>
 
 namespace AwsMock::Service {
 
@@ -43,16 +44,12 @@ namespace AwsMock::Service {
         /**
          * @brief Executes a lambda function
          *
+         * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
          */
-        void operator()(std::string host, int port, std::string payload);
-
-        /**
-         * @brief Send the invocation request to the corresponding port
-         */
-        //        void Run() override;
+        void operator()(const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
       private:
 

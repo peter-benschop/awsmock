@@ -78,6 +78,50 @@ namespace AwsMock::Core {
         return stringstream.str();
     }
 
+    std::string AwsUtils::GetS3BucketName(const http::request<http::dynamic_body> &request) {
+        if (IsS3HostStyle(request)) {
+            return GetS3HostStyleBucket(request);
+        } else {
+            return GetS3PathStyleBucket(request);
+        }
+    }
+
+    std::string AwsUtils::GetS3ObjectKey(const http::request<http::dynamic_body> &request) {
+        if (IsS3HostStyle(request)) {
+            return GetS3HostStyleObjectKey(request);
+        } else {
+            return GetS3PathStyleObjectKey(request);
+        }
+    }
+
+    bool AwsUtils::IsS3HostStyle(const http::request<http::dynamic_body> &request) {
+        if (request.base().find(http::field::host) != request.end()) {
+            std::string host = request.base()[http::field::host];
+            return Core::StringUtils::Contains(host, ".s3.");
+        }
+        return false;
+    }
+
+    std::string AwsUtils::GetS3HostStyleBucket(const http::request<http::dynamic_body> &request) {
+        if (request.base().find(http::field::host) != request.end()) {
+            std::string host = request.base()[http::field::host];
+            return Core::StringUtils::SubStringUntil(host, ".");
+        }
+        return {};
+    }
+
+    std::string AwsUtils::GetS3PathStyleBucket(const http::request<http::dynamic_body> &request) {
+        return Core::HttpUtils::GetPathParameter(request.target(), 0);
+    }
+
+    std::string AwsUtils::GetS3HostStyleObjectKey(const http::request<http::dynamic_body> &request) {
+        return Core::HttpUtils::GetPathParametersFromIndex(request.target(), 0);
+    }
+
+    std::string AwsUtils::GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request) {
+        return Core::HttpUtils::GetPathParametersFromIndex(request.target(), 1);
+    }
+
     void AwsUtils::AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
 
         Core::Configuration &configuration = Core::Configuration::instance();

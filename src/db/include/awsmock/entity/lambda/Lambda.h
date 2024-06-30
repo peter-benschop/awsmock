@@ -31,6 +31,7 @@
 #include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
+#include <awsmock/entity/lambda/Instance.h>
 #include <awsmock/entity/lambda/Tags.h>
 #include <awsmock/repository/S3Database.h>
 
@@ -272,6 +273,11 @@ namespace AwsMock::Database::Entity::Lambda {
         system_clock::time_point lastInvocation;
 
         /**
+         * Running instances
+         */
+        std::vector<Instance> instances;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -280,6 +286,24 @@ namespace AwsMock::Database::Entity::Lambda {
          * Last modification date
          */
         system_clock::time_point modified = system_clock::now();
+
+        /**
+         * @brief Returns an instance by instance ID
+         *
+         * @param instanceId instance ID
+         * @return lambda instance.
+         */
+        Instance GetInstance(const std::string &instanceId);
+
+        /**
+         * @brief Remove an instance from the instances list.
+         *
+         * @par
+         * The instance is identified by the containerId.
+         *
+         * @param instance
+         */
+        void RemoveInstance(const Instance &instance);
 
         /**
          * @brief Checks whether a tags with the given tags key exists.

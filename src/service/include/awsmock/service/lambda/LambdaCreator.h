@@ -16,16 +16,16 @@
 #include <boost/beast/core/detail/base64.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Task.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/service/docker/DockerService.h>
 
 namespace AwsMock::Service {
 
@@ -72,10 +72,20 @@ namespace AwsMock::Service {
          *
          * @param functionCode zipped and BASE64 encoded function code
          * @param functionId lambda function OID
+         * @param instanceId instanceId
          */
-        void operator()(std::string &functionCode, std::string &functionId);
+        void operator()(std::string &functionCode, std::string &functionId, std::string &instanceId);
 
       private:
+
+        /**
+         * @brief Create a lambda function instance
+         *
+         * @param instanceId name of the instance, lambda function name + '-' + 8 random hex digits
+         * @param lambdaEntity lambda entity
+         * @param functionCode function code
+         */
+        static void CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, std::string &functionCode);
 
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder
@@ -90,9 +100,10 @@ namespace AwsMock::Service {
          * @brief Creates an new docker container, in case the container does not exists inside the docker daemon.
          *
          * @param lambdaEntity lambda entity.
+         * @param instance lambda entity instance.
          * @param dockerTag docker tag.
          */
-        static void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+        static void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag);
 
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API

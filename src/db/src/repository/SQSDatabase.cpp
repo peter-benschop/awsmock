@@ -431,8 +431,7 @@ namespace AwsMock::Database {
         auto client = ConnectionPool::instance().GetConnection();
         auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-        mongocxx::stdx::optional<bsoncxx::document::value>
-                mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
+        mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult->view());
 
@@ -800,8 +799,7 @@ namespace AwsMock::Database {
                                                                              kvp("queueUrl", queueUrl),
                                                                              kvp("status",
                                                                                  Entity::SQS::MessageStatusToString(status))));
-                log_trace << "Count resources by status, status: " << Entity::SQS::MessageStatusToString(status)
-                          << " result: " << count;
+                log_trace << "Count resources by status, status: " << Entity::SQS::MessageStatusToString(status) << " result: " << count;
                 return count;
 
             } catch (const mongocxx::exception &exc) {

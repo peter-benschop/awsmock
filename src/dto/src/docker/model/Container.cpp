@@ -2,7 +2,7 @@
 // Created by vogje01 on 22/09/2023.
 //
 
-#include <awsmock/dto/docker/Container.h>
+#include "awsmock/dto/docker/Container.h"
 
 namespace AwsMock::Dto::Docker {
 

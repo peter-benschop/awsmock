@@ -36,10 +36,11 @@ and authentication configurations. You can get started by downloading and instal
 Lambda Runtime API emulator is executed, a ```/2015-03-31/functions/function/invocations``` endpoint will be stood up
 within the container that you post data to it in order to invoke your function for testing.
 
-Due to the lack of a orchestrator, invocations will be stored in a AwsMock internal queue and executed sequentially.
-This
-internal queue has an arbitrary length and stores the invocation events, which will be executed sequentially by the
-lambda executor thread one after the other.
+Orchestration is done through different docker images. A maximal concurrency of 1000 is supported. Each invocation will
+be sent to an idle instance of the lambda function. If no idle function docker container can be found, a new docker
+container will be created, up to an upper limit of 1000 lambda function. Each instance of the lambda function docker
+container will be cached for 60 min. The lifetime can be set in the awsmock configuration file (```awsmock.service.lambda.lifetime```)
+Default is 3600 seconds.
 
 The lambda functions are executed inside the RIE (Runtime Interface Emulator). Lambdas run as docker container using
 port 8080 as REST API port for invocation requests. The internal port 8080 are connected to the host via a port

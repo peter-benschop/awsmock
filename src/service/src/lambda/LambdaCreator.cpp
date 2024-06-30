@@ -8,12 +8,25 @@
 
 namespace AwsMock::Service {
 
-    void LambdaCreator::operator()(std::string &functionCode, std::string &functionId) {
+    void LambdaCreator::operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) {
 
         log_debug << "Start creating lambda function, oid: " << functionId;
 
         // Make local copy
         Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(functionId);
+
+        CreateInstance(instanceId, lambdaEntity, functionCode);
+
+        // Update database
+        lambdaEntity.lastStarted = std::chrono::system_clock::now();
+        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
+        lambdaEntity.stateReason = "Activated";
+        Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
+
+        log_debug << "Lambda function created: " << lambdaEntity.function;
+    }
+
+    void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, std::string &functionCode) {
 
         // Docker tag
         std::string dockerTag = GetDockerTag(lambdaEntity);
@@ -25,31 +38,28 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing get the current port from the docker container
-        if (!DockerService::instance().ContainerExists(lambdaEntity.function, dockerTag)) {
-            lambdaEntity.hostPort = GetHostPort();
-            CreateDockerContainer(lambdaEntity, dockerTag);
+        std::string containerName = lambdaEntity.function + "-" + instanceId;
+        if (!DockerService::instance().ContainerExists(containerName, dockerTag)) {
+            Database::Entity::Lambda::Instance instance;
+            instance.hostPort = GetHostPort();
+            instance.id = instanceId;
+            instance.status = Database::Entity::Lambda::InstanceIdle;
+            CreateDockerContainer(lambdaEntity, instance, dockerTag);
+            lambdaEntity.instances.emplace_back(instance);
         }
 
         // Get docker container
-        Dto::Docker::Container container = DockerService::instance().GetContainerByName(lambdaEntity.function, dockerTag);
+        Dto::Docker::Container container = DockerService::instance().GetContainerByName(containerName, dockerTag);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
             DockerService::instance().StartDockerContainer(container.id);
+            log_debug << "Lambda docker container started, containerId: " << container.id;
         } else {
             lambdaEntity.hostPort = container.GetLambdaPort();
+            log_debug << "Lambda docker container already started, containerId: " << container.id << " port: " << lambdaEntity.hostPort;
         }
-
-        // Update database
-        lambdaEntity.containerId = container.id;
-        lambdaEntity.lastStarted = std::chrono::system_clock::now();
-        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
-        lambdaEntity.stateReason = "Activated";
-        Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
-
-        log_debug << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag;
     }
-
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
@@ -78,13 +88,15 @@ namespace AwsMock::Service {
         log_debug << "Using port: " << lambdaEntity.hostPort;
     }
 
-    void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
+    void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag) {
 
         try {
 
+            std::string containerName = lambdaEntity.function + "-" + instance.id;
             std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-            Dto::Docker::CreateContainerResponse containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
-            log_debug << "Lambda container created, hostPort: " << lambdaEntity.hostPort;
+            Dto::Docker::CreateContainerResponse containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, instance.hostPort);
+            instance.containerId = containerCreateResponse.id;
+            log_debug << "Lambda container created, hostPort: " << instance.hostPort << " containerId: " << instance.containerId;
 
         } catch (std::exception &exc) {
             log_error << exc.what();

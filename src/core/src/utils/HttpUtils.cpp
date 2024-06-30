@@ -206,7 +206,7 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
         std::string headerValue = request.get(name);
         if (headerValue.empty()) {
-            log_warning << "Header value not found, key: " << name;
+            log_debug << "Header value not found, key: " << name;
         }
         return headerValue;
     }
@@ -215,8 +215,6 @@ namespace AwsMock::Core {
         if (request.base().find(name) == request.end()) {
             if (!defaultValue.empty()) {
                 return defaultValue;
-            } else {
-                log_warning << "Header value not found, key: " << name;
             }
         }
         return request.base()[name];
@@ -226,8 +224,6 @@ namespace AwsMock::Core {
         if (!HasHeader(request, name)) {
             if (!defaultValue.empty()) {
                 return defaultValue;
-            } else {
-                log_warning << "Header value not found, key: " << name;
             }
         }
         return request.base()[name];

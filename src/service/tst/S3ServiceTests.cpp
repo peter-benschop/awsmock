@@ -82,7 +82,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
-        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
+        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs, false);
 
         // assert
         EXPECT_TRUE(putResponse.bucket == BUCKET);
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
         std::ifstream ifs(testFile);
         Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
-        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
+        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs, false);
 
         // act
         Dto::S3::DeleteObjectRequest deleteRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};

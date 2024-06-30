@@ -270,6 +270,28 @@ namespace AwsMock::Database {
         }
     }
 
+    void LambdaDatabase::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
+                                             make_document(kvp("$set",
+                                                               make_document(kvp("instances.$.status", Entity::Lambda::LambdaInstanceStatusToString(status))))));
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Get lambda by ARN failed, error: " << e.what();
+            }
+
+        } else {
+
+            _memoryDb.SetInstanceStatus(containerId, status);
+        }
+    }
+
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
 
         std::vector<Entity::Lambda::Lambda> lambdas;

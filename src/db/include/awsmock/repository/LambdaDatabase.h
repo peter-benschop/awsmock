@@ -152,6 +152,15 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name);
 
         /**
+         * @brief Sets the status of an lambda instance
+         *
+         * @param containerId lambda container ID
+         * @param status lambda instance status
+         * @throws DatabaseException
+         */
+        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
+
+        /**
          * @brief Returns a list of lambda functions.
          *
          * @param region AWS region name

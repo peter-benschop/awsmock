@@ -147,6 +147,15 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
 
         /**
+         * @brief Sets the status of an lambda instance
+         *
+         * @param containerId lambda container ID
+         * @param status lambda instance status
+         * @throws DatabaseException
+         */
+        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
+
+        /**
          * Deletes an existing lambda function
          *
          * @param functionName lambda function name

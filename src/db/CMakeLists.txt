@@ -13,7 +13,7 @@ set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src
         src/entity/s3/QueueNotification.cpp src/entity/s3/TopicNotification.cpp src/entity/s3/LambdaNotification.cpp
         src/entity/s3/BucketEncryption.cpp)
 set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp src/entity/lambda/Code.cpp
-        src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp)
+        src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp
         src/memorydb/TransferMemoryDb.cpp)
 set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp src/entity/cognito/Group.cpp
@@ -36,8 +36,7 @@ add_subdirectory(tst)
 # Includes
 include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/entity/sqs/MessageWaitTime.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

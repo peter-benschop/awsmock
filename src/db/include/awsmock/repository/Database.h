@@ -13,6 +13,7 @@
 #include <mongocxx/database.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <mongocxx/exception/query_exception.hpp>
+#include <mongocxx/instance.hpp>
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 
@@ -20,8 +21,8 @@
 #include <Poco/Util/AbstractConfiguration.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
@@ -46,13 +47,6 @@ namespace AwsMock::Database {
          * @return MongoDB database client
          */
         mongocxx::database GetConnection();
-
-        /**
-         * @brief Returns a MongoDB client from the pool
-         *
-         * @return MongoDB database client
-         */
-        mongocxx::pool::entry GetClient();
 
         /**
          * @brief Check all indexes.
@@ -86,49 +80,14 @@ namespace AwsMock::Database {
       private:
 
         /**
-         * @brief Update module status
-         */
-        void UpdateModuleStatus();
-
-        /**
-         * Application configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * Database name
          */
         std::string _name;
 
         /**
-         * Database host
-         */
-        std::string _host;
-
-        /**
-         * Database port
-         */
-        int _port;
-
-        /**
-         * Database user
-         */
-        std::string _user;
-
-        /**
-         * Database password
-         */
-        std::string _password;
-
-        /**
          * Database client
          */
         std::unique_ptr<mongocxx::pool> _pool;
-
-        /**
-         * Database connection pool size
-         */
-        int _poolSize;
 
         /**
          * Database flag

@@ -45,6 +45,11 @@ namespace AwsMock::Dto::S3 {
         std::string uploadId;
 
         /**
+         * Metadata
+         */
+        std::map<std::string, std::string> metadata;
+
+        /**
          * Convert to a JSON string
          *
          * @return JSON string

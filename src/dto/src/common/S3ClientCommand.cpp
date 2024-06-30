@@ -21,19 +21,20 @@ namespace AwsMock::Dto::Common {
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Core values
-        bucket = Core::HttpUtils::GetPathParameter(request.target(), 0);
-        key = Core::HttpUtils::GetPathParametersFromIndex(request.target(), 1);
+        bucket = Core::AwsUtils::GetS3BucketName(request);
+        key = Core::AwsUtils::GetS3ObjectKey(request);
 
-        // Qualifiers
-        multipartRequest = Core::HttpUtils::HasQueryParameter(request.target(), "uploads") || Core::HttpUtils::HasQueryParameter(request.target(), "uploadId") || Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        // Multipart uploads/downloads
         uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
+        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        multipartRequest = uploads || !uploadId.empty() || partNumber;
+
         notificationRequest = Core::HttpUtils::HasQueryParameter(request.target(), "notification");
         versionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "versioning");
         copyRequest = Core::HttpUtils::HasHeader(request, "x-amz-copy-source");
-        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
         encryptionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "encryption");
-        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
 
         if (!userAgent.clientCommand.empty()) {
 
@@ -102,7 +103,7 @@ namespace AwsMock::Dto::Common {
                     break;
             }
         }
-        log_info << "Client command: " << ToString();
+        log_debug << "Client command: " << ToString();
     }
 
     void S3ClientCommand::GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent) {
