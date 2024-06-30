@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/InvocationNotification.h>
@@ -20,6 +20,7 @@
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaMonitoring.h>
+#include <awsmock/service/lambda/LambdaWorker.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define LAMBDA_DEFAULT_PORT 9503
@@ -28,6 +29,7 @@
 #define LAMBDA_DEFAULT_THREADS 50
 #define LAMBDA_DEFAULT_TIMEOUT 120
 #define LAMBDA_DEFAULT_MONITORING_PERIOD 300
+#define LAMBDA_DEFAULT_WORKER_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -112,6 +114,11 @@ namespace AwsMock::Service {
         std::shared_ptr<LambdaMonitoring> _lambdaMonitoring;
 
         /**
+         * Lambda worker
+         */
+        std::shared_ptr<LambdaWorker> _lambdaWorker;
+
+        /**
          * Data dir
          */
         std::string _lambdaDir;
@@ -170,6 +177,11 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * Worker period
+         */
+        int _workerPeriod;
     };
 
 }// namespace AwsMock::Service

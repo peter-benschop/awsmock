@@ -49,9 +49,10 @@ namespace AwsMock::Service {
     TEST_F(DockerServiceTest, ContainerExistsTest) {
 
         // arrange
+        std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         const std::vector<std::string> environment;
         _service.CreateImage("hello-world", "latest", "hello-world");
-        _service.CreateContainer("hello-world", "latest", environment, 1025);
+        _service.CreateContainer("hello-world", instanceId, "latest", environment, 1025);
 
         // act
         bool result = _service.ContainerExists("hello-world", "latest");

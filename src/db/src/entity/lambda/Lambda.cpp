@@ -19,7 +19,27 @@ namespace AwsMock::Database::Entity::Lambda {
         return it->second;
     }
 
+    Instance Lambda::GetInstance(const std::string &instanceId) {
+        auto it = std::ranges::find(instances, instanceId, &Instance::id);
+        if (it != instances.end()) {
+            return *it;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+        return {};
+    }
+
+    void Lambda::RemoveInstance(const AwsMock::Database::Entity::Lambda::Instance &instance) {
+        std::string id = instance.id;
+        instances.erase(std::remove_if(instances.begin(), instances.end(), [&id](const Instance &instance) { return id == instance.id; }), instances.end());
+    }
+
     view_or_value<view, value> Lambda::ToDocument() const {
+
+        // Convert instances
+        auto instancesDoc = bsoncxx::builder::basic::array{};
+        for (const auto &instance: instances) {
+            instancesDoc.append(instance.ToDocument());
+        }
 
         // Convert environment to document
         auto variablesDoc = bsoncxx::builder::basic::array{};
@@ -59,6 +79,7 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("state", LambdaStateToString(state)),
                 kvp("stateReason", stateReason),
                 kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
+                kvp("instances", instancesDoc),
                 kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
                 kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
                 kvp("created", bsoncxx::types::b_date(created)),
@@ -107,6 +128,16 @@ namespace AwsMock::Database::Entity::Lambda {
         // Get code
         if (mResult.value().find("code") != mResult.value().end()) {
             code.FromDocument(mResult.value()["code"].get_document().value);
+        }
+
+        // Get instances
+        if (mResult.value().find("instances") != mResult.value().end()) {
+            bsoncxx::document::view instancesView = mResult.value()["instances"].get_array().value;
+            for (const bsoncxx::document::element &instanceElement: instancesView) {
+                Instance instance;
+                instance.FromDocument(instanceElement.get_document().view());
+                instances.emplace_back(instance);
+            }
         }
     }
 

@@ -378,13 +378,13 @@ namespace AwsMock::Service {
                         std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
                         s3Request.min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
                         s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
-                        log_info << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max);
+                        log_debug << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max);
                     }
                     log_debug << "S3 multipart upload part copy: " << partNumber;
 
                     Dto::S3::UploadPartCopyResponse s3Response = _s3Service.UploadPartCopy(s3Request);
 
-                    log_debug << "Finished S3 multipart upload part copy: " << partNumber;
+                    log_info << "Finished S3 multipart upload part copy: " << partNumber;
 
                     return SendOkResponse(request, s3Response.ToXml());
                 }

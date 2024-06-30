@@ -157,6 +157,17 @@ namespace AwsMock::Database {
         return _lambdas[it->first];
     }
 
+    void LambdaMemoryDb::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+
+        for (auto &lambda: _lambdas) {
+            for (auto &instance: lambda.second.instances) {
+                if (instance.containerId == containerId) {
+                    instance.status = status;
+                }
+            }
+        }
+    }
+
     void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
         Poco::ScopedLock lock(_lambdaMutex);
 

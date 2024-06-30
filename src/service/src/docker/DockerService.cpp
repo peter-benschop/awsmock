@@ -218,14 +218,14 @@ namespace AwsMock::Service {
         return response.containerList.front();
     }
 
-    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
+    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         // Create the request
         std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         Dto::Docker::CreateContainerRequest request = {
-                .hostName = name,
-                .domainName = name + networkMode,
+                .hostName = instanceName,
+                .domainName = instanceName + networkMode,
                 .user = "root",
                 .image = name + ":" + tag,
                 .networkMode = networkMode,
@@ -235,7 +235,7 @@ namespace AwsMock::Service {
 
         std::string jsonBody = request.ToJson();
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + name, jsonBody);
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + instanceName, jsonBody);
         if (domainSocketResponse.statusCode != http::status::created) {
             log_warning << "Create container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
             return {};
@@ -296,18 +296,26 @@ namespace AwsMock::Service {
     }
 
     void DockerService::StopContainer(const Dto::Docker::Container &container) {
+        StopContainer(container.id);
+    }
+
+    void DockerService::StopContainer(const std::string &containerId) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + container.id + "/stop");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + containerId + "/stop");
         if (domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Stop container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
         }
     }
 
     void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
+        DeleteContainer(container.id);
+    }
+
+    void DockerService::DeleteContainer(const std::string &containerId) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::delete_, "http://localhost/containers/" + container.id + "?force=true");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::delete_, "http://localhost/containers/" + containerId + "?force=true");
         if (domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Delete container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
         }

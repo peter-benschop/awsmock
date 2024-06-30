@@ -44,8 +44,9 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
         // Create lambda function asynchronously
+        std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         LambdaCreator lambdaCreator;
-        boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid);
+        boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
         t.detach();
         log_debug << "Lambda create started, function: " << lambdaEntity.function;
 
@@ -97,16 +98,30 @@ namespace AwsMock::Service {
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
         std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", "000000000000");
-
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
         log_debug << "Got lambda entity, name: " << lambda.function;
 
+        // Find an idle instance
+        std::string instanceId = FindIdleInstance(lambda);
+        if (instanceId.empty()) {
+
+            // Create instance
+            instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            LambdaCreator lambdaCreator;
+            boost::thread t(boost::ref(lambdaCreator), lambda.code.zipFile, lambda.oid, instanceId);
+            t.join();
+
+            // Replace lambda
+            lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+        }
+
+        Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
+
         // Send invocation request
         std::string output;
-        std::string url = GetRequestUrl("localhost", lambda.hostPort);
         if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
 
             // Synchronous execution
@@ -115,11 +130,8 @@ namespace AwsMock::Service {
         } else {
 
             LambdaExecutor lambdaExecutor;
-            boost::thread t(boost::ref(lambdaExecutor), "localHost", lambda.hostPort, payload);
+            boost::thread t(boost::ref(lambdaExecutor), instance.containerId, "localHost", instance.hostPort, payload);
             t.detach();
-
-            // Asynchronous execution
-            //Core::TaskPool::instance().Add<std::string, LambdaExecutor>("lambda-creator", LambdaExecutor("localhost", lambda.hostPort, payload));
         }
         log_debug << "Lambda executor notification send, name: " << lambda.function;
 
@@ -250,8 +262,6 @@ namespace AwsMock::Service {
         log_debug << "Sending lambda invocation request, endpoint: " << host << ":" << port;
 
         Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/", payload, {});
-
-        //Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", url, {}, payload);
         if (response.statusCode != http::status::ok) {
             log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
         }
@@ -260,4 +270,15 @@ namespace AwsMock::Service {
         return response.body.substr(0, MAX_OUTPUT_LENGTH);
     }
 
+    std::string LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) {
+        if (lambda.instances.empty()) {
+            return {};
+        }
+        for (const auto &instance: lambda.instances) {
+            if (instance.status == Database::Entity::Lambda::InstanceIdle) {
+                return instance.id;
+            }
+        }
+        return {};
+    }
 }// namespace AwsMock::Service

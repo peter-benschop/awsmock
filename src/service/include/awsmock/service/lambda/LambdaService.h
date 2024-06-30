@@ -178,6 +178,14 @@ namespace AwsMock::Service {
         static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload);
 
         /**
+         * @brief Tries to find an idle instance
+         *
+         * @param lambda lambda entity to check
+         * @return containerId of the idle instance
+         */
+        static std::string FindIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+
+        /**
          * lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
