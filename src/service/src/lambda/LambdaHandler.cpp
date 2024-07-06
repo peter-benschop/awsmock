@@ -111,6 +111,17 @@ namespace AwsMock::Service {
                 return SendNoContentResponse(request);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
+            } else if (action == "event-source-mappings") {
+
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
+                Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest;
+                lambdaRequest.FromJson(body);
+
+                Dto::Lambda::CreateEventSourceMappingsResponse lambdaResponse = _lambdaService.CreateEventSourceMappings(lambdaRequest);
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+                log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
+
             } else {
                 log_error << "Unknown method";
                 return SendBadRequestError(request, "Unknown method");

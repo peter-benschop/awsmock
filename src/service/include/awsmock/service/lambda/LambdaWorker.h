@@ -10,7 +10,7 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/docker/DockerService.h>
 
-#define LAMBDA_TIMEOUT_MINUTES 15
+#define DEFAULT_LAMBDA_LIFETIME 60
 
 namespace AwsMock::Service {
 

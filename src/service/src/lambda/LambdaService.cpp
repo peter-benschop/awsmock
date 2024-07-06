@@ -130,7 +130,7 @@ namespace AwsMock::Service {
         } else {
 
             LambdaExecutor lambdaExecutor;
-            boost::thread t(boost::ref(lambdaExecutor), instance.containerId, "localHost", instance.hostPort, payload);
+            boost::thread t(boost::ref(lambdaExecutor), lambda.function, instance.containerId, "localHost", instance.hostPort, payload);
             t.detach();
         }
         log_debug << "Lambda executor notification send, name: " << lambda.function;
@@ -202,6 +202,20 @@ namespace AwsMock::Service {
         response.accountUsage.totalCodeSize = 10 * 1024 * 1024L;
         response.accountUsage.functionCount = _lambdaDatabase.LambdaCount();
 
+        return response;
+    }
+
+    Dto::Lambda::CreateEventSourceMappingsResponse LambdaService::CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) {
+
+        Dto::Lambda::CreateEventSourceMappingsResponse response;
+        response.functionName = request.functionName;
+        response.eventSourceArn = request.eventSourceArn;
+        response.batchSize = request.batchSize;
+        response.maximumBatchingWindowInSeconds = request.maximumBatchingWindowInSeconds;
+        response.enabled = request.enabled;
+
+        log_trace << "Response: " << response.ToJson();
+        log_debug << "Event source mapping created, function: " << response.functionName << " sourceArn: " << response.eventSourceArn;
         return response;
     }
 

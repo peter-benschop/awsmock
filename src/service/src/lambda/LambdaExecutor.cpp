@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    void LambdaExecutor::operator()(const std::string &containerId, const std::string &host, int port, const std::string &payload) {
+    void LambdaExecutor::operator()(const std::string &function, const std::string &containerId, const std::string &host, int port, const std::string &payload) {
 
         Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
@@ -24,7 +24,7 @@ namespace AwsMock::Service {
 
         // Reset status
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
-        log_debug << "Lambda invocation finished, httpStatus: " << response.statusCode;
+        log_debug << "Lambda invocation finished, function: " << function << " httpStatus: " << response.statusCode;
         log_info << "Lambda output: " << response.body;
     }
 

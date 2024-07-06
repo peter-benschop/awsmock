@@ -128,7 +128,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers) {
         log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         if (!Core::MemoryMappedFile::instance().IsMapped()) {
@@ -144,7 +144,7 @@ namespace AwsMock::Service {
             http::response<http::dynamic_body> response;
             response.content_length(size);
             response.version(request.version());
-            response.result(http::status::partial_content);
+            response.result(status);
             response.set(http::field::server, "awsmock");
             response.set(http::field::content_type, "application/octet-stream");
 
@@ -169,6 +169,7 @@ namespace AwsMock::Service {
             }
 
             // Send the response to the client
+            log_debug << "Range response finished, filename: " << fileName << " size: " << size << " status: " << status;
             return response;
 
         } catch (Poco::Exception &exc) {

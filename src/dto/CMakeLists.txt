@@ -30,7 +30,8 @@ set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp src/lambda/model/DeadLetterConfig.cpp
         src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
         src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp
-        src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp)
+        src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp
+        src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp src/cognito/model/Group.cpp src/cognito/CreateGroupRequest.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp
@@ -73,9 +74,7 @@ add_subdirectory(tst)
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/transfer/mapper/Mapper.h
-        include/awsmock/dto/cognito/model/AuthFlow.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
