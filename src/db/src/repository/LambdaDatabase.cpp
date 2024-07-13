@@ -28,7 +28,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -56,7 +56,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -79,7 +79,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
 
             } catch (mongocxx::exception::system_error &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -134,7 +134,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -152,7 +152,7 @@ namespace AwsMock::Database {
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Lambda not found ";
-                throw Core::DatabaseException("Database exception, Lambda not found ", 500);
+                throw Core::DatabaseException("Database exception, Lambda not found ");
             }
 
             Entity::Lambda::Lambda result;
@@ -161,7 +161,7 @@ namespace AwsMock::Database {
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
-            throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
     }
 
@@ -188,7 +188,7 @@ namespace AwsMock::Database {
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
-                    throw Core::DatabaseException("Database exception, Lambda not found ", 500);
+                    throw Core::DatabaseException("Database exception, Lambda not found ");
                 }
 
                 Entity::Lambda::Lambda result;
@@ -215,9 +215,9 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 mongocxx::stdx::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
-                if (mResult->empty()) {
+                if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
-                    throw Core::DatabaseException("Database exception, Lambda not found ", 500);
+                    throw Core::DatabaseException("Database exception, Lambda not found ");
                 }
 
                 Entity::Lambda::Lambda result;
@@ -261,7 +261,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -320,7 +320,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -328,7 +328,37 @@ namespace AwsMock::Database {
             lambdas = _memoryDb.ListLambdas(region);
         }
 
-        log_trace << "Got lamda list, size:" << lambdas.size();
+        log_trace << "Got lambda list, size:" << lambdas.size();
+        return lambdas;
+    }
+
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdasWithEventSource(const std::string &eventSourceArn) {
+
+        std::vector<Entity::Lambda::Lambda> lambdas;
+        if (_useDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                auto lambdaCursor = _lambdaCollection.find(make_document(kvp("eventSources.eventSourceArn", eventSourceArn)));
+                for (auto lambda: lambdaCursor) {
+                    Entity::Lambda::Lambda result;
+                    result.FromDocument(lambda);
+                    lambdas.push_back(result);
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            lambdas = _memoryDb.ListLambdasWithEventSource(eventSourceArn);
+        }
+
+        log_trace << "Got lambda list, size:" << lambdas.size();
         return lambdas;
     }
 
@@ -346,7 +376,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {
@@ -368,7 +398,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {

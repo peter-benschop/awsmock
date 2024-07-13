@@ -318,7 +318,7 @@ namespace AwsMock::Service {
          * @param bucket S3 bucket
          * @param object S3 object
          */
-        void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
+        static void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
 
         /**
          * @brief Checks the decryption status and decrypts the internal file using the KMS key supplied in the encryption object of the bucket.
@@ -331,7 +331,7 @@ namespace AwsMock::Service {
          * @param object S3 object
          * @param outFile name of the output file
          */
-        void CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile);
+        static void CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile);
 
         /**
          * @brief Get the temporary upload directory for a uploadId.

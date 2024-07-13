@@ -828,4 +828,36 @@ namespace AwsMock::Database {
         }
     }
 
+    void CognitoDatabase::DeleteAllGroups(const std::string &region) {
+
+        if (_hasDatabase) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                if (region.empty()) {
+                    auto result = _groupCollection.delete_many({});
+                    log_debug << "All groups deleted, count: " << result->deleted_count();
+                } else {
+                    auto result = _groupCollection.delete_many(make_document(kvp("region", region)));
+                    log_debug << "All groups deleted, region: " << region << " count: " << result->deleted_count();
+                }
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            _memoryDb.DeleteAllGroups(region);
+        }
+    }
+
 }// namespace AwsMock::Database

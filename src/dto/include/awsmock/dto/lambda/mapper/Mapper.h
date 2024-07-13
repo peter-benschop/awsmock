@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_LAMBDA_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/entity/lambda/Lambda.h>
@@ -49,10 +50,20 @@ namespace AwsMock::Dto::Lambda {
          * @brief Maps a lambda create request to a lambda entity
          *
          * @param request create lambda request
-         * @return Lambda entity
+         * @return lambda entity
          * @see CreateFunctionRequest
          */
         static Database::Entity::Lambda::Lambda map(const Dto::Lambda::CreateFunctionRequest &request);
+
+        /**
+         * @brief Maps a lambda create eventsource mappings request request to a lambda event source mapping
+         *
+         * @param request create lambda request
+         * @return lambda event source mapping
+         * @see CreateEventSourceMappingsRequest
+         * @see EventSourceMapping
+         */
+        static Database::Entity::Lambda::EventSourceMapping map(const Dto::Lambda::CreateEventSourceMappingsRequest &request);
     };
 
 }// namespace AwsMock::Dto::Lambda

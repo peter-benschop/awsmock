@@ -12,7 +12,7 @@ namespace AwsMock::Service {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", "000000000000");
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", "000000000000");
 
         // Save to file
         Database::Entity::Lambda::Lambda lambdaEntity;
@@ -82,7 +82,9 @@ namespace AwsMock::Service {
 
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
 
-            Dto::Lambda::GetFunctionResponse response = {.region = lambda.region, .functionName = lambda.function};
+            Dto::Lambda::Configuration configuration = {.functionName = lambda.function, .state = LambdaStateToString(lambda.state), .stateReason = lambda.stateReason, .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
+            Dto::Lambda::GetFunctionResponse response = {.region = lambda.region, .configuration = configuration, .tags = lambda.tags};
+
             log_trace << "Lambda function: " + response.ToJson();
             return response;
 
@@ -97,7 +99,7 @@ namespace AwsMock::Service {
         Poco::ScopedLock lock(_mutex);
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", "000000000000");
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", "000000000000");
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
         // Get the lambda entity
@@ -206,13 +208,40 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::CreateEventSourceMappingsResponse LambdaService::CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) {
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_event_source_mapping");
+        log_debug << "Create event source mapping, arn: " << request.functionName << " sourceArn: " << request.eventSourceArn;
 
+        if (!_lambdaDatabase.LambdaExists(request.functionName)) {
+            log_warning << "Lambda function does not exist, function: " << request.functionName;
+            throw Core::NotFoundException("Lambda function does not exist");
+        }
+
+        // Get the existing entity
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+
+        // Map request to entity
+        Database::Entity::Lambda::EventSourceMapping eventSourceMapping = Dto::Lambda::Mapper::map(request);
+        eventSourceMapping.uuid = Core::StringUtils::CreateRandomUuid();
+
+        // Check existence
+        if (lambdaEntity.HasEventSource(request.eventSourceArn)) {
+            log_warning << "Event source exists already, function: " << request.functionName << " sourceArn: " << request.eventSourceArn;
+            throw Core::BadRequestException("Event source exists already");
+        }
+
+        // Update database
+        lambdaEntity.eventSources.emplace_back(eventSourceMapping);
+        lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
+        log_debug << "Lambda function updated, function: " << lambdaEntity.function;
+
+        // Create response (which is actually the request)
         Dto::Lambda::CreateEventSourceMappingsResponse response;
         response.functionName = request.functionName;
         response.eventSourceArn = request.eventSourceArn;
         response.batchSize = request.batchSize;
         response.maximumBatchingWindowInSeconds = request.maximumBatchingWindowInSeconds;
         response.enabled = request.enabled;
+        response.uuid = eventSourceMapping.uuid;
 
         log_trace << "Response: " << response.ToJson();
         log_debug << "Event source mapping created, function: " << response.functionName << " sourceArn: " << response.eventSourceArn;

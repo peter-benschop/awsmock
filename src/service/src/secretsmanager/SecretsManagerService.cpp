@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SecretsManagerService::SecretsManagerService() : _database(Database::SecretsManagerDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_ACCOUNT_ID);
+        _accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_ACCOUNT_ID);
 
         // Simulation of KMS key
         _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";

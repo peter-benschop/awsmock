@@ -20,6 +20,10 @@ namespace AwsMock::Core {
         return std::format("{:%FT%TZ}", timePoint);
     }
 
+    std::string DateTimeUtils::ISO8601Now() {
+        return std::format("{:%FT%TZ}", system_clock::now());
+    }
+
     std::string DateTimeUtils::HttpFormat(const system_clock::time_point &timePoint) {
         char buf[256];
         time_t timeT = system_clock::to_time_t(timePoint);

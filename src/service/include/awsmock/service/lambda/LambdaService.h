@@ -21,6 +21,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/TaskPool.h>
+#include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
@@ -37,6 +38,7 @@
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
+#include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/lambda/LambdaCreator.h>

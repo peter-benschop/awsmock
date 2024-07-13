@@ -15,7 +15,7 @@ namespace AwsMock::Service {
     KMSService::KMSService(Core::Configuration &configuration) : _configuration(configuration), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // Initialize environment
-        _accountId = _configuration.getString("awsmock.account.userPoolId", DEFAULT_KMS_ACCOUNT_ID);
+        _accountId = _configuration.getString("awsmock.account.id", DEFAULT_KMS_ACCOUNT_ID);
     }
 
     Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) {

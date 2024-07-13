@@ -125,6 +125,16 @@ namespace AwsMock::Core {
         static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
 
         /**
+         * @brief Creates a queue ARN
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param queueName name of the queue
+         * @return ARN of the queue
+         */
+        static std::string CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName);
+
+        /**
          * @brief Converts a queue ARN to a queue URL
          *
          * @param queueArn ARN of the queue
@@ -523,7 +533,7 @@ namespace AwsMock::Core {
         std::string hostname = Core::SystemUtils::GetHostName();
         std::string port = Core::Configuration::instance().getString("awsmock.service.gateway.http.port");
         std::string region = Core::Configuration::instance().getString("awsmock.region", SQS_DEFAULT_REGION);
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
         std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
         log_trace << "queueUrl: " << queueUrl;
         return queueUrl;
@@ -537,7 +547,7 @@ namespace AwsMock::Core {
      */
     inline std::string CreateSQSQueueArn(const std::string &queueName) {
         std::string region = Core::Configuration::instance().getString("awsmock.region", GATEWAY_DEFAULT_REGION);
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", SQS_DEFAULT_ACCOUNT_ID);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }

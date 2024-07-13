@@ -41,8 +41,8 @@ of the variable.
 
 ```
 awsmock.region                          AWSMOCK_REGION                      AWS region
-awsmock.account.userPoolId                      AMWSMOCK_ACCOUNT_ID                 AWS account ID, default 000000000000
-awsmock.client.userPoolId                       AWSMOCK_CLIENT_ID                   AWS client ID, default 00000000
+awsmock.account.id                      AMWSMOCK_ACCOUNT_ID                 AWS account ID, default 000000000000
+awsmock.client.id                       AWSMOCK_CLIENT_ID                   AWS client ID, default 00000000
 awsmock.user                            AWSMOCK_USER                        AWS user default none
 awsmock.data.dir                        AWSMOCK_DATA_DIR                    AwsMock base data dir
 awsmock.pretty                          AWSMOCK_PRETTY                      Pretty print output for XML and JSON

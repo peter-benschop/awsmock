@@ -19,6 +19,7 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 
@@ -47,6 +48,21 @@ namespace AwsMock::Core {
          * @return HTTP response
          */
         static HttpSocketResponse SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+
+        /**
+         * @brief Send a JSON string to a HTTP endpoint
+         *
+         * @param method HTTP method
+         * @param module HTTP method
+         * @param host HTTP host
+         * @param port HTTP port
+         * @param path URL path
+         * @param signedHeaders list of headers which should be included in the signature
+         * @param body HTTP body
+         * @param headers HTTP headers
+         * @return HTTP response
+         */
+        static HttpSocketResponse SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers, const std::string &body = {});
 
         /**
          * @brief Send a binary to a HTTP endpoint

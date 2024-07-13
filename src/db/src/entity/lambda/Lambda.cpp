@@ -6,6 +6,12 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
+    bool Lambda::HasEventSource(const std::string &eventSourceArn) const {
+        return find_if(eventSources.begin(), eventSources.end(), [eventSourceArn](const EventSourceMapping &e) {
+                   return e.eventSourceArn == eventSourceArn;
+               }) != eventSources.end();
+    }
+
     bool Lambda::HasTag(const std::string &key) const {
         return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
                    return t.first == key;
@@ -54,6 +60,12 @@ namespace AwsMock::Database::Entity::Lambda {
             tagsDoc.append(kvp(t.first, t.second));
         }
 
+        // Convert event source mappings
+        auto eventSourcesDoc = bsoncxx::builder::basic::array{};
+        for (const auto &e: eventSources) {
+            eventSourcesDoc.append(e.ToDocument());
+        }
+
         view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
 
         view_or_value<view, value> lambdaDoc = make_document(
@@ -80,6 +92,7 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("stateReason", stateReason),
                 kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
                 kvp("instances", instancesDoc),
+                kvp("eventSources", eventSourcesDoc),
                 kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
                 kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
                 kvp("created", bsoncxx::types::b_date(created)),
@@ -137,6 +150,16 @@ namespace AwsMock::Database::Entity::Lambda {
                 Instance instance;
                 instance.FromDocument(instanceElement.get_document().view());
                 instances.emplace_back(instance);
+            }
+        }
+
+        // Get event sources
+        if (mResult.value().find("eventSources") != mResult.value().end()) {
+            bsoncxx::document::view eventSourcesView = mResult.value()["eventSources"].get_array().value;
+            for (const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
+                EventSourceMapping eventSourceMapping;
+                eventSourceMapping.FromDocument(eventSourceElement.get_document().view());
+                eventSources.emplace_back(eventSourceMapping);
             }
         }
     }

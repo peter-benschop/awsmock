@@ -24,6 +24,8 @@
 
 // Boost includes
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace AwsMock::Core {
 
@@ -83,6 +85,13 @@ namespace AwsMock::Core {
          * @return true in case the provided string is a UUID, otherwise false.
          */
         static bool IsUuid(const std::string &value);
+
+        /**
+         * @brief Creates a random UUID and return is as a string
+         *
+         * @return random UUID as string
+         */
+        static std::string CreateRandomUuid();
 
         /**
          * @brief Splits a string into pieces using the provided delimiter char.

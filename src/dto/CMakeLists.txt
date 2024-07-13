@@ -3,13 +3,15 @@ set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp src/common/Services.cpp src/common/Infrastructure.cpp
-        src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp)
+        src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
+        src/common/LambdaClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp
         src/sqs/ListQueueResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp
         src/sqs/RestErrorResponse.cpp src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp
         src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp
-        src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp)
+        src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp
+        src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
         src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
         src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp src/sns/TagResourceRequest.cpp src/sns/TagResourceResponse.cpp src/sns/GetTopicAttributesRequest.cpp
@@ -31,7 +33,7 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
         src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp
         src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp
-        src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp)
+        src/lambda/model/Configuration.cpp src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp src/cognito/model/Group.cpp src/cognito/CreateGroupRequest.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp
@@ -74,7 +76,9 @@ add_subdirectory(tst)
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        src/sqs/model/EventRecord.cpp
+        include/awsmock/dto/sqs/model/EventRecord.h)
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})

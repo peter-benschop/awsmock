@@ -21,8 +21,8 @@ namespace AwsMock::Core {
 
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
-        DefineStringProperty("awsmock.account.userPoolId", "AWSMOCK_ACCOUNT_ID", "000000000000");
-        DefineStringProperty("awsmock.client.userPoolId", "AWSMOCK_CLIENT_ID", "00000000");
+        DefineStringProperty("awsmock.account.id", "AWSMOCK_ACCOUNT_ID", "000000000000");
+        DefineStringProperty("awsmock.client.id", "AWSMOCK_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
         DefineStringProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
         DefineStringProperty("awsmock.temp.dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
