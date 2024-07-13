@@ -34,6 +34,10 @@ namespace AwsMock::Core {
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }
 
+    std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
+        return CreateArn("sqs", region, accountId, queueName);
+    }
+
     std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {
         return CreateArn("sns", region, accountId, topicName);
     }
@@ -161,11 +165,11 @@ namespace AwsMock::Core {
             headers["Host"] = Core::SystemUtils::GetHostName();
         }
         headers["Content-Type"] = contentType;
-        headers["x-amz-content-sha256"] = Core::Crypto::GetSha256FromString(payload);
-        if (headers.find("x-amz-date") == headers.end()) {
-            headers["x-amz-date"] = GetISODateString();
+        headers["X-Amz-Content-Sha256"] = Core::Crypto::GetSha256FromString(payload);
+        if (headers.find("X-Amz-Date") == headers.end()) {
+            headers["X-Amz-Date"] = GetISODateString();
         }
-        headers["x-amz-security-token"] = secretAccessKey;
+        headers["X-Amz-Security-Token"] = secretAccessKey;
 
         std::string dateString = GetDateString();
         std::string requestVersion = "aws4_request";

@@ -19,7 +19,7 @@ namespace AwsMock::Service {
         std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
 
         Database::Entity::Transfer::Transfer transferEntity;
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", "000000000000");
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", "000000000000");
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, accountId, serverId);
 
         // Create entity
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
             }
 
             // Add user
-            std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId");
+            std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
             std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
             Database::Entity::Transfer::User user = {
                     .userName = request.userName,

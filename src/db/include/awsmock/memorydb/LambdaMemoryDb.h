@@ -139,6 +139,14 @@ namespace AwsMock::Database {
         std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
 
         /**
+         * @brief Returns a list of lambda functions with the given event source ARN attached.
+         *
+         * @param eventSourceArn event source ARN
+         * @return list of lambda functions
+         */
+        std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn);
+
+        /**
          * Updates an existing lambda lambda function
          *
          * @param lambda lambda entity

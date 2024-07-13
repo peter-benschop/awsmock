@@ -29,6 +29,7 @@ namespace AwsMock::Dto::Common {
         uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
         uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        rangeRequest = Core::HttpUtils::HasHeader(request, "Range");
         multipartRequest = uploads || !uploadId.empty() || partNumber;
 
         notificationRequest = Core::HttpUtils::HasQueryParameter(request.target(), "notification");
@@ -54,6 +55,8 @@ namespace AwsMock::Dto::Common {
                         } else {
                             command = S3CommandType::LIST_OBJECTS;
                         }
+                    } else if (rangeRequest && !partNumber) {
+                        command = S3CommandType::GET_OBJECT_RANGE;
                     } else {
                         command = S3CommandType::GET_OBJECT;
                     }
@@ -100,10 +103,39 @@ namespace AwsMock::Dto::Common {
                     break;
 
                 case http::verb::head:
+                case http::verb::unknown:
+                case http::verb::connect:
+                case http::verb::options:
+                case http::verb::trace:
+                case http::verb::copy:
+                case http::verb::lock:
+                case http::verb::mkcol:
+                case http::verb::move:
+                case http::verb::propfind:
+                case http::verb::proppatch:
+                case http::verb::search:
+                case http::verb::unlock:
+                case http::verb::bind:
+                case http::verb::rebind:
+                case http::verb::unbind:
+                case http::verb::acl:
+                case http::verb::report:
+                case http::verb::mkactivity:
+                case http::verb::checkout:
+                case http::verb::merge:
+                case http::verb::msearch:
+                case http::verb::notify:
+                case http::verb::subscribe:
+                case http::verb::unsubscribe:
+                case http::verb::patch:
+                case http::verb::purge:
+                case http::verb::mkcalendar:
+                case http::verb::link:
+                case http::verb::unlink:
                     break;
             }
         }
-        log_debug << "Client command: " << ToString();
+        log_trace << "Client command: " << ToString();
     }
 
     void S3ClientCommand::GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent) {

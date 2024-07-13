@@ -1,5 +1,5 @@
 
-#include "awsmock/core/StringUtils.h"
+#include <awsmock/core/StringUtils.h>
 
 static const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -75,6 +75,11 @@ namespace AwsMock::Core {
     bool StringUtils::IsUuid(const std::string &value) {
         std::regex regex("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}", std::regex_constants::icase);
         return std::regex_match(value, regex);
+    }
+
+    std::string StringUtils::CreateRandomUuid() {
+        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+        return boost::uuids::to_string(uuid);
     }
 
     std::vector<std::string> StringUtils::Split(const std::string &s, char delimiter) {

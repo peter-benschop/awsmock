@@ -54,7 +54,7 @@ namespace AwsMock::Dto::Common {
         }
 
         // We have a user agent, so use i
-        std::string tmp = request["User-Agent"];
+        std::string userAgentHeader = request["User-Agent"];
 
         std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' ');
         if (parts.empty() || parts.size() < 4) {
@@ -70,11 +70,12 @@ namespace AwsMock::Dto::Common {
                 clientOs = parts[2];
                 clientExecutableType = parts[3];
                 clientPrompt = parts[4] == "ON";
-                std::string tmp1 = Core::StringUtils::Split(parts[11], '#')[1];
-                clientModule = Core::StringUtils::Split(tmp1, '.')[0];
-                clientCommand = Core::StringUtils::Split(tmp1, '.')[1];
+                std::string command = Core::StringUtils::Split(parts[11], '#')[1];
+                clientModule = Core::StringUtils::Split(command, '.')[0];
+                clientCommand = Core::StringUtils::Split(command, '.')[1];
             }
         }
+
         if (Core::HttpUtils::HasHeader(request, "Content-Type")) {
             contentType = Core::StringUtils::Contains(request["Content-Type"], "json") ? "json" : "xml";
         }

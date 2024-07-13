@@ -24,7 +24,7 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
+            std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
             std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = _snsDatabase.CreateTopic({.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn});
             log_trace << "SNS topic created: " << topic.ToString();
@@ -135,7 +135,7 @@ namespace AwsMock::Service {
             }
 
             // Create new subscription
-            std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId", DEFAULT_SQS_ACCOUNT_ID);
+            std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 

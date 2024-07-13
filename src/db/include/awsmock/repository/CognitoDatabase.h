@@ -306,7 +306,7 @@ namespace AwsMock::Database {
         std::vector<Entity::Cognito::Group> ListGroups(const std::string &region = {}, const std::string &userPoolId = {});
 
         /**
-         * @brief Deletes an existing cognito user pool
+         * @brief Deletes an existing cognito user group.
          *
          * @param region AWS region
          * @param userPoolId cognito user pool ID
@@ -314,6 +314,14 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
+
+        /**
+         * @brief Deletes all existing cognito user groups.
+         *
+         * @param region AWS region
+         * @throws DatabaseException
+         */
+        void DeleteAllGroups(const std::string &region = {});
 
       private:
 

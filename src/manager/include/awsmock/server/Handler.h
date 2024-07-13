@@ -83,6 +83,15 @@ namespace AwsMock::Manager {
         static boost::beast::http::response<boost::beast::http::string_body> SendOkResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body = {});
 
         /**
+         * @brief Send a Internal server error response (status=500)
+         *
+         * @param request HTTP request
+         * @param body HTTP body
+         * @return HTTP response structure
+         */
+        static boost::beast::http::response<boost::beast::http::string_body> SendInternalServerErrorResponse(boost::beast::http::request<boost::beast::http::string_body> &request, const std::string &body = {});
+
+        /**
          * Module service
          */
         Service::ModuleService _moduleService;

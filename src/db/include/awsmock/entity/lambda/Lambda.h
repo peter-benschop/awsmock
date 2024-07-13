@@ -31,6 +31,7 @@
 #include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
+#include <awsmock/entity/lambda/EventSourceMapping.h>
 #include <awsmock/entity/lambda/Instance.h>
 #include <awsmock/entity/lambda/Tags.h>
 #include <awsmock/repository/S3Database.h>
@@ -278,6 +279,11 @@ namespace AwsMock::Database::Entity::Lambda {
         std::vector<Instance> instances;
 
         /**
+         * Event sources
+         */
+        std::vector<EventSourceMapping> eventSources;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -304,6 +310,14 @@ namespace AwsMock::Database::Entity::Lambda {
          * @param instance
          */
         void RemoveInstance(const Instance &instance);
+
+        /**
+         * @brief Checks whether a event source with the given ARN exists already.
+         *
+         * @param eventSourceArn event source ARN
+         * @return true if a event source with the given ARN exists.
+         */
+        [[nodiscard]] bool HasEventSource(const std::string &eventSourceArn) const;
 
         /**
          * @brief Checks whether a tags with the given tags key exists.

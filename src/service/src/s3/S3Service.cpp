@@ -15,7 +15,7 @@ namespace AwsMock::Service {
 
         // Get region
         std::string region = s3Request.region;
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.userPoolId");
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
 
         // Check existence
         if (_database.BucketExists({.region = region, .name = s3Request.name})) {

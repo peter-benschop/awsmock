@@ -37,7 +37,7 @@ namespace AwsMock::Service {
             std::string _port = _configuration.getString("awsmock.service.cognito.http.port", std::to_string(COGNITO_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.userPoolId", ACCOUNT_ID);
+            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager

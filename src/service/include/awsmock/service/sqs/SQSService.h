@@ -46,8 +46,14 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
+#include <awsmock/dto/sqs/model/EventNotification.h>
+#include <awsmock/dto/sqs/model/EventRecord.h>
+#include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/lambda/LambdaService.h>
 
+#define DEFAULT_USER "none"
+#define DEFAULT_REGION "eu-central-1"
 #define SQS_DEFAULT_ACCOUNT_ID "000000000000"
 #define SQS_DEFAULT_VISIBILITY_TIMEOUT 300
 
@@ -67,7 +73,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _database(Database::SQSDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Creates a new queue.
@@ -189,15 +195,34 @@ namespace AwsMock::Service {
         /**
          * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
          *
+         * @param lambda lambda to invoke.
+         * @param message SQS message.
+         * @param eventSourceArn event source ARN
+         */
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, Database::Entity::SQS::Message &message, const std::string &eventSourceArn);
+
+        /**
+         * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
+         *
          * @param attributes vector of attributes.
          * @param value value to check for.
          */
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
         /**
-         * Database connection
+         * SQS database connection
          */
-        Database::SQSDatabase &_database;
+        Database::SQSDatabase &_sqsDatabase;
+
+        /**
+         * Lambda database connection
+         */
+        Database::LambdaDatabase &_lambdaDatabase;
+
+        /**
+         * Lambda service
+         */
+        LambdaService _lambdaService;
     };
 
 }// namespace AwsMock::Service

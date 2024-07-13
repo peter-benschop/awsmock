@@ -100,19 +100,54 @@ namespace AwsMock::Service {
                     }
 
                     if (Core::HttpUtils::HasHeader(request, "Range")) {
+
                         headerMap["Accept-Ranges"] = "bytes";
                         headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
                         headerMap["Content-Length"] = std::to_string(size);
                         log_info << "Multi-part download progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
-                        log_info << "Multi-part download request range, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-
-                        return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, headerMap);
+                        log_info << "Multi-part download request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                        return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
 
                     } else {
 
                         log_info << "Get object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendOkResponse(request, s3Response.filename, s3Response.size, headerMap);
                     }
+                }
+
+                case Dto::Common::S3CommandType::GET_OBJECT_RANGE: {
+
+                    Core::HttpUtils::DumpHeaders(request);
+
+                    // Get object request
+                    log_debug << "S3 get object request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    Dto::S3::GetObjectRequest s3Request = {
+                            .region = clientCommand.region,
+                            .bucket = clientCommand.bucket,
+                            .key = clientCommand.key};
+
+                    // Get range
+                    long size;
+                    GetRange(request, s3Request.min, s3Request.max, size);
+
+                    // Get object
+                    Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
+
+                    std::map<std::string, std::string> headerMap;
+                    headerMap["ETag"] = Core::StringUtils::Quoted(s3Response.md5sum);
+                    headerMap["Content-Type"] = s3Response.contentType;
+                    headerMap["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
+
+                    // Set user headers
+                    for (const auto &m: s3Response.metadata) {
+                        headerMap["x-amz-meta-" + m.first] = m.second;
+                    }
+
+                    headerMap["Accept-Ranges"] = "bytes";
+                    headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max);
+                    log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
+                    log_info << "Range download request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::ok, headerMap);
                 }
 
                 case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS: {

@@ -36,7 +36,7 @@ namespace AwsMock::Service {
             std::string _port = _configuration.getString("awsmock.service.s3.http.port", std::to_string(S3_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.userPoolId", S3_ACCOUNT_ID);
+            _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
             _output = "json";
 

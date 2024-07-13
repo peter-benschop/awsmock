@@ -73,4 +73,13 @@ namespace AwsMock::Dto::Lambda {
         return lambda;
     }
 
+    Database::Entity::Lambda::EventSourceMapping Mapper::map(const Dto::Lambda::CreateEventSourceMappingsRequest &request) {
+        Database::Entity::Lambda::EventSourceMapping eventSourceMapping;
+        eventSourceMapping.eventSourceArn = request.eventSourceArn;
+        eventSourceMapping.batchSize = request.batchSize;
+        eventSourceMapping.maximumBatchingWindowInSeconds = request.maximumBatchingWindowInSeconds;
+        eventSourceMapping.enabled = request.enabled;
+        return eventSourceMapping;
+    }
+
 }// namespace AwsMock::Dto::Lambda

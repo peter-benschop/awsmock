@@ -395,4 +395,20 @@ namespace AwsMock::Database {
         log_debug << "Cognito group deleted, groupName: " << groupName << " count: " << count;
     }
 
+    void CognitoMemoryDb::DeleteAllGroups(const std::string &region) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        if (region.empty()) {
+
+            _groups.clear();
+            log_debug << "All cognito groups deleted";
+
+        } else {
+            const auto count = std::erase_if(_groups, [region](const std::pair<std::string, Entity::Cognito::Group> &g) {
+                return g.second.region == region;
+            });
+            log_debug << "All cognito groups deleted, region: " << region << " count: " << count;
+        }
+    }
+
 }// namespace AwsMock::Database

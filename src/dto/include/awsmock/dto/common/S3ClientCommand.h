@@ -36,6 +36,7 @@ namespace AwsMock::Dto::Common {
         LIST_OBJECTS,
         PUT_OBJECT,
         GET_OBJECT,
+        GET_OBJECT_RANGE,
         COPY_OBJECT,
         MOVE_OBJECT,
         DELETE_OBJECT,
@@ -59,6 +60,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::LIST_OBJECTS, "ListObjects"},
             {S3CommandType::PUT_OBJECT, "PutObject"},
             {S3CommandType::GET_OBJECT, "GetObject"},
+            {S3CommandType::GET_OBJECT_RANGE, "GetObjectRange"},
             {S3CommandType::COPY_OBJECT, "CopyObject"},
             {S3CommandType::MOVE_OBJECT, "MoveObject"},
             {S3CommandType::DELETE_OBJECT, "DeleteObject"},
@@ -156,6 +158,11 @@ namespace AwsMock::Dto::Common {
          * SSE encryption
          */
         bool encryptionRequest = false;
+
+        /**
+         * Get range request
+         */
+        bool rangeRequest = false;
 
         /**
          * Multipart upload ID

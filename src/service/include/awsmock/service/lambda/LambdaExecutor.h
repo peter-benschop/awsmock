@@ -44,12 +44,13 @@ namespace AwsMock::Service {
         /**
          * @brief Executes a lambda function
          *
+         * @param function lambda function name
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
          */
-        void operator()(const std::string &containerId, const std::string &host, int port, const std::string &payload);
+        void operator()(const std::string &function, const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
       private:
 

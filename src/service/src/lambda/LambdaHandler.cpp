@@ -6,8 +6,36 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> LambdaHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda GET request, URI: " << request.target() << " region: " << region << " user: " << user;
 
+        Dto::Common::LambdaClientCommand clientCommand;
+        clientCommand.FromRequest(request, region, user);
+
         try {
 
+            switch (clientCommand.command) {
+
+                case Dto::Common::LambdaCommandType::LIST_LAMBDAS: {
+                    Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
+                    log_trace << "Lambda function list";
+                    return SendOkResponse(request, lambdaResponse.ToJson());
+                }
+
+                case Dto::Common::LambdaCommandType::WAIT_LAMBDA: {
+
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
+
+                    std::string functionName = Core::HttpUtils::GetPathParameters(request.target())[2];
+                    Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
+                    return SendOkResponse(request, lambdaResponse.ToJson());
+                }
+
+                case Dto::Common::LambdaCommandType::CREATE_LAMBDA:
+                case Dto::Common::LambdaCommandType::DELETE_LAMBDA:
+                case Dto::Common::LambdaCommandType::INVOKE_LAMBDA:
+                case Dto::Common::LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING:
+                case Dto::Common::LambdaCommandType::TAG_LAMBDA:
+                case Dto::Common::LambdaCommandType::UNKNOWN:
+                    break;
+            }
             std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
 
             std::string version, action;
@@ -60,6 +88,9 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
+        Dto::Common::LambdaClientCommand clientCommand;
+        clientCommand.FromRequest(request, region, user);
+
         try {
             std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
 
@@ -111,6 +142,19 @@ namespace AwsMock::Service {
                 return SendNoContentResponse(request);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
+            } else if (action == "event-source-mappings") {
+
+                std::string body = Core::HttpUtils::GetBodyAsString(request);
+                Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest;
+                lambdaRequest.FromJson(body);
+                lambdaRequest.region = region;
+                lambdaRequest.user = user;
+
+                Dto::Lambda::CreateEventSourceMappingsResponse lambdaResponse = _lambdaService.CreateEventSourceMappings(lambdaRequest);
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+                log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
+
             } else {
                 log_error << "Unknown method";
                 return SendBadRequestError(request, "Unknown method");
@@ -126,6 +170,9 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> LambdaHandler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
+
+        Dto::Common::LambdaClientCommand clientCommand;
+        clientCommand.FromRequest(request, region, user);
 
         try {
             std::string version, action;

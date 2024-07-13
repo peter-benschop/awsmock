@@ -71,8 +71,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::DELETE_TABLE: {
@@ -90,8 +88,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::GET_ITEM: {
@@ -109,8 +105,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
@@ -128,8 +122,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::QUERY: {
@@ -147,8 +139,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, queryResponse.body, queryResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::SCAN: {
@@ -166,8 +156,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, scanResponse.body, scanResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::DELETE_ITEM: {
@@ -185,8 +173,6 @@ namespace AwsMock::Service {
                     } else {
                         return SendInternalServerError(request, dynamoDbResponse.body, dynamoDbResponse.headers);
                     }
-
-                    break;
                 }
 
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {
@@ -200,10 +186,13 @@ namespace AwsMock::Service {
                 }
             }
 
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         } catch (Poco::Exception &exc) {
+            log_error << exc.message();
             return SendInternalServerError(request, exc.message());
         }
-        return SendBadRequestError(request);
     }
 
 }// namespace AwsMock::Service

@@ -380,7 +380,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::CleanInfrastructure(Dto::Module::Module::ModuleList &modules) {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "import");
+        AddStandardHeaders(headers, "clean");
 
         Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
         if (response.statusCode != boost::beast::http::status::ok) {

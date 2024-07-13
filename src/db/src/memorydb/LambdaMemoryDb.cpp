@@ -46,6 +46,19 @@ namespace AwsMock::Database {
                }) != _lambdas.end();
     }
 
+    Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdasWithEventSource(const std::string &eventSourceArn) {
+
+        Entity::Lambda::LambdaList lambdaList;
+        for (const auto &lambda: _lambdas) {
+            if (lambda.second.HasEventSource(eventSourceArn)) {
+                lambdaList.emplace_back(lambda.second);
+            }
+        }
+
+        log_trace << "Got lambda list, size: " << lambdaList.size();
+        return lambdaList;
+    }
+
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdas(const std::string &region) {
 
         Entity::Lambda::LambdaList lambdaList;

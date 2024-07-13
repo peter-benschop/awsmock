@@ -147,13 +147,28 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Send the request to the DynamoDB container
+         * @brief Send the request to the DynamoDB container.
+         *
+         * @par
+         * The authorization header is taken from the original request.
          *
          * @param body original HTTP request body
          * @param headers original HTTP request headers
          * @return response body
          */
         Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers);
+
+        /**
+         * @brief Send the request to the DynamoDB container.
+         *
+         * @par
+         * The authorization header is calculated from the request parameter.
+         *
+         * @param body original HTTP request body
+         * @param headers original HTTP request headers
+         * @return response body
+         */
+        Dto::DynamoDb::DynamoDbResponse SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers);
 
         /**
          * Database connection

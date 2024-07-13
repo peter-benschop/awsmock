@@ -294,6 +294,7 @@ namespace AwsMock::Service {
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
                 _cognitoDatabase.DeleteAllUsers();
                 _cognitoDatabase.DeleteAllUserPools();
+                _cognitoDatabase.DeleteAllGroups();
             } else if (m.name == "dynamodb") {
                 Service::DynamoDbService _dynamoDbService;
                 //_dynamoDbService.DeleteAllItems();
