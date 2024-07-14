@@ -82,4 +82,18 @@ namespace AwsMock::Dto::Lambda {
         return eventSourceMapping;
     }
 
+    Dto::Lambda::ListEventSourceMappingsResponse Mapper::map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings) {
+        Dto::Lambda::ListEventSourceMappingsResponse response;
+        for (auto &eventSourceMapping: eventSourceMappings) {
+            Dto::Lambda::EventSourceMapping eventSourceMappingDto;
+            eventSourceMappingDto.functionArn = functionArn;
+            eventSourceMappingDto.eventSourceArn = eventSourceMapping.eventSourceArn;
+            eventSourceMappingDto.batchSize = eventSourceMapping.batchSize;
+            eventSourceMappingDto.maximumBatchingWindowInSeconds = eventSourceMapping.maximumBatchingWindowInSeconds;
+            eventSourceMappingDto.uuid = eventSourceMapping.uuid;
+            response.eventSourceMappings.emplace_back(eventSourceMappingDto);
+        }
+        return response;
+    }
+
 }// namespace AwsMock::Dto::Lambda

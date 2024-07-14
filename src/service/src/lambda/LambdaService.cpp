@@ -248,6 +248,21 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::Lambda::ListEventSourceMappingsResponse LambdaService::ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) {
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_event_source_mapping");
+        log_debug << "List event source mappings, functionName: " << request.functionName << " sourceArn: " << request.eventSourceArn;
+
+        if (!_lambdaDatabase.LambdaExists(request.functionName)) {
+            log_warning << "Lambda function does not exist, function: " << request.functionName;
+            throw Core::NotFoundException("Lambda function does not exist");
+        }
+
+        // Get the existing entity
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+
+        return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
+    }
+
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();

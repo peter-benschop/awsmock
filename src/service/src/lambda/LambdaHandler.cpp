@@ -28,6 +28,23 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
+                case Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS: {
+
+                    std::string functionName = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "FunctionName");
+                    std::string eventSourceArn = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "EventSourceArn");
+                    std::string marker = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "Marker");
+                    int maxItems = Core::NumberUtils::ToInt(Core::HttpUtils::GetQueryParameterValueByName(request.target(), "MaxItems"));
+
+                    Dto::Lambda::ListEventSourceMappingsRequest lambdaRequest = {.functionName = functionName, .eventSourceArn = eventSourceArn, .marker = marker, .maxItems = maxItems};
+                    lambdaRequest.region = clientCommand.region;
+                    lambdaRequest.user = clientCommand.user;
+                    lambdaRequest.requestId = clientCommand.requestId;
+
+                    Dto::Lambda::ListEventSourceMappingsResponse lambdaResponse = _lambdaService.ListEventSourceMappings(lambdaRequest);
+
+                    return SendOkResponse(request, lambdaResponse.ToJson());
+                }
+
                 case Dto::Common::LambdaCommandType::CREATE_LAMBDA:
                 case Dto::Common::LambdaCommandType::DELETE_LAMBDA:
                 case Dto::Common::LambdaCommandType::INVOKE_LAMBDA:

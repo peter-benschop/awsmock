@@ -9,6 +9,7 @@
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -64,6 +65,17 @@ namespace AwsMock::Dto::Lambda {
          * @see EventSourceMapping
          */
         static Database::Entity::Lambda::EventSourceMapping map(const Dto::Lambda::CreateEventSourceMappingsRequest &request);
+
+        /**
+         * @brief Maps a list of lambda event source mappings to a lambda event source mapping response.
+         *
+         * @param functionArn lambda function ARN
+         * @param eventSourceMappings list of event source mapping entities
+         * @return lambda event source mapping list response
+         * @see ListEventSourceMappingsRequest
+         * @see EventSourceMapping
+         */
+        static Dto::Lambda::ListEventSourceMappingsResponse map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings);
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_DYNAMODB_PROVISIONED_THROUGHPUT_H
 
 // C++ standard includes
+#include <chrono>
 #include <sstream>
 #include <string>
 
@@ -15,6 +16,8 @@
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::DynamoDb {
+
+    using std::chrono::system_clock;
 
     /**
      * DynamoDB provisioned throughput
@@ -36,12 +39,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Last decrease time
          */
-        Poco::DateTime lastDecreaseDateTime;
+        system_clock::time_point lastDecreaseDateTime;
 
         /**
          * Last increase time
          */
-        Poco::DateTime lastIncreaseDateTime;
+        system_clock::time_point lastIncreaseDateTime;
 
         /**
          * NUmber of decreases

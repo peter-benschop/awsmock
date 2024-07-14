@@ -12,7 +12,7 @@ namespace AwsMock::Service {
 
         // Check existence. In case the queue exists already return the existing queue.
         if (_sqsDatabase.QueueExists(request.region, request.queueName)) {
-            log_error << "Queue exists already, region: " << request.region << " queueUrl: " << request.queueUrl;
+            log_warning << "Queue exists already, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException("Queue exists already, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 

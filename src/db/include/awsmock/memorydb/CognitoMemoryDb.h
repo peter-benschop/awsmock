@@ -290,7 +290,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteAllGroups(const std::string &region = {});
-        
+
       private:
 
         /**

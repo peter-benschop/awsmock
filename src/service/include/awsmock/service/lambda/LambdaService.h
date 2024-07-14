@@ -33,6 +33,8 @@
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/dto/lambda/DeleteTagsRequest.h>
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
+#include <awsmock/dto/lambda/ListEventSourceMappingsRequest.h>
+#include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
@@ -150,9 +152,10 @@ namespace AwsMock::Service {
         Dto::Lambda::AccountSettingsResponse GetAccountSettings();
 
         /**
-         * @brief Create a eventsource mapping
+         * @brief Creates a event source mapping.
          *
-         * @parThe event source mapping is created in the SQS/SNS entities and executes whenever a SQS/SNS message is created.
+         * @par
+         * The event source mapping is created in the SQS/SNS entities and executes whenever a SQS/SNS message is created.
          *
          * @param request create event source mappings request
          * @return create event source mappings response
@@ -161,6 +164,17 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::Lambda::CreateEventSourceMappingsResponse
          */
         Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request);
+
+        /**
+         * @brief List a event source mappings
+         *
+         * @param request list event source mappings request
+         * @return list event source mappings response
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::ListEventSourceMappingsRequest
+         * @see AwsMock::Dto::Lambda::ListEventSourceMappingsResponse
+         */
+        Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request);
 
         /**
          * @brief Delete lambda function

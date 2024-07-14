@@ -79,7 +79,8 @@ namespace AwsMock::Service {
 
         try {
             // Send request to docker container
-            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
+            std::map<std::string, std::string> headers = request.headers;
+            Dto::DynamoDb::DynamoDbResponse response = SendAuthorizedDynamoDbRequest(request.body, headers);
             describeTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
             log_info << "DynamoDb describe table, name: " << request.tableName;
 
@@ -313,7 +314,6 @@ namespace AwsMock::Service {
         return {.body = response.body, .headers = headers, .status = response.statusCode};
     }
 
-    // "AWS4-HMAC-SHA256 Credential=none/20240713/eu-central-1/dynamodb/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token;x-amz-target, Signature=ee5bf524e29d66955511f2b36a964b49fcbe2a0146f2aaee001fcd41db09aa31"
     Dto::DynamoDb::DynamoDbResponse DynamoDbService::SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers) {
         log_debug << "Sending DynamoDB container request, endpoint: " << _dockerHost << ":" << _dockerPort;
 
