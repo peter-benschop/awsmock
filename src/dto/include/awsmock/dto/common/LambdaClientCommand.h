@@ -35,6 +35,7 @@ namespace AwsMock::Dto::Common {
         LIST_LAMBDAS,
         WAIT_LAMBDA,
         CREATE_EVENT_SOURCE_MAPPING,
+        LIST_EVENT_SOURCE_MAPPINGS,
         TAG_LAMBDA,
         UNKNOWN
     };
@@ -45,7 +46,8 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::INVOKE_LAMBDA, "invoke-function"},
             {LambdaCommandType::LIST_LAMBDAS, "list-functions"},
             {LambdaCommandType::WAIT_LAMBDA, "wait"},
-            {LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING, "create-.event-source-mapping"},
+            {LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING, "create-event-source-mapping"},
+            {LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS, "list-event-source-mappings"},
             {LambdaCommandType::TAG_LAMBDA, "function-tag"}};
 
     [[maybe_unused]] static std::string LambdaCommandTypeToString(LambdaCommandType commandType) {

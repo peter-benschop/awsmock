@@ -78,7 +78,7 @@ namespace AwsMock::Core {
 
         // arrange
         std::string queueName = "file-delivery1-queue";
-        std::string sqsQueueUrl = "http://" + _endpoint + "/" + _accountId + "/" + queueName;
+        std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
         std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act

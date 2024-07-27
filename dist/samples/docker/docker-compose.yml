@@ -1,9 +1,8 @@
-version: "3.8"
-
 services:
 
   # MongoDB
   mongodb:
+    container_name: awsmock-mongodb
     image: mongo:latest
     environment:
       - MONGO_INITDB_DATABASE=admin
@@ -26,7 +25,7 @@ services:
     environment:
       - AWSMOCK_MONGODB_ACTIVE=true
       - AWSMOCK_MONGODB_NAME=awsmock
-      - AWSMOCK_MONGODB_HOST=mongodb
+      - AWSMOCK_MONGODB_HOST=awsmock-mongodb
       - AWSMOCK_MONGODB_PORT=27017
       - AWSMOCK_MONGODB_USER=admin
       - AWSMOCK_MONGODB_PASSWORD=admin

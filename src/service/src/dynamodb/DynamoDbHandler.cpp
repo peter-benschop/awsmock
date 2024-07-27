@@ -4,11 +4,6 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbHandler::DynamoDbHandler() {
-
-        _secretAccessKey = Core::Configuration::instance().getString("awsmock.secret.access.key", "none");
-    }
-
     http::response<http::dynamic_body> DynamoDbHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "DynamoDb POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -29,7 +24,7 @@ namespace AwsMock::Service {
                     tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
-
+                    tableResponse.headers["Content-Length"] = std::to_string(tableResponse.body.length());
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
                     } else {
@@ -48,6 +43,7 @@ namespace AwsMock::Service {
                     tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::ListTableResponse tableResponse = _dynamoDbService.ListTables(tableRequest);
+                    tableResponse.headers["Content-Length"] = std::to_string(tableResponse.body.length());
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
                     } else {
@@ -66,6 +62,7 @@ namespace AwsMock::Service {
                     tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
+                    tableResponse.headers["Content-Length"] = std::to_string(tableResponse.body.length());
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
                     } else {
@@ -83,6 +80,7 @@ namespace AwsMock::Service {
                     tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
+                    tableResponse.headers["Content-Length"] = std::to_string(tableResponse.body.length());
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
                     } else {
@@ -100,6 +98,7 @@ namespace AwsMock::Service {
                     itemRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
+                    itemResponse.headers["Content-Length"] = itemResponse.body.length();
                     if (itemResponse.status == http::status::ok) {
                         return SendOkResponse(request, itemResponse.body, itemResponse.headers);
                     } else {
@@ -117,6 +116,7 @@ namespace AwsMock::Service {
                     itemRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
+                    itemResponse.headers["Content-Length"] = itemResponse.body.length();
                     if (itemResponse.status == http::status::ok) {
                         return SendOkResponse(request, itemResponse.body, itemResponse.headers);
                     } else {
@@ -134,6 +134,7 @@ namespace AwsMock::Service {
                     queryRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+                    queryResponse.headers["Content-Length"] = queryResponse.body.length();
                     if (queryResponse.status == http::status::ok) {
                         return SendOkResponse(request, queryResponse.body, queryResponse.headers);
                     } else {

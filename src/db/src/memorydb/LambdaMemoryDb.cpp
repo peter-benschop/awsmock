@@ -151,7 +151,6 @@ namespace AwsMock::Database {
     }
 
     Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
-
         Poco::ScopedLock lock(_lambdaMutex);
 
         std::string region = lambda.region;
@@ -171,6 +170,7 @@ namespace AwsMock::Database {
     }
 
     void LambdaMemoryDb::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+        Poco::ScopedLock lock(_lambdaMutex);
 
         for (auto &lambda: _lambdas) {
             for (auto &instance: lambda.second.instances) {

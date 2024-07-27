@@ -94,6 +94,11 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
+         * Creates date time
+         */
+        system_clock::time_point createdDateTime;
+
+        /**
          * Creates a JSON string from the object.
          *
          * @return JSON string

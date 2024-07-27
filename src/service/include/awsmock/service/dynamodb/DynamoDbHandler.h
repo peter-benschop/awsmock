@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler();
+        explicit DynamoDbHandler() = default;
 
         /**
          * @brief HTTP POST request.
@@ -51,11 +51,6 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * AWS secret access key
-         */
-        std::string _secretAccessKey;
 
         /**
          * DynamoDB service

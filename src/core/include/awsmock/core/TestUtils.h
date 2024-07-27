@@ -14,7 +14,7 @@
 #include <awsmock/core/SystemUtils.h>
 
 #define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"
-#define JAVA std::string("/usr/lib/jvm/jdk-21-oracle-x64/bin/java")
+#define JAVA std::string("/usr/lib/jvm/java-21-openjdk-amd64/bin/java")
 
 namespace AwsMock::Core {
 

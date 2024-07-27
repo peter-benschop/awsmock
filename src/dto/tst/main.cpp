@@ -23,7 +23,7 @@ class TestEnvironment : public ::testing::Environment {
 
 int main(int argc, char **argv) {
 
-    // Run tests
+    // Run data
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::AddGlobalTestEnvironment(new TestEnvironment);
     int ret = RUN_ALL_TESTS();

@@ -12,9 +12,9 @@ namespace AwsMock::Dto::Common {
         this->region = region;
         this->user = user;
         this->method = request.method();
+        this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->url = request.target();
         this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
@@ -44,11 +44,27 @@ namespace AwsMock::Dto::Common {
     std::string DynamoDbClientCommand::ToJson() const {
 
         try {
+
+            // General attributes
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
             rootJson.set("method", boost::lexical_cast<std::string>(method));
             rootJson.set("command", DynamoDbCommandTypeToString(command));
             rootJson.set("user", user);
+            rootJson.set("url", url);
+            rootJson.set("method", method);
+            rootJson.set("contentType", contentType);
+            rootJson.set("contentLength", contentLength);
+            rootJson.set("payload", payload);
+            rootJson.set("requestId", requestId);
+
+            // Headers
+            Poco::JSON::Array jsonHeadersArray;
+            for (const auto &header: headers) {
+                Poco::JSON::Object jsonHeaderObject;
+                jsonHeaderObject.set(header.first, header.second);
+                jsonHeadersArray.add(jsonHeaderObject);
+            }
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

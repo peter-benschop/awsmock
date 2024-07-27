@@ -21,7 +21,7 @@ namespace AwsMock::Database {
     }
 
     bool DatabaseBase::HasDatabase() const {
-        return _useDatabase;
+        return Core::Configuration::instance().getBool("awsmock.mongodb.active");
     }
 
     std::string DatabaseBase::GetDatabaseName() const {

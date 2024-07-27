@@ -76,16 +76,16 @@ namespace AwsMock::Service {
 
     Dto::Lambda::GetFunctionResponse LambdaService::GetFunction(const std::string &region, const std::string &name) {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_function");
-        log_debug << "List functions request, region: " << region << " name: " << name;
+        log_debug << "Get function request, region: " << region << " name: " << name;
 
         try {
 
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
 
-            Dto::Lambda::Configuration configuration = {.functionName = lambda.function, .state = LambdaStateToString(lambda.state), .stateReason = lambda.stateReason, .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
+            Dto::Lambda::Configuration configuration = {.functionName = lambda.function, .handler = lambda.handler, .runtime = lambda.runtime, .state = LambdaStateToString(lambda.state), .stateReason = lambda.stateReason, .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
             Dto::Lambda::GetFunctionResponse response = {.region = lambda.region, .configuration = configuration, .tags = lambda.tags};
 
-            log_trace << "Lambda function: " + response.ToJson();
+            log_info << "Lambda function: " + response.ToJson();
             return response;
 
         } catch (Poco::Exception &ex) {
@@ -246,6 +246,21 @@ namespace AwsMock::Service {
         log_trace << "Response: " << response.ToJson();
         log_debug << "Event source mapping created, function: " << response.functionName << " sourceArn: " << response.eventSourceArn;
         return response;
+    }
+
+    Dto::Lambda::ListEventSourceMappingsResponse LambdaService::ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) {
+        Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_event_source_mapping");
+        log_debug << "List event source mappings, functionName: " << request.functionName << " sourceArn: " << request.eventSourceArn;
+
+        if (!_lambdaDatabase.LambdaExists(request.functionName)) {
+            log_warning << "Lambda function does not exist, function: " << request.functionName;
+            throw Core::NotFoundException("Lambda function does not exist");
+        }
+
+        // Get the existing entity
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+
+        return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
     }
 
     void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {

@@ -24,6 +24,7 @@
 #define ROLE "lambda-role"
 #define HANDLER "de.jensvogt.test-lambda.handler"
 #define QUALIFIER "latest"
+#define ZIP_FILE "/tmp/java-basic-1.0-SNAPSHOT.jar"
 
 namespace AwsMock::Service {
 
@@ -38,6 +39,35 @@ namespace AwsMock::Service {
             _database.DeleteAllLambdas();
         }
 
+        static Dto::Lambda::CreateFunctionRequest CreateTestLambdaRequest() {
+            Dto::Lambda::Code code;
+            code.zipFile = ZIP_FILE;
+            Dto::Lambda::CreateFunctionRequest request = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
+            request.ephemeralStorage = Dto::Lambda::EphemeralStorage();
+            request.environment = Dto::Lambda::EnvironmentVariables();
+            request.code = code;
+            return request;
+        }
+
+        void CreateTestFunctionAndWaitForActive() {
+            Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
+
+            Dto::Lambda::GetFunctionResponse response = _service.GetFunction(REGION, FUNCTION_NAME);
+            while (response.configuration.state != Database::Entity::Lambda::LambdaStateToString(Database::Entity::Lambda::LambdaState::Active)) {
+                std::this_thread::sleep_for(500ms);
+                response = _service.GetFunction(REGION, FUNCTION_NAME);
+            }
+        }
+
+        void WaitForActive(const std::string &region, const std::string &functionName) {
+
+            Dto::Lambda::GetFunctionResponse response = _service.GetFunction(region, functionName);
+            while (response.configuration.state != Database::Entity::Lambda::LambdaStateToString(Database::Entity::Lambda::LambdaState::Active)) {
+                std::this_thread::sleep_for(500ms);
+                response = _service.GetFunction(region, functionName);
+            }
+        }
+
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         LambdaService _service;
@@ -47,7 +77,7 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaCreateTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest request = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
+        Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
 
         // act
         Dto::Lambda::CreateFunctionResponse response = _service.CreateFunction(request);
@@ -71,6 +101,21 @@ namespace AwsMock::Service {
         // assert
         EXPECT_FALSE(response.lambdaList.empty());
         EXPECT_TRUE(response.lambdaList.front().function == FUNCTION_NAME);
+    }
+
+    TEST_F(LambdaServiceTest, LambdaGetTest) {
+
+        // arrange
+        Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
+        Dto::Lambda::CreateFunctionResponse createFunctionResponse = _service.CreateFunction(request);
+
+        // act
+        WaitForActive(REGION, FUNCTION_NAME);
+        Dto::Lambda::GetFunctionResponse response = _service.GetFunction(REGION, FUNCTION_NAME);
+
+        // assert
+        EXPECT_TRUE(response.configuration.handler == HANDLER);
+        EXPECT_TRUE(response.configuration.runtime == RUNTIME);
     }
 
     TEST_F(LambdaServiceTest, LambdaCreateTagsTest) {

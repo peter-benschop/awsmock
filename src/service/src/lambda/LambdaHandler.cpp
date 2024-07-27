@@ -25,6 +25,26 @@ namespace AwsMock::Service {
 
                     std::string functionName = Core::HttpUtils::GetPathParameters(request.target())[2];
                     Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
+                    std::map<std::string, std::string> headers;
+                    headers["Content-Length"] = std::to_string(lambdaResponse.ToXml().length());
+                    headers["Content-Type"] = "application/xml";
+                    return SendOkResponse(request, lambdaResponse.ToXml(), headers);
+                }
+
+                case Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS: {
+
+                    std::string functionName = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "FunctionName");
+                    std::string eventSourceArn = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "EventSourceArn");
+                    std::string marker = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "Marker");
+                    int maxItems = Core::NumberUtils::ToInt(Core::HttpUtils::GetQueryParameterValueByName(request.target(), "MaxItems"));
+
+                    Dto::Lambda::ListEventSourceMappingsRequest lambdaRequest = {.functionName = functionName, .eventSourceArn = eventSourceArn, .marker = marker, .maxItems = maxItems};
+                    lambdaRequest.region = clientCommand.region;
+                    lambdaRequest.user = clientCommand.user;
+                    lambdaRequest.requestId = clientCommand.requestId;
+
+                    Dto::Lambda::ListEventSourceMappingsResponse lambdaResponse = _lambdaService.ListEventSourceMappings(lambdaRequest);
+
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 

@@ -22,7 +22,7 @@ namespace AwsMock::Database {
     void ModuleDatabase::Initialize() {
 
         for (const auto &module: _existingModules) {
-            if (_useDatabase) {
+            if (HasDatabase()) {
 
                 if (!ModuleExists(module.first)) {
                     CreateModule(module.second);
@@ -70,7 +70,7 @@ namespace AwsMock::Database {
 
     bool ModuleDatabase::ModuleExists(const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::GetModuleById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetModuleById(bsoncxx::oid(oid));
 
@@ -127,7 +127,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::GetModuleByName(const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -152,7 +152,7 @@ namespace AwsMock::Database {
 
     std::vector<std::string> ModuleDatabase::GetAllModuleNames() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -179,7 +179,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::CreateModule(const Entity::Module::Module &module) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -202,7 +202,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::UpdateModule(const Entity::Module::Module &module) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -224,7 +224,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
@@ -256,7 +256,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -282,7 +282,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::SetPort(const std::string &name, int port) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -313,7 +313,7 @@ namespace AwsMock::Database {
 
     int ModuleDatabase::ModuleCount() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -337,7 +337,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList ModuleDatabase::ListModules() {
 
         Entity::Module::ModuleList modulesList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
@@ -359,7 +359,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::DeleteModule(const Entity::Module::Module &module) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -380,7 +380,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::DeleteAllModules() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();

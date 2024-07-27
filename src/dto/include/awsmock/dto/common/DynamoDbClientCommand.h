@@ -70,6 +70,7 @@ namespace AwsMock::Dto::Common {
     /**
      * @brief The DynamoDB client command is used as a standardized way of interpreting the different ways the clients are calling the REST services.
      *
+     * @par
      * Each client type is using a different way of calling the AWS REST services.
      *
      * @author jens.vogt\@opitz-consulting.com

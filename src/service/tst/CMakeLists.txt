@@ -22,3 +22,4 @@ target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsm
         PocoUtil PocoFoundation PocoNet PocoJSON PocoXML PocoZip boost_thread boost_filesystem gtest pthread ssl crypto z archive tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
+add_custom_command(TARGET ${BINARY} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/data/lambda/java-basic-1.0-SNAPSHOT.jar" "/tmp")
