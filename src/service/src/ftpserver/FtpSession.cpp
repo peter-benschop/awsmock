@@ -151,6 +151,8 @@ namespace AwsMock::FtpServer {
                 // Transfer parameter commands
                 {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
                 {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
+                {"EPRT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
+                {"EPSV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
                 {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
                 {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
                 {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
