@@ -23,8 +23,8 @@ namespace AwsMock::Core {
         std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
         // AWS configuration
         ofs << "awsmock.region=eu-central-1" << std::endl;
-        ofs << "awsmock.account.userPoolId=000000000000" << std::endl;
-        ofs << "awsmock.client.userPoolId=00000000" << std::endl;
+        ofs << "awsmock.account.id=000000000000" << std::endl;
+        ofs << "awsmock.client.id=00000000" << std::endl;
         ofs << "awsmock.user=none" << std::endl;
         ofs << "awsmock.data.dir=/tmp/awsmock/data" << std::endl;
         // Rest configuration

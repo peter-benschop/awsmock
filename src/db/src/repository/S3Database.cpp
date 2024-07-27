@@ -15,11 +15,11 @@ namespace AwsMock::Database {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    S3Database::S3Database() : _memoryDb(S3MemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object") {}
+    S3Database::S3Database() : _memoryDb(S3MemoryDb::instance()), _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object") {}
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -47,7 +47,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::CreateBucket(const Entity::S3::Bucket &bucket) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
 
     long S3Database::BucketCount() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -112,7 +112,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetBucketById(bsoncxx::oid(oid));
 
@@ -124,7 +124,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -148,7 +148,7 @@ namespace AwsMock::Database {
     Entity::S3::BucketList S3Database::ListBuckets() {
 
         Entity::S3::BucketList bucketList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -170,7 +170,7 @@ namespace AwsMock::Database {
 
     bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -189,7 +189,7 @@ namespace AwsMock::Database {
     std::vector<Entity::S3::Object> S3Database::GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) {
 
         std::vector<Entity::S3::Object> objectList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -215,7 +215,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -254,7 +254,7 @@ namespace AwsMock::Database {
     Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
 
         Entity::S3::ObjectList objectList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             if (prefix.empty()) {
 
@@ -294,7 +294,7 @@ namespace AwsMock::Database {
     Entity::S3::ObjectList S3Database::ListObjects(const std::string &prefix) {
 
         Entity::S3::ObjectList objectList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -328,7 +328,7 @@ namespace AwsMock::Database {
 
     void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -355,7 +355,7 @@ namespace AwsMock::Database {
 
     void S3Database::DeleteAllBuckets() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -382,7 +382,7 @@ namespace AwsMock::Database {
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -399,7 +399,7 @@ namespace AwsMock::Database {
 
     bool S3Database::ObjectExists(const std::string &filename) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -415,7 +415,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -465,7 +465,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::GetObjectById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetObjectById(bsoncxx::oid(oid));
 
@@ -486,7 +486,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::UpdateObject(const Entity::S3::Object &object) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -518,7 +518,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -549,7 +549,7 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -609,7 +609,7 @@ namespace AwsMock::Database {
 
     long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -650,7 +650,7 @@ namespace AwsMock::Database {
 
     void S3Database::DeleteObject(const Entity::S3::Object &object) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -674,7 +674,7 @@ namespace AwsMock::Database {
 
     void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             bsoncxx::builder::basic::array array{};
             for (const auto &key: keys) {
@@ -707,7 +707,7 @@ namespace AwsMock::Database {
 
     void S3Database::DeleteAllObjects() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];

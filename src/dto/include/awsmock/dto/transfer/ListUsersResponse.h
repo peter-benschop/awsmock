@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Transfer {
      *   "Users": [
      *      {
      *         "Arn": "arn:aws:transfer:us-east-1:176354371281:user/s-01234567890abcdef/charlie",
-     *         "HomeDirectory": "/tests/home/charlie",
+     *         "HomeDirectory": "/data/home/charlie",
      *         "SshPublicKeyCount": 1,
      *         "Role": "arn:aws:iam::176354371281:role/transfer-role1",
      *         "Tags": [

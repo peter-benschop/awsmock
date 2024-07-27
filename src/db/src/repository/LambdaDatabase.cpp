@@ -10,11 +10,11 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("lambda") {}
+    LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _databaseName(GetDatabaseName()), _collectionName("lambda") {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -44,7 +44,7 @@ namespace AwsMock::Database {
 
     bool LambdaDatabase::LambdaExists(const std::string &functionName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -67,7 +67,7 @@ namespace AwsMock::Database {
 
     bool LambdaDatabase::LambdaExistsByArn(const std::string &arn) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -90,7 +90,7 @@ namespace AwsMock::Database {
 
     int LambdaDatabase::LambdaCount(const std::string &region) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -121,7 +121,7 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -167,7 +167,7 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetLambdaById(bsoncxx::oid(oid));
 
@@ -179,7 +179,7 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -208,7 +208,7 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaByName(const std::string &region, const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -246,7 +246,7 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -272,7 +272,7 @@ namespace AwsMock::Database {
 
     void LambdaDatabase::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -295,7 +295,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -335,7 +335,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdasWithEventSource(const std::string &eventSourceArn) {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -364,7 +364,7 @@ namespace AwsMock::Database {
 
     void LambdaDatabase::DeleteLambda(const std::string &functionName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -387,7 +387,7 @@ namespace AwsMock::Database {
 
     void LambdaDatabase::DeleteAllLambdas() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 

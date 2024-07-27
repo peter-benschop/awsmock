@@ -36,8 +36,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _memoryDb(CognitoMemoryDb::instance()), _hasDatabase(DatabaseBase::HasDatabase()), _userpoolCollectionName("cognito_userpool"),
-                                     _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"){};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _memoryDb(CognitoMemoryDb::instance()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"){};
 
         /**
          * @brief Singleton instance
@@ -324,11 +323,6 @@ namespace AwsMock::Database {
         void DeleteAllGroups(const std::string &region = {});
 
       private:
-
-        /**
-         * Use MongoDB
-         */
-        bool _hasDatabase;
 
         /**
          * Database name

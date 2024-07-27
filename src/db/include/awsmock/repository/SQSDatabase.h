@@ -386,11 +386,6 @@ namespace AwsMock::Database {
         std::map<std::string, Entity::SQS::Message> _messages;
 
         /**
-         * Use MongoDB
-         */
-        bool _useDatabase;
-
-        /**
          * Database name
          */
         std::string _databaseName;

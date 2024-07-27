@@ -345,11 +345,6 @@ namespace AwsMock::Database {
         static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
         /**
-         * Use MongoDB
-         */
-        bool _useDatabase;
-
-        /**
          * Database name
          */
         std::string _databaseName;

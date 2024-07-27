@@ -40,7 +40,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
+        explicit ModuleDatabase() : _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
 
         /**
          * @brief Singleton instance
@@ -195,11 +195,6 @@ namespace AwsMock::Database {
         void DeleteAllModules();
 
       private:
-
-        /**
-         * Use MongoDB
-         */
-        bool _useDatabase;
 
         /**
          * Database name

@@ -8,7 +8,7 @@ namespace AwsMock::Database {
 
     bool CognitoDatabase::UserPoolExists(const std::string &region, const std::string &name) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -31,7 +31,7 @@ namespace AwsMock::Database {
 
     bool CognitoDatabase::UserPoolExists(const std::string &userPoolId) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -54,7 +54,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::UserPool CognitoDatabase::CreateUserPool(const Entity::Cognito::UserPool &userPool) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
@@ -104,7 +104,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByUserPoolId(const std::string &userPoolId) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -133,7 +133,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -174,7 +174,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::UserPool CognitoDatabase::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
@@ -204,7 +204,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Cognito::UserPool> CognitoDatabase::ListUserPools(const std::string &region) {
 
         std::vector<Entity::Cognito::UserPool> userPools;
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -244,7 +244,7 @@ namespace AwsMock::Database {
 
     long CognitoDatabase::CountUserPools(const std::string &region) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
                 long count = 0;
@@ -271,7 +271,7 @@ namespace AwsMock::Database {
 
     void CognitoDatabase::DeleteUserPool(const std::string &id) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
@@ -298,7 +298,7 @@ namespace AwsMock::Database {
 
     void CognitoDatabase::DeleteAllUserPools() {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
@@ -325,7 +325,7 @@ namespace AwsMock::Database {
 
     bool CognitoDatabase::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -350,7 +350,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::User CognitoDatabase::CreateUser(const Entity::Cognito::User &user) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
@@ -401,7 +401,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::User CognitoDatabase::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -430,7 +430,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::User CognitoDatabase::GetUserById(const std::string &oid) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             return GetUserById(bsoncxx::oid(oid));
 
@@ -442,7 +442,7 @@ namespace AwsMock::Database {
 
     long CognitoDatabase::CountUsers(const std::string &region, const std::string &userPoolId) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -473,7 +473,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) {
 
         std::vector<Entity::Cognito::User> users;
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -524,7 +524,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Cognito::User> CognitoDatabase::ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
 
         std::vector<Entity::Cognito::User> users;
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -556,7 +556,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::User CognitoDatabase::UpdateUser(const Entity::Cognito::User &user) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
@@ -596,7 +596,7 @@ namespace AwsMock::Database {
 
     void CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
@@ -623,7 +623,7 @@ namespace AwsMock::Database {
 
     void CognitoDatabase::DeleteAllUsers() {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
@@ -650,7 +650,7 @@ namespace AwsMock::Database {
 
     bool CognitoDatabase::GroupExists(const std::string &region, const std::string &groupName) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -695,7 +695,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::Group CognitoDatabase::GetGroupByGroupName(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -724,7 +724,7 @@ namespace AwsMock::Database {
 
     Entity::Cognito::Group CognitoDatabase::CreateGroup(const Entity::Cognito::Group &group) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
@@ -753,7 +753,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Cognito::Group> CognitoDatabase::ListGroups(const std::string &region, const std::string &userPoolId) {
 
         std::vector<Entity::Cognito::Group> groups;
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -803,7 +803,7 @@ namespace AwsMock::Database {
 
     void CognitoDatabase::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
@@ -830,7 +830,7 @@ namespace AwsMock::Database {
 
     void CognitoDatabase::DeleteAllGroups(const std::string &region) {
 
-        if (_hasDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];

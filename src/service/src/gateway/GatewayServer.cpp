@@ -34,9 +34,6 @@ namespace AwsMock::Service {
             return;
         }
         log_info << "Gateway server starting";
-
-        // Start HTTP manager
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new GatewayRouter(_configuration, _metricService));
     }
 
     void GatewayServer::Run() {

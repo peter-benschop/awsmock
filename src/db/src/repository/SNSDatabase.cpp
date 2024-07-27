@@ -11,11 +11,11 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::builder::stream::document;
 
-    SNSDatabase::SNSDatabase() : _memoryDb(SNSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message") {}
+    SNSDatabase::SNSDatabase() : _memoryDb(SNSMemoryDb::instance()), _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message") {}
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -38,7 +38,7 @@ namespace AwsMock::Database {
 
     bool SNSDatabase::TopicExists(const std::string &region, const std::string &topicName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -62,7 +62,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::CreateTopic(const Entity::SNS::Topic &topic) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
@@ -113,7 +113,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::GetTopicById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetTopicById(bsoncxx::oid(oid));
 
@@ -125,7 +125,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::GetTopicByArn(const std::string &topicArn) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -150,7 +150,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::GetTopicByName(const std::string &region, const std::string &topicName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -181,7 +181,7 @@ namespace AwsMock::Database {
     Entity::SNS::TopicList SNSDatabase::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) {
 
         Entity::SNS::TopicList topicList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -209,7 +209,7 @@ namespace AwsMock::Database {
     Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &region) {
 
         Entity::SNS::TopicList topicList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -250,7 +250,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSDatabase::UpdateTopic(const Entity::SNS::Topic &topic) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
@@ -293,7 +293,7 @@ namespace AwsMock::Database {
 
     long SNSDatabase::CountTopics(const std::string &region) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -316,7 +316,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
@@ -343,7 +343,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteAllTopics() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
@@ -370,7 +370,7 @@ namespace AwsMock::Database {
 
     bool SNSDatabase::MessageExists(const std::string &id) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -393,7 +393,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Message SNSDatabase::CreateMessage(const Entity::SNS::Message &message) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -442,7 +442,7 @@ namespace AwsMock::Database {
 
     long SNSDatabase::CountMessages(const std::string &region, const std::string &topicArn) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -475,7 +475,7 @@ namespace AwsMock::Database {
                                             const std::string &topicArn,
                                             Entity::SNS::MessageStatus status) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -503,7 +503,7 @@ namespace AwsMock::Database {
     Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region) {
 
         Entity::SNS::MessageList messageList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -536,7 +536,7 @@ namespace AwsMock::Database {
 
     Entity::SNS::Message SNSDatabase::UpdateMessage(Entity::SNS::Message &message) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
@@ -576,7 +576,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -604,7 +604,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -640,7 +640,7 @@ namespace AwsMock::Database {
 
         const std::chrono::system_clock::time_point reset = std::chrono::system_clock::now() - std::chrono::seconds{timeout};
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -667,7 +667,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteAllMessages() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
