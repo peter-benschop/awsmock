@@ -829,12 +829,14 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::handleFtpCommandLIST(const std::string &param) {
         if (!_logged_in_user) {
+            log_error << "Not logged in";
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
 
         // RFC 959 does not allow ACTION_NOT_TAKEN (-> permanent error), so we return a temporary error (FILE_ACTION_NOT_TAKEN).
         if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
+            log_error << "Permission denied";
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -873,6 +875,7 @@ namespace AwsMock::FtpServer {
         }
 
         const std::string local_path = toLocalPath(path2dst);
+        log_debug << "Local path: " << local_path;
         auto dir_status = FileStatus(local_path);
 
         if (dir_status.isOk()) {
