@@ -138,7 +138,11 @@ namespace AwsMock::FtpServer {
         // Transfer parameter commands
         void handleFtpCommandPORT(const std::string &param);
 
+        void handleFtpCommandEPRT(const std::string &param);
+
         void handleFtpCommandPASV(const std::string &param);
+
+        void handleFtpCommandEPSV(const std::string &param);
 
         void handleFtpCommandTYPE(const std::string &param);
 
