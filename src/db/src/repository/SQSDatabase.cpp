@@ -21,7 +21,7 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
             int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-            log_trace << "Queue exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -38,7 +38,7 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
             int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
-            log_trace << "Queue exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -55,7 +55,7 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
             int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
-            log_trace << "Queue exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -417,7 +417,7 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
             int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
-            log_trace << "Message exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Message exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {

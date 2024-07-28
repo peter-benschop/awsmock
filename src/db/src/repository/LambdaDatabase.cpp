@@ -23,7 +23,7 @@ namespace AwsMock::Database {
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region),
                                                                                 kvp("function", function),
                                                                                 kvp("runtime", runtime)));
-                log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
+                log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -51,7 +51,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
-                log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
+                log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
-                log_trace << "lambda function exists: " << (count > 0 ? "true" : "false");
+                log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {

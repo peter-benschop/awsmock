@@ -27,6 +27,8 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
         DefineStringProperty("awsmock.temp.dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
         DefineBoolProperty("awsmock.pretty", "AWSMOCK_PRETTY", false);
+        DefineBoolProperty("awsmock.verifysignature", "AWSMOCK_VERIFY_SIGNATURE", false);
+        DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
 
         // Manager
         DefineStringProperty("awsmock.manager.host", "AWSMOCK_MANAGER_HOST", "localhost");

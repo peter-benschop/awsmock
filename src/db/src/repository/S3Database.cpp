@@ -27,7 +27,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
                 int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-                log_trace << "Bucket exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Bucket exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -177,7 +177,7 @@ namespace AwsMock::Database {
 
             int64_t count =
                     _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-            log_trace << "Objects exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Objects exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -389,7 +389,7 @@ namespace AwsMock::Database {
             int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region),
                                                                             kvp("bucket", object.bucket),
                                                                             kvp("key", object.key)));
-            log_trace << "Object exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Object exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -404,7 +404,7 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
             int64_t count = _objectCollection.count_documents(make_document(kvp("internalName", filename)));
-            log_trace << "Object exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Object exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {

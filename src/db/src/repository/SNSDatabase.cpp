@@ -22,7 +22,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
-                log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Topic exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -46,7 +46,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
                 int64_t
                         count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
-                log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Topic exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -377,7 +377,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 int64_t count = _messageCollection.count_documents(make_document(kvp("_id", id)));
-                log_trace << "Message exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Message exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {

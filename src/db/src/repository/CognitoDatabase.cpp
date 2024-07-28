@@ -15,7 +15,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 int64_t count = _userPoolCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-                log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Cognito user pool exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -38,7 +38,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
                 int64_t count = _userPoolCollection.count_documents(make_document(kvp("userPoolId", userPoolId)));
-                log_trace << "Cognito user pool exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Cognito user pool exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -334,7 +334,7 @@ namespace AwsMock::Database {
                 int64_t count = _userCollection.count_documents(make_document(kvp("region", region),
                                                                               kvp("userPoolId", userPoolId),
                                                                               kvp("userName", userName)));
-                log_trace << "Cognito user exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Cognito user exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -657,7 +657,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
                 int64_t count = _groupCollection.count_documents(make_document(kvp("region", region), kvp("groupName", groupName)));
-                log_trace << "Cognito group exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Cognito group exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
