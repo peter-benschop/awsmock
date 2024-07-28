@@ -1,9 +1,11 @@
 #include <awsmock/ftpserver/Filesystem.h>
 
+#include "awsmock/core/LogStream.h"
 #include <array>
-#include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <ctime>
+#include <dirent.h>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -12,22 +14,6 @@
 #include <sstream>
 #include <sys/stat.h>
 
-#ifdef WIN32
-
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <awsmock/core/Win32Utils.h>
-#include <filesystem>
-#include <windows.h>
-
-#else// WIN32
-
-#include "awsmock/core/LogStream.h"
-#include <cstring>
-#include <dirent.h>
-
-#endif// WIN32
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Filesystem
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,15 +21,10 @@
 namespace AwsMock::FtpServer {
 
     FileStatus::FileStatus(const std::string &path) : path_(path), file_status_{} {
-#ifdef WIN32
-        const std::wstring w_path_ = Core::Utf8ToWide(path);
-        const int error_code = _wstat64(w_path_.c_str(), &file_status_);
-#else // WIN32
         const int error_code = stat(path.c_str(), &file_status_);
         if (error_code) {
             //log_error << "Cannot stat, file: " << path_ << " error: " << error_code;
         }
-#endif// WIN32
         is_ok_ = (error_code == 0);
     }
 
@@ -62,7 +43,6 @@ namespace AwsMock::FtpServer {
                 return FileType::Dir;
             case S_IFCHR:
                 return FileType::CharacterDevice;
-#ifndef WIN32
             case S_IFBLK:
                 return FileType::BlockDevice;
             case S_IFIFO:
@@ -71,7 +51,6 @@ namespace AwsMock::FtpServer {
                 return FileType::SymbolicLink;
             case S_IFSOCK:
                 return FileType::Socket;
-#endif
             default:
                 return FileType::Unknown;
         }
@@ -84,17 +63,6 @@ namespace AwsMock::FtpServer {
         return file_status_.st_size;
     }
 
-#ifdef WIN32
-    bool FileStatus::permissionRootRead() const { return 0 != (file_status_.st_mode & S_IREAD); }
-    bool FileStatus::permissionRootWrite() const { return 0 != (file_status_.st_mode & S_IWRITE); }
-    bool FileStatus::permissionRootExecute() const { return 0 != (file_status_.st_mode & S_IEXEC); }
-    bool FileStatus::permissionGroupRead() const { return 0 != (file_status_.st_mode & S_IREAD); }
-    bool FileStatus::permissionGroupWrite() const { return 0 != (file_status_.st_mode & S_IWRITE); }
-    bool FileStatus::permissionGroupExecute() const { return 0 != (file_status_.st_mode & S_IEXEC); }
-    bool FileStatus::permissionOwnerRead() const { return 0 != (file_status_.st_mode & S_IREAD); }
-    bool FileStatus::permissionOwnerWrite() const { return 0 != (file_status_.st_mode & S_IWRITE); }
-    bool FileStatus::permissionOwnerExecute() const { return 0 != (file_status_.st_mode & S_IEXEC); }
-#else // WIN32
     bool FileStatus::permissionRootRead() const { return 0 != (file_status_.st_mode & S_IRUSR); }
     bool FileStatus::permissionRootWrite() const { return 0 != (file_status_.st_mode & S_IWUSR); }
     bool FileStatus::permissionRootExecute() const { return 0 != (file_status_.st_mode & S_IXUSR); }
@@ -104,28 +72,12 @@ namespace AwsMock::FtpServer {
     bool FileStatus::permissionOwnerRead() const { return 0 != (file_status_.st_mode & S_IROTH); }
     bool FileStatus::permissionOwnerWrite() const { return 0 != (file_status_.st_mode & S_IWOTH); }
     bool FileStatus::permissionOwnerExecute() const { return 0 != (file_status_.st_mode & S_IXOTH); }
-#endif// WIN32
 
     std::string FileStatus::permissionString() const {
         std::string permission_string(9, '-');
 
         if (!is_ok_)
             return permission_string;
-
-#ifdef WIN32
-        // Root
-        permission_string[0] = ((file_status_.st_mode & S_IREAD) != 0) ? 'r' : '-';
-        permission_string[1] = ((file_status_.st_mode & S_IWRITE) != 0) ? 'w' : '-';
-        permission_string[2] = ((file_status_.st_mode & S_IEXEC) != 0) ? 'x' : '-';
-        // Group
-        permission_string[3] = ((file_status_.st_mode & S_IREAD) != 0) ? 'r' : '-';
-        permission_string[4] = ((file_status_.st_mode & S_IWRITE) != 0) ? 'w' : '-';
-        permission_string[5] = ((file_status_.st_mode & S_IEXEC) != 0) ? 'x' : '-';
-        // Owner
-        permission_string[6] = ((file_status_.st_mode & S_IREAD) != 0) ? 'r' : '-';
-        permission_string[7] = ((file_status_.st_mode & S_IWRITE) != 0) ? 'w' : '-';
-        permission_string[8] = ((file_status_.st_mode & S_IEXEC) != 0) ? 'x' : '-';
-#else // WIN32 \
         // Root
         permission_string[0] = ((file_status_.st_mode & S_IRUSR) != 0) ? 'r' : '-';
         permission_string[1] = ((file_status_.st_mode & S_IWUSR) != 0) ? 'w' : '-';
@@ -138,7 +90,6 @@ namespace AwsMock::FtpServer {
         permission_string[6] = ((file_status_.st_mode & S_IROTH) != 0) ? 'r' : '-';
         permission_string[7] = ((file_status_.st_mode & S_IWOTH) != 0) ? 'w' : '-';
         permission_string[8] = ((file_status_.st_mode & S_IXOTH) != 0) ? 'x' : '-';
-#endif// WIN32
         return permission_string;
     }
 
@@ -240,51 +191,16 @@ namespace AwsMock::FtpServer {
 
         bool can_open_dir(false);
 
-#ifdef WIN32
-        std::string find_file_path = path_ + "\\*";
-        std::replace(find_file_path.begin(), find_file_path.end(), '/', '\\');
-
-        const std::wstring w_find_file_path = Core::Utf8ToWide(find_file_path);
-
-        HANDLE hFind = nullptr;
-        WIN32_FIND_DATAW ffd;
-        hFind = FindFirstFileW(w_find_file_path.c_str(), &ffd);
-        if (hFind != INVALID_HANDLE_VALUE) {
-            can_open_dir = true;
-        }
-        FindClose(hFind);
-#else // WIN32
         DIR *dp = opendir(path_.c_str());
         if (dp != nullptr) {
             can_open_dir = true;
             closedir(dp);
         }
-#endif// WIN32
         return can_open_dir;
     }
 
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
-#ifdef WIN32
-        std::string find_file_path = path + "\\*";
-        std::replace(find_file_path.begin(), find_file_path.end(), '/', '\\');
-
-        const std::wstring w_find_file_path = Core::Utf8ToWide(find_file_path);
-
-        HANDLE hFind = nullptr;
-        WIN32_FIND_DATAW ffd;
-        hFind = FindFirstFileW(w_find_file_path.c_str(), &ffd);
-        if (hFind == INVALID_HANDLE_VALUE) {
-            std::cerr << "FindFirstFile Error" << std::endl;
-            return content;
-        }
-
-        do {
-            const std::string file_name = Core::WideToUtf8(std::wstring(ffd.cFileName));
-            content.emplace(file_name, FileStatus(path + "\\" + file_name));
-        } while (FindNextFileW(hFind, &ffd) != 0);
-        FindClose(hFind);
-#else// WIN32
         DIR *dp = opendir(path.c_str());
         struct dirent *dirp = nullptr;
         if (dp == nullptr) {
@@ -296,8 +212,6 @@ namespace AwsMock::FtpServer {
             content.emplace(std::string(dirp->d_name), FileStatus(path + "/" + std::string(dirp->d_name)));
         }
         closedir(dp);
-
-#endif// WIN32
         return content;
     }
 
