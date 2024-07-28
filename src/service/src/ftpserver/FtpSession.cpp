@@ -304,7 +304,7 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 6000);
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 0);
 
         {
             asio::error_code ec;
@@ -335,9 +335,8 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        auto ip_bytes = command_socket_.remote_endpoint().address().to_v4().to_bytes();
         auto port = data_acceptor_.local_endpoint().port();
-        //uint_least16_t port = 6000;
         log_info << "Server suggested port: " << port;
 
         // Form reply string
