@@ -201,15 +201,18 @@ namespace AwsMock::FtpServer {
 
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
+        log_info << "Get directory content, path: " << path;
+
         DIR *dp = opendir(path.c_str());
         struct dirent *dirp = nullptr;
         if (dp == nullptr) {
-            std::cerr << "Error opening directory: " << strerror(errno) << std::endl;
+            log_error << "Error opening directory: " << strerror(errno) << ", returning empty dir";
             return content;
         }
 
         while ((dirp = readdir(dp)) != nullptr) {
             content.emplace(std::string(dirp->d_name), FileStatus(path + "/" + std::string(dirp->d_name)));
+            log_info << "Adding file, path: " << path << "/" << std::string(dirp->d_name);
         }
         closedir(dp);
         return content;
