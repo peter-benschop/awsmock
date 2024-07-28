@@ -20,10 +20,11 @@ FROM alpine:latest
 RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread
 
 # Make dirctories
-RUN mkdir -p /tmp/awsmock/data/s3 && \
-    mkdir -p /tmp/awsmock/data/lambda && \
-    mkdir -p /tmp/awsmock/data/transfer && \
-    mkdir -p /tmp/awsmock/data/tmp
+RUN mkdir -p /home/awsmock/data/s3 && \
+    mkdir -p /home/awsmock/data/lambda && \
+    mkdir -p /home/awsmock/data/transfer && \
+    mkdir -p /home/awsmock/data/dynamodb && \
+    mkdir -p /home/awsmock/data/tmp
 
 # Runtime
 

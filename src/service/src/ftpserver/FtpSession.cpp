@@ -1021,6 +1021,7 @@ namespace AwsMock::FtpServer {
             }
 
             std::string tmp = stream.str();
+            log_info << "Sending directory listing: " << tmp;
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();

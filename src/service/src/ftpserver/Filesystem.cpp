@@ -215,6 +215,7 @@ namespace AwsMock::FtpServer {
             log_info << "Adding file, path: " << path << "/" << std::string(dirp->d_name);
         }
         closedir(dp);
+        log_info << "Found directory content, path: " << path << " count: " << content.size();
         return content;
     }
 
