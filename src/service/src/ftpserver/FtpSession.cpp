@@ -335,7 +335,10 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.remote_endpoint().address().to_v4().to_bytes();
+        boost::asio::io_service ios;
+        boost::asio::ip::tcp::resolver resolver(ios);
+        auto ip_bytes = resolver.resolve(boost::asio::ip::host_name(), "localhost")->endpoint().address().to_v4().to_bytes();
+        //auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
         auto port = data_acceptor_.local_endpoint().port();
         log_info << "Server suggested port: " << port;
 
