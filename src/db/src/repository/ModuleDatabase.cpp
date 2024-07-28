@@ -77,7 +77,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 int64_t count = _moduleCollection.count_documents(make_document(kvp("name", name)));
-                log_trace << "Module exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Module exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -320,7 +320,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 int64_t count = _moduleCollection.count_documents(make_document());
-                log_trace << "Service state: " << (count > 0 ? "true" : "false");
+                log_trace << "Service state: " << std::boolalpha << count;
                 return static_cast<int>(count);
 
             } catch (mongocxx::exception::system_error &e) {

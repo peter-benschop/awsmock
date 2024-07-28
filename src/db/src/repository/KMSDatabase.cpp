@@ -15,7 +15,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
                 int64_t count = _keyCollection.count_documents(make_document(kvp("keyId", keyId)));
-                log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Topic exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {

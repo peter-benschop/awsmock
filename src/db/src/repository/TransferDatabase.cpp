@@ -20,7 +20,7 @@ namespace AwsMock::Database {
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             int64_t
                     count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("serverId", serverId)));
-            log_trace << "Transfer manager exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Transfer manager exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -41,7 +41,7 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             int64_t count = _transferCollection.count_documents(make_document(kvp("serverId", serverId)));
-            log_trace << "Transfer manager exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Transfer manager exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {
@@ -64,7 +64,7 @@ namespace AwsMock::Database {
             int64_t count = _transferCollection.count_documents(make_document(kvp("region", region),
                                                                               kvp("protocols",
                                                                                   make_document(kvp("$all", mProtocol)))));
-            log_trace << "Transfer manager exists: " << (count > 0 ? "true" : "false");
+            log_trace << "Transfer manager exists: " << std::boolalpha << count;
             return count > 0;
 
         } else {

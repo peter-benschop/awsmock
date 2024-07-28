@@ -13,6 +13,7 @@ namespace AwsMock::Manager {
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
                  << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
+        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().getBool("awsmock.dockerized");
     }
 
     void Manager::InitializeMonitoring() {

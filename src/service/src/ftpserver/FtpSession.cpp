@@ -304,7 +304,14 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 6000);
+        // In case of a dockerized FTP server we need to use some special ports
+        asio::ip::tcp::endpoint endpoint;
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            int port = Core::RandomUtils::NextInt(6000, 7000);
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
+        } else {
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
+        }
 
         {
             asio::error_code ec;
@@ -335,8 +342,12 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
-        //auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        boost::asio::ip::address_v4::bytes_type ip_bytes;
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
+        } else {
+            ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        }
         auto port = data_acceptor_.local_endpoint().port();
         log_info << "Server suggested port: " << port;
 

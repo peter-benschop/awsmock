@@ -24,7 +24,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
                 int64_t count = _secretCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-                log_trace << "Secret exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Secret exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -52,7 +52,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
                 int64_t count = _secretCollection.count_documents(make_document(kvp("secretId", secretId)));
-                log_trace << "Secret exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Secret exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {

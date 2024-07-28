@@ -121,7 +121,7 @@ namespace AwsMock::Database {
                 } else {
                     count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
                 }
-                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -313,7 +313,7 @@ namespace AwsMock::Database {
                 } else {
                     count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
                 }
-                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                log_trace << "DynamoDb table exists: " << std::boolalpha<<(count>0);
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -360,7 +360,7 @@ namespace AwsMock::Database {
                 }
                 int64_t count = _itemCollection.count_documents(queryDoc.extract());
 
-                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
