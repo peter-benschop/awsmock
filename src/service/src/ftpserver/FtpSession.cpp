@@ -304,7 +304,7 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 20);
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 6000);
 
         {
             asio::error_code ec;
