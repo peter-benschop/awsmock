@@ -28,8 +28,9 @@
 #define DYNAMODB_DEFAULT_WORKER_PERIOD 300
 #define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
 #define DYNAMODB_DOCKER_TAG std::string("latest")
-#define DYNAMODB_INTERNAL_PORT 8000
+#define DYNAMODB_DOCKER_PORT 8000
 #define DYNAMODB_EXTERNAL_PORT 8000
+#define DYNAMODB_DOCKER_HOST "localhost"
 #define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
                              "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
                              "WORKDIR /home/dynamodblocal\n"                                 \
@@ -154,6 +155,16 @@ namespace AwsMock::Service {
          * Worker period
          */
         int _workerPeriod;
+
+        /**
+         * Dynamo DB docker host
+         */
+        std::string _dockerHost;
+
+        /**
+         * Dynamo DB docker host
+         */
+        int _dockerPort;
 
         /**
          * Module name

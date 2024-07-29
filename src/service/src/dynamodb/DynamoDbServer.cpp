@@ -18,6 +18,8 @@ namespace AwsMock::Service {
         _requestTimeout = configuration.getInt("awsmock.service.dynamodb.timeout", DYNAMODB_DEFAULT_TIMEOUT);
         _workerPeriod = configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
         _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
+        _dockerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
+        _dockerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
 
         // Sleeping period
         _period = configuration.getInt("awsmock.worker.dynamodb.period", 10000);
@@ -79,7 +81,7 @@ namespace AwsMock::Service {
 
         // Check container image
         if (!_dockerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            _dockerService.CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_EXTERNAL_PORT, DYNAMODB_INTERNAL_PORT);
+            _dockerService.CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, _dockerPort, _dockerPort);
         }
 
         // Get docker container

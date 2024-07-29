@@ -113,7 +113,9 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.dynamodb.http.max.queue", "AWSMOCK_SERVICE_DYNAMODB_MAX_QUEUE", 250);
         DefineIntProperty("awsmock.service.dynamodb.http.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.dynamodb.http.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
-        DefineIntProperty("awsmock.monitoring.dynamodb.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
+        DefineIntProperty("awsmock.service.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
+        DefineStringProperty("awsmock.dynamodb.host", "AWSMOCK_DYNAMODB_HOST", "localhost");
+        DefineIntProperty("awsmock.dynamodb.port", "AWSMOCK_DYNAMODB_PORT", 8000);
 
         // SecretsManager
         DefineBoolProperty("awsmock.service.secretsmanager.active", "AWSMOCK_SERVICE_SECRETSMANAGER_ACTIVE", true);
