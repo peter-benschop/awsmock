@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     void DynamoDbWorker::Initialize() {
 
         // DynamoDB docker host, port
-        _dockerHost = "localhost";
+        _dockerHost = Core::Configuration::instance().getString("awsmock.dynamodb.host");
         _dockerPort = Core::Configuration::instance().getInt("awsmock.dynamodb.port");
 
         // Region

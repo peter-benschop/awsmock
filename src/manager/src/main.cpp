@@ -93,9 +93,9 @@ int main(int argc, char *argv[]) {
 
     // Set log file
     if (vm.count("logfile")) {
-        std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
-        AwsMock::Core::LogStream::SetSeverity(value);
+        std::string value = vm["logfile"].as<std::string>();
+        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.file", value);
+        AwsMock::Core::LogStream::SetFilename(value);
     }
 
     // Start manager
