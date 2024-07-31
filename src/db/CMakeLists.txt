@@ -35,7 +35,7 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
 add_subdirectory(tst)
 
 # Includes
-include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
