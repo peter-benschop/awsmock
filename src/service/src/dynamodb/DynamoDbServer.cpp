@@ -20,6 +20,7 @@ namespace AwsMock::Service {
         _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
         _dockerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
         _dockerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
+        log_debug << "DynamoDB docker endpoint: " << _dockerHost << ":" << _dockerPort;
 
         // Sleeping period
         _period = configuration.getInt("awsmock.worker.dynamodb.period", 10000);
