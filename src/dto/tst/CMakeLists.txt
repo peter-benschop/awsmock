@@ -15,7 +15,7 @@ set(MAIN_SOURCES main.cpp)
 
 # Includes
 
-include_directories(../include ../../core/include ../../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+include_directories(../include ../../core/include ../../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 link_directories(../../core ../../db ../../dto)
 
 

@@ -19,6 +19,7 @@
 #include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
+#include <Poco/JSON/Object.h>
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMok includes

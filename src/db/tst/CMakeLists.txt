@@ -13,7 +13,7 @@ set(SECRETSMANAGER_SOURCES SecretsManagerDatabaseTests.cpp)
 set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
 
 # Includes
-include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 link_directories(../ ../../core)
 
 add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES}
