@@ -14,6 +14,7 @@
 #include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
+#include <Poco/JSON/Object.h>
 
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"

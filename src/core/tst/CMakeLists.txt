@@ -2,9 +2,8 @@ set(BINARY core_tst)
 set(STATIC_LIB awsmockcore)
 
 # Includes
-include_directories()
-include_directories(../include /usr/include)
-link_directories(../)
+include_directories(../include /usr/local/include)
+link_directories(../ /usr/local/lib)
 
 set(SOURCES CryptoTests.cpp FileUtilsTests.cpp DirUtilsTests.cpp StringUtilsTests.cpp ConfigurationTests.cpp
         RandomUtilsTests.cpp AwsUtilsTests.cpp JsonUtilsTests.cpp HttpUtilsTests.cpp SystemUtilsTests.cpp

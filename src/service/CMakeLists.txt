@@ -29,7 +29,7 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES}
 add_subdirectory(tst)
 
 # Includes
-include_directories(./include ../core/include ../db/include ../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+include_directories(./include ../core/include ../db/include ../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
