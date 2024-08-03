@@ -15,12 +15,14 @@ namespace AwsMock::Manager {
     }
 
     void Session::DoRead() {
+
         // Construct a new parser for each message
         parser_.emplace();
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
-        parser_->body_limit(10000);
+        int maxBody = Core::Configuration::instance().getInt("awsmock.manager.http.max.body");
+        parser_->body_limit(maxBody);
 
         // Set the timeout.
         stream_.expires_after(std::chrono::seconds(30));

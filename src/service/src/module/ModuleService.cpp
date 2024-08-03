@@ -57,7 +57,7 @@ namespace AwsMock::Service {
                 log_info << "Module " << m.name << " started";
             }
         }
-        return modules;
+        return Dto::Module::Mapper::map(_moduleDatabase.ListModules());
     }
 
     Dto::Module::Module::ModuleList ModuleService::StopModules(Dto::Module::Module::ModuleList &modules) {
@@ -84,7 +84,8 @@ namespace AwsMock::Service {
             }
             log_info << "Module " + m.name + " stopped";
         }
-        return modules;
+
+        return Dto::Module::Mapper::map(_moduleDatabase.ListModules());
     }
 
     std::string ModuleService::ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool prettyPrint, bool includeObjects) {
