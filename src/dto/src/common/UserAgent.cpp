@@ -70,7 +70,7 @@ namespace AwsMock::Dto::Common {
                 clientOs = parts[2];
                 clientExecutableType = parts[3];
                 clientPrompt = parts[4] == "ON";
-                std::string command = Core::StringUtils::Split(parts[11], '#')[1];
+                std::string command = Core::StringUtils::Split(parts[parts.size() - 1], '#')[1];
                 clientModule = Core::StringUtils::Split(command, '.')[0];
                 clientCommand = Core::StringUtils::Split(command, '.')[1];
             }

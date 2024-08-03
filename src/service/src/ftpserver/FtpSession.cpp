@@ -298,7 +298,7 @@ namespace AwsMock::FtpServer {
 
         if (data_acceptor_.is_open()) {
             asio::error_code ec;
-            data_acceptor_.close(ec);
+            ec = data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
             }
@@ -307,15 +307,18 @@ namespace AwsMock::FtpServer {
         // In case of a dockerized FTP server we need to use some special ports
         asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
-            int port = Core::RandomUtils::NextInt(6000, 7000);
+            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
+            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
+            int port = Core::RandomUtils::NextInt(minPort, minPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
         }
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
 
         {
             asio::error_code ec;
-            data_acceptor_.open(endpoint.protocol(), ec);
+            ec = data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -324,7 +327,7 @@ namespace AwsMock::FtpServer {
         }
         {
             asio::error_code ec;
-            data_acceptor_.bind(endpoint, ec);
+            ec = data_acceptor_.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -333,7 +336,7 @@ namespace AwsMock::FtpServer {
         }
         {
             asio::error_code ec;
-            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            ec = data_acceptor_.listen(asio::socket_base::max_connections, ec);
             if (ec) {
                 log_error << "Error listening on data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");

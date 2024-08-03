@@ -65,7 +65,7 @@ set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/k
         src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp
         src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp)
-set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp)
+set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp src/module/mapper/Mapper.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}
