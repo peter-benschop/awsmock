@@ -2,6 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
+#include "awsmock/core/JsonUtils.h"
 #include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Database::Entity::Transfer {
@@ -36,7 +37,7 @@ namespace AwsMock::Database::Entity::Transfer {
                 kvp("arn", arn),
                 kvp("protocols", protocolsDoc),
                 kvp("users", usersDoc),
-                kvp("state", state),
+                kvp("state", Entity::Transfer::ServerStateToString(state)),
                 kvp("concurrency", concurrency),
                 kvp("port", port),
                 kvp("listenAddress", listenAddress),
@@ -53,7 +54,7 @@ namespace AwsMock::Database::Entity::Transfer {
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         serverId = bsoncxx::string::to_string(mResult.value()["serverId"].get_string().value);
         arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-        state = bsoncxx::string::to_string(mResult.value()["state"].get_string().value);
+        state = Entity::Transfer::ServerStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
         concurrency = mResult.value()["concurrency"].get_int32().value;
         port = mResult.value()["port"].get_int32().value;
         listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
@@ -112,6 +113,37 @@ namespace AwsMock::Database::Entity::Transfer {
         }
 
         return jsonObject;
+    }
+
+    void Transfer::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+        Core::JsonUtils::GetJsonValueInt("port", jsonObject, port);
+        Core::JsonUtils::GetJsonValueInt("concurrency", jsonObject, concurrency);
+        Core::JsonUtils::GetJsonValueString("serverId", jsonObject, serverId);
+        Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
+        Core::JsonUtils::GetJsonValueString("listenAddress", jsonObject, listenAddress);
+        Core::JsonUtils::GetJsonValueDate("lastStarted", jsonObject, lastStarted);
+        std::string stateStr;
+        Core::JsonUtils::GetJsonValueString("state", jsonObject, stateStr);
+        state = ServerStateFromString(stateStr);
+
+        // Users
+        if (jsonObject->has("users")) {
+            Poco::JSON::Array::Ptr jsonUsersArray = jsonObject->getArray("users");
+            for (int i = 0; i < jsonUsersArray->size(); i++) {
+                User user;
+                user.FromJsonObject(jsonUsersArray->getObject(i));
+                users.emplace_back(user);
+            }
+        }
+
+        if (jsonObject->has("protocols")) {
+            Poco::JSON::Array::Ptr jsonProtocolsArray = jsonObject->getArray("protocols");
+            for (int i = 0; i < jsonProtocolsArray->size(); i++) {
+                protocols.emplace_back(jsonProtocolsArray->getElement<std::string>(i));
+            }
+        }
     }
 
     std::string Transfer::ToString() const {
