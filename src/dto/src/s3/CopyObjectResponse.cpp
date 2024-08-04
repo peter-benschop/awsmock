@@ -11,7 +11,7 @@ namespace AwsMock::Dto::S3 {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("eTag", eTag);
-            rootJson.set("lastModified", lastModified);
+            rootJson.set("modified", lastModified);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

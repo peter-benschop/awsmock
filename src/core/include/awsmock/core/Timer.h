@@ -2,11 +2,10 @@
 // Created by vogje01 on 4/12/24.
 //
 
-#ifndef AWSMOCK_CORE_JTIMER_H
-#define AWSMOCK_CORE_JTIMER_H
+#ifndef AWSMOCK_CORE_TIMER_H
+#define AWSMOCK_CORE_TIMER_H
 
 // C++ standard includes
-#include <future>
 #include <iostream>
 #include <stop_token>
 #include <thread>
@@ -29,7 +28,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param name timer name
          * @param timeout timeout in seconds
@@ -37,49 +36,49 @@ namespace AwsMock::Core {
         explicit Timer(std::string name, int timeout) : _name(std::move(name)), _timeout(timeout) {}
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param name timer name
          */
         explicit Timer(std::string name) : _name(std::move(name)) {}
 
         /**
-         * Start the timer
+         * @brief Start the timer
          */
         void Start();
 
         /**
-         * Start the task
+         * @brief Start the task
          */
         void Start(int timeout);
 
         /**
-         * Restart the timer
+         * @brief Restart the timer
          */
         void Restart();
 
         /**
-         * Stop the task
+         * @brief Stop the task
          */
         void Stop();
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         virtual void Initialize() = 0;
 
         /**
-         * Main loop
+         * @brief Main loop
          */
         virtual void Run() = 0;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         virtual void Shutdown() = 0;
 
         /**
-         * Sets the timeout.
+         * @brief Sets the timeout.
          *
          * <p>
          * The time will be stopped and restarted
@@ -88,7 +87,7 @@ namespace AwsMock::Core {
         void SetTimeout(int timeout);
 
         /**
-         * Thread main method.
+         * @brief Thread main method.
          *
          * @param stopSource stop source variable
          */
@@ -114,4 +113,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_JTIMER_H
+#endif// AWSMOCK_CORE_TIMER_H

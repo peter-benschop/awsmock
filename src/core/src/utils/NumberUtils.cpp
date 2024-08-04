@@ -29,4 +29,15 @@ namespace AwsMock::Core {
         bytes[offset] = (n & 0xff000000) >> 24;
     }
 
+    int NumberUtils::HexToInt(const std::string &hex) {
+        return std::stoul(hex, nullptr, 16);
+    }
+
+    int NumberUtils::ToInt(const std::string &str) {
+        if (!str.empty()) {
+            return std::stoi(str);
+        }
+        return -1;
+    }
+
 }// namespace AwsMock::Core

@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/common/DockerService.h"
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
+#include "awsmock/service/docker/DockerService.h"
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -49,9 +49,10 @@ namespace AwsMock::Service {
     TEST_F(DockerServiceTest, ContainerExistsTest) {
 
         // arrange
+        std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         const std::vector<std::string> environment;
         _service.CreateImage("hello-world", "latest", "hello-world");
-        _service.CreateContainer("hello-world", "latest", environment, 1025);
+        _service.CreateContainer("hello-world", instanceId, "latest", environment, 1025);
 
         // act
         bool result = _service.ContainerExists("hello-world", "latest");

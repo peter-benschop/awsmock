@@ -6,6 +6,7 @@
 #define AWSMOCK_DB_ENTITY_LAMBDA_H
 
 // C++ includes
+#include <chrono>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -20,18 +21,20 @@
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
+#include <awsmock/entity/lambda/EventSourceMapping.h>
+#include <awsmock/entity/lambda/Instance.h>
 #include <awsmock/entity/lambda/Tags.h>
+#include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
@@ -42,9 +45,10 @@ namespace AwsMock::Database::Entity::Lambda {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
-     * Lambda state
+     * @brief Lambda entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -255,32 +259,68 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string codeSha256;
 
         /**
-         * Filename of the code
+         * Code
          */
-        std::string fileName;
+        Code code;
 
         /**
          * Last function StartServer
          */
-        Poco::DateTime lastStarted;
+        system_clock::time_point lastStarted;
 
         /**
          * Last function invocation
          */
-        Poco::DateTime lastInvocation;
+        system_clock::time_point lastInvocation;
+
+        /**
+         * Running instances
+         */
+        std::vector<Instance> instances;
+
+        /**
+         * Event sources
+         */
+        std::vector<EventSourceMapping> eventSources;
 
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Checks whether a tags with the given tags key exists.
+         * @brief Returns an instance by instance ID
+         *
+         * @param instanceId instance ID
+         * @return lambda instance.
+         */
+        Instance GetInstance(const std::string &instanceId);
+
+        /**
+         * @brief Remove an instance from the instances list.
+         *
+         * @par
+         * The instance is identified by the containerId.
+         *
+         * @param instance
+         */
+        void RemoveInstance(const Instance &instance);
+
+        /**
+         * @brief Checks whether a event source with the given ARN exists already.
+         *
+         * @param eventSourceArn event source ARN
+         * @return true if a event source with the given ARN exists.
+         */
+        [[nodiscard]] bool HasEventSource(const std::string &eventSourceArn) const;
+
+        /**
+         * @brief Checks whether a tags with the given tags key exists.
          *
          * @param key key of the tags
          * @return true if tags with the given key exists.
@@ -288,7 +328,7 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] bool HasTag(const std::string &key) const;
 
         /**
-         * Returns a given tags value by key
+         * @brief Returns a given tags value by key
          *
          * @param key name of the tag
          * @return found notification or notifications.end().
@@ -296,35 +336,35 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] std::string GetTagValue(const std::string &key) const;
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param lambda lambda entity

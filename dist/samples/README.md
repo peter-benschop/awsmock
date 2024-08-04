@@ -12,9 +12,11 @@ The following AwsMock modules are covered:
 - [S3](./s3/README.md): Amazon Simple Storage Service
 - [SQS](./sqs/README.md): Amazon Simple Queue Service
 - [SNS](./sns/README.md): Amazon Simple Notification Service
-- [Lambda](./lambda/README.md): Amazon Lambda service
+- [Lambda](lambda/README.md): Amazon Lambda service
 - [DynamoDB](./dynamodb/README.md): Amazon Dynamo database service
+- [Cognito](./cognito/README.md): Amazon Cognito Identity management
 - [KMS](./kms/README.md): Amazon key management service
+- [Transfer](./transfer/README.md): Amazon Transfer Family
 
 if your AwsMock manager runs in a docker container, make sure the docker container is reachable from the host, and the
 port can be pinged.

@@ -6,16 +6,19 @@
 #define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
 
 // C++ includes
+#include <chrono>
 #include <sstream>
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Cognito {
+
+    using std::chrono::system_clock;
 
     struct UserPool {
 
@@ -40,38 +43,48 @@ namespace AwsMock::Dto::Cognito {
         std::string userPoolId;
 
         /**
+         * User pool ARN
+         */
+        std::string arn;
+
+        /**
+         * User pool domain
+         */
+        std::string domain;
+
+        /**
          * Created
          */
-        Poco::DateTime created;
+        system_clock::time_point created;
 
         /**
          * Last modified
          */
-        Poco::DateTime lastModified;
+        system_clock::time_point modified;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -6,10 +6,10 @@
 
 namespace AwsMock::Dto::Common {
 
-    void SecretsManagerClientCommand::FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user) {
+    void SecretsManagerClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "secretsmanager");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = region;
@@ -17,18 +17,19 @@ namespace AwsMock::Dto::Common {
         this->method = method;
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->payload = GetBodyAsString(request);
-        this->url = request.getURI();
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
+        this->url = request.target();
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Command
-        std::string action = request.get("X-Amz-Target");
+        std::string action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
 
         switch (method) {
-            case HttpMethod::GET:
-            case HttpMethod::PUT:
-            case HttpMethod::DELETE:
+            case http::verb::get:
+            case http::verb::put:
+            case http::verb::delete_:
                 break;
-            case HttpMethod::POST:
+            case http::verb::post:
                 if (Core::StringUtils::ContainsIgnoreCase(action, "CreateSecret")) {
                     command = SecretsManagerCommandType::CREATE_SECRET;
                 } else if (Core::StringUtils::ContainsIgnoreCase(action, "DeleteSecret")) {
@@ -45,9 +46,6 @@ namespace AwsMock::Dto::Common {
                     command = SecretsManagerCommandType::LIST_SECRETS;
                 }
                 break;
-            case HttpMethod::UNKNOWN: {
-                break;
-            }
         }
     }
 
@@ -62,7 +60,7 @@ namespace AwsMock::Dto::Common {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
-            rootJson.set("method", HttpMethodToString(method));
+            rootJson.set("method", boost::lexical_cast<std::string>(method));
             rootJson.set("command", SecretsManagerCommandTypeToString(command));
             rootJson.set("user", user);
 

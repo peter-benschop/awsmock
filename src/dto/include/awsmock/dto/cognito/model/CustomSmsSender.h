@@ -10,11 +10,11 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/XmlUtils.h"
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/dto/common/BaseRequest.h"
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 

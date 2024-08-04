@@ -31,7 +31,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Status from DynamoDb docker image
          */
-        Poco::Net::HTTPResponse::HTTPStatus status;
+        boost::beast::http::status status;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

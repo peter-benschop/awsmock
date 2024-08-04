@@ -36,31 +36,24 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         LogStream() = default;
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         static void Initialize();
 
         /**
-         * Constructor
-         *
-         * @param severity PLog severity string
-         */
-        explicit LogStream(const std::string &severity);
-
-        /**
-         * Set the maximum severity
+         * @brief Set the maximum severity
          *
          * @param severity PLog severity string
          */
         static void SetSeverity(const std::string &severity);
 
         /**
-         * Set the log filename
+         * @brief Set the log filename
          *
          * @param filename name of the log file
          */

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractServer(configuration, "lambda"), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
+    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractServer("lambda"), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
 
         // Get HTTP configuration values
         _port = _configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
@@ -14,11 +14,12 @@ namespace AwsMock::Service {
         _maxQueueLength = _configuration.getInt("awsmock.service.lambda.http.max.queue", LAMBDA_DEFAULT_QUEUE);
         _maxThreads = _configuration.getInt("awsmock.service.lambda.http.max.threads", LAMBDA_DEFAULT_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.lambda.http.timeout", LAMBDA_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.sns.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
+        _monitoringPeriod = _configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = _configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
 
         // Directories
-        _dataDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
-        log_debug << "Lambda directory: " << _dataDir;
+        _lambdaDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
+        log_debug << "Lambda directory: " << _lambdaDir;
 
         // Sleeping period
         _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
@@ -38,8 +39,15 @@ namespace AwsMock::Service {
         // Monitoring
         _lambdaMonitoring = std::make_unique<LambdaMonitoring>(_monitoringPeriod);
 
+        // Worker thread
+        _lambdaWorker = std::make_unique<LambdaWorker>(_workerPeriod);
+
         // Create lambda directory
-        Core::DirUtils::EnsureDirectory(_dataDir);
+        Core::DirUtils::EnsureDirectory(_lambdaDir);
+
+        // Set running
+        SetRunning();
+
         log_debug << "Lambda server initialized";
     }
 
@@ -55,14 +63,14 @@ namespace AwsMock::Service {
         // Start monitoring
         _lambdaMonitoring->Start();
 
-        // Start HTTP manager
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new LambdaRequestHandlerFactory(_configuration));
+        // Start monitoring
+        _lambdaWorker->Start();
 
         // Cleanup
         CleanupContainers();
 
         // Start all lambda functions
-        StartLambdaFunctions();
+        // StartLambdaFunctions();
     }
 
     void LambdaServer::Run() {
@@ -70,7 +78,8 @@ namespace AwsMock::Service {
 
     void LambdaServer::Shutdown() {
         _lambdaMonitoring->Stop();
-        StopHttpServer();
+        _lambdaWorker->Stop();
+        //       StopHttpServer();
     }
 
     void LambdaServer::CleanupContainers() {
@@ -83,32 +92,50 @@ namespace AwsMock::Service {
         log_debug << "Starting lambdas";
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
-        Service::LambdaService lambdaService(_configuration);
+        Service::LambdaService lambdaService;
 
         for (auto &lambda: lambdas) {
 
-            Dto::Lambda::Code code = GetCode(lambda);
+            try {
+                // Create function request and send to service
+                Dto::Lambda::CreateFunctionRequest request = Dto::Lambda::Mapper::map(lambda);
 
-            // Create create function request and send to service
-            Dto::Lambda::CreateFunctionRequest request = Dto::Lambda::Mapper::map(lambda);
-            lambdaService.CreateFunction(request);
-            log_debug << "Lambda started, name:" << lambda.function;
+                // Add function code
+                request.code = GetCode(lambda);
+
+                lambdaService.CreateFunction(request);
+                log_debug << "Lambda started, name:" << lambda.function;
+
+            } catch (Core::ServiceException &e) {
+                log_error << e.message();
+            }
         }
     }
 
     Dto::Lambda::Code LambdaServer::GetCode(const Database::Entity::Lambda::Lambda &lambda) {
 
         Dto::Lambda::Code code;
-        if (Core::FileUtils::FileExists(lambda.fileName)) {
+
+        // Check file
+        if (lambda.code.zipFile.empty()) {
+            throw Core::ServiceException("Lambda Zip file missing");
+        }
+
+        // Load file
+        std::string filename = _lambdaDir + Poco::Path::separator() + lambda.code.zipFile;
+        if (Core::FileUtils::FileExists(filename)) {
+
             std::stringstream ss;
-            std::ifstream ifs(lambda.fileName);
+            std::ifstream ifs(filename);
             ss << ifs.rdbuf();
             ifs.close();
 
-            code = {.zipFile = ss.str()};
-            log_debug << "Loaded lambda from file:" << lambda.fileName << " size: " << Core::FileUtils::FileSize(lambda.fileName);
+            log_debug << "Loaded lambda from file: " << filename << " size: " << Core::FileUtils::FileSize(filename);
+            return {.zipFile = ss.str()};
+
+        } else {
+            throw Core::ServiceException("Lambda Zip file does not exist");
         }
-        return code;
     }
 
 }// namespace AwsMock::Service

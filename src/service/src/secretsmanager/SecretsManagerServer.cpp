@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration) : AbstractServer(configuration, "secretsmanager", 10), _configuration(configuration),
-                                                                                     _moduleDatabase(Database::ModuleDatabase::instance()) {
+    SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration) : AbstractServer("secretsmanager", 10), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()) {
+
         // HTTP manager configuration
         _port = _configuration.getInt("awsmock.service.secretsmanager.port", SECRETSMANAGER_DEFAULT_PORT);
         _host = _configuration.getString("awsmock.service.secretsmanager.host", SECRETSMANAGER_DEFAULT_HOST);
@@ -38,8 +38,11 @@ namespace AwsMock::Service {
         // Start monitoring
         _secretsManagerMonitoring->Start();
 
+        // Set running
+        SetRunning();
+
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration));
     }
 
     void SecretsManagerServer::Run() {

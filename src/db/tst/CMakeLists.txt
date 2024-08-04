@@ -13,30 +13,13 @@ set(SECRETSMANAGER_SOURCES SecretsManagerDatabaseTests.cpp)
 set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
 
 # Includes
-if (WIN32)
-    include_directories(../include ../../core/include ${AWSMOCK_WIN32_DIR}/poco/include ${AWSMOCK_WIN32_DIR}/gnuwin32/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/plog/include ${AWSMOCK_WIN32_DIR}/openssl/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/curl/include ${AWSMOCK_WIN32_DIR}/boost)
-    include_directories(${AWSMOCK_WIN32_DIR}/asio/include ${AWSMOCK_WIN32_DIR}/gtest/include)
-    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/bsoncxx/v_noabi)
-    include_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/include/mongocxx/v_noabi)
-    link_directories(../ ../../core ${AWSMOCK_WIN32_DIR}/poco/lib)
-    link_directories(${AWSMOCK_WIN32_DIR}/mongo-cxx-driver/lib)
-else ()
-    include_directories(../include ../../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
-    link_directories(/usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib ../ ../../core)
-endif ()
-
+include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
+link_directories(../ ../../core)
 
 add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES}
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${SECRETSMANAGER_SOURCES} main.cpp)
 
-if (WIN32)
-    target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNet PocoJSON
-            PocoPrometheus PocoZip gtest ssl crypto z archive curl)
-else ()
-    target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx PocoUtil PocoFoundation PocoNet
-            PocoJSON PocoPrometheus PocoZip gtest pthread ssl crypto z archive curl tbb)
-endif ()
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoPrometheus PocoUtil
+        PocoFoundation PocoNet PocoJSON PocoZip gtest pthread ssl crypto z archive tbb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

@@ -13,12 +13,11 @@
 // Poco includes
 #include <Poco/Mutex.h>
 #include <Poco/ScopedLock.h>
-#include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -45,8 +44,8 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static LambdaMemoryDb &instance() {
-            static Poco::SingletonHolder<LambdaMemoryDb> sh;
-            return *sh.get();
+            static LambdaMemoryDb lambdaMemoryDb;
+            return lambdaMemoryDb;
         }
 
         /**
@@ -140,12 +139,29 @@ namespace AwsMock::Database {
         std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region);
 
         /**
+         * @brief Returns a list of lambda functions with the given event source ARN attached.
+         *
+         * @param eventSourceArn event source ARN
+         * @return list of lambda functions
+         */
+        std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn);
+
+        /**
          * Updates an existing lambda lambda function
          *
          * @param lambda lambda entity
          * @return updated lambda entity.
          */
         Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Sets the status of an lambda instance
+         *
+         * @param containerId lambda container ID
+         * @param status lambda instance status
+         * @throws DatabaseException
+         */
+        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
 
         /**
          * Deletes an existing lambda function

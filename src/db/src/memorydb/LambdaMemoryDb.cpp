@@ -46,6 +46,19 @@ namespace AwsMock::Database {
                }) != _lambdas.end();
     }
 
+    Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdasWithEventSource(const std::string &eventSourceArn) {
+
+        Entity::Lambda::LambdaList lambdaList;
+        for (const auto &lambda: _lambdas) {
+            if (lambda.second.HasEventSource(eventSourceArn)) {
+                lambdaList.emplace_back(lambda.second);
+            }
+        }
+
+        log_trace << "Got lambda list, size: " << lambdaList.size();
+        return lambdaList;
+    }
+
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdas(const std::string &region) {
 
         Entity::Lambda::LambdaList lambdaList;
@@ -138,7 +151,6 @@ namespace AwsMock::Database {
     }
 
     Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
-
         Poco::ScopedLock lock(_lambdaMutex);
 
         std::string region = lambda.region;
@@ -155,6 +167,18 @@ namespace AwsMock::Database {
         }
         _lambdas[it->first] = lambda;
         return _lambdas[it->first];
+    }
+
+    void LambdaMemoryDb::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+        Poco::ScopedLock lock(_lambdaMutex);
+
+        for (auto &lambda: _lambdas) {
+            for (auto &instance: lambda.second.instances) {
+                if (instance.containerId == containerId) {
+                    instance.status = status;
+                }
+            }
+        }
     }
 
     void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {

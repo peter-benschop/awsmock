@@ -14,8 +14,13 @@
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/UUIDGenerator.h>
 
+// Boost includes
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>
@@ -28,6 +33,7 @@
 
 #define SQS_RECEIPT_HANDLE_LENGTH 512
 #define SQS_DEFAULT_ACCOUNT_ID "000000000000"
+#define SQS_DEFAULT_REGION "eu-central-1"
 
 #define GATEWAY_DEFAULT_PORT 4566
 #define GATEWAY_DEFAULT_PROTOCOL std::string("http")
@@ -100,17 +106,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Create Amazon Resource Names (ARNs)
-         *
-         * @param service AWS module name
-         * @param region AWS region
-         * @param accountId AWS accountId
-         * @param resourceId AWS resourceId
-         */
-        static std::string CreateArn(const std::string &service, const std::string &region, const std::string &accountId, const std::string &resourceId);
-
-        /**
-         * Create S3 Amazon bucket/key ARN
+         * @brief Create S3 Amazon bucket/key ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -120,7 +116,7 @@ namespace AwsMock::Core {
         static std::string CreateS3Arn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key);
 
         /**
-         * Create lambda function ARN
+         * @brief Create lambda function ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -129,71 +125,72 @@ namespace AwsMock::Core {
         static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
 
         /**
-         * Generate a SQS queue URL.
+         * @brief Creates a queue ARN
          *
-         * <p>
-         * @verbatim
-         * The queue name has the format 'http://<host>:<port>/<accountId>/<queueName>'
-         * @endcode
-         * </p>
-         *
-         * @param configuration current AwsMock configuration
+         * @param region AWS region
+         * @param accountId AWS account ID
          * @param queueName name of the queue
-         * @return SQS queue URL
+         * @return ARN of the queue
          */
-        static std::string CreateSQSQueueUrl(const Configuration &configuration, const std::string &queueName);
+        static std::string CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName);
 
         /**
-         * Create SQS queue ARN
+         * @brief Converts a queue ARN to a queue URL
          *
-         * @param configuration current AwsMock configuration
-         * @param queueName name of the queue
-         * @return SQS queue ARN
-         */
-        static std::string CreateSQSQueueArn(const Configuration &configuration, const std::string &queueName);
-
-        /**
-         * Converts a queue ARN to a queue URL
-         *
-         * @param configuration current AwsMock configuration
          * @param queueArn ARN of the queue
          * @return URL of the queue
          */
-        static std::string ConvertSQSQueueArnToUrl(const Configuration &configuration, const std::string &queueArn);
+        static std::string ConvertSQSQueueArnToUrl(const std::string &queueArn);
 
         /**
-         * Create SNS topic ARN
+         *@brief  Create SNS topic ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
          * @param topicName name of the topic
+         * @return SNS topic ARN
          */
         static std::string CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
         /**
-         * Create SNS subscription ARN
+         * @brief Create SNS subscription ARN
          *
          * <p>Syntax arn:aws:sns:us-west-2:123456789012:MyTopic:6b0e71bd-7e97-4d97-80ce-4a0994e55286</p>
          *
          * @param region AWS region
          * @param accountId AWS account ID
          * @param topicName name of the topic
+         * @return SNS topic subscription ARN
          */
         static std::string CreateSNSSubscriptionArn(const std::string &region, const std::string &accountId, const std::string &topicName);
 
         /**
-         * Create transfer manager ARN
+         * @brief Create transfer manager ARN
          *
          * <p>Syntax arn:aws:sns:us-west-2:123456789012:serverId</p>
          *
          * @param region AWS region
          * @param accountId AWS account ID
          * @param serverId ID of the transfer manager
+         * @return transfer server ARN
          */
         static std::string CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId);
 
         /**
-         * Create secrets manager ARN
+         * @brief Create transfer manager ARN
+         *
+         * <p>Syntax arn:aws:sns:us-west-2:123456789012:userName</p>
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param serverId ID of the transfer manager
+         * @param userName user name
+         * @return transfer user ARN
+         */
+        static std::string CreateTransferUserArn(const std::string &region, const std::string &accountId, const std::string &serverId, const std::string &userName);
+
+        /**
+         * @brief Create secrets manager ARN
          *
          * <p>Syntax arn:aws:secrets manager:us-west-2:123456789012:secret:MyDatabaseSecretName-a1b2c3</p>
          *
@@ -205,7 +202,7 @@ namespace AwsMock::Core {
         static std::string CreateSecretArn(const std::string &region, const std::string &accountId, const std::string &secretId);
 
         /**
-         * Create KMS key ARN
+         * @brief Create KMS key ARN
          *
          * <p>Syntax arn:aws:kms:us-west-2:123456789012:name</p>
          *
@@ -217,17 +214,17 @@ namespace AwsMock::Core {
         static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
 
         /**
-         * Create Cognito user pool ID
+         * @brief Create Cognito user pool ID
          *
          * <p>region_<9-random-digit></p>
          *
          * @param region AWS region
-         * @param return ID of the user pool
+         * @return ID of the user pool
          */
         static std::string CreateCognitoUserPoolId(const std::string &region);
 
         /**
-         * Create Cognito user pool ARN
+         * @brief Create Cognito user pool ARN
          *
          * <p>Syntax arn:aws:cognito:us-west-2:123456789012:userPoolId</p>
          *
@@ -239,14 +236,14 @@ namespace AwsMock::Core {
         static std::string CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId);
 
         /**
-         * Returns a request ID.
+         * @brief Returns a request ID.
          *
          * @return request ID
          */
         static std::string CreateRequestId();
 
         /**
-         * Returns a message ID.
+         * @brief Returns a message ID.
          *
          * <p>Used for SQS and SNS to generate a message ID, which is basically a UUID.</p>
          *
@@ -255,7 +252,7 @@ namespace AwsMock::Core {
         static std::string CreateMessageId();
 
         /**
-         * Returns a receipt handle.
+         * @brief Returns a receipt handle.
          *
          * @return receipt handle
          */
@@ -264,7 +261,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Generate a S3 file name
+         * @brief Generate a S3 file name
          *
          * @return random file name
          */
@@ -273,7 +270,7 @@ namespace AwsMock::Core {
         }
 
         /**
-         * Generate a S3 version ID
+         * @brief Generate a S3 version ID
          *
          * @return random version ID
          */
@@ -292,14 +289,16 @@ namespace AwsMock::Core {
          * @param signedHeaders signed header names
          * @param payload HTTP payload
          */
-        static void AddAuthorizationHeader(Poco::Net::HTTPRequest &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload);
+        static void AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload);
 
         /**
          * @brief Add the AWS v4 signed authorization header
          *
          * Adds the AWS authorization header, based on the supplied Curl request HTTP request.
          *
-         * @param request HTTP request
+         * @param method HTTP method
+         * @param path HTTP path
+         * @param headers HTTP headers
          * @param module AwsMock module
          * @param contentType HTTP content type
          * @param signedHeaders signed header names
@@ -310,24 +309,88 @@ namespace AwsMock::Core {
         /**
          * @brief Verify the request signature
          *
+         * Examples:
+         * https://github.com/aws-samples/sigv4-signing-examples
+         * https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html#code-signing-examples
+         * https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+         *
          * @param request HTTP request
-         * @param payload HTTP payload
          * @param secretAccessKey AWS secret access key
          * @return true if signature could be verified
          */
-        static bool VerifySignature(const Poco::Net::HTTPRequest &request, const std::string &payload, const std::string &secretAccessKey);
+        static bool VerifySignature(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
+
+        /**
+         * @brief Returns the bucket name from the request.
+         *
+         * @par
+         * Distinguishes between host-style and path-style requests.
+         *
+         * @param request HTTP request
+         * @return bucket name.
+         */
+        static std::string GetS3BucketName(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Returns the object key name from the request.
+         *
+         * @par
+         * Distinguishes between host-style and path-style requests.
+         *
+         * @param request HTTP request
+         * @return bucket name.
+         */
+        static std::string GetS3ObjectKey(const http::request<http::dynamic_body> &request);
 
       private:
+
+        /**
+         * @brief Checks whether this is a host-style or path-style S3 request
+         *
+         * @param request HTTP request.
+         */
+        static bool IsS3HostStyle(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the bucket name for a S3 host-style request
+          *
+          * @param request HTTP request
+          * @return bucket name
+          */
+        static std::string GetS3HostStyleBucket(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the bucket name for a S3 path-style request
+          *
+          * @param request HTTP request
+          * @return bucket name
+          */
+        static std::string GetS3PathStyleBucket(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the object key for a S3 host-style request
+          *
+          * @param request HTTP request
+          * @return object key
+          */
+        static std::string GetS3HostStyleObjectKey(const http::request<http::dynamic_body> &request);
+
+        /**
+          * @brief Returns the bucket name for a S3 path-style request
+          *
+          * @param request HTTP request
+          * @return object key
+          */
+        static std::string GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Returns the canonical request.
          *
          * @param request HTTP request
-         * @param payload HTTP payload
          * @param authorizationHeaderKeys
          * @return
          */
-        static std::string GetCanonicalRequest(const Poco::Net::HTTPRequest &request, const std::string &payload, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetCanonicalRequest(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the canonical request.
@@ -357,7 +420,7 @@ namespace AwsMock::Core {
          *
          * This is used by the Curl base request.
          *
-         * @param request HTTP request
+         * @param path HTTP query path
          * @return canonical request parameters
          */
         static std::string GetCanonicalQueryParameters(const std::string &path);
@@ -377,14 +440,14 @@ namespace AwsMock::Core {
          * @param authorizationHeaderKeys authorization parameter
          * @return canonical header string
          */
-        static std::string GetCanonicalHeaders(const Poco::Net::HTTPRequest &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetCanonicalHeaders(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the canonical header string.
          *
          * This is used by the Curl base request.
          *
-         * @param request HTTP request
+         * @param headers HTTP headers
          * @param authorizationHeaderKeys authorization parameter
          * @return canonical header string
          */
@@ -405,7 +468,7 @@ namespace AwsMock::Core {
          * @param secretAccessKey AWS secret access key
          * @return AuthorizationHeaderKeys
          */
-        static AuthorizationHeaderKeys GetAuthorizationKeys(const Poco::Net::HTTPRequest &request, const std::string &secretAccessKey);
+        static AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
 
         /**
          * @brief Returns the signature for the request
@@ -438,13 +501,66 @@ namespace AwsMock::Core {
     /**
      * @brief Returns the HTTP endpoint
      *
-     * @param configuration current AwsMock configuration
      * @return HTTP endpoint
      */
-    static inline std::string GetEndpoint() {
+    inline std::string GetEndpoint() {
         int port = Core::Configuration::instance().getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
         std::string hostname = Core::Configuration::instance().getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
         return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
+    }
+
+    /**
+     * @brief Create Amazon Resource Names (ARNs)
+     *
+     * @param service AWS module name
+     * @param region AWS region
+     * @param accountId AWS accountId
+     * @param resourceId AWS resourceId
+     */
+    inline std::string CreateArn(const std::string &service, const std::string &region, const std::string &accountId, const std::string &resourceId) {
+        return "arn:aws:" + service + ":" + region + ":" + accountId + ":" + resourceId;
+    }
+
+    /**
+     * @brief Generate a SQS queue URL.
+     *
+     * The queue name has the format <i>'http://sqs.&lt;region&gt;.&lt;host&lt;port&gt;/&lt;accountId&gt;/&lt;queueName&gt;'</i>
+     *
+     * @param queueName name of the queue
+     * @return SQS queue URL
+     */
+    inline std::string CreateSQSQueueUrl(const std::string &queueName) {
+        std::string hostname = Core::SystemUtils::GetHostName();
+        std::string port = Core::Configuration::instance().getString("awsmock.service.gateway.http.port");
+        std::string region = Core::Configuration::instance().getString("awsmock.region", SQS_DEFAULT_REGION);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+        std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+        log_trace << "queueUrl: " << queueUrl;
+        return queueUrl;
+    }
+
+    /**
+     * @brief Create SQS queue ARN
+     *
+     * @param queueName name of the queue
+     * @return SQS queue ARN
+     */
+    inline std::string CreateSQSQueueArn(const std::string &queueName) {
+        std::string region = Core::Configuration::instance().getString("awsmock.region", GATEWAY_DEFAULT_REGION);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+        log_trace << "Region: " << region << " accountId: " << accountId;
+        return CreateArn("sqs", region, accountId, queueName);
+    }
+
+
+    /**
+     * @brief Get the name from a queue URL
+     *
+     * @param queueUrl URL of the queue
+     * @return SQS queue ARN
+     */
+    inline std::string GetSQSQueueNameFromUrl(const std::string &queueUrl) {
+        return queueUrl.substr(queueUrl.find_last_of('/'));
     }
 
     /**
@@ -453,7 +569,7 @@ namespace AwsMock::Core {
      * @param queue queue from Spring cloud
      * @return true if this is a URL
      */
-    static inline bool IsSQSUrl(const std::string &queue) {
+    inline bool IsSQSUrl(const std::string &queue) {
         return Core::StringUtils::StartsWith(queue, "http");
     }
 
@@ -463,8 +579,8 @@ namespace AwsMock::Core {
      * @param queue queue from Spring cloud
      * @return true if this is a URL
      */
-    static inline bool IsSQSArn(const std::string &queue) {
-        return Core::StringUtils::ContainsIgnoreCase(queue, "http");
+    inline bool IsSQSArn(const std::string &queue) {
+        return Core::StringUtils::ContainsIgnoreCase(queue, "arn");
     }
 
     /**
@@ -473,13 +589,13 @@ namespace AwsMock::Core {
      * @param queue from Spring cloud request
      * @return queue URL
      */
-    static inline std::string SanitizeSQSUrl(const std::string &queue) {
+    inline std::string SanitizeSQSUrl(const std::string &queue) {
         if (IsSQSUrl(queue)) {
             return queue;
         } else if (IsSQSArn(queue)) {
-            return AwsUtils::ConvertSQSQueueArnToUrl(Configuration::instance(), queue);
+            return AwsUtils::ConvertSQSQueueArnToUrl(queue);
         } else {
-            return AwsUtils::CreateSQSQueueUrl(Configuration::instance(), queue);
+            return CreateSQSQueueUrl(queue);
         }
     }
 

@@ -10,11 +10,11 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -22,7 +22,7 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 Notification configuration
+     * @brief S3 Notification configuration
      *
      * Example:
      * @code{.xml}
@@ -58,28 +58,28 @@ namespace AwsMock::Dto::S3 {
         std::vector<LambdaConfiguration> lambdaConfigurations;
 
         /**
-          * Convert from XML representation
+          * @brief Convert from XML representation
           *
-          * @param xmlString XML string
+          * @return xmlString XML string
           */
         [[nodiscard]] std::string ToXml();
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

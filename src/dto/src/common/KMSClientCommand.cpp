@@ -6,19 +6,20 @@
 
 namespace AwsMock::Dto::Common {
 
-    void KMSClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
+    void KMSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "kms");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
-        this->method = httpMethod;
+        this->method = request.method();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
-        this->url = request.getURI();
+        this->url = request.target();
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         if (userAgent.clientCommand.empty()) {
 
@@ -30,7 +31,7 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    std::string KMSClientCommand::GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) {
+    std::string KMSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) {
 
         std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
         std::string cmd = Core::StringUtils::Split(headerValue, '.')[1];
@@ -42,7 +43,7 @@ namespace AwsMock::Dto::Common {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
-            rootJson.set("method", HttpMethodToString(method));
+            rootJson.set("method", boost::lexical_cast<std::string>(method));
             rootJson.set("command", KMSCommandTypeToString(command));
             rootJson.set("user", user);
             rootJson.set("contentType", contentType);

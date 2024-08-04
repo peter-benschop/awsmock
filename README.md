@@ -180,11 +180,31 @@ To start the docker image:
 
 2. Start the container
 
-  ```
-  docker run -p 4566:4566 -p 4567:4567 -p 8080:8080 jensvogt/aws-mock:latest
+  ```  
+  docker run -p 4566-4567:4566-4567 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
   ```
 
-This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance.
+This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance. Port ```4566``` (gateway) and ```4567``` (manager)
+should be reachable. ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and ```-v /var/run/docker.sock:/var/run/docker.sock``` for
+the communication with the host's socker daemon (lambdas, dynamodb).
+
+If you have problems with the docker daemon connection and you see errors like:
+
+```
+2024-06-01 12:28:46.116 ERROR [1] [Core::DomainSocket::SendJson:18] Could not connect to docker UNIX domain socket, error: Connection refused
+```
+
+you probably need either runs it under root:
+
+```
+sudo docker run -p 4566-4567:4566-4567 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
+```
+
+or you can give the current user access to the docker domain socket:
+
+```
+sudo chmod 666 /var/run/docker.sock
+```
 
 ### Using the docker image with an MongoDB backend
 

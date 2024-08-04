@@ -6,33 +6,36 @@
 
 namespace AwsMock::Dto::Common {
 
-    void S3ClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
+    void S3ClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "s3");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
-        this->method = httpMethod;
+        this->method = request.method();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
-        this->url = request.getURI();
+        this->url = request.target();
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Core values
-        bucket = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
-        key = Core::HttpUtils::GetPathParametersFromIndex(request.getURI(), 1);
+        bucket = Core::AwsUtils::GetS3BucketName(request);
+        key = Core::AwsUtils::GetS3ObjectKey(request);
 
-        // Qualifiers
-        multipartRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads") || Core::HttpUtils::HasQueryParameter(request.getURI(), "uploadId") || Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
-        uploads = Core::HttpUtils::HasQueryParameter(request.getURI(), "uploads");
-        partNumber = Core::HttpUtils::HasQueryParameter(request.getURI(), "partNumber");
-        notificationRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "notification");
-        versionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "versioning");
-        copyRequest = request.has("x-amz-copy-source");
-        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "uploadId");
-        encryptionRequest = Core::HttpUtils::HasQueryParameter(request.getURI(), "encryption");
-        bool listType = Core::HttpUtils::HasQueryParameter(request.getURI(), "list-type");
+        // Multipart uploads/downloads
+        uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
+        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
+        partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        rangeRequest = Core::HttpUtils::HasHeader(request, "Range");
+        multipartRequest = uploads || !uploadId.empty() || partNumber;
+
+        notificationRequest = Core::HttpUtils::HasQueryParameter(request.target(), "notification");
+        versionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "versioning");
+        copyRequest = Core::HttpUtils::HasHeader(request, "x-amz-copy-source");
+        encryptionRequest = Core::HttpUtils::HasQueryParameter(request.target(), "encryption");
 
         if (!userAgent.clientCommand.empty()) {
 
@@ -42,24 +45,30 @@ namespace AwsMock::Dto::Common {
 
             switch (method) {
 
-                case HttpMethod::GET:
+                case http::verb::get:
                     if (bucket.empty() && key.empty()) {
                         command = S3CommandType::LIST_BUCKETS;
                     } else if (!bucket.empty() && key.empty()) {
-                        if (Core::HttpUtils::HasQueryParameter(request.getURI(), "versions")) {
-                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.getURI(), "prefix");
+                        if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
+                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "prefix");
                             command = S3CommandType::LIST_OBJECT_VERSIONS;
                         } else {
                             command = S3CommandType::LIST_OBJECTS;
                         }
+                    } else if (rangeRequest && !partNumber) {
+                        command = S3CommandType::GET_OBJECT_RANGE;
                     } else {
                         command = S3CommandType::GET_OBJECT;
                     }
                     break;
 
-                case HttpMethod::PUT:
+                case http::verb::put:
                     if (multipartRequest) {
-                        command = S3CommandType::UPLOAD_PART;
+                        if (uploadPartCopy) {
+                            command = S3CommandType::UPLOAD_PART_COPY;
+                        } else {
+                            command = S3CommandType::UPLOAD_PART;
+                        }
                     } else if (encryptionRequest) {
                         command = S3CommandType::PUT_BUCKET_ENCRYPTION;
                     } else if (notificationRequest) {
@@ -71,7 +80,7 @@ namespace AwsMock::Dto::Common {
                     }
                     break;
 
-                case HttpMethod::POST:
+                case http::verb::post:
                     if (!bucket.empty() && !key.empty()) {
                         if (uploads) {
                             command = S3CommandType::CREATE_MULTIPART_UPLOAD;
@@ -83,7 +92,7 @@ namespace AwsMock::Dto::Common {
                     }
                     break;
 
-                case HttpMethod::DELETE:
+                case http::verb::delete_:
                     if (multipartRequest) {
                         command = S3CommandType::ABORT_MULTIPART_UPLOAD;
                     } else if (!bucket.empty() && key.empty()) {
@@ -93,16 +102,43 @@ namespace AwsMock::Dto::Common {
                     }
                     break;
 
-                case HttpMethod::UNKNOWN: {
-                    break;
-                }
-                case HttpMethod::HEAD:
+                case http::verb::head:
+                case http::verb::unknown:
+                case http::verb::connect:
+                case http::verb::options:
+                case http::verb::trace:
+                case http::verb::copy:
+                case http::verb::lock:
+                case http::verb::mkcol:
+                case http::verb::move:
+                case http::verb::propfind:
+                case http::verb::proppatch:
+                case http::verb::search:
+                case http::verb::unlock:
+                case http::verb::bind:
+                case http::verb::rebind:
+                case http::verb::unbind:
+                case http::verb::acl:
+                case http::verb::report:
+                case http::verb::mkactivity:
+                case http::verb::checkout:
+                case http::verb::merge:
+                case http::verb::msearch:
+                case http::verb::notify:
+                case http::verb::subscribe:
+                case http::verb::unsubscribe:
+                case http::verb::patch:
+                case http::verb::purge:
+                case http::verb::mkcalendar:
+                case http::verb::link:
+                case http::verb::unlink:
                     break;
             }
         }
+        log_trace << "Client command: " << ToString();
     }
 
-    void S3ClientCommand::GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent) {
+    void S3ClientCommand::GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent) {
         if (userAgent.clientCommand == "mb") {
             command = S3CommandType::CREATE_BUCKET;
         } else if (userAgent.clientCommand == "ls") {
@@ -112,15 +148,15 @@ namespace AwsMock::Dto::Common {
                 command = S3CommandType::LIST_OBJECTS;
             }
         } else if (userAgent.clientCommand == "cp") {
-            if (httpMethod == HttpMethod::PUT) {
+            if (httpMethod == http::verb::put) {
                 if (multipartRequest) {
                     command = S3CommandType::UPLOAD_PART;
                 } else {
                     command = S3CommandType::PUT_OBJECT;
                 }
-            } else if (httpMethod == HttpMethod::GET) {
+            } else if (httpMethod == http::verb::get) {
                 command = S3CommandType::GET_OBJECT;
-            } else if (httpMethod == HttpMethod::POST) {
+            } else if (httpMethod == http::verb::post) {
                 if (multipartRequest && uploadId.empty()) {
                     command = S3CommandType::CREATE_MULTIPART_UPLOAD;
                 } else {
@@ -133,17 +169,17 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::DELETE_BUCKET;
         } else if (userAgent.clientCommand == "rm") {
             command = S3CommandType::DELETE_OBJECT;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "create-multipart-upload") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "create-multipart-upload") {
             command = S3CommandType::CREATE_MULTIPART_UPLOAD;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "upload-part") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "upload-part") {
             command = S3CommandType::UPLOAD_PART;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "complete-multipart-upload") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "complete-multipart-upload") {
             command = S3CommandType::COMPLETE_MULTIPART_UPLOAD;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-notification-configuration") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-notification-configuration") {
             command = S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "put-bucket-encryption") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-encryption") {
             command = S3CommandType::PUT_BUCKET_ENCRYPTION;
-        } else if (userAgent.clientModule == "command/s3api" && userAgent.clientCommand == "list-object-versions") {
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "list-object-versions") {
             command = S3CommandType::LIST_OBJECT_VERSIONS;
         }
     }
@@ -152,13 +188,15 @@ namespace AwsMock::Dto::Common {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("method", method);
+            rootJson.set("method", std::string(to_string(method)));
             rootJson.set("region", region);
             rootJson.set("user", user);
             rootJson.set("command", Dto::Common::S3CommandTypeToString(command));
             rootJson.set("bucket", bucket);
             rootJson.set("key", key);
             rootJson.set("prefix", prefix);
+            rootJson.set("contentType", contentType);
+            rootJson.set("contentLength", contentLength);
             rootJson.set("versionRequest", versionRequest);
             rootJson.set("notificationRequest", notificationRequest);
             rootJson.set("multipartRequest", multipartRequest);

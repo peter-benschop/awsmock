@@ -19,7 +19,7 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * List container request
+     * @brief List container request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,35 +31,28 @@ namespace AwsMock::Dto::Docker {
         std::vector<Image> imageList;
 
         /**
-         * Constructor
-         *
-         * @param body HTTP response body
-         */
-        explicit ListImageResponse(const std::string &body);
-
-        /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
-         * @param object JSON object
+         * @return object JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

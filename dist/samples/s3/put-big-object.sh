@@ -20,5 +20,3 @@ aws s3 ls s3://test-bucket \
 
 # Cleanup
 rm -f /tmp/$tmpfile
-
-

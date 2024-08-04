@@ -9,13 +9,16 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Dto::Module {
+
+    using std::chrono::system_clock;
 
     /**
      * AwsMock module
@@ -47,23 +50,22 @@ namespace AwsMock::Dto::Module {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
          *
-         * @param moduleEntity module entity
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
          *
          * @param moduleList module entity list
          * @return JSON string
@@ -71,7 +73,16 @@ namespace AwsMock::Dto::Module {
         static std::string ToJson(const Database::Entity::Module::ModuleList &moduleList);
 
         /**
-         * Convert from JSON representation
+         * @brief Convert to JSON representation
+         *
+         * @param moduleList module entity list
+         * @return JSON string
+         */
+        typedef std::vector<Dto::Module::Module> ModuleList;
+        static std::string ToJson(const ModuleList &moduleList);
+
+        /**
+         * @brief Convert from JSON representation
          *
          * @param payload JSON representation
          * @return Module
@@ -79,7 +90,7 @@ namespace AwsMock::Dto::Module {
         static Module FromJson(const std::string &payload);
 
         /**
-         * Convert from JSON representation
+         * @brief Convert from JSON representation
          *
          * @param payload JSON representation
          * @return ModuleList
@@ -87,14 +98,14 @@ namespace AwsMock::Dto::Module {
         static std::vector<Module> FromJsonList(const std::string &payload);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param m module struct

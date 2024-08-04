@@ -21,7 +21,7 @@
 #include <mongocxx/uri.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Database {
@@ -43,8 +43,8 @@ namespace AwsMock::Database {
          * @return singleton
          */
         static ConnectionPool &instance() {
-            static Poco::SingletonHolder<ConnectionPool> instance;
-            return *instance.get();
+            static ConnectionPool connectionPool;
+            return connectionPool;
         }
 
         /**

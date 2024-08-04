@@ -11,8 +11,8 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -33,8 +33,6 @@ namespace AwsMock::Database {
 
         /**
          * @brief Constructor
-         *
-         * @param configuration configuration properties
          */
         explicit LambdaDatabase();
 
@@ -42,8 +40,8 @@ namespace AwsMock::Database {
          * @brief Singleton instance
          */
         static LambdaDatabase &instance() {
-            static Poco::SingletonHolder<LambdaDatabase> sh;
-            return *sh.get();
+            static LambdaDatabase lambdaDatabase;
+            return lambdaDatabase;
         }
 
         /**
@@ -154,12 +152,29 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name);
 
         /**
+         * @brief Sets the status of an lambda instance
+         *
+         * @param containerId lambda container ID
+         * @param status lambda instance status
+         * @throws DatabaseException
+         */
+        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
+
+        /**
          * @brief Returns a list of lambda functions.
          *
          * @param region AWS region name
          * @return list of lambda functions
          */
         std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
+
+        /**
+         * @brief Returns a list of lambda functions with the given event source ARN attached.
+         *
+         * @param eventSourceArn event source ARN
+         * @return list of lambda functions
+         */
+        std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn);
 
         /**
          * @brief Deletes an existing lambda function
@@ -177,11 +192,6 @@ namespace AwsMock::Database {
         void DeleteAllLambdas();
 
       private:
-
-        /**
-         * Use MongoDB
-         */
-        bool _useDatabase;
 
         /**
          * Database name

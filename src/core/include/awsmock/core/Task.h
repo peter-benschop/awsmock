@@ -44,19 +44,19 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param name task name
          */
         explicit Task(std::string name);
 
         /**
-         * Main loop
+         * @brief Main loop
          */
         virtual void Run() = 0;
 
         /**
-         * Actually do the work. WIll call Run method.
+         * @brief Actually do the work. WIll call Run method.
          */
         [[maybe_unused]] void DoWork();
 

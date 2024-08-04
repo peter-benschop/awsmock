@@ -5,99 +5,130 @@
 #ifndef AWSMOCK_SERVICE_S3_HANDLER_H
 #define AWSMOCK_SERVICE_S3_HANDLER_H
 
-// Poco includes
-#include "Poco/DateTime.h"
-#include "Poco/DateTimeFormat.h"
-#include "Poco/DateTimeFormatter.h"
+// C*+ includes
+#include <chrono>
+
+// Boost includes
+#include <boost/beast.hpp>
+#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/s3/S3CmdHandler.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     /**
      * @brief S3 request handler
      *
      * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs) are using different request structure, the request
+     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structure, the request
      * are first send to the S3CmdHandler, which normalizes the commands.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Handler : public S3CmdHandler {
+    class S3Handler : public AbstractHandler {
 
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit S3Handler(Core::Configuration &configuration) : S3CmdHandler(configuration) {}
+        explicit S3Handler() = default;
 
         /**
-         * HTTP GET request.
+         * @brief HTTP GET request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP PUT request.
+         * @brief HTTP PUT request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP POST request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * Delete DELETE request.
+         * @brief Delete DELETE request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
+         * @return HTTP response
          * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * Head request.
+         * @brief Head request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
+         * @return response HTTP response
          * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
+      private:
+
+        /**
+         * @brief Get the range for a range request
+         *
+         * @param request HTTP request
+         * @param min minimum byte
+         * @param max maximum byte
+         * @param size content length
+         */
+        static void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size);
+
+        /**
+         * @brief Returns the metadata has string key/value map.
+         *
+         * @par
+         * Only headers with keys starting with x-amz-meta are included in the map.
+         *
+         * @param request HTTP request
+         * @return hash map of key/value pairs.
+         */
+        static std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request);
+
+        /**
+         * S3 service
+         */
+        S3Service _s3Service;
     };
 
 }// namespace AwsMock::Service

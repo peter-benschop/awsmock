@@ -11,8 +11,8 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -23,7 +23,7 @@
 namespace AwsMock::Database {
 
     /**
-     * Transfer manager MongoDB database.
+     * @brief Transfer manager MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -32,22 +32,20 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration configuration properties
+         * @brief Constructor
          */
         explicit TransferDatabase();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static TransferDatabase &instance() {
-            static Poco::SingletonHolder<TransferDatabase> sh;
-            return *sh.get();
+            static TransferDatabase transferDatabase;
+            return transferDatabase;
         }
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param region AWS region name
          * @param serverId AWS server ID
@@ -57,7 +55,7 @@ namespace AwsMock::Database {
         bool TransferExists(const std::string &region, const std::string &serverId);
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param transfer AWS transfer
          * @return true if transfer manager already exists
@@ -66,7 +64,7 @@ namespace AwsMock::Database {
         bool TransferExists(const Entity::Transfer::Transfer &transfer);
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param transferName AWS transfer name
          * @return true if transfer manager already exists
@@ -75,7 +73,7 @@ namespace AwsMock::Database {
         bool TransferExists(const std::string &transferName);
 
         /**
-         * Check existence of lambda
+         * @brief Check existence of lambda
          *
          * @param region AWS region name
          * @param protocols list of protocols
@@ -85,7 +83,7 @@ namespace AwsMock::Database {
         bool TransferExists(const std::string &region, const std::vector<std::string> &protocols);
 
         /**
-         * Create a new lambda function
+         * @brief Create a new lambda function
          *
          * @param lambda lambda entity
          * @return created lambda entity.
@@ -93,7 +91,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer CreateTransfer(const Entity::Transfer::Transfer &lambda);
 
         /**
-         * Updates an existing transfer manager
+         * @brief Updates an existing transfer manager
          *
          * @param lambda lambda entity
          * @return updated lambda entity.
@@ -101,7 +99,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer UpdateTransfer(const Entity::Transfer::Transfer &lambda);
 
         /**
-         * Created or updates an existing transfer manager
+         * @brief Created or updates an existing transfer manager
          *
          * @param lambda lambda entity
          * @return created or updated lambda entity.
@@ -109,7 +107,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &lambda);
 
         /**
-         * Returns a transfer manager entity by primary key
+         * @brief Returns a transfer manager entity by primary key
          *
          * @param oid transfer manager primary key
          * @return transfer manager entity
@@ -118,7 +116,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer GetTransferById(bsoncxx::oid oid);
 
         /**
-         * Returns a transfer manager entity by primary key
+         * @brief Returns a transfer manager entity by primary key
          *
          * @param oid transfer manager primary key
          * @return transfer manager entity
@@ -127,7 +125,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer GetTransferById(const std::string &oid);
 
         /**
-         * Returns a transfer manager entity by manager ID
+         * @brief Returns a transfer manager entity by manager ID
          *
          * @param serverId transfer manager ID
          * @return transfer manager entity
@@ -136,7 +134,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer GetTransferByServerId(const std::string &serverId);
 
         /**
-         * Returns a transfer manager entity by ARN
+         * @brief Returns a transfer manager entity by ARN
          *
          * @param arn transfer manager ARN
          * @return transfer manager entity
@@ -145,7 +143,7 @@ namespace AwsMock::Database {
         Entity::Transfer::Transfer GetTransferByArn(const std::string &arn);
 
         /**
-         * Returns a list of transfer manager.
+         * @brief Returns a list of transfer manager.
          *
          * @param region AWS region name
          * @return list of transfer manager
@@ -153,7 +151,16 @@ namespace AwsMock::Database {
         std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {});
 
         /**
-         * Returns the total number of servers.
+         * @brief Returns a list of transfer users.
+         *
+         * @param region AWS region name
+         * @param serverId AWS server ID
+         * @return list of transfer users
+         */
+        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId);
+
+        /**
+         * @brief Returns the total number of servers.
          *
          * @param region AWS region name
          * @return total number of transfer server
@@ -161,7 +168,7 @@ namespace AwsMock::Database {
         long CountServers(const std::string &region = {});
 
         /**
-         * Deletes an existing transfer manager
+         * @brief Deletes an existing transfer manager
          *
          * @param serverId transfer serverID
          * @throws DatabaseException
@@ -169,7 +176,7 @@ namespace AwsMock::Database {
         void DeleteTransfer(const std::string &serverId);
 
         /**
-         * Deletes all existing transfer server
+         * @brief Deletes all existing transfer server
          *
          * @throws DatabaseException
          */

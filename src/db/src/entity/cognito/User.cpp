@@ -6,11 +6,25 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
+    bool User::HasGroup(const std::string &userPoolIdIn, const std::string &groupNameIn) {
+
+        return std::find_if(groups.begin(), groups.end(), [&userPoolIdIn, &groupNameIn](const Group &g) {
+                   return g.userPoolId == userPoolIdIn && g.groupName == groupNameIn;
+               }) != groups.end();
+    }
+
     view_or_value<view, value> User::ToDocument() const {
 
+        // Attributes
         auto userAttributesDoc = bsoncxx::builder::basic::array{};
         for (const auto &attribute: userAttributes) {
             userAttributesDoc.append(make_document(kvp(attribute.name, attribute.value)));
+        }
+
+        // Groups
+        auto groupsDoc = bsoncxx::builder::basic::array{};
+        for (const auto &group: groups) {
+            groupsDoc.append(group.ToDocument());
         }
 
         view_or_value<view, value> userDocument = make_document(
@@ -18,10 +32,11 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("userName", userName),
                 kvp("userPoolId", userPoolId),
                 kvp("enabled", enabled),
+                kvp("groups", groupsDoc),
                 kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
                 kvp("userAttributes", userAttributesDoc),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
         return userDocument;
     }
 
@@ -33,17 +48,26 @@ namespace AwsMock::Database::Entity::Cognito {
         userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
         enabled = mResult.value()["enabled"].get_bool().value;
         userStatus = Entity::Cognito::UserStatusFromString(bsoncxx::string::to_string(mResult.value()["userStatus"].get_string().value));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
         // Attributes
         if (mResult.value().find("userAttributes") != mResult.value().end()) {
             bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
-            for (bsoncxx::array::element attributeElement: attributesView) {
+            for (const bsoncxx::array::element &attributeElement: attributesView) {
                 UserAttribute attribute{
                         .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
                         .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};
                 userAttributes.push_back(attribute);
+            }
+        }
+        // Groups
+        if (mResult.value().find("groups") != mResult.value().end()) {
+            bsoncxx::array::view groupsView{mResult.value()["groups"].get_array().value};
+            for (const bsoncxx::array::element &groupElement: groupsView) {
+                Group group;
+                group.FromDocument(groupElement.get_document().view());
+                groups.push_back(group);
             }
         }
     }

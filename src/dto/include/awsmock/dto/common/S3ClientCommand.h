@@ -9,14 +9,12 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/RegularExpression.h>
+// Boost includes
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -24,10 +22,12 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
-#include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     enum class S3CommandType {
         CREATE_BUCKET,
@@ -36,12 +36,14 @@ namespace AwsMock::Dto::Common {
         LIST_OBJECTS,
         PUT_OBJECT,
         GET_OBJECT,
+        GET_OBJECT_RANGE,
         COPY_OBJECT,
         MOVE_OBJECT,
         DELETE_OBJECT,
         DELETE_OBJECTS,
         CREATE_MULTIPART_UPLOAD,
         UPLOAD_PART,
+        UPLOAD_PART_COPY,
         COMPLETE_MULTIPART_UPLOAD,
         ABORT_MULTIPART_UPLOAD,
         LIST_OBJECT_VERSIONS,
@@ -58,12 +60,14 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::LIST_OBJECTS, "ListObjects"},
             {S3CommandType::PUT_OBJECT, "PutObject"},
             {S3CommandType::GET_OBJECT, "GetObject"},
+            {S3CommandType::GET_OBJECT_RANGE, "GetObjectRange"},
             {S3CommandType::COPY_OBJECT, "CopyObject"},
             {S3CommandType::MOVE_OBJECT, "MoveObject"},
             {S3CommandType::DELETE_OBJECT, "DeleteObject"},
             {S3CommandType::DELETE_OBJECTS, "DeleteObjects"},
             {S3CommandType::CREATE_MULTIPART_UPLOAD, "CreateMultipartUpload"},
             {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
+            {S3CommandType::UPLOAD_PART_COPY, "PartMultipartUploadCopy"},
             {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
             {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
             {S3CommandType::LIST_OBJECT_VERSIONS, "ListObjectVersions"},
@@ -118,37 +122,47 @@ namespace AwsMock::Dto::Common {
         /**
          * Versioning
          */
-        bool versionRequest;
+        bool versionRequest = false;
 
         /**
          * Notification
          */
-        bool notificationRequest;
+        bool notificationRequest = false;
 
         /**
          * Multipart upload/download
          */
-        bool multipartRequest;
+        bool multipartRequest = false;
 
         /**
          * Multipart uploads
          */
-        bool uploads;
+        bool uploads = false;
+
+        /**
+         * Multipart upload part copy
+         */
+        bool uploadPartCopy = false;
 
         /**
          * Multipart part number
          */
-        bool partNumber;
+        bool partNumber = false;
 
         /**
          * Multipart upload/download
          */
-        bool copyRequest;
+        bool copyRequest = false;
 
         /**
          * SSE encryption
          */
-        bool encryptionRequest;
+        bool encryptionRequest = false;
+
+        /**
+         * Get range request
+         */
+        bool rangeRequest = false;
 
         /**
          * Multipart upload ID
@@ -168,17 +182,16 @@ namespace AwsMock::Dto::Common {
          * @param httpMethod HTTP request method
          * @param userAgent HTTP user agent
          */
-        void GetCommandFromUserAgent(const HttpMethod &httpMethod, const UserAgent &userAgent);
+        void GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent);
 
         /**
          * Getś the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Converts the DTO to a string representation.

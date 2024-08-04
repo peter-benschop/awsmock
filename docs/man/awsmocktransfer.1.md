@@ -32,8 +32,20 @@ corresponding man page ```awslocal(1)```.
 ```awslocal transfer list-servers```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available transfer servers
 
-```awslocal transfer delete-server --server-url <server-userPoolId>```  
+```awslocal transfer create-user --server-id <server-id> --role <role> --user-name <user-name> --home-directory <home-dir>```  
+&nbsp;&nbsp;&nbsp;&nbsp;creates a new user
+
+```awslocal transfer list-users```  
+&nbsp;&nbsp;&nbsp;&nbsp;lists all available transfer servers
+
+```awslocal transfer delete-server --server-id <server-id>```  
 &nbsp;&nbsp;&nbsp;&nbsp;deletes a transfer server
+
+```awslocal transfer start-server --server-id <server-id>```  
+&nbsp;&nbsp;&nbsp;&nbsp;starts a server
+
+```awslocal transfer stop-server --server-id <server-id>```  
+&nbsp;&nbsp;&nbsp;&nbsp;stops a server
 
 ## EXAMPLES
 
@@ -73,6 +85,31 @@ To delete a transfer server:
 awslocal transfer delete-server --server-userPoolId s-27134679b31c0a9833ee
 ```
 
+Show a list of all users
+
+```
+awslocal transfer list-users --server-id 27134679b31c0a9833ee
+{
+    "Users": [
+        {
+            "Arn": "arn:aws:transfer:us-east-1:176354371281:user/s-27134679b31c0a9833ee/anonymous",
+            "HomeDirectory": "/",
+            "Role": "anonymous",
+            "SshPublicKeyCount": 0,
+            "UserName": "anonymous"
+        },
+        {
+            "Arn": "arn:aws:transfer:us-east-1:176354371281:user/s-27134679b31c0a9833ee/ftpuser1",
+            "HomeDirectory": "ftpuser1",
+            "Role": "user",
+            "SshPublicKeyCount": 0,
+            "UserName": "ftpuser1"
+        }
+    ],
+    "ServerId": ""
+}
+```
+
 ## AUTHOR
 
 Jens Vogt <jens.vogt@opitz-consulting.com>
@@ -88,4 +125,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```, ```awsmockkms(1)```

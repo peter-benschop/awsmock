@@ -17,6 +17,13 @@ namespace AwsMock::Dto::Common {
                }) != serviceNames.end();
     }
 
+    bool Services::Contains(const std::string &service) const {
+
+        return find_if(serviceNames.begin(), serviceNames.end(), [service](const std::string &t) {
+                   return Core::StringUtils::EqualsIgnoreCase(t, service);
+               }) != serviceNames.end();
+    }
+
     std::string Services::ToJson() {
 
         try {

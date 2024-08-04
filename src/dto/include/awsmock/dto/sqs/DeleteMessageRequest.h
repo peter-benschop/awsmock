@@ -10,11 +10,11 @@
 #include <string>
 
 // Poco includes
-#include "Poco/UUID.h"
-#include "Poco/UUIDGenerator.h"
 #include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
+#include <Poco/UUID.h>
+#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"

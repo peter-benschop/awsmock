@@ -2,7 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "awsmock/core/HttpUtils.h"
+#include <awsmock/core/HttpUtils.h>
 
 namespace AwsMock::Core {
 
@@ -190,20 +190,42 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::AddQueryDelimiter(std::string &url) {
-        if (Core::StringUtils::Contains(url, "?")) {
-            url += "&";
-        } else {
-            url += "?";
-        }
+        url += Core::StringUtils::Contains(url, "?") ? "&" : "?";
         return url;
+    }
+
+    bool HttpUtils::HasHeader(const http::request<http::string_body> &request, const std::string &name) {
+        return request.base().find(name) != request.end();
+    }
+
+    bool HttpUtils::HasHeader(const http::request<http::dynamic_body> &request, const std::string &name) {
+        return request.base().find(name) != request.end();
     }
 
     std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
         std::string headerValue = request.get(name);
         if (headerValue.empty()) {
-            log_warning << "Header value not found, key: " << name;
+            log_debug << "Header value not found, key: " << name;
         }
         return headerValue;
+    }
+
+    std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &defaultValue) {
+        if (request.base().find(name) == request.end()) {
+            if (!defaultValue.empty()) {
+                return defaultValue;
+            }
+        }
+        return request.base()[name];
+    }
+
+    std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name, const std::string &defaultValue) {
+        if (!HasHeader(request, name)) {
+            if (!defaultValue.empty()) {
+                return defaultValue;
+            }
+        }
+        return request.base()[name];
     }
 
     std::map<std::string, std::string> HttpUtils::GetHeaders(const Poco::Net::HTTPRequest &request) {
@@ -215,6 +237,21 @@ namespace AwsMock::Core {
         return headers;
     }
 
+    std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::dynamic_body> &request) {
+
+        std::map<std::string, std::string> headers;
+        for (const auto &header: request) {
+            headers[header.name_string()] = header.value();
+            log_trace << header.name_string() << ": " << header.value();
+        }
+        return headers;
+    }
+
+    void HttpUtils::DumpHeaders(const http::request<http::dynamic_body> &request) {
+        for (const auto &header: request.base()) {
+            log_info << header.name_string() << ": " << header.value();
+        }
+    }
     std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {
 
         return Core::StringUtils::ContainsIgnoreCase(request.getContentType(), "json") ? "json" : "xml";
@@ -223,6 +260,19 @@ namespace AwsMock::Core {
     long HttpUtils::GetContentLength(const Poco::Net::HTTPRequest &request) {
 
         return static_cast<long>(request.getContentLength64());
+    }
+
+    std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
+
+        return Core::StringUtils::ContainsIgnoreCase(request.base()[http::field::content_type], "json") ? "json" : "xml";
+    }
+
+    long HttpUtils::GetContentLength(const http::request<http::dynamic_body> &request) {
+
+        if (request.has_content_length()) {
+            return std::stol(request.base()[http::field::content_length]);
+        }
+        return 0;
     }
 
     bool HttpUtils::IsUrlEncoded(const std::string &value) {
@@ -234,11 +284,70 @@ namespace AwsMock::Core {
         action = GetPathParameters(uri)[1];
     }
 
-    std::string HttpUtils::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-        std::string body;
-        Poco::StreamCopier::copyToString(request.stream(), body);
-        request.stream().clear(std::ios::eofbit);
-        request.stream().seekg(0, std::ios::beg);
-        return body;
+    std::string HttpUtils::GetBodyAsString(const http::request<http::dynamic_body> &request) {
+
+        boost::beast::net::streambuf sb;
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+
+        return boost::beast::buffers_to_string(sb.data());
     }
+
+    std::string HttpUtils::GetBodyAsString(const http::request<http::string_body> &request) {
+
+        return request.body();
+    }
+
+    http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
+
+        http::response<http::dynamic_body> res{http::status::ok, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::bad_request, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::Unauthorized(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::unauthorized, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::InternalServerError(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::internal_server_error, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
+    http::response<http::dynamic_body> HttpUtils::NotImplemented(const http::request<http::dynamic_body> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> res{http::status::not_implemented, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        boost::beast::ostream(res.body()) << reason;
+        res.prepare_payload();
+        return res;
+    }
+
 }// namespace AwsMock::Core

@@ -12,8 +12,6 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/CurlResponse.h>
-#include <awsmock/core/CurlUtils.h>
 #include <awsmock/core/Timer.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/DynamoDbResponse.h>

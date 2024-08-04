@@ -10,16 +10,16 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/SystemUtils.h>
 
 #define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"
-#define JAVA std::string("/usr/lib/jvm/jdk-21-oracle-x64/bin/java")
+#define JAVA std::string("/usr/lib/jvm/java-21-openjdk-amd64/bin/java")
 
 namespace AwsMock::Core {
 
     /**
-     * Test utilities
+     * @brief Test utilities
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -28,21 +28,21 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Creates a test configuration file.
+         * @brief Creates a test configuration file.
          *
          * @param withDatabase set to true when the configuration should be for a database
          */
         static void CreateTestConfigurationFile(bool withDatabase = true);
 
         /**
-         * Returns the name of the generated test configuration properties file.
+         * @brief Returns the name of the generated test configuration properties file.
          *
          * @return name of the generated test configuration file
          */
         static std::string GetTestConfigurationFilename();
 
         /**
-         * Returns the name of the generated test configuration properties file.
+         * @brief Returns the name of the generated test configuration properties file.
          *
          * @param withDatabase run with MongoDB database
          * @return name of the generated test configuration file
@@ -50,7 +50,7 @@ namespace AwsMock::Core {
         static Core::Configuration &GetTestConfiguration(bool withDatabase = true);
 
         /**
-         * Send a CLI command
+         * @brief Send a CLI command
          *
          * @param command command name
          * @return exec result

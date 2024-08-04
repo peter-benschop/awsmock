@@ -11,14 +11,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/transfer/TransferHandlerFactory.h>
 #include <awsmock/service/transfer/TransferMonitoring.h>
 
 #define TRANSFER_DEFAULT_PORT 9504
@@ -34,7 +33,7 @@
 namespace AwsMock::Service {
 
     /**
-     * Transfer server HTTP server
+     * @brief Transfer server HTTP server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -43,50 +42,55 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration aws-mock configuration
          */
         explicit TransferServer(Core::Configuration &configuration);
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Starts a single transfer manager
+         * @brief Creates the transfer server bucket
+         */
+        void CreateTransferBucket();
+
+        /**
+         * @brief Starts a single transfer manager
          *
          * @param server transfer manager entity
          */
         void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
-         * Stops a single transfer manager
+         * @brief Stops a single transfer manager
          *
          * @param server transfer manager entity
          */
         void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
-         * Start all transfer servers, if they are not existing
+         * @brief Start all transfer servers, if they are not existing
          */
         void StartTransferServers();
 
         /**
-         * Check transfer servers
+         * @brief Check transfer servers
          */
         void CheckTransferServers();
 
@@ -104,11 +108,6 @@ namespace AwsMock::Service {
          * Transfer monitoring
          */
         std::shared_ptr<TransferMonitoring> _transferMonitoring;
-
-        /**
-         * Sleeping period in ms
-         */
-        int _period;
 
         /**
          * Rest port
@@ -179,16 +178,6 @@ namespace AwsMock::Service {
          * Actual FTP manager
          */
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
-
-        /**
-         * S3 module host
-         */
-        std::string _s3ServiceHost;
-
-        /**
-         * S3 module port
-         */
-        int _s3ServicePort;
 
         /**
          * Module name

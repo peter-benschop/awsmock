@@ -5,22 +5,23 @@
 #ifndef AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
 #define AWSMOCK_SERVICE_DYNAMODB_HANDLER_H
 
-// Poco includes
-#include <Poco/Net/HTTPServerRequestImpl.h>
+// Boost includes
+#include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/dynamodb/DynamoDbCmdHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     /**
      * @brief AWS DynamoDB mock handler
@@ -29,96 +30,32 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbHandler : public DynamoDbCmdHandler {
+    class DynamoDbHandler : public AbstractHandler {
 
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit DynamoDbHandler(Core::Configuration &configuration);
+        explicit DynamoDbHandler() = default;
 
         /**
-         * HTTP GET request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
-         * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @return HTTP response
+         * @see AbstractResource::HandlePostRequest
          */
-        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * HTTP PUT request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * HTTP POST request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * Delete DELETE request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * Options request.
-         *
-         * @param response HTTP response
-         * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleOptions(Poco::Net::HTTPServerResponse &response) override;
-
-        /**
-         * Head request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 
         /**
-         * S3 handler configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
-         * DynamoDB module
+         * DynamoDB service
          */
         Service::DynamoDbService _dynamoDbService;
-
-        /**
-         * AWS secret access key
-         */
-        std::string _secretAccessKey;
     };
 
 }// namespace AwsMock::Service

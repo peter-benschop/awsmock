@@ -17,11 +17,16 @@ namespace AwsMock::Service {
 
     void SQSWorker::Shutdown() {}
 
-    [[maybe_unused]] void SQSWorker::ResetMessages() {
+    void SQSWorker::ResetMessages() {
 
         Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
-        log_trace << "Working on queue list, count" << queueList.size();
+        log_trace << "SQS worker starting, count: " << queueList.size();
 
+        if (queueList.empty()) {
+            return;
+        }
+
+        // Loop over queues and do some maintenance work
         for (auto &queue: queueList) {
 
             // Check retention period
@@ -50,5 +55,7 @@ namespace AwsMock::Service {
             _sqsDatabase.UpdateQueue(queue);
             log_trace << "Queue updated, queueName" << queue.name;
         }
+        log_trace << "SQS worker finished, count: " << queueList.size();
     }
+
 }// namespace AwsMock::Service

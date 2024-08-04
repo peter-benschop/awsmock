@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     // Initialize MongoDB
     // mongocxx::instance _instance{};
 
-    // Run tests
+    // Run data
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::AddGlobalTestEnvironment(new TestEnvironment);
     int ret = RUN_ALL_TESTS();

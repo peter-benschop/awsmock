@@ -8,71 +8,75 @@
 
 namespace AwsMock::Service {
 
-    [[maybe_unused]] LambdaCreator::LambdaCreator(std::string functionCode, std::string functionId) : Core::Task("lambda-creator"), _lambdaDatabase(Database::LambdaDatabase::instance()), _dockerService(), _functionCode(std::move(functionCode)), _functionId(std::move(functionId)) {
+    void LambdaCreator::operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) {
 
-        // Configuration
-        _dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
-        _tempDir = _dataDir + Poco::Path::separator() + "tmp";
-    }
-
-    void LambdaCreator::Run() {
-
-        log_debug << "Start creating lambda function, oid: " << _functionId;
+        log_debug << "Start creating lambda function, oid: " << functionId;
 
         // Make local copy
-        Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(_functionId);
+        Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(functionId);
+
+        CreateInstance(instanceId, lambdaEntity, functionCode);
+
+        // Update database
+        lambdaEntity.lastStarted = std::chrono::system_clock::now();
+        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
+        lambdaEntity.stateReason = "Activated";
+        Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
+
+        log_debug << "Lambda function created: " << lambdaEntity.function;
+    }
+
+    void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, std::string &functionCode) {
 
         // Docker tag
         std::string dockerTag = GetDockerTag(lambdaEntity);
         log_debug << "Using docker tag: " << dockerTag;
 
         // Build the docker image, if not existing
-        if (!_dockerService.ImageExists(lambdaEntity.function, dockerTag)) {
-            CreateDockerImage(_functionCode, lambdaEntity, dockerTag);
+        if (!DockerService::instance().ImageExists(lambdaEntity.function, dockerTag)) {
+            CreateDockerImage(functionCode, lambdaEntity, dockerTag);
         }
 
         // Create the container, if not existing. If existing get the current port from the docker container
-        if (!_dockerService.ContainerExists(lambdaEntity.function, dockerTag)) {
-            lambdaEntity.hostPort = GetHostPort();
-            CreateDockerContainer(lambdaEntity, dockerTag);
+        std::string containerName = lambdaEntity.function + "-" + instanceId;
+        if (!DockerService::instance().ContainerExists(containerName, dockerTag)) {
+            Database::Entity::Lambda::Instance instance;
+            instance.hostPort = GetHostPort();
+            instance.id = instanceId;
+            instance.status = Database::Entity::Lambda::InstanceIdle;
+            CreateDockerContainer(lambdaEntity, instance, dockerTag);
+            lambdaEntity.instances.emplace_back(instance);
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService.GetContainerByName(lambdaEntity.function, dockerTag);
+        Dto::Docker::Container container = DockerService::instance().GetContainerByName(containerName, dockerTag);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
-            _dockerService.StartDockerContainer(container.id);
+            DockerService::instance().StartDockerContainer(container.id);
+            log_debug << "Lambda docker container started, containerId: " << container.id;
         } else {
             lambdaEntity.hostPort = container.GetLambdaPort();
+            log_debug << "Lambda docker container already started, containerId: " << container.id << " port: " << lambdaEntity.hostPort;
         }
-
-        // Update database
-        lambdaEntity.containerId = container.id;
-        lambdaEntity.lastStarted = Poco::DateTime();
-        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
-        lambdaEntity.stateReason = "Activated";
-        _lambdaDatabase.UpdateLambda(lambdaEntity);
-
-        log_debug << "Lambda function started: " << lambdaEntity.function << ":" << dockerTag;
     }
-
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
-        if (zipFile.empty()) {
-            log_error << "Empty lambda zip file";
-            return;
-        }
+        std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+        std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
+
+        // Write base64 encoded zip file
+        std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag, dataDir);
 
         // Unzip provided zip-file into a temporary directory
-        std::string codeDir = UnpackZipFile(zipFile, lambdaEntity.runtime, lambdaEntity.fileName);
+        codeDir = UnpackZipFile(codeDir, encodedFile, lambdaEntity.runtime);
         log_debug << "Lambda file unzipped, codeDir: " << codeDir;
 
         // Build the docker image using the docker module
-        std::string imageFile = _dockerService.BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
+        std::string imageFile = DockerService::instance().BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
 
         // Get the image struct
-        Dto::Docker::Image image = _dockerService.GetImageByName(lambdaEntity.function, dockerTag);
+        Dto::Docker::Image image = DockerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
         lambdaEntity.codeSize = image.size;
         lambdaEntity.imageId = image.id;
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
@@ -84,34 +88,37 @@ namespace AwsMock::Service {
         log_debug << "Using port: " << lambdaEntity.hostPort;
     }
 
-    void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
+    void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag) {
 
         try {
+
+            std::string containerName = lambdaEntity.function + "-" + instance.id;
             std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-            Dto::Docker::CreateContainerResponse
-                    containerCreateResponse = _dockerService.CreateContainer(lambdaEntity.function, dockerTag, environment, lambdaEntity.hostPort);
-            log_debug << "Lambda container created, hostPort: " << lambdaEntity.hostPort;
+            Dto::Docker::CreateContainerResponse containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, instance.hostPort);
+            instance.containerId = containerCreateResponse.id;
+            log_debug << "Lambda container created, hostPort: " << instance.hostPort << " containerId: " << instance.containerId;
+
         } catch (std::exception &exc) {
             log_error << exc.what();
         }
     }
 
-    std::string LambdaCreator::UnpackZipFile(const std::string &zipFile, const std::string &runtime, const std::string &fileName) {
+    std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime) {
 
-        // If we do not have a local file already, write the Base64 encoded file to lambda dir
-        if (!Core::FileUtils::FileExists(fileName)) {
-            std::ofstream ofs(fileName);
-            ofs << zipFile;
-            ofs.flush();
-            ofs.close();
-        }
+        std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
+        std::string tempDir = dataDir + Poco::Path::separator() + "tmp";
 
-        // Base64 decode file
-        std::string decoded = Core::Crypto::Base64Decode(zipFile);
+        // Decode Base64 file
+        std::stringstream strstream;
+        std::ifstream ifs(zipFile);
+        strstream << ifs.rdbuf();
+        ifs.close();
 
-        // Create directory
+        std::string decoded = Core::Crypto::Base64Decode(strstream.str());
+
         try {
-            std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+
+            // Save zip file
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create classes directory
@@ -127,16 +134,13 @@ namespace AwsMock::Service {
 
             } else {
 
-                // Create directory
-                Core::DirUtils::EnsureDirectory(codeDir);
-
                 // Write to temp file
-                std::ofstream ofs(_tempDir + "/zipfile.zip");
+                std::ofstream ofs(tempDir + "/zipfile.zip");
                 ofs << decoded;
                 ofs.close();
 
                 // Decompress
-                Core::ExecResult result = Core::SystemUtils::Exec("unzip -o -d " + codeDir + " " + _tempDir + "/zipfile.zip");
+                Core::ExecResult result = Core::SystemUtils::Exec("unzip -o -d " + codeDir + " " + tempDir + "/zipfile.zip");
                 log_debug << "ZIP file unpacked, dir: " << codeDir << " result: " << result.status;
             }
             return codeDir;
@@ -173,5 +177,55 @@ namespace AwsMock::Service {
             return lambda.GetTagValue("tag");
         }
         return "latest";
+    }
+
+    template<typename Out>
+    Out load_file(std::string const &filename, Out out) {
+        std::ifstream ifs(filename, std::ios::binary);
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
+        return std::copy(std::istreambuf_iterator<char>(ifs), {}, out);
+    }
+
+    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, const std::string &dataDir) {
+
+        std::string s3DataDir = dataDir + Poco::Path::separator() + "s3";
+        std::string lambdaDir = dataDir + Poco::Path::separator() + "lambda";
+
+        std::string base64Path = lambdaDir + Poco::Path::separator();
+        std::string base64File = lambdaEntity.function + "-" + dockerTag + ".zip";
+        std::string base64FullFile = base64Path + base64File;
+
+        // Write Base64 ZIP file
+        if (!Core::FileUtils::FileExists(base64FullFile)) {
+
+            // Write base64 zip file, either from S3 bucket/key or from supplied string
+            if (zipFile.empty()) {
+
+                // Get internal name of S3 object
+                Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambdaEntity.region, lambdaEntity.code.s3Bucket, lambdaEntity.code.s3Key);
+                std::string s3CodeFile = s3DataDir + Poco::Path::separator() + s3Object.internalName;
+
+                // Load file
+                std::vector<char> input;
+                load_file(s3CodeFile, back_inserter(input));
+
+                // Allocate "enough" space, using an upperbound prediction:
+                std::string encoded(boost::beast::detail::base64::encoded_size(input.size()), '\0');
+
+                // Encode returns the actual encoded_size
+                auto encoded_size = boost::beast::detail::base64::encode(encoded.data(), input.data(), input.size());
+                encoded.resize(encoded_size);
+                std::ofstream(base64Path + base64File) << encoded;
+
+            } else {
+
+                // If we do not have a local file already, write the Base64 encoded file to lambda dir
+                std::ofstream ofs(base64FullFile);
+                ofs << zipFile;
+                ofs.close();
+            }
+        }
+        lambdaEntity.code.zipFile = base64File;
+        return base64FullFile;
     }
 }// namespace AwsMock::Service

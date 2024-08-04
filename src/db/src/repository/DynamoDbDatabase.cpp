@@ -121,7 +121,7 @@ namespace AwsMock::Database {
                 } else {
                     count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
                 }
-                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -313,7 +313,7 @@ namespace AwsMock::Database {
                 } else {
                     count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
                 }
-                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                log_trace << "DynamoDb table exists: " << std::boolalpha<<(count>0);
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -360,7 +360,7 @@ namespace AwsMock::Database {
                 }
                 int64_t count = _itemCollection.count_documents(queryDoc.extract());
 
-                log_trace << "DynamoDb table exists: " << (count > 0 ? "true" : "false");
+                log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -536,6 +536,34 @@ namespace AwsMock::Database {
             return UpdateItem(item);
         } else {
             return CreateItem(item);
+        }
+    }
+
+    long DynamoDbDatabase::CountItems(const std::string &region) {
+
+        if (_useDatabase) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+                if (region.empty()) {
+
+                    return _itemCollection.count_documents({});
+
+                } else {
+
+                    return _itemCollection.count_documents(make_document(kvp("region", region)));
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.CountItems(region);
         }
     }
 

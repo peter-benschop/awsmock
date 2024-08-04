@@ -18,14 +18,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 6,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of queues",
       "fieldConfig": {
@@ -49,14 +49,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -66,6 +66,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -93,15 +94,17 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -113,7 +116,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "sqs_queue_count_total",
+          "expr": "increase(sqs_queue_counter[5m])",
           "instant": false,
           "legendFormat": "Queues",
           "range": true,
@@ -126,7 +129,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of messages",
       "fieldConfig": {
@@ -150,14 +153,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -167,6 +170,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -194,15 +198,17 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -214,7 +220,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "sqs_message_count_total",
+          "expr": "increase(sqs_message_counter[5m])",
           "instant": false,
           "legendFormat": "Messages",
           "range": true,
@@ -227,7 +233,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Number of messages per queue",
       "fieldConfig": {
@@ -251,14 +257,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -269,6 +275,7 @@
           },
           "fieldMinMax": false,
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -296,9 +303,10 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -307,6 +315,7 @@
           "sortDesc": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -318,7 +327,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(sqs_message_by_queue_count[5m])",
+          "expr": "avg_over_time(sqs_message_by_queue_counter[5m])",
           "instant": false,
           "interval": "",
           "legendFormat": "{{queue}}",
@@ -332,7 +341,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Amount of milliseconds for the deifferent service calls",
       "fieldConfig": {
@@ -356,14 +365,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -373,6 +382,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -400,15 +410,17 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -421,7 +433,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sqs_service_timer",
+          "expr": "avg_over_time(sqs_service_timer[5m]) or vector(0)",
           "instant": false,
           "legendFormat": "{{method}}",
           "range": true,
@@ -429,6 +441,113 @@
         }
       ],
       "title": "Service time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ddmuv3dszk000a"
+      },
+      "description": "Average amount of amount of milliseconds a message waits in a queue",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 8,
+        "x": 8,
+        "y": 14
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg_over_time(sqs_message_wait_time[5m])",
+          "instant": false,
+          "legendFormat": "{{queue}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Message wait time",
       "type": "timeseries"
     }
   ],
@@ -439,13 +558,14 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-3h",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "SQS",
   "uid": "c9431625-6813-44af-8b0b-00388afc4745",
-  "version": 13,
+  "version": 4,
   "weekStart": ""
 }

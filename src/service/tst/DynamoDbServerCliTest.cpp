@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/dynamodb/DynamoDbServer.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 
@@ -35,25 +35,24 @@ namespace AwsMock::Service {
             std::string _port = _configuration.getString("awsmock.service.dynamodb.port", std::to_string(DYNAMODB_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.port", _port);
-            _accountId = _configuration.getString("awsmock.account.userPoolId", ACCOUNT_ID);
+            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _dynamodbServer = std::make_unique<DynamoDbServer>(_configuration);
-            _dynamodbServer->Start();
+            _dynamodbServer.Start();
         }
 
         void TearDown() override {
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint-url http://localhost:8000");
             EXPECT_EQ(0, deleteResult1.status);
-            _dynamodbServer->Stop();
+            _dynamodbServer.Stop();
         }
 
         std::string _endpoint, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        std::unique_ptr<DynamoDbServer> _dynamodbServer;
+        DynamoDbServer _dynamodbServer;
     };
 
     TEST_F(DynamoDbServerCliTest, TableCreateTest) {

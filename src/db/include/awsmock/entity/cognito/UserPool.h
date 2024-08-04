@@ -8,12 +8,6 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Object.h>
-
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -22,7 +16,13 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/entity/cognito/UserPoolClient.h>
+#include <awsmock/entity/cognito/UserPoolDomain.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::Cognito {
 
@@ -33,6 +33,7 @@ namespace AwsMock::Database::Entity::Cognito {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * @brief Cognito user pool entity
@@ -74,55 +75,64 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * Domain
          */
-        std::string domain;
+        UserPoolDomain domain;
+
+        /**
+         * Clients
+         */
+        std::vector<UserPoolClient> userPoolClients;
 
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
+         *
+         * Basically only used for the infrastructure export.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
+         *
+         * Basically only used for the infrastructure import.
          *
          * @param jsonObject JSON object.
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-         * Converts the entity to a string representation.
+         * @brief Converts the entity to a string representation.
          *
          * @return entity as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param userPool userPool entity

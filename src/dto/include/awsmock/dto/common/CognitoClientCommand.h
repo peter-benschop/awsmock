@@ -10,13 +10,15 @@
 #include <string>
 
 // Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/RegularExpression.h>
 
+// Boost includes
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
+
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -24,22 +26,40 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
-#include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
 
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
+
     enum class CognitoCommandType {
         CREATE_USER_POOL,
-        CREATE_USER,
+        CREATE_USER_POOL_DOMAIN,
+        DESCRIBE_USER_POOL,
         DELETE_USER_POOL,
+        CREATE_USER,
+        DELETE_USER,
+        CREATE_GROUP,
+        DELETE_GROUP,
+        ADD_USER_TO_GROUP,
+        LIST_USERS_IN_GROUP,
+        CREATE_USER_POOL_CLIENT,
         UNKNOWN
     };
 
     static std::map<CognitoCommandType, std::string> CognitoCommandTypeNames{
             {CognitoCommandType::CREATE_USER_POOL, "CreateUserPool"},
-            {CognitoCommandType::CREATE_USER, "CreateUser"},
+            {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "CreateUserPoolDomain"},
+            {CognitoCommandType::DESCRIBE_USER_POOL, "DescribeUserPool"},
             {CognitoCommandType::DELETE_USER_POOL, "DeleteUserPool"},
+            {CognitoCommandType::CREATE_USER, "CreateUser"},
+            {CognitoCommandType::DELETE_USER, "DeleteUser"},
+            {CognitoCommandType::CREATE_GROUP, "CreateGroup"},
+            {CognitoCommandType::DELETE_GROUP, "DeleteGroup"},
+            {CognitoCommandType::ADD_USER_TO_GROUP, "AdminAddUserToGroup"},
+            {CognitoCommandType::LIST_USERS_IN_GROUP, "ListUsersInGroup"},
+            {CognitoCommandType::CREATE_USER_POOL_CLIENT, "CreateUserPoolClient"},
     };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(CognitoCommandType commandType) {
@@ -85,12 +105,11 @@ namespace AwsMock::Dto::Common {
         /**
          * Getś the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * Converts the DTO to a string representation.

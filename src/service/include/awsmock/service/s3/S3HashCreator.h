@@ -9,7 +9,7 @@
 #include <Poco/Path.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/Task.h>
 #include <awsmock/entity/s3/Object.h>
@@ -35,34 +35,24 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3HashCreator : public Core::Task {
+    class S3HashCreator {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
+         */
+        explicit S3HashCreator() = default;
+
+        /**
+         * @brief Work method
+         *
+         * Generated several hashes for the S3 object (SHA1, SHA256, etc.)
          *
          * @param algorithms vector of algorithm names
          * @param object S3 object to hash
          */
-        explicit S3HashCreator(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) : Core::Task("s3-hash-creator"), _object(object), _algorithms(algorithms) {}
-
-        /**
-         * Work method
-         */
-        void Run() override;
-
-      private:
-
-        /**
-         * Hash algorithm
-         */
-        std::vector<std::string> _algorithms;
-
-        /**
-         * S3 object
-         */
-        Database::Entity::S3::Object _object;
+        void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object);
     };
 
 }// namespace AwsMock::Service

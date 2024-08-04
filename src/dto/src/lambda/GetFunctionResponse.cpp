@@ -12,13 +12,17 @@ namespace AwsMock::Dto::Lambda {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
             rootJson.set("User", user);
-            rootJson.set("FunctionName", functionName);
-            rootJson.set("Runtime", runtime);
-            rootJson.set("Role", role);
-            rootJson.set("Handler", handler);
-            rootJson.set("MemorySize", memorySize);
+            rootJson.set("Configuration", configuration.ToJsonObject());
             rootJson.set("Code", code.ToJson());
             rootJson.set("Timeout", timeout);
+
+            if (!tags.empty()) {
+                Poco::JSON::Object jsonTags;
+                for (const auto &tag: tags) {
+                    jsonTags.set(tag.first, tag.second);
+                }
+                rootJson.set("Tags", jsonTags);
+            }
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -28,49 +32,21 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    void GetFunctionResponse::FromJson(const std::string &jsonString) {
+    std::string GetFunctionResponse::ToXml() const {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("GetFunctionResponse");
+        Poco::XML::AutoPtr<Poco::XML::Element> pConfig = pDoc->createElement("Configuration");
 
-        try {
+        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "Region", region);
+        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "FunctionName", configuration.functionName);
+        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "FunctionArn", configuration.functionArn);
+        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "State", configuration.state);
+        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "State", configuration.state);
+        pRoot->appendChild(pConfig);
+        pDoc->appendChild(pRoot);
 
-            Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
-            Core::JsonUtils::GetJsonValueString("Runtime", rootObject, runtime);
-            Core::JsonUtils::GetJsonValueString("Role", rootObject, role);
-            Core::JsonUtils::GetJsonValueString("Handler", rootObject, handler);
-            Core::JsonUtils::GetJsonValueInt("Timeout", rootObject, timeout);
-
-            // Tags
-            if (rootObject->has("Tags")) {
-                Poco::JSON::Object::Ptr tagsObject = rootObject->getObject("Tags");
-                for (const auto &tag: tagsObject->getNames()) {
-                    std::string value;
-                    Core::JsonUtils::GetJsonValueString(tag, tagsObject, value);
-                    tags[tag] = value;
-                }
-            }
-
-            // EphemeralStorage
-            if (rootObject->has("EphemeralStorage")) {
-                ephemeralStorage.FromJson(rootObject->getObject("EphemeralStorage"));
-            }
-
-            // Environment
-            if (rootObject->has("Environment")) {
-                environmentVariables.FromJson(rootObject->getObject("Environment"));
-            }
-
-            // Code
-            if (rootObject->has("Code")) {
-                code.FromJson(rootObject->getObject("Code"));
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string GetFunctionResponse::ToString() const {

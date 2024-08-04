@@ -21,8 +21,14 @@ namespace AwsMock::Service {
     void DynamoDbMonitoring::Shutdown() {}
 
     void DynamoDbMonitoring::UpdateCounter() {
+        log_trace << "Dynamodb monitoring starting";
+
         long tables = _dynamoDbDatabase.CountTables();
+        long items = _dynamoDbDatabase.CountItems();
         _metricService.SetGauge(DYNAMODB_TABLE_COUNT, tables);
-        log_trace << "DynamoDb update counter finished";
+        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, items);
+
+        log_trace << "DynamoDb monitoring finished";
     }
+
 }// namespace AwsMock::Service

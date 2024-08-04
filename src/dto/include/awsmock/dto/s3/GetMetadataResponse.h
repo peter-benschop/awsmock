@@ -6,16 +6,19 @@
 #define AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
 
 // C++ standard includes
+#include <chrono>
 #include <sstream>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
+
+    using std::chrono::system_clock;
 
     struct GetMetadataResponse {
 
@@ -57,12 +60,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Created
          */
-        Poco::DateTime created;
+        system_clock::time_point created;
 
         /**
          * Last modified
          */
-        Poco::DateTime modified;
+        system_clock::time_point modified;
 
         /**
          * Convert to a JSON string

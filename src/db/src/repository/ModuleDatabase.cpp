@@ -17,12 +17,12 @@ namespace AwsMock::Database {
             {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-            {"database", {.name = "database", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
+            /*{"database", {.name = "database", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}*/};
 
     void ModuleDatabase::Initialize() {
 
         for (const auto &module: _existingModules) {
-            if (_useDatabase) {
+            if (HasDatabase()) {
 
                 if (!ModuleExists(module.first)) {
                     CreateModule(module.second);
@@ -70,14 +70,14 @@ namespace AwsMock::Database {
 
     bool ModuleDatabase::ModuleExists(const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 int64_t count = _moduleCollection.count_documents(make_document(kvp("name", name)));
-                log_trace << "Module exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Module exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::GetModuleById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetModuleById(bsoncxx::oid(oid));
 
@@ -127,7 +127,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::GetModuleByName(const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -150,9 +150,36 @@ namespace AwsMock::Database {
         return {};
     }
 
+    std::vector<std::string> ModuleDatabase::GetAllModuleNames() {
+
+        if (HasDatabase()) {
+
+            try {
+
+                std::vector<std::string> moduleNameList;
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+                auto serviceCursor = _moduleCollection.find({});
+                for (auto service: serviceCursor) {
+                    Entity::Module::Module result;
+                    result.FromDocument(service);
+                    moduleNameList.push_back(result.name);
+                }
+                return moduleNameList;
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Get module names, error: " << e.what();
+                return {};
+            }
+        } else {
+
+            return _memoryDb.GetAllModuleNames();
+        }
+    }
+
     Entity::Module::Module ModuleDatabase::CreateModule(const Entity::Module::Module &module) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -175,7 +202,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::UpdateModule(const Entity::Module::Module &module) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -197,7 +224,7 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
@@ -229,7 +256,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -255,7 +282,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::SetPort(const std::string &name, int port) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -286,14 +313,14 @@ namespace AwsMock::Database {
 
     int ModuleDatabase::ModuleCount() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 int64_t count = _moduleCollection.count_documents(make_document());
-                log_trace << "Service state: " << (count > 0 ? "true" : "false");
+                log_trace << "Service state: " << std::boolalpha << count;
                 return static_cast<int>(count);
 
             } catch (mongocxx::exception::system_error &e) {
@@ -310,7 +337,7 @@ namespace AwsMock::Database {
     Entity::Module::ModuleList ModuleDatabase::ListModules() {
 
         Entity::Module::ModuleList modulesList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
@@ -332,7 +359,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::DeleteModule(const Entity::Module::Module &module) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -353,7 +380,7 @@ namespace AwsMock::Database {
 
     void ModuleDatabase::DeleteAllModules() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();

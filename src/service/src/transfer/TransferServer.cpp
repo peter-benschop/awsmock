@@ -2,11 +2,12 @@
 // Created by vogje01 on 03/06/2023.
 //
 
+#include "awsmock/service/s3/S3Service.h"
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer(configuration, "transfer"), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
+    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer("transfer"), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
 
         // REST manager configuration
         _port = _configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
@@ -15,21 +16,6 @@ namespace AwsMock::Service {
         _maxThreads = _configuration.getInt("awsmock.service.transfer.http.max.threads", TRANSFER_DEFAULT_THREADS);
         _requestTimeout = _configuration.getInt("awsmock.service.transfer.http.timeout", TRANSFER_DEFAULT_TIMEOUT);
         _monitoringPeriod = _configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
-
-        // Create environment
-        _region = _configuration.getString("awsmock.region");
-        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET);
-        _baseDir = _configuration.getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
-
-        // S3 module connection
-        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9501);
-        _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
-        log_debug << "S3 module endpoint: http://" << _s3ServiceHost << ":" << _s3ServicePort;
-
-        // Ensure base directory exists
-        Core::DirUtils::EnsureDirectory(_baseDir);
-        log_debug << "Using baseDir: " << _baseDir;
 
         // Monitoring
         _transferMonitoring = std::make_unique<TransferMonitoring>(_monitoringPeriod);
@@ -50,18 +36,39 @@ namespace AwsMock::Service {
         _transferMonitoring->Start();
 
         // Start REST manager
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration));
+
+        // Create transfer bucket
+        CreateTransferBucket();
 
         // Start all transfer servers
         StartTransferServers();
+
+        // Set running
+        SetRunning();
+        log_debug << "All online transfer servers started";
     }
 
     void TransferServer::Run() {
+        CheckTransferServers();
     }
 
     void TransferServer::Shutdown() {
         _transferMonitoring->Stop();
         StopHttpServer();
+    }
+
+    void TransferServer::CreateTransferBucket() {
+
+        Service::S3Service s3Service;
+
+        Dto::S3::CreateBucketRequest request;
+        request.name = "transfer-server";
+        request.owner = Core::Configuration::instance().getString("awsmock.user");
+        request.region = Core::Configuration::instance().getString("awsmock.region");
+        if (!s3Service.BucketExists(request.region, request.name)) {
+            s3Service.CreateBucket(request);
+        }
     }
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -70,14 +77,17 @@ namespace AwsMock::Service {
         _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId, server.port, server.listenAddress);
         _transferServerList[server.serverId] = _ftpServer;
 
+        // Get base dir
+        std::string baseDir = Core::Configuration::instance().getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
+
         // Add users
         for (const auto &user: server.users) {
 
-            std::string homeDir = _baseDir + Poco::Path::separator() + user.homeDirectory;
+            std::string homeDir = baseDir + Poco::Path::separator() + user.homeDirectory;
 
             // Ensure the home directory exists
             Core::DirUtils::EnsureDirectory(homeDir);
-            log_debug << "Using homeDir: " << homeDir;
+            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
 
             // Add to FTP manager
             _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
@@ -87,7 +97,7 @@ namespace AwsMock::Service {
         // Update database
         server.state = Database::Entity::Transfer::ServerState::ONLINE;
 
-        log_info << "Transfer manager " << server.serverId << " started ";
+        log_debug << "Transfer server started, serverId: " << server.serverId;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -99,7 +109,7 @@ namespace AwsMock::Service {
         // Update database
         server.state = Database::Entity::Transfer::ServerState::OFFLINE;
 
-        log_debug << "Transfer manager " << server.serverId << " stopped ";
+        log_debug << "Transfer server " << server.serverId << " stopped ";
     }
 
     void TransferServer::StartTransferServers() {
@@ -124,11 +134,13 @@ namespace AwsMock::Service {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it == _transferServerList.end()) {
                     StartTransferServer(transfer);
+                    log_info << "Transfer server started, serverId: " << transfer.serverId;
                 }
             } else if (transfer.state == Database::Entity::Transfer::ServerState::OFFLINE) {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it != _transferServerList.end()) {
                     StopTransferServer(transfer);
+                    log_info << "Transfer server stopped, serverId: " << transfer.serverId;
                 }
             }
         }
@@ -137,6 +149,7 @@ namespace AwsMock::Service {
             if (!_transferDatabase.TransferExists(transfer.first)) {
                 Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(transfer.first);
                 StopTransferServer(server);
+                log_info << "Transfer server stopped, serverId: " << transfer.first;
             }
         }
     }

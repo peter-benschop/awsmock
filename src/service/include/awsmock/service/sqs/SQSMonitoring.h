@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_SQS_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
 #include <awsmock/core/Timer.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/repository/SQSDatabase.h>
 
 namespace AwsMock::Service {
@@ -23,29 +23,37 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit SQSMonitoring(int timeout);
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Update counters
+         * @brief Collect waiting time statistics
+         *
+         * @par
+         * Collects the average waiting time for messages in that queue.
+         */
+        void CollectWaitingTimeStatistics();
+
+        /**
+         * @brief Update counters
          */
         void UpdateCounter();
 

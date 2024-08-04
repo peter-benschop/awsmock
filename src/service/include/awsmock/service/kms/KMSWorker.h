@@ -5,12 +5,18 @@
 #ifndef AWSMOCK_SERVICE_KMS_WORKER_H
 #define AWSMOCK_SERVICE_KMS_WORKER_H
 
+// C++ includes
+#include <chrono>
+#include <string>
+
 // AwsMock includes
-#include "awsmock/dto/kms/model/KeyState.h"
 #include <awsmock/core/Timer.h>
+#include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/repository/KMSDatabase.h>
 
 namespace AwsMock::Service {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief KMS worker thread

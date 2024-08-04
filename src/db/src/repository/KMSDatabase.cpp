@@ -15,7 +15,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
                 int64_t count = _keyCollection.count_documents(make_document(kvp("keyId", keyId)));
-                log_trace << "Topic exists: " << (count > 0 ? "true" : "false");
+                log_trace << "Topic exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -235,4 +235,32 @@ namespace AwsMock::Database {
             _memoryDb.DeleteKey(key);
         }
     }
+
+    void KMSDatabase::DeleteAllKeys() {
+
+        if (_useDatabase) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto delete_many_result = _bucketCollection.delete_many({});
+                session.commit_transaction();
+                log_debug << "All KMS keys deleted, count: " << delete_many_result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what(), 500);
+            }
+
+        } else {
+
+            _memoryDb.DeleteAllKeys();
+        }
+    }
+
 }// namespace AwsMock::Database

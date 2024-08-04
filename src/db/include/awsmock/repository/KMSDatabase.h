@@ -16,8 +16,8 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -50,8 +50,8 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static KMSDatabase &instance() {
-            static Poco::SingletonHolder<KMSDatabase> sh;
-            return *sh.get();
+            static KMSDatabase kmsDatabase;
+            return kmsDatabase;
         }
 
         /**
@@ -131,6 +131,13 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteKey(const Entity::KMS::Key &key);
+
+        /**
+         * Delete a all keys
+         *
+         * @throws DatabaseException
+         */
+        void DeleteAllKeys();
 
       private:
 

@@ -7,10 +7,8 @@
 
 // C++ standard includes
 #include <chrono>
-#include <ctime>
 #include <map>
 #include <string>
-#include <thread>
 
 // Poco includes
 #include <Poco/Condition.h>
@@ -19,13 +17,14 @@
 #include <Poco/UTF8Encoding.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/NotFoundException.h"
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricServiceTimer.h>
+#include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -47,15 +46,23 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
+#include <awsmock/dto/sqs/model/EventNotification.h>
+#include <awsmock/dto/sqs/model/EventRecord.h>
+#include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/lambda/LambdaService.h>
 
+#define DEFAULT_USER "none"
+#define DEFAULT_REGION "eu-central-1"
 #define SQS_DEFAULT_ACCOUNT_ID "000000000000"
 #define SQS_DEFAULT_VISIBILITY_TIMEOUT 300
 
 namespace AwsMock::Service {
 
+    using std::chrono::system_clock;
+
     /**
-     * SQS service
+     * @brief SQS service
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -64,14 +71,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration module configuration
+         * @brief Constructor
          */
-        explicit SQSService(Core::Configuration &configuration);
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
-         * Creates a new queue.
+         * @brief Creates a new queue.
          *
          * <p>In case the queue exists already, return the existing queue.</p>
          *
@@ -81,7 +86,7 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request);
 
         /**
-         * Returns a list of all available queues
+         * @brief Returns a list of all available queues
          *
          * @param region AWS region
          * @return ListQueuesResponse
@@ -89,7 +94,7 @@ namespace AwsMock::Service {
         Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
 
         /**
-         * Purge a queue.
+         * @brief Purge a queue.
          *
          * @param request purge queue request
          * @throws ServiceException
@@ -97,7 +102,7 @@ namespace AwsMock::Service {
         void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
 
         /**
-         * Return the queue userAttributes
+         * @brief Return the queue userAttributes
          *
          * @param request get queue sqs request
          * @return GetQueueAttributesResponse
@@ -106,7 +111,7 @@ namespace AwsMock::Service {
         Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
 
         /**
-         * Return the queue userAttributes
+         * @brief Return the queue userAttributes
          *
          * @param request get queue sqs request
          * @return GetQueueAttributesResponse
@@ -115,7 +120,7 @@ namespace AwsMock::Service {
         Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
 
         /**
-         * Set queue userAttributes
+         * @brief Set queue userAttributes
          *
          * @param request put queue sqs request
          * @return SetQueueAttributesResponse
@@ -124,7 +129,7 @@ namespace AwsMock::Service {
         Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
 
         /**
-         * Sets the message visibility timeout timeout.
+         * @brief Sets the message visibility timeout timeout.
          *
          * @param request set visibility timeout request
          * @throws ServiceException
@@ -132,7 +137,7 @@ namespace AwsMock::Service {
         void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request);
 
         /**
-         * Sets tags for a queue.
+         * @brief Sets tags for a queue.
          *
          * <p>
          * Existing tags will be updates, and not existing tags will be created.
@@ -143,7 +148,7 @@ namespace AwsMock::Service {
         void TagQueue(const Dto::SQS::TagQueueRequest &request);
 
         /**
-         * Delete a queue
+         * @brief Delete a queue
          *
          * @param request delete request DTO
          * @return SQSQueueResponse
@@ -152,7 +157,7 @@ namespace AwsMock::Service {
         Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 
         /**
-         * Creates a new queue
+         * @brief Creates a new queue
          *
          * @param request create message request
          * @return SendMessageResponse
@@ -161,7 +166,7 @@ namespace AwsMock::Service {
         Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
         /**
-         * Receive a list of resources
+         * @brief Receive a list of resources
          *
          * @param request receive message request
          * @return ReceiveMessageResponse
@@ -170,7 +175,7 @@ namespace AwsMock::Service {
         Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
 
         /**
-         * Deletes a message
+         * @brief Deletes a message
          *
          * @param request delete message request DTO
          * @throws ServiceException
@@ -178,7 +183,7 @@ namespace AwsMock::Service {
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
 
         /**
-         * Deletes a message in a batch
+         * @brief Deletes a message in a batch
          *
          * @param request delete message batch request DTO
          * @throws ServiceException
@@ -188,7 +193,16 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Checks the attributes for a entry with 'all'. The search is case insensitive.
+         * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
+         *
+         * @param lambda lambda to invoke.
+         * @param message SQS message.
+         * @param eventSourceArn event source ARN
+         */
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, Database::Entity::SQS::Message &message, const std::string &eventSourceArn);
+
+        /**
+         * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
          *
          * @param attributes vector of attributes.
          * @param value value to check for.
@@ -196,19 +210,19 @@ namespace AwsMock::Service {
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
         /**
-         * Account ID
+         * SQS database connection
          */
-        std::string _accountId;
+        Database::SQSDatabase &_sqsDatabase;
 
         /**
-         * Configuration
+         * Lambda database connection
          */
-        Core::Configuration &_configuration;
+        Database::LambdaDatabase &_lambdaDatabase;
 
         /**
-         * Database connection
+         * Lambda service
          */
-        Database::SQSDatabase &_database;
+        LambdaService _lambdaService;
     };
 
 }// namespace AwsMock::Service

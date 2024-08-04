@@ -6,12 +6,13 @@
 #define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/dto/common/LambdaClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
@@ -29,81 +30,44 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration application configuration
+         * @brief Constructor
          */
-        explicit LambdaHandler(Core::Configuration &configuration) : AbstractHandler(), _configuration(configuration), _lambdaService(configuration) {}
+        explicit LambdaHandler() : AbstractHandler() {}
 
         /**
-         * HTTP GET request.
+         * @brief HTTP GET request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
-         * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @return HTTP response
+         * @see AbstractResource::HandleGetRequest
          */
-        void handleGet(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP PUT request.
+         * @brief HTTP POST request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
-         * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @return HTTP response
+         * @see AbstractResource::HandleGetRequest
          */
-        void handlePut(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
-         * HTTP POST request.
+         * @brief HTTP DELETE request.
          *
          * @param request HTTP request
-         * @param response HTTP response
          * @param region AWS region name
          * @param user AWS user
-         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @return HTTP response
+         * @see AbstractResource::HandleGetRequest
          */
-        void handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * Delete DELETE request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleDelete(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
-
-        /**
-         * Options request.
-         *
-         * @param response HTTP response
-         * @see AbstractResource::handleOption(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleOptions(Poco::Net::HTTPServerResponse &response) override;
-
-        /**
-         * Head request.
-         *
-         * @param request HTTP request
-         * @param response HTTP response
-         * @param region AWS region name
-         * @param user AWS user
-         * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
-         */
-        void handleHead(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * Lambda handler configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Lambda module

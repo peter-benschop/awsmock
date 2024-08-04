@@ -2,7 +2,7 @@
 // Created by vogje01 on 06/09/2023.
 //
 
-#include "awsmock/dto/lambda/model/Function.h"
+#include <awsmock/dto/lambda/model/Function.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -26,9 +26,10 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("FunctionArn", functionArn);
             rootJson.set("FunctionName", functionName);
             rootJson.set("Handler", handler);
+            rootJson.set("Runtime", runtime);
             rootJson.set("FunctionName", functionName);
             // TODO: ImageConfig
-            rootJson.set("LastModified", Poco::DateTimeFormatter().format(lastModified, Poco::DateTimeFormat::HTTP_FORMAT));
+            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
             rootJson.set("LastUpdateStatus", lastUpdateStatusReason);
             rootJson.set("LastUpdateStatusCode", lastUpdateStatusReasonCode);
             rootJson.set("State", state);

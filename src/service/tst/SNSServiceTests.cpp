@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/sns/SNSService.h"
 #include "awsmock/service/sqs/SQSService.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/repository/SQSDatabase.h>
 
 // AwsMOck includes
@@ -44,8 +44,8 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSService _snsService = SNSService(_configuration);
-        SQSService _sqsService = SQSService(_configuration);
+        SNSService _snsService;
+        SQSService _sqsService;
     };
 
     TEST_F(SNSServiceTest, TopicCreateTest) {

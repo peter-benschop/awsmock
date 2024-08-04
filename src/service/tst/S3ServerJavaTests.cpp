@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/s3/S3Server.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
 
@@ -42,24 +42,20 @@ namespace AwsMock::Service {
             _tempFile = Core::FileUtils::CreateTempFile("txt");
 
             // Start HTTP manager
-            _s3Server = std::make_shared<S3Server>(_configuration);
-            _s3Server->Start();
-            _s3Monitoring = std::make_shared<S3Monitoring>(300);
-            _s3Monitoring->Start();
+            _s3Server.Start();
         }
 
         void TearDown() override {
             Core::FileUtils::DeleteFile(_tempFile);
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
-            _s3Server->Stop();
+            _s3Server.Stop();
         }
 
         std::string _endpoint, _baseCommand, _tempFile;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
-        std::shared_ptr<S3Server> _s3Server;
-        std::shared_ptr<S3Monitoring> _s3Monitoring;
+        S3Server _s3Server;
     };
 
     TEST_F(S3ServerJavaTest, BucketCreateTest) {

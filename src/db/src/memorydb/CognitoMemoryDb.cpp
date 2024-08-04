@@ -8,6 +8,7 @@ namespace AwsMock::Database {
 
     Poco::Mutex CognitoMemoryDb::_userPoolMutex;
     Poco::Mutex CognitoMemoryDb::_userMutex;
+    Poco::Mutex CognitoMemoryDb::_groupMutex;
 
     bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
@@ -72,8 +73,24 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region,
-                                                                       const std::string &name) {
+    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByUserPoolId(const std::string &userPoolId) {
+
+        auto it = find_if(_userPools.begin(),
+                          _userPools.end(),
+                          [userPoolId](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                              return userPool.second.userPoolId == userPoolId;
+                          });
+
+        if (it == _userPools.end()) {
+            log_error << "Get cognito user pool by userPoolId failed, region: " << userPoolId;
+            throw Core::DatabaseException("Get cognito user pool by userPoolId failed, userPoolId: " + userPoolId);
+        }
+
+        it->second.oid = it->first;
+        return it->second;
+    }
+
+    Entity::Cognito::UserPool CognitoMemoryDb::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
 
         auto it = find_if(_userPools.begin(),
                           _userPools.end(),
@@ -176,9 +193,7 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region,
-                                                             const std::string &userPoolId,
-                                                             const std::string &userName) {
+    Entity::Cognito::User CognitoMemoryDb::GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) {
 
         auto it = find_if(_users.begin(),
                           _users.end(),
@@ -223,8 +238,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region,
-                                                                  const std::string &userPoolId) {
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region, const std::string &userPoolId) {
 
         Entity::Cognito::UserList userList;
         if (!region.empty() && !userPoolId.empty()) {
@@ -251,6 +265,22 @@ namespace AwsMock::Database {
         }
 
         log_trace << "Got user list, size: " << userList.size();
+        return userList;
+    }
+
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+
+        Entity::Cognito::UserList userList;
+
+        for (const auto &user: _users) {
+            if (user.second.region == region && user.second.userPoolId == userPoolId && std::find_if(user.second.groups.begin(), user.second.groups.end(), [&groupName](const Entity::Cognito::Group &g) {
+                                                                                            return g.groupName == groupName;
+                                                                                        }) != user.second.groups.end()) {
+                userList.emplace_back(user.second);
+            }
+        }
+
+        log_trace << "Got user in group list, size: " << userList.size();
         return userList;
     }
 
@@ -289,6 +319,96 @@ namespace AwsMock::Database {
 
         log_debug << "All cognito users deleted, count: " << _userPools.size();
         _users.clear();
+    }
+
+    bool CognitoMemoryDb::GroupExists(const std::string &region, const std::string &groupName) {
+
+        return find_if(_groups.begin(),
+                       _groups.end(),
+                       [region, groupName](const std::pair<std::string, Entity::Cognito::Group> &group) {
+                           return group.second.region == region && group.second.groupName == groupName;
+                       }) != _groups.end();
+    }
+
+    Entity::Cognito::Group CognitoMemoryDb::GetGroupByGroupName(const std::string &region, const std::string &groupPoolId, const std::string &groupName) {
+
+        auto it = find_if(_groups.begin(),
+                          _groups.end(),
+                          [region, groupPoolId, groupName](const std::pair<std::string, Entity::Cognito::Group> &group) {
+                              return group.second.region == region && group.second.userPoolId == groupPoolId && group.second.groupName == groupName;
+                          });
+
+        if (it == _groups.end()) {
+            log_error << "Get cognito group by group name failed, groupName: " << groupName;
+            throw Core::DatabaseException("Get cognito group by group name failed, groupName: " + groupName);
+        }
+
+        it->second.oid = it->first;
+        return it->second;
+    }
+
+    Entity::Cognito::Group CognitoMemoryDb::CreateGroup(const Entity::Cognito::Group &group) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        _groups[oid] = group;
+        log_trace << "Cognito user pool created, oid: " << oid;
+        return _groups[oid];
+    }
+
+    std::vector<Entity::Cognito::Group> CognitoMemoryDb::ListGroups(const std::string &region, const std::string &userPoolId) {
+
+        Entity::Cognito::GroupList groupList;
+        if (!region.empty() && !userPoolId.empty()) {
+
+            for (const auto &group: _groups) {
+                if (group.second.region == region && group.second.userPoolId == userPoolId) {
+                    groupList.emplace_back(group.second);
+                }
+            }
+
+        } else if (!region.empty()) {
+
+            for (const auto &group: _groups) {
+                if (group.second.region == region) {
+                    groupList.emplace_back(group.second);
+                }
+            }
+
+        } else {
+
+            for (const auto &group: _groups) {
+                groupList.emplace_back(group.second);
+            }
+        }
+
+        log_trace << "Got group list, size: " << groupList.size();
+        return groupList;
+    }
+
+    void CognitoMemoryDb::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        const auto count = std::erase_if(_groups, [region, userPoolId, groupName](const std::pair<std::string, Entity::Cognito::Group> &g) {
+            return g.second.region == region && g.second.userPoolId == userPoolId && g.second.groupName == groupName;
+        });
+        log_debug << "Cognito group deleted, groupName: " << groupName << " count: " << count;
+    }
+
+    void CognitoMemoryDb::DeleteAllGroups(const std::string &region) {
+        Poco::ScopedLock lock(_groupMutex);
+
+        if (region.empty()) {
+
+            _groups.clear();
+            log_debug << "All cognito groups deleted";
+
+        } else {
+            const auto count = std::erase_if(_groups, [region](const std::pair<std::string, Entity::Cognito::Group> &g) {
+                return g.second.region == region;
+            });
+            log_debug << "All cognito groups deleted, region: " << region << " count: " << count;
+        }
     }
 
 }// namespace AwsMock::Database

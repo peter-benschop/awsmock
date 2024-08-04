@@ -1,0 +1,10 @@
+{
+  "Variables": {
+    "AWS_REGION": "eu-central-1",
+    "AWS_ACCOUNT_ID": "000000000000",
+    "AWS_ACCESS_KEY_ID": "none",
+    "AWS_SECRET_ACCESS_KEY": "none",
+    "AWS_SESSION_TOKEN": "none",
+    "AWS_ENDPOINT": "http://host.docker.internal:4566"
+  }
+}

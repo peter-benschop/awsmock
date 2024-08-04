@@ -23,11 +23,11 @@
 #include <Poco/Net/HTTPRequest.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Win32Utils.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
@@ -138,7 +138,11 @@ namespace AwsMock::FtpServer {
         // Transfer parameter commands
         void handleFtpCommandPORT(const std::string &param);
 
+        void handleFtpCommandEPRT(const std::string &param);
+
         void handleFtpCommandPASV(const std::string &param);
+
+        void handleFtpCommandEPSV(const std::string &param);
 
         void handleFtpCommandTYPE(const std::string &param);
 

@@ -5,6 +5,9 @@
 #ifndef AWMOCK_CORE_SQSDATABASETEST_H
 #define AWMOCK_CORE_SQSDATABASETEST_H
 
+// C++ includes
+#include <chrono>
+
 // GTest includes
 #include <gtest/gtest.h>
 
@@ -20,15 +23,17 @@
 
 namespace AwsMock::Database {
 
+    using std::chrono::system_clock;
+
     class SQSDatabaseTest : public ::testing::Test {
 
       protected:
 
         void SetUp() override {
-            _queueArn = Core::AwsUtils::CreateSQSQueueArn(_configuration, QUEUE_NAME);
-            _queueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, QUEUE_NAME);
-            _dlqueueUrl = Core::AwsUtils::CreateSQSQueueUrl(_configuration, DLQ_NAME);
-            _dlqueueArn = Core::AwsUtils::CreateSQSQueueArn(_configuration, DLQ_NAME);
+            _queueArn = Core::CreateSQSQueueArn(QUEUE_NAME);
+            _queueUrl = Core::CreateSQSQueueUrl(QUEUE_NAME);
+            _dlqueueUrl = Core::CreateSQSQueueUrl(DLQ_NAME);
+            _dlqueueArn = Core::CreateSQSQueueArn(DLQ_NAME);
             _region = _configuration.getString("awsmock.region");
         }
 
@@ -330,8 +335,8 @@ namespace AwsMock::Database {
                 queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .attributes = queueAttribute};
         queue = _sqsDatabase.CreateQueue(queue);
 
-        Poco::DateTime reset;
-        reset += Poco::Timespan(queueAttribute.delaySeconds, 0);
+        system_clock::time_point reset = system_clock::now();
+        reset += std::chrono::seconds(queueAttribute.delaySeconds);
         Entity::SQS::Message message =
                 {.region = _region, .queueUrl = queue.queueUrl, .body = BODY, .status = Entity::SQS::MessageStatus::DELAYED, .reset = reset};
         _sqsDatabase.CreateMessage(message);

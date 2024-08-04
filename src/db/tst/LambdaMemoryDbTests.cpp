@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
@@ -28,7 +28,7 @@ namespace AwsMock::Database {
 
         void SetUp() override {
             _region = _configuration.getString("awsmock.region");
-            _accountId = _configuration.getString("awsmock.account.userPoolId");
+            _accountId = _configuration.getString("awsmock.account.id");
         }
 
         void TearDown() override {

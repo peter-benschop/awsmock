@@ -11,6 +11,9 @@
 #include <utility>
 #include <vector>
 
+// Boost include<
+#include <boost/beast.hpp>
+
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -20,6 +23,7 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    namespace http = boost::beast::http;
     /**
      * @brief Delete item request DTO
      *
@@ -61,7 +65,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * HTTP status from docker image
          */
-        Poco::Net::HTTPResponse::HTTPStatus status;
+        http::status status;
 
         /**
          * Creates a JSON string from the object.

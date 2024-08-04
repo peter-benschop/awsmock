@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/s3/S3Server.h"
 #include "awsmock/service/s3/S3Service.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/repository/S3Database.h>
 
@@ -36,25 +36,24 @@ namespace AwsMock::Service {
             std::string _port = _configuration.getString("awsmock.service.s3.http.port", std::to_string(S3_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.userPoolId", S3_ACCOUNT_ID);
+            _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
             _output = "json";
 
             // Start HTTP manager
-            _s3Server = std::make_shared<S3Server>(_configuration);
-            _s3Server->Start();
+            _s3Server.Start();
         }
 
         void TearDown() override {
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
-            _s3Server->Stop();
+            _s3Server.Stop();
         }
 
         std::string _endpoint, _accountId, _output;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
-        std::shared_ptr<S3Server> _s3Server;
+        S3Server _s3Server;
     };
 
     TEST_F(S3ServerCliTest, BucketCreateTest) {

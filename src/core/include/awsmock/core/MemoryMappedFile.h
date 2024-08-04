@@ -6,19 +6,18 @@
 #define AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 
 // C includes
-#include <fcntl.h>
-#include <sys/stat.h>
-#ifndef _WIN32
 #include <cerrno>
+#include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
-#endif
 
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/SingletonHolder.h>
+// Boost includes
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
@@ -27,7 +26,7 @@
 namespace AwsMock::Core {
 
     /**
-     * Memory mapped file utility.
+     * @brief Memory mapped file utility.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -36,22 +35,22 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
 
         /**
-         * Singleton
+         * @brief Singleton
          *
          * @return singleton instance
          */
         static MemoryMappedFile &instance() {
-            static Poco::SingletonHolder<MemoryMappedFile> memoryMappedFile;
-            return *memoryMappedFile.get();
+            static MemoryMappedFile memoryMappedFile;
+            return memoryMappedFile;
         }
 
         /**
-         * Opens a file and prepares the memory map
+         * @brief Opens a file and prepares the memory map
          *
          * @param filename name of the file.
          * @return true on success
@@ -59,12 +58,12 @@ namespace AwsMock::Core {
         bool OpenFile(const std::string &filename);
 
         /**
-         * Release all resources
+         * @brief Release all resources
          */
         void CloseFile();
 
         /**
-         * Copy a chunk of data from the memory mapped file the provided output buffer
+         * @brief Copy a chunk of data from the memory mapped file the provided output buffer
          *
          * @param start start index
          * @param end end index
@@ -74,30 +73,15 @@ namespace AwsMock::Core {
         long ReadChunk(long start, long end, char *buffer);
 
         /**
-         * Returns true in case the file is mapped already.
+         * @brief Returns true in case the file is mapped already.
          *
          * @return true, in case file is already mapped.
          */
         [[nodiscard]] bool IsMapped() const { return _mapped; }
-#ifdef _WIN32
-        /// tweak performance
-        enum CacheHint
-        {
-            Normal,         ///< good overall performance
-            SequentialScan, ///< read file only once with few seeks
-            RandomAccess    ///< jump around
-        };
-#endif
 
       private:
 
-#ifdef _WIN32
-        typedef void* FileHandle;
-        /// Windows handle to memory mapping of _file
-        void*       _mappedFile;
-#else
-        typedef int   FileHandle;
-#endif
+        typedef int FileHandle;
 
         /**
          * Start pointer
@@ -129,6 +113,10 @@ namespace AwsMock::Core {
          */
         long _fileSize = 0;
 
+        /**
+         * Mutex
+         */
+        static boost::mutex _mutex;
     };
 
 }// namespace AwsMock::Core

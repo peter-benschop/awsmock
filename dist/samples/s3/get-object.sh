@@ -19,6 +19,3 @@ aws s3 cp s3://test-bucket/$tmpfile ./tmp.txt \
 
 # Cleanup
 rm -f /tmp/$tmpfile
-rm -f ./tmp.txt
-
-

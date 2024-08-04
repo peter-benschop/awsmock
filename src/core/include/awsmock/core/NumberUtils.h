@@ -11,10 +11,13 @@
 // Poco includes
 #include <Poco/String.h>
 
+// Boost includes
+#include <boost/lexical_cast.hpp>
+
 namespace AwsMock::Core {
 
     /**
-     * Number utilities.
+     * @brief Number utilities.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -23,7 +26,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Return a string with the value in kilobytes.
+         * @brief Return a string with the value in kilobytes.
          *
          * @param value value to print
          * @return value string
@@ -31,7 +34,7 @@ namespace AwsMock::Core {
         static std::string ToKilobytesStr(long value);
 
         /**
-         * Converts the given number to kilobytes.
+         * @brief Converts the given number to kilobytes.
          *
          * @param value value to convert
          * @return value in kilobytes
@@ -39,7 +42,7 @@ namespace AwsMock::Core {
         static long ToKilobytes(long value);
 
         /**
-         * Return a string with the value in megabytes.
+         * @brief Return a string with the value in megabytes.
          *
          * @param value value to print
          * @return value string
@@ -47,7 +50,7 @@ namespace AwsMock::Core {
         static std::string ToMegabytesStr(long value);
 
         /**
-         * Converts the given number to megabytes.
+         * @brief Converts the given number to megabytes.
          *
          * @param value value to convert
          * @return value in kilobytes
@@ -55,13 +58,32 @@ namespace AwsMock::Core {
         static long ToMegabytes(long value);
 
         /**
-         * Returns a byte array from an integer
+         * @brief Returns a byte array from an integer
          *
          * @param n integer value
          * @param bytes output bytes
          * @param offset offset
          */
         static void GetIntAsByteArray(int n, unsigned char *bytes, int offset);
+
+        /**
+         * @brief Returns a integer from a hex string
+         *
+         * @param hex hex string
+         * @return converted integer
+         */
+        static int HexToInt(const std::string &hex);
+
+        /**
+         * @brief Returns a integer from a string
+         *
+         * @par
+         * Returns -1 in case str is empty.
+         *
+         * @param str string
+         * @return converted integer
+         */
+        static int ToInt(const std::string &str);
     };
 
 }// namespace AwsMock::Core

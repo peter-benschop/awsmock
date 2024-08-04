@@ -18,14 +18,19 @@
 #include <sstream>
 #include <string>
 
+// Boost includes
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+
 // AwsMock includes
-#include <awsmock/controller/Configuration.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/CurlUtils.h>
-#include <awsmock/core/HttpUtils.h>
-#include <awsmock/dto/common/Services.h>
+#include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/dto/transfer/model/Server.h>
+#include <awsmock/dto/transfer/model/User.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
 #define AWSMOCKCTL_DEFAULT_HOST "localhost"
@@ -36,99 +41,141 @@
 
 namespace AwsMock::Controller {
 
-    class Controller {
+    class AwsMockCtl {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
+         *
+         * AwsMock controller, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
+         *
+         * @author jens.vogt\@opitz-consulting.com
          */
-        explicit Controller(const Configuration &configuration);
+        explicit AwsMockCtl();
 
         /**
-         * List all available services
+         * @brief Initialization
+         *
+         * @param vm vector of command line options
+         * @param commands vector of commands
+         */
+        void Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands);
+
+        /**
+         * @brief Main method
+         */
+        void Run();
+
+        /**
+         * @brief List all available services
          */
         void ListServices();
 
         /**
-         * Start a module
+         * @brief Start a module
          *
-         * @param name module name, or 'all'
+         * @param modules list of modules names
          */
-        void StartService(const std::string &name);
+        void StartService(std::vector<Dto::Module::Module> &modules);
 
         /**
-         * Restart a module
+         * @brief Restart a module
          *
-         * @param name module name, or 'all'
+         * @param modules list of modules names
          */
-        void RestartService(const std::string &name);
+        void RestartService(std::vector<Dto::Module::Module> &modules);
 
         /**
-         * Stops a module
+         * @brief Stops a module
          *
-         * @param name module name, or 'all'
+         * @param modules list of modules names
          */
-        void StopService(const std::string &name);
+        void StopService(std::vector<Dto::Module::Module> &modules);
 
 #ifdef HAS_SYSTEMD
         /**
-         * Show the logs
+         * @brief Show the logs
          */
         static void ShowServiceLogs();
 #endif
 
         /**
-         * Sets the managers log level
+         * @brief Sets the managers log level
          *
          * @param level log level
          */
         void SetLogLevel(const std::string &level);
 
         /**
-         * Returns the current AwsMock configuration
+         * @brief Returns the current AwsMock configuration
          */
-        void GetDefaults();
+        void GetConfig();
 
         /**
-         * Dumps the current infrastructure as JSON file to stdout.
+         * @brief Dumps the current infrastructure as JSON file to stdout.
          *
-         * @param services list of services
+         * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(const std::vector<std::string> &services, bool pretty = true, bool includeObjects = false);
+        void ExportInfrastructure(Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false);
 
         /**
-         * Imports the current infrastructure from stdin
+         * @brief Imports the current infrastructure from stdin
          */
         void ImportInfrastructure();
 
         /**
-         * Cleans the current infrastructure.
+         * @brief Cleans the current infrastructure.
          *
-         * @param services list of services
+         * @param modules list of modules
          */
-        void CleanInfrastructure(const std::vector<std::string> &services);
+        void CleanInfrastructure(Dto::Module::Module::ModuleList &modules);
+
+        /**
+         * @brief Cleans the objects of the given modules
+         *
+         * @param modules list of modules
+         */
+        void CleanObjects(Dto::Module::Module::ModuleList &modules);
+
+        /**
+         * @brief Show FTP users.
+         *
+         * As the AWS CLI does not allow to see the users password, this is a workaround. It will send a FTP user list
+         * request to the server and shows the currently defined FTP users.
+         *
+         * @param serverId ID of the FTP server.
+         */
+        void ShowFtpUsers(const std::string &serverId);
 
       private:
 
         /**
-         * Add authorization header.
+         * @brief Add authorization header.
          *
          * @param headers headers
+         * @param action action to perform
          */
-        void AddStandardHeaders(std::map<std::string, std::string> &headers);
+        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action);
 
         /**
-         * Application configuration
+         * @brief Get a list of all modules.
+         *
+         * @return list of all modules.
          */
-        const Configuration &_configuration;
+        Dto::Module::Module::ModuleList GetAllModules();
 
         /**
-         * Curl utils
+         * Commands
          */
-        Core::CurlUtils _curlUtils;
+        std::vector<std::string> _commands;
+
+        /**
+         * Command line options
+         */
+        boost::program_options::variables_map _vm;
 
         /**
          * Host

@@ -19,15 +19,15 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 7,
+  "id": 4,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
-      "description": "Total number of users.",
+      "description": "Total number of user pools.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -49,14 +49,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -66,6 +66,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -92,12 +93,18 @@
       "id": 3,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -106,23 +113,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+            "uid": "ddmuv3dszk000a"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(cognito_user_count_total[5m])",
+          "expr": "avg_over_time(cognito_userpool_counter[5m])",
           "instant": false,
-          "legendFormat": "Userpools",
+          "legendFormat": "UserPools:",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Number of Users",
+      "title": "Number of users pools",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of users.",
       "fieldConfig": {
@@ -146,14 +153,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -163,6 +170,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -189,12 +197,18 @@
       "id": 1,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -203,12 +217,12 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+            "uid": "ddmuv3dszk000a"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(cognito_user_count_total[5m])",
+          "expr": "avg_over_time(cognito_user_counter[5m])",
           "instant": false,
-          "legendFormat": "Users",
+          "legendFormat": "User:",
           "range": true,
           "refId": "A"
         }
@@ -219,7 +233,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Total number of users per user pool.",
       "fieldConfig": {
@@ -250,7 +264,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -260,6 +274,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -286,12 +301,18 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -300,10 +321,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+            "uid": "ddmuv3dszk000a"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(cognito_user_by_userpool_count[5m])",
+          "expr": "avg_over_time(cognito_user_by_userpool_counter[5m])",
           "instant": false,
           "legendFormat": "{{userpool}}",
           "range": true,
@@ -316,7 +337,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Amount of milliseconds for the different Cognito service calls",
       "fieldConfig": {
@@ -340,14 +361,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -357,6 +378,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -384,15 +406,17 @@
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -401,11 +425,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+            "uid": "ddmuv3dszk000a"
           },
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "cognito_service_timer",
+          "expr": "avg_over_time(cognito_service_timer[5m])",
           "instant": false,
           "legendFormat": "{{method}}",
           "range": true,
@@ -416,15 +439,17 @@
       "type": "timeseries"
     }
   ],
+  "refresh": "30s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "Cognito",

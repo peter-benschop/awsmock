@@ -9,10 +9,10 @@
 #include <gtest/gtest.h>
 
 // Poco includes
-#include "Poco/Path.h"
+#include <Poco/Path.h>
 
 // Local includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SNSDatabase.h>
 

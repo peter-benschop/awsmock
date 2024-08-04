@@ -12,7 +12,7 @@
 #define FTP_BUCKET "transfer-manager"
 
 // C++ includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/ftpserver/Permissions.h>
 
 namespace AwsMock::FtpServer {

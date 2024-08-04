@@ -10,8 +10,8 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -21,7 +21,7 @@
 namespace AwsMock::Database {
 
     /**
-     * DynamoDB MongoDB database.
+     * @brief DynamoDB MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -30,20 +30,20 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit DynamoDbDatabase();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static DynamoDbDatabase &instance() {
-            static Poco::SingletonHolder<DynamoDbDatabase> sh;
-            return *sh.get();
+            static DynamoDbDatabase dynamoDbDatabase;
+            return dynamoDbDatabase;
         }
 
         /**
-         * Check existence of DynamoDb table
+         * @brief Check existence of DynamoDb table
          *
          * @param region AWS region name
          * @param tableName table name
@@ -53,7 +53,7 @@ namespace AwsMock::Database {
         bool TableExists(const std::string &region, const std::string &tableName);
 
         /**
-         * Create a new DynamoDb table
+         * @brief Create a new DynamoDb table
          *
          * @param table DynamoDb table
          * @return created DynamoDb table.
@@ -61,7 +61,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
 
         /**
-         * Updates a new DynamoDb table
+         * @brief Updates a new DynamoDb table
          *
          * @param table DynamoDb table
          * @return updated DynamoDb table.
@@ -69,7 +69,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
 
         /**
-         * Create a new DynamoDb table or update an existing one
+         * @brief Create a new DynamoDb table or update an existing one
          *
          * @param table DynamoDb table
          * @return created or updated DynamoDb table.
@@ -77,7 +77,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table);
 
         /**
-         * Returns a table entity by primary key
+         * @brief Returns a table entity by primary key
          *
          * @param oid table primary key
          * @return table entity
@@ -86,7 +86,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table GetTableById(bsoncxx::oid oid);
 
         /**
-         * Returns a table entity by primary key
+         * @brief Returns a table entity by primary key
          *
          * @param oid table primary key
          * @return table entity
@@ -95,7 +95,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table GetTableById(const std::string &oid);
 
         /**
-         * Returns a table entity by primary key
+         * @brief Returns a table entity by primary key
          *
          * @param region table region
          * @param name table name
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
 
         /**
-         * Returns a list of DynamoDB tables
+         * @brief Returns a list of DynamoDB tables
          *
          * @param region AWS region name
          * @return list of DynamoDB tables
@@ -113,7 +113,7 @@ namespace AwsMock::Database {
         Entity::DynamoDb::TableList ListTables(const std::string &region = {});
 
         /**
-         * Returns the number of DynamoDB tables
+         * @brief Returns the number of DynamoDB tables
          *
          * @param region AWS region name
          * @return number of DynamoDB tables
@@ -121,7 +121,7 @@ namespace AwsMock::Database {
         long CountTables(const std::string &region = {});
 
         /**
-         * Deletes an existing DynamoDB table
+         * @brief Deletes an existing DynamoDB table
          *
          * @param region AWS region
          * @param tableName name of the table
@@ -130,25 +130,14 @@ namespace AwsMock::Database {
         void DeleteTable(const std::string &region, const std::string &tableName);
 
         /**
-         * Deletes all existing DynamoDB tables
+         * @brief Deletes all existing DynamoDB tables
          *
          * @throws DatabaseException
          */
         void DeleteAllTables();
 
         /**
-         * Checks the existence of an item.
-         *
-         * @param region AWS region.
-         * @param tableName name of the table
-         * @param key primary key of the item
-         * @return true if database exists, otherwise false
-         * @throws DatabaseException
-         */
-        //bool ItemExists(const std::string &region, const std::string &tableName, const std::string &key);
-
-        /**
-         * Checks the existence of an item.
+         * @brief Checks the existence of an item.
          *
          * @param item DynamoDB item
          * @return true if database exists, otherwise false
@@ -157,7 +146,7 @@ namespace AwsMock::Database {
         bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
-         * Returns a list of DynamoDB items
+         * @brief Returns a list of DynamoDB items
          *
          * @param region AWS region.
          * @param tableName table name
@@ -168,7 +157,7 @@ namespace AwsMock::Database {
 
 
         /**
-         * Returns a item entity by primary key
+         * @brief Returns a item entity by primary key
          *
          * @param oid item primary key
          * @return item entity
@@ -202,6 +191,14 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::DynamoDb::Item CreateOrUpdateItem(const Entity::DynamoDb::Item &item);
+
+        /**
+         * @brief Returns the number of DynamoDB items.
+         *
+         * @param region AWS region name
+         * @return number of DynamoDB items
+         */
+        long CountItems(const std::string &region = {});
 
         /**
          * @brief Deletes an item by primary key

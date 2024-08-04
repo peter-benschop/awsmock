@@ -5,8 +5,8 @@
 #ifndef AWSMOCK_CORE_UNAUTHORIZED_EXCEPTION_H
 #define AWSMOCK_CORE_UNAUTHORIZED_EXCEPTION_H
 
-#include "Poco/Exception.h"
-#include "Poco/Net/HTTPResponse.h"
+#include <Poco/Exception.h>
+#include <Poco/Net/HTTPResponse.h>
 
 namespace AwsMock::Core {
 

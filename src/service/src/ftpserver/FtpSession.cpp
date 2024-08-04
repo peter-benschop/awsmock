@@ -1,5 +1,4 @@
 
-#include "awsmock/core/MetricDefinition.h"
 #include <awsmock/ftpserver/FtpSession.h>
 
 #include <utility>
@@ -26,7 +25,7 @@ namespace AwsMock::FtpServer {
         _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
 
         // S3 service
-        _s3Service = std::make_shared<Service::S3Service>(configuration);
+        _s3Service = std::make_shared<Service::S3Service>();
     }
 
     FtpSession::~FtpSession() {
@@ -40,7 +39,7 @@ namespace AwsMock::FtpServer {
         if (ec)
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
 
-        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Server"));
+        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
         readFtpCommand();
     }
 
@@ -68,7 +67,7 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::startSendingMessages() {
 
-        log_debug << "FTP >> " << command_output_queue_.front();
+        log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
         asio::async_write(command_socket_, asio::buffer(command_output_queue_.front()), command_write_strand_.wrap([me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
             if (!ec) {
                 me->command_output_queue_.pop_front();
@@ -152,6 +151,8 @@ namespace AwsMock::FtpServer {
                 // Transfer parameter commands
                 {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
                 {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
+                {"EPRT", std::bind(&FtpSession::handleFtpCommandEPRT, this, std::placeholders::_1)},
+                {"EPSV", std::bind(&FtpSession::handleFtpCommandEPSV, this, std::placeholders::_1)},
                 {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
                 {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
                 {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
@@ -297,13 +298,88 @@ namespace AwsMock::FtpServer {
 
         if (data_acceptor_.is_open()) {
             asio::error_code ec;
+            ec = data_acceptor_.close(ec);
+            if (ec) {
+                log_error << "Error closing data acceptor: " << ec.message();
+            }
+        }
+
+        // In case of a dockerized FTP server we need to use some special ports
+        asio::ip::tcp::endpoint endpoint;
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
+            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
+            int port = Core::RandomUtils::NextInt(minPort, minPort);
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
+        } else {
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
+        }
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
+
+        {
+            asio::error_code ec;
+            ec = data_acceptor_.open(endpoint.protocol(), ec);
+            if (ec) {
+                log_error << "Error opening data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            ec = data_acceptor_.bind(endpoint, ec);
+            if (ec) {
+                log_error << "Error binding data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            ec = data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            if (ec) {
+                log_error << "Error listening on data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+
+        // Split address and port into bytes and get the port the OS chose for us
+        boost::asio::ip::address_v4::bytes_type ip_bytes;
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
+        } else {
+            ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        }
+        auto port = data_acceptor_.local_endpoint().port();
+        log_info << "Server suggested port: " << port;
+
+        // Form reply string
+        std::stringstream stream;
+        stream << "(";
+        for (size_t i = 0; i < 4; i++) {
+            stream << static_cast<int>(ip_bytes[i]) << ",";
+        }
+        stream << ((port >> 8) & 0xff) << "," << (port & 0xff) << ")";
+
+        sendFtpMessage(FtpReplyCode::ENTERING_PASSIVE_MODE, "Entering passive mode " + stream.str());
+    }
+
+    void FtpSession::handleFtpCommandEPRT(const std::string & /*param*/) {
+        if (!_logged_in_user) {
+            sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
+            return;
+        }
+
+        if (data_acceptor_.is_open()) {
+            asio::error_code ec;
             data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 0);
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
 
         {
             asio::error_code ec;
@@ -340,7 +416,66 @@ namespace AwsMock::FtpServer {
         // Form reply string
         std::stringstream stream;
         stream << "(";
-        for (size_t i = 0; i < 4; i++) {
+        for (size_t i = 0; i < 8; i++) {
+            stream << static_cast<int>(ip_bytes[i]) << ",";
+        }
+        stream << ((port >> 8) & 0xff) << "," << (port & 0xff) << ")";
+
+        sendFtpMessage(FtpReplyCode::ENTERING_PASSIVE_MODE, "Entering passive mode " + stream.str());
+    }
+
+    void FtpSession::handleFtpCommandEPSV(const std::string & /*param*/) {
+        if (!_logged_in_user) {
+            sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
+            return;
+        }
+
+        if (data_acceptor_.is_open()) {
+            asio::error_code ec;
+            data_acceptor_.close(ec);
+            if (ec) {
+                log_error << "Error closing data acceptor: " << ec.message();
+            }
+        }
+
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+
+        {
+            asio::error_code ec;
+            data_acceptor_.open(endpoint.protocol(), ec);
+            if (ec) {
+                log_error << "Error opening data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            data_acceptor_.bind(endpoint, ec);
+            if (ec) {
+                log_error << "Error binding data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            if (ec) {
+                log_error << "Error listening on data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+
+        // Split address and port into bytes and get the port the OS chose for us
+        auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+        auto port = data_acceptor_.local_endpoint().port();
+
+        // Form reply string
+        std::stringstream stream;
+        stream << "(";
+        for (size_t i = 0; i < 8; i++) {
             stream << static_cast<int>(ip_bytes[i]) << ",";
         }
         stream << ((port >> 8) & 0xff) << "," << (port & 0xff) << ")";
@@ -460,7 +595,7 @@ namespace AwsMock::FtpServer {
         // TODO: the ACTION_NOT_TAKEN reply is not RCF 959 conform. Apparently in
         // 1985 nobody anticipated that you might not want anybody uploading files
         // to your manager. We use the return code anyways, as the popular FileZilla
-        // Server also returns that code as "Permission denied"
+        // Handler also returns that code as "Permission denied"
         if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileWrite) == 0) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
             return;
@@ -577,7 +712,7 @@ namespace AwsMock::FtpServer {
         // RFC 959 conform. Apparently back in 1985 it was assumed that the RNTO
         // command will always succeed, as long as you enter a valid target file
         // name. Thus we use the two return codes anyways, the popular FileZilla
-        // FTP Server uses those as well.
+        // FTP Handler uses those as well.
         auto is_renamable_error = checkIfPathIsRenamable(_renameFromPath);
 
         if (is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
@@ -710,12 +845,14 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::handleFtpCommandLIST(const std::string &param) {
         if (!_logged_in_user) {
+            log_error << "Not logged in";
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
 
         // RFC 959 does not allow ACTION_NOT_TAKEN (-> permanent error), so we return a temporary error (FILE_ACTION_NOT_TAKEN).
         if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
+            log_error << "Permission denied";
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
             return;
         }
@@ -754,6 +891,7 @@ namespace AwsMock::FtpServer {
         }
 
         const std::string local_path = toLocalPath(path2dst);
+        log_debug << "Local path: " << local_path;
         auto dir_status = FileStatus(local_path);
 
         if (dir_status.isOk()) {
@@ -768,10 +906,12 @@ namespace AwsMock::FtpServer {
                 }
             } else {
                 // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
+                log_error << "Not a directory, directory: " << local_path;
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
                 return;
             }
         } else {
+            log_error << "Path does not exist, directory: " << local_path;
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path does not exist");
             return;
         }
@@ -820,7 +960,7 @@ namespace AwsMock::FtpServer {
     void FtpSession::handleFtpCommandSYST(const std::string & /*param*/) {
         // Always returning "UNIX" when being asked for the operating system.
         // Some clients (Mozilla Firefox for example) may disconnect, when we
-        // return an unknown operating system here. As depending on the Server's
+        // return an unknown operating system here. As depending on the Handler's
         // operating system is a horrible feature anyways, we simply fake it.
         //
         // Unix should be the best compatible value here, as we emulate Unix-like
@@ -897,6 +1037,7 @@ namespace AwsMock::FtpServer {
             }
 
             std::string tmp = stream.str();
+            log_info << "Sending directory listing: " << tmp;
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
@@ -954,6 +1095,7 @@ namespace AwsMock::FtpServer {
             me->readDataFromFileAndSend(file, data_socket);
             me->readDataFromFileAndSend(file, data_socket);
         });
+        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD, static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
     }
 
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket) {
@@ -1196,11 +1338,12 @@ namespace AwsMock::FtpServer {
 
         Dto::S3::PutObjectRequest request = {.region = _region, .bucket = _bucket, .key = key, .owner = user, .metadata = metadata};
 
-        std::ifstream ifs(fileName);
-        _s3Service->PutObject(request, ifs);
+        std::ifstream ifs(fileName, std::ios::binary);
+        _s3Service->PutObject(request, ifs, false);
         ifs.close();
 
         _metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
+        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, static_cast<double>(Core::FileUtils::FileSize(fileName)));
 
         log_debug << "File uploaded, fileName: " << fileName;
     }

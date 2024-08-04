@@ -2,9 +2,11 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 
 namespace AwsMock::Core {
+
+    boost::mutex Configuration::_configurationMutex;
 
     Configuration::Configuration() {
         Initialize();
@@ -19,12 +21,14 @@ namespace AwsMock::Core {
 
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
-        DefineStringProperty("awsmock.account.userPoolId", "AWSMOCK_ACCOUNT_ID", "000000000000");
-        DefineStringProperty("awsmock.client.userPoolId", "AWSMOCK_CLIENT_ID", "00000000");
+        DefineStringProperty("awsmock.account.id", "AWSMOCK_ACCOUNT_ID", "000000000000");
+        DefineStringProperty("awsmock.client.id", "AWSMOCK_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
         DefineStringProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
         DefineStringProperty("awsmock.temp.dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
         DefineBoolProperty("awsmock.pretty", "AWSMOCK_PRETTY", false);
+        DefineBoolProperty("awsmock.verifysignature", "AWSMOCK_VERIFY_SIGNATURE", false);
+        DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
 
         // Manager
         DefineStringProperty("awsmock.manager.host", "AWSMOCK_MANAGER_HOST", "localhost");
@@ -109,7 +113,9 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.dynamodb.http.max.queue", "AWSMOCK_SERVICE_DYNAMODB_MAX_QUEUE", 250);
         DefineIntProperty("awsmock.service.dynamodb.http.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.dynamodb.http.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
-        DefineIntProperty("awsmock.monitoring.dynamodb.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
+        DefineIntProperty("awsmock.service.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
+        DefineStringProperty("awsmock.dynamodb.host", "AWSMOCK_DYNAMODB_HOST", "localhost");
+        DefineIntProperty("awsmock.dynamodb.port", "AWSMOCK_DYNAMODB_PORT", 8000);
 
         // SecretsManager
         DefineBoolProperty("awsmock.service.secretsmanager.active", "AWSMOCK_SERVICE_SECRETSMANAGER_ACTIVE", true);
@@ -139,12 +145,12 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.docker.socket", "AWSMOCK_DOCKER_SOCKET", "/var/run/docker.sock");
 
         // Monitoring
-        DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9100);
-        DefineIntProperty("awsmock.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
+        DefineIntProperty("awsmock.service.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9091);
+        DefineIntProperty("awsmock.service.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
 
         // Logging
-        DefineStringProperty("awsmock.log.level", "AWSMOCK_LOG_LEVEL", "information");
-        DefineStringProperty("awsmock.log.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
+        DefineStringProperty("awsmock.service.logging.level", "AWSMOCK_LOG_LEVEL", "info");
+        DefineStringProperty("awsmock.service.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
 
         // Database
         DefineBoolProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);

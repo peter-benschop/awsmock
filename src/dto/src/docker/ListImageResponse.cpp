@@ -6,10 +6,6 @@
 
 namespace AwsMock::Dto::Docker {
 
-    ListImageResponse::ListImageResponse(const std::string &body) {
-        FromJson(body);
-    }
-
     void ListImageResponse::FromJson(const std::string &jsonString) {
 
         try {

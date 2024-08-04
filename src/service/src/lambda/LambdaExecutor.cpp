@@ -4,25 +4,28 @@
 
 #include <awsmock/service/lambda/LambdaExecutor.h>
 
-#include <utility>
-
 namespace AwsMock::Service {
 
-    Poco::Mutex LambdaExecutor::_mutex;
-
-    void LambdaExecutor::Run() {
-        Poco::ScopedLock lock(_mutex);
+    void LambdaExecutor::operator()(const std::string &function, const std::string &containerId, const std::string &host, int port, const std::string &payload) {
 
         Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
-        log_debug << "Sending lambda invocation request, endpoint: " << _url;
+        log_debug << "Sending lambda invocation request, endpoint: " << host << ":" << port;
 
-        Core::CurlUtils _curlUtils;
-        Core::CurlResponse response = _curlUtils.SendHttpRequest("POST", _url, {}, _payload);
-        if (response.statusCode != Poco::Net::HTTPResponse::HTTP_OK) {
-            log_debug << "HTTP error, status: " << response.statusCode << " reason: " << response.output;
+        // Set status
+        Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceRunning);
+
+        // Send request to lambda docker container
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload, {});
+        if (response.statusCode != http::status::ok) {
+            log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
+            Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceFailed);
         }
-        log_debug << "Lambda invocation finished send, status: " << response.statusCode;
-        log_info << "Lambda output: " << response.output;
+
+        // Reset status
+        Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
+        log_debug << "Lambda invocation finished, function: " << function << " httpStatus: " << response.statusCode;
+        log_info << "Lambda output: " << response.body;
     }
+
 }// namespace AwsMock::Service

@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/entity/s3/Object.h"
+#include <awsmock/entity/s3/Object.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
@@ -30,8 +30,8 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("metadata", metadataDoc),
                 kvp("internalName", internalName),
                 kvp("versionId", versionId),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return objectDoc;
     }
@@ -49,8 +49,8 @@ namespace AwsMock::Database::Entity::S3 {
         contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
         internalName = bsoncxx::string::to_string(mResult.value()["internalName"].get_string().value);
         versionId = bsoncxx::string::to_string(mResult.value()["versionId"].get_string().value);
-        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
         // Get metadata
         if (mResult.value().find("metadata") != mResult.value().end()) {
@@ -76,6 +76,8 @@ namespace AwsMock::Database::Entity::S3 {
         jsonObject.set("contentType", contentType);
         jsonObject.set("internalName", internalName);
         jsonObject.set("versionId", versionId);
+        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
 
         if (!metadata.empty()) {
             Poco::JSON::Array jsonMetadataArray;

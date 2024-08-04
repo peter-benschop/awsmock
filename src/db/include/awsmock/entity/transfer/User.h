@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::Transfer {
     using bsoncxx::document::view;
 
     /**
-     * Transfer manager user entity
+     * @brief Transfer manager user entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -54,14 +54,24 @@ namespace AwsMock::Database::Entity::Transfer {
         std::string homeDirectory;
 
         /**
-         * Converts the entity to a MongoDB document
+         * ARN
+         */
+        std::string arn;
+
+        /**
+         * Role
+         */
+        std::string role;
+
+        /**
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
@@ -82,14 +92,14 @@ namespace AwsMock::Database::Entity::Transfer {
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param m user
@@ -99,4 +109,5 @@ namespace AwsMock::Database::Entity::Transfer {
     };
 
 }// namespace AwsMock::Database::Entity::Transfer
+
 #endif// AWSMOCK_DB_ENTITY_USER_H

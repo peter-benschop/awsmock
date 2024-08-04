@@ -34,7 +34,7 @@
 namespace AwsMock::Dto::Common {
 
     /**
-     * Services
+     * @brief Services
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -51,7 +51,15 @@ namespace AwsMock::Dto::Common {
          * @param service name of the service
          * @return true in case the service exists
          */
-        bool HasService(const std::string &service) const;
+        [[nodiscard]] bool HasService(const std::string &service) const;
+
+        /**
+         * Check existence of given service name
+         *
+         * @param service name of the service
+         * @return true in case the service exists
+         */
+        [[nodiscard]] bool Contains(const std::string &service) const;
 
         /**
          * JSON representation

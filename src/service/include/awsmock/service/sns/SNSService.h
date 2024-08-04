@@ -14,31 +14,32 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/AwsUtils.h"
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/ServiceException.h"
-#include "awsmock/dto/sns/CreateTopicRequest.h"
-#include "awsmock/dto/sns/CreateTopicResponse.h"
-#include "awsmock/dto/sns/DeleteTopicResponse.h"
-#include "awsmock/dto/sns/GetTopicAttributesRequest.h"
-#include "awsmock/dto/sns/GetTopicAttributesResponse.h"
-#include "awsmock/dto/sns/ListSubscriptionsByTopicRequest.h"
-#include "awsmock/dto/sns/ListSubscriptionsByTopicResponse.h"
-#include "awsmock/dto/sns/ListTopicsResponse.h"
-#include "awsmock/dto/sns/PublishRequest.h"
-#include "awsmock/dto/sns/PublishResponse.h"
-#include "awsmock/dto/sns/SqsNotificationRequest.h"
-#include "awsmock/dto/sns/SubscribeRequest.h"
-#include "awsmock/dto/sns/SubscribeResponse.h"
-#include "awsmock/dto/sns/TagResourceRequest.h"
-#include "awsmock/dto/sns/TagResourceResponse.h"
-#include "awsmock/dto/sns/UnsubscribeRequest.h"
-#include "awsmock/dto/sns/UnsubscribeResponse.h"
-#include "awsmock/dto/sqs/SendMessageRequest.h"
-#include "awsmock/dto/sqs/SendMessageResponse.h"
-#include "awsmock/repository/SNSDatabase.h"
-#include "awsmock/service/sqs/SQSService.h"
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/dto/sns/CreateTopicRequest.h>
+#include <awsmock/dto/sns/CreateTopicResponse.h>
+#include <awsmock/dto/sns/DeleteTopicResponse.h>
+#include <awsmock/dto/sns/GetTopicAttributesRequest.h>
+#include <awsmock/dto/sns/GetTopicAttributesResponse.h>
+#include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
+#include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicsResponse.h>
+#include <awsmock/dto/sns/PublishRequest.h>
+#include <awsmock/dto/sns/PublishResponse.h>
+#include <awsmock/dto/sns/SqsNotificationRequest.h>
+#include <awsmock/dto/sns/SubscribeRequest.h>
+#include <awsmock/dto/sns/SubscribeResponse.h>
+#include <awsmock/dto/sns/TagResourceRequest.h>
+#include <awsmock/dto/sns/TagResourceResponse.h>
+#include <awsmock/dto/sns/UnsubscribeRequest.h>
+#include <awsmock/dto/sns/UnsubscribeResponse.h>
+#include <awsmock/dto/sqs/SendMessageRequest.h>
+#include <awsmock/dto/sqs/SendMessageResponse.h>
+#include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 #define SQS_PROTOCOL "sqs"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
@@ -46,7 +47,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SNS server thread
+     * @brief SNS server thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -55,14 +56,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration module configuration
+         * @brief Constructor
          */
-        explicit SNSService(Core::Configuration &configuration);
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
 
         /**
-         * Creates a new queue
+         * @brief Creates a new queue
          *
          * <p>In case the topic exists already, return the existing topic.</p>
          *
@@ -72,7 +71,7 @@ namespace AwsMock::Service {
         Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
 
         /**
-         * Returns a list of all available queues
+         * @brief Returns a list of all available queues
          *
          * @param region AWS region
          * @return ListQueuesResponse
@@ -80,7 +79,7 @@ namespace AwsMock::Service {
         Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
 
         /**
-         * Publish a message to a SNS topic
+         * @brief Publish a message to a SNS topic
          *
          * @param request AWS region
          * @return PublishResponse
@@ -88,7 +87,7 @@ namespace AwsMock::Service {
         Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
         /**
-         * Subscribe to a topic
+         * @brief Subscribe to a topic
          *
          * @param request subscribe request DTO
          * @return SubscribeResponse DTO
@@ -96,7 +95,7 @@ namespace AwsMock::Service {
         Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
 
         /**
-         * Unsubscribe from a topic
+         * @brief Unsubscribe from a topic
          *
          * @param request unsubscribe request DTO
          * @return UnsubscribeResponse DTO
@@ -104,7 +103,7 @@ namespace AwsMock::Service {
         Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
 
         /**
-         * Sets tags for a topic
+         * @brief Sets tags for a topic
          *
          * @param request tag resource request DTO
          * @return TagResourceResponse DTO
@@ -112,7 +111,7 @@ namespace AwsMock::Service {
         Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request);
 
         /**
-         * Returns the topic attributes
+         * @brief Returns the topic attributes
          *
          * @param request get topic attributes request DTO
          * @return GetTopicAttributesResponse DTO
@@ -128,7 +127,7 @@ namespace AwsMock::Service {
         Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
 
         /**
-         * Delete a queue
+         * @brief Delete a queue
          *
          * @param region AWS region name
          * @param topicArn topic ARN
@@ -140,29 +139,19 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Checks the subscriptions.
+         * @brief Checks the subscriptions.
          *
          * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
          */
         void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
 
         /**
-         * Send a SNS message to an SQS queue
+         * @brief Send a SNS message to an SQS queue
          *
          * @param subscription SNS subscription
          * @param request SNS publish request
          */
         void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
-
-        /**
-         * Account ID
-         */
-        std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * SNS database connection
@@ -177,7 +166,7 @@ namespace AwsMock::Service {
         /**
          * SQS module
          */
-        std::unique_ptr<SQSService> _sqsService;
+        SQSService _sqsService;
     };
 
 }// namespace AwsMock::Service

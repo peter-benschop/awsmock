@@ -9,6 +9,8 @@ namespace AwsMock::Database::Entity::Transfer {
     view_or_value<view, value> User::ToDocument() const {
 
         view_or_value<view, value> userDoc = make_document(
+                kvp("arn", arn),
+                kvp("role", role),
                 kvp("userName", userName),
                 kvp("password", password),
                 kvp("homeDirectory", homeDirectory));
@@ -19,6 +21,8 @@ namespace AwsMock::Database::Entity::Transfer {
     void User::FromDocument(bsoncxx::document::view mResult) {
 
         for (auto &v: mResult) {
+            arn = bsoncxx::string::to_string(v["arn"].get_string().value);
+            role = bsoncxx::string::to_string(v["role"].get_string().value);
             userName = bsoncxx::string::to_string(v["userName"].get_string().value);
             password = bsoncxx::string::to_string(v["password"].get_string().value);
             homeDirectory = bsoncxx::string::to_string(v["homeDirectory"].get_string().value);
@@ -28,6 +32,8 @@ namespace AwsMock::Database::Entity::Transfer {
     Poco::JSON::Object User::ToJsonObject() const {
 
         Poco::JSON::Object jsonObject;
+        jsonObject.set("arn", arn);
+        jsonObject.set("role", role);
         jsonObject.set("userName", userName);
         jsonObject.set("password", password);
         jsonObject.set("homeDirectory", homeDirectory);

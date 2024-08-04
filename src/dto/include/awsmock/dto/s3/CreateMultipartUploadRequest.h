@@ -10,10 +10,10 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -43,6 +43,11 @@ namespace AwsMock::Dto::S3 {
          * AWS upload ID
          */
         std::string uploadId;
+
+        /**
+         * Metadata
+         */
+        std::map<std::string, std::string> metadata;
 
         /**
          * Convert to a JSON string

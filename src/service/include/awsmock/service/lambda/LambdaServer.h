@@ -9,9 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
@@ -19,8 +19,8 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
-#include <awsmock/service/lambda/LambdaHandlerFactory.h>
 #include <awsmock/service/lambda/LambdaMonitoring.h>
+#include <awsmock/service/lambda/LambdaWorker.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define LAMBDA_DEFAULT_PORT 9503
@@ -29,6 +29,7 @@
 #define LAMBDA_DEFAULT_THREADS 50
 #define LAMBDA_DEFAULT_TIMEOUT 120
 #define LAMBDA_DEFAULT_MONITORING_PERIOD 300
+#define LAMBDA_DEFAULT_WORKER_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -85,7 +86,7 @@ namespace AwsMock::Service {
          * @param lambda lambda to get the code from.
          * @return Dto::lambda::Code
          */
-        static Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
+        Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * Configuration
@@ -113,9 +114,14 @@ namespace AwsMock::Service {
         std::shared_ptr<LambdaMonitoring> _lambdaMonitoring;
 
         /**
+         * Lambda worker
+         */
+        std::shared_ptr<LambdaWorker> _lambdaWorker;
+
+        /**
          * Data dir
          */
-        std::string _dataDir;
+        std::string _lambdaDir;
 
         /**
          * AWS region
@@ -171,6 +177,11 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * Worker period
+         */
+        int _workerPeriod;
     };
 
 }// namespace AwsMock::Service

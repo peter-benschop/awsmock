@@ -8,6 +8,7 @@
 // C++ standard includes
 #include <algorithm>
 #include <array>
+#include <iconv.h>
 #include <iomanip>
 #include <iterator>
 #include <random>
@@ -16,20 +17,20 @@
 #include <string>
 #include <vector>
 
-// Iconv includes
-#ifndef _WIN32
-#include <iconv.h>
-#endif
-
 // Poco includes
 #include <Poco/RegularExpression.h>
 #include <Poco/String.h>
 #include <Poco/URI.h>
 
+// Boost includes
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 namespace AwsMock::Core {
 
     /**
-     * String utilities.
+     * @brief String utilities.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -38,7 +39,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Generates a random string with the given length.
+         * @brief Generates a random string with the given length.
          *
          * @param length length of the string
          * @return generated random string with the given length.
@@ -46,7 +47,7 @@ namespace AwsMock::Core {
         static std::string GenerateRandomString(int length);
 
         /**
-         * Generates a random hexadecimal string with the given length.
+         * @brief Generates a random hexadecimal string with the given length.
          *
          * @param length length of the string
          * @return generated random hexadecimal string with the given length.
@@ -54,7 +55,7 @@ namespace AwsMock::Core {
         static std::string GenerateRandomHexString(int length);
 
         /**
-         * Generates a random password string with the given length.
+         * @brief Generates a random password string with the given length.
          *
          * @param length length of the string
          * @return generated random password string with the given length.
@@ -62,7 +63,7 @@ namespace AwsMock::Core {
         static std::string GenerateRandomPassword(int length);
 
         /**
-         * Generates a random version string with the given length.
+         * @brief Generates a random version string with the given length.
          *
          * @param length length of the string
          * @return generated random password string with the given length.
@@ -70,7 +71,7 @@ namespace AwsMock::Core {
         static std::string GenerateRandomVersion(int length);
 
         /**
-         * Check whether the provided string is a number.
+         * @brief Check whether the provided string is a number.
          *
          * @param value string value
          * @return true in case the provided string is numeric, otherwise false.
@@ -78,7 +79,7 @@ namespace AwsMock::Core {
         static bool IsNumeric(const std::string &value);
 
         /**
-         * Check whether the provided string is a UUID.
+         * @brief Check whether the provided string is a UUID.
          *
          * @param value string value
          * @return true in case the provided string is a UUID, otherwise false.
@@ -86,7 +87,14 @@ namespace AwsMock::Core {
         static bool IsUuid(const std::string &value);
 
         /**
-         * Splits a string into pieces using the provided delimiter char.
+         * @brief Creates a random UUID and return is as a string
+         *
+         * @return random UUID as string
+         */
+        static std::string CreateRandomUuid();
+
+        /**
+         * @brief Splits a string into pieces using the provided delimiter char.
          *
          * @param s string to split
          * @param delim delimiter
@@ -95,7 +103,7 @@ namespace AwsMock::Core {
         static std::vector<std::string> Split(const std::string &s, char delim);
 
         /**
-         * Joins a string array to a string using the given delimiter.
+         * @brief Joins a string array to a string using the given delimiter.
          *
          * @param vec vector of strings
          * @param delimiter delimiter character
@@ -105,7 +113,7 @@ namespace AwsMock::Core {
         static std::string Join(const std::vector<std::string> &vec, char delimiter, int startIndex = 0);
 
         /**
-         * Strip whitespaces
+         * @brief Strip whitespaces
          *
          * @param s string to split
          * @return string having all whitespaces removed
@@ -113,7 +121,7 @@ namespace AwsMock::Core {
         static std::string StripWhiteSpaces(std::string &s);
 
         /**
-         * Strip line endings
+         * @brief Strip line endings
          *
          * @param s string to split
          * @return string having all line endings removed
@@ -121,7 +129,7 @@ namespace AwsMock::Core {
         static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> s);
 
         /**
-         * Strip beginning of string
+         * @brief Strip beginning of string
          *
          * @param s1 string to strip
          * @param s2 substring to strip
@@ -130,7 +138,7 @@ namespace AwsMock::Core {
         static std::string StripBeginning(const std::string &s1, const std::string &s2);
 
         /**
-         * Return true if s1 and s2 are equal.
+         * @brief Return true if s1 and s2 are equal.
          *
          * @param s1 first input string
          * @param s2 second input string
@@ -139,7 +147,7 @@ namespace AwsMock::Core {
         static bool Equals(const std::string &s1, const std::string &s2);
 
         /**
-         * Return true if s1 and s2 are not case sensitive equal.
+         * @brief Return true if s1 and s2 are not case sensitive equal.
          *
          * @param s1 first input string
          * @param s2 second input string
@@ -148,7 +156,7 @@ namespace AwsMock::Core {
         static bool EqualsIgnoreCase(const std::string &s1, const std::string &s2);
 
         /**
-         * Returns true in case the string is either null or empty
+         * @brief Returns true in case the string is either null or empty
          *
          * @param s1 pointer to the string to check
          * @return true if the string is null or empty.
@@ -156,7 +164,7 @@ namespace AwsMock::Core {
         static bool IsNullOrEmpty(const std::string *s1);
 
         /**
-         * Returns true in case the string s1 contains string s1
+         * @brief Returns true in case the string s1 contains string s1
          *
          * @param s1 string to check
          * @param s2 probe string
@@ -165,7 +173,7 @@ namespace AwsMock::Core {
         static bool Contains(const std::string &s1, const std::string &s2);
 
         /**
-         * Returns true in case the string s1 contains string s1, both string are compares case insensitive
+         * @brief Returns true in case the string s1 contains string s1, both string are compares case insensitive
          *
          * @param s1 string to check
          * @param s2 probe string

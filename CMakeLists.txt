@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 project(awsmock)
 
-set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH " ..." FORCE)
 set(CMAKE_BUILD_PARALLEL_LEVEL 30)
 
 # Doxygen
@@ -27,6 +25,12 @@ endif ()
 
 # Testing
 enable_testing()
+
+# Set includes and libraries
+set(INC_BSON_CXX /usr/local/include/bsoncxx/v_noabi)
+set(INC_MONGO_CXX /usr/local/include/mongocxx/v_noabi)
+set(LIB_BSON_CXX bsoncxx)
+set(LIB_MONGO_CXX mongocxx)
 
 add_subdirectory(src/core)
 add_subdirectory(src/db)

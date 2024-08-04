@@ -5,10 +5,12 @@
 #ifndef AWSMOCK_DTO_BASE_CLIENT_COMMAND_H
 #define AWSMOCK_DTO_BASE_CLIENT_COMMAND_H
 
-// AwsMock includes
-#include <awsmock/dto/common/HttpMethod.h>
+// Boost includes
+#include <boost/beast/http/verb.hpp>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
 
     class BaseClientCommand {
 
@@ -22,7 +24,7 @@ namespace AwsMock::Dto::Common {
         /**
          * HTTP request type
          */
-        HttpMethod method;
+        http::verb method;
 
         /**
          * HTTP headers

@@ -9,9 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Lambda {
 

@@ -5,20 +5,22 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
-// Poco includes
-#include <Poco/Net/HTTPClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
+// C++ include
+#include <utility>
 
 // AwsMock includes
-#include <awsmock/core/CurlUtils.h>
+#include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricDefinition.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/Task.h>
+#include <awsmock/core/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/repository/LambdaDatabase.h>
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief Lambda executor.
@@ -29,22 +31,26 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaExecutor : public Core::Task {
+    class LambdaExecutor {
 
       public:
 
         /**
-         * Constructor
-         *
-         * @param url lambda docker URL
-         * @param payload event payload
+         * @brief Constructor
          */
-        explicit LambdaExecutor(std::string url, std::string payload) : Core::Task("lambda-executor"), _url(std::move(url)), _payload(std::move(payload)){};
+        explicit LambdaExecutor() = default;
+
 
         /**
-         * Send the invocation request to the corresponding port
+         * @brief Executes a lambda function
+         *
+         * @param function lambda function name
+         * @param containerId lambda docker container ID
+         * @param host lambda docker host
+         * @param port lambda docker port
+         * @param payload lambda payload
          */
-        void Run() override;
+        void operator()(const std::string &function, const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
       private:
 
@@ -52,21 +58,6 @@ namespace AwsMock::Service {
          * Metric module
          */
         Core::MetricService &_metricService = Core::MetricService::instance();
-
-        /**
-         * Lambda URL
-         */
-        std::string _url;
-
-        /**
-         * Lambda payload
-         */
-        std::string _payload;
-
-        /**
-         * Mutex
-         */
-        static Poco::Mutex _mutex;
     };
 
 }// namespace AwsMock::Service

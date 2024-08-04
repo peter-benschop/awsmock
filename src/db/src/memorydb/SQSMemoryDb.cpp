@@ -275,7 +275,7 @@ namespace AwsMock::Database {
 
                 // Update values
                 message.second.status = Entity::SQS::MessageStatus::INVISIBLE;
-                message.second.reset = Poco::Timestamp(reset.time_since_epoch().count() / 1000);
+                message.second.reset = reset;
 
                 // Update store
                 _messages[message.first] = message.second;
@@ -297,7 +297,7 @@ namespace AwsMock::Database {
         auto now = std::chrono::high_resolution_clock::now();
         for (auto message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INVISIBLE && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INVISIBLE && message.second.reset < std::chrono::system_clock::now()) {
 
                 // Reset status
                 message.second.status = Entity::SQS::MessageStatus::INITIAL;
@@ -307,18 +307,15 @@ namespace AwsMock::Database {
                 _messages[message.first] = message.second;
                 count++;
             }
-            log_trace << "Message reset, visibilityTimeout: " << visibility << " updated: " << count
-                      << " queue: " << queueUrl;
+            log_trace << "Message reset, visibilityTimeout: " << visibility << " updated: " << count << " queue: " << queueUrl;
         }
     }
 
-    void SQSMemoryDb::RedriveMessages(const std::string &queueUrl,
-                                      const Entity::SQS::RedrivePolicy &redrivePolicy,
-                                      const Core::Configuration &configuration) {
+    void SQSMemoryDb::RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy, const Core::Configuration &configuration) {
         Poco::ScopedLock lock(_sqsMessageMutex);
 
         long count = 0;
-        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(configuration, redrivePolicy.deadLetterTargetArn);
+        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
         for (auto message: _messages) {
 
             if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::INITIAL && message.second.retries > redrivePolicy.maxReceiveCount) {
@@ -341,7 +338,7 @@ namespace AwsMock::Database {
 
         for (auto &message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < Poco::Timestamp(now.time_since_epoch().count() / 1000)) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < std::chrono::system_clock::now()) {
 
                 message.second.status = Entity::SQS::MessageStatus::INITIAL;
                 _messages[message.first] = message.second;
@@ -360,7 +357,7 @@ namespace AwsMock::Database {
 
         for (auto &message: _messages) {
 
-            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < Poco::Timestamp(reset.time_since_epoch().count() / 1000)) {
+            if (message.second.queueUrl == queueUrl && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < std::chrono::system_clock::now()) {
 
                 DeleteMessage(message.second);
                 count++;

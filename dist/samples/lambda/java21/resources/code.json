@@ -1,0 +1,4 @@
+{
+  "S3Bucket": "test-bucket",
+  "S3Key": "lambdas/java-events-1.0-SNAPSHOT.jar"
+}

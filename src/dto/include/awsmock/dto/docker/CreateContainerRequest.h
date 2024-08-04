@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_CREATECONTAINERREQUEST_H
-#define AWSMOCK_DTO_DOCKER_CREATECONTAINERREQUEST_H
+#ifndef AWSMOCK_DTO_DOCKER_CREATE_CONTAINER_REQUEST_H
+#define AWSMOCK_DTO_DOCKER_CREATE_CONTAINER_REQUEST_H
 
 // C++ includes
 #include <sstream>
@@ -18,7 +18,10 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Exposed port
+     * @brief Exposed port
+     *
+     * @par
+     * Defines the port which will be connected to the outside world.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -36,7 +39,11 @@ namespace AwsMock::Dto::Docker {
     };
 
     /**
-     * Create container request
+     * @brief Create container request.
+     *
+     * @par
+     * Adds the DNS entries for S3 host-style requests. This needs a DNS server which is able to resolve the hostnames. Usually on Linux this can be done using 'dnsmasq'. You
+     * need to setup the hosts in dnsmasq. The host names must conform to the AWS S3 specification, i.e.: &lt;bucketname&gt;.s3.&lt;region&gt;.&lt;domainname&gt;.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -83,21 +90,21 @@ namespace AwsMock::Dto::Docker {
         std::string hostPort;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
@@ -106,4 +113,4 @@ namespace AwsMock::Dto::Docker {
 
 }// namespace AwsMock::Dto::Docker
 
-#endif//AWSMOCK_DTO_DOCKER_CREATECONTAINERREQUEST_H
+#endif// AWSMOCK_DTO_DOCKER_CREATE_CONTAINER_REQUEST_H

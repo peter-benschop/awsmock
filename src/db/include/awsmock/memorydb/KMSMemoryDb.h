@@ -11,7 +11,6 @@
 // Poco includes
 #include <Poco/Mutex.h>
 #include <Poco/ScopedLock.h>
-#include <Poco/SingletonHolder.h>
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
@@ -40,8 +39,8 @@ namespace AwsMock::Database {
          * Singleton instance
          */
         static KMSMemoryDb &instance() {
-            static Poco::SingletonHolder<KMSMemoryDb> sh;
-            return *sh.get();
+            static KMSMemoryDb kmsMemoryDb;
+            return kmsMemoryDb;
         }
 
         /**
@@ -113,6 +112,13 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteKey(const Entity::KMS::Key &key);
+
+        /**
+         * Delete a all keys
+         *
+         * @throws DatabaseException
+         */
+        void DeleteAllKeys();
 
       private:
 

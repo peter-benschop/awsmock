@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    KMSServer::KMSServer(Core::Configuration &configuration) : AbstractServer(configuration, "kms", 10), _configuration(configuration), _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSServer::KMSServer(Core::Configuration &configuration) : AbstractServer("kms", 10), _configuration(configuration), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // HTTP manager configuration
         _port = _configuration.getInt("awsmock.service.kms.http.port", KMS_DEFAULT_PORT);
@@ -37,7 +37,10 @@ namespace AwsMock::Service {
         log_info << "KMS module starting";
 
         // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new KMSRequestHandlerFactory(_configuration));
+        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new KMSRequestHandlerFactory(_configuration));
+
+        // Set running
+        SetRunning();
     }
 
     void KMSServer::Run() {

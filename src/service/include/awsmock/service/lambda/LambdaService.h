@@ -9,43 +9,45 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/Notification.h>
-#include <Poco/NotificationQueue.h>
-#include <Poco/RecursiveDirectoryIterator.h>
-#include <Poco/StreamCopier.h>
+// Boost includes
+#include <boost/thread.hpp>
 
 // AwsMock includes
+#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
-#include <awsmock/core/MetricServiceTimer.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/TaskPool.h>
+#include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
+#include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
+#include <awsmock/dto/lambda/CreateEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/dto/lambda/DeleteTagsRequest.h>
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
+#include <awsmock/dto/lambda/ListEventSourceMappingsRequest.h>
+#include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
+#include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
-#include <awsmock/service/common/DockerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
+
+// Maximal output length for a synchronous invocation call
+#define MAX_OUTPUT_LENGTH (4 * 1024)
 
 namespace AwsMock::Service {
 
@@ -79,14 +81,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration module configuration
+         * @brief Constructor
          */
-        explicit LambdaService(const Core::Configuration &configuration);
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
-         * Create lambda function
+         * @brief Create lambda function
          *
          * @param request create lambda request
          * @return CreateFunctionResponse
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
         Dto::Lambda::CreateFunctionResponse CreateFunction(Dto::Lambda::CreateFunctionRequest &request);
 
         /**
-         * List lambda functions
+         * @brief List lambda functions
          *
          * @param region AWS region name
          * @return CreateFunctionResponse
@@ -102,33 +102,28 @@ namespace AwsMock::Service {
         Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
 
         /**
-         * Invoke lambda function
+         * @brief Invoke SQS function.
          *
-         * @param eventNotification S3 event eventNotification
-         * @param region AWS region
-         * @param user user
-         */
-        void InvokeEventFunction(const Dto::S3::EventNotification &eventNotification, const std::string &region, const std::string &user);
-
-        /**
-         * Invoke SQS function.
+         * If the logType is set and is equal to 'Tail', the function will be invoked synchronously and the output will be appended to the response.
          *
          * @param functionName lambda function name
          * @param payload SQS message
          * @param region AWS region
          * @param user user
+         * @param logType logging type
+         * @return output string (limited to 4kb) in case logType = 'Tail' and an synchronous invocation.
          */
-        void InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user);
+        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType = {});
 
         /**
-         * Create a new tag for a lambda functions.
+         * @brief Create a new tag for a lambda functions.
          *
          * @param request lambda create tag request
          */
         void CreateTag(const Dto::Lambda::CreateTagRequest &request);
 
         /**
-         * Returns a list of tags for a ARN.
+         * @brief Returns a list of tags for a ARN.
          *
          * @param arn lambda function ARN
          * @return ListTagsResponse
@@ -137,7 +132,7 @@ namespace AwsMock::Service {
         Dto::Lambda::ListTagsResponse ListTags(const std::string &arn);
 
         /**
-         * Gets a single lambda function
+         * @brief Gets a single lambda function
          *
          * @param region AWS region
          * @param name function name
@@ -157,9 +152,34 @@ namespace AwsMock::Service {
         Dto::Lambda::AccountSettingsResponse GetAccountSettings();
 
         /**
-         * Delete lambda function
+         * @brief Creates a event source mapping.
          *
-         * <p>This method will also delete the corresponding container and images.
+         * @par
+         * The event source mapping is created in the SQS/SNS entities and executes whenever a SQS/SNS message is created.
+         *
+         * @param request create event source mappings request
+         * @return create event source mappings response
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::CreateEventSourceMappingsRequest
+         * @see AwsMock::Dto::Lambda::CreateEventSourceMappingsResponse
+         */
+        Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request);
+
+        /**
+         * @brief List a event source mappings
+         *
+         * @param request list event source mappings request
+         * @return list event source mappings response
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::ListEventSourceMappingsRequest
+         * @see AwsMock::Dto::Lambda::ListEventSourceMappingsResponse
+         */
+        Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request);
+
+        /**
+         * @brief Delete lambda function
+         *
+         * This method will also delete the corresponding container and images.
          *
          * @param request delete lambda request
          * @throws ServiceException
@@ -167,7 +187,7 @@ namespace AwsMock::Service {
         void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
 
         /**
-         * Delete lambda function tags
+         * @brief Delete lambda function tags
          *
          * @param request delete tags request
          * @throws ServiceException
@@ -177,43 +197,24 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Returns the URI for the invocation request.
+         * @brief Invoke the lambda function synchronously.
          *
-         * @param hostName host name of the docker instance
-         * @param port lambda docker external port
-         * @return URI of the invocation request
+         * The output will be returned to the calling method.
+         *
+         * @param host lambda docker container host
+         * @param port lambda docker container port
+         * @param payload payload for the function
+         * @return output from lambda invocation call
          */
-        static std::string GetRequestUrl(const std::string &hostName, int port);
+        static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload);
 
         /**
-         * Data directory
+         * @brief Tries to find an idle instance
+         *
+         * @param lambda lambda entity to check
+         * @return containerId of the idle instance
          */
-        std::string _dataDir;
-
-        /**
-         * lambda directory
-         */
-        std::string _lambdaDir;
-
-        /**
-         * Temp directory
-         */
-        std::string _tempDir;
-
-        /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * AWS account ID
-         */
-        std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        const Core::Configuration &_configuration;
+        static std::string FindIdleInstance(Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * lambda database connection
@@ -221,20 +222,24 @@ namespace AwsMock::Service {
         Database::LambdaDatabase &_lambdaDatabase;
 
         /**
-         * S3 database connection
-         */
-        Database::S3Database &_s3Database;
-
-        /**
-         * Docker module
-         */
-        std::shared_ptr<Service::DockerService> _dockerService;
-
-        /**
          * Mutex
          */
         static Poco::Mutex _mutex;
     };
+
+    /**
+     * @brief Returns the URI for the invocation request.
+     *
+     * @param hostName host name of the docker instance
+     * @param port lambda docker external port
+     * @return URI of the invocation request
+     */
+    inline static std::string GetRequestUrl(const std::string &hostName, int port) {
+        if (hostName.empty()) {
+            return "http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
+        }
+        return "http://" + hostName + ":" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
+    }
 
 }// namespace AwsMock::Service
 

@@ -9,13 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
+#include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/MetricService.h>
+#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/dynamodb/DynamoDbHandlerFactory.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
 #include <awsmock/service/dynamodb/DynamoDbWorker.h>
 
@@ -26,11 +26,12 @@
 #define DYNAMODB_DEFAULT_TIMEOUT 120
 #define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
 #define DYNAMODB_DEFAULT_WORKER_PERIOD 300
-#define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local-with-logging")
+#define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
 #define DYNAMODB_DOCKER_TAG std::string("latest")
-#define DYNAMODB_INTERNAL_PORT 8000
+#define DYNAMODB_DOCKER_PORT 8000
 #define DYNAMODB_EXTERNAL_PORT 8000
-#define DYNAMODB_DOCKER_FILE "FROM wernerwws/dynamodb-local-with-logging:latest\n"           \
+#define DYNAMODB_DOCKER_HOST "localhost"
+#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
                              "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
                              "WORKDIR /home/dynamodblocal\n"                                 \
                              "EXPOSE 8000 8000\n"                                            \
@@ -48,38 +49,36 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration aws-mock configuration
+         * @brief Constructor
          */
-        explicit DynamoDbServer(Core::Configuration &configuration);
+        explicit DynamoDbServer();
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
       protected:
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Delete dangling, stopped containers
+         * @brief Delete dangling, stopped containers
          */
         void CleanupContainers();
 
         /**
-         * Start the local DynamoDB container.
+         * @brief Start the local DynamoDB container.
          *
          * <p>
          * If the AWS DynamoDb docker image does not already exists, it will be downloaded. Otherwise the local docker
@@ -89,7 +88,7 @@ namespace AwsMock::Service {
         void StartLocalDynamoDb();
 
         /**
-         * Stop the local DynamoDB container.
+         * @brief Stop the local DynamoDB container.
          *
          * <p>
          * The AWS DynamoDb docker container will be stopped.
@@ -98,14 +97,9 @@ namespace AwsMock::Service {
         void StopLocalDynamoDb();
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * Docker module
          */
-        std::unique_ptr<Service::DockerService> _dockerService;
+        Service::DockerService &_dockerService;
 
         /**
          * Monitoring
@@ -161,6 +155,16 @@ namespace AwsMock::Service {
          * Worker period
          */
         int _workerPeriod;
+
+        /**
+         * Dynamo DB docker host
+         */
+        std::string _dockerHost;
+
+        /**
+         * Dynamo DB docker host
+         */
+        int _dockerPort;
 
         /**
          * Module name

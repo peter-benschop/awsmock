@@ -31,8 +31,10 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("Tags", tagsArray);
 
             // Ephemeral storage
-            Poco::JSON::Object ephemeralStorageObject;
             rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
+
+            // Code
+            rootJson.set("Code", code.ToJsonObject());
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

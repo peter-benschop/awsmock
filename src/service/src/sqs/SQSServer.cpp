@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SQSServer::SQSServer(Core::Configuration &configuration) : AbstractServer(configuration, "sqs"), _configuration(configuration), _sqsDatabase(Database::SQSDatabase::instance()) {
+    SQSServer::SQSServer(Core::Configuration &configuration) : AbstractServer("sqs"), _configuration(configuration), _sqsDatabase(Database::SQSDatabase::instance()) {
 
         // HTTP manager configuration
         _port = _configuration.getInt("awsmock.service.sqs.http.port", SQS_DEFAULT_PORT);
@@ -35,14 +35,11 @@ namespace AwsMock::Service {
         }
         log_info << "SQS server starting, port: " << _port;
 
-        // Start monitoring
-        //_sqsMonitoring->Start();
-
         // Start worker thread
         _sqsWorker->Start();
 
-        // Start REST module
-        StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SQSRequestHandlerFactory(_configuration));
+        // Set running
+        SetRunning();
     }
 
     void SQSServer::Run() {}

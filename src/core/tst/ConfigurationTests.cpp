@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 // Local includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
@@ -54,7 +54,7 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
-        EXPECT_FALSE(configuration->getString("awsmock.log.level").empty());
+        EXPECT_FALSE(configuration->getString("awsmock.service.logging.level").empty());
     }
 
     TEST_F(ConfigurationTest, SetValueTest) {
@@ -65,11 +65,11 @@ namespace AwsMock::Core {
 
         // act
         if (configuration != nullptr) {
-            configuration->SetValue("awsmock.log.level", std::string("error"));
+            configuration->SetValue("awsmock.service.logging.level", std::string("error"));
         }
 
         // assert
-        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
+        EXPECT_STREQ(configuration->getString("awsmock.service.logging.level").c_str(), "error");
     }
 
     TEST_F(ConfigurationTest, EnvironmentTest) {
@@ -86,8 +86,8 @@ namespace AwsMock::Core {
         EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
-        std::string tmp = configuration->getString("awsmock.log.level");
-        EXPECT_STREQ(configuration->getString("awsmock.log.level").c_str(), "error");
+        std::string tmp = configuration->getString("awsmock.service.logging.level");
+        EXPECT_STREQ(configuration->getString("awsmock.service.logging.level").c_str(), "error");
     }
 
 }// namespace AwsMock::Core

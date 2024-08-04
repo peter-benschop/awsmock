@@ -2,7 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Core {
 

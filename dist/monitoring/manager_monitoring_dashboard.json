@@ -25,7 +25,105 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
+      },
+      "description": "Status of the modules",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
+          },
+          "mappings": [],
+          "noValue": "3",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 1
+              },
+              {
+                "color": "semi-dark-red",
+                "value": 2
+              },
+              {
+                "color": "text",
+                "value": 3
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "colWidth": 0.9,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "rowHeight": 0.9,
+        "showValue": "never",
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ddmuv3dszk000a"
+          },
+          "editorMode": "code",
+          "expr": "manager_updown_gauge",
+          "instant": false,
+          "legendFormat": "{{module}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Module status",
+      "type": "status-history"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 7,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ddmuv3dszk000a"
       },
       "fieldConfig": {
         "defaults": {
@@ -48,14 +146,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -65,6 +163,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -83,20 +182,26 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 11,
         "w": 8,
         "x": 0,
-        "y": 0
+        "y": 8
       },
       "id": 1,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -120,7 +225,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Real memory usage versus time",
       "fieldConfig": {
@@ -151,7 +256,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -161,6 +266,8 @@
             }
           },
           "mappings": [],
+          "min": 0,
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -179,20 +286,26 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 11,
         "w": 8,
         "x": 8,
-        "y": 0
+        "y": 8
       },
       "id": 3,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "last",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -216,7 +329,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Virtual memopy usage versus time",
       "fieldConfig": {
@@ -240,14 +353,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -257,16 +370,13 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -275,20 +385,26 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 11,
         "w": 8,
         "x": 16,
-        "y": 0
+        "y": 8
       },
       "id": 6,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -300,9 +416,9 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(virtual_memory_used [5m])",
+          "expr": "avg_over_time(virtual_memory_used[5m])",
           "hide": false,
-          "legendFormat": "VIrtual Memory",
+          "legendFormat": "Virtual memory",
           "range": true,
           "refId": "B"
         }
@@ -313,7 +429,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "fieldConfig": {
         "defaults": {
@@ -336,14 +452,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -353,6 +469,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -371,20 +488,26 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 11,
         "w": 8,
         "x": 0,
-        "y": 15
+        "y": 19
       },
       "id": 4,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -408,7 +531,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "description": "Number of requests per method",
       "fieldConfig": {
@@ -468,24 +591,28 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 11,
         "w": 8,
         "x": 8,
-        "y": 15
+        "y": 19
       },
       "id": 5,
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -497,7 +624,7 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "rate(gateway_count[5m]) or vector(0)",
+          "expr": "increase(manager_http_counter[5m]) or vector(0)",
           "legendFormat": "{{method}}",
           "range": true,
           "refId": "A"
@@ -509,7 +636,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
+        "uid": "ddmuv3dszk000a"
       },
       "fieldConfig": {
         "defaults": {
@@ -532,14 +659,14 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -556,10 +683,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -568,26 +691,28 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 11,
         "w": 8,
         "x": 16,
-        "y": 15
+        "y": 19
       },
       "id": 2,
       "options": {
         "legend": {
           "calcs": [
+            "lastNotNull",
             "min",
             "max",
-            "last"
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "sortBy": "Min",
+          "sortBy": "Max",
           "sortDesc": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -599,70 +724,10 @@
             "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
           },
           "editorMode": "code",
-          "expr": "rate(gateway_get_time[5m]) or vector(0)",
-          "legendFormat": "GET",
+          "expr": "manager_http_timer or vector(0)",
+          "legendFormat": "{{method}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_put_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "PUT",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_post_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "POST",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_delete_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "DELETE",
-          "range": true,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_options_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "OPTIONS",
-          "range": true,
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "acc1f365-7d2f-4244-97d2-886c47c9b579"
-          },
-          "editorMode": "code",
-          "expr": "rate(gateway_head_time[5m]) or vector(0)",
-          "hide": false,
-          "legendFormat": "HEAD",
-          "range": true,
-          "refId": "F"
         }
       ],
       "title": "HTTP Request Time",
@@ -676,13 +741,14 @@
     "list": []
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-15m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "Manager",
   "uid": "cdae61d8-610f-49e4-bd3f-e7f1bf336d20",
-  "version": 14,
+  "version": 10,
   "weekStart": ""
 }

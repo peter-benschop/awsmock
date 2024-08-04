@@ -11,17 +11,19 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/lambda/model/Code.h>
+#include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * Get function response
+     * @brief Get function response
      *
      * Example:
      * @code{.json}
@@ -147,34 +149,9 @@ namespace AwsMock::Dto::Lambda {
         std::string user;
 
         /**
-         * Name of the function
+         * Configration
          */
-        std::string functionName;
-
-        /**
-         * Runtime environment
-         */
-        std::string runtime;
-
-        /**
-         * Role
-         */
-        std::string role;
-
-        /**
-         * Role
-         */
-        std::string handler;
-
-        /**
-         * Environment
-         */
-        EnvironmentVariables environmentVariables;
-
-        /**
-         * Memory size in MB. Default: 128, Range: 128 - 10240 MB
-         */
-        long memorySize = 128;
+        Configuration configuration;
 
         /**
          * Temporary disk space in MB
@@ -197,32 +174,43 @@ namespace AwsMock::Dto::Lambda {
         int timeout = 3;
 
         /**
-         * Creates a JSON string from the object.
+         * State
+         */
+        std::string state;
+
+        /**
+         * State reason
+         */
+        std::string stateReason;
+
+        /**
+         * State reason code
+         */
+        std::string stateReasonCode;
+
+        /**
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Parse a JSON stream.
+         * @brief Creates a XML string from the object.
          *
-         * @code{.json}
-         *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
-         * @endcode
-         *
-         * @param jsonString JSON string
+         * @return XML string
          */
-        void FromJson(const std::string &jsonString);
+        [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

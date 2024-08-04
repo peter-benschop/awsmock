@@ -3,18 +3,15 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerCmdHandler::SecretsManagerCmdHandler(Core::Configuration &configuration)
-        : AbstractHandler(), _configuration(configuration), _secretsManagerService(configuration) {}
+    SecretsManagerCmdHandler::SecretsManagerCmdHandler() : AbstractHandler() {}
 
-    void SecretsManagerCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request,
-                                              Poco::Net::HTTPServerResponse &response,
-                                              const Dto::Common::SecretsManagerClientCommand &secretsManagerClientCommand) {
+    void SecretsManagerCmdHandler::handlePost(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response, const Dto::Common::SecretsManagerClientCommand &secretsManagerClientCommand) {
         log_debug << "SecretsManager POST request, URI: " << request.getURI() << " region: "
                   << secretsManagerClientCommand.region << " user: " << secretsManagerClientCommand.user
                   << " command: "
                   << Dto::Common::SecretsManagerCommandTypeToString(secretsManagerClientCommand.command);
 
-        std::string requestId = GetHeaderValue(request, "RequestId", Poco::UUIDGenerator().createRandom().toString());
+        std::string requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId");
 
         try {
 
@@ -26,10 +23,9 @@ namespace AwsMock::Service {
                             secretsManagerRequest = {.region = secretsManagerClientCommand.region, .requestId = requestId};
                     secretsManagerRequest.FromJson(secretsManagerClientCommand.payload);
 
-                    Dto::SecretsManager::CreateSecretResponse
-                            secretsManagerResponse = _secretsManagerService.CreateSecret(secretsManagerRequest);
+                    Dto::SecretsManager::CreateSecretResponse secretsManagerResponse = _secretsManagerService.CreateSecret(secretsManagerRequest);
                     log_info << "Secret created, secretId: " << secretsManagerResponse.name;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }
@@ -43,7 +39,7 @@ namespace AwsMock::Service {
                     Dto::SecretsManager::DeleteSecretResponse
                             secretsManagerResponse = _secretsManagerService.DeleteSecret(secretsManagerRequest);
                     log_info << "Secret deleted, secretId: " << secretsManagerResponse.name;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }
@@ -57,7 +53,7 @@ namespace AwsMock::Service {
                     Dto::SecretsManager::DescribeSecretResponse
                             secretsManagerResponse = _secretsManagerService.DescribeSecret(secretsManagerRequest);
                     log_info << "Secret described, secretId: " << secretsManagerResponse.name;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }
@@ -71,7 +67,7 @@ namespace AwsMock::Service {
                     Dto::SecretsManager::GetSecretValueResponse
                             secretsManagerResponse = _secretsManagerService.GetSecretValue(secretsManagerRequest);
                     log_info << "Secret get value, secretId: " << secretsManagerResponse.name;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }
@@ -85,7 +81,7 @@ namespace AwsMock::Service {
                     Dto::SecretsManager::UpdateSecretResponse
                             secretsManagerResponse = _secretsManagerService.UpdateSecret(secretsManagerRequest);
                     log_info << "Secret updated, secretId: " << secretsManagerResponse.name;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }
@@ -99,7 +95,7 @@ namespace AwsMock::Service {
                     Dto::SecretsManager::RotateSecretResponse
                             secretsManagerResponse = _secretsManagerService.RotateSecret(secretsManagerRequest);
                     log_info << "Secret rotated, secretId: " << secretsManagerResponse.arn;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }
@@ -113,7 +109,7 @@ namespace AwsMock::Service {
                     Dto::SecretsManager::ListSecretsResponse
                             secretsManagerResponse = _secretsManagerService.ListSecrets(secretsManagerRequest);
                     log_info << "Secrets listed, region: " << secretsManagerResponse.region;
-                    SendOkResponse(response, secretsManagerResponse.ToJson());
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
 
                     break;
                 }

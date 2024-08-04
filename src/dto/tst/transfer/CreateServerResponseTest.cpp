@@ -9,9 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
+#include "awsmock/dto/transfer/model/Tag.h"
 #include <awsmock/dto/transfer/CreateServerResponse.h>
-#include <awsmock/dto/transfer/Tag.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

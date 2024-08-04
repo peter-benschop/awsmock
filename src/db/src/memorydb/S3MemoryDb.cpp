@@ -173,6 +173,15 @@ namespace AwsMock::Database {
                        }) != _objects.end();
     }
 
+    bool S3MemoryDb::ObjectExists(const std::string &filename) {
+
+        return find_if(_objects.begin(),
+                       _objects.end(),
+                       [filename](const std::pair<std::string, Entity::S3::Object> &object) {
+                           return object.second.internalName == filename;
+                       }) != _objects.end();
+    }
+
     Entity::S3::Object S3MemoryDb::CreateObject(const Entity::S3::Object &object) {
         Poco::ScopedLock lock(_objectMutex);
 

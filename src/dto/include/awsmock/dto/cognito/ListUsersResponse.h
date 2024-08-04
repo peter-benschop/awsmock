@@ -19,7 +19,7 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief List user response
+     * @brief List users response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,21 +31,21 @@ namespace AwsMock::Dto::Cognito {
         Database::Entity::Cognito::UserList users;
 
         /**
-         * Convert to a JSON string.
+         * @brief Convert to a JSON string.
          *
          * @return user pools json string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -44,6 +44,11 @@ namespace AwsMock::Dto::Module {
         std::string host = "localhost";
 
         /**
+         * Listening address
+         */
+        std::string address = "0.0.0.0";
+
+        /**
          * Port
          */
         int port = 4566;

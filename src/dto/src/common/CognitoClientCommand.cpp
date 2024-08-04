@@ -6,24 +6,21 @@
 
 namespace AwsMock::Dto::Common {
 
-    void CognitoClientCommand::FromRequest(const HttpMethod &httpMethod, Poco::Net::HTTPServerRequest &request, const std::string &awsRegion, const std::string &awsUser) {
+    void CognitoClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
         Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request, "s3");
+        userAgent.FromRequest(request);
 
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
-        this->method = httpMethod;
-        this->url = request.getURI();
+        this->method = request.method();
+        this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->headers = Core::HttpUtils::GetHeaders(request);
-        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId");
-
-        // Core values
-        poolName = Core::HttpUtils::GetPathParameter(request.getURI(), 0);
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
     }
 
     std::string CognitoClientCommand::ToJson() const {
@@ -34,6 +31,11 @@ namespace AwsMock::Dto::Common {
             rootJson.set("region", region);
             rootJson.set("user", user);
             rootJson.set("command", Dto::Common::CognitoCommandTypeToString(command));
+            rootJson.set("url", url);
+            rootJson.set("contentType", contentType);
+            rootJson.set("contentLength", contentLength);
+            rootJson.set("payload", payload);
+            rootJson.set("requestId", requestId);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

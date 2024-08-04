@@ -13,6 +13,7 @@
 #include <mongocxx/database.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <mongocxx/exception/query_exception.hpp>
+#include <mongocxx/instance.hpp>
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 
@@ -20,14 +21,14 @@
 #include <Poco/Util/AbstractConfiguration.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 
     /**
-     * MongoDB database base class.
+     * @brief MongoDB database base class.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -36,66 +37,47 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration configuration properties
+         * @brief Constructor
          */
         explicit DatabaseBase();
 
         /**
-         * Returns a MongoDB connection from the pool
+         * @brief Returns a MongoDB connection from the pool
          *
          * @return MongoDB database client
          */
         mongocxx::database GetConnection();
 
         /**
-         * Returns a MongoDB client from the pool
-         *
-         * @return MongoDB database client
-         */
-        mongocxx::pool::entry GetClient();
-
-        /**
-         * Check all indexes.
+         * @brief Check all indexes.
          *
          * <p>Normally done during manager StartServer.</p>
          */
         void CreateIndexes() const;
 
         /**
-         * Check whether we are running without database
+         * @brief Check whether we are running without database
          */
         [[nodiscard]] bool HasDatabase() const;
 
         /**
-         * Returns the database name
+         * @brief Returns the database name
          *
          * @return database name
          */
         [[nodiscard]] std::string GetDatabaseName() const;
 
         /**
-         * Start the database
+         * @brief Start the database
          */
         void StartDatabase();
 
         /**
-         * Stops the database
+         * @brief Stops the database
          */
         void StopDatabase();
 
       private:
-
-        /**
-         * Update module status
-         */
-        void UpdateModuleStatus();
-
-        /**
-         * Application configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database name
@@ -103,34 +85,9 @@ namespace AwsMock::Database {
         std::string _name;
 
         /**
-         * Database host
-         */
-        std::string _host;
-
-        /**
-         * Database port
-         */
-        int _port;
-
-        /**
-         * Database user
-         */
-        std::string _user;
-
-        /**
-         * Database password
-         */
-        std::string _password;
-
-        /**
          * Database client
          */
         std::unique_ptr<mongocxx::pool> _pool;
-
-        /**
-         * Database connection pool size
-         */
-        int _poolSize;
 
         /**
          * Database flag

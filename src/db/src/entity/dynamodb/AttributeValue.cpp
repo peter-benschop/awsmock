@@ -82,8 +82,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
                 kvp("N", numberValue),
                 kvp("BOOL", boolValue),
                 kvp("NULL", nullValue),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         // Convert string set to document
         if (!stringSetValue.empty()) {

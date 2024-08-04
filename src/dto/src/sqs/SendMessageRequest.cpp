@@ -15,6 +15,7 @@ namespace AwsMock::Dto::SQS {
         try {
 
             // General
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, queueUrl);
             Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
             Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
 

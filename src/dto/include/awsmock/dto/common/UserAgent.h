@@ -9,15 +9,20 @@
 #include <sstream>
 #include <string>
 
+// Boost includes
+#include <boost/beast/http/message.hpp>
+
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     enum class UserAgentType {
         AWS_SDK_JAVA1,
@@ -118,9 +123,8 @@ namespace AwsMock::Dto::Common {
          * Gets the value from the user-agent string
          *
          * @param request HTTP server request
-         * @param service AWS service name
          */
-        void FromRequest(Poco::Net::HTTPServerRequest &request, const std::string &service);
+        void FromRequest(const http::request<http::dynamic_body> &request);
 
         /**
          * Converts the DTO to a string representation.

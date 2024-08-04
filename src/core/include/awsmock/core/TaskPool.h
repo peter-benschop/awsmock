@@ -10,12 +10,9 @@
 #include <string>
 #include <thread>
 
-// Poco include
-#include <Poco/SingletonHolder.h>
-
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/Task.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
 
@@ -24,20 +21,20 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         TaskPool();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static TaskPool &instance() {
-            static Poco::SingletonHolder<TaskPool> sh;
-            return *sh.get();
+            static TaskPool taskPool;
+            return taskPool;
         }
 
         /**
-         * Adds a new thread
+         * @brief Adds a new thread
          *
          * @param name name of task
          * @param task task object

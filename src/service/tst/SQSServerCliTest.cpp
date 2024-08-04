@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/sqs/SQSServer.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/S3Database.h>
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
             std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.port", _port);
-            _accountId = _configuration.getString("awsmock.account.userPoolId", SQS_ACCOUNT_ID);
+            _accountId = _configuration.getString("awsmock.account.id", SQS_ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
             _queueUrl = "http://" + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
@@ -73,7 +73,6 @@ namespace AwsMock::Service {
 
         std::string _endpoint, _queueUrl, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricService &_metricService = Core::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         SQSServer _sqsServer = SQSServer(_configuration);
     };

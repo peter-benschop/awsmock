@@ -6,6 +6,20 @@
 
 namespace AwsMock::Database {
 
+    /*bsoncxx::types::b_date MongoUtils::ToBson(const ptime &dateTime) {
+
+        ptime epoch(boost::gregorian::date(1970, 1, 1));
+        bsoncxx::types::b_date bDate{std::chrono::milliseconds((dateTime - epoch).total_milliseconds())};
+        return bDate;
+    }
+
+    ptime MongoUtils::FromBson(const bsoncxx::types::b_date &bDate) {
+
+        ptime epoch(boost::gregorian::date(1970, 1, 1));
+        ptime pt(epoch, bDate.value.count());
+        return pt;
+    }*/
+
     bsoncxx::types::b_date MongoUtils::ToBson(const Poco::DateTime &date) {
 
         if (date.timestamp().epochTime() != 0) {

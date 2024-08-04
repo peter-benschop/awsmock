@@ -10,11 +10,10 @@
 #include <Poco/Net/HTTPServer.h>
 
 // AwsMock includes
-#include <awsmock/core/Configuration.h>
+#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/cognito/CognitoHandlerFactory.h>
 #include <awsmock/service/cognito/CognitoMonitoring.h>
 #include <awsmock/service/common/AbstractServer.h>
 
@@ -38,10 +37,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration application configuration
          */
-        explicit CognitoServer(Core::Configuration &configuration);
+        explicit CognitoServer();
 
         /**
          * Initialization
@@ -71,24 +68,9 @@ namespace AwsMock::Service {
         std::string _host;
 
         /**
-        * Application configuration
-        */
-        Core::Configuration &_configuration;
-
-        /**
          * HTTP manager instance
          */
         std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
-
-        /**
-         * Service database
-         */
-        Database::ModuleDatabase &_moduleDatabase;
-
-        /**
-         * Cognito database
-         */
-        Database::CognitoDatabase &_cognitoDatabase;
 
         /**
          * Cognito monitoring
@@ -109,31 +91,6 @@ namespace AwsMock::Service {
          * HTTP request timeout in seconds
          */
         int _requestTimeout;
-
-        /**
-         * Data directory
-         */
-        std::string _dataDir;
-
-        /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * AWS account ID
-         */
-        std::string _accountId;
-
-        /**
-         * AWS client ID
-         */
-        std::string _clientId;
-
-        /**
-         * AWS user
-         */
-        std::string _user;
 
         /**
          * Cognito module name

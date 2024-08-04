@@ -12,7 +12,7 @@
 namespace AwsMock::Database::Entity::Cognito {
 
     /**
-     * Cognito user attribute entity
+     * @brief Cognito user attribute entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */

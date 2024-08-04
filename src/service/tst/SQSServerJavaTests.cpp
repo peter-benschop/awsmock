@@ -9,10 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/service/sqs/SQSServer.h"
-#include <awsmock/core/Configuration.h>
-#include <awsmock/core/FileUtils.h>
-#include <awsmock/repository/S3Database.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/sqs/SQSServer.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -37,30 +36,29 @@ namespace AwsMock::Service {
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
             std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
-            _configuration.setString("awsmock.service.gateway.port", _port);
+            _configuration.setString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
+            std::cerr << "Endpoint: " << _endpoint << std::endl;
 
             // Set base command
             _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
 
             // Start HTTP manager
-            _sqsServer = std::make_unique<SQSServer>(_configuration);
-            _sqsServer->Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer->Start();
+            std::this_thread::sleep_for(1s);
         }
 
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer->Stop();
+            _gatewayServer->Stop();
         }
 
-        Core::CurlUtils _curlUtils;
         std::string _endpoint, _baseCommand, _region;
-        std::map<std::string, std::string> _extraHeaders;
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricService &_metricService = Core::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::unique_ptr<SQSServer> _sqsServer;
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerJavaTest, QueueCreateTest) {
@@ -236,7 +234,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_EQ(0, sendResult.status);
-        EXPECT_EQ(7, message.attributes.size());
+        EXPECT_EQ(5, message.attributes.size());
     }
 
     TEST_F(SQSServerJavaTest, MessageReceiveTest) {

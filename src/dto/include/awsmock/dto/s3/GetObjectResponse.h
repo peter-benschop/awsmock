@@ -6,18 +6,27 @@
 #define AWSMOCK_DTO_S3_GET_OBJECT_RESPONSE_H
 
 // C++ standard includes
+#include <chrono>
 #include <map>
 #include <sstream>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
+    using std::chrono::system_clock;
+
+    /**
+     * @brief Get object response
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct GetObjectResponse {
 
         /**
@@ -63,12 +72,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Created
          */
-        Poco::DateTime created;
+        system_clock::time_point created;
 
         /**
          * Modified
          */
-        Poco::DateTime modified;
+        system_clock::time_point modified;
 
         /**
          * Convert to a JSON string

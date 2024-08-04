@@ -1,4 +1,5 @@
 #include <awsmock/core/FileUtils.h>
+#include <boost/asio/streambuf.hpp>
 
 namespace AwsMock::Core {
 
@@ -66,20 +67,25 @@ namespace AwsMock::Core {
         sourceFile.copyTo(targetFileName);
     }
 
-    void FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
-        std::ofstream ofs(outFile, std::ios::out | std::ios::trunc | std::ios::binary | std::ios::app);
+    long FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
+
+        int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
+
+        size_t copied = 0;
         for (auto &it: files) {
-            std::string inFile = inDir;
-            inFile.append(Poco::Path::separator() + it);
-            std::ifstream ifs(inFile, std::ios::in);
-            long copied = Poco::StreamCopier::copyStream(ifs, ofs);
-            if (copied != Core::FileUtils::FileSize(inFile)) {
-                throw Poco::Exception("Invalid input file");
-            }
-            ofs.flush();
-            ifs.close();
+
+            std::string inFile = inDir + "/" + it;
+            int source = open(inFile.c_str(), O_RDONLY, 0);
+
+            // struct required, rationale: function stat() exists also
+            struct stat stat_source {};
+            fstat(source, &stat_source);
+            copied += sendfile(dest, source, nullptr, stat_source.st_size);
+
+            close(source);
         }
-        ofs.close();
+        close(dest);
+        return static_cast<long>(copied);
     }
 
     // TODO: Calculate correct checksum: https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html

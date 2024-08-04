@@ -6,8 +6,10 @@
 #define AWSMOCK_DTO_LAMBDA_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
+#include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -40,11 +42,40 @@ namespace AwsMock::Dto::Lambda {
          * stored in the database to an CreateLambdaRequest, which ís send to the lambda service.
          *
          * @param lambdaEntity lambda entity
-         * @param request lambda create function request struct
          * @return CreateFunctionRequest
          * @see CreateFunctionRequest
          */
         static Dto::Lambda::CreateFunctionRequest map(const Database::Entity::Lambda::Lambda &lambdaEntity);
+
+        /**
+         * @brief Maps a lambda create request to a lambda entity
+         *
+         * @param request create lambda request
+         * @return lambda entity
+         * @see CreateFunctionRequest
+         */
+        static Database::Entity::Lambda::Lambda map(const Dto::Lambda::CreateFunctionRequest &request);
+
+        /**
+         * @brief Maps a lambda create eventsource mappings request request to a lambda event source mapping
+         *
+         * @param request create lambda request
+         * @return lambda event source mapping
+         * @see CreateEventSourceMappingsRequest
+         * @see EventSourceMapping
+         */
+        static Database::Entity::Lambda::EventSourceMapping map(const Dto::Lambda::CreateEventSourceMappingsRequest &request);
+
+        /**
+         * @brief Maps a list of lambda event source mappings to a lambda event source mapping response.
+         *
+         * @param functionArn lambda function ARN
+         * @param eventSourceMappings list of event source mapping entities
+         * @return lambda event source mapping list response
+         * @see ListEventSourceMappingsRequest
+         * @see EventSourceMapping
+         */
+        static Dto::Lambda::ListEventSourceMappingsResponse map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings);
     };
 
 }// namespace AwsMock::Dto::Lambda

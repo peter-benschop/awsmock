@@ -13,7 +13,10 @@ namespace AwsMock::Dto::Module {
             gatewayConfigJson.set("protocol", protocol);
             gatewayConfigJson.set("endpoint", endpoint);
             gatewayConfigJson.set("host", host);
+            gatewayConfigJson.set("address", address);
             gatewayConfigJson.set("port", port);
+            gatewayConfigJson.set("pid", pid);
+            gatewayConfigJson.set("pretty", prettyPrint);
             gatewayConfigJson.set("accessId", accessId);
             gatewayConfigJson.set("clientId", clientId);
             gatewayConfigJson.set("user", user);
@@ -45,7 +48,10 @@ namespace AwsMock::Dto::Module {
             Core::JsonUtils::GetJsonValueString("protocol", rootObject, gatewayConfig.protocol);
             Core::JsonUtils::GetJsonValueString("endpoint", rootObject, gatewayConfig.endpoint);
             Core::JsonUtils::GetJsonValueString("host", rootObject, gatewayConfig.host);
+            Core::JsonUtils::GetJsonValueString("address", rootObject, gatewayConfig.address);
             Core::JsonUtils::GetJsonValueInt("port", rootObject, gatewayConfig.port);
+            Core::JsonUtils::GetJsonValueInt("pid", rootObject, gatewayConfig.pid);
+            Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
             Core::JsonUtils::GetJsonValueString("accessId", rootObject, gatewayConfig.accessId);
             Core::JsonUtils::GetJsonValueString("clientId", rootObject, gatewayConfig.clientId);
             Core::JsonUtils::GetJsonValueString("user", rootObject, gatewayConfig.user);

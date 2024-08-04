@@ -12,9 +12,9 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
 #include "awsmock/memorydb/ModuleMemoryDb.h"
-#include <awsmock/core/Configuration.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
@@ -38,32 +38,32 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit ModuleDatabase() : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
+        explicit ModuleDatabase() : _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static ModuleDatabase &instance() {
-            static Poco::SingletonHolder<ModuleDatabase> sh;
-            return *sh.get();
+            static ModuleDatabase moduleDatabase;
+            return moduleDatabase;
         }
 
         /**
-         * Initialize the database
+         * @brief Initialize the database
          */
         void Initialize();
 
         /**
-         * Returns a list of existing modules.
+         * @brief Returns a list of existing modules.
          *
          * @return map of existing modules
          */
-        std::map<std::string, Entity::Module::Module> GetExisting();
+        static std::map<std::string, Entity::Module::Module> GetExisting();
 
         /**
-         * Checks the active flag.
+         * @brief Checks the active flag.
          *
          * @param name module name
          * @return true if active
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
         bool IsActive(const std::string &name);
 
         /**
-         * Check existence of name
+         * @brief Check existence of name
          *
          * @param name name name
          * @return created name
@@ -79,7 +79,7 @@ namespace AwsMock::Database {
         bool ModuleExists(const std::string &name);
 
         /**
-         * Returns the module by userPoolId
+         * @brief Returns the module by userPoolId
          *
          * @param oid module oid
          * @return module, if existing
@@ -88,7 +88,7 @@ namespace AwsMock::Database {
         Entity::Module::Module GetModuleById(const bsoncxx::oid &oid);
 
         /**
-         * Returns the module by userPoolId
+         * @brief Returns the module by userPoolId
          *
          * @param oid module oid
          * @return module, if existing
@@ -97,7 +97,7 @@ namespace AwsMock::Database {
         Entity::Module::Module GetModuleById(const std::string &oid);
 
         /**
-         * Returns the module by userPoolId
+         * @brief Returns the module by userPoolId
          *
          * @param name module name
          * @return module, if existing
@@ -106,7 +106,15 @@ namespace AwsMock::Database {
         Entity::Module::Module GetModuleByName(const std::string &name);
 
         /**
-         * Creates a module
+         * @brief Returns all module names
+         *
+         * @return list of module names
+         * @throws DatabaseException
+         */
+        std::vector<std::string> GetAllModuleNames();
+
+        /**
+         * @brief Creates a module
          *
          * @param module module entity
          * @return created module
@@ -114,7 +122,7 @@ namespace AwsMock::Database {
         Entity::Module::Module CreateModule(const Entity::Module::Module &module);
 
         /**
-         * Updates a module
+         * @brief Updates a module
          *
          * @param module module entity
          * @return updated module
@@ -122,7 +130,7 @@ namespace AwsMock::Database {
         Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
 
         /**
-         * Sets the state of module.
+         * @brief Sets the state of module.
          *
          * <p>State can be one of STARTING, RUNNING, STOPPED, UNKNOWN.</p>
          *
@@ -134,7 +142,7 @@ namespace AwsMock::Database {
         Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
         /**
-         * Sets the status of module.
+         * @brief Sets the status of module.
          *
          * <p>Status can be one of UNKNOWN, ACTIVE, INACTIVE.</p>
          *
@@ -145,7 +153,7 @@ namespace AwsMock::Database {
         void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
 
         /**
-         * Sets the port of module.
+         * @brief Sets the port of module.
          *
          * @param name module name
          * @param port module port
@@ -153,7 +161,7 @@ namespace AwsMock::Database {
         void SetPort(const std::string &name, int port);
 
         /**
-         * Creates or updates a modules
+         * @brief Creates or updates a modules
          *
          * @param modules modules entity
          * @return updated modules
@@ -161,7 +169,7 @@ namespace AwsMock::Database {
         Entity::Module::Module CreateOrUpdateModule(const Entity::Module::Module &modules);
 
         /**
-         * Counts the number of modules
+         * @brief Counts the number of modules
          *
          * @return total number of modules
          */
@@ -175,23 +183,18 @@ namespace AwsMock::Database {
         Entity::Module::ModuleList ListModules();
 
         /**
-         * Deletes module
+         * @brief Deletes module
          *
          * @param module module entity
          */
         void DeleteModule(const Entity::Module::Module &module);
 
         /**
-         * Deletes all modules
+         * @brief Deletes all modules
          */
         void DeleteAllModules();
 
       private:
-
-        /**
-         * Use MongoDB
-         */
-        bool _useDatabase;
 
         /**
          * Database name
@@ -206,7 +209,7 @@ namespace AwsMock::Database {
         /**
          * Modules in-memory database
          */
-        ModuleMemoryDb _memoryDb;
+        ModuleMemoryDb _memoryDb{};
 
         /**
          * Existing modules

@@ -12,12 +12,13 @@ set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src
         src/repository/S3Database.cpp src/memorydb/S3MemoryDb.cpp src/entity/s3/FilterRule.cpp
         src/entity/s3/QueueNotification.cpp src/entity/s3/TopicNotification.cpp src/entity/s3/LambdaNotification.cpp
         src/entity/s3/BucketEncryption.cpp)
-set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp
-        src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp)
+set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp src/entity/lambda/Code.cpp
+        src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp
+        src/entity/lambda/EventSourceMapping.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp
         src/memorydb/TransferMemoryDb.cpp)
-set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/memorydb/CognitoMemoryDb.cpp
-        src/repository/CognitoDatabase.cpp)
+set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp src/entity/cognito/Group.cpp
+        src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
 set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
         src/repository/DynamoDbDatabase.cpp src/memorydb/DynamoDbMemoryDb.cpp)
 set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
@@ -31,25 +32,13 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
         ${SECRETSMANAGER_SOURCES} ${UTIL_SOURCES})
 
 # Test directory
-if (NOT WIN32)
-    add_subdirectory(tst)
-endif ()
+add_subdirectory(tst)
 
 # Includes
-if (WIN32)
-    include_directories(./include ../core/include ${AWSMOCK_WIN32_DIR}/include)
-    link_directories(../core/${CMAKE_BUILD_TYPE} ${AWSMOCK_WIN32_DIR}/lib)
-else ()
-    include_directories(include ../core/include /usr/include /usr/include/mongo /usr/include/bsoncxx/v_noabi /usr/include/mongocxx/v_noabi)
-endif ()
+include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-
-if (WIN32)
-    target_link_libraries(${LIBRARY} awsmockcore.lib libssl.lib libcrypto.lib libcurl_imp.lib archive.lib
-            bsoncxx-v_noabi-rhb-x64-v143-md.lib mongocxx-v_noabi-rhb-x64-v143-md.lib)
-endif ()
 
 install(TARGETS ${LIBRARY} DESTINATION lib)

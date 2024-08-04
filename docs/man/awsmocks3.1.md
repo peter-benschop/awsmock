@@ -30,11 +30,14 @@ in the KMS module. See ```awsmockmks(1)``` for more details on how to store encr
 The S3 module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
 
-## NOTES
+## VIRTUAL HOSTING OF BUCKETS
 
-The S3 client should be configured to use the path style bucket name. Additionally, the S3 client should not use
-checksum validation, as checksums are not calculated correctly yet. Following are examples for synchronous and
-asynchronous client configurations:
+The S3 client should be configured to use the path style bucket name. It's easier to use and more reliable. Path style
+is deprecated and should be removed in a future release. Nevertheless, path-style deprecation was first announced 2020,
+but still exists as it is easier to use in AWS simulations.
+
+Following are examples for synchronous and asynchronous Java client configurations in case you want to use path-style
+requests:
 
 ```   
   s3Client = S3Client.builder()
@@ -42,7 +45,6 @@ asynchronous client configurations:
          .region(Region.US_EAST_1)
          .endpointOverride(new URI(endpoint))
          .forcePathStyle(true)
-         .serviceConfiguration(S3Configuration.builder().checksumValidationEnabled(false).build())
          .build();
 ```   
 
@@ -51,12 +53,53 @@ and for the async client:
 ```   
   s3AsyncClient = S3CrtAsyncClient.builder()
         .credentialsProvider(ProfileCredentialsProvider.create())
-        .checksumValidationEnabled(false)
         .region(Region.US_EAST_1)
         .endpointOverride(new URI(endpoint))
         .forcePathStyle(true)
-       .build();
+        .build();
 ```   
+
+If you want ot use host-style location requests, you need to se tup the clients differently:
+
+```
+    public S3Client s3Client(AwsCredentialsProvider awsCredentialsProvider) {            
+        return S3Client.builder()
+                .forcePathStyle(false)
+                .endpointOverride(URI.create("http://s3.eu-central-1.awsmock.de:4566"))
+                .credentialsProvider(awsCredentialsProvider)
+                .build();
+    }
+
+  s3AsyncClient = S3CrtAsyncClient.builder()
+        .credentialsProvider(ProfileCredentialsProvider.create())
+        .region(Region.US_EAST_1)
+        .endpointOverride(URI.create("http://s3.eu-central-1.awsmock.de:4566"))
+        .forcePathStyle(true)
+        .build();
+```
+
+Here the endpoint needs to have a ```s3``` prefix and the region should be included in the URL. Additionally, you need to
+provide a DNS settings, which routes all S3 request to awsmock. This is most easily done using a ```dnsmasq``` implementation:
+
+```
+sudo apt install dnsmasq 
+```
+
+The ```dnsmasq``` configuration should be as follows:
+
+```
+port 53
+bogus-priv
+strict-order
+address=/s3.eu-central-1.awsmock.de/172.17.0.1
+address=/awsmock.de/127.0.0.1
+expand-hosts
+domain=awsmock.de
+listen-address=127.0.0.1
+listen-address=172.17.0.1 // docker host
+```
+
+For more information about ```dnsmasq``` see: https://thekelleys.org.uk/dnsmasq/doc.html
 
 ## COMMANDS
 

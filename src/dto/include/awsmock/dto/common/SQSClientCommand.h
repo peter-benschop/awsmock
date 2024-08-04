@@ -9,16 +9,24 @@
 #include <sstream>
 #include <string>
 
+// Boost includes
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
+#include <boost/lexical_cast.hpp>
+
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
-#include <awsmock/dto/common/HttpMethod.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
+
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
 
     enum class SqsCommandType {
         CREATE_QUEUE,
@@ -76,44 +84,43 @@ namespace AwsMock::Dto::Common {
     struct SQSClientCommand : public BaseClientCommand {
 
         /**
-         * Client command
+         * @brief Client command
          */
         SqsCommandType command{};
 
         /**
-         * Returns the command from HTTP header
+         * @brief Returns the command from HTTP header
          *
          * @param request HTTP request
          * @return command string
          */
-        std::string GetCommandFromHeader(Poco::Net::HTTPServerRequest &request) const;
+        [[nodiscard]] std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
 
         /**
-         * Getś the value from the user-agent string
+         * @brief Gets the value from the user-agent string
          *
-         * @param method HTTP method
          * @param request HTTP server request
          * @param region AWS region
          * @param user AWS user
          */
-        void FromRequest(const HttpMethod &method, Poco::Net::HTTPServerRequest &request, const std::string &region, const std::string &user);
+        void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

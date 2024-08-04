@@ -23,14 +23,19 @@ namespace AwsMock::Core {
         std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
         // AWS configuration
         ofs << "awsmock.region=eu-central-1" << std::endl;
-        ofs << "awsmock.account.userPoolId=000000000000" << std::endl;
-        ofs << "awsmock.client.userPoolId=00000000" << std::endl;
+        ofs << "awsmock.account.id=000000000000" << std::endl;
+        ofs << "awsmock.client.id=00000000" << std::endl;
         ofs << "awsmock.user=none" << std::endl;
         ofs << "awsmock.data.dir=/tmp/awsmock/data" << std::endl;
         // Rest configuration
+        ofs << "awsmock.service.gateway.active=true" << std::endl;
         ofs << "awsmock.service.gateway.http.host=" << hostName << std::endl;
         ofs << "awsmock.service.gateway.http.port=" << port << std::endl;
-        // Database configuration
+        ofs << "awsmock.service.gateway.http.address=0.0.0.0" << std::endl;
+        ofs << "awsmock.service.gateway.http.max.queue=10" << std::endl;
+        ofs << "awsmock.service.gateway.http.max.threads=10" << std::endl;
+        ofs << "awsmock.service.gateway.http.timeout=10" << std::endl;
+        // Mongo DB
         ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
         ofs << "awsmock.mongodb.name=test" << std::endl;
         ofs << "awsmock.mongodb.http.host=" << hostName << std::endl;
@@ -81,10 +86,10 @@ namespace AwsMock::Core {
         ofs << "awsmock.docker.default.temp.size=10240" << std::endl;
         ofs << "awsmock.docker.container.port=8080" << std::endl;
         // Monitoring configuration
-        ofs << "awsmock.monitoring.port=9100" << std::endl;
+        ofs << "awsmock.service.monitoring.port=9091" << std::endl;
         // Logging
-        ofs << "awsmock.log.level=debug" << std::endl;
-        ofs << "awsmock.log.file=/tmp/awsmock-test.log" << std::endl;
+        ofs << "awsmock.service.logging.level=debug" << std::endl;
+        ofs << "awsmock.service.logging.file=/tmp/awsmock-test.log" << std::endl;
         ofs.close();
 
         Core::Configuration &configuration = Core::Configuration::instance();

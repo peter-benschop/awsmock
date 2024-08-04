@@ -6,6 +6,12 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
+    bool Lambda::HasEventSource(const std::string &eventSourceArn) const {
+        return find_if(eventSources.begin(), eventSources.end(), [eventSourceArn](const EventSourceMapping &e) {
+                   return e.eventSourceArn == eventSourceArn;
+               }) != eventSources.end();
+    }
+
     bool Lambda::HasTag(const std::string &key) const {
         return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
                    return t.first == key;
@@ -19,7 +25,27 @@ namespace AwsMock::Database::Entity::Lambda {
         return it->second;
     }
 
+    Instance Lambda::GetInstance(const std::string &instanceId) {
+        auto it = std::ranges::find(instances, instanceId, &Instance::id);
+        if (it != instances.end()) {
+            return *it;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+        return {};
+    }
+
+    void Lambda::RemoveInstance(const AwsMock::Database::Entity::Lambda::Instance &instance) {
+        std::string id = instance.id;
+        instances.erase(std::remove_if(instances.begin(), instances.end(), [&id](const Instance &instance) { return id == instance.id; }), instances.end());
+    }
+
     view_or_value<view, value> Lambda::ToDocument() const {
+
+        // Convert instances
+        auto instancesDoc = bsoncxx::builder::basic::array{};
+        for (const auto &instance: instances) {
+            instancesDoc.append(instance.ToDocument());
+        }
 
         // Convert environment to document
         auto variablesDoc = bsoncxx::builder::basic::array{};
@@ -34,6 +60,12 @@ namespace AwsMock::Database::Entity::Lambda {
             tagsDoc.append(kvp(t.first, t.second));
         }
 
+        // Convert event source mappings
+        auto eventSourcesDoc = bsoncxx::builder::basic::array{};
+        for (const auto &e: eventSources) {
+            eventSourcesDoc.append(e.ToDocument());
+        }
+
         view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
 
         view_or_value<view, value> lambdaDoc = make_document(
@@ -46,7 +78,6 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("memorySize", static_cast<bsoncxx::types::b_int64>(memorySize)),
                 kvp("ephemeralStorage", ephemeralStorageDoc),
                 kvp("codeSize", static_cast<bsoncxx::types::b_int64>(codeSize)),
-                kvp("fileName", fileName),
                 kvp("imageId", imageId),
                 kvp("containerId", containerId),
                 kvp("tags", tagsDoc),
@@ -56,13 +87,16 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("concurrency", concurrency),
                 kvp("codeSha256", codeSha256),
                 kvp("environment", varDoc),
+                kvp("code", code.ToDocument()),
                 kvp("state", LambdaStateToString(state)),
                 kvp("stateReason", stateReason),
                 kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
-                kvp("lastStarted", bsoncxx::types::b_date(std::chrono::milliseconds(lastStarted.timestamp().epochMicroseconds() / 1000))),
-                kvp("lastInvocation", bsoncxx::types::b_date(std::chrono::milliseconds(lastInvocation.timestamp().epochMicroseconds() / 1000))),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("instances", instancesDoc),
+                kvp("eventSources", eventSourcesDoc),
+                kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
+                kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
         return lambdaDoc;
     }
 
@@ -78,7 +112,6 @@ namespace AwsMock::Database::Entity::Lambda {
         memorySize = mResult.value()["memorySize"].get_int64().value;
         ephemeralStorage.FromDocument(mResult.value()["ephemeralStorage"].get_document().value);
         codeSize = mResult.value()["codeSize"].get_int64().value;
-        fileName = bsoncxx::string::to_string(mResult.value()["fileName"].get_string().value);
         imageId = bsoncxx::string::to_string(mResult.value()["imageId"].get_string().value);
         containerId = bsoncxx::string::to_string(mResult.value()["containerId"].get_string().value);
         arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
@@ -90,10 +123,10 @@ namespace AwsMock::Database::Entity::Lambda {
         state = LambdaStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
         stateReason = bsoncxx::string::to_string(mResult.value()["stateReason"].get_string().value);
         stateReasonCode = LambdaStateReasonCodeFromString(bsoncxx::string::to_string(mResult.value()["stateReasonCode"].get_string().value));
-        lastStarted = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value) / 1000));
-        lastInvocation = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value) / 1000));
-        created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-        modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+        lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value);
+        lastInvocation = bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value);
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
@@ -102,6 +135,31 @@ namespace AwsMock::Database::Entity::Lambda {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
+            }
+        }
+
+        // Get code
+        if (mResult.value().find("code") != mResult.value().end()) {
+            code.FromDocument(mResult.value()["code"].get_document().value);
+        }
+
+        // Get instances
+        if (mResult.value().find("instances") != mResult.value().end()) {
+            bsoncxx::document::view instancesView = mResult.value()["instances"].get_array().value;
+            for (const bsoncxx::document::element &instanceElement: instancesView) {
+                Instance instance;
+                instance.FromDocument(instanceElement.get_document().view());
+                instances.emplace_back(instance);
+            }
+        }
+
+        // Get event sources
+        if (mResult.value().find("eventSources") != mResult.value().end()) {
+            bsoncxx::document::view eventSourcesView = mResult.value()["eventSources"].get_array().value;
+            for (const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
+                EventSourceMapping eventSourceMapping;
+                eventSourceMapping.FromDocument(eventSourceElement.get_document().view());
+                eventSources.emplace_back(eventSourceMapping);
             }
         }
     }
@@ -120,7 +178,6 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("memorySize", memorySize);
             jsonObject.set("ephemeralStorage", ephemeralStorage.ToJsonObject());
             jsonObject.set("codeSize", codeSize);
-            jsonObject.set("fileName", fileName);
             jsonObject.set("imageId", imageId);
             jsonObject.set("containerId", containerId);
             jsonObject.set("arn", arn);
@@ -129,10 +186,11 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("timeout", timeout);
             jsonObject.set("concurrency", concurrency);
             jsonObject.set("environment", environment.ToJsonObject());
+            jsonObject.set("code", code.ToJsonObject());
             jsonObject.set("state", LambdaStateToString(state));
             jsonObject.set("stateReason", stateReason);
-            jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
-            jsonObject.set("lastInvocation", Poco::DateTimeFormatter::format(lastInvocation, Poco::DateTimeFormat::ISO8601_FORMAT));
+            jsonObject.set("lastStarted", Core::DateTimeUtils::ISO8601(lastStarted));
+            jsonObject.set("lastInvocation", Core::DateTimeUtils::ISO8601(lastInvocation));
 
             // Tags
             if (!tags.empty()) {
