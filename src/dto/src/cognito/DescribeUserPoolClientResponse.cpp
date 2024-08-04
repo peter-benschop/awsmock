@@ -2,17 +2,17 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
+#include <awsmock/dto/cognito/DescribeUserPoolClientResponse.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string DescribeUserPoolResponse::ToJson() const {
+    std::string DescribeUserPoolClientResponse::ToJson() const {
 
         try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
-            rootJson.set("UserPool", userPool.ToJsonObject());
+            rootJson.set("UserPoolClient", userPoolClient.ToJsonObject());
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -22,15 +22,15 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DescribeUserPoolResponse::ToString() const {
+    std::string DescribeUserPoolClientResponse::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const DescribeUserPoolResponse &r) {
-        os << "DescribeUserPoolResponse=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const DescribeUserPoolClientResponse &r) {
+        os << "DescribeUserPoolClientResponse=" << r.ToJson();
         return os;
     }
-    
+
 }// namespace AwsMock::Dto::Cognito

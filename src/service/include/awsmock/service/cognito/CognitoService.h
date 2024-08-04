@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/cognito/DescribeUserPoolResponse.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -30,6 +31,8 @@
 #include <awsmock/dto/cognito/DeleteGroupRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolClientRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolClientRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolClientResponse.h>
 #include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
@@ -99,6 +102,15 @@ namespace AwsMock::Service {
          * @return ListUserPoolClientsResponse DTO
          */
         Dto::Cognito::ListUserPoolClientsResponse ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request);
+
+        /**
+         * @brief Describes a user pool client
+         *
+         * @param request describe user pool client request
+         * @return DescribeUserPoolResponse DTO
+         */
+        Dto::Cognito::DescribeUserPoolClientResponse DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request);
+
 
         /**
          * @brief Deletes a cognito user pool client

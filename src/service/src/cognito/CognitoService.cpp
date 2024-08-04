@@ -118,6 +118,39 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::DescribeUserPoolClientResponse CognitoService::DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_client");
+        log_debug << "Describe user pool client request, userPoolId: " << request.userPoolId << " clientId: " << request.clientId;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        try {
+
+            std::string clientId = request.clientId;
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+            log_trace << "Got user pool userPoolId: " << request.userPoolId;
+            auto it = find_if(userPool.userPoolClients.begin(),
+                              userPool.userPoolClients.end(),
+                              [clientId](const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
+                                  return userPoolClient.clientId == clientId;
+                              });
+
+            if (it != userPool.userPoolClients.end()) {
+                Dto::Cognito::DescribeUserPoolClientResponse response;
+                response.userPoolClient = Dto::Cognito::Mapper::map(*it);
+                return response;
+            }
+            return {};
+
+        } catch (Poco::Exception &ex) {
+            log_error << "User pool list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void CognitoService::DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool_client");
         log_debug << "Delete user pool client request, userPoolId:  " << request.userPoolId << " clientId: " << request.clientId;
