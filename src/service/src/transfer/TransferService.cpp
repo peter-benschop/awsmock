@@ -96,7 +96,7 @@ namespace AwsMock::Service {
                 Dto::Transfer::Server server = {
                         .arn = s.arn,
                         .serverId = s.serverId,
-                        .state = s.state,
+                        .state = Database::Entity::Transfer::ServerStateToString(s.state),
                         .userCount = static_cast<int>(s.users.size())};
                 response.servers.emplace_back(server);
             }
@@ -143,14 +143,14 @@ namespace AwsMock::Service {
             server = _transferDatabase.GetTransferByServerId(request.serverId);
 
             // Update state, rest will be done by transfer worker
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
+            server.state = Database::Entity::Transfer::ServerState::ONLINE;
             server = _transferDatabase.UpdateTransfer(server);
             log_info << "Transfer server started, serverId: " << server.serverId;
 
         } catch (Poco::Exception &ex) {
 
             // Update state
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::START_FAILED);
+            server.state = Database::Entity::Transfer::ServerState::START_FAILED;
             server = _transferDatabase.UpdateTransfer(server);
 
             log_error << "Start transfer server request failed, serverId: " << server.serverId << " message: " << ex.message();
@@ -171,14 +171,14 @@ namespace AwsMock::Service {
             server = _transferDatabase.GetTransferByServerId(request.serverId);
 
             // Update state, rest will be done by transfer worker
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+            server.state = Database::Entity::Transfer::ServerState::OFFLINE;
             server = _transferDatabase.UpdateTransfer(server);
             log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
         } catch (Poco::Exception &ex) {
 
             // Update state
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
+            server.state = Database::Entity::Transfer::ServerState::STOP_FAILED;
             server = _transferDatabase.UpdateTransfer(server);
 
             log_error << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.message();
@@ -199,7 +199,7 @@ namespace AwsMock::Service {
             server = _transferDatabase.GetTransferByServerId(request.serverId);
 
             // Update state, rest will be done by transfer worker
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+            server.state = Database::Entity::Transfer::ServerState::OFFLINE;
             server = _transferDatabase.UpdateTransfer(server);
             log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
@@ -209,7 +209,7 @@ namespace AwsMock::Service {
         } catch (Poco::Exception &ex) {
 
             // Update state
-            server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::STOP_FAILED);
+            server.state = Database::Entity::Transfer::ServerState::STOP_FAILED;
             server = _transferDatabase.UpdateTransfer(server);
 
             log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message();

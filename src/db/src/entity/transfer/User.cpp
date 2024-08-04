@@ -2,6 +2,7 @@
 // Created by vogje01 on 13/09/2023.
 //
 
+#include "awsmock/core/JsonUtils.h"
 #include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Database::Entity::Transfer {
@@ -27,6 +28,16 @@ namespace AwsMock::Database::Entity::Transfer {
             password = bsoncxx::string::to_string(v["password"].get_string().value);
             homeDirectory = bsoncxx::string::to_string(v["homeDirectory"].get_string().value);
         }
+    }
+
+    void User::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
+        Core::JsonUtils::GetJsonValueString("role", jsonObject, role);
+        Core::JsonUtils::GetJsonValueString("userName", jsonObject, userName);
+        Core::JsonUtils::GetJsonValueString("password", jsonObject, password);
+        Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
+        Core::JsonUtils::GetJsonValueString("homeDirectory", jsonObject, homeDirectory);
     }
 
     Poco::JSON::Object User::ToJsonObject() const {

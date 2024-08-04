@@ -118,4 +118,25 @@ namespace AwsMock::Dto::Cognito {
         return groupDto;
     }
 
+    Dto::Cognito::UserPoolClient Mapper::map(const Database::Entity::Cognito::UserPoolClient &clientEntity) {
+        UserPoolClient userPoolClient = {
+                .userPoolId = clientEntity.userPoolId,
+                .clientId = clientEntity.clientId,
+                .clientName = clientEntity.clientName,
+                .clientSecret = clientEntity.clientSecret,
+                .created = clientEntity.created,
+                .lastModified = clientEntity.modified};
+        return userPoolClient;
+    }
+
+    Dto::Cognito::ListUserPoolClientsResponse Mapper::map(const ListUserPoolClientsRequest &request, const std::vector<Database::Entity::Cognito::UserPoolClient> &userPoolClients) {
+
+        Dto::Cognito::ListUserPoolClientsResponse response;
+
+        for (const auto &userPoolClient: userPoolClients) {
+            response.userPoolsClients.emplace_back(Mapper::map(userPoolClient));
+        }
+        return response;
+    }
+
 }// namespace AwsMock::Dto::Cognito

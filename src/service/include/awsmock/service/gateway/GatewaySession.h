@@ -113,7 +113,15 @@ namespace AwsMock::Service {
          */
         void DoClose();
 
-        static Core::AuthorizationHeaderKeys GetAuthorizationKeys(const std::string &authorizationHeader, const std::string &secretAccessKey);
+        /**
+         * @brief * Returns the authorization header
+         *
+         * @param request HTTP request
+         * @param secretAccessKey AWS secret access key
+         * @return AuthorizationHeaderKeys
+         * @see AuthorizationHeaderKeys
+         */
+        static Core::AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
 
         /**
          * TCP stream

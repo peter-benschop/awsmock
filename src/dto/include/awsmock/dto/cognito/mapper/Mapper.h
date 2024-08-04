@@ -15,6 +15,8 @@
 #include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
+#include <awsmock/dto/cognito/ListUserPoolClientsRequest.h>
+#include <awsmock/dto/cognito/ListUserPoolClientsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
@@ -73,6 +75,18 @@ namespace AwsMock::Dto::Cognito {
         static Dto::Cognito::ListUserPoolResponse map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList);
 
         /**
+         * @brief Maps a list of cognito user pool clients to a list user pool clients response
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param request original request
+         * @param userPool cognito user pool entity
+         * @return ListUserPoolClientsResponse
+         * @see ListUserPoolClientsResponse
+         */
+        static Dto::Cognito::ListUserPoolClientsResponse map(const ListUserPoolClientsRequest &request, const std::vector<Database::Entity::Cognito::UserPoolClient> &userPoolClient);
+
+        /**
          * @brief Maps a user pool domain DTO to an entity
          *
          * @param request CreateUserPoolDomain request struct
@@ -89,6 +103,15 @@ namespace AwsMock::Dto::Cognito {
          * @see CreateUserPoolClientRequest
          */
         static Database::Entity::Cognito::UserPoolClient map(const Dto::Cognito::CreateUserPoolClientRequest &request);
+
+        /**
+         * @brief Maps a user pool client entity  to an DTO
+         *
+         * @param clientEntity user pool client entity request struct
+         * @return UserPoolClient
+         * @see UserPoolClient
+         */
+        static Dto::Cognito::UserPoolClient map(const Database::Entity::Cognito::UserPoolClient &clientEntity);
 
         /**
          * @brief Maps a create group DTO request to an entity
