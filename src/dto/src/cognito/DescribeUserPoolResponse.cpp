@@ -32,5 +32,5 @@ namespace AwsMock::Dto::Cognito {
         os << "DescribeUserPoolResponse=" << r.ToJson();
         return os;
     }
-    
+
 }// namespace AwsMock::Dto::Cognito
