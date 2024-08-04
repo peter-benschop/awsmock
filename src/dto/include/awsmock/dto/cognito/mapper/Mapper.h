@@ -167,6 +167,15 @@ namespace AwsMock::Dto::Cognito {
          * @see DescribeUserPoolResponse
          */
         static Dto::Cognito::DescribeUserPoolResponse map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool);
+
+        /**
+         * Converts a validity with validity units to seconds
+         *
+         * @param validity validity value
+         * @param units validity unit
+         * @return validity in seconds
+         */
+        static long GetValidityInSeconds(long validity, ValidityUnits units);
     };
 
 }// namespace AwsMock::Dto::Cognito

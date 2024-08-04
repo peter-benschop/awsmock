@@ -25,64 +25,64 @@ namespace AwsMock::Dto::Cognito {
      * Example:
      * @code{.json}
      * {
-     *     "AccountRecoverySetting": {
-     *       "RecoveryMechanisms": [
-     *          {
-     *                "Name": "string",
-     *                "Priority": number
-     *             }
-     *          ]
-     *       },
-     *       "AdminCreateUserConfig": {
-     *          "AllowAdminCreateUserOnly": boolean,
-     *          "InviteMessageTemplate": {
-     *             "EmailMessage": "string",
-     *             "EmailSubject": "string",
-     *             "SMSMessage": "string"
-     *          },
-     *          "UnusedAccountValidityDays": number
-     *       },
-     *       "AliasAttributes": [ "string" ],
-     *       "AutoVerifiedAttributes": [ "string" ],
-     *       "DeletionProtection": "string",
-     *       "DeviceConfiguration": {
-     *          "ChallengeRequiredOnNewDevice": boolean,
-     *          "DeviceOnlyRememberedOnUserPrompt": boolean
-     *       },
-     *       "EmailConfiguration": {
-     *          "ConfigurationSet": "string",
-     *          "EmailSendingAccount": "string",
-     *          "From": "string",
-     *          "ReplyToEmailAddress": "string",
-     *          "SourceArn": "string"
-     *       },
-     *       "EmailVerificationMessage": "string",
-     *       "EmailVerificationSubject": "string",
-     *       "LambdaConfig": {
-     *          "CreateAuthChallenge": "string",
-     *          "CustomEmailSender": {
-     *             "LambdaArn": "string",
-     *             "LambdaVersion": "string"
-     *          },
-     *          "CustomMessage": "string",
-     *          "CustomSMSSender": {
-     *             "LambdaArn": "string",
-     *             "LambdaVersion": "string"
-     *          },
-     *          "DefineAuthChallenge": "string",
-     *          "KMSKeyID": "string",
-     *          "PostAuthentication": "string",
-     *          "PostConfirmation": "string",
-     *          "PreAuthentication": "string",
-     *          "PreSignUp": "string",
-     *          "PreTokenGeneration": "string",
-     *          "PreTokenGenerationConfig": {
-     *             "LambdaArn": "string",
-     *             "LambdaVersion": "string"
-     *          },
-     *          "UserMigration": "string",
-     *          "VerifyAuthChallengeResponse": "string"
-     *       },
+     *   "AccountRecoverySetting": {
+     *     "RecoveryMechanisms": [
+     *        {
+     *           "Name": "string",
+     *           "Priority": number
+     *        }
+     *     ]
+     *   },
+     *   "AdminCreateUserConfig": {
+     *     "AllowAdminCreateUserOnly": boolean,
+     *     "InviteMessageTemplate": {
+     *        "EmailMessage": "string",
+     *        "EmailSubject": "string",
+     *        "SMSMessage": "string"
+     *     },
+     *     "UnusedAccountValidityDays": number
+     *  },
+     *  "AliasAttributes": [ "string" ],
+     *  "AutoVerifiedAttributes": [ "string" ],
+     *  "DeletionProtection": "string",
+     *  "DeviceConfiguration": {
+     *     "ChallengeRequiredOnNewDevice": boolean,
+     *     "DeviceOnlyRememberedOnUserPrompt": boolean
+     *   },
+     *   "EmailConfiguration": {
+     *      "ConfigurationSet": "string",
+     *      "EmailSendingAccount": "string",
+     *      "From": "string",
+     *      "ReplyToEmailAddress": "string",
+     *      "SourceArn": "string"
+     *   },
+     *   "EmailVerificationMessage": "string",
+     *   "EmailVerificationSubject": "string",
+     *   "LambdaConfig": {
+     *      "CreateAuthChallenge": "string",
+     *      "CustomEmailSender": {
+     *        "LambdaArn": "string",
+     *        "LambdaVersion": "string"
+     *      },
+     *      "CustomMessage": "string",
+     *      "CustomSMSSender": {
+     *      "LambdaArn": "string",
+     *        "LambdaVersion": "string"
+     *      },
+     *      "DefineAuthChallenge": "string",
+     *      "KMSKeyID": "string",
+     *      "PostAuthentication": "string",
+     *        "PostConfirmation": "string",
+     *        "PreAuthentication": "string",
+     *        "PreSignUp": "string",
+     *        "PreTokenGeneration": "string",
+     *        "PreTokenGenerationConfig": {
+     *          "LambdaArn": "string",
+     *          "LambdaVersion": "string"
+     *        },
+     *        "UserMigration": "string",
+     *        "VerifyAuthChallengeResponse": "string"
+     *      },
      *       "MfaConfiguration": "string",
      *       "Policies": {
      *          "PasswordPolicy": {
@@ -120,27 +120,27 @@ namespace AwsMock::Dto::Cognito {
      *       },
      *       "SmsVerificationMessage": "string",
      *       "UserAttributeUpdateSettings": {
-     *          "AttributesRequireVerificationBeforeUpdate": [ "string" ]
-     *       },
-     *       "UsernameAttributes": [ "string" ],
-     *       "UsernameConfiguration": {
-     *          "CaseSensitive": boolean
-     *       },
-     *       "UserPoolAddOns": {
-     *          "AdvancedSecurityMode": "string"
-     *       },
-     *       "UserPoolTags": {
-     *          "string" : "string"
-     *       },
-     *       "VerificationMessageTemplate": {
-     *          "DefaultEmailOption": "string",
-     *          "EmailMessage": "string",
-     *          "EmailMessageByLink": "string",
-     *          "EmailSubject": "string",
-     *          "EmailSubjectByLink": "string",
-     *          "SmsMessage": "string"
-     *       }
-     *       }
+     *       "AttributesRequireVerificationBeforeUpdate": [ "string" ]
+     *    },
+     *    "UsernameAttributes": [ "string" ],
+     *    "UsernameConfiguration": {
+     *       "CaseSensitive": boolean
+     *    },
+     *    "UserPoolAddOns": {
+     *       "AdvancedSecurityMode": "string"
+     *    },
+     *    "UserPoolTags": {
+     *      "string" : "string"
+     *    },
+     *   "VerificationMessageTemplate": {
+     *      "DefaultEmailOption": "string",
+     *      "EmailMessage": "string",
+     *      "EmailMessageByLink": "string",
+     *      "EmailSubject": "string",
+     *      "EmailSubjectByLink": "string",
+     *      "SmsMessage": "string"
+     *   }
+     * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com

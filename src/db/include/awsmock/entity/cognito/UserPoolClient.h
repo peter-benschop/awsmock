@@ -67,6 +67,21 @@ namespace AwsMock::Database::Entity::Cognito {
         bool generateSecret;
 
         /**
+         * Access token validity
+         */
+        long accessTokenValidity;
+
+        /**
+         * ID token validity
+         */
+        long idTokenValidity;
+
+        /**
+         * Refresh token validity
+         */
+        long refreshTokenValidity;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();

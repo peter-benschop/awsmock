@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/cognito/DescribeUserPoolResponse.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -30,6 +31,8 @@
 #include <awsmock/dto/cognito/DeleteGroupRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolClientRequest.h>
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolClientRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolClientResponse.h>
 #include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
@@ -44,6 +47,8 @@
 #include <awsmock/dto/cognito/ListUsersResponse.h>
 #include <awsmock/dto/cognito/SignUpRequest.h>
 #include <awsmock/dto/cognito/SignUpResponse.h>
+#include <awsmock/dto/cognito/UpdateUserPoolClientRequest.h>
+#include <awsmock/dto/cognito/UpdateUserPoolRequest.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
@@ -77,6 +82,36 @@ namespace AwsMock::Service {
         Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request);
 
         /**
+         * @brief Updates an existing cognito user pool
+         *
+         * @param request update user pool request
+         */
+        void UpdateUserPool(const Dto::Cognito::UpdateUserPoolRequest &request);
+
+        /**
+         * @brief List cognito user pools
+         *
+         * @param request list user pool request
+         * @return ListUserPoolResponse DTO
+         */
+        Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
+
+        /**
+         * @brief Describes a user pool
+         *
+         * @param request describe user pool request
+         * @return DescribeUserPoolResponse DTO
+         */
+        Dto::Cognito::DescribeUserPoolResponse DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request);
+
+        /**
+         * @brief Delete a cognito user pool
+         *
+         * @param request delete user pool request
+         */
+        void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request);
+
+        /**
          * @brief Create a new cognito user pool domain
          *
          * @param request create user pool domain request
@@ -101,35 +136,27 @@ namespace AwsMock::Service {
         Dto::Cognito::ListUserPoolClientsResponse ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request);
 
         /**
+         * @brief Describes a user pool client
+         *
+         * @param request describe user pool client request
+         * @return DescribeUserPoolResponse DTO
+         */
+        Dto::Cognito::DescribeUserPoolClientResponse DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request);
+
+        /**
+         * @brief Updates an existing cognito user pool client
+         *
+         * @param request update user pool client request
+         */
+        void UpdateUserPoolClient(const Dto::Cognito::UpdateUserPoolClientRequest &request);
+
+        /**
          * @brief Deletes a cognito user pool client
          *
          * @param request create user pool client request
          * @return CreateUserPoolClientResponse DTO
          */
         void DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request);
-
-        /**
-         * @brief List cognito user pools
-         *
-         * @param request list user pool request
-         * @return ListUserPoolResponse DTO
-         */
-        Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
-
-        /**
-         * @brief Describes a user pool
-         *
-         * @param request describe user pool request
-         * @return DescribeUserPoolResponse DTO
-         */
-        Dto::Cognito::DescribeUserPoolResponse DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request);
-
-        /**
-         * @brief Delete a cognito user pool
-         *
-         * @param request delete user pool request
-         */
-        void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request);
 
         /**
          * @brief Create a new cognito user

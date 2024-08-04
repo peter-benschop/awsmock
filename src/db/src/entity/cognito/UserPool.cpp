@@ -18,6 +18,12 @@ namespace AwsMock::Database::Entity::Cognito {
             userPoolClientsDoc.append(userPoolClient.ToDocument());
         }
 
+        // Tags
+        auto tagsDoc = bsoncxx::builder::basic::document{};
+        for (const auto &tag: tags) {
+            tagsDoc.append(kvp(tag.first, tag.second));
+        }
+
         view_or_value<view, value> userPoolDocument = make_document(
                 kvp("region", region),
                 kvp("userPoolId", userPoolId),
@@ -26,6 +32,7 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("clientId", clientId),
                 kvp("domain", domainDoc.extract()),
                 kvp("userPoolClients", userPoolClientsDoc),
+                kvp("tags", tagsDoc),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userPoolDocument;
@@ -57,6 +64,16 @@ namespace AwsMock::Database::Entity::Cognito {
                     UserPoolClient userPoolClient;
                     userPoolClient.FromDocument(userPoolClientElement.get_document().view());
                     userPoolClients.push_back(userPoolClient);
+                }
+            }
+
+            // Get tags
+            if (mResult.value().find("tags") != mResult.value().end()) {
+                bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+                for (const bsoncxx::document::element &tagElement: tagsView) {
+                    std::string key = bsoncxx::string::to_string(tagElement.key());
+                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                    tags.emplace(key, value);
                 }
             }
 
