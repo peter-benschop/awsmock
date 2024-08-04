@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/HttpUtils.h>
-#include <fstream>
 
 namespace AwsMock::Core {
 
@@ -296,6 +295,15 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetBodyAsString(const http::request<http::string_body> &request) {
 
         return request.body();
+    }
+
+    http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
+
+        http::response<http::dynamic_body> res{http::status::ok, request.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(request.keep_alive());
+        return res;
     }
 
     http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<http::dynamic_body> &request, const std::string &reason) {

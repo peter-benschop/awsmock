@@ -217,9 +217,9 @@ namespace AwsMock::Service {
         /**
          * @brief Stops the container by ID
          *
-         * @param containerId container ID
+         * @param id container ID
          */
-        void StopContainer(const std::string &containerId);
+        void StopContainer(const std::string &id);
 
         /**
          * @brief Deletes the container
@@ -231,9 +231,9 @@ namespace AwsMock::Service {
         /**
          * @brief Deletes the container by ID
          *
-         * @param containerId container ID
+         * @param id container ID
          */
-        void DeleteContainer(const std::string &containerId);
+        void DeleteContainer(const std::string &id);
 
         /**
          * @brief Deletes all stopped containers.

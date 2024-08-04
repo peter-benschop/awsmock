@@ -244,6 +244,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateContainerResponse response = {.hostPort = hostPort};
         response.FromJson(domainSocketResponse.body);
 
+        log_debug << "Docker container created, name: " << name << ":" << tag;
         return response;
     }
 
@@ -271,6 +272,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateContainerResponse response = {.hostPort = hostPort};
         response.FromJson(domainSocketResponse.body);
 
+        log_debug << "Docker container created, name: " << name << ":" << tag;
         return response;
     }
 
@@ -280,7 +282,9 @@ namespace AwsMock::Service {
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/start");
         if (domainSocketResponse.statusCode != http::status::ok && domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Start container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
+            return;
         }
+        log_debug << "Docker container started, id: " << id;
     }
 
     void DockerService::RestartDockerContainer(const std::string &id) {
@@ -288,7 +292,9 @@ namespace AwsMock::Service {
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/restart");
         if (domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Restart container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
+            return;
         }
+        log_debug << "Docker container restarted, id: " << id;
     }
 
     void DockerService::RestartContainer(const Dto::Docker::Container &container) {
@@ -299,26 +305,30 @@ namespace AwsMock::Service {
         StopContainer(container.id);
     }
 
-    void DockerService::StopContainer(const std::string &containerId) {
+    void DockerService::StopContainer(const std::string &id) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + containerId + "/stop");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/stop");
         if (domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Stop container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
+            return;
         }
+        log_debug << "Docker container stopped, id: " << id;
     }
 
     void DockerService::DeleteContainer(const Dto::Docker::Container &container) {
         DeleteContainer(container.id);
     }
 
-    void DockerService::DeleteContainer(const std::string &containerId) {
+    void DockerService::DeleteContainer(const std::string &id) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::delete_, "http://localhost/containers/" + containerId + "?force=true");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::delete_, "http://localhost/containers/" + id + "?force=true");
         if (domainSocketResponse.statusCode != http::status::no_content) {
             log_warning << "Delete container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
+            return;
         }
+        log_debug << "Docker container deleted, id: " << id;
     }
 
     void DockerService::PruneContainers() {

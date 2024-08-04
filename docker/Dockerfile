@@ -102,14 +102,14 @@ RUN aws configure set aws_access_key_id none && \
     aws configure set profile.awsmock.aws_secret_access_key none
 
 # Expose ports
-# Manager/gateway
+# Manager/Controller
 EXPOSE 4566-4567 4566-4567
 # Prometheus
 EXPOSE 9091 9091
-# DynamoDB
-EXPOSE 8000 8000
-# Service
-EXPOSE 9500-9510 9500-9510
+# FTP server
+EXPOSE 21 21
+# FTP passive mode
+EXPOSE 6000-6010 6000-6010
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
