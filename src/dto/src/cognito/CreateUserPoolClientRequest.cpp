@@ -19,6 +19,10 @@ namespace AwsMock::Dto::Cognito {
             Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
             Core::JsonUtils::GetJsonValueBool("GenerateSecret", rootObject, generateSecret);
 
+            if (rootObject->has("TokenValidityUnits")) {
+                tokenValidityUnits.FromJsonObject(rootObject->getObject("TokenValidityUnits"));
+            }
+
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());

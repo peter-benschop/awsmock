@@ -29,6 +29,10 @@ namespace AwsMock::Dto::Cognito {
         userPoolClient.userPoolId = request.userPoolId;
         userPoolClient.clientId = Core::StringUtils::GenerateRandomString(26);
         userPoolClient.clientName = request.clientName;
+        userPoolClient.accessTokenValidity = GetValidityInSeconds(request.accessTokenValidity, request.tokenValidityUnits.accessToken);
+        userPoolClient.idTokenValidity = GetValidityInSeconds(request.idTokenValidity, request.tokenValidityUnits.idToken);
+        userPoolClient.refreshTokenValidity = GetValidityInSeconds(request.refreshTokenValidity, request.tokenValidityUnits.refreshToken);
+
         if (request.generateSecret) {
             userPoolClient.clientSecret = Core::StringUtils::GenerateRandomString(52);
         }
@@ -137,6 +141,21 @@ namespace AwsMock::Dto::Cognito {
             response.userPoolsClients.emplace_back(Mapper::map(userPoolClient));
         }
         return response;
+    }
+
+    long Mapper::GetValidityInSeconds(long validity, ValidityUnits units) {
+        switch (units) {
+            case ValidityUnits::seconds:
+                return validity;
+            case ValidityUnits::minutes:
+                return validity * 60;
+            case ValidityUnits::hours:
+                return validity * 3600;
+            case ValidityUnits::days:
+                return validity * 3600 * 24;
+            default:
+                return validity * 3600 * 8;
+        }
     }
 
 }// namespace AwsMock::Dto::Cognito

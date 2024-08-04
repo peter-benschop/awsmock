@@ -14,6 +14,9 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("clientName", clientName),
                 kvp("clientSecret", clientSecret),
                 kvp("generateSecret", generateSecret),
+                kvp("accessTokenValidity", accessTokenValidity),
+                kvp("idTokenValidity", idTokenValidity),
+                kvp("refreshTokenValidity", refreshTokenValidity),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userPoolDocument;
@@ -27,6 +30,9 @@ namespace AwsMock::Database::Entity::Cognito {
             clientId = bsoncxx::string::to_string(mResult.value()["clientId"].get_string().value);
             clientName = bsoncxx::string::to_string(mResult.value()["clientName"].get_string().value);
             clientSecret = bsoncxx::string::to_string(mResult.value()["clientSecret"].get_string().value);
+            accessTokenValidity = mResult.value()["accessTokenValidity"].get_int64().value;
+            idTokenValidity = mResult.value()["idTokenValidity"].get_int64().value;
+            refreshTokenValidity = mResult.value()["refreshTokenValidity"].get_int64().value;
             generateSecret = mResult.value()["generateSecret"].get_bool().value;
             created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
             modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
@@ -44,6 +50,9 @@ namespace AwsMock::Database::Entity::Cognito {
         jsonObject.set("clientId", clientId);
         jsonObject.set("clientName", clientName);
         jsonObject.set("clientSecret", clientSecret);
+        jsonObject.set("idTokenValidity", idTokenValidity);
+        jsonObject.set("accessTokenValidity", accessTokenValidity);
+        jsonObject.set("refreshTokenValidity", refreshTokenValidity);
         jsonObject.set("generateSecret", generateSecret);
         jsonObject.set("created", created);
         jsonObject.set("modified", modified);
@@ -57,6 +66,9 @@ namespace AwsMock::Database::Entity::Cognito {
         Core::JsonUtils::GetJsonValueString("clientId", jsonObject, clientId);
         Core::JsonUtils::GetJsonValueString("clientName", jsonObject, clientName);
         Core::JsonUtils::GetJsonValueString("clientSecret", jsonObject, clientSecret);
+        Core::JsonUtils::GetJsonValueLong("accessTokenValidity", jsonObject, accessTokenValidity);
+        Core::JsonUtils::GetJsonValueLong("idTokenValidity", jsonObject, idTokenValidity);
+        Core::JsonUtils::GetJsonValueLong("refreshTokenValidity", jsonObject, refreshTokenValidity);
         Core::JsonUtils::GetJsonValueBool("generateSecret", jsonObject, generateSecret);
         Core::JsonUtils::GetJsonValueDate("created", jsonObject, created);
         Core::JsonUtils::GetJsonValueDate("modified", jsonObject, modified);

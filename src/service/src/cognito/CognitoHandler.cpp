@@ -65,6 +65,19 @@ namespace AwsMock::Service {
                 Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
                 return SendOkResponse(request, serviceResponse.ToJson());
 
+            } else if (action == "UpdateUserPool") {
+
+                Dto::Cognito::UpdateUserPoolRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got update user pool request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.UpdateUserPool(cognitoRequest);
+                return SendOkResponse(request);
+
             } else if (action == "ListUserPoolClients") {
 
                 Dto::Cognito::ListUserPoolClientsRequest cognitoRequest{};
@@ -90,6 +103,19 @@ namespace AwsMock::Service {
 
                 Dto::Cognito::DescribeUserPoolClientResponse cognitoResponse = _cognitoService.DescribeUserPoolClient(cognitoRequest);
                 return SendOkResponse(request, cognitoResponse.ToJson());
+
+            } else if (action == "UpdateUserPoolClient") {
+
+                Dto::Cognito::UpdateUserPoolClientRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got update user pool client request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.UpdateUserPoolClient(cognitoRequest);
+                return SendOkResponse(request);
 
             } else if (action == "DeleteUserPoolClient") {
 

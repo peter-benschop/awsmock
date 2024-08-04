@@ -83,6 +83,11 @@ namespace AwsMock::Database::Entity::Cognito {
         std::vector<UserPoolClient> userPoolClients;
 
         /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
