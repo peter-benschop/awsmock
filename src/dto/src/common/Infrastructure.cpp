@@ -231,12 +231,23 @@ namespace AwsMock::Dto::Common {
                 }
             }
 
+            // Secrets manager
             if (infrastructureObject->has("secretsmanager-secrets")) {
                 Poco::JSON::Array::Ptr secretsArray = infrastructureObject->getArray("secretsmanager-secrets");
                 for (int i = 0; i < secretsArray->size(); i++) {
                     Database::Entity::SecretsManager::Secret secretsObject;
                     secretsObject.FromJsonObject(secretsArray->getObject(i));
                     secrets.emplace_back(secretsObject);
+                }
+            }
+
+            // Transfer servers
+            if (infrastructureObject->has("transfer-servers")) {
+                Poco::JSON::Array::Ptr transferServerArray = infrastructureObject->getArray("transfer-servers");
+                for (int i = 0; i < transferServerArray->size(); i++) {
+                    Database::Entity::Transfer::Transfer transferObject;
+                    transferObject.FromJsonObject(transferServerArray->getObject(i));
+                    transferServers.emplace_back(transferObject);
                 }
             }
 

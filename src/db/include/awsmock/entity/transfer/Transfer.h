@@ -60,14 +60,14 @@ namespace AwsMock::Database::Entity::Transfer {
         return ServerStateNames[serverState];
     }
 
-    /*static ServerState ServerStateFromString(const std::string &serverState) {
-        for(auto &it : ServerStateNames) {
-            if(it.second == serverState) {
+    static ServerState ServerStateFromString(const std::string &serverState) {
+        for (auto &it: ServerStateNames) {
+            if (it.second == serverState) {
                 return it.first;
             }
         }
         return ServerState::OFFLINE;
-    }*/
+    }
 
     /**
      * Transfer manager server entity
@@ -109,7 +109,7 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * State
          */
-        std::string state = ServerStateToString(ServerState::OFFLINE);
+        ServerState state = ServerState::OFFLINE;
 
         /**
          * Concurrency, number of FTP manager threads
@@ -177,6 +177,13 @@ namespace AwsMock::Database::Entity::Transfer {
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+
+        /**
+         * Converts the entity to a JSON object
+         *
+         * @param JSON object
+         */
+        void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
         /**
          * Converts the DTO to a string representation.

@@ -68,6 +68,13 @@ namespace AwsMock::Database::Entity::Transfer {
         [[maybe_unused]] void FromDocument(bsoncxx::document::view mResult);
 
         /**
+         * @brief Converts from a JSON object
+         *
+         * @return JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
          * Converts the MongoDB user to an JSON object
          *
          * @return JSON object

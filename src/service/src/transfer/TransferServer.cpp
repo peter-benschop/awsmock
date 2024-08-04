@@ -85,7 +85,7 @@ namespace AwsMock::Service {
         _ftpServer->start(server.concurrency);
 
         // Update database
-        server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE);
+        server.state = Database::Entity::Transfer::ServerState::ONLINE;
 
         log_info << "Transfer manager " << server.serverId << " started ";
     }
@@ -97,7 +97,7 @@ namespace AwsMock::Service {
         ftpserver->stop();
 
         // Update database
-        server.state = Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE);
+        server.state = Database::Entity::Transfer::ServerState::OFFLINE;
 
         log_debug << "Transfer manager " << server.serverId << " stopped ";
     }
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
         for (auto &transfer: transfers) {
-            if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
+            if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 StartTransferServer(transfer);
             }
         }
@@ -120,12 +120,12 @@ namespace AwsMock::Service {
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
         for (auto &transfer: transfers) {
-            if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::ONLINE)) {
+            if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it == _transferServerList.end()) {
                     StartTransferServer(transfer);
                 }
-            } else if (transfer.state == Database::Entity::Transfer::ServerStateToString(Database::Entity::Transfer::ServerState::OFFLINE)) {
+            } else if (transfer.state == Database::Entity::Transfer::ServerState::OFFLINE) {
                 auto it = _transferServerList.find(transfer.serverId);
                 if (it != _transferServerList.end()) {
                     StopTransferServer(transfer);
