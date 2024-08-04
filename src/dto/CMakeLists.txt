@@ -44,7 +44,8 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/ListGroupsResponse.cpp src/cognito/model/UserPoolClient.cpp src/cognito/AdminAddUserToGroupRequest.cpp src/cognito/CreateUserPoolClientRequest.cpp
         src/cognito/CreateUserPoolClientResponse.cpp src/cognito/DescribeUserPoolRequest.cpp src/cognito/DescribeUserPoolResponse.cpp src/cognito/model/User.cpp
         src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp
-        src/cognito/model/AuthenticationResult.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthResponse.cpp)
+        src/cognito/model/AuthenticationResult.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp
+        src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp src/cognito/ListUserPoolClientsResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp

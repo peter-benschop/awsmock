@@ -65,6 +65,19 @@ namespace AwsMock::Service {
                 Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
                 return SendOkResponse(request, serviceResponse.ToJson());
 
+            } else if (action == "ListUserPoolClients") {
+
+                Dto::Cognito::ListUserPoolClientsRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got list user pool clients request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::ListUserPoolClientsResponse serviceResponse = _cognitoService.ListUserPoolClients(cognitoRequest);
+                return SendOkResponse(request, serviceResponse.ToJson());
+
             } else if (action == "DescribeUserPool") {
 
                 Dto::Cognito::DescribeUserPoolRequest cognitoRequest{};
@@ -190,6 +203,19 @@ namespace AwsMock::Service {
 
                 _cognitoService.DeleteGroup(cognitoRequest);
                 return SendOkResponse(request);
+
+            } else if (action == "SignUp") {
+
+                Dto::Cognito::SignUpRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got sign up request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::SignUpResponse cognitoResponse = _cognitoService.SignUp(cognitoRequest);
+                return SendOkResponse(request, cognitoResponse.ToJson());
 
             } else {
 

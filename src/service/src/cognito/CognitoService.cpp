@@ -102,6 +102,22 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::ListUserPoolClientsResponse CognitoService::ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool_clients");
+        log_debug << "List user pools clients request, userPoolId: " << request.userPoolId << " maxResults: " << request.maxResults;
+
+        try {
+
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+            log_trace << "Got user pool, region: " << userPool.region << " userPoolId: " << userPool.userPoolId;
+            return Dto::Cognito::Mapper::map(request, userPool.userPoolClients);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "User pool list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
         log_debug << "List user pools request, maxResults: " << request.maxResults;
@@ -357,4 +373,10 @@ namespace AwsMock::Service {
             throw Core::ServiceException(ex.message());
         }
     }
+
+    Dto::Cognito::SignUpResponse CognitoService::SignUp(const Dto::Cognito::SignUpRequest &request) {
+        Dto::Cognito::SignUpResponse response;
+        return response;
+    }
+
 }// namespace AwsMock::Service
