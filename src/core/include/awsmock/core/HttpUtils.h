@@ -6,6 +6,7 @@
 #define AWS_MOCK_CORE_HTTP_UTILS_H
 
 // Standard C++ includes
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -355,6 +356,15 @@ namespace AwsMock::Core {
          * @return content length in bytes
          */
         static long GetContentLength(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Return a simple ok response (200)
+         *
+         * @param request HTTP request
+         * @param reason reason string
+         * @return HTTP response
+         */
+        static http::response<http::dynamic_body> Ok(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Return a bad request response (400)

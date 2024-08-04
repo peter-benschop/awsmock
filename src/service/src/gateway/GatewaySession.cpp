@@ -88,8 +88,16 @@ namespace AwsMock::Service {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
-            request.method() != http::verb::head) {
+            request.method() != http::verb::head && request.method() != http::verb::connect) {
             return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
+        }
+
+        // Ping request
+        if (request.method() == http::verb::connect) {
+            log_debug << "Handle CONNECT request";
+            Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
+            Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
+            return Core::HttpUtils::Ok(request);
         }
 
         // Request path must be absolute and not contain "..".
