@@ -59,7 +59,7 @@ namespace AwsMock::Dto::Cognito {
          * Client metadata
          */
         std::map<std::string, std::string> clientMetadata;
-        
+
         /**
          * Convert from a JSON object.
          *
