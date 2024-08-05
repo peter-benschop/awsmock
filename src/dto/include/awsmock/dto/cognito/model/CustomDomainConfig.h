@@ -38,7 +38,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @param jsonObject json object
          */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
             try {
 
