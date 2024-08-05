@@ -33,6 +33,8 @@
 #include <awsmock/dto/cognito/DeleteUserPoolRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolClientRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolClientResponse.h>
+#include <awsmock/dto/cognito/DescribeUserPoolDomainRequest.h>
+#include <awsmock/dto/cognito/DescribeUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
@@ -48,6 +50,8 @@
 #include <awsmock/dto/cognito/SignUpRequest.h>
 #include <awsmock/dto/cognito/SignUpResponse.h>
 #include <awsmock/dto/cognito/UpdateUserPoolClientRequest.h>
+#include <awsmock/dto/cognito/UpdateUserPoolDomainRequest.h>
+#include <awsmock/dto/cognito/UpdateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/UpdateUserPoolRequest.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/repository/CognitoDatabase.h>
@@ -118,6 +122,24 @@ namespace AwsMock::Service {
          * @return CreateUserPoolDomainResponse DTO
          */
         Dto::Cognito::CreateUserPoolDomainResponse CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Updates an existing cognito user pool domain
+         *
+         * @param request update user pool domain request
+         * @return UpdateUserPoolDomainResponse
+         * @see UpdateUserPoolDomainResponse
+         */
+        Dto::Cognito::UpdateUserPoolDomainResponse UpdateUserPoolDomain(const Dto::Cognito::UpdateUserPoolDomainRequest &request);
+
+        /**
+         * @brief Describes a user pool domain
+         *
+         * @param request describe user pool domain request
+         * @return DescribeUserPoolDomainResponse DTO
+         * @see DescribeUserPoolDomainResponse DTO
+         */
+        Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
 
         /**
          * @brief Create a new cognito user pool client

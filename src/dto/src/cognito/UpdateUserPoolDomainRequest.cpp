@@ -2,11 +2,11 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/CreateUserPoolDomainRequest.h>
+#include "awsmock/dto/cognito/UpdateUserPoolDomainRequest.h"
 
 namespace AwsMock::Dto::Cognito {
 
-    void CreateUserPoolDomainRequest::FromJson(const std::string &payload) {
+    void UpdateUserPoolDomainRequest::FromJson(const std::string &payload) {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(payload);
@@ -15,8 +15,8 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
             Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
+            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
 
             if (rootObject->has("CustomDomainConfig")) {
                 customDomainConfig.FromJsonObject(rootObject->getObject("CustomDomainConfig"));
@@ -28,15 +28,14 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string CreateUserPoolDomainRequest::ToJson() const {
+    std::string UpdateUserPoolDomainRequest::ToJson() const {
 
         try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
-            rootJson.set("Domain", domain);
             rootJson.set("UserPoolId", userPoolId);
-
+            rootJson.set("Domain", domain);
             rootJson.set("CustomDomainConfig", customDomainConfig.ToJsonObject());
 
             return Core::JsonUtils::ToJsonString(rootJson);
@@ -47,14 +46,14 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string CreateUserPoolDomainRequest::ToString() const {
+    std::string UpdateUserPoolDomainRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const CreateUserPoolDomainRequest &r) {
-        os << "CreateUserPoolDomainRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const UpdateUserPoolDomainRequest &r) {
+        os << "UpdateUserPoolDomainRequest=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Cognito

@@ -156,6 +156,49 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::UpdateUserPoolDomainResponse CognitoService::UpdateUserPoolDomain(const Dto::Cognito::UpdateUserPoolDomainRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool_domain");
+        log_debug << "Update user pool domain request, userPoolId: " << request.userPoolId << " domain: " << request.domain;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exist, userPoolId: " << request.userPoolId;
+            throw Core::ServiceException("User pool does not exist, userPoolId: " + request.userPoolId);
+        }
+
+        try {
+
+            // Get user pool
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+            userPool.domain.domain = request.domain;
+
+            // Update database
+            userPool = _database.UpdateUserPool(userPool);
+            log_trace << "User pool domain updated, userPoolId: " << userPool.userPoolId << " clientId: " << userPool.clientId;
+
+            return {.cloudFrontDomain = userPool.domain.domain};
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Update user pool domain request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::Cognito::DescribeUserPoolDomainResponse CognitoService::DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_domain");
+        log_debug << "Describe user pool domain request, domain: " << request.domain;
+
+        try {
+
+            //Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+            //log_trace << "Got user pool userPoolId: " << request.userPoolId;
+            return {};
+
+        } catch (Poco::Exception &ex) {
+            log_error << "User pool list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::Cognito::CreateUserPoolClientResponse CognitoService::CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_client");
         log_debug << "Create user pool client request, clientName: " << request.clientName;
