@@ -324,6 +324,21 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, cognitoResponse.ToJson());
 
+            } else if (action == "AdminConfirmSignUp") {
+
+                Dto::Cognito::AdminConfirmUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got sign up request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.ConfirmUser(cognitoRequest);
+                log_info << "User confirmed, userPoolId: " << cognitoRequest.userPoolId << " userName: " << cognitoRequest.userName;
+
+                return SendOkResponse(request);
+
             } else {
 
                 return SendBadRequestError(request, "Unknown function");

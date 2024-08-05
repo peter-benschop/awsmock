@@ -1,3 +1,4 @@
+
 //
 // Created by vogje01 on 30/05/2023.
 //
@@ -373,6 +374,7 @@ namespace AwsMock::Service {
                     .userPoolId = request.userPoolId,
                     .userName = request.userName,
                     .enabled = true,
+                    .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
                     .created = system_clock::now(),
                     .modified = system_clock::now(),
             };
@@ -559,4 +561,25 @@ namespace AwsMock::Service {
         return response;
     }
 
+    void CognitoService::ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "confirm_user");
+        log_debug << "Confirm user request, region:  " << request.region << " name: " << request.userName;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exist, region: " << request.region << " userPoolId: " << request.userPoolId;
+            throw Core::NotFoundException("User pool does not exist, region: " + request.region + " userPoolId: " + request.userPoolId);
+        }
+
+        Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+
+        if (_database.UserExists(request.region, userPool.userPoolId, request.userName)) {
+            Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, userPool.userPoolId, request.userName);
+            user.userStatus = Database::Entity::Cognito::UserStatus::CONFIRMED;
+            user = _database.UpdateUser(user);
+            log_debug << "User confirmed, userName: " << user.userName;
+        } else {
+            log_error << "User does not exist, region: " << request.region << " userPoolId: " << request.userPoolId;
+            throw Core::NotFoundException("User does not exist, region: " + request.region + " userPoolId: " + request.userPoolId);
+        }
+    }
 }// namespace AwsMock::Service

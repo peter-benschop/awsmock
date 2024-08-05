@@ -228,6 +228,7 @@ namespace AwsMock::Service {
 
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
+                authKeys.region = Core::Configuration::instance().getString("awsmock.region");
             }
 
             return authKeys;

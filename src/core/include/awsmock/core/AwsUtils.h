@@ -236,6 +236,13 @@ namespace AwsMock::Core {
         static std::string CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId);
 
         /**
+         * @brief Creates a new Cognito confirmation code
+         *
+         * @return Cognito confirmation code
+         */
+        static std::string CreateCognitoConfirmationCode();
+
+        /**
          * @brief Returns a request ID.
          *
          * @return request ID

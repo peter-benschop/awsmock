@@ -14,6 +14,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/model/TokenValidityUnits.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -50,6 +51,26 @@ namespace AwsMock::Dto::Cognito {
          * Client secret
          */
         std::string clientSecret;
+
+        /**
+         * Access token validity
+         */
+        long accessTokenValidity;
+
+        /**
+         * ID token validity
+         */
+        long idTokenValidity;
+
+        /**
+         * Refresh token validity
+         */
+        long refreshTokenValidity;
+
+        /**
+         * Token validity units
+         */
+        TokenValidityUnits tokenValidityUnits;
 
         /**
          * Created

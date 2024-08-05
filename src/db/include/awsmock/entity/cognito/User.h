@@ -90,6 +90,11 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string password;
 
         /**
+         * Confirmation code
+         */
+        std::string confirmationCode;
+
+        /**
          * Groups
          */
         std::vector<Group> groups;

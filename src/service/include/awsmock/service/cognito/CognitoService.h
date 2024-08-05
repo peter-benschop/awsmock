@@ -17,6 +17,7 @@
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/cognito/AdminAddUserToGroupRequest.h>
+#include <awsmock/dto/cognito/AdminConfirmUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
@@ -247,6 +248,13 @@ namespace AwsMock::Service {
          * @return SignUpResponse DTO
          */
         Dto::Cognito::SignUpResponse SignUp(const Dto::Cognito::SignUpRequest &request);
+
+        /**
+         * @brief Confirm a user
+         *
+         * @param request confirm user request
+         */
+        void ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request);
 
       private:
 

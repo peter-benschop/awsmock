@@ -35,6 +35,7 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("groups", groupsDoc),
                 kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
                 kvp("userAttributes", userAttributesDoc),
+                kvp("confirmationCode", confirmationCode),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userDocument;
@@ -48,6 +49,7 @@ namespace AwsMock::Database::Entity::Cognito {
         userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
         enabled = mResult.value()["enabled"].get_bool().value;
         userStatus = Entity::Cognito::UserStatusFromString(bsoncxx::string::to_string(mResult.value()["userStatus"].get_string().value));
+        confirmationCode = bsoncxx::string::to_string(mResult.value()["confirmationCode"].get_string().value);
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
