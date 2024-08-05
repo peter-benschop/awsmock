@@ -123,11 +123,19 @@ namespace AwsMock::Dto::Cognito {
     }
 
     Dto::Cognito::UserPoolClient Mapper::map(const Database::Entity::Cognito::UserPoolClient &clientEntity) {
+        TokenValidityUnits tokenValidityUnits;
+        tokenValidityUnits.accessToken = GetMaxTokenUnits(clientEntity.accessTokenValidity);
+        tokenValidityUnits.refreshToken = GetMaxTokenUnits(clientEntity.refreshTokenValidity);
+        tokenValidityUnits.idToken = GetMaxTokenUnits(clientEntity.idTokenValidity);
+
         UserPoolClient userPoolClient = {
                 .userPoolId = clientEntity.userPoolId,
                 .clientId = clientEntity.clientId,
                 .clientName = clientEntity.clientName,
                 .clientSecret = clientEntity.clientSecret,
+                .accessTokenValidity = GetMaxValidityToken(clientEntity.accessTokenValidity, tokenValidityUnits.accessToken),
+                .idTokenValidity = GetMaxValidityToken(clientEntity.idTokenValidity, tokenValidityUnits.idToken),
+                .refreshTokenValidity = GetMaxValidityToken(clientEntity.refreshTokenValidity, tokenValidityUnits.refreshToken),
                 .created = clientEntity.created,
                 .lastModified = clientEntity.modified};
         return userPoolClient;
@@ -155,6 +163,33 @@ namespace AwsMock::Dto::Cognito {
                 return validity * 3600 * 24;
             default:
                 return validity * 3600 * 8;
+        }
+    }
+
+    ValidityUnits Mapper::GetMaxTokenUnits(long validity) {
+        if (validity > 3600 * 24) {
+            return ValidityUnits::days;
+        } else if (validity > 3600) {
+            return ValidityUnits::hours;
+        } else if (validity > 60) {
+            return ValidityUnits::minutes;
+        } else {
+            return ValidityUnits::seconds;
+        }
+    }
+
+    long Mapper::GetMaxValidityToken(long validity, ValidityUnits validityUnits) {
+        switch (validityUnits) {
+            case ValidityUnits::seconds:
+                return validity;
+            case ValidityUnits::minutes:
+                return validity / 60;
+            case ValidityUnits::hours:
+                return validity / 3600;
+            case ValidityUnits::days:
+                return validity / (3600 * 24);
+            default:
+                return validity;
         }
     }
 

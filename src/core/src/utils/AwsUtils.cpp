@@ -342,6 +342,10 @@ namespace AwsMock::Core {
         return Core::Crypto::HexEncode(digest.data(), static_cast<int>(digest.size()));
     }
 
+    std::string AwsUtils::CreateCognitoConfirmationCode() {
+        return Core::StringUtils::GenerateRandomString(40);
+    }
+
     std::string AwsUtils::GetDateString() {
         auto t = std::time(nullptr);
         auto tm = *std::gmtime(&t);
