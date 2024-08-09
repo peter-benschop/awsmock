@@ -103,9 +103,10 @@ namespace AwsMock::Service {
          *
          * @param name container name
          * @param tag container tags
+         * @param locked if true is already locked
          * @return Image
          */
-        Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag);
+        Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false);
 
         /**
          * @brief Build a docker image for a lambda

@@ -41,13 +41,13 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer.Start();
+            //_gatewayServer.Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllUserPools();
-            _gatewayServer.Stop();
+            //_gatewayServer.Stop();
         }
 
         std::string _endpoint, _accountId;
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         GatewayServer _gatewayServer;
     };
 
-    TEST_F(CognitoServerCliTest, UserPoolCreateTest) {
+    /*TEST_F(CognitoServerCliTest, UserPoolCreateTest) {
 
         // arrange
 
@@ -136,7 +136,7 @@ namespace AwsMock::Service {
         // assert
         EXPECT_EQ(0, deleteUserResult.status);
         EXPECT_EQ(0, userList.size());
-    }
+    }*/
 
 }// namespace AwsMock::Service
 

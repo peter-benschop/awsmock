@@ -60,7 +60,7 @@ namespace AwsMock::Manager {
          *
          * Only the modules are started, which are set to 'active' in the configuration file.
          */
-        void StartModules();
+        void StartModules(boost::asio::io_context &ioc);
 
         /**
          * @brief Stops all currently running modules.

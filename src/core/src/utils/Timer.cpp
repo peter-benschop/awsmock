@@ -49,8 +49,8 @@ namespace AwsMock::Core {
 
     void Timer::Stop() {
         log_debug << "Timer shutdown requested , name: " << _name;
-        Shutdown();
         _stopSource.request_stop();
+        Shutdown();
         log_debug << "Timer shutdown finished, name: " << _name;
     }
 

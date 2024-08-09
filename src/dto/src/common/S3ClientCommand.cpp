@@ -73,6 +73,8 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::PUT_BUCKET_ENCRYPTION;
                     } else if (notificationRequest) {
                         command = S3CommandType::BUCKET_NOTIFICATION;
+                    } else if (versionRequest) {
+                        command = S3CommandType::PUT_BUCKET_VERSIONING;
                     } else if (!bucket.empty() && key.empty()) {
                         command = S3CommandType::CREATE_BUCKET;
                     } else if (!bucket.empty() && !key.empty()) {
@@ -179,6 +181,8 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION;
         } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-encryption") {
             command = S3CommandType::PUT_BUCKET_ENCRYPTION;
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-versioning") {
+            command = S3CommandType::PUT_BUCKET_VERSIONING;
         } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "list-object-versions") {
             command = S3CommandType::LIST_OBJECT_VERSIONS;
         }

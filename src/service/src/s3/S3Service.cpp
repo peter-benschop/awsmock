@@ -208,7 +208,8 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::NotFoundException("Bucket does not exist");
+            log_error << "Bucket does not exist, region: " << request.region << " bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist, name: " + request.bucket);
         }
 
         // Update bucket

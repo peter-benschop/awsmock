@@ -36,10 +36,10 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/model/Configuration.cpp src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
         src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp src/lambda/model/EventSourceMapping.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp src/cognito/model/Group.cpp src/cognito/CreateGroupRequest.cpp
-        src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
+        src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/model/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp
-        src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp src/cognito/LambdaConfig.cpp src/cognito/CustomEmailSender.cpp src/cognito/model/UserPool.cpp
-        src/cognito/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp
+        src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/UserPool.cpp
+        src/cognito/model/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp
         src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp src/cognito/CreateGroupResponse.cpp src/cognito/ListGroupRequest.cpp
         src/cognito/ListGroupsResponse.cpp src/cognito/model/UserPoolClient.cpp src/cognito/AdminAddUserToGroupRequest.cpp src/cognito/CreateUserPoolClientRequest.cpp
         src/cognito/CreateUserPoolClientResponse.cpp src/cognito/DescribeUserPoolRequest.cpp src/cognito/DescribeUserPoolResponse.cpp src/cognito/model/User.cpp
@@ -49,7 +49,7 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/DescribeUserPoolClientRequest.cpp src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp
         src/cognito/UpdateUserPoolClientRequest.cpp src/cognito/model/TokenValidityUnits.cpp src/cognito/UpdateUserPoolDomainRequest.cpp
         src/cognito/AdminConfirmUserRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp src/cognito/DescribeUserPoolDomainRequest.cpp
-        src/cognito/DescribeUserPoolDomainResponse.cpp)
+        src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp)
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp

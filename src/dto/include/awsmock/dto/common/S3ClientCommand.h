@@ -50,6 +50,7 @@ namespace AwsMock::Dto::Common {
         BUCKET_NOTIFICATION,
         PUT_BUCKET_NOTIFICATION_CONFIGURATION,
         PUT_BUCKET_ENCRYPTION,
+        PUT_BUCKET_VERSIONING,
         UNKNOWN
     };
 
@@ -74,6 +75,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::BUCKET_NOTIFICATION, "BucketNotification"},
             {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PUT_BUCKET_NOTIFICATION_CONFIGURATION"},
             {S3CommandType::PUT_BUCKET_ENCRYPTION, "PUT_BUCKET_ENCRYPTION"},
+            {S3CommandType::PUT_BUCKET_VERSIONING, "PUT_BUCKET_VERSIONING"},
     };
 
     [[maybe_unused]] static std::string S3CommandTypeToString(S3CommandType commandType) {

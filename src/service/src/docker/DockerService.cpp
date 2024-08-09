@@ -65,8 +65,8 @@ namespace AwsMock::Service {
             log_debug << "Docker image created, name: " << name << ":" << tag;
 
             // Wait for image creation
-            Dto::Docker::Image image = GetImageByName(name, tag);
-            while (GetImageByName(name, tag).size == 0) {
+            Dto::Docker::Image image = GetImageByName(name, tag, true);
+            while (GetImageByName(name, tag, true).size == 0) {
                 std::this_thread::sleep_for(500ms);
             }
 
@@ -76,8 +76,11 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag) {
-        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+    Dto::Docker::Image DockerService::GetImageByName(const std::string &name, const std::string &tag, bool locked) {
+
+        if (!locked) {
+            boost::mutex::scoped_lock lock(_dockerServiceMutex);
+        }
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
@@ -178,7 +181,7 @@ namespace AwsMock::Service {
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + std::string("/") + name + "\"]}");
+        std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
         if (domainSocketResponse.statusCode == http::status::ok) {
 

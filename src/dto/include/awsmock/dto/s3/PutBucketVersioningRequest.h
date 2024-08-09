@@ -39,12 +39,6 @@ namespace AwsMock::Dto::S3 {
          * Status
          */
         std::string status;
-        /**
-         * Constructor
-         *
-         * @param xmlString XML string
-         */
-        explicit PutBucketVersioningRequest(const std::string &xmlString);
 
         /**
          * Convert from XML representation

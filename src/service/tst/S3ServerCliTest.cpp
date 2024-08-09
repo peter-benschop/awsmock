@@ -9,11 +9,12 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/s3/S3Server.h"
-#include "awsmock/service/s3/S3Service.h"
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/s3/S3Server.h>
+#include <awsmock/service/s3/S3Service.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -32,28 +33,34 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-            // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.s3.http.port", std::to_string(S3_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
+            // General configuration
+            _region = _configuration.getString("awsmock.region", "eu-central-1");
+
+            // Define endpoint. This is the endpoint of the SQS server, not the gateway
+            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(S3_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", S3_DEFAULT_HOST);
+
+            // Set test config
             _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.id", S3_ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
-            _output = "json";
 
             // Start HTTP manager
-            _s3Server.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
-            _s3Server.Stop();
+            _gatewayServer->Stop();
         }
 
-        std::string _endpoint, _accountId, _output;
+        boost::asio::io_context ioc{5};
+        std::string _endpoint, _accountId, _output, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
-        S3Server _s3Server;
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
     TEST_F(S3ServerCliTest, BucketCreateTest) {
@@ -61,7 +68,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint + " --output " + _output);
+        Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
         EXPECT_EQ(0, result.status);
         Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 

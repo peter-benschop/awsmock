@@ -59,7 +59,7 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::StartModules() {
+    void Manager::StartModules(boost::asio::io_context &ioc) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
@@ -104,7 +104,7 @@ namespace AwsMock::Manager {
                 _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
                 _serverMap[module.name]->Start();
             } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::GatewayServer>();
+                _serverMap[module.name] = std::make_shared<Service::GatewayServer>(ioc);
                 _serverMap[module.name]->Start();
             }
             log_debug << "Module " << module.name << " started";
@@ -148,6 +148,7 @@ namespace AwsMock::Manager {
                 [&](boost::beast::error_code const &, int) {
                     // Stop the `io_context`. This will cause `run()` to return immediately, eventually
                     // destroying the `io_context` and all the sockets in it.
+                    log_info << "Manager stopped on signal";
                     ioc.stop();
                 });
 
