@@ -6,6 +6,6 @@
 #define AWSMOCK_CORE_VERSION_H_IN_H
 
 #define PROJECT_NAME "awsmock"
-#define PROJECT_VERSION "0.13.37"
+#define PROJECT_VERSION "0.13.38"
 
 #endif //AWSMOCK_CORE_VERSION_H_IN_H
