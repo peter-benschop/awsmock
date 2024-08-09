@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewayServer::GatewayServer() : AbstractServer("gateway") {
+    GatewayServer::GatewayServer(boost::asio::io_context &ioc) : AbstractServer("gateway"), _ioc(ioc) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -29,37 +29,51 @@ namespace AwsMock::Service {
     void GatewayServer::Initialize() {
 
         // Check module active
-        if (!IsActive("gateway")) {
+        if (!Database::ModuleDatabase::instance().IsActive("gateway")) {
             log_info << "Gateway module inactive";
             return;
         }
         log_info << "Gateway server starting";
     }
 
+    void GatewayServer::Start() {
+        boost::thread(&GatewayServer::Run, this).detach();
+    }
+
     void GatewayServer::Run() {
 
         // Set running
-        SetRunning();
+        Database::ModuleDatabase::instance().SetState("gateway", Database::Entity::Module::ModuleState::RUNNING);
 
-        // The io_context is required for all I/O
-        boost::asio::io_context ioc{_maxThreads};
+        // Capture SIGINT and SIGTERM to perform a clean shutdown
+        /*boost::asio::signal_set signals(_ioc, SIGINT, SIGTERM);
+        signals.async_wait(
+                [&](boost::beast::error_code const &, int) {
+                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
+                    // destroying the `io_context` and all the sockets in it.
+                    _ioc.stop();
+                    log_info << "Gateway stopped";
+                });*/
 
         // Create and launch a listening port
         auto address = ip::make_address(_address);
-        std::make_shared<GatewayListener>(ioc, ip::tcp::endpoint{address, _port})->Run();
+        std::make_shared<GatewayListener>(_ioc, ip::tcp::endpoint{address, _port})->Run();
 
         // Run the I/O service on the requested number of threads
         _threads.reserve(_maxThreads - 1);
         for (auto i = _maxThreads - 1; i > 0; --i)
             _threads.emplace_back(
-                    [&ioc] {
-                        ioc.run();
+                    [this] {
+                        _ioc.run();
                     });
-        ioc.run();
+        _ioc.run();
     }
 
     void GatewayServer::Shutdown() {
-        StopHttpServer();
+        _ioc.stop();
+        for (auto &t: _threads) {
+            t.join();
+        }
     }
 
 }// namespace AwsMock::Service

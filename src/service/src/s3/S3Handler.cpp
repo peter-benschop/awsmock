@@ -144,7 +144,7 @@ namespace AwsMock::Service {
                     }
 
                     headerMap["Accept-Ranges"] = "bytes";
-                    headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max);
+                    headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
                     log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
                     log_info << "Range download request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::ok, headerMap);
@@ -465,6 +465,22 @@ namespace AwsMock::Service {
                     s3Request.bucket = clientCommand.bucket;
 
                     _s3Service.PutBucketEncryption(s3Request);
+
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_VERSIONING: {
+
+                    log_debug << "Put bucket versioning configuration request, bucket: " << clientCommand.bucket;
+
+                    // S3 versioning setup
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
+                    Dto::S3::PutBucketVersioningRequest s3Request;
+                    s3Request.FromXml(body);
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+
+                    _s3Service.PutBucketVersioning(s3Request);
 
                     return SendOkResponse(request);
                 }

@@ -47,7 +47,7 @@ namespace AwsMock::Dto::Cognito {
                     if (!it.isEmpty()) {
                         const auto &object = it.extract<Poco::JSON::Object::Ptr>();
                         UserAttribute userAttribute;
-                        userAttribute.FromJson(object);
+                        userAttribute.FromJsonObject(object);
                         userAttributes.emplace_back(userAttribute);
                     }
                 }

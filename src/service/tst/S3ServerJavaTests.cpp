@@ -9,10 +9,11 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/s3/S3Server.h"
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/s3/S3Server.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -30,32 +31,38 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-            // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.s3.http.port", std::to_string(S3_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
+            // Temporary file
+            _tempFile = Core::FileUtils::CreateTempFile("txt");
+
+            // Define endpoint. This is the endpoint of the SQS server, not the gateway
+            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(S3_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", S3_DEFAULT_HOST);
+
+            // Set test config
+            _configuration.setString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Set base command
             _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
 
-            // Temporary file
-            _tempFile = Core::FileUtils::CreateTempFile("txt");
-
             // Start HTTP manager
-            _s3Server.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
             Core::FileUtils::DeleteFile(_tempFile);
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
-            _s3Server.Stop();
+            _gatewayServer->Stop();
         }
 
+        boost::asio::io_context ioc{10};
         std::string _endpoint, _baseCommand, _tempFile;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
-        S3Server _s3Server;
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
     TEST_F(S3ServerJavaTest, BucketCreateTest) {
@@ -186,6 +193,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, count);
     }
 
+    // TODO: Fix tests
     // Java client tries to download a 10 MB file.
     TEST_F(S3ServerJavaTest, ObjectsDownloadBigFileTest) {
 

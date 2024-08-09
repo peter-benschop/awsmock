@@ -9,11 +9,12 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/sqs/SQSServer.h"
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/sqs/SQSServer.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -32,21 +33,26 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
+            std::string _region = _configuration.getString("awsmock.region");
             std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
-            _configuration.setString("awsmock.service.gateway.port", _port);
+
+            // Set test config
+            _configuration.setString("awsmock.service.gateway.http.port", _port);
             _accountId = _configuration.getString("awsmock.account.id", SQS_ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
-            _queueUrl = "http://" + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
+            _queueUrl = "http://sqs." + _region + "." + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
             // Start HTTP manager
-            _sqsServer.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _sqsServer.Stop();
+            _gatewayServer->Stop();
         }
 
         static std::string GetReceiptHandle(const std::string &jsonString) {
@@ -71,10 +77,11 @@ namespace AwsMock::Service {
             return receiptHandle;
         }
 
+        boost::asio::io_context ioc{2};
         std::string _endpoint, _queueUrl, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SQSServer _sqsServer = SQSServer(_configuration);
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerCliTest, QueueCreateTest) {

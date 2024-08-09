@@ -38,24 +38,24 @@ namespace AwsMock::Service {
             std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
             _configuration.setString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
-            std::cerr << "Endpoint: " << _endpoint << std::endl;
 
             // Set base command
             _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
             _gatewayServer->Start();
-            std::this_thread::sleep_for(1s);
         }
 
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _gatewayServer->Stop();
+            _gatewayServer->Shutdown();
         }
 
         std::string _endpoint, _baseCommand, _region;
+        boost::asio::io_context ioc{2};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

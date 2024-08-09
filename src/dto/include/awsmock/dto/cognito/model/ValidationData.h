@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H
-#define AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H
+#ifndef AWSMOCK_DTO_COGNITO_VALIDATION_DATA_H
+#define AWSMOCK_DTO_COGNITO_VALIDATION_DATA_H
 
 // C++ standard includes
 #include <sstream>
@@ -21,9 +21,15 @@ namespace AwsMock::Dto::Cognito {
     /**
      * @brief User attribute
      *
+     * @par
+     * Temporary user attributes that contribute to the outcomes of your pre sign-up Lambda trigger. This set of key-value pairs are for custom validation of information that you collect from your
+     * users but don't need to retain. Your Lambda function can analyze this additional data and act on it. Your function might perform external API operations like logging user attributes and
+     * validation data to Amazon CloudWatch Logs. Validation data might also affect the response that your function returns to Amazon Cognito, like automatically confirming the user if they sign
+     * up from within your network.
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserAttribute {
+    struct ValidationData {
 
         /**
          * User attribute name
@@ -36,43 +42,41 @@ namespace AwsMock::Dto::Cognito {
         std::string value;
 
         /**
-         * @brief Converts the JSON string to a DTO
+         * Converts the JSON string to a DTO
          *
          * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
-         * @brief Convert to a JSON string.
+         * Convert to a JSON string.
          *
          * @return user pools json string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * @brief Convert to a JSON string.
+         * Convert to a JSON string.
          *
          * @return user pools json string
          */
         Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Stream provider.
+         * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const UserAttribute &r);
+        friend std::ostream &operator<<(std::ostream &os, const ValidationData &r);
     };
-
-    typedef std::vector<UserAttribute> UserAttributeList;
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H
+#endif// AWSMOCK_DTO_COGNITO_VALIDATION_DATA_H

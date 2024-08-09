@@ -275,15 +275,15 @@ namespace AwsMock::Service {
         }
 
         // Delete the container, if existing
-        if (dockerService.ContainerExists(request.functionName, "latest")) {
-            Dto::Docker::Container container = dockerService.GetContainerByName(request.functionName, "latest");
+        if (dockerService.ContainerExists(request.functionName, request.qualifier)) {
+            Dto::Docker::Container container = dockerService.GetContainerByName(request.functionName, request.qualifier);
             dockerService.DeleteContainer(container);
             log_debug << "Docker container deleted, function: " + request.functionName;
         }
 
         // Delete the image, if existing
-        if (dockerService.ImageExists(request.functionName, "latest")) {
-            Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, "latest");
+        if (dockerService.ImageExists(request.functionName, request.qualifier)) {
+            Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, request.qualifier);
             dockerService.DeleteImage(image.id);
             log_debug << "Docker image deleted, function: " + request.functionName;
         }

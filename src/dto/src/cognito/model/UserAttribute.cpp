@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/11/2023.
 //
 
-#include <awsmock/dto/cognito/model/UserAttribute.h>
+#include "awsmock/dto/cognito/model/UserAttribute.h"
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,12 +23,12 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    void UserAttribute::FromJson(const Poco::JSON::Object::Ptr &object) {
+    void UserAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Name", object, name);
-            Core::JsonUtils::GetJsonValueString("Value", object, value);
+            Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
+            Core::JsonUtils::GetJsonValueString("Value", jsonObject, value);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

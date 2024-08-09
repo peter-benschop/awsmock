@@ -48,9 +48,8 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayServer();
+        explicit GatewayServer(boost::asio::io_context &ioc);
 
-      protected:
 
         /**
          * @brief Timer initialization
@@ -58,14 +57,21 @@ namespace AwsMock::Service {
         void Initialize() override;
 
         /**
-         * @brief Main method
+         * @brief Start
          */
-        void Run() override;
+        void Start();
 
         /**
          * @brief Shutdown
          */
         void Shutdown() override;
+
+      protected:
+
+        /**
+         * @brief Main method
+         */
+        void Run();
 
       private:
 
@@ -118,6 +124,8 @@ namespace AwsMock::Service {
          * Thread pool
          */
         std::vector<std::thread> _threads;
+
+        boost::asio::io_context &_ioc;
     };
 
 }// namespace AwsMock::Service

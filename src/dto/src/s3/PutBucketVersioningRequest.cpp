@@ -7,10 +7,6 @@
 
 namespace AwsMock::Dto::S3 {
 
-    PutBucketVersioningRequest::PutBucketVersioningRequest(const std::string &xmlString) {
-        FromXml(xmlString);
-    }
-
     void PutBucketVersioningRequest::FromXml(const std::string &xmlString) {
 
         try {

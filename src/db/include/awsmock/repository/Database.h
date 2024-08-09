@@ -58,7 +58,7 @@ namespace AwsMock::Database {
         /**
          * @brief Check whether we are running without database
          */
-        [[nodiscard]] bool HasDatabase() const;
+        [[nodiscard]] static bool HasDatabase();
 
         /**
          * @brief Returns the database name
