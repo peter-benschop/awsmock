@@ -294,6 +294,21 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, serviceResponse.ToJson());
 
+            } else if (action == "AdminRemoveUserFromGroup") {
+
+                Dto::Cognito::AdminRemoveUserFromGroupRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Remove user from group request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminRemoveUserFromGroup(cognitoRequest);
+                log_info << "Remove user from group, userPoolId: " << cognitoRequest.userPoolId;
+
+                return SendOkResponse(request);
+
             } else if (action == "DeleteGroup") {
 
                 Dto::Cognito::DeleteGroupRequest cognitoRequest{};

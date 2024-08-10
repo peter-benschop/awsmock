@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/cognito/DescribeUserPoolResponse.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -21,6 +20,7 @@
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
+#include <awsmock/dto/cognito/AdminRemoveUserFromGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
 #include <awsmock/dto/cognito/CreateUserPoolClientRequest.h>
@@ -203,6 +203,13 @@ namespace AwsMock::Service {
          * @param request add user to group request
          */
         void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request);
+
+        /**
+         * @brief Removes a user from a group
+         *
+         * @param request remove user from group request
+         */
+        void AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request);
 
         /**
          * @brief Lists the users in a group
