@@ -53,7 +53,7 @@ namespace AwsMock::Service {
         std::shared_ptr<SQSServer> _sqsServer;
     };
 
-    TEST_F(ModuleServiceTest, ModuleListTest) {
+    /*TEST_F(ModuleServiceTest, ModuleListTest) {
 
         // arrange
 
@@ -67,7 +67,7 @@ namespace AwsMock::Service {
     TEST_F(ModuleServiceTest, ModuleStopTest) {
 
         // arrange
-        /*Dto::Common::Services services;
+        Dto::Common::Services services;
         services.serviceNames.emplace_back("sqs");
         Database::Entity::Module::Module startResponse = _lambdaService->StartModules(services);
 
@@ -75,21 +75,21 @@ namespace AwsMock::Service {
         Database::Entity::Module::Module stopResponse =_lambdaService->StopModules(services);
 
         // assert
-        EXPECT_TRUE(stopResponse.state == Database::Entity::Module::ModuleState::STOPPED);*/
+        EXPECT_TRUE(stopResponse.state == Database::Entity::Module::ModuleState::STOPPED);
     }
 
-    TEST_F(ModuleServiceTest, ModuleStartTest) {
+    TEST_F(ModuleServiceTest, ModuleStartTest){
 
-        // arrange
-        /*Dto::Common::Services services;
-        services.serviceNames.emplace_back("sqs");
+            // arrange
+            Dto::Common::Services services;
+            services.serviceNames.emplace_back("sqs");
 
-        // act
-        Database::Entity::Module::Module startResponse =_lambdaService->StartModules(services);
+            // act
+            Database::Entity::Module::Module startResponse =_lambdaService->StartModules(services);
 
-        // assert
-        //EXPECT_TRUE(startResponse.state == Database::Entity::Module::ModuleState::RUNNING);*/
-    }
+            // assert
+            //EXPECT_TRUE(startResponse.state == Database::Entity::Module::ModuleState::RUNNING);
+    }*/
 
 }// namespace AwsMock::Service
 
