@@ -199,7 +199,7 @@ namespace AwsMock::Service {
     Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + std::string("/") + name + "\"]}");
+        std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
         if (domainSocketResponse.statusCode != http::status::ok) {
             log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
@@ -214,7 +214,6 @@ namespace AwsMock::Service {
 
         if (response.containerList.size() > 1) {
             log_warning << "More than one docker container found, name: " << name << ":" << tag;
-            return {};
         }
 
         log_debug << "Docker container found, name: " << name << ":" << tag;

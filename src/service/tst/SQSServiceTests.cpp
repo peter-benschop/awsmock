@@ -86,7 +86,7 @@ namespace AwsMock::Service {
       Dto::SQS::CreateQueueRequest request = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
 
       // act
-      Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
+      Dto::SQS::CreateQueueResponse response = _lambdaService.CreateQueue(request);
       Database::Entity::SQS::QueueAttribute userAttributes = _database.GetQueueAttributesByQueueUrl(response.queueUrl);
 
       // assert

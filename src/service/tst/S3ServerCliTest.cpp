@@ -14,7 +14,6 @@
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/s3/S3Server.h>
-#include <awsmock/service/s3/S3Service.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

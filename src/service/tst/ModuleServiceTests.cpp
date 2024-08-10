@@ -69,10 +69,10 @@ namespace AwsMock::Service {
         // arrange
         /*Dto::Common::Services services;
         services.serviceNames.emplace_back("sqs");
-        Database::Entity::Module::Module startResponse = _service->StartModules(services);
+        Database::Entity::Module::Module startResponse = _lambdaService->StartModules(services);
 
         // act
-        Database::Entity::Module::Module stopResponse =_service->StopModules(services);
+        Database::Entity::Module::Module stopResponse =_lambdaService->StopModules(services);
 
         // assert
         EXPECT_TRUE(stopResponse.state == Database::Entity::Module::ModuleState::STOPPED);*/
@@ -85,7 +85,7 @@ namespace AwsMock::Service {
         services.serviceNames.emplace_back("sqs");
 
         // act
-        Database::Entity::Module::Module startResponse =_service->StartModules(services);
+        Database::Entity::Module::Module startResponse =_lambdaService->StartModules(services);
 
         // assert
         //EXPECT_TRUE(startResponse.state == Database::Entity::Module::ModuleState::RUNNING);*/
