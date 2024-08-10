@@ -9,6 +9,9 @@
 #include <chrono>
 #include <string>
 
+// Boost includes
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 // Poco includes
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
@@ -47,6 +50,7 @@ namespace AwsMock::Core {
          *
          * ISO8601 is '2024-04-28T15:07:37.035332Z'.
          *
+         * @param timePoint point in time
          * @return time_point in ISO 8601 format
          */
         static std::string ISO8601(const system_clock::time_point &timePoint);
@@ -65,9 +69,18 @@ namespace AwsMock::Core {
          *
          * HTTP format is 'Tue, 15 Nov 2010 08:12:31 GMT'.
          *
+         * @param timePoint point in time
          * @return time_point in HTTP format
          */
         static std::string HttpFormat(const system_clock::time_point &timePoint);
+
+        /**
+         * @brief Returns the time_point in Unix epoch timestamp
+         *
+         * @param timePoint point in time
+         * @return time_point as Unix epoch timestamp
+         */
+        static long UnixTimestamp(const system_clock::time_point &timePoint);
     };
 
 }// namespace AwsMock::Core

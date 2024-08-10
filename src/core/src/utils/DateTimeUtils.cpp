@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/DateTimeUtils.h>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace AwsMock::Core {
 
@@ -32,5 +31,8 @@ namespace AwsMock::Core {
         return {buf};
     }
 
+    long DateTimeUtils::UnixTimestamp(const system_clock::time_point &timePoint) {
+        return timePoint.time_since_epoch().count();
+    }
 
 };// namespace AwsMock::Core
