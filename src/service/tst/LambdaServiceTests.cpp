@@ -36,7 +36,12 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllLambdas();
+            try {
+                Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest = {.functionName = FUNCTION_NAME, .qualifier = "latest"};
+                _lambdaService.DeleteFunction({.functionName = FUNCTION_NAME, .qualifier = "latest"});
+            } catch (Core::ServiceException &ex) {
+                // Do nothing
+            }
         }
 
         static Dto::Lambda::CreateFunctionRequest CreateTestLambdaRequest() {
@@ -49,28 +54,19 @@ namespace AwsMock::Service {
             return request;
         }
 
-        void CreateTestFunctionAndWaitForActive() {
-            Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
-
-            Dto::Lambda::GetFunctionResponse response = _service.GetFunction(REGION, FUNCTION_NAME);
-            while (response.configuration.state != Database::Entity::Lambda::LambdaStateToString(Database::Entity::Lambda::LambdaState::Active)) {
-                std::this_thread::sleep_for(500ms);
-                response = _service.GetFunction(REGION, FUNCTION_NAME);
-            }
-        }
-
         void WaitForActive(const std::string &region, const std::string &functionName) {
 
-            Dto::Lambda::GetFunctionResponse response = _service.GetFunction(region, functionName);
+            Dto::Lambda::GetFunctionResponse response = _lambdaService.GetFunction(region, functionName);
             while (response.configuration.state != Database::Entity::Lambda::LambdaStateToString(Database::Entity::Lambda::LambdaState::Active)) {
                 std::this_thread::sleep_for(500ms);
-                response = _service.GetFunction(region, functionName);
+                response = _lambdaService.GetFunction(region, functionName);
             }
         }
 
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
-        LambdaService _service;
+        LambdaService _lambdaService;
+        DockerService _dockerService;
         std::string testFile;
     };
 
@@ -80,7 +76,7 @@ namespace AwsMock::Service {
         Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
 
         // act
-        Dto::Lambda::CreateFunctionResponse response = _service.CreateFunction(request);
+        Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
         long functionCount = _database.LambdaCount();
 
         // assert
@@ -93,10 +89,10 @@ namespace AwsMock::Service {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
-        Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
+        Dto::Lambda::CreateFunctionResponse createResponse = _lambdaService.CreateFunction(createRequest);
 
         // act
-        Dto::Lambda::ListFunctionResponse response = _service.ListFunctions(REGION);
+        Dto::Lambda::ListFunctionResponse response = _lambdaService.ListFunctions(REGION);
 
         // assert
         EXPECT_FALSE(response.lambdaList.empty());
@@ -107,11 +103,11 @@ namespace AwsMock::Service {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
-        Dto::Lambda::CreateFunctionResponse createFunctionResponse = _service.CreateFunction(request);
+        Dto::Lambda::CreateFunctionResponse createFunctionResponse = _lambdaService.CreateFunction(request);
 
         // act
         WaitForActive(REGION, FUNCTION_NAME);
-        Dto::Lambda::GetFunctionResponse response = _service.GetFunction(REGION, FUNCTION_NAME);
+        Dto::Lambda::GetFunctionResponse response = _lambdaService.GetFunction(REGION, FUNCTION_NAME);
 
         // assert
         EXPECT_TRUE(response.configuration.handler == HANDLER);
@@ -121,16 +117,17 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaCreateTagsTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
-        Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
-        std::string functionArn = createResponse.functionArn;
+        Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
+        Dto::Lambda::CreateFunctionResponse createFunctionResponse = _lambdaService.CreateFunction(request);
+        std::string functionArn = createFunctionResponse.functionArn;
+        WaitForActive(REGION, FUNCTION_NAME);
 
         // act
         std::map<std::string, std::string> tags;
         tags["test-key1"] = "test-value1";
         tags["test-key2"] = "test-value2";
         Dto::Lambda::CreateTagRequest createTagRequest = {.arn = functionArn, .tags = tags};
-        _service.CreateTag(createTagRequest);
+        _lambdaService.CreateTag(createTagRequest);
         Database::Entity::Lambda::Lambda lambda = _database.GetLambdaByArn(functionArn);
 
         // assert
@@ -142,19 +139,19 @@ namespace AwsMock::Service {
     TEST_F(LambdaServiceTest, LambdaDeleteTagsTest) {
 
         // arrange
-        Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
-        Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
-        std::string functionArn = createResponse.functionArn;
+        Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
+        Dto::Lambda::CreateFunctionResponse createFunctionResponse = _lambdaService.CreateFunction(request);
+        std::string functionArn = createFunctionResponse.functionArn;
         std::map<std::string, std::string> tags;
         tags["test-key1"] = "test-value1";
         tags["test-key2"] = "test-value2";
         Dto::Lambda::CreateTagRequest createTagRequest = {.arn = functionArn, .tags = tags};
-        _service.CreateTag(createTagRequest);
+        _lambdaService.CreateTag(createTagRequest);
 
         // act
         std::vector<std::string> tagKeys = {"test-key1", "test-key2"};
         Dto::Lambda::DeleteTagsRequest deleteTabsRequest(functionArn, tagKeys);
-        _service.DeleteTags(deleteTabsRequest);
+        _lambdaService.DeleteTags(deleteTabsRequest);
         Database::Entity::Lambda::Lambda lambda = _database.GetLambdaByArn(functionArn);
 
         // assert
@@ -165,11 +162,11 @@ namespace AwsMock::Service {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest createRequest = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
-        Dto::Lambda::CreateFunctionResponse createResponse = _service.CreateFunction(createRequest);
+        Dto::Lambda::CreateFunctionResponse createResponse = _lambdaService.CreateFunction(createRequest);
 
         // act
         Dto::Lambda::DeleteFunctionRequest deleteRequest = {.functionName = FUNCTION_NAME, .qualifier = QUALIFIER};
-        _service.DeleteFunction(deleteRequest);
+        _lambdaService.DeleteFunction(deleteRequest);
         long functionCount = _database.LambdaCount();
 
         // assert

@@ -184,7 +184,7 @@ namespace AwsMock::Service {
          * @param request delete lambda request
          * @throws ServiceException
          */
-        void DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request);
+        void DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request);
 
         /**
          * @brief Delete lambda function tags

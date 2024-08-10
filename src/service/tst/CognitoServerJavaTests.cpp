@@ -9,11 +9,12 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/cognito/CognitoServer.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/service/cognito/CognitoServer.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"
@@ -31,25 +32,31 @@ namespace AwsMock::Service {
             // Define endpoint
             std::string _port = _configuration.getString("awsmock.service.cognito.http.port", std::to_string(COGNITO_DEFAULT_PORT));
             std::string _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
+
+            // Set test config
+            _configuration.setString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Set base command
             _baseCommand = "java -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " cognito ";
 
             // Start HTTP manager
-            _dynamoDbServer.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllUserPools();
-            _dynamoDbServer.Stop();
+            _gatewayServer->Stop();
         }
 
+        boost::asio::io_context ioc{10};
         std::string _endpoint, _baseCommand;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase _database = Database::CognitoDatabase();
-        CognitoServer _dynamoDbServer = CognitoServer();
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
     TEST_F(CognitoServerJavaTest, UserPoolCreateTest) {

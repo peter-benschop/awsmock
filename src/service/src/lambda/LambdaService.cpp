@@ -263,7 +263,7 @@ namespace AwsMock::Service {
         return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
     }
 
-    void LambdaService::DeleteFunction(Dto::Lambda::DeleteFunctionRequest &request) {
+    void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) {
         Core::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();
 
@@ -277,6 +277,7 @@ namespace AwsMock::Service {
         // Delete the container, if existing
         if (dockerService.ContainerExists(request.functionName, request.qualifier)) {
             Dto::Docker::Container container = dockerService.GetContainerByName(request.functionName, request.qualifier);
+            dockerService.StopContainer(container.id);
             dockerService.DeleteContainer(container);
             log_debug << "Docker container deleted, function: " + request.functionName;
         }
