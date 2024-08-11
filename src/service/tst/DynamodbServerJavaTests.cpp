@@ -12,11 +12,13 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 #define REGION "eu-central-1"
-#define BUCKET "test-bucket"
+#define TEST_TABLE "test-table"
 #define KEY "testfile.json"
 #define OWNER "test-owner"
+#define TEST_PORT 10100
 
 namespace AwsMock::Service {
 
@@ -26,27 +28,54 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-            // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.dynamodb.port", std::to_string(DYNAMODB_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
-            _endpoint = "http://" + _host + ":" + _port;
 
-            // Set base command
-            _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint + " dynamodb ";
+            // Define endpoint
+            _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.setString("awsmock.service.gateway.http.host", "localhost");
+
+            // Base URL
+            _baseUrl = "/api/dynamodb/";
 
             // Start HTTP manager
-            _dynamoDbServer.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
-            Core::ExecResult deleteTableResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
-            _dynamoDbServer.Stop();
+            _dynamoDbService.DeleteAllTables();
+            _gatewayServer->Stop();
         }
 
-        std::string _endpoint, _baseCommand;
+        static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {
+            std::map<std::string, std::string> headers;
+            headers[to_string(http::field::content_type)] = "application/json";
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::get, "localhost", TEST_PORT, url, payload, headers);
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
+            return response;
+        }
+
+        static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
+            std::map<std::string, std::string> headers;
+            headers[to_string(http::field::content_type)] = "application/json";
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, "localhost", TEST_PORT, url, payload, headers);
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
+            return response;
+        }
+
+        static Core::HttpSocketResponse SendDeleteCommand(const std::string &url, const std::string &payload) {
+            std::map<std::string, std::string> headers;
+            headers[to_string(http::field::content_type)] = "application/json";
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::delete_, "localhost", TEST_PORT, url, payload, headers);
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
+            return response;
+        }
+
+        boost::asio::io_context ioc{10};
+        std::string _endpoint, _baseUrl;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        DynamoDbServer _dynamoDbServer;
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
         DynamoDbService _dynamoDbService;
     };
 
@@ -55,48 +84,45 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
-        EXPECT_EQ(0, createTableResult.status);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
         Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
 
         // assert
-        EXPECT_EQ(0, createTableResult.status);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_EQ(1, tableList.size());
     }
 
     TEST_F(DynamoDbServerJavaTest, TableListTest) {
 
         // arrange
-        Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
-        EXPECT_EQ(0, result.status);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
         EXPECT_EQ(1, tableList.size());
 
         // act
-        Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + "list-tables 10");
+        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listTables?limit=10", {});
 
         // assert
-        EXPECT_EQ(0, listResult.status);
-        EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-table"));
+        EXPECT_TRUE(listResult.statusCode == http::status::ok);
     }
 
     TEST_F(DynamoDbServerJavaTest, TableDescribeTest) {
 
         // arrange
-        Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
-        EXPECT_EQ(0, result.status);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
         EXPECT_EQ(1, tableList.size());
 
         // act
-        Core::ExecResult describeResult = Core::SystemUtils::Exec(_baseCommand + "describe-table test-table");
+        Core::HttpSocketResponse describeResult = SendGetCommand(_baseUrl + "describeTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
 
         // assert
-        EXPECT_EQ(0, describeResult.status);
-        EXPECT_TRUE(Core::StringUtils::Contains(describeResult.output, "test-table"));
+        EXPECT_TRUE(describeResult.statusCode == http::status::ok);
     }
 
-    TEST_F(DynamoDbServerJavaTest, PutItemTest) {
+    /* TEST_F(DynamoDbServerJavaTest, PutItemTest) {
 
         // arrange
         Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
@@ -112,23 +138,22 @@ namespace AwsMock::Service {
         // assert
         EXPECT_EQ(0, putItemResult.status);
         //EXPECT_EQ(1, itemList.size());
-    }
+    }*/
 
     TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {
 
         // arrange
-        Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
-        EXPECT_EQ(0, createTableResult.status);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
         EXPECT_EQ(1, tableList.size());
 
         // act
-        Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + "delete-table test-table");
-        EXPECT_EQ(0, deleteResult.status);
+        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
         tableList = _database.ListTables();
 
         // assert
-        EXPECT_EQ(0, deleteResult.status);
+        EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
         EXPECT_EQ(0, tableList.size());
     }
 

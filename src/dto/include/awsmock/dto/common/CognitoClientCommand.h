@@ -35,6 +35,7 @@ namespace AwsMock::Dto::Common {
 
     enum class CognitoCommandType {
         CREATE_USER_POOL,
+        CREATE_USER_POOL_CLIENT,
         CREATE_USER_POOL_DOMAIN,
         DESCRIBE_USER_POOL,
         DELETE_USER_POOL,
@@ -44,7 +45,7 @@ namespace AwsMock::Dto::Common {
         DELETE_GROUP,
         ADD_USER_TO_GROUP,
         LIST_USERS_IN_GROUP,
-        CREATE_USER_POOL_CLIENT,
+        REMOVE_USER_FROM_GROUP,
         UNKNOWN
     };
 
@@ -59,6 +60,7 @@ namespace AwsMock::Dto::Common {
             {CognitoCommandType::DELETE_GROUP, "DeleteGroup"},
             {CognitoCommandType::ADD_USER_TO_GROUP, "AdminAddUserToGroup"},
             {CognitoCommandType::LIST_USERS_IN_GROUP, "ListUsersInGroup"},
+            {CognitoCommandType::REMOVE_USER_FROM_GROUP, "AdminRemoveUserGromGroup"},
             {CognitoCommandType::CREATE_USER_POOL_CLIENT, "CreateUserPoolClient"},
     };
 
