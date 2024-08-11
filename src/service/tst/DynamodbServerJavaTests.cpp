@@ -44,7 +44,7 @@ namespace AwsMock::Service {
 
         void TearDown() override {
             _dynamoDbService.DeleteAllTables();
-            _gatewayServer->Stop();
+            _gatewayServer->Shutdown();
         }
 
         static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {

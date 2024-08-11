@@ -66,7 +66,6 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         LambdaService _lambdaService;
-        DockerService _dockerService;
         std::string testFile;
     };
 

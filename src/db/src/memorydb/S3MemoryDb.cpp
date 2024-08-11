@@ -256,13 +256,23 @@ namespace AwsMock::Database {
         }
 
         long count = 0;
-        for (const auto &object: _objects) {
-            if ((!region.empty() && object.second.region == region) && (!bucket.empty() && object.second.bucket == bucket)) {
-                count++;
-            } else if (!region.empty() && object.second.region == region) {
-                count++;
-            } else if (!bucket.empty() && object.second.bucket == bucket) {
-                count++;
+        if (!region.empty() && bucket.empty()) {
+            for (const auto &object: _objects) {
+                if (object.second.region == region) {
+                    count++;
+                }
+            }
+        } else if (region.empty() && !bucket.empty()) {
+            for (const auto &object: _objects) {
+                if (object.second.bucket == bucket) {
+                    count++;
+                }
+            }
+        } else if (!region.empty() && !bucket.empty()) {
+            for (const auto &object: _objects) {
+                if (object.second.bucket == bucket && object.second.region == region) {
+                    count++;
+                }
             }
         }
         return count;
@@ -284,6 +294,29 @@ namespace AwsMock::Database {
         }
 
         log_trace << "Got object list, size: " << objectList.size();
+        return objectList;
+    }
+
+    Entity::S3::ObjectList S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) {
+
+        Entity::S3::ObjectList objectList;
+        if (prefix.empty()) {
+            for (const auto &object: _objects) {
+                if (object.second.region == region && object.second.bucket == bucket) {
+                    objectList.emplace_back(object.second);
+                }
+            }
+        } else {
+            for (const auto &object: _objects) {
+                if (object.second.region == region && object.second.bucket == bucket) {
+                    if (!prefix.empty() && Core::StringUtils::StartsWith(object.second.key, prefix)) {
+                        objectList.emplace_back(object.second);
+                    }
+                }
+            }
+        }
+
+        log_trace << "Got versioned object list, size: " << objectList.size();
         return objectList;
     }
 

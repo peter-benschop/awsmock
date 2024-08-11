@@ -674,7 +674,7 @@ namespace AwsMock::Service {
         Dto::S3::ListObjectVersionsResponse response;
         try {
 
-            std::vector<Database::Entity::S3::Object> objectList = _database.GetBucketObjectList(request.region, request.bucket, request.pageSize);
+            std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
             return Dto::S3::Mapper::map(request, objectList);
 
         } catch (Poco::Exception &ex) {

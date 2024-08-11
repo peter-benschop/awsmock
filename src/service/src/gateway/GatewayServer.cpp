@@ -45,16 +45,6 @@ namespace AwsMock::Service {
         // Set running
         Database::ModuleDatabase::instance().SetState("gateway", Database::Entity::Module::ModuleState::RUNNING);
 
-        // Capture SIGINT and SIGTERM to perform a clean shutdown
-        /*boost::asio::signal_set signals(_ioc, SIGINT, SIGTERM);
-        signals.async_wait(
-                [&](boost::beast::error_code const &, int) {
-                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
-                    // destroying the `io_context` and all the sockets in it.
-                    _ioc.stop();
-                    log_info << "Gateway stopped";
-                });*/
-
         // Create and launch a listening port
         auto address = ip::make_address(_address);
         std::make_shared<GatewayListener>(_ioc, ip::tcp::endpoint{address, _port})->Run();
