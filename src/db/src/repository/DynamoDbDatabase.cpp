@@ -10,11 +10,11 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    DynamoDbDatabase::DynamoDbDatabase() : _memoryDb(DynamoDbMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item") {}
+    DynamoDbDatabase::DynamoDbDatabase() : _memoryDb(DynamoDbMemoryDb::instance()), _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item") {}
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -96,7 +96,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetTableById(bsoncxx::oid(oid));
 
@@ -108,7 +108,7 @@ namespace AwsMock::Database {
 
     bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -138,7 +138,7 @@ namespace AwsMock::Database {
     std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
 
         Entity::DynamoDb::TableList tables;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -179,7 +179,7 @@ namespace AwsMock::Database {
 
     long DynamoDbDatabase::CountTables(const std::string &region) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -219,7 +219,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
@@ -247,7 +247,7 @@ namespace AwsMock::Database {
 
     void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
@@ -274,7 +274,7 @@ namespace AwsMock::Database {
 
     void DynamoDbDatabase::DeleteAllTables() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
@@ -301,7 +301,7 @@ namespace AwsMock::Database {
 
     /*bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -329,7 +329,7 @@ namespace AwsMock::Database {
 
     bool DynamoDbDatabase::ItemExists(const Entity::DynamoDb::Item &item) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -377,7 +377,7 @@ namespace AwsMock::Database {
     Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) {
 
         Entity::DynamoDb::ItemList items;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
@@ -450,7 +450,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(const Entity::DynamoDb::Item &item) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
@@ -479,7 +479,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(const Entity::DynamoDb::Item &item) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
@@ -541,7 +541,7 @@ namespace AwsMock::Database {
 
     long DynamoDbDatabase::CountItems(const std::string &region) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -569,7 +569,7 @@ namespace AwsMock::Database {
 
     void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -592,7 +592,7 @@ namespace AwsMock::Database {
 
     void DynamoDbDatabase::DeleteItems(const std::string &region, const std::string &tableName) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -614,7 +614,7 @@ namespace AwsMock::Database {
 
     void DynamoDbDatabase::DeleteAllItems() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 

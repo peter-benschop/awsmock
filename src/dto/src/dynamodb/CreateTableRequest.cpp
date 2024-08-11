@@ -109,7 +109,9 @@ namespace AwsMock::Dto::DynamoDb {
             }
 
             // Provisioned throughput
-            provisionedThroughput.FromJsonObject(rootObject->getObject("ProvisionedThroughput"));
+            if (rootObject->has("ProvisionedThroughput")) {
+                provisionedThroughput.FromJsonObject(rootObject->getObject("ProvisionedThroughput"));
+            }
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

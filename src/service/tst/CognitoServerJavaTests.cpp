@@ -19,6 +19,8 @@
 #define TEST_USER_POOL "test-user-pool"
 #define TEST_USER "test-user"
 #define TEST_GROUP "test-group"
+#define TEST_CLIENT "test-client"
+#define TEST_DOMAIN "test-domain"
 #define TEST_PORT 10100
 
 namespace AwsMock::Service {
@@ -103,9 +105,63 @@ namespace AwsMock::Service {
 
         // act
         Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listUserPools?maxResults=10", {});
-        EXPECT_TRUE(result.statusCode == http::status::ok);
 
         // assert
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+    }
+
+    TEST_F(CognitoServerJavaTest, UserPoolDescribeTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+
+        // act
+        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "describeUserPools?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId), {});
+
+        // assert
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+    }
+
+    TEST_F(CognitoServerJavaTest, UserPoolCreateClientTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+
+        // act
+        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
+        EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
+        userPoolList = _database.ListUserPools();
+
+        // assert
+        EXPECT_EQ(1, userPoolList.size());
+        EXPECT_EQ(1, userPoolList.front().userPoolClients.size());
+    }
+
+    TEST_F(CognitoServerJavaTest, UserPoolCreateDomainTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+
+        // act
+        Core::HttpSocketResponse createDomainResult = SendGetCommand(_baseUrl + "createUserPoolDomain?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&domainName=" + Core::StringUtils::UrlEncode(TEST_DOMAIN), {});
+        EXPECT_TRUE(createDomainResult.statusCode == http::status::ok);
+        userPoolList = _database.ListUserPools();
+
+        // assert
+        EXPECT_EQ(1, userPoolList.size());
+        EXPECT_TRUE(userPoolList.front().domain.domain == TEST_DOMAIN);
     }
 
     TEST_F(CognitoServerJavaTest, UserPoolDeleteTest) {

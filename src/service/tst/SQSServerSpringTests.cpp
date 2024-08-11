@@ -30,7 +30,7 @@ namespace AwsMock::Service {
         std::string testKey;
         std::string receiptHandle;
 
-        std::string ToJson() {
+        std::string ToJson() const {
             Poco::JSON::Object rootObject;
             rootObject.set("testKey", testKey);
             rootObject.set("receiptHandle", receiptHandle);
@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         void FromJson(const std::string &jsonString) {
             Poco::JSON::Parser parser;
             Poco::Dynamic::Var result = parser.parse(jsonString);
-            const Poco::JSON::Object::Ptr &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
             Core::JsonUtils::GetJsonValueString("testKey", rootObject, testKey);
             Core::JsonUtils::GetJsonValueString("receiptHandle", rootObject, receiptHandle);
         }
@@ -205,6 +205,38 @@ namespace AwsMock::Service {
         EXPECT_TRUE(!queueAttributes.empty());
     }
 
+    TEST_F(SQSServerSpringTest, SQSSetQueueAttributes) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
+
+        // act
+        Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "setQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeValue=3600", {});
+
+        // assert
+        EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
+    }
+
+    TEST_F(SQSServerSpringTest, SQSChangeMessageVisibilityTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
+        TestMessage testMessage = {.testKey = "testKey"};
+        Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
+        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        std::string receiptHandle = messageList[0].receiptHandle;
+
+        // act
+        Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "changeVisibility?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&visibility=3600&receiptHandle=" + Core::StringUtils::UrlEncode(receiptHandle), {});
+
+        // assert
+        EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
+    }
+
     TEST_F(SQSServerSpringTest, SQSSendMessageTest) {
 
         // arrange
@@ -220,6 +252,68 @@ namespace AwsMock::Service {
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
         EXPECT_EQ(1, messageList.size());
+    }
+
+    TEST_F(SQSServerSpringTest, SQSSendMessageAttributeTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
+
+        // act
+        TestMessage testMessage = {.testKey = "testKey"};
+        Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessageAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
+        EXPECT_EQ(http::status::ok, sendResult.statusCode);
+        Core::HttpSocketResponse receiveResult = SendGetCommand(_baseUrl + "receiveMessages?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&maxMessages=10&maxWaitTime=5", {});
+        EXPECT_EQ(http::status::ok, receiveResult.statusCode);
+        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        EXPECT_EQ(1, messageList.size());
+        Database::Entity::SQS::Message message = messageList.front();
+
+        // assert
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_EQ(1, messageList.size());
+        EXPECT_EQ(5, message.attributes.size());
+    }
+
+    TEST_F(SQSServerSpringTest, SQSMessageReceiveTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
+        TestMessage testMessage = {.testKey = "testKey"};
+        Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
+
+        // act
+        Core::HttpSocketResponse receiveResult = SendGetCommand(_baseUrl + "receiveMessages?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&maxMessages=10&maxWaitTime=5", {});
+        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        EXPECT_EQ(1, messageList.size());
+        Database::Entity::SQS::Message message = messageList.front();
+
+        // assert
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_EQ(1, messageList.size());
+        EXPECT_TRUE(message.status == Database::Entity::SQS::MessageStatus::INVISIBLE);
+    }
+
+    TEST_F(SQSServerSpringTest, SQSPurgeQueueTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
+        TestMessage testMessage = {.testKey = "testKey"};
+        Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
+
+        // act
+        Core::HttpSocketResponse purgeResult = SendGetCommand(_baseUrl + "purgeQueue?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), {});
+        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+
+        // assert
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_EQ(0, messageList.size());
     }
 
     TEST_F(SQSServerSpringTest, SQSTemplateTest) {
@@ -255,6 +349,32 @@ namespace AwsMock::Service {
         // act
         std::string receiptHandle = messageList[0].receiptHandle;
         Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&receiptHandle=" + Core::StringUtils::UrlEncode(receiptHandle), {});
+        EXPECT_EQ(http::status::ok, deleteResult.statusCode);
+        messageList = _sqsDatabase.ListMessages();
+
+        // assert
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_EQ(0, messageList.size());
+    }
+
+    TEST_F(SQSServerSpringTest, SQSDeleteMessageBatchTest) {
+
+        // arrange
+        TestMessage testMessage = {.testKey = "testKey"};
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        EXPECT_EQ(http::status::ok, result.statusCode);
+        std::string queueUrl = result.body;
+        Core::HttpSocketResponse sendResult1 = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
+        EXPECT_EQ(http::status::ok, sendResult1.statusCode);
+        Core::HttpSocketResponse sendResult2 = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
+        EXPECT_EQ(http::status::ok, sendResult2.statusCode);
+        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        EXPECT_EQ(2, messageList.size());
+
+        // act
+        std::string receiptHandle1 = messageList[0].receiptHandle;
+        std::string receiptHandle2 = messageList[1].receiptHandle;
+        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteMessageBatch?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&receiptHandle1=" + Core::StringUtils::UrlEncode(receiptHandle1) + "&receiptHandle2=" + Core::StringUtils::UrlEncode(receiptHandle2), {});
         EXPECT_EQ(http::status::ok, deleteResult.statusCode);
         messageList = _sqsDatabase.ListMessages();
 

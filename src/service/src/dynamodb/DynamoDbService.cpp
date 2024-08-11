@@ -138,8 +138,6 @@ namespace AwsMock::Service {
                 dynamoDeleteRequest.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
                 dynamoDeleteRequest.headers["X-Amz-Date"] = Core::DateTimeUtils::ISO8601Now();
                 dynamoDeleteRequest.headers["X-Amz-Security-Token"] = "none";
-                // "AWS4-HMAC-SHA256 Credential=none/20240713/eu-central-1/dynamodb/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token;x-amz-target, Signature=ee5bf524e29d66955511f2b36a964b49fcbe2a0146f2aaee001fcd41db09aa31"
-
                 SendAuthorizedDynamoDbRequest(dynamoDeleteRequest.body, dynamoDeleteRequest.headers);
             }
 
