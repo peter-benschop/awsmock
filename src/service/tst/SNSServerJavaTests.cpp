@@ -9,13 +9,16 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/gateway/GatewayServer.h"
-#include "awsmock/service/sns/SNSServer.h"
-#include "awsmock/service/sqs/SQSServer.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/sns/SNSServer.h>
+#include <awsmock/service/sqs/SQSServer.h>
+
+#define TEST_PORT 10100
+#define TEST_TOPIC std::string("test-topic")
+#define TEST_QUEUE std::string("test-queue")
 
 namespace AwsMock::Service {
 
@@ -32,13 +35,12 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _endpoint = "http://" + _host + ":" + _port;
+            _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.setString("awsmock.service.gateway.http.host", "localhost");
 
-            // Set base command
-            _baseCommand = JAVA + " -jar /usr/local/lib/awsmock-java-test-0.0.1-SNAPSHOT-jar-with-dependencies.jar " + _endpoint;
+            // Set base URLs
+            _snsBaseUrl = "/api/sns/";
+            _sqsBaseUrl = "/api/sqs/";
 
             // Start HTTP manager
             _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
@@ -51,12 +53,35 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _gatewayServer->Stop();
+            _gatewayServer->Shutdown();
+        }
+
+        static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
+            std::map<std::string, std::string> headers;
+            headers[to_string(http::field::content_type)] = "application/json";
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, "localhost", TEST_PORT, url, payload, headers);
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
+            return response;
+        }
+
+        static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {
+            std::map<std::string, std::string> headers;
+            headers[to_string(http::field::content_type)] = "application/json";
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::get, "localhost", TEST_PORT, url, payload, headers);
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
+            return response;
+        }
+
+        static Core::HttpSocketResponse SendDeleteCommand(const std::string &url, const std::string &payload) {
+            std::map<std::string, std::string> headers;
+            headers[to_string(http::field::content_type)] = "application/json";
+            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::delete_, "localhost", TEST_PORT, url, payload, headers);
+            log_debug << "Status: " << response.statusCode << " body: " << response.body;
+            return response;
         }
 
         boost::asio::io_context ioc{5};
-        std::string _endpoint;
-        std::string _baseCommand, _region;
+        std::string _snsBaseUrl, _sqsBaseUrl, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
@@ -68,46 +93,46 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::ExecResult result = Core::SystemUtils::Exec(_baseCommand + " sns create-topic test-topic");
-        Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
+        Core::HttpSocketResponse result = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        std::string topicArn = result.body;
 
         // assert
-        EXPECT_TRUE(result.status == 0);
-        EXPECT_EQ(1, topicList.size());
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_FALSE(topicArn.empty());
+        EXPECT_TRUE(Core::StringUtils::Contains(topicArn, TEST_TOPIC));
     }
 
     TEST_F(SNSServerJavaTest, TopicListTest) {
 
         // arrange
-        Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sns create-topic test-topic");
-        EXPECT_EQ(0, createResult.status);
+        Core::HttpSocketResponse result = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        std::string topicArn = result.body;
 
         // act
-        Core::ExecResult listResult = Core::SystemUtils::Exec(_baseCommand + " sns list-topics");
+        Core::HttpSocketResponse listResult = SendGetCommand(_snsBaseUrl + "listTopics", {});
+        EXPECT_TRUE(listResult.statusCode == http::status::ok);
 
         // assert
-        EXPECT_EQ(0, listResult.status);
-        EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-topic"));
+        EXPECT_EQ(1, std::stoi(listResult.body));
     }
 
     TEST_F(SNSServerJavaTest, TopicSubscribeTest) {
 
         // arrange
-        Core::ExecResult createTopicResult = Core::SystemUtils::Exec(_baseCommand + " sns create-topic test-topic");
-        EXPECT_EQ(0, createTopicResult.status);
-        std::string topicArn = createTopicResult.output;
-        Core::ExecResult createQueueResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
-        EXPECT_EQ(0, createQueueResult.status);
-        Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
-        EXPECT_EQ(0, getQueueUrlResult.status);
-        std::string queueUrl = getQueueUrlResult.output;
+        Core::HttpSocketResponse createTopicResult = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        EXPECT_TRUE(createTopicResult.statusCode == http::status::ok);
+        std::string topicArn = createTopicResult.body;
+        Core::HttpSocketResponse createQueueResult = SendPostCommand(_sqsBaseUrl + "createQueue?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
+        EXPECT_TRUE(createQueueResult.statusCode == http::status::ok);
+        std::string queueUrl = createQueueResult.body;
 
         // act
-        Core::ExecResult subscribeResult = Core::SystemUtils::Exec(_baseCommand + " sns subscribe " + topicArn + " sqs " + queueUrl);
-        std::string subscriptionArn = subscribeResult.output;
+        Core::HttpSocketResponse subscribeResult = SendPostCommand(_snsBaseUrl + "subscribe?topicArn=" + Core::StringUtils::UrlEncode(topicArn) + "&queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&protocol=SQS", {});
+        std::string subscriptionArn = subscribeResult.body;
 
         // assert
-        EXPECT_EQ(0, subscribeResult.status);
+        EXPECT_TRUE(subscribeResult.statusCode == http::status::ok);
         EXPECT_FALSE(subscriptionArn.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(subscriptionArn, "test-topic"));
     }
@@ -115,37 +140,35 @@ namespace AwsMock::Service {
     TEST_F(SNSServerJavaTest, TopicUnsubscribeTest) {
 
         // arrange
-        Core::ExecResult createTopicResult = Core::SystemUtils::Exec(_baseCommand + " sns create-topic test-topic");
-        EXPECT_EQ(0, createTopicResult.status);
-        std::string topicArn = createTopicResult.output;
-        Core::ExecResult createQueueResult = Core::SystemUtils::Exec(_baseCommand + " sqs create-queue test-queue");
-        EXPECT_EQ(0, createQueueResult.status);
-        Core::ExecResult getQueueUrlResult = Core::SystemUtils::Exec(_baseCommand + " sqs get-queue-url test-queue");
-        EXPECT_EQ(0, getQueueUrlResult.status);
-        std::string queueUrl = getQueueUrlResult.output;
-        Core::ExecResult subscribeResult = Core::SystemUtils::Exec(_baseCommand + " sns subscribe " + topicArn + " sqs " + queueUrl);
-        std::string subscriptionArn = subscribeResult.output;
+        Core::HttpSocketResponse createTopicResult = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        EXPECT_TRUE(createTopicResult.statusCode == http::status::ok);
+        std::string topicArn = createTopicResult.body;
+        Core::HttpSocketResponse createQueueResult = SendPostCommand(_sqsBaseUrl + "createQueue?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
+        EXPECT_TRUE(createQueueResult.statusCode == http::status::ok);
+        std::string queueUrl = createQueueResult.body;
+        Core::HttpSocketResponse subscribeResult = SendPostCommand(_snsBaseUrl + "subscribe?topicArn=" + Core::StringUtils::UrlEncode(topicArn) + "&queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&protocol=SQS", {});
+        std::string subscriptionArn = subscribeResult.body;
 
         // act
-        Core::ExecResult unsubscribeResult = Core::SystemUtils::Exec(_baseCommand + " sns unsubscribe " + subscriptionArn);
+        Core::HttpSocketResponse unsubscribeResult = SendPostCommand(_snsBaseUrl + "unsubscribe?subscriptionArn=" + Core::StringUtils::UrlEncode(subscriptionArn), {});
 
         // assert
-        EXPECT_EQ(0, unsubscribeResult.status);
+        EXPECT_TRUE(unsubscribeResult.statusCode == http::status::ok);
     }
 
     TEST_F(SNSServerJavaTest, TopicDeleteTest) {
 
         // arrange
-        Core::ExecResult createResult = Core::SystemUtils::Exec(_baseCommand + " sns create-topic test-topic");
-        EXPECT_EQ(0, createResult.status);
-        std::string topicArn = createResult.output;
+        Core::HttpSocketResponse createTopicResult = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        EXPECT_TRUE(createTopicResult.statusCode == http::status::ok);
+        std::string topicArn = createTopicResult.body;
 
         // act
-        Core::ExecResult deleteResult = Core::SystemUtils::Exec(_baseCommand + " sns delete-topic " + topicArn);
+        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_snsBaseUrl + "deleteTopic?topicArn=" + Core::StringUtils::UrlEncode(topicArn), {});
         Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_EQ(0, deleteResult.status);
+        EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
         EXPECT_EQ(0, topicList.size());
     }
 

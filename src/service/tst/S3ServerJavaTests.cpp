@@ -32,7 +32,7 @@ namespace AwsMock::Service {
      *
      * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
      */
-    class S3ServerSpringTest : public ::testing::Test {
+    class S3ServerJavaTest : public ::testing::Test {
 
       protected:
 
@@ -100,7 +100,7 @@ namespace AwsMock::Service {
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
-    TEST_F(S3ServerSpringTest, S3CreateBucketTest) {
+    TEST_F(S3ServerJavaTest, S3CreateBucketTest) {
 
         // arrange
 
@@ -113,7 +113,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, buckets);
     }
 
-    TEST_F(S3ServerSpringTest, S3ListBucketTest) {
+    TEST_F(S3ServerJavaTest, S3ListBucketTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -129,7 +129,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, buckets);
     }
 
-    TEST_F(S3ServerSpringTest, S3PutBucketVersioningTest) {
+    TEST_F(S3ServerJavaTest, S3PutBucketVersioningTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -146,7 +146,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(bucket.versionStatus == Database::Entity::S3::BucketVersionStatus::ENABLED);
     }
 
-    TEST_F(S3ServerSpringTest, S3ListObjectVersionsTest) {
+    TEST_F(S3ServerJavaTest, S3ListObjectVersionsTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -173,7 +173,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(2, versions);
     }
 
-    TEST_F(S3ServerSpringTest, S3DeleteBucketTest) {
+    TEST_F(S3ServerJavaTest, S3DeleteBucketTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -190,7 +190,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, buckets);
     }
 
-    TEST_F(S3ServerSpringTest, S3PutObjectTest) {
+    TEST_F(S3ServerJavaTest, S3PutObjectTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -207,7 +207,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, objects);
     }
 
-    TEST_F(S3ServerSpringTest, S3GetObjectTest) {
+    TEST_F(S3ServerJavaTest, S3GetObjectTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -227,7 +227,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, objects);
     }
 
-    TEST_F(S3ServerSpringTest, S3GetSizeTest) {
+    TEST_F(S3ServerJavaTest, S3GetSizeTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(size > 0);
     }
 
-    TEST_F(S3ServerSpringTest, S3UploadObjectTest) {
+    TEST_F(S3ServerJavaTest, S3UploadObjectTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -265,7 +265,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, objects);
     }
 
-    TEST_F(S3ServerSpringTest, S3DownloadObjectTest) {
+    TEST_F(S3ServerJavaTest, S3DownloadObjectTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -285,7 +285,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, objects);
     }
 
-    TEST_F(S3ServerSpringTest, S3CopyObjectTest) {
+    TEST_F(S3ServerJavaTest, S3CopyObjectTest) {
 
         // arrange
         Core::HttpSocketResponse createResult1 = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -313,7 +313,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, objects2);
     }
 
-    TEST_F(S3ServerSpringTest, S3DeleteObjectTest) {
+    TEST_F(S3ServerJavaTest, S3DeleteObjectTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
@@ -335,7 +335,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, objects);
     }
 
-    TEST_F(S3ServerSpringTest, S3DeleteObjectsTest) {
+    TEST_F(S3ServerJavaTest, S3DeleteObjectsTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
