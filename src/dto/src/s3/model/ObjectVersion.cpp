@@ -15,7 +15,7 @@ namespace AwsMock::Dto::S3 {
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "StorageClass", storageClass);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsLatest", isLatest);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Size", size);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified.time_since_epoch().count());
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ISO8601(lastModified));
         pRoot->appendChild(owner.ToXmlElement(pDoc));
 
         // Checksums

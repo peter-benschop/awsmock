@@ -253,6 +253,12 @@ namespace AwsMock::Service {
     Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, int hostPort, int containerPort) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
+        // Check container name
+        std::string containerName = name;
+        if (Core::StringUtils::Contains(name, "/")) {
+            containerName = Core::StringUtils::SubStringAfter(containerName, "/");
+        }
+
         // Create the request
         std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         Dto::Docker::CreateContainerRequest request = {
@@ -265,7 +271,7 @@ namespace AwsMock::Service {
                 .hostPort = std::to_string(hostPort)};
         std::string jsonBody = request.ToJson();
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + name, jsonBody);
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + containerName, jsonBody);
         if (domainSocketResponse.statusCode != http::status::created) {
             log_warning << "Create container failed, httpStatus: " << domainSocketResponse.statusCode << " body " << domainSocketResponse.body;
             return {};

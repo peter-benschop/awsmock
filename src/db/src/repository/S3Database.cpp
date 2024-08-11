@@ -579,10 +579,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::GetObjectVersion(const std::string &region,
-                                                    const std::string &bucket,
-                                                    const std::string &key,
-                                                    const std::string &versionId) {
+    Entity::S3::Object S3Database::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &versionId) {
 
         try {
 
@@ -605,6 +602,42 @@ namespace AwsMock::Database {
             throw Core::DatabaseException(exc.what(), 500);
         }
         return {};
+    }
+
+    Entity::S3::ObjectList S3Database::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) {
+
+        Entity::S3::ObjectList objectList;
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+
+            if (prefix.empty()) {
+
+                auto objectCursor = _objectCollection.find(make_document(kvp("region", region), kvp("bucket", bucket)));
+                for (const auto &object: objectCursor) {
+                    Entity::S3::Object result;
+                    result.FromDocument(object);
+                    objectList.push_back(result);
+                }
+            } else {
+
+                auto objectCursor = _objectCollection.find(make_document(kvp("region", region), kvp("bucket", bucket),
+                                                                         kvp("key", make_document(kvp("$regex", "^" + prefix)))));
+                for (const auto &object: objectCursor) {
+                    Entity::S3::Object result;
+                    result.FromDocument(object);
+                    objectList.push_back(result);
+                }
+            }
+
+        } else {
+
+            objectList = _memoryDb.ListObjectVersions(region, bucket, prefix);
+        }
+
+        log_trace << "Got versioned list, size:" << objectList.size();
+        return objectList;
     }
 
     long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {

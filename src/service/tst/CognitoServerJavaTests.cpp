@@ -48,7 +48,7 @@ namespace AwsMock::Service {
             _database.DeleteAllUsers();
             _database.DeleteAllGroups();
             _database.DeleteAllUserPools();
-            _gatewayServer->Stop();
+            _gatewayServer->Shutdown();
         }
 
         static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {

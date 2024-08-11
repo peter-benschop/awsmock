@@ -83,7 +83,7 @@ namespace AwsMock::Service {
      * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
      *
      */
-    class SQSServerSpringTest : public ::testing::Test {
+    class SQSServerJavaTest : public ::testing::Test {
 
       protected:
 
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _gatewayServer->Stop();
+            _gatewayServer->Shutdown();
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
@@ -143,7 +143,7 @@ namespace AwsMock::Service {
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
-    TEST_F(SQSServerSpringTest, SQSCreateQueueTest) {
+    TEST_F(SQSServerJavaTest, SQSCreateQueueTest) {
 
         // arrange
 
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, TEST_QUEUE));
     }
 
-    TEST_F(SQSServerSpringTest, SQSGetQueueUrlTest) {
+    TEST_F(SQSServerJavaTest, SQSGetQueueUrlTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -173,7 +173,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, TEST_QUEUE));
     }
 
-    TEST_F(SQSServerSpringTest, SQSGetAllQueueAttributes) {
+    TEST_F(SQSServerJavaTest, SQSGetAllQueueAttributes) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -189,7 +189,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(!queueAttributes.empty());
     }
 
-    TEST_F(SQSServerSpringTest, SQSGetSingleQueueAttributes) {
+    TEST_F(SQSServerJavaTest, SQSGetSingleQueueAttributes) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -205,7 +205,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(!queueAttributes.empty());
     }
 
-    TEST_F(SQSServerSpringTest, SQSSetQueueAttributes) {
+    TEST_F(SQSServerJavaTest, SQSSetQueueAttributes) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -219,7 +219,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
     }
 
-    TEST_F(SQSServerSpringTest, SQSChangeMessageVisibilityTest) {
+    TEST_F(SQSServerJavaTest, SQSChangeMessageVisibilityTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -237,7 +237,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
     }
 
-    TEST_F(SQSServerSpringTest, SQSSendMessageTest) {
+    TEST_F(SQSServerJavaTest, SQSSendMessageTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -254,7 +254,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, messageList.size());
     }
 
-    TEST_F(SQSServerSpringTest, SQSSendMessageAttributeTest) {
+    TEST_F(SQSServerJavaTest, SQSSendMessageAttributeTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -277,7 +277,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(5, message.attributes.size());
     }
 
-    TEST_F(SQSServerSpringTest, SQSMessageReceiveTest) {
+    TEST_F(SQSServerJavaTest, SQSMessageReceiveTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -298,7 +298,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(message.status == Database::Entity::SQS::MessageStatus::INVISIBLE);
     }
 
-    TEST_F(SQSServerSpringTest, SQSPurgeQueueTest) {
+    TEST_F(SQSServerJavaTest, SQSPurgeQueueTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -316,7 +316,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, messageList.size());
     }
 
-    TEST_F(SQSServerSpringTest, SQSTemplateTest) {
+    TEST_F(SQSServerJavaTest, SQSTemplateTest) {
 
         // arrange
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
@@ -333,7 +333,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, messageList.size());
     }
 
-    TEST_F(SQSServerSpringTest, SQSDeleteMessageTest) {
+    TEST_F(SQSServerJavaTest, SQSDeleteMessageTest) {
 
         // arrange
         TestMessage testMessage = {.testKey = "testKey"};
@@ -357,7 +357,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, messageList.size());
     }
 
-    TEST_F(SQSServerSpringTest, SQSDeleteMessageBatchTest) {
+    TEST_F(SQSServerJavaTest, SQSDeleteMessageBatchTest) {
 
         // arrange
         TestMessage testMessage = {.testKey = "testKey"};

@@ -238,6 +238,17 @@ namespace AwsMock::Database {
         Entity::S3::Object GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version);
 
         /**
+         * @brief Gets a list of versioned objects
+         *
+         * @param region AWS S3 region name
+         * @param bucket object bucket
+         * @param prefix object key prefix
+         * @return list of S3 object
+         * @throws DatabaseException
+         */
+        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix);
+
+        /**
          * @brief Gets an object from an bucket
          *
          * @param oid object ID
