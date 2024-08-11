@@ -227,20 +227,6 @@ namespace AwsMock::Service {
         static Poco::Mutex _mutex;
     };
 
-    /**
-     * @brief Returns the URI for the invocation request.
-     *
-     * @param hostName host name of the docker instance
-     * @param port lambda docker external port
-     * @return URI of the invocation request
-     */
-    inline static std::string GetRequestUrl(const std::string &hostName, int port) {
-        if (hostName.empty()) {
-            return "http://localhost:" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
-        }
-        return "http://" + hostName + ":" + std::to_string(port) + "/2015-03-31/functions/function/invocations";
-    }
-
 }// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

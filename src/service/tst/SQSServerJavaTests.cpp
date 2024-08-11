@@ -148,7 +148,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         std::string queueUrl = result.body;
 
         // assert
@@ -160,7 +160,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSGetQueueUrlTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
 
         // act
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSGetAllQueueAttributes) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
 
@@ -192,7 +192,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSGetSingleQueueAttributes) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
 
@@ -208,7 +208,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSSetQueueAttributes) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
 
@@ -222,7 +222,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSChangeMessageVisibilityTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
         TestMessage testMessage = {.testKey = "testKey"};
@@ -240,7 +240,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSSendMessageTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
 
@@ -257,7 +257,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSSendMessageAttributeTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
 
@@ -280,7 +280,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSMessageReceiveTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
         TestMessage testMessage = {.testKey = "testKey"};
@@ -301,7 +301,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSPurgeQueueTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
         std::string queueUrl = result.body;
         TestMessage testMessage = {.testKey = "testKey"};
@@ -319,7 +319,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSTemplateTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
+        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, createResult.statusCode);
         std::string queueUrl = createResult.body;
 
@@ -337,9 +337,9 @@ namespace AwsMock::Service {
 
         // arrange
         TestMessage testMessage = {.testKey = "testKey"};
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
-        EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
+        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        EXPECT_EQ(http::status::ok, createResult.statusCode);
+        std::string queueUrl = createResult.body;
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
         EXPECT_EQ(http::status::ok, sendResult.statusCode);
         std::string messageId = sendResult.body;
@@ -349,11 +349,10 @@ namespace AwsMock::Service {
         // act
         std::string receiptHandle = messageList[0].receiptHandle;
         Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&receiptHandle=" + Core::StringUtils::UrlEncode(receiptHandle), {});
-        EXPECT_EQ(http::status::ok, deleteResult.statusCode);
         messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
         EXPECT_EQ(0, messageList.size());
     }
 
@@ -361,9 +360,9 @@ namespace AwsMock::Service {
 
         // arrange
         TestMessage testMessage = {.testKey = "testKey"};
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue", TEST_QUEUE);
-        EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
+        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        EXPECT_EQ(http::status::ok, createResult.statusCode);
+        std::string queueUrl = createResult.body;
         Core::HttpSocketResponse sendResult1 = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
         EXPECT_EQ(http::status::ok, sendResult1.statusCode);
         Core::HttpSocketResponse sendResult2 = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
@@ -375,11 +374,10 @@ namespace AwsMock::Service {
         std::string receiptHandle1 = messageList[0].receiptHandle;
         std::string receiptHandle2 = messageList[1].receiptHandle;
         Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteMessageBatch?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&receiptHandle1=" + Core::StringUtils::UrlEncode(receiptHandle1) + "&receiptHandle2=" + Core::StringUtils::UrlEncode(receiptHandle2), {});
-        EXPECT_EQ(http::status::ok, deleteResult.statusCode);
         messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
+        EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
         EXPECT_EQ(0, messageList.size());
     }
 

@@ -9,10 +9,11 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/dynamodb/DynamoDbServer.h"
 #include <awsmock/core/TestUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/service/dynamodb/DynamoDbServer.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
@@ -32,27 +33,34 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.dynamodb.port", std::to_string(DYNAMODB_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
-            _configuration.setString("awsmock.service.gateway.port", _port);
-            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
+            std::string _port = _configuration.getString("awsmock.service.dynamodb.http.port", std::to_string(DYNAMODB_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.dynamodb.http.host", DYNAMODB_DEFAULT_HOST);
+
+            // Setup gateway
+            _configuration.setString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
+            // Get account ID
+            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
+
             // Start HTTP manager
-            _dynamodbServer.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint-url http://localhost:8000");
             EXPECT_EQ(0, deleteResult1.status);
-            _dynamodbServer.Stop();
+            _gatewayServer->Shutdown();
         }
 
+        boost::asio::io_context ioc{10};
         std::string _endpoint, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        DynamoDbServer _dynamodbServer;
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
     TEST_F(DynamoDbServerCliTest, TableCreateTest) {

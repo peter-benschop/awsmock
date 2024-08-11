@@ -28,7 +28,6 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-
             // Define endpoint
             _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
             _configuration.setString("awsmock.service.gateway.http.host", "localhost");
@@ -125,13 +124,13 @@ namespace AwsMock::Service {
     /* TEST_F(DynamoDbServerJavaTest, PutItemTest) {
 
         // arrange
-        Core::ExecResult createTableResult = Core::SystemUtils::Exec(_baseCommand + "create-table test-table");
+        Core::ExecResult createTableResult = Core::SystemUtils::Exec(_snsBaseUrl + "create-table test-table");
         EXPECT_EQ(0, createTableResult.status);
         Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
         EXPECT_EQ(1, tableList.size());
 
         // act
-        Core::ExecResult putItemResult = Core::SystemUtils::Exec(_baseCommand + "put-item test-table orgaNr 123");
+        Core::ExecResult putItemResult = Core::SystemUtils::Exec(_snsBaseUrl + "put-item test-table orgaNr 123");
         EXPECT_EQ(0, putItemResult.status);
         Database::Entity::DynamoDb::ItemList itemList = _database.ListItems();
 
