@@ -19,8 +19,11 @@
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
 #define ACCOUNT_ID "000000000000"
+#define PASSWORD std::string("test-password")
 #define USER_NAME std::string("test-user")
 #define GROUP_NAME std::string("test-group")
+#define CLIENT_NAME std::string("test-client")
+#define DOMAIN_NAME std::string("test-domain")
 #define USER_POOL_NAME std::string("test-user-pool")
 
 namespace AwsMock::Service {
@@ -93,6 +96,42 @@ namespace AwsMock::Service {
         EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, USER_POOL_NAME));
     }
 
+    TEST_F(CognitoServerCliTest, UserPoolCreateClientTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+
+        // act
+        Core::ExecResult createUserPoolClientResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool-client --user-pool-id " + userPoolId + " --client-name " + CLIENT_NAME + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+
+        // assert
+        EXPECT_EQ(0, createUserPoolClientResult.status);
+        EXPECT_EQ(1, userPoolList.size());
+        EXPECT_FALSE(userPoolList.front().userPoolClients.empty());
+    }
+
+    TEST_F(CognitoServerCliTest, UserPoolCreateDomainTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+
+        // act
+        Core::ExecResult createUserPoolDomainResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool-domain --user-pool-id " + userPoolId + " --domain " + DOMAIN_NAME + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+
+        // assert
+        EXPECT_EQ(0, createUserPoolDomainResult.status);
+        EXPECT_EQ(1, userPoolList.size());
+        EXPECT_TRUE(userPoolList.front().domain.domain == DOMAIN_NAME);
+    }
+
     TEST_F(CognitoServerCliTest, UserPoolDeleteTest) {
 
         // arrange
@@ -125,6 +164,52 @@ namespace AwsMock::Service {
         // assert
         EXPECT_EQ(0, createUserResult.status);
         EXPECT_EQ(1, userList.size());
+    }
+
+    TEST_F(CognitoServerCliTest, UserEnableTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserResult.status);
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+        EXPECT_EQ(1, userList.size());
+
+        // act
+        Core::ExecResult enableUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-enable-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        userList = _database.ListUsers();
+
+        // assert
+        EXPECT_EQ(0, enableUserResult.status);
+        EXPECT_EQ(1, userList.size());
+        EXPECT_TRUE(userList.front().enabled);
+    }
+
+    TEST_F(CognitoServerCliTest, UserDisableTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserResult.status);
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+        EXPECT_EQ(1, userList.size());
+        Core::ExecResult enableUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-enable-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, enableUserResult.status);
+
+        // act
+        Core::ExecResult disableUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-disable-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        userList = _database.ListUsers();
+
+        // assert
+        EXPECT_EQ(0, disableUserResult.status);
+        EXPECT_EQ(1, userList.size());
+        EXPECT_FALSE(userList.front().enabled);
     }
 
     TEST_F(CognitoServerCliTest, UserDeleteTest) {
@@ -182,7 +267,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, groupList.size());
     }
 
-    TEST_F(CognitoServerCliTest, AddUserToGroupTest) {
+    TEST_F(CognitoServerCliTest, UserAddToGroupTest) {
 
         // arrange
         Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
@@ -205,7 +290,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(userList.front().groups.front().groupName == GROUP_NAME);
     }
 
-    TEST_F(CognitoServerCliTest, RemoveUserFromGroupTest) {
+    TEST_F(CognitoServerCliTest, UserRemoveFromGroupTest) {
 
         // arrange
         Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
@@ -227,6 +312,28 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, removeUserFromGroupResult.status);
         EXPECT_EQ(1, userList.size());
         EXPECT_EQ(0, userList.front().groups.size());
+    }
+
+    TEST_F(CognitoServerCliTest, UserSignUpTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        std::string userPoolId = userPoolList.front().userPoolId;
+        Core::ExecResult createUserPoolClientResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool-client --user-pool-id " + userPoolId + " --client-name " + CLIENT_NAME + " --endpoint " + _endpoint);
+        userPoolList = _database.ListUserPools();
+        std::string clientId = userPoolList.front().userPoolClients.front().clientId;
+
+        // act
+        Core::ExecResult signupUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp sign-up --client-id " + clientId + " --username " + USER_NAME + " --password " + PASSWORD + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_EQ(0, signupUserResult.status);
+        EXPECT_EQ(1, userList.size());
+        EXPECT_TRUE(userList.front().enabled);
+        EXPECT_TRUE(userList.front().userStatus == Database::Entity::Cognito::UserStatus::UNCONFIRMED);
     }
 
 }// namespace AwsMock::Service
