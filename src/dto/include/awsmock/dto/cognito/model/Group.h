@@ -55,12 +55,12 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Created
          */
-        long created;
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modified
          */
-        long modified;
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * Convert to a JSON string

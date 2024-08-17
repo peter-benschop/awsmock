@@ -97,6 +97,15 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool GetUserPoolByUserPoolId(const std::string &userPoolId);
 
         /**
+         * @brief Returns a cognito user pool entity by client Id
+         *
+         * @param clientId cognito client ID
+         * @return cognito user pool entity
+         * @throws DatabaseException
+         */
+        Entity::Cognito::UserPool GetUserPoolByClientId(const std::string &clientId);
+
+        /**
          * @brief Returns a cognito user pool entity by region and name
          *
          * @param region AWS region
@@ -155,6 +164,17 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         bool UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName);
+
+        /**
+         * Check existence of cognito user
+         *
+         * @param region AWS region name
+         * @param userPoolId user pool ID
+         * @param userName name of the user
+         * @return true if cognito user exists
+         * @throws DatabaseException
+         */
+        bool UserExists(const std::string &region, const std::string &userName);
 
         /**
          * @brief Create a new cognito user

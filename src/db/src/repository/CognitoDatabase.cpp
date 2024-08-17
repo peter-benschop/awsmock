@@ -131,6 +131,35 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByClientId(const std::string &clientId) {
+
+        if (HasDatabase()) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
+                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("clientId", clientId)));
+                if (!mResult) {
+                    log_error << "Database exception: user pool not found ";
+                    throw Core::DatabaseException("Database exception, user pool not found ");
+                }
+
+                Entity::Cognito::UserPool result;
+                result.FromDocument(mResult->view());
+                return result;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.GetUserPoolByClientId(clientId);
+        }
+    }
+
     Entity::Cognito::UserPool CognitoDatabase::GetUserPoolByRegionName(const std::string &region, const std::string &name) {
 
         if (HasDatabase()) {
@@ -345,6 +374,29 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.UserExists(region, userPoolId, userName);
+        }
+    }
+
+    bool CognitoDatabase::UserExists(const std::string &region, const std::string &userName) {
+
+        if (HasDatabase()) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
+                int64_t count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userName", userName)));
+                log_trace << "Cognito user exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.UserExists(region, userName);
         }
     }
 

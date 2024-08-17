@@ -14,7 +14,7 @@
 #include <awsmock/utils/TestUtils.h>
 
 #define TEST_CONTAINER_NAME std::string("jensvogt/awsmock-test")
-#define TEST_CONTAINER_VERSION std::string("0.2.2")
+#define TEST_CONTAINER_VERSION std::string("latest")
 
 class TestEnvironment : public ::testing::Environment {
 

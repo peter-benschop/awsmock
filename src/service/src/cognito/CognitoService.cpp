@@ -511,6 +511,54 @@ namespace AwsMock::Service {
         }
     }
 
+    void CognitoService::AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "enable_user");
+        log_debug << "Admin enable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            throw Core::ServiceException("User does not exists, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+        }
+
+        try {
+            Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
+            user.enabled = true;
+            user = _database.UpdateUser(user);
+            log_trace << "User enabled, userName:  " << user.userName << " userPoolId: " << user.userPoolId;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Enable user request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void CognitoService::AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "disable_user");
+        log_debug << "Admin disable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            throw Core::ServiceException("User does not exists, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+        }
+
+        try {
+            Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
+            user.enabled = false;
+            user = _database.UpdateUser(user);
+            log_trace << "User disabled, userName:  " << user.userName << " userPoolId: " << user.userPoolId;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Disable user request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user");
         log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
@@ -595,8 +643,37 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::SignUpResponse CognitoService::SignUp(const Dto::Cognito::SignUpRequest &request) {
-        Dto::Cognito::SignUpResponse response;
-        return response;
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "signup_user");
+        log_debug << "Signup user request, region:  " << request.region << " userName: " << request.userName << " clientId: " << request.clientId;
+
+        if (_database.UserExists(request.region, request.userName)) {
+            throw Core::ServiceException("User exists exists already, userName: " + request.userName);
+        }
+
+        Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
+        try {
+            Database::Entity::Cognito::User user = {
+                    .region = request.region,
+                    .userPoolId = userPool.userPoolId,
+                    .userName = request.userName,
+                    .enabled = true,
+                    .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
+            };
+
+            user = _database.CreateUser(user);
+            Dto::Cognito::SignUpResponse response = {
+                    {.region = user.region},
+                    Core::StringUtils::CreateRandomUuid(),
+                    false};
+            log_trace << "Signup user response: " + response.ToJson();
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Create user request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
     }
 
     void CognitoService::ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request) {
@@ -608,9 +685,8 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("User pool does not exist, region: " + request.region + " userPoolId: " + request.userPoolId);
         }
 
-        Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
-
-        if (_database.UserExists(request.region, userPool.userPoolId, request.userName)) {
+        if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
             Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, userPool.userPoolId, request.userName);
             user.userStatus = Database::Entity::Cognito::UserStatus::CONFIRMED;
             user = _database.UpdateUser(user);
