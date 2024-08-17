@@ -200,6 +200,93 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, userList.size());
     }
 
+    TEST_F(CognitoServerJavaTest, UserEnableTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        EXPECT_TRUE(userCreateResult.statusCode == http::status::ok);
+
+        // act
+        Core::HttpSocketResponse userEnableResult = SendPostCommand(_baseUrl + "enableUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_TRUE(userEnableResult.statusCode == http::status::ok);
+        EXPECT_TRUE(userList.front().enabled);
+    }
+
+    TEST_F(CognitoServerJavaTest, UserDisableTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        EXPECT_TRUE(userCreateResult.statusCode == http::status::ok);
+
+        // act
+        Core::HttpSocketResponse userDisableResult = SendPostCommand(_baseUrl + "disableUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_TRUE(userDisableResult.statusCode == http::status::ok);
+        EXPECT_FALSE(userList.front().enabled);
+    }
+
+    TEST_F(CognitoServerJavaTest, UserSignupTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
+        EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
+        std::string clientId = userPoolList.front().clientId;
+        std::string password = Core::StringUtils::GenerateRandomPassword(8);
+
+        // act
+        Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password), {});
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_TRUE(userSignupResult.statusCode == http::status::ok);
+        EXPECT_TRUE(userList.front().enabled);
+        EXPECT_TRUE(userList.front().userStatus == Database::Entity::Cognito::UserStatus::UNCONFIRMED);
+    }
+
+    TEST_F(CognitoServerJavaTest, UserConfirmTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
+        EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
+        std::string clientId = userPoolList.front().clientId;
+        std::string password = Core::StringUtils::GenerateRandomPassword(8);
+        Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password), {});
+
+        // act
+        Core::HttpSocketResponse confirmUserResult = SendPostCommand(_baseUrl + "adminConfirmSignUp?userPoolId=" + userPoolId + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_TRUE(confirmUserResult.statusCode == http::status::ok);
+        EXPECT_TRUE(userList.front().enabled);
+        EXPECT_TRUE(userList.front().userStatus == Database::Entity::Cognito::UserStatus::CONFIRMED);
+    }
+
     TEST_F(CognitoServerJavaTest, UserDeleteTest) {
 
         // arrange
@@ -283,6 +370,33 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, userList.size());
         EXPECT_EQ(1, userList.front().groups.size());
         EXPECT_TRUE(userList.front().groups.front().groupName == TEST_GROUP);
+    }
+
+    TEST_F(CognitoServerJavaTest, ListUsersInGroupTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        EXPECT_EQ(1, userPoolList.size());
+        std::string userPoolId = userPoolList.front().userPoolId;
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+        EXPECT_EQ(1, userList.size());
+        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        EXPECT_TRUE(userGroupCreateResult.statusCode == http::status::ok);
+        Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
+        EXPECT_EQ(1, groupList.size());
+        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        EXPECT_TRUE(addUserToCreateResult.statusCode == http::status::ok);
+
+        // act
+        Core::HttpSocketResponse listUsersInGroupResult = SendGetCommand(_baseUrl + "listUsersInGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        int count = std::stoi(listUsersInGroupResult.body);
+
+        // assert
+        EXPECT_TRUE(listUsersInGroupResult.statusCode == http::status::ok);
+        EXPECT_EQ(1, count);
     }
 
     TEST_F(CognitoServerJavaTest, RemoveUserFromGroupTest) {

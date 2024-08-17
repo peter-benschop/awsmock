@@ -20,6 +20,7 @@
 #define OWNER "test-owner"
 #define ACCOUNT_ID "000000000000"
 #define USER_NAME std::string("test-user")
+#define GROUP_NAME std::string("test-group")
 #define USER_POOL_NAME std::string("test-user-pool")
 
 namespace AwsMock::Service {
@@ -33,31 +34,38 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-            // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.cognito.http.port", std::to_string(COGNITO_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
+            // General configuration
+            _region = _configuration.getString("awsmock.region", "eu-central-1");
+
+            // Define endpoint. This is the endpoint of the SQS server, not the gateway
+            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(COGNITO_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", COGNITO_DEFAULT_HOST);
+
+            // Set test config
             _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            //_gatewayServer.Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer->Initialize();
+            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
+            _database.DeleteAllGroups();
             _database.DeleteAllUserPools();
-            //_gatewayServer.Stop();
+            _gatewayServer->Shutdown();
         }
 
-        std::string _endpoint, _accountId;
+        boost::asio::io_context ioc{5};
+        std::string _endpoint, _accountId, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase &_database = Database::CognitoDatabase::instance();
-        CognitoServer _cognitoServer;
-        GatewayServer _gatewayServer;
+        std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 
-    /*TEST_F(CognitoServerCliTest, UserPoolCreateTest) {
+    TEST_F(CognitoServerCliTest, UserPoolCreateTest) {
 
         // arrange
 
@@ -136,7 +144,90 @@ namespace AwsMock::Service {
         // assert
         EXPECT_EQ(0, deleteUserResult.status);
         EXPECT_EQ(0, userList.size());
-    }*/
+    }
+
+    TEST_F(CognitoServerCliTest, GroupCreateTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+
+        // act
+        Core::ExecResult createGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
+
+        // assert
+        EXPECT_EQ(0, createGroupResult.status);
+        EXPECT_EQ(1, groupList.size());
+    }
+
+    TEST_F(CognitoServerCliTest, GroupDeleteTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+        Core::ExecResult createGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createGroupResult.status);
+
+        // act
+        Core::ExecResult deleteGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp delete-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
+
+        // assert
+        EXPECT_EQ(0, deleteGroupResult.status);
+        EXPECT_EQ(0, groupList.size());
+    }
+
+    TEST_F(CognitoServerCliTest, AddUserToGroupTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+        Core::ExecResult createGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createGroupResult.status);
+        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserResult.status);
+
+        // act
+        Core::ExecResult addUserToGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-add-user-to-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_EQ(0, addUserToGroupResult.status);
+        EXPECT_EQ(1, userList.size());
+        EXPECT_EQ(1, userList.front().groups.size());
+        EXPECT_TRUE(userList.front().groups.front().groupName == GROUP_NAME);
+    }
+
+    TEST_F(CognitoServerCliTest, RemoveUserFromGroupTest) {
+
+        // arrange
+        Core::ExecResult createUserPoolResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-user-pool --pool-name " + USER_POOL_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserPoolResult.status);
+        Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
+        std::string userPoolId = createdPoolList.front().userPoolId;
+        Core::ExecResult createGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp create-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createGroupResult.status);
+        Core::ExecResult createUserResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-create-user --user-pool-id " + userPoolId + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, createUserResult.status);
+        Core::ExecResult addUserToGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-add-user-to-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, addUserToGroupResult.status);
+
+        // act
+        Core::ExecResult removeUserFromGroupResult = Core::TestUtils::SendCliCommand("aws cognito-idp admin-remove-user-from-group --user-pool-id " + userPoolId + " --group-name " + GROUP_NAME + " --username " + USER_NAME + " --endpoint " + _endpoint);
+        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+
+        // assert
+        EXPECT_EQ(0, removeUserFromGroupResult.status);
+        EXPECT_EQ(1, userList.size());
+        EXPECT_EQ(0, userList.front().groups.size());
+    }
 
 }// namespace AwsMock::Service
 

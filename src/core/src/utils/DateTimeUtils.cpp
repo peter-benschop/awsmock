@@ -32,7 +32,7 @@ namespace AwsMock::Core {
     }
 
     long DateTimeUtils::UnixTimestamp(const system_clock::time_point &timePoint) {
-        return timePoint.time_since_epoch().count();
+        return std::chrono::duration_cast<std::chrono::seconds>(timePoint.time_since_epoch()).count();
     }
 
 };// namespace AwsMock::Core

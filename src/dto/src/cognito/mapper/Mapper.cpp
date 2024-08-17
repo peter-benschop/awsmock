@@ -117,8 +117,8 @@ namespace AwsMock::Dto::Cognito {
                 .groupName = groupEntity.groupName,
                 .userPoolId = groupEntity.userPoolId,
                 .precedence = groupEntity.precedence,
-                .created = Core::DateTimeUtils::UnixTimestamp(groupEntity.created),
-                .modified = Core::DateTimeUtils::UnixTimestamp(groupEntity.modified)};
+                .created = groupEntity.created,
+                .modified = groupEntity.modified};
         return groupDto;
     }
 

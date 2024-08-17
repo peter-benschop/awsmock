@@ -20,6 +20,8 @@
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserResponse.h>
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
+#include <awsmock/dto/cognito/AdminDisableUserRequest.h>
+#include <awsmock/dto/cognito/AdminEnableUserRequest.h>
 #include <awsmock/dto/cognito/AdminRemoveUserFromGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
@@ -217,6 +219,20 @@ namespace AwsMock::Service {
          * @param request list user in group request
          */
         Dto::Cognito::ListUsersInGroupResponse ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request);
+
+        /**
+         * @brief Enable a user
+         *
+         * @param request enable user request
+         */
+        void AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request);
+
+        /**
+         * @brief Disable a user
+         *
+         * @param request disable user request
+         */
+        void AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request);
 
         /**
          * @brief Deletes a cognito user

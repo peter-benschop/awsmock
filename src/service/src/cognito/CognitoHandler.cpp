@@ -220,6 +220,34 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, cognitoResponse.ToJson());
 
+            } else if (action == "AdminEnableUser") {
+
+                Dto::Cognito::AdminEnableUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin enable user request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminEnableUser(cognitoRequest);
+                log_info << "User enabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
+
+                return SendOkResponse(request);
+
+            } else if (action == "AdminDisableUser") {
+
+                Dto::Cognito::AdminDisableUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin disable user request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminDisableUser(cognitoRequest);
+                log_info << "User disabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
+
+                return SendOkResponse(request);
+
             } else if (action == "AdminDeleteUser") {
 
                 Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
@@ -347,7 +375,7 @@ namespace AwsMock::Service {
                 cognitoRequest.requestId = clientCommand.requestId;
                 cognitoRequest.user = clientCommand.user;
 
-                log_debug << "Got sign up request, json: " << cognitoRequest.ToString();
+                log_debug << "Got confirm sign up request, json: " << cognitoRequest.ToString();
 
                 _cognitoService.ConfirmUser(cognitoRequest);
                 log_info << "User confirmed, userPoolId: " << cognitoRequest.userPoolId << " userName: " << cognitoRequest.userName;
