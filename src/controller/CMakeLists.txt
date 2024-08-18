@@ -14,12 +14,12 @@ find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)
 if (SYSTEMD)
     # systemd available
     add_definitions(-DHAS_SYSTEMD)
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoPrometheus PocoNet
-            PocoJSON PocoXML PocoZip PocoFoundation PocoUtil boost_program_options pthread crypto ssl z archive tbb systemd)
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoPrometheus PocoNet PocoJSON PocoXML PocoZip
+            PocoFoundation PocoUtil boost_program_options pthread crypto ssl z archive tbb systemd)
 else ()
     # systemd not available
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet
-            PocoJSON PocoXML PocoZip PocoFoundation PocoUtil ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_program_options pthread crypto ssl z archive tbb)
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil
+            ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_program_options pthread crypto ssl z archive tbb)
 endif ()
 
 add_library(${BINARY}_lib STATIC ${SOURCES})

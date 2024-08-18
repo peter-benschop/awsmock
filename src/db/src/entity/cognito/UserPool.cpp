@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("userPoolId", userPoolId),
                 kvp("name", name),
                 kvp("arn", arn),
-                kvp("clientId", clientId),
+                kvp("kmsKey", kmsKey),
                 kvp("domain", domainDoc.extract()),
                 kvp("userPoolClients", userPoolClientsDoc),
                 kvp("tags", tagsDoc),
@@ -46,7 +46,7 @@ namespace AwsMock::Database::Entity::Cognito {
             userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
             region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
             name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-            clientId = bsoncxx::string::to_string(mResult.value()["clientId"].get_string().value);
+            kmsKey = bsoncxx::string::to_string(mResult.value()["kmsKey"].get_string().value);
             arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
             created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
             modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
@@ -89,7 +89,7 @@ namespace AwsMock::Database::Entity::Cognito {
         jsonObject.set("region", region);
         jsonObject.set("userPoolId", userPoolId);
         jsonObject.set("name", name);
-        jsonObject.set("clientId", clientId);
+        jsonObject.set("kmsKey", kmsKey);
         jsonObject.set("arn", arn);
         jsonObject.set("domain", domain.domain);
         jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::Cognito {
         Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
         Core::JsonUtils::GetJsonValueString("userPoolId", jsonObject, userPoolId);
         Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
-        Core::JsonUtils::GetJsonValueString("clientId", jsonObject, clientId);
+        Core::JsonUtils::GetJsonValueString("kmsKey", jsonObject, kmsKey);
         Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
         Core::JsonUtils::GetJsonValueString("domain", jsonObject, domain.domain);
     }

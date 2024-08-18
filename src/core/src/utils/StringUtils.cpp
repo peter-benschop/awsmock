@@ -29,6 +29,10 @@ namespace AwsMock::Core {
         return randomString(length);
     }
 
+    std::string StringUtils::GenerateRandomAlphanumericString(int length) {
+        return Poco::toLower(randomString(length));
+    }
+
     auto randomHexString(std::size_t len) -> std::string {
         static constexpr auto chars = "0123456789abcdef";
         thread_local auto rng = RandomGenerator<>();

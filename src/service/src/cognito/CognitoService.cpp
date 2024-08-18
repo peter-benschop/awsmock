@@ -23,6 +23,10 @@ namespace AwsMock::Service {
 
         Dto::Cognito::CreateUserPoolResponse response{};
         try {
+
+            // Create KMS SHA 256 key
+
+            // Generate user pool ID
             std::string userPoolId = Core::AwsUtils::CreateCognitoUserPoolId(request.region);
             Database::Entity::Cognito::UserPool userPool = {
                     .region = request.region,
@@ -174,7 +178,7 @@ namespace AwsMock::Service {
 
             // Update database
             userPool = _database.UpdateUserPool(userPool);
-            log_trace << "User pool domain updated, userPoolId: " << userPool.userPoolId << " clientId: " << userPool.clientId;
+            log_trace << "User pool domain updated, userPoolId: " << userPool.userPoolId << " Domain: " << request.domain;
 
             return {.cloudFrontDomain = userPool.domain.domain};
 
@@ -214,8 +218,12 @@ namespace AwsMock::Service {
             // Get user pool
             Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
 
+            // Create client
+            Database::Entity::Cognito::UserPoolClient userPoolClient = Dto::Cognito::Mapper::Mapper::map(request);
+            userPoolClient.clientSecret = Core::StringUtils::GenerateRandomAlphanumericString(40);
+
             // Update database
-            userPool.userPoolClients.emplace_back(Dto::Cognito::Mapper::Mapper::map(request));
+            userPool.userPoolClients.emplace_back(userPoolClient);
             userPool = _database.UpdateUserPool(userPool);
 
             Dto::Cognito::CreateUserPoolClientResponse response{};
@@ -318,7 +326,7 @@ namespace AwsMock::Service {
 
                 // Update database
                 userPool = _database.UpdateUserPool(userPool);
-                log_trace << "User pool client updated, userPoolId: " << userPool.userPoolId << " clientId: " << userPool.clientId;
+                log_trace << "User pool client updated, userPoolId: " << userPool.userPoolId << " clientId: " << request.clientId;
             }
 
         } catch (Poco::Exception &ex) {

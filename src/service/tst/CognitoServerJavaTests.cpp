@@ -250,7 +250,8 @@ namespace AwsMock::Service {
         std::string userPoolId = userPoolList.front().userPoolId;
         Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
         EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
-        std::string clientId = userPoolList.front().clientId;
+        userPoolList = _database.ListUserPools();
+        std::string clientId = userPoolList.front().userPoolClients.front().clientId;
         std::string password = Core::StringUtils::GenerateRandomPassword(8);
 
         // act
@@ -273,7 +274,8 @@ namespace AwsMock::Service {
         std::string userPoolId = userPoolList.front().userPoolId;
         Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
         EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
-        std::string clientId = userPoolList.front().clientId;
+        userPoolList = _database.ListUserPools();
+        std::string clientId = userPoolList.front().userPoolClients.front().clientId;
         std::string password = Core::StringUtils::GenerateRandomPassword(8);
         Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password), {});
 

@@ -2,15 +2,12 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_TARUTILS_H
-#define AWSMOCK_CORE_TARUTILS_H
+#ifndef AWSMOCK_CORE_TAR_UTILS_H
+#define AWSMOCK_CORE_TAR_UTILS_H
 
 // C++ standard includes
 #include <fcntl.h>
 #include <string>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 
 // Poco includes
 #include <Poco/RecursiveDirectoryIterator.h>
@@ -26,7 +23,7 @@
 namespace AwsMock::Core {
 
     /**
-     * @brief TAR compresion utilities
+     * @brief TAR compression utilities
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -71,4 +68,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif//AWSMOCK_CORE_TARUTILS_H
+#endif//A WSMOCK_CORE_TAR_UTILS_H
