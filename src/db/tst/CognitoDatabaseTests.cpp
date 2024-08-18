@@ -16,6 +16,8 @@
 #define USER_POOL_ID "test-user-pool_sdjhdjft"
 #define USER_POOL_NAME "test-user-pool"
 #define USER_NAME "test-user"
+#define CLIENT_ID "asdasjasdkjasd"
+#define CLIENT_NAME "test-client"
 
 namespace AwsMock::Database {
 
@@ -91,6 +93,21 @@ namespace AwsMock::Database {
 
         // assert
         EXPECT_TRUE(updateUserPoolResult.userPoolId == std::string(USER_POOL_NAME) + "2");
+    }
+
+    TEST_F(CognitoDatabaseDbTest, UserPoolClientFindTest) {
+
+        // arrange
+        Entity::Cognito::UserPoolClient userPoolClient = {.userPoolId = USER_POOL_ID, .clientId = CLIENT_ID, .clientName = CLIENT_NAME};
+        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        userPool.userPoolClients.emplace_back(userPoolClient);
+        Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+
+        // act
+        Entity::Cognito::UserPool resultUserPool = _cognitoDatabase.GetUserPoolByClientId(CLIENT_ID);
+
+        // assert
+        EXPECT_TRUE(resultUserPool.userPoolId == USER_POOL_ID);
     }
 
     TEST_F(CognitoDatabaseDbTest, UserPoolDeleteTest) {

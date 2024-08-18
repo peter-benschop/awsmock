@@ -47,6 +47,14 @@ namespace AwsMock::Core {
         static std::string GenerateRandomString(int length);
 
         /**
+         * @brief Generates a random string with the given length.
+         *
+         * @param length length of the string
+         * @return generated random string with the given length.
+         */
+        static std::string GenerateRandomAlphanumericString(int length);
+
+        /**
          * @brief Generates a random hexadecimal string with the given length.
          *
          * @param length length of the string

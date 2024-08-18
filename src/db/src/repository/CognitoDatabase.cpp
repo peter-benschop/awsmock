@@ -139,7 +139,10 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(kvp("clientId", clientId)));
+                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _userPoolCollection.find_one(make_document(
+                        kvp("userPoolClients",
+                            make_document(kvp("$elemMatch",
+                                              make_document(kvp("clientId", clientId)))))));
                 if (!mResult) {
                     log_error << "Database exception: user pool not found ";
                     throw Core::DatabaseException("Database exception, user pool not found ");

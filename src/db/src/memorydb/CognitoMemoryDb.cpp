@@ -95,7 +95,12 @@ namespace AwsMock::Database {
         auto it = find_if(_userPools.begin(),
                           _userPools.end(),
                           [clientId](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                              return userPool.second.clientId == clientId;
+                              auto it1 = find_if(userPool.second.userPoolClients.begin(),
+                                                 userPool.second.userPoolClients.end(),
+                                                 [clientId](const Entity::Cognito::UserPoolClient &userPoolClient) {
+                                                     return userPoolClient.clientId == clientId;
+                                                 });
+                              return it1 != userPool.second.userPoolClients.end();
                           });
 
         if (it == _userPools.end()) {

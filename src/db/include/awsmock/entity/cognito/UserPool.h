@@ -63,14 +63,14 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string name;
 
         /**
-         * Client ID
-         */
-        std::string clientId;
-
-        /**
          * ARN
          */
         std::string arn;
+
+        /**
+         * Key for a SHA256 KMS key
+         */
+        std::string kmsKey;
 
         /**
          * Domain
