@@ -53,6 +53,15 @@ namespace AwsMock::Dto::KMS {
         std::string keyId;
 
         /**
+         * Plain text
+         *
+         * <p>
+         * The plain text is Base64 encoded in case of AWS CLI, plain otherwise.
+         * </p>
+         */
+        std::string ciphertext;
+
+        /**
          * Encryption algorithm
          */
         EncryptionAlgorithm encryptionAlgorithm;
@@ -71,15 +80,6 @@ namespace AwsMock::Dto::KMS {
          * Dry run
          */
         bool dryRun = false;
-
-        /**
-         * Plain text
-         *
-         * <p>
-         * The plain text is Base64 encoded in case of AWS CLI, plain otherwise.
-         * </p>
-         */
-        std::string ciphertext;
 
         /**
          * Converts the JSON string to DTO.

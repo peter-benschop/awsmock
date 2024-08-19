@@ -30,7 +30,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit KMSHandler() : _kmsService(Core::Configuration::instance()) {}
+        explicit KMSHandler() {}
 
         /**
          * @brief HTTP POST request.

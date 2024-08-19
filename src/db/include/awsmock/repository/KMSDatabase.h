@@ -44,7 +44,7 @@ namespace AwsMock::Database {
         /**
          * Constructor
          */
-        explicit KMSDatabase() : _memoryDb(KMSMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _keyCollectionName("kms_key") {}
+        explicit KMSDatabase() : _memoryDb(KMSMemoryDb::instance()), _databaseName(GetDatabaseName()), _keyCollectionName("kms_key") {}
 
         /**
          * Singleton instance
@@ -144,7 +144,7 @@ namespace AwsMock::Database {
         /**
          * Use MongoDB
          */
-        bool _useDatabase;
+        //bool _useDatabase;
 
         /**
          * Database name

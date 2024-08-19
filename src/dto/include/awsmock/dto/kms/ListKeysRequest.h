@@ -34,15 +34,16 @@ namespace AwsMock::Dto::KMS {
      */
     struct ListKeysRequest : public Dto::Common::BaseRequest {
 
-        /**
-         * Marker for paging
-         */
-        std::string marker;
 
         /**
          * Limit
          */
         long limit;
+
+        /**
+         * Marker for paging
+         */
+        std::string marker;
 
         /**
          * Converts the JSON string to DTO.
