@@ -199,8 +199,6 @@ namespace AwsMock::Service {
         Core::AuthorizationHeaderKeys authKeys;
         std::string authorizationHeader = request["Authorization"];
 
-        Core::HttpUtils::DumpHeaders(request);
-        
         if (!authorizationHeader.empty()) {
 
             authKeys.signingVersion = Core::StringUtils::Split(authorizationHeader, ' ')[0];
