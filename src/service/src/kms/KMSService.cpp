@@ -12,10 +12,10 @@ namespace AwsMock::Service {
         std::thread(&KMSCreator::CreateKmsKey, k).detach();
     }
 
-    KMSService::KMSService(Core::Configuration &configuration) : _configuration(configuration), _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // Initialize environment
-        _accountId = _configuration.getString("awsmock.account.id", DEFAULT_KMS_ACCOUNT_ID);
+        _accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_KMS_ACCOUNT_ID);
     }
 
     Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) {
@@ -79,6 +79,32 @@ namespace AwsMock::Service {
         } catch (Core::DatabaseException &exc) {
             log_error << "KMS create key failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
+        }
+    }
+
+    void KMSService::WaitForRsaKey(const std::string &keyId, int maxSeconds) {
+
+        int i = 0;
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId);
+            if (!key.rsaPrivateKey.empty() || i > maxSeconds * 2) {
+                break;
+            }
+            i++;
+        }
+    }
+
+    void KMSService::WaitForAesKey(const std::string &keyId, int maxSeconds) {
+
+        int i = 0;
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId);
+            if (!key.aes256Key.empty() || i > maxSeconds * 2) {
+                break;
+            }
+            i++;
         }
     }
 

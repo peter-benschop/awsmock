@@ -55,10 +55,8 @@ namespace AwsMock::Service {
 
         /**
          * Constructor
-         *
-         * @param configuration module configuration
          */
-        explicit KMSService(Core::Configuration &configuration);
+        explicit KMSService();
 
         /**
          * List all keys
@@ -80,6 +78,22 @@ namespace AwsMock::Service {
          * @see Dto::KMS::CreateKeyResponse
          */
         Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request);
+
+        /**
+         * @brief Wait for the asynchronous key creation
+         *
+         * @param keyId key ID
+         * @param maxSeconds maximal seconds
+         */
+        void WaitForRsaKey(const std::string &keyId, int maxSeconds);
+
+        /**
+         * @brief Wait for the asynchronous key creation
+         *
+         * @param keyId key ID
+         * @param maxSeconds maximal seconds
+         */
+        void WaitForAesKey(const std::string &keyId, int maxSeconds);
 
         /**
          * Schedules a key deletion
@@ -148,11 +162,6 @@ namespace AwsMock::Service {
          * Account ID
          */
         std::string _accountId;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Database connection

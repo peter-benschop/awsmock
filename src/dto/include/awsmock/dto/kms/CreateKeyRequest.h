@@ -49,16 +49,6 @@ namespace AwsMock::Dto::KMS {
     struct CreateKeyRequest : public Dto::Common::BaseRequest {
 
         /**
-         * Customer key store ID
-         */
-        std::string customKeyStoreId;
-
-        /**
-         * Description
-         */
-        std::string description;
-
-        /**
          * Key specification
          */
         KeySpec keySpec = KeySpec::SYMMETRIC_DEFAULT;
@@ -67,6 +57,16 @@ namespace AwsMock::Dto::KMS {
          * Key usage
          */
         KeyUsage keyUsage = KeyUsage::ENCRYPT_DECRYPT;
+
+        /**
+         * Description
+         */
+        std::string description;
+
+        /**
+         * Customer key store ID
+         */
+        std::string customKeyStoreId;
 
         /**
          * Multi region

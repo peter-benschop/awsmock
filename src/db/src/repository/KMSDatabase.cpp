@@ -8,7 +8,7 @@ namespace AwsMock::Database {
 
     bool KMSDatabase::KeyExists(const std::string &keyId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -54,7 +54,7 @@ namespace AwsMock::Database {
 
     Entity::KMS::Key KMSDatabase::GetKeyById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetKeyById(bsoncxx::oid(oid));
 
@@ -66,7 +66,7 @@ namespace AwsMock::Database {
 
     Entity::KMS::Key KMSDatabase::GetKeyByKeyId(const std::string &keyId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
@@ -97,7 +97,7 @@ namespace AwsMock::Database {
     Entity::KMS::KeyList KMSDatabase::ListKeys(const std::string &region) {
 
         Entity::KMS::KeyList keyList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
@@ -131,7 +131,7 @@ namespace AwsMock::Database {
 
     long KMSDatabase::CountKeys() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -154,7 +154,7 @@ namespace AwsMock::Database {
 
     Entity::KMS::Key KMSDatabase::CreateKey(const Entity::KMS::Key &key) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
@@ -183,7 +183,7 @@ namespace AwsMock::Database {
 
     Entity::KMS::Key KMSDatabase::UpdateKey(const Entity::KMS::Key &key) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
@@ -211,7 +211,7 @@ namespace AwsMock::Database {
 
     void KMSDatabase::DeleteKey(const Entity::KMS::Key &key) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
@@ -238,7 +238,7 @@ namespace AwsMock::Database {
 
     void KMSDatabase::DeleteAllKeys() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
