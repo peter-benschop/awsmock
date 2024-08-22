@@ -32,6 +32,7 @@
 #include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 #include <awsmock/service/sns/SNSServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
+#include <awsmock/service/ssm/SSMServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
@@ -50,7 +51,7 @@ namespace AwsMock::Service {
          *
          * @param serverMap module map
          */
-        explicit ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleDatabase(Database::ModuleDatabase::instance()){};
+        explicit ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
          * @brief Return all list of all modules

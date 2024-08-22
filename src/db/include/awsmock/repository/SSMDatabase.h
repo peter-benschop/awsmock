@@ -33,7 +33,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::stream::document;
 
     /**
-     * @brief SSM MongoDB database.
+     * @brief ssm MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -107,7 +107,7 @@ namespace AwsMock::Database {
         long CountParameters();
 
         /**
-         * @brief Create a new parameter in the SSM parameter table
+         * @brief Create a new parameter in the ssm parameter table
          *
          * @param parameter parameter entity
          * @return created parameter entity
@@ -152,7 +152,7 @@ namespace AwsMock::Database {
         std::string _parameterCollectionName;
 
         /**
-         * SSM in-memory database
+         * ssm in-memory database
          */
         SSMMemoryDb &_memoryDb;
     };

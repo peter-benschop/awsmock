@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::SSM {
     using std::chrono::system_clock;
 
     /**
-     * SSM parameter entity
+     * ssm parameter entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */

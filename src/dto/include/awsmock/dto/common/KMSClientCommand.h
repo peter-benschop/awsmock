@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
-    enum class SSMCommandType {
+    enum class KMSCommandType {
         CREATE_KEY,
         SCHEDULE_KEY_DELETION,
         DESCRIBE_KEY,
@@ -38,26 +38,26 @@ namespace AwsMock::Dto::Common {
         UNKNOWN
     };
 
-    static std::map<SSMCommandType, std::string> KMSCommandTypeNames{
-            {SSMCommandType::CREATE_KEY, "create-key"},
-            {SSMCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
-            {SSMCommandType::DESCRIBE_KEY, "describe-key"},
-            {SSMCommandType::ENCRYPT, "encrypt"},
-            {SSMCommandType::DECRYPT, "decrypt"},
-            {SSMCommandType::LIST_KEYS, "list-keys"},
+    static std::map<KMSCommandType, std::string> KMSCommandTypeNames{
+            {KMSCommandType::CREATE_KEY, "create-key"},
+            {KMSCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
+            {KMSCommandType::DESCRIBE_KEY, "describe-key"},
+            {KMSCommandType::ENCRYPT, "encrypt"},
+            {KMSCommandType::DECRYPT, "decrypt"},
+            {KMSCommandType::LIST_KEYS, "list-keys"},
     };
 
-    [[maybe_unused]] static std::string KMSCommandTypeToString(SSMCommandType commandType) {
+    [[maybe_unused]] static std::string KMSCommandTypeToString(KMSCommandType commandType) {
         return KMSCommandTypeNames[commandType];
     }
 
-    [[maybe_unused]] static SSMCommandType KMSCommandTypeFromString(const std::string &commandType) {
+    [[maybe_unused]] static KMSCommandType KMSCommandTypeFromString(const std::string &commandType) {
         for (auto &it: KMSCommandTypeNames) {
             if (Core::StringUtils::EqualsIgnoreCase(commandType, it.second)) {
                 return it.first;
             }
         }
-        return SSMCommandType::UNKNOWN;
+        return KMSCommandType::UNKNOWN;
     }
 
     /**
@@ -74,7 +74,7 @@ namespace AwsMock::Dto::Common {
         /**
          * Client command
          */
-        SSMCommandType command{};
+        KMSCommandType command{};
 
         /**
          * Returns the command from HTTP header

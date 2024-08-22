@@ -31,7 +31,7 @@ namespace AwsMock::Dto::SSM {
 
             // Attributes
             Core::JsonUtils::GetJsonValueString("Tier", rootObject, tier);
-            Core::JsonUtils::GetJsonValueString("Version", rootObject, version);
+            Core::JsonUtils::GetJsonValueInt("Version", rootObject, version);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

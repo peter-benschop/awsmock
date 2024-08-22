@@ -45,9 +45,9 @@ namespace AwsMock::Database {
         return {};
     }
 
-    /*Entity::SSM::ParameterList SSMMemoryDb::ListParameters(const std::string &region) {
+    /*Entity::ssm::ParameterList SSMMemoryDb::ListParameters(const std::string &region) {
 
-        Entity::SSM::ParameterList parameterList;
+        Entity::ssm::ParameterList parameterList;
 
         if (region.empty()) {
 
@@ -113,7 +113,7 @@ namespace AwsMock::Database {
     void SSMMemoryDb::DeleteAllParameters() {
         Poco::ScopedLock lock(_parameterMutex);
         _parameters.clear();
-        log_debug << "All SSM parameters deleted";
+        log_debug << "All ssm parameters deleted";
     }
 
 }// namespace AwsMock::Database

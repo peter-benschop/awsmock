@@ -12,9 +12,9 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>

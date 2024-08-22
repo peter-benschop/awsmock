@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SSM {
         /**
          * Parameter version
          */
-        std::string version;
+        int version = 0;
 
         /**
          * AWS request ID

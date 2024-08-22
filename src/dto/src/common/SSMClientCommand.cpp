@@ -23,11 +23,11 @@ namespace AwsMock::Dto::Common {
 
         if (userAgent.clientCommand.empty()) {
 
-            this->command = Dto::Common::KMSCommandTypeFromString(GetCommandFromHeader(request));
+            this->command = Dto::Common::SSMCommandTypeFromString(GetCommandFromHeader(request));
 
         } else {
 
-            this->command = Dto::Common::KMSCommandTypeFromString(userAgent.clientCommand);
+            this->command = Dto::Common::SSMCommandTypeFromString(userAgent.clientCommand);
         }
     }
 
@@ -44,7 +44,7 @@ namespace AwsMock::Dto::Common {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
             rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("command", KMSCommandTypeToString(command));
+            rootJson.set("command", SSMCommandTypeToString(command));
             rootJson.set("user", user);
             rootJson.set("contentType", contentType);
             rootJson.set("payload", payload.length() > 256 ? Core::StringUtils::SubString(payload, 0, 256) : payload);

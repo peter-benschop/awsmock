@@ -10,8 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/secretsmanager/SecretsManagerMonitoring.h>
 

@@ -38,11 +38,11 @@ namespace AwsMock::Dto::Common {
             {SSMCommandType::UNKNOWN, "unknown"},
     };
 
-    [[maybe_unused]] static std::string KMSCommandTypeToString(SSMCommandType commandType) {
+    [[maybe_unused]] static std::string SSMCommandTypeToString(SSMCommandType commandType) {
         return SSMCommandTypeNames[commandType];
     }
 
-    [[maybe_unused]] static SSMCommandType KMSCommandTypeFromString(const std::string &commandType) {
+    [[maybe_unused]] static SSMCommandType SSMCommandTypeFromString(const std::string &commandType) {
         for (auto &it: SSMCommandTypeNames) {
             if (Core::StringUtils::EqualsIgnoreCase(commandType, it.second)) {
                 return it.first;
@@ -52,9 +52,9 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-     * @brief SSM client command
+     * @brief ssm client command
      * <p>
-     * The SSM client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of
+     * The ssm client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of
      * calling the AWS REST services.
      * </p>
      *

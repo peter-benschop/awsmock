@@ -11,7 +11,7 @@ namespace AwsMock::Service {
 
         switch (clientCommand.command) {
 
-            case Dto::Common::SSMCommandType::CREATE_KEY: {
+            case Dto::Common::KMSCommandType::CREATE_KEY: {
 
                 Dto::KMS::CreateKeyRequest kmsRequest;
                 kmsRequest.FromJson(clientCommand.payload);
@@ -23,7 +23,7 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, kmsResponse.ToJson());
             }
 
-            case Dto::Common::SSMCommandType::SCHEDULE_KEY_DELETION: {
+            case Dto::Common::KMSCommandType::SCHEDULE_KEY_DELETION: {
 
                 Dto::KMS::ScheduleKeyDeletionRequest kmsRequest;
                 kmsRequest.FromJson(clientCommand.payload);
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, kmsResponse.ToJson());
             }
 
-            case Dto::Common::SSMCommandType::LIST_KEYS: {
+            case Dto::Common::KMSCommandType::LIST_KEYS: {
 
                 Dto::KMS::ListKeysRequest kmsRequest;
                 kmsRequest.FromJson(clientCommand.payload);
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, kmsResponse.ToJson());
             }
 
-            case Dto::Common::SSMCommandType::DESCRIBE_KEY: {
+            case Dto::Common::KMSCommandType::DESCRIBE_KEY: {
 
                 Dto::KMS::DescribeKeyRequest kmsRequest;
                 kmsRequest.FromJson(clientCommand.payload);
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, kmsResponse.ToJson());
             }
 
-            case Dto::Common::SSMCommandType::ENCRYPT: {
+            case Dto::Common::KMSCommandType::ENCRYPT: {
 
                 Dto::KMS::EncryptRequest kmsRequest;
                 kmsRequest.FromJson(clientCommand.payload);
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, kmsResponse.ToJson());
             }
 
-            case Dto::Common::SSMCommandType::DECRYPT: {
+            case Dto::Common::KMSCommandType::DECRYPT: {
 
                 Dto::KMS::DecryptRequest kmsRequest;
                 kmsRequest.FromJson(clientCommand.payload);
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
             }
 
             default:
-            case Dto::Common::SSMCommandType::UNKNOWN: {
+            case Dto::Common::KMSCommandType::UNKNOWN: {
                 log_error << "Unimplemented command called";
                 throw Core::ServiceException("Unimplemented command called");
             }

@@ -18,7 +18,7 @@
 #include <awsmock/service/sns/SNSMonitoring.h>
 #include <awsmock/service/sns/SNSWorker.h>
 
-#define KMS_DEFAULT_PORT 9502
+#define SSM_DEFAULT_PORT 9502
 #define SNS_DEFAULT_HOST "localhost"
 #define SNS_DEFAULT_QUEUE_LENGTH 250
 #define SNS_DEFAULT_THREADS 50

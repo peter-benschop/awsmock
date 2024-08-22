@@ -30,7 +30,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::stream::document;
 
     /**
-     * @brief SSM in-memory database
+     * @brief ssm in-memory database
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -95,7 +95,7 @@ namespace AwsMock::Database {
         long CountParameters();
 
         /**
-         * @brief Create a new parameter in the SSM parameter table
+         * @brief Create a new parameter in the ssm parameter table
          *
          * @param parameter parameter entity
          * @return created parameter entity
@@ -130,7 +130,7 @@ namespace AwsMock::Database {
       private:
 
         /**
-         * SSM parameter vector, when running without database
+         * ssm parameter vector, when running without database
          */
         std::map<std::string, Entity::SSM::Parameter> _parameters{};
 
