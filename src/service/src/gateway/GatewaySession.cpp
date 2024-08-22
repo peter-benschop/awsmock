@@ -17,6 +17,7 @@ namespace AwsMock::Service {
             {"cognito-identity", std::make_shared<CognitoHandler>()},
             {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
             {"kms", std::make_shared<KMSHandler>()},
+            {"ssm", std::make_shared<SSMHandler>()},
             {"dynamodb", std::make_shared<DynamoDbHandler>()}};
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {

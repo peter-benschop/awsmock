@@ -13,7 +13,6 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include "awsmock/service/module/ModuleService.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
@@ -21,7 +20,7 @@
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
-#include <awsmock/service/transfer/TransferService.h>
+#include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Manager {
 
@@ -39,7 +38,7 @@ namespace AwsMock::Manager {
          *
          * @param serverMap currently running servers
          */
-        explicit Handler(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleService(serverMap){};
+        explicit Handler(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleService(serverMap) {};
 
         /**
          * @brief Handler HTTP GET requests.

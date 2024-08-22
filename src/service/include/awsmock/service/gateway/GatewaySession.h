@@ -24,6 +24,7 @@
 #include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
 #include <awsmock/service/sns/SNSHandler.h>
 #include <awsmock/service/sqs/SQSHandler.h>
+#include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
 
 // Maximal body size (10MB)

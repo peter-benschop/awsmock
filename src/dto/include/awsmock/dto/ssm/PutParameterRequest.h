@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
-#define AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
+#ifndef AWSMOCK_DTO_SSM_PUT_PARAMETER_REQUEST_H
+#define AWSMOCK_DTO_SSM_PUT_PARAMETER_REQUEST_H
 
 // C++ standard includes
 #include <map>
@@ -17,13 +17,13 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/dto/sqs/SqsCommonRequest.h>
-#include <awsmock/dto/sqs/model/QueueAttribute.h>
+#include <awsmock/dto/ssm/model/ParameterType.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SSM {
 
-    struct CreateQueueRequest {
+    struct PutParameterRequest {
 
         /**
          * AWS region
@@ -31,24 +31,34 @@ namespace AwsMock::Dto::SQS {
         std::string region;
 
         /**
-         * Queue name
+         * Parameter name
          */
-        std::string queueName;
+        std::string name;
 
         /**
-         * Queue URL
+         * Parameter value
          */
-        std::string queueUrl;
+        std::string value;
 
         /**
-         * Owner
+         * Description
          */
-        std::string owner;
+        std::string description;
 
         /**
-         * Attributes
+         * Parameter type
          */
-        QueueAttributeList attributes;
+        ParameterType type;
+
+        /**
+         * KMS key ID
+         */
+        std::string keyId;
+
+        /**
+         * Parameter tier
+         */
+        std::string tier;
 
         /**
          * Tags
@@ -86,9 +96,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const PutParameterRequest &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SSM
 
-#endif// AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
+#endif// AWSMOCK_DTO_SSM_PUT_PARAMETER_REQUEST_H

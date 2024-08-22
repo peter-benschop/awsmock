@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_KMS_SERVER_H
-#define AWSMOCK_SERVICE_KMS_SERVER_H
+#ifndef AWSMOCK_SERVICE_SSM_SERVER_H
+#define AWSMOCK_SERVICE_SSM_SERVER_H
 
 // C++ standard includes
 #include <string>
@@ -15,47 +15,47 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/kms/KMSMonitoring.h>
-#include <awsmock/service/kms/KMSWorker.h>
+#include <awsmock/service/ssm/SSMMonitoring.h>
+#include <awsmock/service/ssm/SSMWorker.h>
 
-#define KMS_DEFAULT_PORT 9502
-#define KMS_DEFAULT_HOST "localhost"
-#define KMS_DEFAULT_QUEUE_LENGTH 250
-#define KMS_DEFAULT_THREADS 50
-#define KMS_DEFAULT_TIMEOUT 120
-#define KMS_DEFAULT_WORKER_PERIOD 3600
-#define KMS_DEFAULT_MONITORING_PERIOD 300
+#define SSM_DEFAULT_PORT 9509
+#define SSM_DEFAULT_HOST "localhost"
+#define SSM_DEFAULT_QUEUE_LENGTH 250
+#define SSM_DEFAULT_THREADS 50
+#define SSM_DEFAULT_TIMEOUT 120
+#define SSM_DEFAULT_WORKER_PERIOD 3600
+#define SSM_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
     /**
-     * @brief KMS HTTP server
+     * @brief SSM HTTP server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSServer : public AbstractServer {
+    class SSMServer : public AbstractServer {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param configuration aws-mock configuration
          */
-        explicit KMSServer(Core::Configuration &configuration);
+        explicit SSMServer(Core::Configuration &configuration);
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
@@ -67,19 +67,19 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration;
 
         /**
-         * KMS database
+         * ssm database
          */
-        Database::KMSDatabase &_kmsDatabase;
+        Database::SSMDatabase &_ssmDatabase;
 
         /**
          * SNS monitoring
          */
-        std::shared_ptr<KMSMonitoring> _kmsMonitoring;
+        std::shared_ptr<SSMMonitoring> _ssmMonitoring;
 
         /**
          * SNS worker
          */
-        std::shared_ptr<KMSWorker> _kmsWorker;
+        std::shared_ptr<SSMWorker> _ssmWorker;
 
         /**
          * Rest port

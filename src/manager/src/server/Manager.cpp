@@ -100,6 +100,9 @@ namespace AwsMock::Manager {
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::KMSServer>(configuration);
                 _serverMap[module.name]->Start();
+            } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::SSMServer>(configuration);
+                _serverMap[module.name]->Start();
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
                 _serverMap[module.name]->Start();
