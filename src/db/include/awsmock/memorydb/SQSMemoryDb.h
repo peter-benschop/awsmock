@@ -315,12 +315,12 @@ namespace AwsMock::Database {
         /**
          * SQS queue vector, when running without database
          */
-        std::map<std::string, Entity::SQS::Queue> _queues;
+        std::map<std::string, Entity::SQS::Queue> _queues{};
 
         /**
          * SQS message vector, when running without database
          */
-        std::map<std::string, Entity::SQS::Message> _messages;
+        std::map<std::string, Entity::SQS::Message> _messages{};
 
         /**
          * Queue mutex

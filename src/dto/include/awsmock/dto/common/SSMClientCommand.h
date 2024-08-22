@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_KMS_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_KMS_CLIENT_COMMAND_H
+#ifndef AWSMOCK_DTO_COMMON_SSM_CLIENT_COMMAND_H
+#define AWSMOCK_DTO_COMMON_SSM_CLIENT_COMMAND_H
 
 // C++ includes
 #include <sstream>
@@ -29,30 +29,21 @@ namespace AwsMock::Dto::Common {
     namespace ip = boost::asio::ip;
 
     enum class SSMCommandType {
-        CREATE_KEY,
-        SCHEDULE_KEY_DELETION,
-        DESCRIBE_KEY,
-        LIST_KEYS,
-        ENCRYPT,
-        DECRYPT,
+        PUT_PARAMETER,
         UNKNOWN
     };
 
-    static std::map<SSMCommandType, std::string> KMSCommandTypeNames{
-            {SSMCommandType::CREATE_KEY, "create-key"},
-            {SSMCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
-            {SSMCommandType::DESCRIBE_KEY, "describe-key"},
-            {SSMCommandType::ENCRYPT, "encrypt"},
-            {SSMCommandType::DECRYPT, "decrypt"},
-            {SSMCommandType::LIST_KEYS, "list-keys"},
+    static std::map<SSMCommandType, std::string> SSMCommandTypeNames{
+            {SSMCommandType::PUT_PARAMETER, "put-parameter"},
+            {SSMCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string KMSCommandTypeToString(SSMCommandType commandType) {
-        return KMSCommandTypeNames[commandType];
+        return SSMCommandTypeNames[commandType];
     }
 
     [[maybe_unused]] static SSMCommandType KMSCommandTypeFromString(const std::string &commandType) {
-        for (auto &it: KMSCommandTypeNames) {
+        for (auto &it: SSMCommandTypeNames) {
             if (Core::StringUtils::EqualsIgnoreCase(commandType, it.second)) {
                 return it.first;
             }
@@ -61,15 +52,15 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-     * KMS client command
+     * @brief SSM client command
      * <p>
-     * The KMS client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of
+     * The SSM client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of
      * calling the AWS REST services.
      * </p>
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct KMSClientCommand : public BaseClientCommand {
+    struct SSMClientCommand : public BaseClientCommand {
 
         /**
          * Client command
@@ -112,9 +103,9 @@ namespace AwsMock::Dto::Common {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const KMSClientCommand &i);
+        friend std::ostream &operator<<(std::ostream &os, const SSMClientCommand &i);
     };
 
 }// namespace AwsMock::Dto::Common
 
-#endif// AWSMOCK_DTO_COMMON_KMS_CLIENT_COMMAND_H
+#endif// AWSMOCK_DTO_COMMON_SSM_CLIENT_COMMAND_H

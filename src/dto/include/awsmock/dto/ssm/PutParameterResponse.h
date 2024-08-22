@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
-#define AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
+#ifndef AWSMOCK_DTO_SSM_PUT_PARAMETER_RESPONSE_H
+#define AWSMOCK_DTO_SSM_PUT_PARAMETER_RESPONSE_H
 
 // C++ standard includes
 #include <map>
@@ -17,13 +17,13 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/dto/sqs/SqsCommonRequest.h>
-#include <awsmock/dto/sqs/model/QueueAttribute.h>
+#include <awsmock/dto/ssm/model/ParameterType.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SSM {
 
-    struct CreateQueueRequest {
+    struct PutParameterResponse {
 
         /**
          * AWS region
@@ -31,29 +31,14 @@ namespace AwsMock::Dto::SQS {
         std::string region;
 
         /**
-         * Queue name
+         * Parameter tier
          */
-        std::string queueName;
+        std::string tier;
 
         /**
-         * Queue URL
+         * Parameter version
          */
-        std::string queueUrl;
-
-        /**
-         * Owner
-         */
-        std::string owner;
-
-        /**
-         * Attributes
-         */
-        QueueAttributeList attributes;
-
-        /**
-         * Tags
-         */
-        std::map<std::string, std::string> tags;
+        std::string version;
 
         /**
          * AWS request ID
@@ -86,9 +71,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const PutParameterResponse &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SSM
 
-#endif// AWSMOCK_DTO_SQS_CREATE_QUEUE_REQUEST_H
+#endif// AWSMOCK_DTO_SSM_PUT_PARAMETER_RESPONSE_H

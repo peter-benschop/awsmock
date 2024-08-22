@@ -24,12 +24,12 @@ set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp 
 set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
         src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
+set(SSM_SOURCES src/entity/ssm/Parameter.cpp src/repository/SSMDatabase.cpp src/memorydb/SSMMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
 set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp)
 
-set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
-        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${UTIL_SOURCES})
+set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
+        ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

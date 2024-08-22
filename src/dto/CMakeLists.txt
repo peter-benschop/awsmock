@@ -4,7 +4,7 @@ set(LIBRARY_STATIC awsmockdto_static)
 
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp src/common/Services.cpp src/common/Infrastructure.cpp
         src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
-        src/common/LambdaClientCommand.cpp)
+        src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp
         src/sqs/ListQueueResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp
@@ -71,11 +71,11 @@ set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/k
         src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp
         src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp)
+set(SSM_SOURCES src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp src/module/mapper/Mapper.cpp)
 
-set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
-        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}
-        ${MODULE_SOURCES})
+set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES}
+        ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES})
 
 # Test directory
 add_subdirectory(tst)
