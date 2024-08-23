@@ -33,7 +33,7 @@ RUN cd /usr/src && \
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
-    git clone -b releases/v3.10 https://github.com/mongodb/mongo-cxx-driver.git && \
+    git clone https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
