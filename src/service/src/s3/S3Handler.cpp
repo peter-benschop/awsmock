@@ -506,21 +506,6 @@ namespace AwsMock::Service {
                     return SendBadRequestError(request, "Unknown method");
             }
 
-            if (clientCommand.versionRequest) {
-
-                log_debug << "Bucket versioning request, bucket: " << clientCommand.bucket;
-
-                std::string body = Core::HttpUtils::GetBodyAsString(request);
-
-                Dto::S3::PutBucketVersioningRequest s3Request(body);
-                s3Request.user = clientCommand.user;
-                s3Request.region = clientCommand.region;
-                s3Request.bucket = clientCommand.bucket;
-
-                _s3Service.PutBucketVersioning(s3Request);
-
-                return SendNoContentResponse(request);
-            }
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
@@ -534,7 +519,6 @@ namespace AwsMock::Service {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         }
-        return SendBadRequestError(request, "Unknown method");
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {

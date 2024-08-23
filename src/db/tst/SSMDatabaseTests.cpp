@@ -49,7 +49,7 @@ namespace AwsMock::Database {
     TEST_F(SSMDatabaseTest, ParameterCreateTest) {
 
         // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = Core::StringUtils::CreateRandomUuid()};
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
 
         // act
         Entity::SSM::Parameter result = _ssmDatabase.CreateParameter(parameter);
@@ -63,7 +63,7 @@ namespace AwsMock::Database {
     TEST_F(SSMDatabaseTest, ParameterExistsTest) {
 
         // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = Core::StringUtils::CreateRandomUuid()};
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
 
         // act
@@ -78,7 +78,7 @@ namespace AwsMock::Database {
     TEST_F(SSMDatabaseTest, ParameterGetByNameTest) {
 
         // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = Core::StringUtils::CreateRandomUuid()};
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
 
         // act
@@ -91,7 +91,7 @@ namespace AwsMock::Database {
     TEST_F(SSMDatabaseTest, ParameterGetByIdTest) {
 
         // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = Core::StringUtils::CreateRandomUuid()};
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
         bsoncxx::oid oid(createResult.oid);
 
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
     TEST_F(SSMDatabaseTest, ParameterUpdateTest) {
 
         // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = Core::StringUtils::CreateRandomUuid()};
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         parameter = _ssmDatabase.CreateParameter(parameter);
         parameter.description = "new description";
 
@@ -132,7 +132,7 @@ namespace AwsMock::Database {
     TEST_F(SSMDatabaseTest, ParameterDeleteTest) {
 
         // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = Core::StringUtils::CreateRandomUuid()};
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         parameter = _ssmDatabase.CreateParameter(parameter);
 
         // act

@@ -21,8 +21,12 @@
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/dto/ssm/DeleteParameterRequest.h>
+#include <awsmock/dto/ssm/GetParameterRequest.h>
+#include <awsmock/dto/ssm/GetParameterResponse.h>
 #include <awsmock/dto/ssm/PutParameterRequest.h>
 #include <awsmock/dto/ssm/PutParameterResponse.h>
+#include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/SSMDatabase.h>
 
 #define DEFAULT_SSM_ACCOUNT_ID "000000000000"
@@ -41,89 +45,37 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit SSMService();
 
         /**
-         * List all keys
+         * @brief Creates a new parameter
          *
-         * @param request list queue request
-         * @return ListKeysResponse
-         * @throws Core::DatabaseException
-         * @see Dto::KMS::ListKeysRequest
-         * @see Dto::KMS::ListKeysResponse
+         * @param request put parameter request
+         * @return PutParameterResponse
+         * @see Dto::KMS::PutParameterRequest
+         * @see Dto::KMS::PutParameterResponse
          */
-        //Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request);
+        Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request);
 
         /**
-         * Creates a new key
+         * @brief Returns a new parameter
          *
-         * @param request create key request
-         * @return CreateKeyResponse
-         * @see Dto::KMS::CreateKeyRequest
-         * @see Dto::KMS::CreateKeyResponse
+         * @param request get parameter request
+         * @return GetParameterResponse
+         * @see Dto::KMS::GetParameterRequest
+         * @see Dto::KMS::GetParameterResponse
          */
-        //Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request);
+        Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request);
 
         /**
-         * @brief Wait for the asynchronous key creation
+         * @brief Deletes a parameter
          *
-         * @param keyId key ID
-         * @param maxSeconds maximal seconds
+         * @param request delete parameter request
+         * @see Dto::KMS::DeleteParameterRequest
          */
-        //void WaitForRsaKey(const std::string &keyId, int maxSeconds);
-
-        /**
-         * @brief Wait for the asynchronous key creation
-         *
-         * @param keyId key ID
-         * @param maxSeconds maximal seconds
-         */
-        //void WaitForAesKey(const std::string &keyId, int maxSeconds);
-
-        /**
-         * Schedules a key deletion
-         *
-         * @param request create queue request
-         * @return ScheduleKeyDeletionRequest
-         * @throws Core::DatabaseException
-         * @see Dto::KMS::ScheduledKeyDeletionResponse
-         */
-        //Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request);
-
-        /**
-         * Describe a key
-         *
-         * @param request describe key request
-         * @return DescribeKeyResponse
-         * @throws Core::DatabaseException
-         * @see Dto::KMS::DescribeKeyRequest
-         * @see Dto::KMS::DescribeKeyResponse
-         */
-        //Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request);
-
-        /**
-         * Encrypt a plain text using a given algorithm
-         *
-         * @param request encrypt request
-         * @return EncryptResponse
-         * @throws Core::DatabaseException, Core::ServiceException
-         * @see Dto::KMS::EncryptRequest
-         * @see Dto::KMS::EncryptResponse
-         */
-        //Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request);
-
-        /**
-         * Decrypts a cipher text using a given algorithm
-         *
-         * @param request decrypt request
-         * @return DecryptResponse
-         * @throws Core::DatabaseException, Core::ServiceException
-         * @see Dto::KMS::DecryptRequest
-         * @see Dto::KMS::DecryptResponse
-         */
-        //Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request);
+        void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request);
 
       private:
 

@@ -94,9 +94,9 @@ namespace AwsMock::Database {
          * @brief List all parameters
          *
          * @param region AWS region
-         * @return KeyList
+         * @return ParameterList
          */
-        //        Entity::KMS::KeyList ListKeys(const std::string &region = {});
+        Entity::SSM::ParameterList ListParameters(const std::string &region = {});
 
         /**
          * @brief Returns the total number of parameters

@@ -12,9 +12,8 @@
 
 namespace AwsMock::Dto::SSM {
 
-
     /**
-     * ssm parameter type
+     * @brief SSM parameter type
      *
      * @author jens.vogt\@opitz-consulting.com
      */

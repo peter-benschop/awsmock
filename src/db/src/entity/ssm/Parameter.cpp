@@ -23,6 +23,7 @@ namespace AwsMock::Database::Entity::SSM {
                 kvp("description", description),
                 kvp("tier", tier),
                 kvp("version", version),
+                kvp("arn", arn),
                 kvp("tags", tagsDoc),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
@@ -38,7 +39,8 @@ namespace AwsMock::Database::Entity::SSM {
         type = bsoncxx::string::to_string(mResult.value()["type"].get_string().value);
         description = bsoncxx::string::to_string(mResult.value()["description"].get_string().value);
         tier = bsoncxx::string::to_string(mResult.value()["tier"].get_string().value);
-        version = bsoncxx::string::to_string(mResult.value()["version"].get_string().value);
+        version = mResult.value()["version"].get_int32().value;
+        arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
