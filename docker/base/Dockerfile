@@ -20,7 +20,7 @@ RUN cd /usr/src && \
     cd jwt-cpp && \
     cmake . && \
     cmake --install .
- \
+
     # Install Poco framework
 RUN cd /usr/src && \
     git clone -b poco-1.13.3 https://github.com/pocoproject/poco.git && \

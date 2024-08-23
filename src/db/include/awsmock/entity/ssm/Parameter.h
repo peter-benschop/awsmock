@@ -76,7 +76,12 @@ namespace AwsMock::Database::Entity::SSM {
         /**
          * Version
          */
-        std::string version;
+        int version;
+
+        /**
+         * AWS ARN
+         */
+        std::string arn;
 
         /**
          * Topic tags

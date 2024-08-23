@@ -9,25 +9,52 @@ namespace AwsMock::Service {
         Dto::Common::SSMClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        switch (clientCommand.command) {
+        try {
 
-            case Dto::Common::SSMCommandType::PUT_PARAMETER: {
+            switch (clientCommand.command) {
 
-                Dto::SSM::PutParameterRequest ssmRequest;
-                ssmRequest.FromJson(clientCommand.payload);
-                ssmRequest.region = clientCommand.region;
+                case Dto::Common::SSMCommandType::PUT_PARAMETER: {
 
-                Dto::SSM::PutParameterResponse kmsResponse;// = _ssmService.PutParameter(ssmRequest);
+                    Dto::SSM::PutParameterRequest ssmRequest;
+                    ssmRequest.FromJson(clientCommand.payload);
+                    ssmRequest.region = clientCommand.region;
 
-                log_info << "Parameter created, name: " << ssmRequest.name << " version: " << kmsResponse.version;
-                return SendOkResponse(request, kmsResponse.ToJson());
+                    Dto::SSM::PutParameterResponse ssmResponse = _ssmService.PutParameter(ssmRequest);
+
+                    log_info << "Parameter created, name: " << ssmRequest.name << " version: " << ssmResponse.version;
+                    return SendOkResponse(request, ssmResponse.ToJson());
+                }
+
+                case Dto::Common::SSMCommandType::GET_PARAMETER: {
+
+                    Dto::SSM::GetParameterRequest ssmRequest;
+                    ssmRequest.FromJson(clientCommand.payload);
+                    ssmRequest.region = clientCommand.region;
+
+                    Dto::SSM::GetParameterResponse ssmResponse = _ssmService.GetParameter(ssmRequest);
+
+                    log_info << "Parameter found, name: " << ssmRequest.name;
+                    return SendOkResponse(request, ssmResponse.ToJson());
+                }
+
+                default:
+                case Dto::Common::SSMCommandType::UNKNOWN: {
+                    log_error << "Unimplemented command called";
+                    throw Core::ServiceException("Unimplemented command called");
+                }
             }
-
-            default:
-            case Dto::Common::SSMCommandType::UNKNOWN: {
-                log_error << "Unimplemented command called";
-                throw Core::ServiceException("Unimplemented command called");
-            }
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (Core::JsonException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
         }
     }
 }// namespace AwsMock::Service

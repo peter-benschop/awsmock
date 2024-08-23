@@ -46,6 +46,10 @@ namespace AwsMock::Core {
         return CreateArn("sns", region, accountId, topicName + ":" + Poco::UUIDGenerator().createRandom().toString());
     }
 
+    std::string AwsUtils::CreateSSMParameterArn(const std::string &region, const std::string &accountId, const std::string &name) {
+        return CreateArn("ssm", region, accountId, name);
+    }
+
     std::string AwsUtils::CreateTransferArn(const std::string &region, const std::string &accountId, const std::string &serverId) {
         return CreateArn("transfer", region, accountId, "manager/" + serverId);
     }
