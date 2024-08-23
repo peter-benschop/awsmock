@@ -45,9 +45,9 @@ namespace AwsMock::Database {
         return {};
     }
 
-    /*Entity::ssm::ParameterList SSMMemoryDb::ListParameters(const std::string &region) {
+    Entity::SSM::ParameterList SSMMemoryDb::ListParameters(const std::string &region) {
 
-        Entity::ssm::ParameterList parameterList;
+        Entity::SSM::ParameterList parameterList;
 
         if (region.empty()) {
 
@@ -66,7 +66,7 @@ namespace AwsMock::Database {
 
         log_trace << "Got parameter list, size: " << parameterList.size();
         return parameterList;
-    }*/
+    }
 
     long SSMMemoryDb::CountParameters() {
 

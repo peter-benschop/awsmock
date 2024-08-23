@@ -94,9 +94,9 @@ namespace AwsMock::Database {
         }
     }
 
-    /*Entity::ssm::ParameterList SSMDatabase::ListParameters(const std::string &region) {
+    Entity::SSM::ParameterList SSMDatabase::ListParameters(const std::string &region) {
 
-        Entity::ssm::ParameterList parameterList;
+        Entity::SSM::ParameterList parameterList;
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
@@ -106,7 +106,7 @@ namespace AwsMock::Database {
 
                 auto parameterCursor = _parameterCollection.find({});
                 for (const auto &parameter: parameterCursor) {
-                    Entity::ssm::Parameter result;
+                    Entity::SSM::Parameter result;
                     result.FromDocument(parameter);
                     parameterList.push_back(result);
                 }
@@ -114,7 +114,7 @@ namespace AwsMock::Database {
 
                 auto parameterCursor = _parameterCollection.find(make_document(kvp("region", region)));
                 for (const auto &parameter: parameterCursor) {
-                    Entity::ssm::Parameter result;
+                    Entity::SSM::Parameter result;
                     result.FromDocument(parameter);
                     parameterList.push_back(result);
                 }
@@ -127,7 +127,7 @@ namespace AwsMock::Database {
 
         log_trace << "Got parameter list, size:" << parameterList.size();
         return parameterList;
-    }*/
+    }
 
     long SSMDatabase::CountParameters() {
 
