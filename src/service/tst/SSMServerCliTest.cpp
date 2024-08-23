@@ -82,6 +82,22 @@ namespace AwsMock::Service {
         EXPECT_TRUE(Core::StringUtils::Contains(getResult.output, TEST_PARAMETER_NAME));
     }
 
+    TEST_F(SSMServerCliTest, ParameterDeleteTest) {
+
+        // arrange
+        Core::ExecResult putResult = Core::TestUtils::SendCliCommand("aws ssm put-parameter --name " + TEST_PARAMETER_NAME + " --value " + TEST_PARAMETER_VALUE + " --endpoint " + _endpoint);
+        Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
+        EXPECT_EQ(1, parameterList.size());
+
+        // act
+        Core::ExecResult deleteResult = Core::TestUtils::SendCliCommand("aws ssm delete-parameter --name " + TEST_PARAMETER_NAME + " --endpoint " + _endpoint);
+        parameterList = _ssmDatabase.ListParameters();
+
+        // assert
+        EXPECT_EQ(0, deleteResult.status);
+        EXPECT_EQ(0, parameterList.size());
+    }
+
 }// namespace AwsMock::Service
 
 #endif// AWMOCK_SERVICE_SNS_CLI_INTEGRATION_TEST_H

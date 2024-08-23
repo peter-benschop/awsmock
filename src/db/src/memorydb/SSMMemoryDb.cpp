@@ -105,7 +105,7 @@ namespace AwsMock::Database {
         std::string oid = parameter.oid;
         const auto count = std::erase_if(_parameters, [oid](const auto &item) {
             auto const &[k, v] = item;
-            return v.oid == oid;
+            return k == oid;
         });
         log_debug << "Parameter deleted, count: " << count;
     }

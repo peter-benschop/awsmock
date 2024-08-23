@@ -21,6 +21,7 @@
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/dto/ssm/DeleteParameterRequest.h>
 #include <awsmock/dto/ssm/GetParameterRequest.h>
 #include <awsmock/dto/ssm/GetParameterResponse.h>
 #include <awsmock/dto/ssm/PutParameterRequest.h>
@@ -49,35 +50,32 @@ namespace AwsMock::Service {
         explicit SSMService();
 
         /**
-         * @brief Creates a new key
+         * @brief Creates a new parameter
          *
-         * @param request create key request
-         * @return CreateKeyResponse
-         * @see Dto::KMS::CreateKeyRequest
-         * @see Dto::KMS::CreateKeyResponse
+         * @param request put parameter request
+         * @return PutParameterResponse
+         * @see Dto::KMS::PutParameterRequest
+         * @see Dto::KMS::PutParameterResponse
          */
         Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request);
 
         /**
-         * @brief Creates a new key
+         * @brief Returns a new parameter
          *
-         * @param request create key request
-         * @return CreateKeyResponse
-         * @see Dto::KMS::CreateKeyRequest
-         * @see Dto::KMS::CreateKeyResponse
+         * @param request get parameter request
+         * @return GetParameterResponse
+         * @see Dto::KMS::GetParameterRequest
+         * @see Dto::KMS::GetParameterResponse
          */
         Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request);
 
         /**
-         * List all keys
+         * @brief Deletes a parameter
          *
-         * @param request list queue request
-         * @return ListKeysResponse
-         * @throws Core::DatabaseException
-         * @see Dto::KMS::ListKeysRequest
-         * @see Dto::KMS::ListKeysResponse
+         * @param request delete parameter request
+         * @see Dto::KMS::DeleteParameterRequest
          */
-        //Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request);
+        void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request);
 
       private:
 

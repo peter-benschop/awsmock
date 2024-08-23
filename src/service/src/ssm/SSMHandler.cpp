@@ -37,6 +37,18 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, ssmResponse.ToJson());
                 }
 
+                case Dto::Common::SSMCommandType::DELETE_PARAMETER: {
+
+                    Dto::SSM::DeleteParameterRequest ssmRequest;
+                    ssmRequest.FromJson(clientCommand.payload);
+                    ssmRequest.region = clientCommand.region;
+
+                    _ssmService.DeleteParameter(ssmRequest);
+
+                    log_info << "Parameter deleted, name: " << ssmRequest.name;
+                    return SendOkResponse(request);
+                }
+
                 default:
                 case Dto::Common::SSMCommandType::UNKNOWN: {
                     log_error << "Unimplemented command called";

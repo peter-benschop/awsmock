@@ -69,4 +69,26 @@ namespace AwsMock::Service {
         }
     }
 
+    void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "delete_parameter");
+        log_trace << "Delete parameter request: " << request.ToString();
+
+        if (!_ssmDatabase.ParameterExists(request.name)) {
+            log_error << "Parameter does not exist, name: " << request.name;
+            throw Core::ServiceException("Parameter does not exist, name: " + request.name);
+        }
+
+        try {
+            // Get from database
+            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            log_trace << "SSM parameter found: " << parameterEntity.ToString();
+
+            _ssmDatabase.DeleteParameter(parameterEntity);
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "SSM delete parameter failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
 }// namespace AwsMock::Service
