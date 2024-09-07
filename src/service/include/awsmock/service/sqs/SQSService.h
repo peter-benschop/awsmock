@@ -41,6 +41,8 @@
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
+#include <awsmock/dto/sqs/SendMessageBatchRequest.h>
+#include <awsmock/dto/sqs/SendMessageBatchResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
@@ -73,7 +75,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.
@@ -157,13 +159,22 @@ namespace AwsMock::Service {
         Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
 
         /**
+         * @brief Send a message to the queue
+         *
+         * @param request send message request
+         * @return SendMessageResponse
+         * @throws ServiceException
+         */
+        Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+
+        /**
          * @brief Creates a new queue
          *
          * @param request create message request
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+        Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request);
 
         /**
          * @brief Receive a list of resources

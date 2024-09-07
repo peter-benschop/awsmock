@@ -34,6 +34,16 @@ namespace AwsMock::Core {
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }
 
+    std::string AwsUtils::ConvertSQSQueueArnToName(const std::string &queueArn) {
+
+        std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
+        if (parts.size() < 6) {
+            log_error << "Could not convert SQS arn to name, arn: " << queueArn;
+            return {};
+        }
+        return parts[5];
+    }
+
     std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
         return CreateArn("sqs", region, accountId, queueName);
     }
