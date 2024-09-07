@@ -36,7 +36,7 @@
 # options. To request support for more options, contact support@codedocs.xyz.
 #
 PROJECT_NAME           = "awsmock"
-INPUT                  = "../src"
+INPUT                  = "src"
 OUTPUT_DIRECTORY       = "."
 FILE_PATTERNS          = *.h, main.cpp
 EXTRACT_ALL            = YES
@@ -48,3 +48,4 @@ GENERATE_LATEX         = NO
 GENERATE_XML           = NO
 EXCLUDE_SYMBOLS        = _*, plog*
 DOT_GRAPH_MAX_NODES    = 100
+HAVE_DOT               = NO
