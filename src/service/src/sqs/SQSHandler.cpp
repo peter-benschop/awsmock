@@ -224,6 +224,20 @@ namespace AwsMock::Service {
                     log_info << "Send message, queueUrl: " << sqsRequest.queueUrl;
                 }
 
+                case Dto::Common::SqsCommandType::SEND_MESSAGE_BATCH: {
+
+                    Dto::SQS::SendMessageBatchRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+
+                    // Call service
+                    Dto::SQS::SendMessageBatchResponse sqsResponse = _sqsService.SendMessageBatch(sqsRequest);
+
+                    log_info << "SQS message batch send, successful: " << sqsResponse.successful.size() << " failed: " << sqsResponse.failed.size();
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::RECEIVE_MESSAGE: {
 
                     Dto::SQS::ReceiveMessageRequest sqsRequest;

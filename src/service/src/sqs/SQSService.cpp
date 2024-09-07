@@ -394,7 +394,7 @@ namespace AwsMock::Service {
                      .md5SystemAttr = md5SystemAttr,
                      .attributes = attributes,
                      .messageAttributes = messageAttributes});
-            log_info << "Message send, queueName: " << queue.name << " messageId: " << request.messageId << " md5Body: " << request.md5sum;
+            log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId << " md5Body: " << md5Body;
 
             // Find Lambdas with this as event source
             std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
@@ -415,6 +415,48 @@ namespace AwsMock::Service {
                     .md5UserAttr = md5UserAttr,
                     .md5SystemAttr = md5SystemAttr,
                     .requestId = request.requestId};
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message_batch");
+        log_trace << "Send message batch request, queueUrl: " << request.queueUrl;
+
+        if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
+            log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+        }
+
+        try {
+
+            // Get queue by URL
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+
+            Dto::SQS::SendMessageBatchResponse sqsResponse;
+            for (const auto &entry: request.entries) {
+                Dto::SQS::SendMessageRequest entryRequest;
+                entryRequest.region = request.region;
+                entryRequest.queueUrl = request.queueUrl;
+                entryRequest.attributes = entry.attributes;
+                entryRequest.messageAttributes = entry.messageAttributes;
+                entryRequest.body = entry.body;
+                entryRequest.md5sum = entry.md5Sum;
+                entryRequest.messageId = entry.messageId;
+                try {
+                    Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
+                    Dto::SQS::MessageSuccessful s = {.id = entry.id, .messageId = response.messageId, .md5Body = response.md5Body, .md5UserAttr = response.md5UserAttr, .md5SystemAttr = response.md5SystemAttr};
+                    sqsResponse.successful.emplace_back(s);
+                } catch (Poco::Exception &exc) {
+                    Dto::SQS::MessageFailed f = {.id = Core::StringUtils::CreateRandomUuid(), .message = exc.message(), .senderFault = false};
+                    sqsResponse.failed.emplace_back(f);
+                }
+            }
+
+            return sqsResponse;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();

@@ -42,6 +42,7 @@ namespace AwsMock::Dto::SQS {
                     messageAttributeListDto[at.attributeName] = messageAttributeDto;
                     messageAttributeObject.set(at.attributeName, messageAttributesObject);
                 }
+                messageObject.set("MessageAttributes", messageAttributeObject);
 
                 // Attributes
                 Poco::JSON::Object attributeObject;
@@ -52,7 +53,6 @@ namespace AwsMock::Dto::SQS {
 
                 // MD5 of message attributes
                 messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto));
-                messageObject.set("MessageAttributes", messageAttributeObject);
                 messageArray.add(messageObject);
             }
 

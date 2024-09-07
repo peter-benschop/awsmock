@@ -180,7 +180,7 @@ namespace AwsMock::Core {
         if (!GaugeExists(name, labelName, labelValue)) {
             AddGauge(name, labelName, labelValue);
         }
-        _gaugeMap[name]->labels({labelValue}).inc((double) value);
+        _gaugeMap[name]->labels({labelValue}).set((double) value);
         log_trace << "Gauge value set, name: " << name;
     }
 

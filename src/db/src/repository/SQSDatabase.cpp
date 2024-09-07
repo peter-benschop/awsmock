@@ -661,16 +661,19 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
+                std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(redrivePolicy.deadLetterTargetArn);
                 auto result = messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
-                                                                          kvp("status",
-                                                                              Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                                           kvp("retries", make_document(
                                                                                                  kvp("$gt", redrivePolicy.maxReceiveCount)))),
                                                             make_document(kvp("$set", make_document(kvp("retries", 0),
                                                                                                     kvp("queueArn",
                                                                                                         redrivePolicy.deadLetterTargetArn),
                                                                                                     kvp("queueUrl",
-                                                                                                        dlqQueueUrl)))));
+                                                                                                        dlqQueueUrl),
+                                                                                                    kvp("queueName",
+                                                                                                        dlqQueueName),
+                                                                                                    kvp("status",
+                                                                                                        Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                 session.commit_transaction();
                 log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: "
                           << result->modified_count() << " queue: "

@@ -7,8 +7,7 @@
 
 #include <awsmock/core/monitoring/MetricService.h>
 
-#define TIME_DIFF_NAME(x) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _start).count())
-#define TIME_DIFF_LABEL(x, y, z) (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _start).count())
+#define TIME_DIFF (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _start).count())
 
 namespace AwsMock::Core {
 
@@ -55,10 +54,10 @@ namespace AwsMock::Core {
          */
         ~MetricServiceTimer() {
             if (_labelName.empty()) {
-                _metricService.SetGauge(_name, TIME_DIFF_NAME(_name));
+                _metricService.SetGauge(_name, TIME_DIFF);
                 log_trace << "Timer deleted, name: " << _name;
             } else {
-                _metricService.SetGauge(_name, _labelName, _labelValue, TIME_DIFF_LABEL(_name, labelName, labelValue));
+                _metricService.SetGauge(_name, _labelName, _labelValue, TIME_DIFF);
                 log_trace << "Timer deleted, name: " << _name << " labelName: " << _labelName << " labelValue: " << _labelValue;
             }
         }
@@ -88,17 +87,17 @@ namespace AwsMock::Core {
         /**
          * Name of the timer
          */
-        const std::string _name{};
+        std::string _name{};
 
         /**
          * Label name of the timer
          */
-        const std::string _labelName{};
+        std::string _labelName{};
 
         /**
          * Label value of the timer
          */
-        const std::string _labelValue{};
+        std::string _labelValue{};
 
         /**
          * Timer start time point

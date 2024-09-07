@@ -50,6 +50,7 @@ namespace AwsMock::Dto::SQS {
                     }
                 }
             }
+
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
         }
