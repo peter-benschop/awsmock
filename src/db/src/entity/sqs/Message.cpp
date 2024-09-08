@@ -43,9 +43,7 @@ namespace AwsMock::Database::Entity::SQS {
         }
 
         view_or_value<view, value> messageDoc = make_document(
-                kvp("region", region),
-                kvp("queueUrl", queueUrl),
-                kvp("queueName", queueName),
+                kvp("queueArn", queueArn),
                 kvp("body", body),
                 kvp("status", MessageStatusToString(status)),
                 kvp("retries", retries),
@@ -66,9 +64,7 @@ namespace AwsMock::Database::Entity::SQS {
     void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
-        queueName = bsoncxx::string::to_string(mResult.value()["queueName"].get_string().value);
+        queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
         body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
         status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
         retries = mResult.value()["retries"].get_int32().value;
@@ -112,9 +108,7 @@ namespace AwsMock::Database::Entity::SQS {
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("region", region);
-            jsonObject.set("queueUrl", queueUrl);
-            jsonObject.set("queueName", queueName);
+            jsonObject.set("queueArn", queueArn);
             jsonObject.set("body", body);
             jsonObject.set("status", MessageStatusToString(status));
             jsonObject.set("messageId", messageId);
@@ -159,9 +153,7 @@ namespace AwsMock::Database::Entity::SQS {
     void Message::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
 
         try {
-            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-            Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
-            Core::JsonUtils::GetJsonValueString("queueName", jsonObject, queueName);
+            Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
             Core::JsonUtils::GetJsonValueString("body", jsonObject, body);
             Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
             Core::JsonUtils::GetJsonValueString("receiptHandle", jsonObject, receiptHandle);

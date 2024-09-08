@@ -88,6 +88,20 @@ namespace AwsMock::Core {
         EXPECT_STREQ(result.c_str(), sqsQueueUrl.c_str());
     }
 
+    TEST_F(AwsUtilsTest, ConvertUrlToArnTest) {
+
+        // arrange
+        std::string queueName = "file-delivery1-queue";
+        std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
+        std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+
+        // act
+        std::string result = AwsUtils::ConvertSQSQueueUrlToArn(_region, sqsQueueUrl);
+
+        // assert
+        EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());
+    }
+
     /**
      * @brief Test the AWS4 signature
      *

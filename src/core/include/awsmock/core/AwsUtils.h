@@ -151,6 +151,15 @@ namespace AwsMock::Core {
         static std::string ConvertSQSQueueArnToName(const std::string &queueArn);
 
         /**
+         * @brief Converts a queue ARN to a queue URL
+         *
+         * @param region AWS region
+         * @param queueUrl URL of the queue
+         * @return URL of the queue
+         */
+        static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl);
+
+        /**
          *@brief  Create SNS topic ARN
          *
          * @param region AWS region

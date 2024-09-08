@@ -202,7 +202,7 @@ namespace AwsMock::Service {
         EXPECT_NO_FATAL_FAILURE({ _service.DeleteMessage(delRequest); });
 
         // assert
-        EXPECT_EQ(0, _database.CountMessages(REGION, queueUrl));
+        EXPECT_EQ(0, _database.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, queueUrl)));
     }
 
     TEST_F(SQSServiceTest, GetMd5AttributesTest) {

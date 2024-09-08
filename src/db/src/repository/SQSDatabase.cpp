@@ -231,7 +231,7 @@ namespace AwsMock::Database {
         return queueList;
     }
 
-    void SQSDatabase::PurgeQueue(const std::string &region, const std::string &queueUrl) {
+    void SQSDatabase::PurgeQueue(const std::string &queueArn) {
 
         if (HasDatabase()) {
 
@@ -242,9 +242,9 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = messageCollection.delete_many(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+                auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
                 session.commit_transaction();
-                log_debug << "Purged queue, count: " << result->deleted_count() << " url: " << queueUrl;
+                log_debug << "Purged queue, count: " << result->deleted_count() << " queueArn: " << queueArn;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -255,7 +255,7 @@ namespace AwsMock::Database {
         } else {
 
             log_debug << "Purged queue, count: " << _messages.size();
-            _memoryDb.PurgeQueue(region, queueUrl);
+            _memoryDb.PurgeQueue(queueArn);
         }
     }
 
@@ -551,10 +551,10 @@ namespace AwsMock::Database {
         return messageList;
     }
 
-    void SQSDatabase::ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int maxMessages, Entity::SQS::MessageList &messageList) {
+    void SQSDatabase::ReceiveMessages(const std::string &queueArn, int visibility, int maxMessages, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) {
 
         // First rest resources
-        ResetMessages(queueUrl, visibility);
+        ResetMessages(queueArn, visibility);
 
         auto reset = std::chrono::system_clock::now() + std::chrono::seconds(visibility);
 
@@ -572,7 +572,7 @@ namespace AwsMock::Database {
                 opts.limit(maxMessages);
 
                 // Get the cursor
-                auto messageCursor = messageCollection.find(make_document(kvp("queueUrl", queueUrl),
+                auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn),
                                                                           kvp("status",
                                                                               Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
                                                             opts);
@@ -582,18 +582,50 @@ namespace AwsMock::Database {
                     Entity::SQS::Message result;
                     result.FromDocument(message);
 
+                    // Check retries
                     result.retries++;
-                    result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-                    messageList.push_back(result);
+                    if (maxRetries > 0 && result.retries >= maxRetries) {
 
-                    // Update values
-                    messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                                 make_document(kvp("$set",
-                                                                   make_document(kvp("status",
-                                                                                     Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                                                                                 kvp("reset", bsoncxx::types::b_date(reset)),
-                                                                                 kvp("receiptHandle", result.receiptHandle),
-                                                                                 kvp("retries", result.retries)))));
+                        // Send to DQL when existing
+                        if (!dlQueueArn.empty()) {
+
+                            std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
+                            std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
+                            messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
+                                                         make_document(kvp("$set", make_document(kvp("retries", 0),
+                                                                                                 kvp("queueArn",
+                                                                                                     dlQueueArn),
+                                                                                                 kvp("queueArn",
+                                                                                                     dlqQueueUrl),
+                                                                                                 kvp("queueName",
+                                                                                                     dlqQueueName),
+                                                                                                 kvp("status",
+                                                                                                     Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                            log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
+
+                        } else {
+
+                            // Delete message
+                            DeleteMessage(result);
+                            log_debug << "Message deleted, id: " << result.oid << " queueArn: " << queueArn;
+                        }
+
+                    } else {
+
+                        // TODO: Check if retries get a different receipt handle
+                        result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+                        messageList.push_back(result);
+
+                        // Update values
+                        messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
+                                                     make_document(kvp("$set",
+                                                                       make_document(kvp("status",
+                                                                                         Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                                                                                     kvp("reset", bsoncxx::types::b_date(reset)),
+                                                                                     kvp("receiptHandle", result.receiptHandle),
+                                                                                     kvp("retries", result.retries)))));
+                        log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
+                    }
                 }
 
                 // Commit
@@ -606,12 +638,12 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.ReceiveMessages(region, queueUrl, visibility, maxMessages, messageList);
+            _memoryDb.ReceiveMessages(queueArn, visibility, maxMessages, dlQueueArn, maxRetries, messageList);
         }
-        log_trace << "Messages received, region: " << region << " queue: " << queueUrl + " count: " << messageList.size();
+        log_trace << "Messages received, queueArn: " << queueArn + " count: " << messageList.size();
     }
 
-    void SQSDatabase::ResetMessages(const std::string &queueUrl, long visibility) {
+    void SQSDatabase::ResetMessages(const std::string &queueArn, long visibility) {
 
         if (HasDatabase()) {
 
@@ -624,7 +656,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.update_many(
                         make_document(
-                                kvp("queueUrl", queueUrl),
+                                kvp("queueArn", queueArn),
                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
                                 kvp("reset", make_document(
                                                      kvp("$lt", bsoncxx::types::b_date(std::chrono::system_clock::now()))))),
@@ -636,7 +668,7 @@ namespace AwsMock::Database {
                                                   kvp("reset", bsoncxx::types::b_null())))));
                 session.commit_transaction();
 
-                log_trace << "Message reset, updated: " << result->upserted_count() << " queue: " << queueUrl;
+                log_trace << "Message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -645,11 +677,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.ResetMessages(queueUrl, visibility);
+            _memoryDb.ResetMessages(queueArn, visibility);
         }
     }
 
-    void SQSDatabase::RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy) {
+    void SQSDatabase::RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) {
 
         if (HasDatabase()) {
 
@@ -662,7 +694,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
                 std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(redrivePolicy.deadLetterTargetArn);
-                auto result = messageCollection.update_many(make_document(kvp("queueUrl", queueUrl),
+                auto result = messageCollection.update_many(make_document(kvp("queueArn", queueArn),
                                                                           kvp("retries", make_document(
                                                                                                  kvp("$gt", redrivePolicy.maxReceiveCount)))),
                                                             make_document(kvp("$set", make_document(kvp("retries", 0),
@@ -675,9 +707,7 @@ namespace AwsMock::Database {
                                                                                                     kvp("status",
                                                                                                         Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                 session.commit_transaction();
-                log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: "
-                          << result->modified_count() << " queue: "
-                          << queueUrl;
+                log_trace << "Message redrive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queueArn: " << queueArn;
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -686,11 +716,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.RedriveMessages(queueUrl, redrivePolicy, Core::Configuration::instance());
+            _memoryDb.RedriveMessages(queueArn, redrivePolicy, Core::Configuration::instance());
         }
     }
 
-    void SQSDatabase::ResetDelayedMessages(const std::string &queueUrl, long delay) {
+    void SQSDatabase::ResetDelayedMessages(const std::string &queueArn, long delay) {
 
         if (HasDatabase()) {
 
@@ -704,7 +734,7 @@ namespace AwsMock::Database {
                 auto now = std::chrono::system_clock::now();
                 auto result = messageCollection.update_many(
                         make_document(
-                                kvp("queueUrl", queueUrl),
+                                kvp("queueArn", queueArn),
                                 kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
                                 kvp("reset", make_document(
                                                      kvp("$lt", bsoncxx::types::b_date(now))))),
@@ -714,8 +744,7 @@ namespace AwsMock::Database {
                                             kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                 session.commit_transaction();
 
-                log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queue: "
-                          << queueUrl;
+                log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
 
             } catch (mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -725,7 +754,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.ResetDelayedMessages(queueUrl, delay);
+            _memoryDb.ResetDelayedMessages(queueArn, delay);
         }
     }
 
@@ -762,7 +791,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSDatabase::CountMessages(const std::string &region, const std::string &queueUrl) {
+    long SQSDatabase::CountMessages(const std::string &queueArn) {
 
         if (HasDatabase()) {
 
@@ -770,13 +799,9 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-            if (!region.empty() && !queueUrl.empty()) {
-                count = static_cast<long>(messageCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl))));
-                log_trace << "Count resources, region: " << region << " url: " << queueUrl << " result: "
-                          << count;
-            } else if (!region.empty()) {
-                count = static_cast<long>(messageCollection.count_documents(make_document(kvp("region", region))));
-                log_trace << "Count resources, region: " << region << " result: " << count;
+            if (!queueArn.empty()) {
+                count = static_cast<long>(messageCollection.count_documents(make_document(kvp("queueArn", queueArn))));
+                log_trace << "Count resources, queueArn: " << queueArn << " result: " << count;
             } else {
                 count = static_cast<long>(messageCollection.count_documents({}));
                 log_trace << "Count resources, result: " << count;
@@ -785,11 +810,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            return _memoryDb.CountMessages(region, queueUrl);
+            return _memoryDb.CountMessages(queueArn);
         }
     }
 
-    long SQSDatabase::CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status) {
+    long SQSDatabase::CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status) {
 
         if (HasDatabase()) {
 
@@ -798,8 +823,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-                long count = messageCollection.count_documents(make_document(kvp("region", region),
-                                                                             kvp("queueUrl", queueUrl),
+                long count = messageCollection.count_documents(make_document(kvp("queueArn", queueArn),
                                                                              kvp("status",
                                                                                  Entity::SQS::MessageStatusToString(status))));
                 log_trace << "Count resources by status, status: " << Entity::SQS::MessageStatusToString(status) << " result: " << count;
@@ -811,7 +835,7 @@ namespace AwsMock::Database {
             }
         } else {
 
-            return _memoryDb.CountMessagesByStatus(region, queueUrl, status);
+            return _memoryDb.CountMessagesByStatus(queueArn, status);
         }
     }
 
@@ -826,7 +850,7 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 //p.match(make_document(kvp("queueName", queueName)));
-                p.group(make_document(kvp("_id", "$queueName"),
+                p.group(make_document(kvp("_id", "$queueArn"),
                                       kvp("averageTime",
                                           make_document(kvp("$avg",
                                                             make_document(kvp("$subtract",
@@ -848,7 +872,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    void SQSDatabase::DeleteMessages(const std::string &queueUrl) {
+    void SQSDatabase::DeleteMessages(const std::string &queueArn) {
 
         if (HasDatabase()) {
 
@@ -859,9 +883,9 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = messageCollection.delete_many(make_document(kvp("queueUrl", queueUrl)));
+                auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
                 session.commit_transaction();
-                log_debug << "Messages deleted, queue: " << queueUrl << " count: " << result->deleted_count();
+                log_debug << "Messages deleted, queueArn: " << queueArn << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -871,7 +895,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteMessages(queueUrl);
+            _memoryDb.DeleteMessages(queueArn);
         }
     }
 

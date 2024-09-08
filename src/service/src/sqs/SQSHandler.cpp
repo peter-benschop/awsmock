@@ -256,9 +256,6 @@ namespace AwsMock::Service {
                     }
                     Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
 
-                    // Add message attribute headers
-                    //AddReceiveHeaders(request, sqsResponse);
-
                     // Send response
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                     log_info << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;

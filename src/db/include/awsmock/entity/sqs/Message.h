@@ -53,19 +53,9 @@ namespace AwsMock::Database::Entity::SQS {
         std::string oid;
 
         /**
-         * Aws region name
+         * Queue ARN
          */
-        std::string region;
-
-        /**
-         * Queue URL
-         */
-        std::string queueUrl;
-
-        /**
-         * Queue name
-         */
-        std::string queueName;
+        std::string queueArn;
 
         /**
          * Message body

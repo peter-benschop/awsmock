@@ -34,6 +34,14 @@ namespace AwsMock::Core {
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }
 
+    std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl) {
+
+        std::string queueName = queueUrl.substr(queueUrl.rfind('/') + 1);
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+        log_trace << "Region: " << region << " accountId: " << accountId;
+        return CreateArn("sqs", region, accountId, queueName);
+    }
+
     std::string AwsUtils::ConvertSQSQueueArnToName(const std::string &queueArn) {
 
         std::vector<std::string> parts = StringUtils::Split(queueArn, ':');

@@ -151,10 +151,9 @@ namespace AwsMock::Database {
         /**
          * @brief Purge a given queueUrl.
          *
-         * @param region AWS region
-         * @param queueUrl queueUrl name
+         * @param queueArn queue ARN
          */
-        void PurgeQueue(const std::string &region, const std::string &queueUrl);
+        void PurgeQueue(const std::string &queueArn);
 
         /**
          * @brief Updates a given queue.
@@ -266,15 +265,16 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList ListMessages(const std::string &region = {});
 
         /**
-         * @brief Receive resources from an queue.
+         * @brief Receive messages from an queue.
          *
-         * @param region AWS region
-         * @param queueUrl queue URL
+         * @param queueArn queue ARN
          * @param visibility in seconds
-         * @param count message count to receive
+         * @param maxResult maximal message count to receive
+         * @param dlQueueArn dead letter queue ARN
+         * @param maxRetries maximal number of retries
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &region, const std::string &queueUrl, int visibility, int count, Entity::SQS::MessageList &messageList);
+        void ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList);
 
         /**
          * @brief Reset expired resources
@@ -287,43 +287,41 @@ namespace AwsMock::Database {
         /**
          * @brief Redrive expired resources.
          *
-         * @param queueUrl URL of the queue
+         * @param queueArn ARN of the queue
          * @param redrivePolicy redrive policy
          */
-        void RedriveMessages(const std::string &queueUrl, const Entity::SQS::RedrivePolicy &redrivePolicy);
+        void RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy);
 
         /**
          * @brief Any message, which has a message state is DELAYED is reset when the delay period is over.
          *
-         * @param queueUrl queue URL.
+         * @param queueArn queue ARN.
          * @param delay delay in seconds.
          */
-        void ResetDelayedMessages(const std::string &queueUrl, long delay);
+        void ResetDelayedMessages(const std::string &queueArn, long delay);
 
         /**
          * @brief Any message, which has is older than the retention period is deleted.
          *
-         * @param queueUrl queue URL.
+         * @param queueArn queue ARN.
          * @param retentionPeriod retention period in seconds.
          */
-        void MessageRetention(const std::string &queueUrl, long retentionPeriod);
+        void MessageRetention(const std::string &queueArn, long retentionPeriod);
 
         /**
-         *@brief  Count the number of message by state
+         * @brief  Count the number of message by state
          *
-         * @param region AWS region
-         * @param queueUrl URL of the queue
+         * @param queueArn ARN of the queue
          */
-        long CountMessages(const std::string &region = {}, const std::string &queueUrl = {});
+        long CountMessages(const std::string &queueArn = {});
 
         /**
          * @brief Count the number of message by state
          *
-         * @param region AWS region
-         * @param queueUrl URL of the queue
+         * @param queueArn ARN of the queue
          * @param status message state
          */
-        long CountMessagesByStatus(const std::string &region, const std::string &queueUrl, Entity::SQS::MessageStatus status);
+        long CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status);
 
         /**
          * @brief Converts a message object to a JSON string
@@ -343,12 +341,12 @@ namespace AwsMock::Database {
         Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime();
 
         /**
-         * @brief Deletes all resources of a queue
+         * @brief Deletes all messages of a queue
          *
-         * @param queue message queue to delete resources from
+         * @param queueArn message queue ARN to delete messages from
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &queue);
+        void DeleteMessages(const std::string &queueArn);
 
         /**
          * @brief Deletes a message.

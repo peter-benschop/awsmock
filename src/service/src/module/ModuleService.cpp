@@ -190,7 +190,7 @@ namespace AwsMock::Service {
             if (!infrastructure.sqsMessages.empty()) {
                 for (auto &message: infrastructure.sqsMessages) {
                     _sqsDatabase.CreateOrUpdateMessage(message);
-                    log_debug << "SQS queues imported, url: " << message.queueUrl;
+                    log_debug << "SQS queues imported, queueArn: " << message.queueArn;
                 }
                 log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();
             }
