@@ -59,7 +59,7 @@ namespace AwsMock::Database {
 
         auto it =
                 find_if(_topics.begin(), _topics.end(), [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
-                    return topic.second.region == region && topic.second.topicArn == topicName;
+                    return topic.second.region == region && topic.second.topicName == topicName;
                 });
 
         if (it != _topics.end()) {
