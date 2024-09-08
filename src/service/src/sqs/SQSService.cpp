@@ -97,8 +97,9 @@ namespace AwsMock::Service {
 
         try {
 
-            _sqsDatabase.PurgeQueue(request.region, request.queueUrl);
-            log_trace << "SQS queue purged, region: " << request.region << " queueUrl: " << request.queueUrl;
+            std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
+            _sqsDatabase.PurgeQueue(queueArn);
+            log_trace << "SQS queue purged, queueArn: " << queueArn;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -381,9 +382,7 @@ namespace AwsMock::Service {
 
             // Update database
             Database::Entity::SQS::Message message = _sqsDatabase.CreateMessage(
-                    {.region = request.region,
-                     .queueUrl = queue.queueUrl,
-                     .queueName = queue.name,
+                    {.queueArn = queue.queueArn,
                      .body = request.body,
                      .status = Database::Entity::SQS::MessageStatus::INITIAL,
                      .reset = reset,
@@ -408,7 +407,7 @@ namespace AwsMock::Service {
             }
 
             return {
-                    .queueUrl = message.queueUrl,
+                    .queueUrl = queue.queueUrl,
                     .messageId = message.messageId,
                     .receiptHandle = message.receiptHandle,
                     .md5Body = md5Body,
@@ -474,17 +473,26 @@ namespace AwsMock::Service {
         }
 
         try {
-            Database::Entity::SQS::MessageList messageList;
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+
+            // Check redrive policy
+            std::string dlQueueArn{};
+            int maxRetries = -1;
+            int visibilityTimeout = queue.attributes.visibilityTimeout;
+            if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
+                dlQueueArn = queue.attributes.redrivePolicy.deadLetterTargetArn;
+                maxRetries = queue.attributes.redrivePolicy.maxReceiveCount;
+            }
 
             long elapsed = 0;
             auto begin = system_clock::now();
+            Database::Entity::SQS::MessageList messageList;
             while (elapsed < request.waitTimeSeconds) {
 
-                _sqsDatabase.ReceiveMessages(queue.region, queue.queueUrl, queue.attributes.visibilityTimeout, request.maxMessages, messageList);
-                log_trace << "Messages in database, url: " << queue.queueUrl << " count: " << messageList.size();
+                _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
+                log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
 
-                if (!messageList.empty()) {
+                if (messageList.size() == request.maxMessages) {
                     break;
                 }
 
@@ -493,26 +501,12 @@ namespace AwsMock::Service {
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
 
-            // TODO: Check
-            // Reduce attributes, the response contains only the requested attributes. The MD5 of the attributes in the response is only calculated on the requested attributes
-            /*for (auto &message: messageList) {
-                for (auto &attributeName: request.attributeName) {
-                    message.messageAttributes.erase(std::remove_if(message.attributes.begin(),
-                                                            message.attributes.end(),
-                                                            [attributeName](const Database::Entity::SQS::MessageAttribute &attribute) {
-                                                                return attributeName == attribute.attributeName;
-                                                            }),
-                                             message.attributes.end());
-                }
-            }*/
-
             Dto::SQS::ReceiveMessageResponse response;
             if (!messageList.empty()) {
                 response.messageList = messageList;
                 response.requestId = request.requestId;
-                log_info << "Messages received, count: " << messageList.size() << " requestId: " << request.requestId;
             }
-            log_trace << "Messages in response: " << messageList.size();
+            log_info << "Messages received, count: " << messageList.size();
 
             return response;
 
@@ -534,7 +528,7 @@ namespace AwsMock::Service {
             }
 
             // Delete from database
-            _sqsDatabase.DeleteMessage({.queueUrl = request.queueUrl, .receiptHandle = request.receiptHandle});
+            _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
 
         } catch (Poco::Exception &ex) {
@@ -582,7 +576,7 @@ namespace AwsMock::Service {
         std::string user = Core::Configuration::instance().getString("awsmock.user", DEFAULT_USER);
 
         // Create the event record
-        Dto::SQS::Record record = {.region = message.region, .messageId = message.messageId, .receiptHandle = message.receiptHandle, .body = message.body, .attributes = message.attributes, .md5Sum = message.md5Body, .eventSource = "aws:sqs", .eventSourceArn = eventSourceArn};
+        Dto::SQS::Record record = {.region = lambda.region, .messageId = message.messageId, .receiptHandle = message.receiptHandle, .body = message.body, .attributes = message.attributes, .md5Sum = message.md5Body, .eventSource = "aws:sqs", .eventSourceArn = eventSourceArn};
 
         Dto::SQS::EventNotification eventNotification;
         eventNotification.records.emplace_back(record);

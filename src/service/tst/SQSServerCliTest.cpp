@@ -137,7 +137,7 @@ namespace AwsMock::Service {
 
         // act
         Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs purge-queue --queue-url " + _queueUrl + " --endpoint " + _endpoint);
-        long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
+        long messageCount = _sqsDatabase.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, _queueUrl));
 
         // assert
         EXPECT_EQ(0, messageCount);
@@ -169,7 +169,7 @@ namespace AwsMock::Service {
 
         // act
         Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs send-message --queue-url " + queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
-        long messageCount = _sqsDatabase.CountMessages(REGION, queueUrl);
+        long messageCount = _sqsDatabase.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, queueUrl));
 
         // assert
         EXPECT_EQ(0, result.status);
@@ -212,7 +212,7 @@ namespace AwsMock::Service {
         // act
         Core::ExecResult result = Core::TestUtils::SendCliCommand("aws sqs delete-message --queue-url " + queueUrl + " --receipt-handle " + receiptHandle + " --endpoint " + _endpoint);
         EXPECT_EQ(0, receiveResult.status);
-        long messageCount = _sqsDatabase.CountMessages(REGION, _queueUrl);
+        long messageCount = _sqsDatabase.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, queueUrl));
 
         // assert
         EXPECT_EQ(0, messageCount);

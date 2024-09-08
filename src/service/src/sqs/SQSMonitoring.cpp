@@ -34,7 +34,7 @@ namespace AwsMock::Service {
         // Count resources per queue
         for (const auto &queue: _sqsDatabase.ListQueues()) {
             std::string labelValue = Poco::replace(queue.name, "-", "_");
-            long messagesPerQueue = _sqsDatabase.CountMessages(queue.region, queue.queueUrl);
+            long messagesPerQueue = _sqsDatabase.CountMessages(queue.queueArn);
             _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "queue", labelValue, static_cast<double>(messagesPerQueue));
         }
         log_trace << "SQS counter update finished";

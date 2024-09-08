@@ -23,7 +23,7 @@ namespace AwsMock::Dto::SQS {
         try {
 
             Poco::JSON::Object rootJson;
-            rootJson.set("awsRegion", region);
+            rootJson.set("region", region);
             rootJson.set("messageId", messageId);
             rootJson.set("receiptHandle", receiptHandle);
             rootJson.set("body", body);
