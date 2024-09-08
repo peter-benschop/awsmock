@@ -252,6 +252,13 @@ namespace AwsMock::Core {
             log_info << header.name_string() << ": " << header.value();
         }
     }
+
+    void HttpUtils::DumpHeaders(const http::response<http::dynamic_body> &response) {
+        for (const auto &header: response.base()) {
+            log_info << header.name_string() << ": " << header.value();
+        }
+    }
+
     std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {
 
         return Core::StringUtils::ContainsIgnoreCase(request.getContentType(), "json") ? "json" : "xml";

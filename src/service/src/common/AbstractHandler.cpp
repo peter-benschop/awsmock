@@ -36,6 +36,7 @@ namespace AwsMock::Service {
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
 
         // Body
         boost::beast::ostream(response.body()) << body;
@@ -61,6 +62,7 @@ namespace AwsMock::Service {
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(contentLength));
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
 
         // Body
         std::ifstream ifs(fileName);
@@ -87,6 +89,7 @@ namespace AwsMock::Service {
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
 
         // Copy headers
         if (!headers.empty()) {
@@ -112,6 +115,7 @@ namespace AwsMock::Service {
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
 
         // Body
         boost::beast::ostream(response.body()) << body;
@@ -147,6 +151,7 @@ namespace AwsMock::Service {
             response.result(status);
             response.set(http::field::server, "awsmock");
             response.set(http::field::content_type, "application/octet-stream");
+            response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
 
             // Body
             char *buffer = new char[size];
@@ -177,57 +182,5 @@ namespace AwsMock::Service {
             return SendInternalServerError(request, exc.message());
         }
     }
-    /*
-    void AbstractHandler::DumpRequest(Poco::Net::HTTPServerRequest &request) {
-        log_trace << "Dump request";
-        log_trace << "==================== Request =====================";
-        request.write(std::cerr);
-        log_trace << "==================================================";
-    }
-
-    void AbstractHandler::DumpRequestHeaders(Poco::Net::HTTPServerRequest &request) {
-        log_trace << "Dump request headers";
-        log_trace << "================ Request Headers =================";
-        for (const auto &h: request) {
-            log_trace << h.first << ": " << h.second;
-        }
-        log_trace << "==================================================";
-    }
-
-    void AbstractHandler::DumpResponseHeaders(Poco::Net::HTTPServerResponse &response) {
-        log_trace << "Dump response headers";
-        log_trace << "============== Response Headers ==================";
-        for (const auto &h: response) {
-            log_trace << h.first << ": " << h.second;
-        }
-        log_trace << "==================================================";
-    }
-
-    void AbstractHandler::DumpResponse(Poco::Net::HTTPServerResponse &response) {
-        log_trace << "Dump response";
-        log_trace << "==================== Response ====================";
-        response.write(std::cerr);
-        log_trace << "==================================================";
-    }
-
-    [[maybe_unused]] void AbstractHandler::DumpBody(Poco::Net::HTTPServerRequest &request) {
-        log_trace << "Dump request body";
-        log_trace << "================== Request Body ==================";
-        log_trace << request.stream().rdbuf();
-        log_trace << "==================================================";
-    }
-
-    [[maybe_unused]] void AbstractHandler::DumpPayload(const std::string &payload) {
-        log_trace << "Dump request body";
-        log_trace << "================== Request Body ==================";
-        log_trace << payload;
-        log_trace << "==================================================";
-    }
-
-    void AbstractHandler::DumpBodyToFile(Poco::Net::HTTPServerRequest &request, const std::string &filename) {
-        log_trace << "Dump request body to file: " + filename;
-        std::ofstream ofs(filename);
-        ofs << request.stream().rdbuf();
-        ofs.close();
-    }*/
+    
 }// namespace AwsMock::Service

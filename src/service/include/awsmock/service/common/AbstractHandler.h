@@ -15,11 +15,12 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ForbiddenException.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/dto/s3/RestErrorResponse.h>
