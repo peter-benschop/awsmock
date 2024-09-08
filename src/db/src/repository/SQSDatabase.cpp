@@ -612,7 +612,6 @@ namespace AwsMock::Database {
 
                     } else {
 
-                        // TODO: Check if retries get a different receipt handle
                         result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
                         messageList.push_back(result);
 
