@@ -17,7 +17,6 @@ namespace AwsMock::Manager {
         std::string payload = Core::HttpUtils::GetBodyAsString(request);
         log_debug << "Found action and target, target: " << target << " action: " << action;
 
-
         try {
             if (action == "get-config") {
 
