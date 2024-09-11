@@ -182,5 +182,5 @@ namespace AwsMock::Service {
             return SendInternalServerError(request, exc.message());
         }
     }
-    
+
 }// namespace AwsMock::Service
