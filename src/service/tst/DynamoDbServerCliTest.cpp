@@ -40,9 +40,6 @@ namespace AwsMock::Service {
             _configuration.setString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
-            // Get account ID
-            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
-
             // Start HTTP manager
             _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
             _gatewayServer->Initialize();
@@ -51,13 +48,21 @@ namespace AwsMock::Service {
 
         void TearDown() override {
             _database.DeleteAllTables();
-            Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint-url http://localhost:8000");
-            EXPECT_EQ(0, deleteResult1.status);
+            Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint http://localhost:8000");
             _gatewayServer->Shutdown();
         }
 
+        static std::string WriteItemFile() {
+            return Core::FileUtils::CreateTempFile("json", R"({"orgaNr":{"N":"1"}})");
+        }
+
+
+        static std::string WriteKeyFile() {
+            return Core::FileUtils::CreateTempFile("json", R"({"orgaNr":{"N":"1"}})");
+        }
+
         boost::asio::io_context ioc{10};
-        std::string _endpoint, _accountId;
+        std::string _endpoint;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
@@ -83,9 +88,6 @@ namespace AwsMock::Service {
         Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
                 "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint " + _endpoint);
         EXPECT_EQ(0, createResult.status);
-        Poco::Thread::sleep(2000);
-        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
-        EXPECT_EQ(1, tableList.size());
 
         // act
         Core::ExecResult listResult = Core::TestUtils::SendCliCommand("aws dynamodb list-tables --max-items 10 --endpoint " + _endpoint);
@@ -94,6 +96,105 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, listResult.status);
         EXPECT_FALSE(listResult.output.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(listResult.output, "test-table1"));
+    }
+
+    TEST_F(DynamoDbServerCliTest, TableDescribeTest) {
+
+        // arrange
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
+                "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+
+        // act
+        Core::ExecResult describeResult = Core::TestUtils::SendCliCommand("aws dynamodb describe-table --table-name test-table1 --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, describeResult.status);
+        EXPECT_FALSE(describeResult.output.empty());
+        EXPECT_TRUE(Core::StringUtils::Contains(describeResult.output, "test-table1"));
+    }
+
+    TEST_F(DynamoDbServerCliTest, TableDeleteTest) {
+
+        // arrange
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
+                "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+
+        // act
+        Core::ExecResult deleteResult = Core::TestUtils::SendCliCommand("aws dynamodb delete-table --table-name test-table1 --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, deleteResult.status);
+        EXPECT_FALSE(deleteResult.output.empty());
+    }
+
+    TEST_F(DynamoDbServerCliTest, ItemPutTest) {
+
+        // arrange
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
+                "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+        std::string itemFile = WriteItemFile();
+
+        // act
+        std::ofstream tmp("/tmp/debug.txt");
+        tmp << "aws dynamodb put-item --table-name test-table1 --item file://" + itemFile + " --endpoint " + _endpoint << std::endl;
+        tmp.close();
+        Core::ExecResult itemPutResult = Core::TestUtils::SendCliCommand("aws dynamodb put-item --table-name test-table1 --item file://" + itemFile + " --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, itemPutResult.status);
+        EXPECT_TRUE(itemPutResult.output.empty());
+    }
+
+    TEST_F(DynamoDbServerCliTest, ItemGetTest) {
+
+        // arrange
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
+                "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+        std::string itemFile = WriteItemFile();
+        Core::ExecResult itemPutResult = Core::TestUtils::SendCliCommand("aws dynamodb put-item --table-name test-table1 --item file://" + itemFile + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, itemPutResult.status);
+
+        // act
+        std::string keyFile = WriteKeyFile();
+        Core::ExecResult itemGetResult = Core::TestUtils::SendCliCommand("aws dynamodb get-item --table-name test-table1 --key file://" + keyFile + " --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, itemGetResult.status);
+        EXPECT_FALSE(itemGetResult.output.empty());
+    }
+
+    TEST_F(DynamoDbServerCliTest, ItemScanTest) {
+
+        // arrange
+        Core::ExecResult createResult = Core::TestUtils::SendCliCommand(
+                "aws dynamodb create-table --table-name test-table1 --attribute-definitions AttributeName=orgaNr,AttributeType=N --key-schema AttributeName=orgaNr,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --endpoint " + _endpoint);
+        EXPECT_EQ(0, createResult.status);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+        std::string itemFile = WriteItemFile();
+        Core::ExecResult itemPutResult = Core::TestUtils::SendCliCommand("aws dynamodb put-item --table-name test-table1 --item file://" + itemFile + " --endpoint " + _endpoint);
+        EXPECT_EQ(0, itemPutResult.status);
+
+        // act
+        std::string keyFile = WriteKeyFile();
+        Core::ExecResult scanResult = Core::TestUtils::SendCliCommand("aws dynamodb scan --table-name test-table1 --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, scanResult.status);
+        EXPECT_FALSE(scanResult.output.empty());
+        EXPECT_TRUE(Core::StringUtils::Contains(scanResult.output, "orgaNr"));
     }
 
 }// namespace AwsMock::Service

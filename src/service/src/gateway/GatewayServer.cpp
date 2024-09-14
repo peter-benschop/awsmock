@@ -16,13 +16,6 @@ namespace AwsMock::Service {
         _maxQueueLength = configuration.getInt("awsmock.service.gateway.http.max.queue", GATEWAY_MAX_QUEUE);
         _maxThreads = configuration.getInt("awsmock.service.gateway.http.max.threads", GATEWAY_MAX_THREADS);
         _requestTimeout = configuration.getInt("awsmock.service.gateway.http.timeout", GATEWAY_TIMEOUT);
-
-        // Sleeping period
-        _period = configuration.getInt("awsmock.worker.gateway.period", 10000);
-        log_debug << "Gateway worker period: " << _period;
-
-        // Create environment
-        _region = configuration.getString("awsmock.region");
         log_debug << "GatewayServer initialized";
     }
 
