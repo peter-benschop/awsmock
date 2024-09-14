@@ -23,46 +23,46 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param timeout monitoring period in seconds.
          */
-        explicit TransferMonitoring(int timeout) : Core::Timer("cognito-monitoring", timeout) {}
+        explicit TransferMonitoring(int timeout) : Core::Timer("transfer-monitoring", timeout) {}
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * Update counters
+         * @brief Update counters
          */
         void UpdateCounter();
 
         /**
-         * Metric service
+         * @brief Metric service
          */
         Core::MetricService &_metricService = Core::MetricService::instance();
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
 
         /**
-         * Period
+         * @brief Period
          */
         int _period{};
     };

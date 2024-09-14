@@ -50,7 +50,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::Run() {
-        CheckTransferServers();
+        // Intentionally left empty
     }
 
     void TransferServer::Shutdown() {
