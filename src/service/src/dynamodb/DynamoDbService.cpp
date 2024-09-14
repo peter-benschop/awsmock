@@ -25,18 +25,17 @@ namespace AwsMock::Service {
         Dto::DynamoDb::CreateTableResponse createTableResponse;
         try {
 
+            // Send request to DynamoDB docker container
+            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
+            createTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
+
+            // Update database
             Database::Entity::DynamoDb::Table table = {
                     .region = request.region,
                     .name = request.tableName,
                     .attributes = request.attributes,
                     .tags = request.tags,
                     .keySchemas = request.keySchemas};
-
-            // Send request to DynamoDB docker container
-            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
-            createTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
-
-            // Update database
             table = _dynamoDbDatabase.CreateTable(table);
             log_info << "DynamoDb table created, name: " << table.name;
 
@@ -80,7 +79,7 @@ namespace AwsMock::Service {
         try {
             // Send request to docker container
             std::map<std::string, std::string> headers = request.headers;
-            Dto::DynamoDb::DynamoDbResponse response = SendAuthorizedDynamoDbRequest(request.body, headers);
+            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, headers);
             describeTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
             log_info << "DynamoDb describe table, name: " << request.tableName;
 

@@ -121,24 +121,6 @@ namespace AwsMock::Service {
         EXPECT_TRUE(describeResult.statusCode == http::status::ok);
     }
 
-    /* TEST_F(DynamoDbServerJavaTest, PutItemTest) {
-
-        // arrange
-        Core::ExecResult createTableResult = Core::SystemUtils::Exec(_snsBaseUrl + "create-table test-table");
-        EXPECT_EQ(0, createTableResult.status);
-        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
-        EXPECT_EQ(1, tableList.size());
-
-        // act
-        Core::ExecResult putItemResult = Core::SystemUtils::Exec(_snsBaseUrl + "put-item test-table orgaNr 123");
-        EXPECT_EQ(0, putItemResult.status);
-        Database::Entity::DynamoDb::ItemList itemList = _database.ListItems();
-
-        // assert
-        EXPECT_EQ(0, putItemResult.status);
-        //EXPECT_EQ(1, itemList.size());
-    }*/
-
     TEST_F(DynamoDbServerJavaTest, TableDeleteTest) {
 
         // arrange
@@ -154,6 +136,61 @@ namespace AwsMock::Service {
         // assert
         EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
         EXPECT_EQ(0, tableList.size());
+    }
+
+    TEST_F(DynamoDbServerJavaTest, ItemPutTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+
+        // act
+        Core::HttpSocketResponse putItemResult = SendPostCommand(_baseUrl + "putItem?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        long itemCount = _database.CountItems();
+
+        // assert
+        EXPECT_TRUE(putItemResult.statusCode == http::status::ok);
+        EXPECT_EQ(1, itemCount);
+    }
+
+    TEST_F(DynamoDbServerJavaTest, ItemGetTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+        Core::HttpSocketResponse putItemResult = SendPostCommand(_baseUrl + "putItem?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        long itemCount = _database.CountItems();
+        EXPECT_EQ(1, itemCount);
+
+        // act
+        Core::HttpSocketResponse getItemResult = SendGetCommand(_baseUrl + "getItem?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), "{\"orgaNr\":{\"N\":\"1\"}}");
+
+        // assert
+        EXPECT_TRUE(putItemResult.statusCode == http::status::ok);
+        EXPECT_EQ(1, itemCount);
+    }
+
+    TEST_F(DynamoDbServerJavaTest, ItemScanTest) {
+
+        // arrange
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createTable?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+        Database::Entity::DynamoDb::TableList tableList = _database.ListTables();
+        EXPECT_EQ(1, tableList.size());
+        Core::HttpSocketResponse putItemResult = SendPostCommand(_baseUrl + "putItem?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+        long itemCount = _database.CountItems();
+        EXPECT_EQ(1, itemCount);
+
+        // act
+        Core::HttpSocketResponse scanResult = SendGetCommand(_baseUrl + "scan?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), {});
+
+        // assert
+        EXPECT_TRUE(scanResult.statusCode == http::status::ok);
+        EXPECT_EQ(1, itemCount);
     }
 
 }// namespace AwsMock::Service

@@ -11,16 +11,12 @@
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/sns/SNSServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
-
-// Test includes
-#include <awsmock/core/TestUtils.h>
 
 #define TEST_TOPIC std::string("test-topic")
 
@@ -33,8 +29,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SQS_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(SNS_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", SNS_DEFAULT_HOST);
 
             // Set test config
             _configuration.setString("awsmock.service.gateway.http.port", _port);

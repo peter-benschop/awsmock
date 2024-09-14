@@ -81,16 +81,6 @@ namespace AwsMock::Service {
         std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
         /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * Sleeping period in ms
-         */
-        int _period;
-
-        /**
          * Rest port
          */
         unsigned short _port;
@@ -125,6 +115,9 @@ namespace AwsMock::Service {
          */
         std::vector<std::thread> _threads;
 
+        /**
+         * Boost asio IO context
+         */
         boost::asio::io_context &_ioc;
     };
 
