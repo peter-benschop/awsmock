@@ -131,7 +131,7 @@ namespace AwsMock::Database {
 
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
 
-            if (mResult->empty()) {
+            if (!mResult) {
                 log_error << "Queue not found, queueArn: " << queueArn;
                 throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
             }
@@ -595,7 +595,7 @@ namespace AwsMock::Database {
                                                          make_document(kvp("$set", make_document(kvp("retries", 0),
                                                                                                  kvp("queueArn",
                                                                                                      dlQueueArn),
-                                                                                                 kvp("queueArn",
+                                                                                                 kvp("queueUrl",
                                                                                                      dlqQueueUrl),
                                                                                                  kvp("queueName",
                                                                                                      dlqQueueName),
