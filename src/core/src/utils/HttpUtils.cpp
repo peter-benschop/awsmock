@@ -253,7 +253,19 @@ namespace AwsMock::Core {
         }
     }
 
+    void HttpUtils::DumpHeaders(const http::request<http::string_body> &request) {
+        for (const auto &header: request.base()) {
+            log_info << header.name_string() << ": " << header.value();
+        }
+    }
+
     void HttpUtils::DumpHeaders(const http::response<http::dynamic_body> &response) {
+        for (const auto &header: response.base()) {
+            log_info << header.name_string() << ": " << header.value();
+        }
+    }
+
+    void HttpUtils::DumpHeaders(const http::response<http::string_body> &response) {
         for (const auto &header: response.base()) {
             log_info << header.name_string() << ": " << header.value();
         }

@@ -176,7 +176,11 @@ namespace AwsMock::Core {
     }
 
     HttpSocketResponse HttpSocket::PrepareResult(http::response<http::string_body> response) {
-        return {.statusCode = response.result(), .body = response.body()};
+        HttpSocketResponse res = {.statusCode = response.result(), .body = response.body()};
+        for (const auto &header: response.base()) {
+            res.headers[header.name_string()] = header.value();
+        }
+        return res;
     }
 
     HttpSocketResponse HttpSocket::PrepareResult(http::response<http::dynamic_body> response) {

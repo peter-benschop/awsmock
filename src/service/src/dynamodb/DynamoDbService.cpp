@@ -309,7 +309,7 @@ namespace AwsMock::Service {
             log_error << "HTTP error, status: " << response.statusCode << " body: " << response.body;
             throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(response.statusCode) + " reason: " + response.body);
         }
-        return {.body = response.body, .headers = headers, .status = response.statusCode};
+        return {.body = response.body, .headers = response.headers, .status = response.statusCode};
     }
 
     Dto::DynamoDb::DynamoDbResponse DynamoDbService::SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers) {

@@ -21,9 +21,14 @@ namespace AwsMock::Core {
         boost::beast::http::status statusCode;
 
         /**
-          * Body
-          */
+         * Body
+         */
         std::string body;
+
+        /**
+         * Headers
+         */
+        std::map<std::string, std::string> headers;
     };
 
 }// namespace AwsMock::Core

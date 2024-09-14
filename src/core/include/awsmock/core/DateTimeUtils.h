@@ -48,7 +48,8 @@ namespace AwsMock::Core {
         /**
          * @brief Returns the time_point in ISO8001 format
          *
-         * ISO8601 is '2024-04-28T15:07:37.035332Z'.
+         * @pre
+         * Format is according to ISO8601, for instance: '2024-04-28T15:07:37.035332Z'.
          *
          * @param timePoint point in time
          * @return time_point in ISO 8601 format
@@ -58,25 +59,28 @@ namespace AwsMock::Core {
         /**
          * @brief Returns the current date time in ISO8001 format
          *
-         * ISO8601 is '2024-04-28T15:07:37.035332Z'.
+         * @pre
+         * Format is according to ISO8601, for instance: '2024-04-28T15:07:37.035332Z'.
          *
          * @return time_point in ISO 8601 format
          */
         static std::string ISO8601Now();
 
         /**
-         * @brief Returns the current time in HTTP format
+         * @brief Returns the current time in HTTP format.
          *
-         * HTTP format is 'Tue, 15 Nov 2010 08:12:31 GMT'.
+         * @pre
+         * Format is according to RFC822, for instance: 'Tue, 15 Nov 2010 08:12:31 +0200'.
          *
-         * @return time_point in HTTP format
+         * @return current time in HTTP format
          */
         static std::string HttpFormat();
 
         /**
          * @brief Returns the time_point in HTTP format
          *
-         * HTTP format is 'Tue, 15 Nov 2010 08:12:31 GMT'.
+         * @pre
+         * Format is according to RFC822, for instance: 'Tue, 15 Nov 2010 08:12:31 +0200'.
          *
          * @param timePoint point in time
          * @return time_point in HTTP format
