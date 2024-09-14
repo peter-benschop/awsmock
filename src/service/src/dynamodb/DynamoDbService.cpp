@@ -246,11 +246,11 @@ namespace AwsMock::Service {
             // Send request to docker container
             Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
             scanResponse = {.body = response.body, .headers = response.headers, .status = response.status};
-            log_info << "DynamoDb query item, name: " << request.tableName;
+            log_info << "DynamoDb scan item, name: " << request.tableName;
 
         } catch (Poco::Exception &exc) {
-            log_error << "DynamoDb query failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            log_error << "DynamoDb scan failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
         }
 
         return scanResponse;
@@ -285,20 +285,6 @@ namespace AwsMock::Service {
 
         return deleteItemResponse;
     }
-
-    /*void DynamoDbService::DeleteItems(const std::string &region, const std::string &tableName) {
-        log_debug << "Deleting all items, table: " << tableName;
-
-        try {
-            // Delete table in database
-            _dynamoDbDatabase.DeleteAllTables();
-            log_info << "DynamoDb tables deleted";
-
-        } catch (Poco::Exception &exc) {
-            log_error << "DynamoDbd delete table failed, message: " << exc.message();
-            throw Core::ServiceException("DynamoDbd delete table failed, message: " + exc.message());
-        }
-    }*/
 
     Dto::DynamoDb::DynamoDbResponse DynamoDbService::SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) {
         log_debug << "Sending DynamoDB container request, endpoint: " << _dockerHost << ":" << _dockerPort;
