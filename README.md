@@ -123,6 +123,19 @@ changes to application clients.
 
 See [AwsMock SecretsManager supported commands](docs/man/awsmocksecretsmanager.1.md) for a list of supported commands.
 
+## Systems Manager
+
+AWS Systems Manager is the operations hub for your AWS applications and resources and a secure end-to-end management
+solution for hybrid and multicloud environments that enables secure operations at scale. Currently only the parameter
+store is implemented.
+
+Parameter Store provides secure, hierarchical storage for configuration data and secrets management. You can store
+data such as passwords, database strings, Amazon Elastic Compute Cloud (Amazon EC2) instance IDs and Amazon Machine
+Image (AMI) IDs, and license codes as parameter values. You can store values as plain text or encrypted data. You can
+then reference values by using the unique name you specified when you created the parameter.
+
+See [AwsMock SystemsManager supported commands](docs/man/awsmocksecretsmanager.1.md) for a list of supported commands.
+
 ## Getting started
 
 ### Building AwsMock
@@ -134,7 +147,7 @@ Building of the AwsMOck executables is CMake based.
 - GNU Compiler Collection (GCC) 4.9 or later or Clang 3.3 or later
 - Poco installed (see [Simplify C++ development](https://pocoproject.org/))
 - MongoDB C and CXX driver (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
-- Development releaases of libcurl, libz, libssl, libcrypto, libarchive, libtbb
+- Development releases of boost, libz, libssl, libcrypto, libarchive, libtbb
 - 4GB of RAM.
 
 #### Building from Source:
@@ -186,7 +199,7 @@ To start the docker image:
 
 This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance. Port ```4566``` (gateway) and ```4567``` (manager)
 should be reachable. ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and ```-v /var/run/docker.sock:/var/run/docker.sock``` for
-the communication with the host's socker daemon (lambdas, dynamodb).
+the communication with the host's docker daemon (lambdas, dynamodb).
 
 If you have problems with the docker daemon connection and you see errors like:
 
@@ -197,7 +210,7 @@ If you have problems with the docker daemon connection and you see errors like:
 you probably need either runs it under root:
 
 ```
-sudo docker run -p 4566-4567:4566-4567 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
+sudo docker run -p 4566-4567:4566-4567 -p 6000-6010:6000:6010 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
 ```
 
 or you can give the current user access to the docker domain socket:
@@ -216,12 +229,11 @@ To connect a MongoDB instance use the provided docker-compose file:
 
 ```
   cd /usr/local/share/awsmock/docker
-  docker-compose up
+  docker compose up
 ```
 
 This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured
-separately. See for
-instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
+separately. See for instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
 
 ## Examples
 
@@ -238,3 +250,12 @@ Simply change to the directory and execute one of the example scripts:
 cd /usr/local/share/awsmock/s3
 ./create-bucket.sh
 ```
+
+## Windows support
+
+The distribution contains Windows ports of ```awslocal``` and ```awsmockctl``` in the ```./dist/bin``` directory. This
+Windows executables are written in Go and ported to Windows. These executables allow to control awsmock from a Windows
+machine.
+
+```
+c:\Program Files\awsmock\bin\awsmockctl status

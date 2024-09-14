@@ -1,6 +1,6 @@
 //
 // Created by vogje01 on 21/12/2022.
-// Copyright 2022, 2023 Jens Vogt
+// Copyright 2022 - 2024 Jens Vogt
 //
 // This file is part of aws-mock.
 //
@@ -31,6 +31,46 @@
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
 
+// Allowed actions
+static std::list<std::string> allowedActions() {
+    return {"list", "logLevel", "logs", "start", "stop", "restart", "export", "import", "clean", "clean-objects", "show-ftp-users", "config"};
+}
+
+/**
+ * Show help
+ */
+void ShowHelp(boost::program_options::options_description desc) {
+    int leftIndent = 40;
+    std::cout << std::endl
+              << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+              << std::endl
+              << "Usage: " << std::endl
+              << "  awsmockctl [Options] Commands" << std::endl
+              << std::endl
+              << desc << std::endl
+              << "Commands: " << std::endl
+              << std::left << std::setw(leftIndent) << "  list" << ": lists all available services" << std::endl
+              << std::left << std::setw(leftIndent) << "  start [<module>]" << ": starts the given module. If no argument is given, starts all services." << std::endl
+              << std::left << std::setw(leftIndent) << "  stop [<module>]" << ": stops the given module. If no argument is given, stops all services" << std::endl
+              << std::left << std::setw(leftIndent) << "  restart [<module>]" << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
+#ifdef HAS_SYSTEMD
+    std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
+#endif
+    std::cout << std::left << std::setw(leftIndent) << "  loglevel <level>" << ": sets the manager log to level" << std::endl
+              << std::left << std::setw(leftIndent) << "  config" << ": shows the gateway configuration" << std::endl
+              << std::left << std::setw(leftIndent) << "  export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl
+              << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
+              << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
+              << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
+              << std::left << std::setw(leftIndent) << "  show-ftp-users [serverId]" << ": shows the current ftp users of the given server." << std::endl
+              << "\nExport options:\n"
+              << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
+              << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
+              << "\nValid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb, kms, secretsmanager, sts." << std::endl
+              << "\nValid log levels are: fatal, error, warning, info, debug, verbose." << std::endl
+              << std::endl;
+}
+
 /**
  * Main routine.
  *
@@ -60,41 +100,13 @@ int main(int argc, char *argv[]) {
 
     // Get commands
     std::vector<std::string> commands;
-    for (int i = vm.size() + 1; i < argc; i++) {
+    for (size_t i = vm.size() + 1; i < argc; i++) {
         commands.emplace_back(argv[i]);
     }
 
     // Show usage
     if (vm.count("help")) {
-        int leftIndent = 40;
-        std::cout << std::endl
-                  << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-                  << std::endl
-                  << "Usage: " << std::endl
-                  << "  awsmockctl [Options] Commands" << std::endl
-                  << std::endl
-                  << desc << std::endl
-                  << "Commands: " << std::endl
-                  << std::left << std::setw(leftIndent) << "  list" << ": lists all available services" << std::endl
-                  << std::left << std::setw(leftIndent) << "  start [<module>]" << ": starts the given module. If no argument is given, starts all services." << std::endl
-                  << std::left << std::setw(leftIndent) << "  stop [<module>]" << ": stops the given module. If no argument is given, stops all services" << std::endl
-                  << std::left << std::setw(leftIndent) << "  restart [<module>]" << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
-#ifdef HAS_SYSTEMD
-        std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
-#endif
-        std::cout << std::left << std::setw(leftIndent) << "  loglevel <level>" << ": sets the manager log to level" << std::endl
-                  << std::left << std::setw(leftIndent) << "  config" << ": shows the gateway configuration" << std::endl
-                  << std::left << std::setw(leftIndent) << "  export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl
-                  << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
-                  << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
-                  << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
-                  << std::left << std::setw(leftIndent) << "  show-ftp-users [serverId]" << ": shows the current ftp users of the given server." << std::endl
-                  << "\nModules:\n"
-                  << std::endl
-                  << "Valid modules are: all, s3, sqs, sns, lambda, transfer, cognito, dynamodb, kms secretsmanager." << std::endl
-                  << "\nExport options:\n"
-                  << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
-                  << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl;
+        ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
@@ -128,6 +140,22 @@ int main(int argc, char *argv[]) {
         std::string value = vm["logfile"].as<std::string>();
         AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.file", value);
         AwsMock::Core::LogStream::SetFilename(value);
+    }
+
+    // Check command
+    bool found = false;
+    std::string action = commands.front();
+    for (const std::string &s: allowedActions()) {
+        if (s == action) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        std::cerr << std::endl
+                  << "Unknown command: " << action << std::endl;
+        ShowHelp(desc);
+        return EXIT_FAILURE;
     }
 
     // Start manager
