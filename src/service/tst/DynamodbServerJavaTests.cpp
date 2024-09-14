@@ -167,7 +167,7 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, itemCount);
 
         // act
-        Core::HttpSocketResponse getItemResult = SendGetCommand(_baseUrl + "getItem?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), "{\"orgaNr\":{\"N\":\"1\"}}");
+        Core::HttpSocketResponse getItemResult = SendGetCommand(_baseUrl + "getItem?tableName=" + Core::StringUtils::UrlEncode(TEST_TABLE), R"({"orgaNr":{"N":"1"}})");
 
         // assert
         EXPECT_TRUE(putItemResult.statusCode == http::status::ok);
