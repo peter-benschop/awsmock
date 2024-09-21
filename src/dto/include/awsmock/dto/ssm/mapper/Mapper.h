@@ -6,6 +6,8 @@
 #define AWSMOCK_DTO_SSM_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/ssm/DescribeParametersRequest.h>
+#include <awsmock/dto/ssm/DescribeParametersResponse.h>
 #include <awsmock/dto/ssm/GetParameterRequest.h>
 #include <awsmock/dto/ssm/GetParameterResponse.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
@@ -44,16 +46,16 @@ namespace AwsMock::Dto::SSM {
         static Dto::SSM::GetParameterResponse map(const GetParameterRequest &request, const Database::Entity::SSM::Parameter &parameter);
 
         /**
-         * @brief Maps a SSM parameter entity list to a parameter response
+         * @brief Maps a list of SSM parameter entity list to a parameter describe response
          *
          * Some values will be pulled over from the request.
          *
-         * @param objectList S3 object entity list
          * @param request request struct
+         * @param parameterEntities SSM parameter entity list
          * @return ListObjectVersionsResponse
          * @see ListObjectVersionsResponse
          */
-        static Dto::SSM::GetParameterResponse map(const GetParameterRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterList);
+        static Dto::SSM::DescribeParametersResponse map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities);
     };
 
 }// namespace AwsMock::Dto::SSM

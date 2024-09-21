@@ -1,6 +1,6 @@
 # Examples
 
-This directory contains examples for the use of the AwsMock AWS simulation package. Most of the features of AwsMOck are
+This directory contains examples for the use of the AwsMock AWS simulation package. Most of the features of AwsMock are
 covered in the different samples.
 
 All example need a running awsmock manager listening on port 4566. If you prefer
@@ -17,6 +17,7 @@ The following AwsMock modules are covered:
 - [Cognito](./cognito/README.md): Amazon Cognito Identity management
 - [KMS](./kms/README.md): Amazon key management service
 - [Transfer](./transfer/README.md): Amazon Transfer Family
+- [SSM](./ssm/README.md): Amazon systems manager
 
 if your AwsMock manager runs in a docker container, make sure the docker container is reachable from the host, and the
 port can be pinged.

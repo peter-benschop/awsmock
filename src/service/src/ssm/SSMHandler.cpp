@@ -37,6 +37,18 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, ssmResponse.ToJson());
                 }
 
+                case Dto::Common::SSMCommandType::DESCRIBE_PARAMETERS: {
+
+                    Dto::SSM::DescribeParametersRequest ssmRequest;
+                    ssmRequest.FromJson(clientCommand.payload);
+                    ssmRequest.region = clientCommand.region;
+
+                    Dto::SSM::DescribeParametersResponse ssmResponse = _ssmService.DescribeParameters(ssmRequest);
+
+                    log_info << "Describe parameters, region: " << ssmRequest.region;
+                    return SendOkResponse(request, ssmResponse.ToJson());
+                }
+
                 case Dto::Common::SSMCommandType::DELETE_PARAMETER: {
 
                     Dto::SSM::DeleteParameterRequest ssmRequest;

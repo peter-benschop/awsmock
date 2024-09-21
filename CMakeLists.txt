@@ -42,5 +42,5 @@ add_subdirectory(docs)
 
 install(FILES dist/etc/awsmock.properties DESTINATION /etc)
 install(FILES dist/etc/systemd/system/awsmock.service DESTINATION /etc/systemd/system)
-install(FILES dist/bin/awslocal DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE)
+install(FILES dist/bin/awslocal DESTINATION ${CMAKE_INSTALL_PREFIX}/bin PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE)
 install(DIRECTORY dist/samples/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/awsmock)

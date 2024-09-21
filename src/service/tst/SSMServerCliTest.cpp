@@ -82,6 +82,21 @@ namespace AwsMock::Service {
         EXPECT_TRUE(Core::StringUtils::Contains(getResult.output, TEST_PARAMETER_NAME));
     }
 
+    TEST_F(SSMServerCliTest, ParameterDescribeTest) {
+
+        // arrange
+        Core::ExecResult putResult = Core::TestUtils::SendCliCommand("aws ssm put-parameter --name " + TEST_PARAMETER_NAME + " --value " + TEST_PARAMETER_VALUE + " --endpoint " + _endpoint);
+        Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
+        EXPECT_EQ(1, parameterList.size());
+
+        // act
+        Core::ExecResult describeResult = Core::TestUtils::SendCliCommand("aws ssm describe-parameters --endpoint " + _endpoint);
+
+        // assert
+        EXPECT_EQ(0, describeResult.status);
+        EXPECT_TRUE(Core::StringUtils::Contains(describeResult.output, TEST_PARAMETER_NAME));
+    }
+
     TEST_F(SSMServerCliTest, ParameterDeleteTest) {
 
         // arrange

@@ -22,6 +22,8 @@
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/ssm/DeleteParameterRequest.h>
+#include <awsmock/dto/ssm/DescribeParametersRequest.h>
+#include <awsmock/dto/ssm/DescribeParametersResponse.h>
 #include <awsmock/dto/ssm/GetParameterRequest.h>
 #include <awsmock/dto/ssm/GetParameterResponse.h>
 #include <awsmock/dto/ssm/PutParameterRequest.h>
@@ -68,6 +70,16 @@ namespace AwsMock::Service {
          * @see Dto::KMS::GetParameterResponse
          */
         Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request);
+
+        /**
+         * @brief Describe the parameters
+         *
+         * @param request describe parameters request
+         * @return describe parameters response
+         * @see Dto::KMS::DescribeParametersRequest
+         * @see Dto::KMS::DescribeParametersResponse
+         */
+        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request);
 
         /**
          * @brief Deletes a parameter
