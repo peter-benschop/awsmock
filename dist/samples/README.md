@@ -9,14 +9,14 @@ another port edit the sample bash script accordingly. To set a port of 9000 chan
 
 The following AwsMock modules are covered:
 
-- [S3](./s3/README.md): Amazon Simple Storage Service
-- [SQS](./sqs/README.md): Amazon Simple Queue Service
-- [SNS](./sns/README.md): Amazon Simple Notification Service
-- [Lambda](lambda/README.md): Amazon Lambda service
+- [S3](./s3/README.md): Amazon simple storage service
+- [SQS](./sqs/README.md): Amazon simple queue service
+- [SNS](./sns/README.md): Amazon simple notification service
+- [Lambda](lambda/README.md): Amazon lambda service
 - [DynamoDB](./dynamodb/README.md): Amazon Dynamo database service
 - [Cognito](./cognito/README.md): Amazon Cognito Identity management
 - [KMS](./kms/README.md): Amazon key management service
-- [Transfer](./transfer/README.md): Amazon Transfer Family
+- [Transfer](./transfer/README.md): Amazon transfer family
 - [SSM](./ssm/README.md): Amazon systems manager
 
 if your AwsMock manager runs in a docker container, make sure the docker container is reachable from the host, and the
