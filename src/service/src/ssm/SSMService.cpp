@@ -69,6 +69,23 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) {
+        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "describe_parameters");
+        log_trace << "Describe parameters request: " << request.ToString();
+
+        try {
+            // Get from database
+            Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region);
+            log_trace << "SSM parameters found: " << parameterEntities.size();
+
+            return Dto::SSM::Mapper::map(request, parameterEntities);
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "SSM describe parameters failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) {
         Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();

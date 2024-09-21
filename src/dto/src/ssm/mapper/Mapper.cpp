@@ -30,4 +30,14 @@ namespace AwsMock::Dto::SSM {
         return response;
     }
 
+    Dto::SSM::DescribeParametersResponse Mapper::map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
+        Dto::SSM::DescribeParametersResponse response;
+        response.region = request.region;
+        for (const auto &parameterEntity: parameterEntities) {
+            Dto::SSM::Parameter parameter = map(parameterEntity);
+            response.parameters.emplace_back(parameter);
+        }
+        return response;
+    }
+
 }// namespace AwsMock::Dto::SSM

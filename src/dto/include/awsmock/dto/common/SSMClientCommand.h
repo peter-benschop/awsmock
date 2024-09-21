@@ -31,6 +31,7 @@ namespace AwsMock::Dto::Common {
     enum class SSMCommandType {
         PUT_PARAMETER,
         GET_PARAMETER,
+        DESCRIBE_PARAMETERS,
         DELETE_PARAMETER,
         UNKNOWN
     };
@@ -38,6 +39,7 @@ namespace AwsMock::Dto::Common {
     static std::map<SSMCommandType, std::string> SSMCommandTypeNames{
             {SSMCommandType::PUT_PARAMETER, "put-parameter"},
             {SSMCommandType::GET_PARAMETER, "get-parameter"},
+            {SSMCommandType::DESCRIBE_PARAMETERS, "describe-parameters"},
             {SSMCommandType::DELETE_PARAMETER, "delete-parameter"},
             {SSMCommandType::UNKNOWN, "unknown"},
     };

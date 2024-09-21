@@ -58,6 +58,7 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::database database = (*client)[_name];
 
+            log_info << "Start creating indexes";
             // SQS
             database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
                                                  make_document(kvp("name", "sqs_message_idx1")));
@@ -65,6 +66,8 @@ namespace AwsMock::Database {
                                                  make_document(kvp("name", "sqs_message_idx2")));
             database["sqs_message"].create_index(make_document(kvp("receiptHandle", 1)),
                                                  make_document(kvp("name", "sqs_message_idx3")));
+            database["sqs_message"].create_index(make_document(kvp("queueArn", 1), kvp("status", 1)),
+                                                 make_document(kvp("name", "sqs_message_idx4")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
                                                make_document(kvp("name", "sqs_queue_idx1")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),

@@ -29,7 +29,7 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-// AwsMOck includes
+// AwsMock includes
 #include <awsmock/server/Manager.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"

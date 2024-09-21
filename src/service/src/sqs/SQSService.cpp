@@ -115,8 +115,8 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_sqsDatabase.QueueUrlExists(request.region, queueUrl)) {
-            log_error << "Queue does not exist, region: " << request.region << " queueName: " << request.queueName;
-            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueName: " + request.queueName);
+            log_error << "Queue does not exist, region: " << request.region << " queueName: " << request.queueName << " queueUrl: " << queueUrl;
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueName: " + request.queueName + " queueUrl: " + queueUrl);
         }
 
         try {

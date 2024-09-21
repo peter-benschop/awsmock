@@ -625,6 +625,9 @@ namespace AwsMock::Database {
                                                                                      kvp("retries", result.retries)))));
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
                     }
+                    if (messageList.size() >= maxMessages) {
+                        break;
+                    }
                 }
 
                 // Commit
