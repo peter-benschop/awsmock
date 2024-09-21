@@ -22,6 +22,9 @@
 
 namespace AwsMock::Core {
 
+    /**
+     * Substring comparison
+     */
     struct SubstringCompare {
 
         char _delimiter;
