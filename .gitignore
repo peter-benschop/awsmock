@@ -75,3 +75,7 @@ src/manager/awsmockmgr
 
 # Examples
 **/out.json
+
+# Tests
+**/cmake-build-debug-coverage
+**/test*
