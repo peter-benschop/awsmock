@@ -259,3 +259,4 @@ machine.
 
 ```
 c:\Program Files\awsmock\bin\awsmockctl status
+
