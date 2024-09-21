@@ -11,5 +11,4 @@ This directory container the following SQS examples:
 
 - ```create-topic.sh```: creates a new topic ```test-topic```
 - ```delete-topic.sh```: deletes the topic ```test-topic```
-
-
+- 
