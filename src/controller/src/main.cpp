@@ -93,18 +93,18 @@ int main(int argc, char *argv[]) {
     desc.add_options()("loglevel", boost::program_options::value<std::string>(), "set log level");
     desc.add_options()("logfile", boost::program_options::value<std::string>(), "set log file");
 
-    // Get command line options
+    // Get command line options.
     boost::program_options::variables_map vm;
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
     boost::program_options::notify(vm);
 
-    // Get commands
+    // Get commands.
     std::vector<std::string> commands;
     for (size_t i = vm.size() + 1; i < argc; i++) {
         commands.emplace_back(argv[i]);
     }
 
-    // Show usage
+    // Show usage.
     if (vm.count("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
 
-    // Read configuration
+    // Read configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
     if (vm.count("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
-    // Set log level
+    // Set log level.
     if (vm.count("loglevel")) {
         std::string value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
