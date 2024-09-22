@@ -8,4 +8,4 @@
 #define PROJECT_NAME "awsmock"
 #define PROJECT_VERSION ""
 
-#endif //AWSMOCK_CORE_VERSION_H_IN_H
+#endif//AWSMOCK_CORE_VERSION_H_IN_H
