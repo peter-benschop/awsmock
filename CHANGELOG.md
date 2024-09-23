@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.249](https://github.com/jensvogt/awsmock/compare/v0.13.248...v0.13.249) (2024-09-23)
+
+
+### Bug Fixes
+
+* **581-test-issue:** Test semantic versioning ([27b8619](https://github.com/jensvogt/awsmock/commit/27b86190c8fafbd0ef6d689fe270231adfab526f))
+
 ## [0.13.248](https://github.com/jensvogt/awsmock/compare/v0.13.247...v0.13.248) (2024-09-23)
 
 
