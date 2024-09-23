@@ -1,8 +1,8 @@
 name: AWSMockBuild
 on:
-  release:
-    types: [ created ]
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: write
