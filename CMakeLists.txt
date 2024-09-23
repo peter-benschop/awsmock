@@ -11,6 +11,7 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation 
 
 # Current version
 file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VERSION)
+string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
 configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h")
 
 # Build message
