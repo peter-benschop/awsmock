@@ -10,10 +10,8 @@ set(CMAKE_BUILD_PARALLEL_LEVEL 30)
 option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " ON)
 
 # Current version
-file(READ "src/core/include/awsmock/core/Version.h" ver)
-string(REGEX MATCH "#define PROJECT_VERSION \"([0-9\.]+)\"" _ ${ver})
-set(PROJECT_VERSION ${CMAKE_MATCH_1})
-string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
+file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VERSION)
+configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h")
 
 # Build message
 message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
