@@ -311,6 +311,16 @@ namespace AwsMock::Database {
          */
         void DeleteAllGroups(const std::string &region = {});
 
+        /**
+         * @brief Check existence of a client ID
+         *
+         * @param region AWS region name
+         * @param clientId client ID
+         * @return true if cognito client ID exists
+         * @throws DatabaseException
+         */
+        bool ClientIdExists(const std::string &region, const std::string &clientId);
+
       private:
 
         /**

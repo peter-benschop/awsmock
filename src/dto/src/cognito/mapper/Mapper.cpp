@@ -32,11 +32,8 @@ namespace AwsMock::Dto::Cognito {
         userPoolClient.accessTokenValidity = GetValidityInSeconds(request.accessTokenValidity, request.tokenValidityUnits.accessToken);
         userPoolClient.idTokenValidity = GetValidityInSeconds(request.idTokenValidity, request.tokenValidityUnits.idToken);
         userPoolClient.refreshTokenValidity = GetValidityInSeconds(request.refreshTokenValidity, request.tokenValidityUnits.refreshToken);
-
-        if (request.generateSecret) {
-            userPoolClient.clientSecret = Core::StringUtils::GenerateRandomString(52);
-        }
         userPoolClient.generateSecret = request.generateSecret;
+
         return userPoolClient;
     }
 

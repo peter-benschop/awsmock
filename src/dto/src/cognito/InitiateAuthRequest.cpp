@@ -6,6 +6,18 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    std::string InitiateAuthRequest::GetUserId() {
+        return authParameters["USERNAME"];
+    }
+
+    std::string InitiateAuthRequest::GetPassword() {
+        return authParameters["PASSWORD"];
+    }
+
+    std::string InitiateAuthRequest::GetClientSecret() {
+        return authParameters["SECRET_HASH"];
+    }
+
     void InitiateAuthRequest::FromJson(const std::string &payload) {
 
         Poco::JSON::Parser parser;
@@ -25,8 +37,8 @@ namespace AwsMock::Dto::Cognito {
             }
 
             // Auth parameter
-            if (rootObject->has("AuthParameter")) {
-                Poco::JSON::Object::Ptr authParameterObject = rootObject->getObject("AuthParameter");
+            if (rootObject->has("AuthParameters")) {
+                Poco::JSON::Object::Ptr authParameterObject = rootObject->getObject("AuthParameters");
                 for (int i = 0; i < authParameterObject->getNames().size(); i++) {
                     std::string key = authParameterObject->getNames()[i];
                     std::string value = authParameterObject->get(key);

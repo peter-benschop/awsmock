@@ -442,4 +442,17 @@ namespace AwsMock::Database {
         }
     }
 
+    bool CognitoMemoryDb::ClientIdExists(const std::string &region, const std::string &clientId) {
+
+        return find_if(_userPools.begin(),
+                       _userPools.end(),
+                       [region, clientId](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                           return userPool.second.region == region && find_if(userPool.second.userPoolClients.begin(),
+                                                                              userPool.second.userPoolClients.end(),
+                                                                              [clientId](const Entity::Cognito::UserPoolClient &userPoolClient) {
+                                                                                  return userPoolClient.clientId == clientId;
+                                                                              }) != userPool.second.userPoolClients.end();
+                       }) != _userPools.end();
+    }
+
 }// namespace AwsMock::Database

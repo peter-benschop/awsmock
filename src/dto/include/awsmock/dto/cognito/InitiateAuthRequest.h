@@ -90,6 +90,27 @@ namespace AwsMock::Dto::Cognito {
         [[nodiscard]] std::string ToString() const;
 
         /**
+         * @brief Returns the user name
+         *
+         * @return user ID
+         */
+        std::string GetUserId();
+
+        /**
+         * @brief Returns the user password
+         *
+         * @return user password
+         */
+        std::string GetPassword();
+
+        /**
+         * @brief Returns the client secret from the AuthParameters
+         *
+         * @return client secret
+         */
+        std::string GetClientSecret();
+
+        /**
          * @brief Stream provider.
          *
          * @return output stream

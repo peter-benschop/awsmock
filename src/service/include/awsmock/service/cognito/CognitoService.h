@@ -40,6 +40,8 @@
 #include <awsmock/dto/cognito/DescribeUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
+#include <awsmock/dto/cognito/InitiateAuthRequest.h>
+#include <awsmock/dto/cognito/InitiateAuthResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolClientsRequest.h>
@@ -279,6 +281,16 @@ namespace AwsMock::Service {
          */
         void ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request);
 
+        /**
+         * @brief Initiate authentication
+         *
+         * @param request confirm user request
+         * @return InitiateAuthResponse DTO
+         * @see InitiateAuthRequest
+         * @see InitiateAuthResponse
+         */
+        Dto::Cognito::InitiateAuthResponse InitiateAuth(Dto::Cognito::InitiateAuthRequest &request);
+
       private:
 
         /**
@@ -287,7 +299,7 @@ namespace AwsMock::Service {
         Database::CognitoDatabase &_database;
 
         /**
-         * S3 account userPoolId
+         * AWS account userPoolId
          */
         std::string _accountId;
     };

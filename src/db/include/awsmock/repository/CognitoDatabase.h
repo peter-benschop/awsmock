@@ -36,7 +36,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _memoryDb(CognitoMemoryDb::instance()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"){};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _memoryDb(CognitoMemoryDb::instance()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group") {};
 
         /**
          * @brief Singleton instance
@@ -159,7 +159,7 @@ namespace AwsMock::Database {
         void DeleteAllUserPools();
 
         /**
-         * Check existence of cognito user
+         * @brief Check existence of cognito user
          *
          * @param region AWS region name
          * @param userPoolId user pool ID
@@ -341,6 +341,16 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         void DeleteAllGroups(const std::string &region = {});
+
+        /**
+         * @brief Check existence of a client ID
+         *
+         * @param region AWS region name
+         * @param clientId client ID
+         * @return true if cognito client ID exists
+         * @throws DatabaseException
+         */
+        bool ClientIdExists(const std::string &region, const std::string &clientId);
 
       private:
 

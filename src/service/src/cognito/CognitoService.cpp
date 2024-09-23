@@ -220,7 +220,11 @@ namespace AwsMock::Service {
 
             // Create client
             Database::Entity::Cognito::UserPoolClient userPoolClient = Dto::Cognito::Mapper::Mapper::map(request);
-            userPoolClient.clientSecret = Core::StringUtils::GenerateRandomAlphanumericString(40);
+
+            // Create KMS symmetric key if needed
+            if (userPoolClient.generateSecret) {
+                userPoolClient.clientSecret = Core::StringUtils::GenerateRandomAlphanumericString(64);
+            }
 
             // Update database
             userPool.userPoolClients.emplace_back(userPoolClient);
@@ -231,7 +235,6 @@ namespace AwsMock::Service {
 
             log_trace << "Create user pool client result: " + response.ToJson();
             return response;
-
 
         } catch (Poco::Exception &ex) {
             log_error << "Create user pool client request failed, message: " << ex.message();
@@ -704,4 +707,26 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("User does not exist, region: " + request.region + " userPoolId: " + request.userPoolId);
         }
     }
+
+    Dto::Cognito::InitiateAuthResponse CognitoService::InitiateAuth(Dto::Cognito::InitiateAuthRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "initiate_auth");
+        log_debug << "Confirm initiate auth request, region:  " << request.region << " clientId: " << request.clientId;
+
+        if (!_database.ClientIdExists(request.region, request.clientId)) {
+            log_error << "Client id does not exist, region: " << request.region << " clientId: " << request.clientId;
+            throw Core::NotFoundException("Client id does not exist, region: " + request.region + " clientId: " + request.clientId);
+        }
+
+        std::string tmp = request.GetUserId();
+        if (!_database.UserExists(request.region, request.GetUserId())) {
+            log_error << "User does not exist, region: " << request.region << " user: " << request.user;
+            throw Core::NotFoundException("User does not exist, region: " + request.region + " user: " + request.user);
+        }
+
+        Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
+
+        Dto::Cognito::InitiateAuthResponse response;
+        return response;
+    }
+
 }// namespace AwsMock::Service

@@ -69,7 +69,7 @@ namespace AwsMock::Service {
                 log_debug << "Got create user pool client request, json: " << cognitoRequest.ToString();
 
                 Dto::Cognito::CreateUserPoolClientResponse serviceResponse = _cognitoService.CreateUserPoolClient(cognitoRequest);
-                log_info << "User pool client created, userPoolId: " << serviceResponse.userGroupClient.userPoolId << " clientId: " << serviceResponse.userGroupClient.clientId;
+                log_info << "User pool client created, userPoolId: " << cognitoRequest.userPoolId << " clientName: " << cognitoRequest.clientName;
 
                 return SendOkResponse(request, serviceResponse.ToJson());
 
@@ -379,6 +379,21 @@ namespace AwsMock::Service {
 
                 _cognitoService.ConfirmUser(cognitoRequest);
                 log_info << "User confirmed, userPoolId: " << cognitoRequest.userPoolId << " userName: " << cognitoRequest.userName;
+
+                return SendOkResponse(request);
+
+            } else if (action == "InitiateAuth") {
+
+                Dto::Cognito::InitiateAuthRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got initiate auth request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::InitiateAuthResponse cognitoResponse = _cognitoService.InitiateAuth(cognitoRequest);
+                log_info << "User authorization initiated, userName: " << cognitoRequest.user;
 
                 return SendOkResponse(request);
 
