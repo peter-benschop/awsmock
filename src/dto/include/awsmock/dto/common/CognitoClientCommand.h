@@ -49,6 +49,7 @@ namespace AwsMock::Dto::Common {
         LIST_USERS_IN_GROUP,
         REMOVE_USER_FROM_GROUP,
         INITIATE_AUTH,
+        RESPOND_TO_AUTH_CHALLENGE,
         UNKNOWN
     };
 
@@ -68,6 +69,7 @@ namespace AwsMock::Dto::Common {
             {CognitoCommandType::REMOVE_USER_FROM_GROUP, "AdminRemoveUserFromGroup"},
             {CognitoCommandType::CREATE_USER_POOL_CLIENT, "CreateUserPoolClient"},
             {CognitoCommandType::INITIATE_AUTH, "InitiateAuth"},
+            {CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE, "RespondToAuthChallenge"},
     };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(CognitoCommandType commandType) {

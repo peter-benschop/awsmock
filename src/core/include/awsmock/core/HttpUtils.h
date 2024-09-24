@@ -28,6 +28,9 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 
+//#define SEPARATOR std::string("===============================================================================")
+const char SEPARATOR[] = "===============================================================================";
+
 namespace AwsMock::Core {
 
     namespace http = boost::beast::http;

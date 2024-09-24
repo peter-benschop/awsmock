@@ -2,26 +2,25 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/InitiateAuthResponse.h>
+#include <awsmock/dto/cognito/RespondToAuthChallengeResponse.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string InitiateAuthResponse::ToJson() const {
+    std::string RespondToAuthChallengeResponse::ToJson() const {
 
         try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
             rootJson.set("Session", session);
+            rootJson.set("ChallengeName", ChallengeNameToString(challengeName));
             rootJson.set("AuthenticationResult", authenticationResult.ToJsonObject());
-            rootJson.set("ChallengeName", challengeName);
 
-            // Challenge parameters
-            Poco::JSON::Object challengeParameterObject;
+            Poco::JSON::Object::Ptr challengeParametersObject;
             for (const auto &challengeParameter: challengeParameters) {
-                challengeParameterObject.set(challengeParameter.first, challengeParameter.second);
+                challengeParametersObject->set(challengeParameter.first, challengeParameter.second);
             }
-            rootJson.set("ChallengeParameters", challengeParameterObject);
+            rootJson.set("ChallengeParameters", challengeParametersObject);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -31,14 +30,14 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string InitiateAuthResponse::ToString() const {
+    std::string RespondToAuthChallengeResponse::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const InitiateAuthResponse &r) {
-        os << "InitiateAuthResponse=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const RespondToAuthChallengeResponse &r) {
+        os << "RespondToAuthChallengeResponse=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Cognito

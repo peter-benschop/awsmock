@@ -87,7 +87,7 @@ namespace AwsMock::Core {
         payload["first2"] = "second2";
 
         // act
-        std::string result = JwtUtils::CreateToken(privateKey, "auth0", payload);
+        std::string result = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
 
         // assert
         EXPECT_FALSE(result.empty());
@@ -99,11 +99,11 @@ namespace AwsMock::Core {
         std::map<std::string, std::string> payload;
         payload["first1"] = "second1";
         payload["first2"] = "second2";
-        std::string createResult = JwtUtils::CreateToken(privateKey, "auth0", payload);
+        std::string createResult = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
         EXPECT_FALSE(createResult.empty());
 
         // act
-        bool result = JwtUtils::VerifyToken(publicKey, createResult, "auth0");
+        bool result = JwtUtils::VerifyTokenRs256(publicKey, createResult, "auth0");
 
         // assert
         EXPECT_TRUE(result);

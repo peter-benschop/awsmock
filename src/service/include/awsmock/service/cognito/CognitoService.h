@@ -59,6 +59,7 @@
 #include <awsmock/dto/cognito/UpdateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/UpdateUserPoolRequest.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
+#include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 

@@ -395,7 +395,7 @@ namespace AwsMock::Service {
                 Dto::Cognito::InitiateAuthResponse cognitoResponse = _cognitoService.InitiateAuth(cognitoRequest);
                 log_info << "User authorization initiated, userName: " << cognitoRequest.user;
 
-                return SendOkResponse(request);
+                return SendOkResponse(request, cognitoResponse.ToJson());
 
             } else {
 

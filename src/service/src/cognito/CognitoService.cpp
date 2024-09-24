@@ -726,6 +726,15 @@ namespace AwsMock::Service {
         Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
 
         Dto::Cognito::InitiateAuthResponse response;
+        response.region = request.region;
+        response.user = request.user;
+        response.challengeName = Dto::Cognito::ChallengeNameToString(Dto::Cognito::ChallengeName::SMS_MFA);
+        response.challengeParameters["USERNAME"] = request.authParameters["USERNAME"];
+        response.challengeParameters["SECRET_HASH"] = request.authParameters["SECRET_HASH"];
+        response.challengeParameters["USER_ID_FOR_SRP"] = request.authParameters["USERNAME"];
+        response.challengeParameters["SECRET_BLOCK"] = Core::Crypto::Base64Decode(request.authParameters["SRP_A"]);
+
+        response.session = Core::StringUtils::GenerateRandomAlphanumericString(256);
         return response;
     }
 
