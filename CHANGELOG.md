@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.3](https://github.com/jensvogt/awsmock/compare/v0.15.2...v0.15.3) (2024-09-25)
+
+
+### Bug Fixes
+
+* **616-sqs-memory-db-has-no-wait-time-average:** new average waittime calculation ([5035570](https://github.com/jensvogt/awsmock/commit/50355708a8c5116e2979ec3060fc899d2021902f))
+
 ## [0.15.2](https://github.com/jensvogt/awsmock/compare/v0.15.1...v0.15.2) (2024-09-25)
 
 
