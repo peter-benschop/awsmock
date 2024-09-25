@@ -9,10 +9,6 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/RegularExpression.h>
-
 // Boost includes
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
@@ -31,7 +27,6 @@
 namespace AwsMock::Dto::Common {
 
     namespace http = boost::beast::http;
-    namespace ip = boost::asio::ip;
 
     enum class CognitoCommandType {
         CREATE_USER_POOL,
@@ -48,6 +43,9 @@ namespace AwsMock::Dto::Common {
         ADD_USER_TO_GROUP,
         LIST_USERS_IN_GROUP,
         REMOVE_USER_FROM_GROUP,
+        INITIATE_AUTH,
+        RESPOND_TO_AUTH_CHALLENGE,
+        GLOBAL_SIGN_OUT,
         UNKNOWN
     };
 
@@ -64,8 +62,11 @@ namespace AwsMock::Dto::Common {
             {CognitoCommandType::DELETE_GROUP, "DeleteGroup"},
             {CognitoCommandType::ADD_USER_TO_GROUP, "AdminAddUserToGroup"},
             {CognitoCommandType::LIST_USERS_IN_GROUP, "ListUsersInGroup"},
-            {CognitoCommandType::REMOVE_USER_FROM_GROUP, "AdminRemoveUserGromGroup"},
+            {CognitoCommandType::REMOVE_USER_FROM_GROUP, "AdminRemoveUserFromGroup"},
             {CognitoCommandType::CREATE_USER_POOL_CLIENT, "CreateUserPoolClient"},
+            {CognitoCommandType::INITIATE_AUTH, "InitiateAuth"},
+            {CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE, "RespondToAuthChallenge"},
+            {CognitoCommandType::GLOBAL_SIGN_OUT, "GlobalSignOut"},
     };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(CognitoCommandType commandType) {

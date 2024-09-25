@@ -6,6 +6,18 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
+    UserPoolClient UserPool::GetClient(const std::string &clientId) {
+        auto it = find_if(userPoolClients.begin(),
+                          userPoolClients.end(),
+                          [clientId](const Entity::Cognito::UserPoolClient &client) {
+                              return client.clientId == clientId;
+                          });
+        if (it != userPoolClients.end()) {
+            return *it;
+        }
+        return {};
+    }
+
     view_or_value<view, value> UserPool::ToDocument() const {
 
         // Domain

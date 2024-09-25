@@ -89,7 +89,8 @@ namespace AwsMock::Service {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
-            request.method() != http::verb::head && request.method() != http::verb::connect) {
+            request.method() != http::verb::head && request.method() != http::verb::connect &&
+            request.method() != http::verb::options) {
             return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
@@ -104,50 +105,59 @@ namespace AwsMock::Service {
         // Request path must be absolute and not contain "..".
         if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
-            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
+            return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
-        if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
-            log_warning << "AWS signature could not be verified";
-            return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
-        }
+        // Process OPTIONS requests
+        if (request.method() == http::verb::options) {
 
-        // Get the module from the authorization key, or the target header field.
-        Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
+            return HandleOptionsRequest(request);
 
-        std::shared_ptr<AbstractHandler> handler = _routingTable[authKey.module];
-        if (handler) {
+        } else {
 
-            switch (request.method()) {
-                case http::verb::get: {
-                    log_debug << "Handle GET request";
-                    Core::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
-                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                    return handler->HandleGetRequest(request, authKey.region, "none");
-                }
-                case http::verb::put: {
-                    log_debug << "Handle PUT request";
-                    Core::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
-                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                    return handler->HandlePutRequest(request, authKey.region, "none");
-                }
-                case http::verb::post: {
-                    log_debug << "Handle POST request";
-                    Core::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
-                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                    return handler->HandlePostRequest(request, authKey.region, "none");
-                }
-                case http::verb::delete_: {
-                    log_debug << "Handle DELETE request";
-                    Core::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
-                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                    return handler->HandleDeleteRequest(request, authKey.region, "none");
-                }
-                case http::verb::head: {
-                    log_debug << "Handle HEAD request";
-                    Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
-                    Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                    return handler->HandleHeadRequest(request, authKey.region, "none");
+            // Verify AWS signature
+            if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
+                log_warning << "AWS signature could not be verified";
+                return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
+            }
+
+            // Get the module from the authorization key, or the target header field.
+            Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
+
+            std::shared_ptr<AbstractHandler> handler = _routingTable[authKey.module];
+            if (handler) {
+
+                switch (request.method()) {
+                    case http::verb::get: {
+                        log_debug << "Handle GET request";
+                        Core::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
+                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
+                        return handler->HandleGetRequest(request, authKey.region, "none");
+                    }
+                    case http::verb::put: {
+                        log_debug << "Handle PUT request";
+                        Core::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
+                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
+                        return handler->HandlePutRequest(request, authKey.region, "none");
+                    }
+                    case http::verb::post: {
+                        log_debug << "Handle POST request";
+                        Core::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
+                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
+                        return handler->HandlePostRequest(request, authKey.region, "none");
+                    }
+                    case http::verb::delete_: {
+                        log_debug << "Handle DELETE request";
+                        Core::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
+                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
+                        return handler->HandleDeleteRequest(request, authKey.region, "none");
+                    }
+                    case http::verb::head: {
+                        log_debug << "Handle HEAD request";
+                        Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
+                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
+                        return handler->HandleHeadRequest(request, authKey.region, "none");
+                    }
                 }
             }
         }
@@ -236,4 +246,24 @@ namespace AwsMock::Service {
         }
         return {};
     }
+
+    http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
+
+        log_debug << "Handle OPTIONS request";
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::access_control_allow_origin, "http://localhost:4200");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::allow, "*/*");
+
+        // Send the response to the client
+        return response;
+    }
+
 }// namespace AwsMock::Service

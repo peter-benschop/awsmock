@@ -1,0 +1,81 @@
+//
+// Created by vogje01 on 11/25/23.
+//
+
+#ifndef AWSMOCK_DTO_COGNITO_GLOBAL_SIGN_OUT_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_GLOBAL_SIGN_OUT_REQUEST_H
+
+// C++ standard includes
+#include <sstream>
+#include <string>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/cognito/model/AuthFlow.h>
+#include <awsmock/dto/common/BaseRequest.h>
+
+namespace AwsMock::Dto::Cognito {
+
+    /**
+     * @brief Global sign out request
+     *
+     * @par
+     * Invalidates the identity, access, and refresh tokens that Amazon Cognito issued to a user. Call this operation when your user signs out of your app. This
+     * results in the following behavior. Amazon Cognito no longer accepts token-authorized user operations that you authorize with a signed-out user's access
+     * tokens. For more information, see Using the Amazon Cognito user pools API and user pool endpoints. Amazon Cognito returns an Access Token has been revoked
+     * error when your app attempts to authorize a user pools API request with a revoked access token that contains the scope aws.cognito.signin.user.admin.
+     * Amazon Cognito no longer accepts a signed-out user's ID token in a GetId request to an identity pool with ServerSideTokenCheck enabled for its user pool
+     * IdP configuration in CognitoIdentityProvider. Amazon Cognito no longer accepts a signed-out user's refresh tokens in refresh requests. Other requests
+     * might be valid until your user's token expires. Authorize this action with a signed-in user's access token. It must include the scope
+     * aws.cognito.signin.user.admin.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "AccessToken": "string"
+     * }
+     * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct GlobalSignOutRequest : public Dto::Common::BaseRequest {
+
+        /**
+         * A valid access token that Amazon Cognito issued to the user who you want to sign out.
+         */
+        std::string accessToken;
+
+        /**
+         * @brief Convert from a JSON object.
+         *
+         * @param payload json string object
+         */
+        void FromJson(const std::string &payload);
+
+        /**
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * @brief Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const GlobalSignOutRequest &i);
+    };
+
+}// namespace AwsMock::Dto::Cognito
+
+#endif// AWSMOCK_DTO_COGNITO_GLOBAL_SIGN_OUT_REQUEST_H

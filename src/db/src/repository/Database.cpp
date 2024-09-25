@@ -68,6 +68,8 @@ namespace AwsMock::Database {
                                                  make_document(kvp("name", "sqs_message_idx3")));
             database["sqs_message"].create_index(make_document(kvp("queueArn", 1), kvp("status", 1)),
                                                  make_document(kvp("name", "sqs_message_idx4")));
+            database["sqs_message"].create_index(make_document(kvp("queueArn", 1), kvp("created", 1)),
+                                                 make_document(kvp("name", "sqs_message_idx5")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
                                                make_document(kvp("name", "sqs_queue_idx1")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),

@@ -2,23 +2,23 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/InitiateAuthRequest.h>
+#include <awsmock/dto/cognito/RespondToAuthChallengeRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string InitiateAuthRequest::GetUserId() {
-        return authParameters["USERNAME"];
+    std::string RespondToAuthChallengeRequest::GetUserName() {
+        return challengeResponses["USERNAME"];
     }
 
-    std::string InitiateAuthRequest::GetPassword() {
-        return authParameters["PASSWORD"];
+    std::string RespondToAuthChallengeRequest::GetPasswordClaimSecretBlock() {
+        return challengeResponses["PASSWORD_CLAIM_SECRET_BLOCK"];
     }
 
-    std::string InitiateAuthRequest::GetClientSecret() {
-        return authParameters["SECRET_HASH"];
+    std::string RespondToAuthChallengeRequest::GetPasswordClaim_Signature() {
+        return challengeResponses["PASSWORD_CLAIM_SIGNATURE"];
     }
 
-    void InitiateAuthRequest::FromJson(const std::string &payload) {
+    void RespondToAuthChallengeRequest::FromJson(const std::string &payload) {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(payload);
@@ -28,21 +28,22 @@ namespace AwsMock::Dto::Cognito {
 
             Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
             Core::JsonUtils::GetJsonValueString("ClientId", rootObject, clientId);
+            Core::JsonUtils::GetJsonValueString("Session", rootObject, session);
 
-            // Auth flow
-            std::string tmpAuthFlow;
-            Core::JsonUtils::GetJsonValueString("AuthFlow", rootObject, tmpAuthFlow);
-            if (!tmpAuthFlow.empty()) {
-                AuthFlowTypeFromString(tmpAuthFlow);
+            // Challenge name ENUM
+            std::string tmpChallengeName;
+            Core::JsonUtils::GetJsonValueString("ChallengeName", rootObject, tmpChallengeName);
+            if (!tmpChallengeName.empty()) {
+                challengeName = ChallengeNameFromString(tmpChallengeName);
             }
 
-            // Auth parameter
-            if (rootObject->has("AuthParameters")) {
-                Poco::JSON::Object::Ptr authParameterObject = rootObject->getObject("AuthParameters");
+            // Challenge responses
+            if (rootObject->has("ChallengeResponses")) {
+                Poco::JSON::Object::Ptr authParameterObject = rootObject->getObject("ChallengeResponses");
                 for (int i = 0; i < authParameterObject->getNames().size(); i++) {
                     std::string key = authParameterObject->getNames()[i];
                     std::string value = authParameterObject->get(key);
-                    authParameters[key] = value;
+                    challengeResponses[key] = value;
                 }
             }
 
@@ -62,21 +63,20 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string InitiateAuthRequest::ToJson() const {
+    std::string RespondToAuthChallengeRequest::ToJson() const {
 
         try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
             rootJson.set("ClientId", clientId);
-            rootJson.set("AuthFlow", AuthFlowTypeToString(authFlow));
 
             // Auth parameters
-            Poco::JSON::Object authParameterObject;
-            for (const auto &authParameter: authParameters) {
-                authParameterObject.set(authParameter.first, authParameter.second);
+            Poco::JSON::Object challengeResponsesObject;
+            for (const auto &challengeResponse: challengeResponses) {
+                challengeResponsesObject.set(challengeResponse.first, challengeResponse.second);
             }
-            rootJson.set("AuthParameter", authParameterObject);
+            rootJson.set("ChallengeResponses", challengeResponsesObject);
 
             // Client metadata
             Poco::JSON::Object clientMetadataObject;
@@ -93,14 +93,14 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string InitiateAuthRequest::ToString() const {
+    std::string RespondToAuthChallengeRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const InitiateAuthRequest &r) {
-        os << "InitiateAuthRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const RespondToAuthChallengeRequest &r) {
+        os << "RespondToAuthChallengeRequest=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Cognito

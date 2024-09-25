@@ -57,7 +57,7 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string clientName;
 
         /**
-         * Client secret
+         * Client secret. This is actually a KMS symmetric key ID. Used for encrypting/decrypting client passwords.
          */
         std::string clientSecret;
 

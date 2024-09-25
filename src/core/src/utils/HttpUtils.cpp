@@ -248,27 +248,37 @@ namespace AwsMock::Core {
     }
 
     void HttpUtils::DumpHeaders(const http::request<http::dynamic_body> &request) {
+        log_info << SEPARATOR;
+        log_info << "Method: " << request.method_string();
         for (const auto &header: request.base()) {
             log_info << header.name_string() << ": " << header.value();
         }
+        log_info << SEPARATOR;
     }
 
     void HttpUtils::DumpHeaders(const http::request<http::string_body> &request) {
+        log_info << SEPARATOR;
+        log_info << "Method: " << request.method_string();
         for (const auto &header: request.base()) {
             log_info << header.name_string() << ": " << header.value();
         }
+        log_info << SEPARATOR;
     }
 
     void HttpUtils::DumpHeaders(const http::response<http::dynamic_body> &response) {
+        log_info << SEPARATOR;
         for (const auto &header: response.base()) {
             log_info << header.name_string() << ": " << header.value();
         }
+        log_info << SEPARATOR;
     }
 
     void HttpUtils::DumpHeaders(const http::response<http::string_body> &response) {
+        log_info << SEPARATOR;
         for (const auto &header: response.base()) {
             log_info << header.name_string() << ": " << header.value();
         }
+        log_info << SEPARATOR;
     }
 
     std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {

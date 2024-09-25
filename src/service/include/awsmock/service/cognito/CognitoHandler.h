@@ -61,6 +61,20 @@ namespace AwsMock::Service {
          * Cognito service
          */
         Service::CognitoService _cognitoService;
+
+        /**
+         * @brief Create static default headers map.
+         *
+         * @return default header map
+         */
+        static std::map<std::string, std::string> CreateHeaderMap() {
+            std::map<std::string, std::string> defaultHeaders;
+            defaultHeaders[to_string(http::field::access_control_allow_origin)] = "http://localhost:4200";
+            defaultHeaders[to_string(http::field::access_control_allow_headers)] = "cache-control,content-type,x-amz-target,x-amz-user-agent";
+            defaultHeaders[to_string(http::field::access_control_allow_methods)] = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
+            return defaultHeaders;
+        }
+        static const std::map<std::string, std::string> headers;
     };
 
 }// namespace AwsMock::Service

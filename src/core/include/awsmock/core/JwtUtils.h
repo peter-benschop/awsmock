@@ -9,12 +9,6 @@
 #include <fcntl.h>
 #include <string>
 
-// Poco includes
-//#include <Poco/Crypto/RSAKey.h>
-//#include <Poco/JWT/Signer.h>
-//#include <Poco/JWT/Token.h>
-//#include <Poco/String.h>
-
 // JWT-cpp includes
 #include <jwt-cpp/jwt.h>
 
@@ -38,24 +32,44 @@ namespace AwsMock::Core {
         JwtUtils() = default;
 
         /**
-         * @brief Create a new JWT token
+         * @brief Create a new JWT token using Rs256 as signing algorithm
          *
          * @param privateKey RSA private key
          * @param issuer issuer of the token
          * @param payload payload
          * @return JWT token string
          */
-        static std::string CreateToken(const std::string &privateKey, const std::string &subject, const std::map<std::string, std::string> &payload);
+        static std::string CreateTokenRs256(const std::string &privateKey, const std::string &subject, const std::map<std::string, std::string> &payload);
 
         /**
-         * @brief Verifies a JWT token
+         * @brief Create a new JWT token using Hs256 as signing algorithm
+         *
+         * @param privateKey RSA private key
+         * @param issuer issuer of the token
+         * @param payload payload
+         * @return JWT token string
+         */
+        static std::string CreateTokenHs256(const std::string &privateKey, const std::string &subject, const std::map<std::string, std::string> &payload);
+
+        /**
+         * @brief Verifies a JWT token using Rs256 as signing algorithm
          *
          * @param publicKey RSA public key
          * @param jwt token string
          * @param issuer issuer of the token
          * @return JWT token
          */
-        static bool VerifyToken(const std::string &publicKey, const std::string &jwt, const std::string &issuer);
+        static bool VerifyTokenRs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer);
+
+        /**
+         * @brief Verifies a JWT token using Hs256 as signing algorithm
+         *
+         * @param publicKey RSA public key
+         * @param jwt token string
+         * @param issuer issuer of the token
+         * @return JWT token
+         */
+        static bool VerifyTokenHs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer);
     };
 
 }// namespace AwsMock::Core

@@ -588,7 +588,6 @@ namespace AwsMock::Core {
         return CreateArn("sqs", region, accountId, queueName);
     }
 
-
     /**
      * @brief Get the name from a queue URL
      *

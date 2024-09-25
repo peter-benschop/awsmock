@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
             for (const auto &challengeParameter: challengeParameters) {
                 challengeParameterObject.set(challengeParameter.first, challengeParameter.second);
             }
-            rootJson.set("ChallengeParameter", challengeParameterObject);
+            rootJson.set("ChallengeParameters", challengeParameterObject);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

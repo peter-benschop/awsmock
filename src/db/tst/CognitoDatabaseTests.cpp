@@ -33,6 +33,7 @@ namespace AwsMock::Database {
         void TearDown() override {
             _cognitoDatabase.DeleteAllUsers();
             _cognitoDatabase.DeleteAllUserPools();
+            _cognitoDatabase.DeleteAllGroups();
         }
 
         std::string _region;
@@ -200,6 +201,21 @@ namespace AwsMock::Database {
 
         // assert
         EXPECT_FALSE(result);
+    }
+
+    TEST_F(CognitoDatabaseDbTest, ClientIdExistsTest) {
+
+        // arrange
+        Entity::Cognito::UserPoolClient userPoolClient = {.clientId = "clientId", .clientName = "clientName"};
+        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        userPool.userPoolClients.emplace_back(userPoolClient);
+        Entity::Cognito::UserPool result = _cognitoDatabase.CreateUserPool(userPool);
+
+        // act
+        bool clientIdExists = _cognitoDatabase.ClientIdExists(_region, "clientId");
+
+        // assert
+        EXPECT_TRUE(clientIdExists);
     }
 
 }// namespace AwsMock::Database

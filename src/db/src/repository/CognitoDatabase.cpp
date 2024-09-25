@@ -915,4 +915,30 @@ namespace AwsMock::Database {
         }
     }
 
+    bool CognitoDatabase::ClientIdExists(const std::string &region, const std::string &clientId) {
+
+        if (HasDatabase()) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _groupCollection = (*client)[_databaseName][_userpoolCollectionName];
+                int64_t count = _groupCollection.count_documents(make_document(kvp("region", region),
+                                                                               kvp("userPoolClients",
+                                                                                   make_document(kvp("$elemMatch",
+                                                                                                     make_document(kvp("clientId", clientId)))))));
+                log_trace << "Cognito client id exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+
+        } else {
+
+            return _memoryDb.ClientIdExists(region, clientId);
+        }
+    }
+
 }// namespace AwsMock::Database

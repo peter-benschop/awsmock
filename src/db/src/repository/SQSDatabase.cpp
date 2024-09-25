@@ -851,14 +851,14 @@ namespace AwsMock::Database {
 
             try {
                 mongocxx::pipeline p{};
-                //p.match(make_document(kvp("queueName", queueName)));
                 p.group(make_document(kvp("_id", "$queueArn"),
                                       kvp("averageTime",
                                           make_document(kvp("$avg",
                                                             make_document(kvp("$subtract",
                                                                               make_array("$$NOW", "$created"))))))));
                 p.project(make_document(kvp("_id", "$_id"), kvp("millis", make_document(kvp("$trunc", make_array("$averageTime", 2))))));
-
+                p.skip(0);
+                p.limit(1000);
                 Entity::SQS::MessageWaitTime waitTime;
                 auto waitingTimeCursor = messageCollection.aggregate(p, mongocxx::options::aggregate{});
                 for (const auto &waitingTime: waitingTimeCursor) {

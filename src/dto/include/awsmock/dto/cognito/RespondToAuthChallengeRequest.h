@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_INITIATE_AUTH_REQUEST_H
-#define AWSMOCK_DTO_COGNITO_INITIATE_AUTH_REQUEST_H
+#ifndef AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_REQUEST_H
+#define AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -14,12 +14,14 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/AuthFlow.h>
+#include <awsmock/dto/cognito/model/ChallengeName.h>
+#include <awsmock/dto/cognito/model/UserContextData.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief Initiate authentication request
+     * @brief Responde to an authentication challenge
      *
      * Example:
      * @code{.json}
@@ -27,14 +29,15 @@ namespace AwsMock::Dto::Cognito {
      *   "AnalyticsMetadata": {
      *      "AnalyticsEndpointId": "string"
      *   },
-     *   "AuthFlow": "string",
-     *   "AuthParameters": {
+     *   "ChallengeName": "string",
+     *   "ChallengeResponses": {
      *      "string" : "string"
      *   },
      *   "ClientId": "string",
      *   "ClientMetadata": {
      *      "string" : "string"
      *   },
+     *   "Session": "string",
      *   "UserContextData": {
      *      "EncodedData": "string",
      *      "IpAddress": "string"
@@ -44,29 +47,63 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct InitiateAuthRequest : public Dto::Common::BaseRequest {
+    struct RespondToAuthChallengeRequest : public Dto::Common::BaseRequest {
 
         /**
-         * Auth flow
-         *
-         * Valid Values: USER_SRP_AUTH | REFRESH_TOKEN_AUTH | REFRESH_TOKEN | CUSTOM_AUTH | ADMIN_NO_SRP_AUTH | USER_PASSWORD_AUTH | ADMIN_USER_PASSWORD_AUTH
-         */
-        AuthFlowType authFlow;
-
-        /**
-         * Client ID
+         * The app client ID.
          */
         std::string clientId;
 
         /**
-         * Auth parameters
+         * The session that should be passed both ways in challenge-response calls to the service. If InitiateAuth or RespondToAuthChallenge API
+         * call determines that the caller must pass another challenge, they return a session with other challenge parameters. This session
+         * should be passed as it is to the next RespondToAuthChallenge API call.
          */
-        std::map<std::string, std::string> authParameters;
+        std::string session;
+
+        /**
+         * Auth flow
+         *
+         * The challenge name. For more information, see InitiateAuth.
+         */
+        ChallengeName challengeName;
+
+        /**
+         * The responses to the challenge that you received in the previous request. Each challenge has its own required response parameters. The
+         * following examples are partial JSON request bodies that highlight challenge-response parameters.
+         */
+        std::map<std::string, std::string> challengeResponses;
 
         /**
          * Client metadata
          */
         std::map<std::string, std::string> clientMetaData;
+
+        /**
+         * User context data
+         */
+        UserContextData userContextData;
+
+        /**
+         * @brief Returns the user name
+         *
+         * @return user ID
+         */
+        std::string GetUserName();
+
+        /**
+         * @brief Returns the user password
+         *
+         * @return user password
+         */
+        std::string GetPasswordClaim_Signature();
+
+        /**
+         * @brief Returns the client secret from the AuthParameters
+         *
+         * @return client secret
+         */
+        std::string GetPasswordClaimSecretBlock();
 
         /**
          * @brief Convert from a JSON object.
@@ -115,9 +152,9 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const InitiateAuthRequest &i);
+        friend std::ostream &operator<<(std::ostream &os, const RespondToAuthChallengeRequest &i);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_INITIATE_AUTH_REQUEST_H
+#endif// AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_REQUEST_H

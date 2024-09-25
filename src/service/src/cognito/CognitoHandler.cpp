@@ -1,7 +1,8 @@
-
 #include <awsmock/service/cognito/CognitoHandler.h>
 
 namespace AwsMock::Service {
+
+    const std::map<std::string, std::string> CognitoHandler::headers = CognitoHandler::CreateHeaderMap();
 
     http::response<http::dynamic_body> CognitoHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Cognito POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -12,7 +13,6 @@ namespace AwsMock::Service {
         try {
 
             std::string action = GetActionFromHeader(request);
-
             if (action == "CreateUserPool") {
 
                 Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
@@ -69,7 +69,7 @@ namespace AwsMock::Service {
                 log_debug << "Got create user pool client request, json: " << cognitoRequest.ToString();
 
                 Dto::Cognito::CreateUserPoolClientResponse serviceResponse = _cognitoService.CreateUserPoolClient(cognitoRequest);
-                log_info << "User pool client created, userPoolId: " << serviceResponse.userGroupClient.userPoolId << " clientId: " << serviceResponse.userGroupClient.clientId;
+                log_info << "User pool client created, userPoolId: " << cognitoRequest.userPoolId << " clientName: " << cognitoRequest.clientName;
 
                 return SendOkResponse(request, serviceResponse.ToJson());
 
@@ -205,7 +205,6 @@ namespace AwsMock::Service {
                 log_info << "User created, userPoolId: " << cognitoRequest.userPoolId;
 
                 return SendOkResponse(request, cognitoResponse.ToJson());
-
             } else if (action == "ListUsers") {
 
                 Dto::Cognito::ListUsersRequest cognitoRequest{};
@@ -336,7 +335,6 @@ namespace AwsMock::Service {
                 log_info << "Remove user from group, userPoolId: " << cognitoRequest.userPoolId;
 
                 return SendOkResponse(request);
-
             } else if (action == "DeleteGroup") {
 
                 Dto::Cognito::DeleteGroupRequest cognitoRequest{};
@@ -351,7 +349,6 @@ namespace AwsMock::Service {
                 log_info << "Group deleted, userPoolId: " << cognitoRequest.userPoolId << " group: " << cognitoRequest.groupName;
 
                 return SendOkResponse(request);
-
             } else if (action == "SignUp") {
 
                 Dto::Cognito::SignUpRequest cognitoRequest{};
@@ -382,9 +379,54 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request);
 
+            } else if (action == "InitiateAuth") {
+
+                Dto::Cognito::InitiateAuthRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got initiate auth request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::InitiateAuthResponse cognitoResponse = _cognitoService.InitiateAuth(cognitoRequest);
+                log_info << "User authorization initiated, userName: " << cognitoRequest.GetUserId();
+
+                return SendOkResponse(request, cognitoResponse.ToJson(), headers);
+
+            } else if (action == "RespondToAuthChallenge") {
+
+                Dto::Cognito::RespondToAuthChallengeRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got response to auth challenge request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::RespondToAuthChallengeResponse cognitoResponse = _cognitoService.RespondToAuthChallenge(cognitoRequest);
+                log_info << "Respond to auth challenge, clientId: " << cognitoRequest.clientId << " json: " << cognitoResponse.ToJson();
+
+                return SendOkResponse(request, cognitoResponse.ToJson(), headers);
+
+            } else if (action == "GlobalSignOut") {
+
+                Dto::Cognito::GlobalSignOutRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got global sign out request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.GlobalSignOut(cognitoRequest);
+                log_info << "Global sign out, accessToken: " << cognitoRequest.accessToken;
+
+                return SendOkResponse(request, {}, headers);
+
             } else {
 
-                return SendBadRequestError(request, "Unknown function");
+                return SendBadRequestError(request, "Unknown action");
             }
 
         } catch (Poco::Exception &exc) {

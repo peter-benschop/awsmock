@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/JwtUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
@@ -40,6 +41,9 @@
 #include <awsmock/dto/cognito/DescribeUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/DescribeUserPoolRequest.h>
 #include <awsmock/dto/cognito/DescribeUserPoolResponse.h>
+#include <awsmock/dto/cognito/GlobalSignOutRequest.h>
+#include <awsmock/dto/cognito/InitiateAuthRequest.h>
+#include <awsmock/dto/cognito/InitiateAuthResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolClientsRequest.h>
@@ -50,6 +54,8 @@
 #include <awsmock/dto/cognito/ListUsersInGroupResponse.h>
 #include <awsmock/dto/cognito/ListUsersRequest.h>
 #include <awsmock/dto/cognito/ListUsersResponse.h>
+#include <awsmock/dto/cognito/RespondToAuthChallengeRequest.h>
+#include <awsmock/dto/cognito/RespondToAuthChallengeResponse.h>
 #include <awsmock/dto/cognito/SignUpRequest.h>
 #include <awsmock/dto/cognito/SignUpResponse.h>
 #include <awsmock/dto/cognito/UpdateUserPoolClientRequest.h>
@@ -57,6 +63,7 @@
 #include <awsmock/dto/cognito/UpdateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/UpdateUserPoolRequest.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
+#include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
@@ -279,6 +286,39 @@ namespace AwsMock::Service {
          */
         void ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request);
 
+        /**
+         * @brief Initiate authentication
+         *
+         * @param request confirm user request
+         * @return InitiateAuthResponse DTO
+         * @see InitiateAuthRequest
+         * @see InitiateAuthResponse
+         */
+        Dto::Cognito::InitiateAuthResponse InitiateAuth(Dto::Cognito::InitiateAuthRequest &request);
+
+        /**
+         * @brief Respond to auth challenge
+         *
+         * @par
+         * Some API operations in a user pool generate a challenge, like a prompt for an MFA code, for device authentication that bypasses MFA, or for a custom authentication
+         * challenge. A RespondToAuthChallenge API request provides the answer to that challenge, like a code or a secure remote password (SRP). The parameters of a response
+         * to an authentication challenge vary with the type of challenge.
+         *
+         * @param request respond to auth challenge request
+         * @return RespondToAuthChallengeResponse DTO
+         * @see RespondToAuthChallengeRequest
+         * @see RespondToAuthChallengeResponse
+         */
+        Dto::Cognito::RespondToAuthChallengeResponse RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request);
+
+        /**
+         * @brief Global sign out request
+         *
+         * @param request sign out request
+         * @see GlobalSignOutRequest
+         */
+        void GlobalSignOut(Dto::Cognito::GlobalSignOutRequest &request);
+
       private:
 
         /**
@@ -287,7 +327,7 @@ namespace AwsMock::Service {
         Database::CognitoDatabase &_database;
 
         /**
-         * S3 account userPoolId
+         * AWS account userPoolId
          */
         std::string _accountId;
     };
