@@ -863,19 +863,19 @@ namespace AwsMock::Database {
                     std::chrono::system_clock::time_point firstTimestamp = std::chrono::system_clock::now();
                     std::chrono::system_clock::time_point lastTimestamp = std::chrono::system_clock::now();
 
-                    auto first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
-                    if (first.has_value()) {
+                    mongocxx::stdx::optional<bsoncxx::document::value> first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
+                    if (first) {
                         Entity::SQS::Message firstMessage;
-                        firstMessage.FromDocument(first.get().view());
+                        firstMessage.FromDocument(first->view());
                         firstTimestamp = firstMessage.created;
                     }
 
                     opts.sort(make_document(kvp("created", 1)));
 
-                    auto last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
+                    mongocxx::stdx::optional<bsoncxx::document::value> last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
                     if (last.has_value()) {
                         Entity::SQS::Message lastMessage;
-                        lastMessage.FromDocument(last.get().view());
+                        lastMessage.FromDocument(last->view());
                         lastTimestamp = lastMessage.created;
                     }
 
