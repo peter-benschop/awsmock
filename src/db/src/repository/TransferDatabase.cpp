@@ -10,11 +10,11 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    TransferDatabase::TransferDatabase() : _memoryDb(TransferMemoryDb::instance()), _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _serverCollectionName("transfer") {}
+    TransferDatabase::TransferDatabase() : _memoryDb(TransferMemoryDb::instance()), _databaseName(GetDatabaseName()), _serverCollectionName("transfer") {}
 
     bool TransferDatabase::TransferExists(const std::string &region, const std::string &serverId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -36,7 +36,7 @@ namespace AwsMock::Database {
 
     bool TransferDatabase::TransferExists(const std::string &serverId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -52,7 +52,7 @@ namespace AwsMock::Database {
 
     bool TransferDatabase::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             bsoncxx::builder::basic::array mProtocol{};
             for (const auto &p: protocols) {
@@ -75,7 +75,7 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferDatabase::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferDatabase::GetTransferById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetTransferById(bsoncxx::oid(oid));
 
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferDatabase::GetTransferByServerId(const std::string &serverId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -145,7 +145,7 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferDatabase::UpdateTransfer(const Entity::Transfer::Transfer &transfer) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -163,7 +163,7 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferDatabase::GetTransferByArn(const std::string &arn) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -182,7 +182,7 @@ namespace AwsMock::Database {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -223,7 +223,7 @@ namespace AwsMock::Database {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -252,7 +252,7 @@ namespace AwsMock::Database {
     long TransferDatabase::CountServers(const std::string &region) {
 
         long count = 0;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _serverCollection = (*client)[_databaseName][_serverCollectionName];
@@ -273,7 +273,7 @@ namespace AwsMock::Database {
 
     void TransferDatabase::DeleteTransfer(const std::string &serverId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
@@ -288,7 +288,7 @@ namespace AwsMock::Database {
 
     void TransferDatabase::DeleteAllTransfers() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];

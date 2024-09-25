@@ -336,9 +336,8 @@ namespace AwsMock::Database {
          * @brief Returns the average waiting time for messages in the given queue
          *
          * @par
-         * Uses a aggregate MongoDB query to collect the average waiting time of messages in the different queues. The time is calculated by subtracting
-         * the current time and the created timestamp and is afterwards grouped by queue ARN. Only one page of 1000 items is considered, otherwise the
-         * query hit a cache memory limit and will finally OOM the mongod service.
+         * Uses a simple min, max query to get the first and the last entry in the sqs_message collection. The average is then calculated as
+         * (max-min)/2. This is done on a per queue arn basis.
          *
          * @return map of average message waiting time per queue
          * @throws Core::DatabaseException

@@ -172,11 +172,6 @@ namespace AwsMock::Database {
       private:
 
         /**
-         * Use MongoDB
-         */
-        bool _useDatabase;
-
-        /**
          * Database name
          */
         std::string _databaseName;
