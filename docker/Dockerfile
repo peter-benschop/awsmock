@@ -44,7 +44,7 @@ COPY --from=build /usr/lib/libidn2.so.0 /usr/lib/
 COPY --from=build /usr/lib/libbrotlidec.so.1 /usr/lib/
 COPY --from=build /usr/lib/libicudata.so.74 /usr/lib/
 COPY --from=build /usr/lib/libunistring.so.5 /usr/lib/
-COPY --from=build /usr/lib/libbrotlicommon.so.1 /usr/lib/
+COPY --from=build /usr/lib/libbrotlicommon.so.1 /usr/lib
 COPY --from=build /lib/libacl.so.1.1.2302 /lib/
 RUN ln -s /lib/libacl.so.1.1.2302 /lib/libacl.so.1
 
