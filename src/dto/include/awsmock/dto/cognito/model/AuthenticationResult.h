@@ -39,7 +39,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Token type
          */
-        std::string tokenType;
+        std::string tokenType = "Bearer";
 
         /**
          * Expires in

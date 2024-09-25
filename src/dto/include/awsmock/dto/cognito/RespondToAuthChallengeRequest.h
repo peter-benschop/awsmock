@@ -85,6 +85,27 @@ namespace AwsMock::Dto::Cognito {
         UserContextData userContextData;
 
         /**
+         * @brief Returns the user name
+         *
+         * @return user ID
+         */
+        std::string GetUserName();
+
+        /**
+         * @brief Returns the user password
+         *
+         * @return user password
+         */
+        std::string GetPasswordClaim_Signature();
+
+        /**
+         * @brief Returns the client secret from the AuthParameters
+         *
+         * @return client secret
+         */
+        std::string GetPasswordClaimSecretBlock();
+
+        /**
          * @brief Convert from a JSON object.
          *
          * @param payload json string object

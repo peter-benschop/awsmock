@@ -719,23 +719,45 @@ namespace AwsMock::Service {
 
         std::string tmp = request.GetUserId();
         if (!_database.UserExists(request.region, request.GetUserId())) {
-            log_error << "User does not exist, region: " << request.region << " user: " << request.user;
-            throw Core::NotFoundException("User does not exist, region: " + request.region + " user: " + request.user);
+            log_error << "User does not exist, region: " << request.region << " user: " << request.GetUserId();
+            throw Core::NotFoundException("User does not exist, region: " + request.region + " user: " + request.GetUserId());
         }
 
         Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
+        Database::Entity::Cognito::UserPoolClient userPoolClient = userPool.GetClient(request.clientId);
 
         Dto::Cognito::InitiateAuthResponse response;
         response.region = request.region;
         response.user = request.user;
-        response.challengeName = Dto::Cognito::ChallengeNameToString(Dto::Cognito::ChallengeName::SMS_MFA);
-        response.challengeParameters["USERNAME"] = request.authParameters["USERNAME"];
-        response.challengeParameters["SECRET_HASH"] = request.authParameters["SECRET_HASH"];
-        response.challengeParameters["USER_ID_FOR_SRP"] = request.authParameters["USERNAME"];
-        response.challengeParameters["SECRET_BLOCK"] = Core::Crypto::Base64Decode(request.authParameters["SRP_A"]);
+        response.authenticationResult.accessToken = Core::JwtUtils::CreateTokenHs256(userPoolClient.clientSecret, request.GetUserId(), {});
+        response.authenticationResult.refreshToken = Core::JwtUtils::CreateTokenHs256(userPoolClient.clientSecret, request.GetUserId(), {});
+        response.authenticationResult.idToken = Core::JwtUtils::CreateTokenHs256(userPoolClient.clientSecret, request.GetUserId(), {});
 
-        response.session = Core::StringUtils::GenerateRandomAlphanumericString(256);
         return response;
+    }
+
+    Dto::Cognito::RespondToAuthChallengeResponse CognitoService::RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "respond_to_auth_challenge");
+        log_debug << "Respond to auth challenge request, region:  " << request.region << " clientId: " << request.clientId;
+
+        if (!_database.ClientIdExists(request.region, request.clientId)) {
+            log_error << "Client id does not exist, region: " << request.region << " clientId: " << request.clientId;
+            throw Core::NotFoundException("Client id does not exist, region: " + request.region + " clientId: " + request.clientId);
+        }
+
+        Dto::Cognito::RespondToAuthChallengeResponse response;
+        response.challengeName = request.challengeName;
+        response.requestId = request.requestId;
+        response.authenticationResult.accessToken = Core::JwtUtils::CreateTokenHs256(request.GetPasswordClaim_Signature(), request.GetUserName(), {});
+        response.authenticationResult.refreshToken = Core::JwtUtils::CreateTokenHs256(request.GetPasswordClaim_Signature(), request.GetUserName(), {});
+        response.authenticationResult.idToken = Core::JwtUtils::CreateTokenHs256(request.GetPasswordClaim_Signature(), request.GetUserName(), {});
+        response.session = request.session;
+        return response;
+    }
+
+    void CognitoService::GlobalSignOut(Dto::Cognito::GlobalSignOutRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "global_sign_out");
+        log_debug << "Global sign out request, region:  " << request.region << " accessToken: " << request.accessToken;
     }
 
 }// namespace AwsMock::Service

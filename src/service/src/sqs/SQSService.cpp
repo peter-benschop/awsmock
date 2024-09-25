@@ -506,7 +506,7 @@ namespace AwsMock::Service {
                 response.messageList = messageList;
                 response.requestId = request.requestId;
             }
-            log_info << "Messages received, count: " << messageList.size();
+            log_info << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
 
             return response;
 

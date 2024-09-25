@@ -11,7 +11,7 @@ namespace AwsMock::Core {
         auto token = jwt::create()
                              .set_issuer(issuer)
                              .set_type("JWT")
-                             .set_id("rsa-create-example")
+                             .set_id("awsmock-rsa256")
                              .set_issued_now()
                              .set_expires_in(std::chrono::seconds{36000});
         for (const auto &p: payload) {
@@ -25,13 +25,13 @@ namespace AwsMock::Core {
         auto token = jwt::create()
                              .set_issuer(issuer)
                              .set_type("JWT")
-                             .set_id("rsa-create-example")
+                             .set_id("awsmock-hs256")
                              .set_issued_now()
                              .set_expires_in(std::chrono::seconds{36000});
         for (const auto &p: payload) {
             token.set_payload_claim(p.first, jwt::claim(p.second));
         }
-        return token.sign(jwt::algorithm::rs256(secret));
+        return token.sign(jwt::algorithm::hs256(secret));
     }
 
     bool JwtUtils::VerifyTokenRs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer) {

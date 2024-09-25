@@ -98,6 +98,14 @@ namespace AwsMock::Database::Entity::Cognito {
         system_clock::time_point modified = system_clock::now();
 
         /**
+         * @brief Returns a client by clientId
+         *
+         * @param clientId user pool client ID
+         * @return UserPoolClient
+         */
+        UserPoolClient GetClient(const std::string &clientId);
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

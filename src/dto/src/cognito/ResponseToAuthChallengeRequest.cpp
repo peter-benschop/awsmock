@@ -6,6 +6,18 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    std::string RespondToAuthChallengeRequest::GetUserName() {
+        return challengeResponses["USERNAME"];
+    }
+
+    std::string RespondToAuthChallengeRequest::GetPasswordClaimSecretBlock() {
+        return challengeResponses["PASSWORD_CLAIM_SECRET_BLOCK"];
+    }
+
+    std::string RespondToAuthChallengeRequest::GetPasswordClaim_Signature() {
+        return challengeResponses["PASSWORD_CLAIM_SIGNATURE"];
+    }
+
     void RespondToAuthChallengeRequest::FromJson(const std::string &payload) {
 
         Poco::JSON::Parser parser;
@@ -16,6 +28,7 @@ namespace AwsMock::Dto::Cognito {
 
             Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
             Core::JsonUtils::GetJsonValueString("ClientId", rootObject, clientId);
+            Core::JsonUtils::GetJsonValueString("Session", rootObject, session);
 
             // Challenge name ENUM
             std::string tmpChallengeName;

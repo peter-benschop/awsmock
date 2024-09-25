@@ -75,13 +75,6 @@ namespace AwsMock::Dto::Cognito {
         AuthenticationResult authenticationResult;
 
         /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
-
-        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string

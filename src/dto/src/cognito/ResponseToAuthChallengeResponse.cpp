@@ -16,11 +16,13 @@ namespace AwsMock::Dto::Cognito {
             rootJson.set("ChallengeName", ChallengeNameToString(challengeName));
             rootJson.set("AuthenticationResult", authenticationResult.ToJsonObject());
 
-            Poco::JSON::Object::Ptr challengeParametersObject;
-            for (const auto &challengeParameter: challengeParameters) {
-                challengeParametersObject->set(challengeParameter.first, challengeParameter.second);
+            if (!challengeParameters.empty()) {
+                Poco::JSON::Object::Ptr challengeParametersObject;
+                for (const auto &challengeParameter: challengeParameters) {
+                    challengeParametersObject->set(challengeParameter.first, challengeParameter.second);
+                }
+                rootJson.set("ChallengeParameters", challengeParametersObject);
             }
-            rootJson.set("ChallengeParameters", challengeParametersObject);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

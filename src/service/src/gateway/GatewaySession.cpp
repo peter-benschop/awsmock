@@ -105,7 +105,7 @@ namespace AwsMock::Service {
         // Request path must be absolute and not contain "..".
         if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
-            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
+            return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
         // Process OPTIONS requests
@@ -115,7 +115,6 @@ namespace AwsMock::Service {
 
         } else {
 
-            Core::HttpUtils::DumpHeaders(request);
             // Verify AWS signature
             if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
                 log_warning << "AWS signature could not be verified";
@@ -250,9 +249,7 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
 
-        log_info << "Handle OPTIONS request";
-
-        Core::HttpUtils::DumpHeaders(request);
+        log_debug << "Handle OPTIONS request";
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
