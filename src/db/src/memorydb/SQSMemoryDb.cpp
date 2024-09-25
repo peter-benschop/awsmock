@@ -400,6 +400,43 @@ namespace AwsMock::Database {
         return count;
     }
 
+    Entity::SQS::MessageWaitTime SQSMemoryDb::GetAverageMessageWaitingTime() {
+
+        Entity::SQS::MessageWaitTime waitTime{};
+        Entity::SQS::QueueList queueList = ListQueues();
+        for (const auto &queue: queueList) {
+
+            // Extract map values
+            std::vector<Entity::SQS::Message> filtered;
+            std::transform(_messages.begin(), _messages.end(),
+                           std::back_inserter(filtered),
+                           [queue](auto &kv) {
+                               if (kv.second.queueArn == queue.queueArn) {
+                                   return kv.second;
+                               }
+                               return (Entity::SQS::Message){};
+                           });
+
+            if (!filtered.empty()) {
+
+                // Sort by created timestamp
+                std::sort(filtered.begin(), filtered.end(), [](auto x, auto y) { return x.created > y.created; });
+
+                double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.front().created).count();
+                double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count();
+
+                if (max + min > 5) {
+                    waitTime.waitTime[queue.name] = (max + min) / 2.0;
+                } else {
+                    waitTime.waitTime[queue.name] = 0.0;
+                }
+            } else {
+                waitTime.waitTime[queue.name] = 0.0;
+            }
+        }
+        return waitTime;
+    }
+
     void SQSMemoryDb::DeleteMessages(const std::string &queueArn) {
         Poco::ScopedLock lock(_sqsMessageMutex);
 

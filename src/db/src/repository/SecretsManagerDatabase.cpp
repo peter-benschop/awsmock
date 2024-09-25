@@ -10,13 +10,11 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    SecretsManagerDatabase::SecretsManagerDatabase()
-        : _useDatabase(HasDatabase()), _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"),
-          _memoryDb(SecretsManagerMemoryDb::instance()) {}
+    SecretsManagerDatabase::SecretsManagerDatabase() : _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"), _memoryDb(SecretsManagerMemoryDb::instance()) {}
 
     bool SecretsManagerDatabase::SecretExists(const std::string &region, const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -44,7 +42,7 @@ namespace AwsMock::Database {
 
     bool SecretsManagerDatabase::SecretExists(const std::string &secretId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
 
@@ -81,7 +79,7 @@ namespace AwsMock::Database {
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(const std::string &oid) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             return GetSecretById(bsoncxx::oid(oid));
 
@@ -94,7 +92,7 @@ namespace AwsMock::Database {
     Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretByRegionName(const std::string &region,
                                                                                  const std::string &name) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
@@ -117,7 +115,7 @@ namespace AwsMock::Database {
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretBySecretId(const std::string &secretId) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
@@ -140,7 +138,7 @@ namespace AwsMock::Database {
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
@@ -170,7 +168,7 @@ namespace AwsMock::Database {
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(const Entity::SecretsManager::Secret &secret) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
@@ -213,7 +211,7 @@ namespace AwsMock::Database {
     Entity::SecretsManager::SecretList SecretsManagerDatabase::ListSecrets() {
 
         Entity::SecretsManager::SecretList secretList;
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
@@ -235,7 +233,7 @@ namespace AwsMock::Database {
 
     long SecretsManagerDatabase::CountSecrets(const std::string &region) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             try {
                 auto client = ConnectionPool::instance().GetConnection();
@@ -263,7 +261,7 @@ namespace AwsMock::Database {
 
     void SecretsManagerDatabase::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
@@ -291,7 +289,7 @@ namespace AwsMock::Database {
 
     void SecretsManagerDatabase::DeleteAllSecrets() {
 
-        if (_useDatabase) {
+        if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];

@@ -846,30 +846,55 @@ namespace AwsMock::Database {
         // TODO: Add memory db implementation
         if (HasDatabase()) {
 
+            Entity::SQS::MessageWaitTime waitTime;
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
             try {
-                mongocxx::pipeline p{};
-                p.group(make_document(kvp("_id", "$queueArn"),
-                                      kvp("averageTime",
-                                          make_document(kvp("$avg",
-                                                            make_document(kvp("$subtract",
-                                                                              make_array("$$NOW", "$created"))))))));
-                p.project(make_document(kvp("_id", "$_id"), kvp("millis", make_document(kvp("$trunc", make_array("$averageTime", 2))))));
-                p.skip(0);
-                p.limit(1000);
-                Entity::SQS::MessageWaitTime waitTime;
-                auto waitingTimeCursor = messageCollection.aggregate(p, mongocxx::options::aggregate{});
-                for (const auto &waitingTime: waitingTimeCursor) {
-                    waitTime.waitTime[bsoncxx::string::to_string(waitingTime["_id"].get_string().value)] = waitingTime["millis"].get_double().value;
+                mongocxx::options::find opts;
+                opts.limit(1);
+
+                Entity::SQS::QueueList queueList = ListQueues();
+
+                for (const auto &queue: queueList) {
+
+                    opts.sort(make_document(kvp("created", -1)));
+
+                    std::chrono::system_clock::time_point firstTimestamp = std::chrono::system_clock::now();
+                    std::chrono::system_clock::time_point lastTimestamp = std::chrono::system_clock::now();
+
+                    auto first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
+                    if (first.is_initialized()) {
+                        Entity::SQS::Message firstMessage;
+                        firstMessage.FromDocument(first.get().view());
+                        firstTimestamp = firstMessage.created;
+                    }
+
+                    opts.sort(make_document(kvp("created", 1)));
+
+                    auto last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
+                    if (last.is_initialized()) {
+                        Entity::SQS::Message lastMessage;
+                        lastMessage.FromDocument(last.get().view());
+                        lastTimestamp = lastMessage.created;
+                    }
+
+                    double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - firstTimestamp).count();
+                    double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - lastTimestamp).count();
+
+                    if (max + min > 5) {
+                        waitTime.waitTime[queue.name] = (max + min) / 2.0;
+                    } else {
+                        waitTime.waitTime[queue.name] = 0.0;
+                    }
                 }
                 return waitTime;
-
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            return _memoryDb.GetAverageMessageWaitingTime();
         }
         return {};
     }

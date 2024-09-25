@@ -17,6 +17,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/Database.h>
 
@@ -277,6 +278,18 @@ namespace AwsMock::Database {
          * @param status message state
          */
         long CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status);
+
+        /**
+         * @brief Returns the average waiting time for messages in the given queue
+         *
+         * @par
+         * Uses a simple min, max query to get the first and the last entry in the sqs_message collection. The average is then calculated as
+         * (max-min)/2. This is done on a per queue arn basis.
+         *
+         * @return map of average message waiting time per queue
+         * @throws Core::DatabaseException
+         */
+        Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime();
 
         /**
          * @brief Deletes all resources of a queue
