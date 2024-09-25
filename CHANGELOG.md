@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/jensvogt/awsmock/compare/v0.14.0...v0.15.0) (2024-09-25)
+
+
+### Features
+
+* **612-cognito-add-sign-in-method:** Add cognito initiate auth feature ([03fbdac](https://github.com/jensvogt/awsmock/commit/03fbdacdf011be443584baaccc987e664ab0e095))
+
 ## [0.14.0](https://github.com/jensvogt/awsmock/compare/v0.13.250...v0.14.0) (2024-09-23)
 
 
