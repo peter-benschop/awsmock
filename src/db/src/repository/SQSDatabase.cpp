@@ -864,7 +864,7 @@ namespace AwsMock::Database {
                     std::chrono::system_clock::time_point lastTimestamp = std::chrono::system_clock::now();
 
                     auto first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
-                    if (first.is_initialized()) {
+                    if (first.has_value()) {
                         Entity::SQS::Message firstMessage;
                         firstMessage.FromDocument(first.get().view());
                         firstTimestamp = firstMessage.created;
@@ -873,7 +873,7 @@ namespace AwsMock::Database {
                     opts.sort(make_document(kvp("created", 1)));
 
                     auto last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
-                    if (last.is_initialized()) {
+                    if (last.has_value()) {
                         Entity::SQS::Message lastMessage;
                         lastMessage.FromDocument(last.get().view());
                         lastTimestamp = lastMessage.created;
