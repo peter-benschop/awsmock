@@ -14,19 +14,23 @@
     },
     {
       "type": "feature",
-      "section": "New Features"
+      "section": "New Features",
+      "hidden": false
     },
     {
       "type": "fix",
-      "section": "Bug Fixes"
+      "section": "Bug Fixes",
+      "hidden": false
     },
     {
       "type": "perf",
-      "section": "Performance Improvements"
+      "section": "Performance Improvements",
+      "hidden": false
     },
     {
       "type": "revert",
-      "section": "Reverts"
+      "section": "Reverts",
+      "hidden": true
     },
     {
       "type": "docs",

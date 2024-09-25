@@ -1,4 +1,4 @@
-FROM jensvogt/awsmock-base:1.22 AS build
+FROM jensvogt/awsmock-base:latest AS build
 
 # Create build environment
 RUN mkdir -p /usr/src
