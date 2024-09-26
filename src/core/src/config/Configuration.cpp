@@ -31,8 +31,8 @@ namespace AwsMock::Core {
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
 
         // Manager
-        DefineStringProperty("awsmock.manager.host", "AWSMOCK_MANAGER_HOST", "localhost");
-        DefineIntProperty("awsmock.manager.port", "AWSMOCK_MANAGER_PORT", 4567);
+        DefineStringProperty("awsmock.manager.http.host", "AWSMOCK_MANAGER_HOST", "localhost");
+        DefineIntProperty("awsmock.manager.http.port", "AWSMOCK_MANAGER_PORT", 4567);
         DefineIntProperty("awsmock.manager.http.max.queue", "AWSMOCK_MANAGER_MAX_QUEUE", 50);
         DefineIntProperty("awsmock.manager.http.max.threads", "AWSMOCK_MANAGER_MAX_THREADS", 10);
 

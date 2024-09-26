@@ -1,11 +1,12 @@
 name: AWSMockBuild
 on:
-  release:
-    types: [ created ]
-  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: self-hosted
     env:
       GH_TOKEN: ${{ github.token }}
@@ -31,6 +32,7 @@ jobs:
   #      - run: ctest -V
 
   push_to_registry:
+    if: github.event.pull_request.merged == true
     name: Push Docker image to Docker Hub
     runs-on: self-hosted
     needs: [ build ]
