@@ -35,9 +35,6 @@ namespace AwsMock::Service {
         // Start monitoring
         _transferMonitoring->Start();
 
-        // Start REST manager
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new TransferRequestHandlerFactory(_configuration));
-
         // Create transfer bucket
         CreateTransferBucket();
 

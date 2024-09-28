@@ -545,8 +545,15 @@ namespace AwsMock::Service {
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
 
+
+            // Prepare response
             Dto::SQS::ReceiveMessageResponse response;
             if (!messageList.empty()) {
+
+                // Update queue
+                queue.attributes.approximateNumberOfMessagesNotVisible += messageList.size();
+                queue = _sqsDatabase.UpdateQueue(queue);
+
                 response.messageList = messageList;
                 response.requestId = request.requestId;
             }
@@ -565,11 +572,29 @@ namespace AwsMock::Service {
         log_trace << "Delete message request, url: " << request.receiptHandle;
 
         try {
-            // TODO: Check existence
             if (!_sqsDatabase.MessageExists(request.receiptHandle)) {
                 log_error << "Message does not exist, receiptHandle: " << request.receiptHandle;
                 throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
             }
+
+            // Update queue counters
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
+            switch (message.status) {
+                case Database::Entity::SQS::MessageStatus::INITIAL:
+                    queue.attributes.approximateNumberOfMessages--;
+                    break;
+                case Database::Entity::SQS::MessageStatus::INVISIBLE:
+                    queue.attributes.approximateNumberOfMessagesNotVisible--;
+                    break;
+                case Database::Entity::SQS::MessageStatus::DELAYED:
+                    queue.attributes.approximateNumberOfMessagesDelayed--;
+                    break;
+                case Database::Entity::SQS::MessageStatus::UNKNOWN:
+                    break;
+            }
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_debug << "Queue counters updated, queue: " << queue.queueArn;
 
             // Delete from database
             _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
@@ -589,7 +614,6 @@ namespace AwsMock::Service {
 
             for (const auto &entry: request.deleteMessageBatchEntries) {
 
-                // TODO: Check existence
                 if (!_sqsDatabase.MessageExists(entry.receiptHandle)) {
                     //throw Core::ServiceException("Message does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
                     log_warning << "Message does not exist, id: " << entry.id;
