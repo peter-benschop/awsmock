@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.4](https://github.com/jensvogt/awsmock/compare/v0.15.3...v0.15.4) (2024-09-28)
+
+
+### Bug Fixes
+
+* **626-random-port-does-not-work:** fixed configuration issue using random ports ([c7b9967](https://github.com/jensvogt/awsmock/commit/c7b9967681da55bdced8293453c3d49de526e570))
+
 ## [0.15.3](https://github.com/jensvogt/awsmock/compare/v0.15.2...v0.15.3) (2024-09-25)
 
 
