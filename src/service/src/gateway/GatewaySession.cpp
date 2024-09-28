@@ -185,7 +185,6 @@ namespace AwsMock::Service {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
             return DoClose();
         }
-        return DoClose();
 
         // Resume the read if it has been paused
         if (response_queue_.size() == _queueLimit)
