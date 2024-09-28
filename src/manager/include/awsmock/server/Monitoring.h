@@ -10,7 +10,6 @@
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/repository/PerformanceDatabase.h>
 
 namespace AwsMock::Manager {
 
