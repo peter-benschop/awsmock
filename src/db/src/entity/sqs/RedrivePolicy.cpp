@@ -14,7 +14,7 @@ namespace AwsMock::Database::Entity::SQS {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(body);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        const Poco::JSON::Object::Ptr &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
 

@@ -61,9 +61,10 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
+        Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
 
         // act
-        Dto::SQS::ListQueueResponse response = _service.ListQueues(REGION);
+        Dto::SQS::ListQueuesResponse response = _service.ListQueues(listQueuesRequest);
 
         // assert
         EXPECT_FALSE(response.queueList.empty());
@@ -72,9 +73,10 @@ namespace AwsMock::Service {
     TEST_F(SQSServiceTest, QueueListEmptyTest) {
 
         // arrange
+        Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
 
         // act
-        Dto::SQS::ListQueueResponse response = _service.ListQueues(REGION);
+        Dto::SQS::ListQueuesResponse response = _service.ListQueues(listQueuesRequest);
 
         // assert
         EXPECT_TRUE(response.queueList.empty());

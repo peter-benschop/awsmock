@@ -55,6 +55,12 @@ namespace AwsMock::Dto::SNS {
             pOwner->appendChild(pOwnerText);
         }
 
+        // Total
+        Poco::XML::AutoPtr<Poco::XML::Element> pNextToken = pDoc->createElement("NextToken");
+        pSubscriptionByTopicResult->appendChild(pNextToken);
+        Poco::XML::AutoPtr<Poco::XML::Text> pNextTokenText = pDoc->createTextNode(nextToken);
+        pNextToken->appendChild(pNextTokenText);
+
         // Metadata
         Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
         pRoot->appendChild(pMetaData);

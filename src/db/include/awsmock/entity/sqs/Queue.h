@@ -91,6 +91,16 @@ namespace AwsMock::Database::Entity::SQS {
         Poco::DateTime modified = Poco::DateTime();
 
         /**
+         * Pagination token
+         */
+        std::string paginationToken;
+
+        /**
+         * Pagination score
+         */
+        double score;
+
+        /**
          * Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

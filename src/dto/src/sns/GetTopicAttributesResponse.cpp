@@ -44,6 +44,18 @@ namespace AwsMock::Dto::SNS {
         Poco::XML::AutoPtr<Poco::XML::Text> pTopicOwnerValueText = pDoc->createTextNode(owner);
         pTopicOwnerValue->appendChild(pTopicOwnerValueText);
 
+        // Display name
+        Poco::XML::AutoPtr<Poco::XML::Element> pTopicDisplayNameEntry = pDoc->createElement("entry");
+        pAttributes->appendChild(pTopicDisplayNameEntry);
+        Poco::XML::AutoPtr<Poco::XML::Element> pTopicDisplayNameKey = pDoc->createElement("key");
+        pTopicDisplayNameEntry->appendChild(pTopicDisplayNameKey);
+        Poco::XML::AutoPtr<Poco::XML::Text> pTopicDisplayNameKeyText = pDoc->createTextNode("DisplayName");
+        pTopicDisplayNameKey->appendChild(pTopicDisplayNameKeyText);
+        Poco::XML::AutoPtr<Poco::XML::Element> pTopicDisplayNameValue = pDoc->createElement("value");
+        pTopicDisplayNameEntry->appendChild(pTopicDisplayNameValue);
+        Poco::XML::AutoPtr<Poco::XML::Text> pTopicDisplayNameValueText = pDoc->createTextNode(displayName);
+        pTopicDisplayNameValue->appendChild(pTopicDisplayNameValueText);
+
         // Metadata
         Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
         pRoot->appendChild(pMetaData);
@@ -53,13 +65,7 @@ namespace AwsMock::Dto::SNS {
         Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
         pRequestId->appendChild(pRequestText);
 
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string GetTopicAttributesResponse::ToString() const {

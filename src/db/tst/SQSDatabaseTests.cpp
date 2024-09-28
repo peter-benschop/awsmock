@@ -142,6 +142,42 @@ namespace AwsMock::Database {
         EXPECT_EQ(result.size(), 1);
     }
 
+    TEST_F(SQSDatabaseTest, QueueListPagingTest) {
+
+        // arrange
+        for (int i = 0; i < 10; i++) {
+            std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
+            Entity::SQS::Queue queue = {.region = _region, .name = name, .owner = OWNER, .queueUrl = _queueUrl};
+            _sqsDatabase.CreateQueue(queue);
+        }
+
+        // act
+        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(5, "", "", _region);
+
+        // assert
+        EXPECT_EQ(result.size(), 5);
+        EXPECT_TRUE(result.front().name == std::string(QUEUE_NAME) + "_" + std::to_string(0));
+    }
+
+    TEST_F(SQSDatabaseTest, QueueListPagingNextTest) {
+
+        // arrange
+        for (int i = 0; i < 10; i++) {
+            std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
+            Entity::SQS::Queue queue = {.region = _region, .name = name, .owner = OWNER, .queueUrl = _queueUrl};
+            _sqsDatabase.CreateQueue(queue);
+        }
+
+        // act
+        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(5, "", "", _region);
+        std::string nextToken = result.back().oid;
+        Entity::SQS::QueueList result2 = _sqsDatabase.ListQueues(5, "", nextToken, _region);
+
+        // assert
+        EXPECT_EQ(result2.size(), 5);
+        EXPECT_TRUE(result2.front().name == std::string(QUEUE_NAME) + "_" + std::to_string(5));
+    }
+
     TEST_F(SQSDatabaseTest, QueuePurgeTest) {
 
         // arrange

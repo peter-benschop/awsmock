@@ -37,6 +37,8 @@
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/ListQueueArnsResponse.h>
+#include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
@@ -90,10 +92,21 @@ namespace AwsMock::Service {
         /**
          * @brief Returns a list of all available queues
          *
-         * @param region AWS region
+         * @param request AWS list queue request
          * @return ListQueuesResponse
+         * @see ListQueuesRequest
+         * @see ListQueuesResponse
          */
-        Dto::SQS::ListQueueResponse ListQueues(const std::string &region);
+        Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request);
+
+        /**
+         * @brief Returns a list of all available queues ARNs
+         *
+         * @return ListQueueArnsResponse
+         * @see ListQueuesRequest
+         * @see ListQueuesResponse
+         */
+        Dto::SQS::ListQueueArnsResponse ListQueueArns();
 
         /**
          * @brief Purge a queue.

@@ -178,13 +178,14 @@ namespace AwsMock::Service {
 
         if (ec) {
             log_error << ec.message();
-            return;
+            return DoClose();
         }
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
             return DoClose();
         }
+        return DoClose();
 
         // Resume the read if it has been paused
         if (response_queue_.size() == _queueLimit)
@@ -200,6 +201,9 @@ namespace AwsMock::Service {
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = stream_.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        if (ec) {
+            //log_error << "Could not shutdown socket, message: " << ec.message();
+        }
 
         // At this point the connection is closed gracefully
     }
@@ -252,17 +256,23 @@ namespace AwsMock::Service {
         log_debug << "Handle OPTIONS request";
 
         // Prepare the response message
+        std::string referer = request.base()[http::field::referer].substr(0, request.base()[http::field::referer].length() - 1);
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
-        response.set(http::field::access_control_allow_origin, "http://localhost:4200");
-        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
-        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::allow, "*/*");
+        response.set(http::field::access_control_allow_origin, referer);
+        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::access_control_max_age, "86400");
+        response.set(http::field::vary, "Accept-Encoding, Origin");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
 
         // Send the response to the client
+        log_debug << "Handle OPTIONS request finished";
         return response;
     }
 

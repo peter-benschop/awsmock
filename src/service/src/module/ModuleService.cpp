@@ -105,7 +105,7 @@ namespace AwsMock::Service {
             } else if (module.name == "sqs") {
 
                 Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-                infrastructure.sqsQueues = _sqsDatabase.ListQueues();
+                infrastructure.sqsQueues = _sqsDatabase.ListQueues(-1, "", "");
                 if (includeObjects) {
                     infrastructure.sqsMessages = _sqsDatabase.ListMessages();
                 }

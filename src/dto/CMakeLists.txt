@@ -6,17 +6,18 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
         src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp
-        src/sqs/ListQueueResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp src/sqs/GetQueueUrlRequest.cpp
-        src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp
-        src/sqs/RestErrorResponse.cpp src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp
-        src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp
-        src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp
-        src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp
-        src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp)
+        src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
+        src/sqs/GetQueueUrlRequest.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp
+        src/sqs/SetQueueAttributesResponse.cpp src/sqs/RestErrorResponse.cpp src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp
+        src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
+        src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp
+        src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
+        src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp
+        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
         src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
         src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp src/sns/TagResourceRequest.cpp src/sns/TagResourceResponse.cpp src/sns/GetTopicAttributesRequest.cpp
-        src/sns/GetTopicAttributesResponse.cpp src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp src/sns/Subscription.cpp)
+        src/sns/GetTopicAttributesResponse.cpp src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp src/sns/model/Subscription.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp src/s3/PutObjectRequest.cpp
         src/s3/GetObjectRequest.cpp src/s3/GetObjectResponse.cpp src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
         src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp
@@ -87,9 +88,7 @@ add_subdirectory(tst)
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/ssm/model/Parameter.h
-        include/awsmock/dto/sqs/model/MessageFailed.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})

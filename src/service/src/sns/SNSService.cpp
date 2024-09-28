@@ -43,8 +43,10 @@ namespace AwsMock::Service {
 
         try {
 
+            long total = _snsDatabase.CountTopics(region);
             Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
             auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
+            listTopicsResponse.nextToken = "" + std::to_string(total);
             log_trace << "SNS list topics response: " << listTopicsResponse.ToXml();
 
             return listTopicsResponse;
@@ -200,16 +202,18 @@ namespace AwsMock::Service {
         Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_subscriptions");
         log_trace << "List subscriptions request: " << request.ToString();
 
-        try {
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
+        }
 
-            // Check existence
-            if (!_snsDatabase.TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-            }
+        try {
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionsByTopicResponse response;
+            response.nextToken = std::to_string(topic.subscriptions.size());
             for (const auto &s: topic.subscriptions) {
                 Dto::SNS::Subscription subscription = {.topicArn = request.topicArn, .protocol = s.protocol, .subscriptionArn = s.subscriptionArn, .endpoint = s.endpoint};
                 response.subscriptions.emplace_back(subscription);

@@ -12,11 +12,17 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 // Mongo included
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
 #include <bsoncxx/types.hpp>
+#include <mongocxx/pipeline.hpp>
 
 namespace AwsMock::Database {
 
     using namespace boost::posix_time;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_document;
 
     class MongoUtils {
 

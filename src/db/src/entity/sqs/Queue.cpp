@@ -42,6 +42,14 @@ namespace AwsMock::Database::Entity::SQS {
             created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
             modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
+            // Paging
+            if (mResult.value().find("paginationToken") != mResult.value().end()) {
+                paginationToken = bsoncxx::string::to_string(mResult.value()["paginationToken"].get_string().value);
+            }
+            if (mResult.value().find("score") != mResult.value().end()) {
+                score = mResult.value()["score"].get_double().value;
+            }
+
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
                 if (mResult.value().find("tags") != mResult.value().end()) {

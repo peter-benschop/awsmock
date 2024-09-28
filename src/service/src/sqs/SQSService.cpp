@@ -67,16 +67,46 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListQueueResponse SQSService::ListQueues(const std::string &region) {
+    Dto::SQS::ListQueuesResponse SQSService::ListQueues(const Dto::SQS::ListQueuesRequest &request) {
         Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queues");
-        log_trace << "List all queues request, region: " << region;
+        log_trace << "List all queues request, region: " << request.region;
 
         try {
 
-            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(region);
-            auto listQueueResponse = Dto::SQS::ListQueueResponse(queueList);
-            log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
+            if (request.maxResults > 0) {
 
+                // Get total number
+                long total = _sqsDatabase.CountQueues(request.region);
+                Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.maxResults, request.queueNamePrefix, request.nextToken, request.region);
+                Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList, .nextToken = queueList.back().oid, .total = total};
+                log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
+                return listQueueResponse;
+
+            } else {
+
+                Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
+                Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList};
+                log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
+                return listQueueResponse;
+            }
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::ListQueueArnsResponse SQSService::ListQueueArns() {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queues");
+        log_trace << "List all queues ARNs request";
+
+        try {
+
+            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+            Dto::SQS::ListQueueArnsResponse listQueueResponse;
+            for (const auto &queue: queueList) {
+                listQueueResponse.queueArns.emplace_back(queue.queueArn);
+            }
+            log_trace << "SQS create queue ARN list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
 
         } catch (Poco::Exception &ex) {
@@ -97,9 +127,18 @@ namespace AwsMock::Service {
 
         try {
 
+            // Update messages
             std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
             _sqsDatabase.PurgeQueue(queueArn);
             log_trace << "SQS queue purged, queueArn: " << queueArn;
+
+            // Update queue counter
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+            queue.attributes.approximateNumberOfMessages = 0;
+            queue.attributes.approximateNumberOfMessagesDelayed = 0;
+            queue.attributes.approximateNumberOfMessagesNotVisible = 0;
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_trace << "SQS queue counter updated, queueArn: " << queue.queueArn;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -195,6 +234,9 @@ namespace AwsMock::Service {
             }
             if (CheckAttribute(request.attributeNames, "RedrivePolicy")) {
                 response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
+            }
+            if (CheckAttribute(request.attributeNames, "QueueArn")) {
+                response.attributes.emplace_back("QueueArn", queue.queueArn);
             }
         }
         log_debug << response.ToString();
@@ -381,6 +423,8 @@ namespace AwsMock::Service {
             std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes);
 
             // Update database
+            queue.attributes.approximateNumberOfMessages++;
+            queue = _sqsDatabase.UpdateQueue(queue);
             Database::Entity::SQS::Message message = _sqsDatabase.CreateMessage(
                     {.queueArn = queue.queueArn,
                      .body = request.body,

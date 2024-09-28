@@ -7,8 +7,8 @@
 
 // C++ standard includes
 #include <iostream>
+#include <iterator>
 #include <string>
-#include <vector>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -29,6 +29,7 @@
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/memorydb/SQSMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database {
 
@@ -138,6 +139,18 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SQS::Queue GetQueueByUrl(const std::string &region, const std::string &queueUrl);
+
+        /**
+         * @brief List available queues, using paging
+         *
+         * @param maxResults maximal number of results
+         * @param prefix queue name prefix
+         * @param nextToken next token
+         * @param region AWS region
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        Entity::SQS::QueueList ListQueues(int maxResults, const std::string &prefix, const std::string &nextToken, const std::string &region = {});
 
         /**
          * @brief List all available queues

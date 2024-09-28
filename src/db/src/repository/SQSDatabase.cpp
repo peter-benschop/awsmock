@@ -196,6 +196,48 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::SQS::QueueList SQSDatabase::ListQueues(int maxResults, const std::string &prefix, const std::string &nextToken, const std::string &region) {
+
+        Entity::SQS::QueueList queueList;
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
+
+            bsoncxx::builder::basic::document query;
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "/^" + prefix + "/"))));
+            }
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+
+            long skipCount = 0;
+            if (!nextToken.empty()) {
+                skipCount = std::stol(nextToken);
+                log_debug << "Skip count, count: " << skipCount;
+            }
+
+            mongocxx::options::find opts;
+            opts.sort(make_document(kvp("_id", 1)));
+            opts.limit(maxResults);
+            opts.skip(skipCount);
+
+            auto queueCursor = _queueCollection.find(query.view(), opts);
+            for (auto queue: queueCursor) {
+                Entity::SQS::Queue result;
+                result.FromDocument(queue);
+                queueList.push_back(result);
+            }
+
+        } else {
+
+            queueList = _memoryDb.ListQueues(region);
+        }
+        log_trace << "Got queue list, size: " << queueList.size();
+        return queueList;
+    }
+
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) {
 
         Entity::SQS::QueueList queueList;
@@ -204,23 +246,16 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            if (region.empty()) {
+            bsoncxx::builder::basic::document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
 
-                auto queueCursor = _queueCollection.find({});
-                for (auto queue: queueCursor) {
-                    Entity::SQS::Queue result;
-                    result.FromDocument(queue);
-                    queueList.push_back(result);
-                }
-
-            } else {
-
-                auto queueCursor = _queueCollection.find(make_document(kvp("region", region)));
-                for (auto queue: queueCursor) {
-                    Entity::SQS::Queue result;
-                    result.FromDocument(queue);
-                    queueList.push_back(result);
-                }
+            auto queueCursor = _queueCollection.find(query.view());
+            for (auto queue: queueCursor) {
+                Entity::SQS::Queue result;
+                result.FromDocument(queue);
+                queueList.push_back(result);
             }
 
         } else {
@@ -843,7 +878,6 @@ namespace AwsMock::Database {
 
     Entity::SQS::MessageWaitTime SQSDatabase::GetAverageMessageWaitingTime() {
 
-        // TODO: Add memory db implementation
         if (HasDatabase()) {
 
             Entity::SQS::MessageWaitTime waitTime;
@@ -894,6 +928,7 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException(exc.what());
             }
         } else {
+
             return _memoryDb.GetAverageMessageWaitingTime();
         }
         return {};

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    std::string ListQueueResponse::ToXml() const {
+    std::string ListQueuesResponse::ToXml() const {
 
         try {
 
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListQueueResponse::ToJson() const {
+    std::string ListQueuesResponse::ToJson() const {
 
         try {
             Poco::JSON::Array queuesArrayJson;
@@ -42,6 +42,8 @@ namespace AwsMock::Dto::SQS {
 
             Poco::JSON::Object rootJson;
             rootJson.set("QueueUrls", queuesArrayJson);
+            rootJson.set("NextToken", nextToken);
+            rootJson.set("Total", total);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -51,14 +53,14 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListQueueResponse::ToString() const {
+    std::string ListQueuesResponse::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListQueueResponse &r) {
-        os << "ListQueueResponse=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListQueuesResponse &r) {
+        os << "ListQueuesResponse=" << r.ToJson();
         return os;
     }
 
