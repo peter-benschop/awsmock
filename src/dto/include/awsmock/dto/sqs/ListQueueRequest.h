@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H
-#define AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_LIST_QUEUES_REQUEST_H
+#define AWSMOCK_DTO_SQS_LIST_QUEUES_REQUEST_H
 
 // C++ standard includes
 #include <iostream>
@@ -29,12 +29,29 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListQueuesResponse {
+    /**
+     *
+     * Example
+     * @code(.json)
+     * {
+     *   "MaxResults":10,
+     *   "NextToken":"",
+     *   "QueueNamePrefix":""
+     * }"
+     * @endcode
+     *
+     */
+    struct ListQueuesRequest {
 
         /**
-         * List of queues
+         * Region
          */
-        Database::Entity::SQS::QueueList queueList;
+        std::string region;
+
+        /**
+         * Max results
+         */
+        int maxResults = -1;
 
         /**
          * Next token
@@ -42,16 +59,16 @@ namespace AwsMock::Dto::SQS {
         std::string nextToken;
 
         /**
-         * Total number of queue
+         * Queue name prefix
          */
-        long total;
+        std::string queueNamePrefix;
 
         /**
-         * Convert to XML representation
+         * Convert to JSON representation
          *
-         * @return XML string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToXml() const;
+        void FromJson(const std::string &jsonString);
 
         /**
          * Convert to JSON representation
@@ -72,9 +89,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListQueuesResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListQueuesRequest &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H
+#endif// AWSMOCK_DTO_SQS_LIST_QUEUES_REQUEST_H

@@ -22,6 +22,9 @@
 #include <Poco/UUIDGenerator.h>
 #include <Poco/XML/XMLWriter.h>
 
+// AwsMock includes
+#include <awsmock/core/XmlUtils.h>
+
 namespace AwsMock::Dto::SNS {
 
     struct GetTopicAttributesResponse {
@@ -45,6 +48,11 @@ namespace AwsMock::Dto::SNS {
          * Owner
          */
         std::string owner;
+
+        /**
+         * Display name
+         */
+        std::string displayName;
 
         /**
          * Convert to XML representation

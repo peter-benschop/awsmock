@@ -29,9 +29,16 @@ namespace AwsMock::Dto::SNS {
 
             Poco::XML::AutoPtr<Poco::XML::Element> pTopicArn = pDoc->createElement("TopicArn");
             pTopicMember->appendChild(pTopicArn);
+
             Poco::XML::AutoPtr<Poco::XML::Text> pTopicArnText = pDoc->createTextNode(it.topicArn);
             pTopicArn->appendChild(pTopicArnText);
         }
+
+        // Total
+        Poco::XML::AutoPtr<Poco::XML::Element> pNextToken = pDoc->createElement("NextToken");
+        pListTopicResult->appendChild(pNextToken);
+        Poco::XML::AutoPtr<Poco::XML::Text> pNextTokenText = pDoc->createTextNode(nextToken);
+        pNextToken->appendChild(pNextTokenText);
 
         // Metadata
         Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
@@ -42,13 +49,7 @@ namespace AwsMock::Dto::SNS {
         Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
         pRequestId->appendChild(pRequestText);
 
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string ListTopicsResponse::ToString() const {

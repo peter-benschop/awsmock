@@ -45,6 +45,16 @@ namespace AwsMock::Dto::SNS {
         SubscriptionsList subscriptions;
 
         /**
+         * Next token
+         */
+        std::string nextToken;
+
+        /**
+         * Total number of queue
+         */
+        long total;
+
+        /**
          * Convert to XML representation
          *
          * @return XML string

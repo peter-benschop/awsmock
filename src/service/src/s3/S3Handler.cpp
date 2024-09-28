@@ -118,8 +118,6 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::GET_OBJECT_RANGE: {
 
-                    Core::HttpUtils::DumpHeaders(request);
-
                     // Get object request
                     log_debug << "S3 get object request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     Dto::S3::GetObjectRequest s3Request = {
@@ -283,8 +281,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::S3CommandType::PUT_OBJECT: {
-
-                    //Core::HttpUtils::DumpHeaders(request);
 
                     // Get the user metadata
                     std::map<std::string, std::string> metadata = GetMetadata(request);
@@ -580,7 +576,6 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD: {
 
                     log_debug << "Starting multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    //Core::HttpUtils::DumpHeaders(request);
 
                     Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
                     s3Request.metadata = GetMetadata(request);
@@ -595,7 +590,6 @@ namespace AwsMock::Service {
 
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
-                    //Core::HttpUtils::DumpHeaders(request);
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
                     Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);

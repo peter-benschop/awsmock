@@ -2,6 +2,7 @@
 // Created by vogje01 on 6/3/24.
 //
 
+#include "awsmock/core/monitoring/MetricSystemCollector.h"
 #include <awsmock/server/Monitoring.h>
 
 namespace AwsMock::Manager {
@@ -11,6 +12,7 @@ namespace AwsMock::Manager {
     }
 
     void ManagerMonitoring::Initialize() {
+        UpdateCounter();
     }
 
     void ManagerMonitoring::Run() {
@@ -38,7 +40,6 @@ namespace AwsMock::Manager {
                 metricService.SetGauge(MODULE_UPDOWN_GAUGE, "module", module.name, 1.0);
             }
         }
-
         log_trace << "Manager monitoring finished";
     }
 }// namespace AwsMock::Manager

@@ -2,10 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_TOPICS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_LIST_TOPICS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SQS_LIST_QUEUE_ARNS_RESPONSE_H
+#define AWSMOCK_DTO_SQS_LIST_QUEUE_ARNS_RESPONSE_H
 
 // C++ standard includes
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -18,42 +19,29 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/Object.h>
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/entity/sns/Topic.h>
+#include <awsmock/entity/sqs/Queue.h>
 
-namespace AwsMock::Dto::SNS {
+namespace AwsMock::Dto::SQS {
 
-    struct ListTopicsResponse {
+    struct ListQueueArnsResponse {
 
         /**
-         * List of topics
+         * List of queues ARNs
          */
-        Database::Entity::SNS::TopicList topicList;
+        std::vector<std::string> queueArns;
 
         /**
-         * Next token
-         */
-        std::string nextToken;
-
-        /**
-         * Total number of queue
-         */
-        long total;
-
-        /**
-         * Convert to XML representation
+         * Convert to JSON representation
          *
-         * @return XML string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Converts the DTO to a string representation.
@@ -67,9 +55,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTopicsResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListQueueArnsResponse &r);
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_LIST_TOPICS_RESPONSE_H
+#endif// AWSMOCK_DTO_SQS_LIST_QUEUE_ARNS_RESPONSE_H

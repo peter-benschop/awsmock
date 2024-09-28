@@ -3,6 +3,8 @@
 
 namespace AwsMock::Service {
 
+    //    const std::map<std::string, std::string> SQSHandler::headers = CognitoHandler::CreateHeaderMap();
+
     http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "SQS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -125,8 +127,15 @@ namespace AwsMock::Service {
                         sqsRequest = {.region = clientCommand.region, .queueName = queueName};
                     }
                     Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+
                     log_info << "Get queue url, queueName: " << sqsRequest.queueName;
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                }
+
+                case Dto::Common::SqsCommandType::GET_QUEUE_ARNS: {
+
+                    Dto::SQS::ListQueueArnsResponse sqsResponse = _sqsService.ListQueueArns();
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::TAG_QUEUE: {
@@ -156,7 +165,13 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUES: {
 
-                    Dto::SQS::ListQueueResponse sqsResponse = _sqsService.ListQueues(clientCommand.region);
+                    Dto::SQS::ListQueuesRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+
+                    std::string tmp = Core::HttpUtils::GetBodyAsString(request);
+
+                    Dto::SQS::ListQueuesResponse sqsResponse = _sqsService.ListQueues(sqsRequest);
 
                     if (clientCommand.contentType == "json") {
 
