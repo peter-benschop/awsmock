@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.5](https://github.com/jensvogt/awsmock/compare/v0.15.4...v0.15.5) (2024-09-28)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** fixed http keep-alive ([e280f41](https://github.com/jensvogt/awsmock/commit/e280f41ddb9e35055154a6f029c0b1b21d984648))
+* **628-sqs-receive-message-spoils-statistics:** fixed http keep-alive ([6c0c3e8](https://github.com/jensvogt/awsmock/commit/6c0c3e8bc50e67d3aa8229acf7a92332d58f9552))
+* **628-sqs-receive-message-spoils-statistics:** fixed http keep-alive ([6dbc4f7](https://github.com/jensvogt/awsmock/commit/6dbc4f7d343996eccd48e396c57ff59ab82fefd8))
+
 ## [0.15.4](https://github.com/jensvogt/awsmock/compare/v0.15.3...v0.15.4) (2024-09-28)
 
 
