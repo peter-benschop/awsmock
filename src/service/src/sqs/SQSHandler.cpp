@@ -16,17 +16,13 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::CREATE_QUEUE: {
 
+                    Dto::SQS::CreateQueueRequest sqsRequest;
                     if (clientCommand.contentType == "json") {
 
-                        Dto::SQS::CreateQueueRequest sqsRequest;
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.queueUrl = Core::CreateSQSQueueUrl(sqsRequest.queueName);
                         sqsRequest.region = clientCommand.region;
                         sqsRequest.owner = clientCommand.user;
-
-                        Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-                        return SendOkResponse(request, sqsResponse.ToJson());
-                        log_info << "Create queue, queueName: " << sqsRequest.queueName;
 
                     } else {
 
@@ -35,12 +31,13 @@ namespace AwsMock::Service {
                         std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(clientCommand.payload);
                         std::map<std::string, std::string> tags = GetQueueTags(clientCommand.payload);
 
-                        Dto::SQS::CreateQueueRequest sqsRequest = {.region = clientCommand.region, .queueName = queueName, .queueUrl = queueUrl, .owner = clientCommand.user, .attributes = attributes, .tags = tags, .requestId = Core::AwsUtils::CreateRequestId()};
-
-                        Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
-                        return SendOkResponse(request, sqsResponse.ToXml());
-                        log_info << "Create queue, queueName: " << queueName;
+                        sqsRequest = {.region = clientCommand.region, .queueName = queueName, .queueUrl = queueUrl, .owner = clientCommand.user, .attributes = attributes, .tags = tags, .requestId = Core::AwsUtils::CreateRequestId()};
                     }
+
+                    Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
+                    log_info << "Create queue, queueName: " << sqsRequest.queueName;
+
+                    return SendOkResponse(request, sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
@@ -57,8 +54,9 @@ namespace AwsMock::Service {
                         sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl};
                     }
                     _sqsService.PurgeQueue(sqsRequest);
-                    return SendOkResponse(request);
                     log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl;
+
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_ATTRIBUTES: {
@@ -77,8 +75,9 @@ namespace AwsMock::Service {
                     }
 
                     Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                     log_info << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl;
+
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
@@ -88,9 +87,6 @@ namespace AwsMock::Service {
 
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
-
-                        Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
-                        return SendOkResponse(request, sqsResponse.ToJson());
 
                     } else {
 
@@ -107,11 +103,12 @@ namespace AwsMock::Service {
                         }
 
                         sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl, .attributes = attributes};
-
-                        Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
-                        return SendOkResponse(request, sqsResponse.ToXml());
                     }
+
+                    Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
                     log_info << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl;
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
@@ -127,8 +124,8 @@ namespace AwsMock::Service {
                         sqsRequest = {.region = clientCommand.region, .queueName = queueName};
                     }
                     Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
-
                     log_info << "Get queue url, queueName: " << sqsRequest.queueName;
+
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
@@ -158,9 +155,9 @@ namespace AwsMock::Service {
                         sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl, .tags = tags};
                     }
                     _sqsService.TagQueue(sqsRequest);
+                    log_info << "Tag queue, queueUrl: " << sqsRequest.queueUrl;
 
                     return SendOkResponse(request);
-                    log_info << "Tag queue, queueUrl: " << sqsRequest.queueUrl;
                 }
 
                 case Dto::Common::SqsCommandType::LIST_QUEUES: {
@@ -172,16 +169,15 @@ namespace AwsMock::Service {
                     std::string tmp = Core::HttpUtils::GetBodyAsString(request);
 
                     Dto::SQS::ListQueuesResponse sqsResponse = _sqsService.ListQueues(sqsRequest);
+                    log_info << "List queues";
 
                     if (clientCommand.contentType == "json") {
 
                         return SendOkResponse(request, sqsResponse.ToJson());
-                        log_info << "List queues";
 
                     } else {
 
                         return SendOkResponse(request, sqsResponse.ToXml());
-                        log_info << "List queues";
                     }
                 }
 
@@ -193,23 +189,19 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
 
-                        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-
-                        // Empty response
-                        return SendOkResponse(request);
-                        log_info << "Delete queue, queueUrl: " << sqsRequest.queueUrl;
-
                     } else {
 
                         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
                         sqsRequest = {.queueUrl = queueUrl};
                         sqsRequest.region = clientCommand.region;
                         sqsRequest.requestId = Core::AwsUtils::CreateRequestId();
-
-                        Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-                        return SendOkResponse(request, sqsResponse.ToXml());
-                        log_info << "Delete queue, queueUrl: " << sqsRequest.queueUrl;
                     }
+
+                    Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
+                    log_info << "Delete queue, queueUrl: " << sqsRequest.queueUrl;
+
+                    // Empty response
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE: {
@@ -234,9 +226,9 @@ namespace AwsMock::Service {
 
                     // Call service
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
+                    log_info << "Send message, queueArn: " << sqsRequest.queueArn;
 
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-                    log_info << "Send message, queueUrl: " << sqsRequest.queueUrl;
                 }
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE_BATCH: {
@@ -247,7 +239,6 @@ namespace AwsMock::Service {
 
                     // Call service
                     Dto::SQS::SendMessageBatchResponse sqsResponse = _sqsService.SendMessageBatch(sqsRequest);
-
                     log_info << "SQS message batch send, successful: " << sqsResponse.successful.size() << " failed: " << sqsResponse.failed.size();
 
                     return SendOkResponse(request, sqsResponse.ToJson());
@@ -270,10 +261,10 @@ namespace AwsMock::Service {
                         sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl, .maxMessages = maxMessages, .visibilityTimeout = visibility, .waitTimeSeconds = waitTimeSeconds, .requestId = Core::AwsUtils::CreateRequestId()};
                     }
                     Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
+                    log_info << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;
 
                     // Send response
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
-                    log_info << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;
                 }
 
                 case Dto::Common::SqsCommandType::CHANGE_MESSAGE_VISIBILITY: {
@@ -294,8 +285,9 @@ namespace AwsMock::Service {
                     }
 
                     _sqsService.SetVisibilityTimeout(sqsRequest);
-                    return SendOkResponse(request);
                     log_info << "Change visibility, queueUrl: " << sqsRequest.queueUrl << " timeout: " << sqsRequest.visibilityTimeout;
+
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
@@ -317,8 +309,9 @@ namespace AwsMock::Service {
                     }
 
                     _sqsService.DeleteMessage(sqsRequest);
-                    return SendOkResponse(request);
                     log_info << "Delete message, queueUrl: " << sqsRequest.queueUrl;
+
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE_BATCH: {
@@ -345,8 +338,9 @@ namespace AwsMock::Service {
                         }
                     }
                     _sqsService.DeleteMessageBatch(sqsRequest);
-                    return SendOkResponse(request);
                     log_info << "Delete message batch, queueUrl: " << sqsRequest.queueUrl;
+
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::UNKNOWN: {
