@@ -59,7 +59,7 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::StartModules(boost::asio::io_context &ioc) {
+    void Manager::StartModules() {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
@@ -107,7 +107,7 @@ namespace AwsMock::Manager {
                 _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
                 _serverMap[module.name]->Start();
             } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::GatewayServer>(ioc);
+                _serverMap[module.name] = std::make_shared<Service::GatewayServer>();
                 _serverMap[module.name]->Start();
             }
             log_debug << "Module " << module.name << " started";
@@ -138,6 +138,8 @@ namespace AwsMock::Manager {
         std::string hostAddress = Core::Configuration::instance().getString("awsmock.manager.http.address");
         unsigned short port = Core::Configuration::instance().getInt("awsmock.manager.http.port");
 
+        ManagerMonitoring managerMonitoring(60);
+
         // The io_context is required for all I/O
         boost::asio::io_context ioc{threads};
 
@@ -155,25 +157,15 @@ namespace AwsMock::Manager {
                     ioc.stop();
                 });
 
-        ManagerMonitoring managerMonitoring(60);
-
-        // Run the I/O service on the requested number of threads
-        std::vector<std::thread> worker;
-        worker.reserve(threads - 1);
-        for (auto i = threads - 1; i > 0; --i)
-            worker.emplace_back(
-                    [&ioc] {
-                        ioc.run();
-                    });
-        ioc.run();
+        boost::thread_group threadGroup;
+        for (auto i = 0; i < threads; i++) {
+            threadGroup.create_thread(
+                    [ObjectPtr = &ioc] { return ObjectPtr->run(); });
+        }
+        threadGroup.join_all();
 
         // Stop all services
         StopModules();
-
-        // Block until all the threads exit
-        for (auto &t: worker) {
-            t.join();
-        }
 
         log_info << "So long, and thanks for all the fish!";
     }

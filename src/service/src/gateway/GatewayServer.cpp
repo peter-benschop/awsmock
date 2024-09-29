@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewayServer::GatewayServer(boost::asio::io_context &ioc) : AbstractServer("gateway"), _ioc(ioc) {
+    GatewayServer::GatewayServer() : AbstractServer("gateway") {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -38,25 +38,36 @@ namespace AwsMock::Service {
         // Set running
         Database::ModuleDatabase::instance().SetState("gateway", Database::Entity::Module::ModuleState::RUNNING);
 
+        // The io_context is required for all I/O
+        boost::asio::io_context ioc{_maxThreads};
+
         // Create and launch a listening port
         auto address = ip::make_address(_address);
-        std::make_shared<GatewayListener>(_ioc, ip::tcp::endpoint{address, _port})->Run();
+        std::make_shared<GatewayListener>(ioc, ip::tcp::endpoint{address, _port})->Run();
 
-        // Run the I/O service on the requested number of threads
-        _threads.reserve(_maxThreads - 1);
-        for (auto i = _maxThreads - 1; i > 0; --i)
-            _threads.emplace_back(
-                    [this] {
-                        _ioc.run();
-                    });
-        _ioc.run();
+        // Capture SIGINT and SIGTERM to perform a clean shutdown
+        boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
+        signals.async_wait(
+                [&](boost::beast::error_code const &, int) {
+                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
+                    // destroying the `io_context` and all the sockets in it.
+                    log_info << "Manager stopped on signal";
+                    ioc.stop();
+                });
+
+        boost::thread_group threadGroup;
+        for (auto i = 0; i < _maxThreads; i++) {
+            threadGroup.create_thread(
+                    [ObjectPtr = &ioc] { return ObjectPtr->run(); });
+        }
+        threadGroup.join_all();
     }
 
     void GatewayServer::Shutdown() {
-        _ioc.stop();
+        /* _ioc.stop();
         for (auto &t: _threads) {
             t.join();
-        }
+        }*/
     }
 
 }// namespace AwsMock::Service

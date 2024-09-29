@@ -586,6 +586,29 @@ namespace AwsMock::Database {
         return messageList;
     }
 
+    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, int pageSize, int pageIndex) {
+
+        Entity::SQS::MessageList messageList;
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+
+            mongocxx::options::find opts;
+            opts.limit(pageSize);
+            opts.skip(pageSize * pageIndex);
+
+            auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn)), opts);
+            for (auto message: messageCursor) {
+                Entity::SQS::Message result;
+                result.FromDocument(message);
+                messageList.push_back(result);
+            }
+        }
+        log_trace << "Got message list, size: " << messageList.size();
+        return messageList;
+    }
+
     void SQSDatabase::ReceiveMessages(const std::string &queueArn, int visibility, int maxMessages, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) {
 
         // First rest resources

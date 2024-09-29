@@ -278,6 +278,15 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList ListMessages(const std::string &region = {});
 
         /**
+         * @brief Paged list of messages
+         *
+         * @param queueArn queue ARN
+         * @return list of SQS messages
+         * @throws DatabaseException
+         */
+        Entity::SQS::MessageList ListMessages(const std::string &queueArn, int pageSize, int pageIndex);
+
+        /**
          * @brief Receive messages from an queue.
          *
          * @param queueArn queue ARN
