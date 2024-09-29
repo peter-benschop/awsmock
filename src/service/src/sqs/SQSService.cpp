@@ -122,7 +122,9 @@ namespace AwsMock::Service {
         try {
 
             Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.pageSize, {}, std::to_string(request.pageSize * request.pageIndex), request.region);
+
             Dto::SQS::ListQueueCountersResponse listQueueResponse;
+            listQueueResponse.total = _sqsDatabase.CountQueues(request.region);
             for (const auto &queue: queueList) {
                 Dto::SQS::QueueCounter counter;
                 counter.queueName = queue.name;

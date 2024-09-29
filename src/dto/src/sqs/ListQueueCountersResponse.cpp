@@ -16,6 +16,7 @@ namespace AwsMock::Dto::SQS {
 
             Poco::JSON::Object rootJson;
             rootJson.set("QueueCounters", queueCounterArrayJson);
+            rootJson.set("Total", total);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
