@@ -37,7 +37,11 @@
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/ListMessagesRequest.h>
+#include <awsmock/dto/sqs/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/ListQueueArnsResponse.h>
+#include <awsmock/dto/sqs/ListQueueCountersRequest.h>
+#include <awsmock/dto/sqs/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
@@ -103,10 +107,18 @@ namespace AwsMock::Service {
          * @brief Returns a list of all available queues ARNs
          *
          * @return ListQueueArnsResponse
-         * @see ListQueuesRequest
-         * @see ListQueuesResponse
+         * @see ListQueueArnsResponse
          */
         Dto::SQS::ListQueueArnsResponse ListQueueArns();
+
+        /**
+         * @brief Returns a list of all available queues counters
+         *
+         * @param request list queue counters request
+         * @return ListQueueCountersResponse
+         * @see ListQueueCountersResponse
+         */
+        Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
 
         /**
          * @brief Purge a queue.
@@ -197,6 +209,16 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
+
+        /**
+         * @brief Returns a list SQS messages
+         *
+         * @param request list messages request
+         * @return ListMessagesResponse
+         * @throws ServiceException
+         * @see ListMessagesResponse
+         */
+        Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request);
 
         /**
          * @brief Deletes a message

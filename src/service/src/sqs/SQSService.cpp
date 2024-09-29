@@ -96,7 +96,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueArnsResponse SQSService::ListQueueArns() {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queues");
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_arns");
         log_trace << "List all queues ARNs request";
 
         try {
@@ -107,6 +107,33 @@ namespace AwsMock::Service {
                 listQueueResponse.queueArns.emplace_back(queue.queueArn);
             }
             log_trace << "SQS create queue ARN list response: " << listQueueResponse.ToJson();
+            return listQueueResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::ListQueueCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_counters");
+        log_trace << "List all queues counters request";
+
+        try {
+
+            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.pageSize, {}, std::to_string(request.pageSize * request.pageIndex), request.region);
+            Dto::SQS::ListQueueCountersResponse listQueueResponse;
+            for (const auto &queue: queueList) {
+                Dto::SQS::QueueCounter counter;
+                counter.queueName = queue.name;
+                counter.queueArn = queue.queueArn;
+                counter.queueUrl = queue.queueUrl;
+                counter.available = queue.attributes.approximateNumberOfMessages;
+                counter.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
+                counter.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
+                listQueueResponse.queueCounters.emplace_back(counter);
+            }
+            log_trace << "SQS create queue counters list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
 
         } catch (Poco::Exception &ex) {
@@ -560,6 +587,36 @@ namespace AwsMock::Service {
             log_info << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
 
             return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::ListMessagesResponse SQSService::ListMessages(const Dto::SQS::ListMessagesRequest &request) {
+        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_messages");
+        log_trace << "List all messages request";
+
+        try {
+
+            long total = _sqsDatabase.CountMessages(request.queueArn);
+
+            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.pageSize, request.pageIndex);
+
+            Dto::SQS::ListMessagesResponse listMessagesResponse;
+            for (const auto &message: messages) {
+                Dto::SQS::MessageEntry messageEntry;
+                messageEntry.region = request.region;
+                messageEntry.messageId = message.messageId;
+                messageEntry.id = message.oid;
+                messageEntry.body = message.body;
+                messageEntry.receiptHandle = message.receiptHandle;
+                messageEntry.md5Sum = message.md5Body;
+                listMessagesResponse.messages.emplace_back(messageEntry);
+            }
+            log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
+            return listMessagesResponse;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();

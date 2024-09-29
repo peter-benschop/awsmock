@@ -56,11 +56,9 @@ namespace AwsMock::Manager {
         static void Initialize();
 
         /**
-         * @brief Start the modules.
-         *
-         * Only the modules are started, which are set to 'active' in the configuration file.
+         * @brief Initialize the Prometheus monitoring counters and StartServer the prometheus manager.
          */
-        void StartModules(boost::asio::io_context &ioc);
+        void StartModules();
 
         /**
          * @brief Stops all currently running modules.
@@ -75,11 +73,6 @@ namespace AwsMock::Manager {
       private:
 
         /**
-         * @brief Initialize the logging
-         */
-        static void InitializeLogging();
-
-        /**
          * @brief Initialize the Prometheus monitoring counters and StartServer the prometheus manager.
          */
         static void InitializeMonitoring();
@@ -88,11 +81,6 @@ namespace AwsMock::Manager {
          * @brief Initialize database
          */
         static void InitializeDatabase();
-
-        /**
-         * @brief Initialize CURL library
-         */
-        static void InitializeCurl();
 
         /**
          * Server map

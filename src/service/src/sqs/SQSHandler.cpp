@@ -129,9 +129,22 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
-                case Dto::Common::SqsCommandType::GET_QUEUE_ARNS: {
+                case Dto::Common::SqsCommandType::LIST_QUEUE_ARNS: {
 
                     Dto::SQS::ListQueueArnsResponse sqsResponse = _sqsService.ListQueueArns();
+                    log_info << "List queue ARNs";
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
+                case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
+
+                    Dto::SQS::ListQueueCountersRequest sqsRequest{};
+                    sqsRequest.FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+
+                    Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
+                    log_info << "List queue Counters";
+
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -288,6 +301,18 @@ namespace AwsMock::Service {
                     log_info << "Change visibility, queueUrl: " << sqsRequest.queueUrl << " timeout: " << sqsRequest.visibilityTimeout;
 
                     return SendOkResponse(request);
+                }
+
+                case Dto::Common::SqsCommandType::LIST_MESSAGES: {
+
+                    Dto::SQS::ListMessagesRequest sqsRequest{};
+                    sqsRequest.FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+
+                    Dto::SQS::ListMessagesResponse sqsResponse = _sqsService.ListMessages(sqsRequest);
+                    log_info << "List queue messages, queueArn: " << sqsRequest.queueArn;
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {

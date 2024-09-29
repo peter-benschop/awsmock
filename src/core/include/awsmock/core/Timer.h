@@ -42,11 +42,10 @@ namespace AwsMock::Core {
          */
         explicit Timer(std::string name) : _name(std::move(name)) {}
 
-        virtual /**
+        /**
          * @brief Start the timer
          */
-                void
-                Start();
+        virtual void Start();
 
         /**
          * @brief Start the task

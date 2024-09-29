@@ -99,11 +99,9 @@ int main(int argc, char *argv[]) {
     }
 
     // Start manager
-    int max = AwsMock::Core::Configuration::instance().getInt("awsmock.service.gateway.http.max.threads");
-    boost::asio::io_context ioc{max};
     AwsMock::Manager::Manager awsMockManager;
     AwsMock::Manager::Manager::Initialize();
-    awsMockManager.StartModules(ioc);
+    awsMockManager.StartModules();
     awsMockManager.Run();
 
     return EXIT_SUCCESS;
