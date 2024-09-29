@@ -41,7 +41,7 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer = std::make_shared<Service::GatewayServer>();
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -61,7 +61,6 @@ namespace AwsMock::Service {
             return Core::FileUtils::CreateTempFile("json", R"({"orgaNr":{"N":"1"}})");
         }
 
-        boost::asio::io_context ioc{10};
         std::string _endpoint;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
