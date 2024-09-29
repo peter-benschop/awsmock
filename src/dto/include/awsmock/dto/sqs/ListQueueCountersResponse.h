@@ -36,6 +36,11 @@ namespace AwsMock::Dto::SQS {
         std::vector<QueueCounter> queueCounters;
 
         /**
+         * Total number of queues
+         */
+        long total;
+
+        /**
          * Convert to JSON representation
          *
          * @return JSON string

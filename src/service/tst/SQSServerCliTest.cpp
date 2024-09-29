@@ -44,7 +44,7 @@ namespace AwsMock::Service {
             _queueUrl = "http://sqs." + _region + "." + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer = std::make_shared<Service::GatewayServer>();
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -77,7 +77,6 @@ namespace AwsMock::Service {
             return receiptHandle;
         }
 
-        boost::asio::io_context ioc{2};
         std::string _endpoint, _queueUrl, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
