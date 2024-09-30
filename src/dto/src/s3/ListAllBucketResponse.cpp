@@ -13,6 +13,11 @@ namespace AwsMock::Dto::S3 {
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListAllMyBucketsResult");
         pDoc->appendChild(pRoot);
 
+        Poco::XML::AutoPtr<Poco::XML::Element> pTotal = pDoc->createElement("Total");
+        pRoot->appendChild(pTotal);
+        Poco::XML::AutoPtr<Poco::XML::Text> pTotalText = pDoc->createTextNode(std::to_string(total));
+        pTotal->appendChild(pTotalText);
+
         Poco::XML::AutoPtr<Poco::XML::Element> pBuckets;
         pBuckets = pDoc->createElement("Buckets");
         pRoot->appendChild(pBuckets);
@@ -38,12 +43,7 @@ namespace AwsMock::Dto::S3 {
             pCreated->appendChild(pCreatedText);
         }
 
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string ListAllBucketResponse::ToString() const {

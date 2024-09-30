@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_LIST_ALL_BUCKET_RESPONSE_H
-#define AWSMOCK_DTO_S3_LIST_ALL_BUCKET_RESPONSE_H
+#ifndef AWSMOCK_DTO_S3_LIST_OBJECT_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_S3_LIST_OBJECT_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <sstream>
@@ -11,28 +11,28 @@
 
 // AwsMock includes
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/entity/s3/Bucket.h>
+#include <awsmock/dto/s3/model/ObjectCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListAllBucketResponse {
+    struct ListObjectCounterResponse {
 
         /**
-         * List of buckets
+         * List of objects
          */
-        Database::Entity::S3::BucketList bucketList;
+        std::vector<ObjectCounter> objectCounters;
 
         /**
-         * Total number of buckets
+         * Total number of objects
          */
         long total = 0;
 
         /**
-         * @brief Convert to XML representation
+         * @brief Convert to JSON representation
          *
-         * @return XML string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -46,9 +46,9 @@ namespace AwsMock::Dto::S3 {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListAllBucketResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListObjectCounterResponse &r);
     };
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_LIST_ALL_BUCKET_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_LIST_ALL_OBJECT_RESPONSE_H

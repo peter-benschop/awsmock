@@ -179,9 +179,9 @@ namespace AwsMock::Database::Entity::S3 {
         }
 
         // Bucket encryption
-        if (mResult.value().find("encryptionConfiguration") != mResult.value().end()) {
+        /*if (mResult.value().find("encryptionConfiguration") != mResult.value().end()) {
             bucketEncryption.FromDocument(mResult.value()["encryptionConfiguration"].get_document().view());
-        }
+        }*/
     }
 
     Poco::JSON::Object Bucket::ToJsonObject() const {

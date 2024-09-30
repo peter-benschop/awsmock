@@ -149,6 +149,23 @@ namespace AwsMock::Database {
         EXPECT_STREQ(result2[0].key.c_str(), (std::string("test1/") + std::string(OBJECT)).c_str());
     }
 
+    TEST_F(S3DatabaseTest, BucketSizeTest) {
+
+        // arrange
+        Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
+        _servicedatabase.CreateBucket(bucket);
+        Entity::S3::Object object1 = {.region = _region, .bucket = bucket.name, .key = OBJECT, .owner = OWNER, .size = 5};
+        _servicedatabase.CreateObject(object1);
+        Entity::S3::Object object2 = {.region = _region, .bucket = bucket.name, .key = "test1/" + std::string(OBJECT), .owner = OWNER, .size = 5};
+        _servicedatabase.CreateObject(object2);
+
+        // act
+        long totalSize = _servicedatabase.BucketSize(_region, BUCKET);
+
+        // assert
+        EXPECT_EQ(totalSize, 10);
+    }
+
     TEST_F(S3DatabaseTest, BucketHasObjetsTest) {
 
         // arrange

@@ -35,8 +35,12 @@
 #include <awsmock/dto/s3/GetObjectRequest.h>
 #include <awsmock/dto/s3/GetObjectResponse.h>
 #include <awsmock/dto/s3/ListAllBucketResponse.h>
+#include <awsmock/dto/s3/ListBucketCounterRequest.h>
+#include <awsmock/dto/s3/ListBucketCounterResponse.h>
 #include <awsmock/dto/s3/ListBucketRequest.h>
 #include <awsmock/dto/s3/ListBucketResponse.h>
+#include <awsmock/dto/s3/ListObjectCounterRequest.h>
+#include <awsmock/dto/s3/ListObjectCounterResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/MoveObjectRequest.h>
@@ -86,7 +90,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -135,6 +139,14 @@ namespace AwsMock::Service {
          * @return CreateBucketResponse
          */
         Dto::S3::ListBucketResponse ListBucket(const Dto::S3::ListBucketRequest &s3Request);
+
+        /**
+         * @brief Lists bucket counters
+         *
+         * @param s3Request S3 list bucket counters request
+         * @return ListBucketCounterResponse
+         */
+        Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request);
 
         /**
          * @brief Put bucket versioning
@@ -214,6 +226,14 @@ namespace AwsMock::Service {
          * @return PutObjectResponse
          */
         Dto::S3::MoveObjectResponse MoveObject(Dto::S3::MoveObjectRequest &request);
+
+        /**
+         * @brief Lists object counters
+         *
+         * @param s3Request S3 list object counters request
+         * @return ListObjectCounterResponse
+         */
+        Dto::S3::ListObjectCounterResponse ListObjectCounters(const Dto::S3::ListObjectCounterRequest &s3Request);
 
         /**
          * @brief Delete object
@@ -436,7 +456,7 @@ namespace AwsMock::Service {
         /**
          * Multipart uploads map
          */
-        MultiPartUploads _uploads;
+        MultiPartUploads _uploads{};
     };
 
 }// namespace AwsMock::Service

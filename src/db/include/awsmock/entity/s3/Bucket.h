@@ -123,11 +123,6 @@ namespace AwsMock::Database::Entity::S3 {
         BucketVersionStatus versionStatus = DISABLED;
 
         /**
-         * Bucket encryption state
-         */
-        //BucketVersionStatus encryptionStatus = DISABLED;
-
-        /**
          * Bucket encryption configurations
          */
         BucketEncryption bucketEncryption;
