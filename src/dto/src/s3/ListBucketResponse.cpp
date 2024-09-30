@@ -42,6 +42,7 @@ namespace AwsMock::Dto::S3 {
             rootJson.set("continuationToken", continuationToken);
             rootJson.set("nextContinuationToken", nextContinuationToken);
             rootJson.set("startAfter", startAfter);
+            rootJson.set("total", total);
 
             // Contents
             if (!contents.empty()) {

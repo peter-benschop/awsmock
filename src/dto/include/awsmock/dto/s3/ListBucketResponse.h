@@ -87,14 +87,19 @@ namespace AwsMock::Dto::S3 {
         std::string startAfter;
 
         /**
-         * Convert to a JSON string
+         * Total number of buckets
+         */
+        long total = 0;
+
+        /**
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param bucket bucket
          * @param objectList object list
@@ -102,21 +107,21 @@ namespace AwsMock::Dto::S3 {
         ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList);
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * @return XML string
          */
         std::string ToXml();
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

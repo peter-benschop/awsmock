@@ -186,6 +186,33 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::S3::ListBucketCounterResponse S3Service::ListBucketCounters(const Dto::S3::ListBucketCounterRequest &request) {
+        log_trace << "List buckets counters request";
+
+        try {
+
+            Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
+
+            Dto::S3::ListBucketCounterResponse listAllBucketResponse;
+            listAllBucketResponse.total = _database.BucketCount();
+
+            for (const auto &bucket: bucketList) {
+                Dto::S3::BucketCounter bucketCounter;
+                bucketCounter.bucketName = bucket.name;
+                bucketCounter.keys = _database.ObjectCount(request.region, bucket.name);
+                bucketCounter.size = _database.BucketSize(request.region, bucket.name);
+                listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
+            }
+            log_debug << "Count all buckets, size: " << bucketList.size();
+
+            return listAllBucketResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "S3 Create Bucket failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::S3::ListBucketResponse S3Service::ListBucket(const Dto::S3::ListBucketRequest &request) {
         log_trace << "List bucket request: " + request.ToString();
 
@@ -842,6 +869,32 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "S3 put notification configurations failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::S3::ListObjectCounterResponse S3Service::ListObjectCounters(const Dto::S3::ListObjectCounterRequest &request) {
+        log_trace << "List objects counters request";
+
+        try {
+
+            Database::Entity::S3::ObjectList objectList = _database.ListObjects(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
+
+            Dto::S3::ListObjectCounterResponse listAllObjectResponse;
+            listAllObjectResponse.total = _database.ObjectCount();
+
+            for (const auto &object: objectList) {
+                Dto::S3::ObjectCounter objectCounter;
+                objectCounter.key = object.key;
+                objectCounter.size = object.size;
+                listAllObjectResponse.objectCounters.emplace_back(objectCounter);
+            }
+            log_debug << "Count all objects, size: " << objectList.size();
+
+            return listAllObjectResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "S3 Create Object failed, message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
     }

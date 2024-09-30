@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_LIST_BUCKET_REQUEST_H
-#define AWSMOCK_DTO_S3_LIST_BUCKET_REQUEST_H
+#ifndef AWSMOCK_DTO_S3_LIST_BUCKET_COUNTER_REQUEST_H
+#define AWSMOCK_DTO_S3_LIST_BUCKET_COUNTER_REQUEST_H
 
 // C++ Standard includes
 #include <sstream>
@@ -12,12 +12,13 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListBucketRequest {
+    struct ListBucketCounterRequest {
 
         /**
          * Region
@@ -25,29 +26,31 @@ namespace AwsMock::Dto::S3 {
         std::string region;
 
         /**
-         * Name
-         */
-        std::string name;
-
-        /**
-         * List type
-         */
-        int listType;
-
-        /**
          * Prefix
          */
         std::string prefix;
 
         /**
-         * Delimiter
+         * MaxResults
          */
-        std::string delimiter;
+        int maxResults;
 
         /**
-         * Encoding type
+         * Skip
          */
-        std::string encodingType;
+        int skip;
+
+        /**
+         * List of sort columns names
+         */
+        std::vector<Core::SortColumn> sortColumns;
+
+        /**
+         * Parse values from a JSON stream
+         *
+         * @param body json input stream
+         */
+        static ListBucketCounterRequest FromJson(const std::string &body);
 
         /**
          * @brief Convert to a JSON string
@@ -68,7 +71,7 @@ namespace AwsMock::Dto::S3 {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListBucketRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListBucketCounterRequest &r);
     };
 
 }// namespace AwsMock::Dto::S3

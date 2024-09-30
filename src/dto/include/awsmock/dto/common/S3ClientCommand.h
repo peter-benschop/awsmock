@@ -32,8 +32,10 @@ namespace AwsMock::Dto::Common {
     enum class S3CommandType {
         CREATE_BUCKET,
         LIST_BUCKETS,
+        LIST_BUCKET_COUNTERS,
         DELETE_BUCKET,
         LIST_OBJECTS,
+        LIST_OBJECT_COUNTERS,
         PUT_OBJECT,
         GET_OBJECT,
         GET_OBJECT_RANGE,
@@ -57,8 +59,10 @@ namespace AwsMock::Dto::Common {
     static std::map<S3CommandType, std::string> S3CommandTypeNames{
             {S3CommandType::CREATE_BUCKET, "CreateBucket"},
             {S3CommandType::LIST_BUCKETS, "ListBuckets"},
+            {S3CommandType::LIST_BUCKET_COUNTERS, "ListBucketCounters"},
             {S3CommandType::DELETE_BUCKET, "DeleteBucket"},
             {S3CommandType::LIST_OBJECTS, "ListObjects"},
+            {S3CommandType::LIST_OBJECT_COUNTERS, "ListObjectCounters"},
             {S3CommandType::PUT_OBJECT, "PutObject"},
             {S3CommandType::GET_OBJECT, "GetObject"},
             {S3CommandType::GET_OBJECT_RANGE, "GetObjectRange"},

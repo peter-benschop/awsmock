@@ -179,11 +179,11 @@ namespace AwsMock::Service {
                     // Get object versions
                     Dto::S3::ListObjectVersionsResponse s3Response = _s3Service.ListObjectVersions(s3Request);
 
-                    log_info << "List object versions, bucket: " << clientCommand.bucket << " prefix: " << clientCommand.prefix;
+                    log_info << "List object versions";
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
-                    // Delete object (rm) with recursive option, issues first a list request
+                // Delete object (rm) with recursive option, issues first a list request
                 case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
                     Dto::S3::ListBucketRequest s3Request;
@@ -601,6 +601,37 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToXml(), headers);
                 }
 
+                case Dto::Common::S3CommandType::LIST_BUCKET_COUNTERS: {
+
+                    // Get object request
+                    log_debug << "S3 list bucket counters request";
+
+                    // Build request
+                    std::string payload = Core::HttpUtils::GetBodyAsString(request);
+                    Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(payload);
+
+                    // Get object versions
+                    Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
+
+                    log_info << "List object counters";
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
+
+                case Dto::Common::S3CommandType::LIST_OBJECT_COUNTERS: {
+
+                    // Get object request
+                    log_debug << "S3 list object counters request";
+
+                    // Build request
+                    std::string payload = Core::HttpUtils::GetBodyAsString(request);
+                    Dto::S3::ListObjectCounterRequest s3Request = Dto::S3::ListObjectCounterRequest::FromJson(payload);
+
+                    // Get object versions
+                    Dto::S3::ListObjectCounterResponse s3Response = _s3Service.ListObjectCounters(s3Request);
+
+                    log_info << "List object counters";
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
 
                     // Should not happen
                 case Dto::Common::S3CommandType::CREATE_BUCKET:

@@ -90,6 +90,7 @@ namespace AwsMock::Core {
         Poco::XML::DOMWriter writer;
         writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
         writer.writeNode(output, document);
+        document->release();
         return output.str();
     }
 

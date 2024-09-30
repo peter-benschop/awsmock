@@ -21,6 +21,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
@@ -116,9 +117,14 @@ namespace AwsMock::Database {
         /**
          * @brief List all buckets
          *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @param maxResult maximal number of results
+         * @param skip number of records to skip
+         * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ListBuckets();
+        Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {});
 
         /**
          * @brief Check whether the bucket has still objects
@@ -147,6 +153,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
+
+        /**
+         * @brief Returns the total bucket size.
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @return bucket size in bytes
+         */
+        long BucketSize(const std::string &region, const std::string &bucket);
 
         /**
          * @brief Create a new bucket or updated a existing bucket
@@ -281,7 +296,19 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
+        //Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
+
+        /**
+         * @brief List all objects.
+         *
+         * @param region AWS region
+         * @param prefix S3 key prefix
+         * @param maxResults maximal number of results
+         * @param skip first rows
+         * @param sortColumns list of sort columns
+         * @return ObjectList
+         */
+        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {});
 
         /**
          * @brief Counts the number of keys in a bucket

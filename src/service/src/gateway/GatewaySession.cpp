@@ -39,7 +39,7 @@ namespace AwsMock::Service {
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
-        _parser->body_limit(_bodyLimit);
+        _parser->body_limit(boost::none);
 
         // Set the timeout.
         stream_.expires_after(std::chrono::seconds(_timeout));
