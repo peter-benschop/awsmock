@@ -35,7 +35,7 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(ioc);
+            _gatewayServer = std::make_shared<Service::GatewayServer>();
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -46,7 +46,6 @@ namespace AwsMock::Service {
         }
 
         std::string _endpoint;
-        boost::asio::io_context ioc{5};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
