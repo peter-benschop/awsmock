@@ -72,7 +72,7 @@ namespace AwsMock::Dto::S3 {
         std::vector<NotificationEventType> events;
 
         /**
-          * Convert from XML representation
+          * @brief Convert from XML representation
           *
           * @param rootNode XML rootNode
           */
@@ -86,21 +86,28 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON object
+         *
+         * @return JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

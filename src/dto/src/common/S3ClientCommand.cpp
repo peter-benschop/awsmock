@@ -41,14 +41,10 @@ namespace AwsMock::Dto::Common {
 
             GetCommandFromUserAgent(method, userAgent);
 
-        } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
+        } else if (Core::HttpUtils::HasHeader(request, "X-AwsMock-Target")) {
 
-            std::string target = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-            if (target == "AmazonSQS.ListBucketCounters") {
-                command = S3CommandType::LIST_BUCKET_COUNTERS;
-            } else {
-                command = S3CommandType::LIST_OBJECT_COUNTERS;
-            };
+            std::string target = Core::HttpUtils::GetHeaderValue(request, "X-AwsMock-Target");
+            command = S3CommandTypeFromString(target);
 
         } else {
             switch (method) {

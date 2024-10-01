@@ -106,14 +106,25 @@ namespace AwsMock::Core {
       public:
 
         /**
+         * @brief Create S3 Amazon bucket ARN
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param bucket bucket name
+         * @return AWS resource ARN
+         */
+        static std::string CreateS3BucketArn(const std::string &region, const std::string &accountId, const std::string &bucket);
+
+        /**
          * @brief Create S3 Amazon bucket/key ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
          * @param bucket bucket name
          * @param key object key
+         * @return AWS resource ARN
          */
-        static std::string CreateS3Arn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key);
+        static std::string CreateS3ObjectArn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key);
 
         /**
          * @brief Create lambda function ARN
@@ -121,6 +132,7 @@ namespace AwsMock::Core {
          * @param region AWS region
          * @param accountId AWS account ID
          * @param function lambda function name
+         * @return AWS resource ARN
          */
         static std::string CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function);
 
@@ -131,6 +143,7 @@ namespace AwsMock::Core {
          * @param accountId AWS account ID
          * @param queueName name of the queue
          * @return ARN of the queue
+         * @return AWS resource ARN
          */
         static std::string CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName);
 

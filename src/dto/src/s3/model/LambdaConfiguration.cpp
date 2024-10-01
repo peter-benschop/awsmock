@@ -57,6 +57,24 @@ namespace AwsMock::Dto::S3 {
         try {
 
             Poco::JSON::Object rootJson;
+            rootJson.set("id", id);
+            rootJson.set("lambdaArn", lambdaArn);
+
+            if (!events.empty()) {
+                Poco::JSON::Array jsonArray;
+                for (const auto &event: events) {
+                    jsonArray.add(Dto::S3::EventTypeToString(event));
+                }
+                rootJson.set("events", jsonArray);
+            }
+
+            if (!filterRules.empty()) {
+                Poco::JSON::Array jsonArray;
+                for (const auto &filterRule: filterRules) {
+                    jsonArray.add(filterRule.ToJsonObject());
+                }
+                rootJson.set("filterRules", jsonArray);
+            }
             return rootJson;
 
         } catch (Poco::Exception &exc) {

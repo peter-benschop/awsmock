@@ -30,7 +30,8 @@ namespace AwsMock::Service {
         try {
 
             // Update database
-            _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner});
+            std::string arn = Core::AwsUtils::CreateS3BucketArn(region, accountId, s3Request.name);
+            _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner, .arn = arn});
 
             createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::CreateArn("s3", region, accountId, s3Request.name));
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
@@ -68,6 +69,28 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_warning << "S3 get object metadata failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::S3::GetBucketResponse S3Service::GetBucket(Dto::S3::GetBucketRequest &request) {
+        log_trace << "Get bucket request, s3Request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucketName})) {
+            log_info << "Bucket " << request.bucketName << " does not exist";
+            throw Core::NotFoundException("Bucket does not exist!");
+        }
+
+        try {
+
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
+            log_info << "Bucket returned, bucket: " << request.bucketName;
+
+            return Dto::S3::Mapper::map(request, bucket);
+
+        } catch (Poco::Exception &ex) {
+            log_warning << "S3 get bucket failed, message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
     }
@@ -199,8 +222,8 @@ namespace AwsMock::Service {
             for (const auto &bucket: bucketList) {
                 Dto::S3::BucketCounter bucketCounter;
                 bucketCounter.bucketName = bucket.name;
-                bucketCounter.keys = _database.ObjectCount(request.region, bucket.name);
-                bucketCounter.size = _database.BucketSize(request.region, bucket.name);
+                bucketCounter.keys = bucket.keys;
+                bucketCounter.size = bucket.size;
                 listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
             }
             log_debug << "Count all buckets, size: " << bucketList.size();

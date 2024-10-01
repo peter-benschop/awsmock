@@ -475,8 +475,10 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
-                log_trace << "Object created, oid: "
-                          << insert_one_result->inserted_id().get_oid().value.to_string();
+                Entity::S3::Bucket bucket = GetBucketByRegionName(object.region, object.bucket);
+                bucket.size += object.size;
+                bucket.keys++;
+                UpdateBucket(bucket);
                 session.commit_transaction();
                 return GetObjectById(insert_one_result->inserted_id().get_oid().value);
 

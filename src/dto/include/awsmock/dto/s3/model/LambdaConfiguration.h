@@ -71,7 +71,6 @@ namespace AwsMock::Dto::S3 {
          */
         std::vector<NotificationEventType> events;
 
-
         /**
           * Convert from XML representation
           *

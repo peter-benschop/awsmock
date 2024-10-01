@@ -633,6 +633,21 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
+                case Dto::Common::S3CommandType::GET_BUCKET: {
+
+                    // Get object request
+                    log_debug << "S3 get bucket request";
+
+                    // Build request
+                    Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+
+                    // Get object versions
+                    Dto::S3::GetBucketResponse s3Response = _s3Service.GetBucket(s3Request);
+
+                    log_info << "Get bucket, name: " << s3Request.bucketName;
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
+
                     // Should not happen
                 case Dto::Common::S3CommandType::CREATE_BUCKET:
                 case Dto::Common::S3CommandType::LIST_BUCKETS:
