@@ -19,7 +19,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) {
-        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "list_keys");
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "list_keys");
         log_trace << "List keys request: " << request.ToString();
 
         try {
@@ -41,7 +41,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) {
-        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "create_key");
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "create_key");
         log_trace << "Create key request: " << request.ToString();
 
         try {
@@ -109,7 +109,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::ScheduledKeyDeletionResponse KMSService::ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) {
-        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "schedule_key_deletion");
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "schedule_key_deletion");
         log_trace << "Schedule key deletion request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -144,7 +144,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::DescribeKeyResponse KMSService::DescribeKey(const Dto::KMS::DescribeKeyRequest &request) {
-        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "describe_key");
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "describe_key");
         log_trace << "Create key request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -177,7 +177,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::EncryptResponse KMSService::Encrypt(const Dto::KMS::EncryptRequest &request) {
-        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "encrypt");
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "encrypt");
         log_trace << "Encrypt plaintext request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
@@ -202,7 +202,7 @@ namespace AwsMock::Service {
     }
 
     Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) {
-        Core::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "decrypt");
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "decrypt");
         log_trace << "Decrypt plaintext request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {

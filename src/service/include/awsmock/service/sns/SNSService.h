@@ -18,7 +18,6 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/dto/sns/CreateTopicRequest.h>
 #include <awsmock/dto/sns/CreateTopicResponse.h>
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
@@ -38,6 +37,7 @@
 #include <awsmock/dto/sns/UnsubscribeResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
+#include <awsmock/monitoring/MetricDefinition.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue

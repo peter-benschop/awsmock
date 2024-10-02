@@ -18,9 +18,6 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
 #include <awsmock/dto/kms/DecryptRequest.h>
@@ -35,6 +32,9 @@
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
 #include <awsmock/dto/kms/model/ListKey.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
 

@@ -8,8 +8,8 @@ namespace AwsMock::Service {
 
     void LambdaExecutor::operator()(const std::string &function, const std::string &containerId, const std::string &host, int port, const std::string &payload) {
 
-        Core::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
-        Core::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
+        Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
         log_debug << "Sending lambda invocation request, endpoint: " << host << ":" << port;
 
         // Set status

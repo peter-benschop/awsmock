@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "create_queue");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
 
         // Check existence. In case the queue exists already return the existing queue.
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueuesResponse SQSService::ListQueues(const Dto::SQS::ListQueuesRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queues");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queues");
         log_trace << "List all queues request, region: " << request.region;
 
         try {
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueArnsResponse SQSService::ListQueueArns() {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_arns");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_arns");
         log_trace << "List all queues ARNs request";
 
         try {
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_counters");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_counters");
         log_trace << "List all queues counters request";
 
         try {
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "purge_queue");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "purge_queue");
         log_trace << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
 
         // Check existence
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_url");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_url");
         log_info << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
 
         std::string queueUrl = Core::SanitizeSQSUrl(request.queueName);
@@ -201,7 +201,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_attributes");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_attributes");
         log_trace << "Get queue userAttributes request, request: " << request.ToString();
 
         // Check existence
@@ -273,7 +273,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_queue_attributes");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
 
         // Check existence
@@ -322,7 +322,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_visibility_timeout");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_visibility_timeout");
         log_trace << "Change message visibilityTimeout request, queue: " << request.queueUrl;
 
         // Check existence
@@ -353,7 +353,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::TagQueue(const Dto::SQS::TagQueueRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_visibility_timeout");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_visibility_timeout");
         log_trace << "Tag queue request, queue: " << request.queueUrl;
 
         try {
@@ -381,7 +381,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_queue");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_queue");
         log_trace << "Delete queue request, request: " << request.ToString();
 
         // Check existence
@@ -407,7 +407,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message");
         log_trace << "Send message request, queueUrl: " << request.queueUrl;
 
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
@@ -495,7 +495,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message_batch");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message_batch");
         log_trace << "Send message batch request, queueUrl: " << request.queueUrl;
 
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
@@ -537,7 +537,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
         log_debug << "Receive message request: " << request.ToString();
 
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
@@ -597,7 +597,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListMessagesResponse SQSService::ListMessages(const Dto::SQS::ListMessagesRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_messages");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_messages");
         log_trace << "List all messages request";
 
         try {
@@ -627,7 +627,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message");
         log_trace << "Delete message request, url: " << request.receiptHandle;
 
         try {
@@ -666,7 +666,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) {
-        Core::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message_batch");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message_batch");
         log_trace << "Delete message batch request, size: " << request.deleteMessageBatchEntries.size();
 
         try {

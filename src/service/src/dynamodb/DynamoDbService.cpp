@@ -14,7 +14,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "create_table");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "create_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -48,7 +48,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListTableResponse DynamoDbService::ListTables(const Dto::DynamoDb::ListTableRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_tables");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_tables");
         log_debug << "Starting list table request, region: " << request.region;
 
         Dto::DynamoDb::ListTableResponse listTableResponse;
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DescribeTableResponse DynamoDbService::DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "describe_table");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "describe_table");
         log_debug << "Describe DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         Dto::DynamoDb::DescribeTableResponse describeTableResponse;
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_table");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -120,7 +120,7 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbService::DeleteAllTables() {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_all_tables");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_all_tables");
         log_debug << "Deleting all tables";
 
         try {
@@ -151,7 +151,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::GetItemResponse DynamoDbService::GetItem(const Dto::DynamoDb::GetItemRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "get_item");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "get_item");
         log_debug << "Start get item, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "put_item");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "put_item");
         log_debug << "Start put item, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -207,7 +207,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "query");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "query");
         log_debug << "Start query, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ScanResponse DynamoDbService::Scan(const Dto::DynamoDb::ScanRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "scan");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "scan");
         log_debug << "Start scan, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -257,7 +257,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) {
-        Core::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_item");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_item");
         log_debug << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName;
 
         Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request);

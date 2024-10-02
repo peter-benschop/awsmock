@@ -2,14 +2,14 @@
 // Created by vogje01 on 18/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
-#define AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
+#ifndef AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
+#define AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
 
-#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricService.h>
 
 #define TIME_DIFF (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _start).count())
 
-namespace AwsMock::Core {
+namespace AwsMock::Monitoring {
 
     using std::chrono::high_resolution_clock;
     using std::chrono::time_point;
@@ -105,6 +105,6 @@ namespace AwsMock::Core {
         time_point<high_resolution_clock> _start;
     };
 
-}// namespace AwsMock::Core
+}// namespace AwsMock::Monitoring
 
-#endif//AWSMOCK_CORE_METRIC_SERVICE_TIMER_H
+#endif//AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H

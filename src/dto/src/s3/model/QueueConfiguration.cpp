@@ -6,6 +6,27 @@
 
 namespace AwsMock::Dto::S3 {
 
+    void QueueConfiguration::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        try {
+
+            Core::JsonUtils::GetJsonValueString("id", jsonObject, id);
+            Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
+
+            // Events
+            if (jsonObject->has("events")) {
+                Poco::JSON::Array::Ptr jsonEventArray = jsonObject->getArray("events");
+                for (const auto &event: *jsonEventArray) {
+                    events.emplace_back(EventTypeFromString(event));
+                }
+            }
+
+        } catch (Poco::Exception &e) {
+            log_error << e.message();
+            throw Core::JsonException(e.message());
+        }
+    }
+
     void QueueConfiguration::FromXmlNode(Poco::XML::Node *rootNode) {
 
         if (rootNode->hasChildNodes()) {

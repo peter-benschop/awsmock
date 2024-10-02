@@ -98,22 +98,22 @@ namespace AwsMock::Manager {
         switch (req.method()) {
             case boost::beast::http::verb::get: {
                 log_debug << "Handle GET request";
-                Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
-                Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
+                Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
+                Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
                 res = _handler.HandleGetRequest(req);
                 break;
             }
             case boost::beast::http::verb::put: {
                 log_debug << "Handle PUT request";
-                Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
-                Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
+                Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
+                Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
                 res = _handler.HandlePutRequest(req);
                 break;
             }
             case boost::beast::http::verb::post: {
                 log_debug << "Handle POST request";
-                Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
-                Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
+                Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
+                Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
                 res = _handler.HandlePostRequest(req);
                 break;
             }

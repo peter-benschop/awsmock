@@ -65,6 +65,23 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
+    void TopicNotification::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("id", jsonObject, id);
+        Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
+
+        for (const auto &event: events) {
+            events.emplace_back(event);
+        }
+
+        Poco::JSON::Array::Ptr jsonFilterRules = jsonObject->getArray("filterRules");
+        for (int i = 0; i < jsonFilterRules->size(); i++) {
+            FilterRule filterRule;
+            filterRule.FromJsonObject(jsonFilterRules->getObject(i));
+            filterRules.emplace_back(filterRule);
+        }
+    }
+
     Poco::JSON::Object TopicNotification::ToJsonObject() const {
 
         Poco::JSON::Object jsonObject;

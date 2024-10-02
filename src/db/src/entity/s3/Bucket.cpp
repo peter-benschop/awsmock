@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/entity/s3/Bucket.h"
+#include <awsmock/entity/s3/Bucket.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
@@ -116,10 +116,13 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("region", region),
                 kvp("name", name),
                 kvp("owner", owner),
+                kvp("arn", arn),
+                kvp("size", size),
+                kvp("keys", keys),
                 kvp("notifications", notificationsDoc),
                 kvp("queueNotifications", queueNotificationsDoc),
                 kvp("topicNotifications", topicNotificationsDoc),
-                kvp("lambdaNotifications", lambdaNotificationsDoc),
+                kvp("lambdaConfigurations", lambdaNotificationsDoc),
                 kvp("encryptionConfiguration", bucketEncryption.ToDocument()),
                 kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
                 kvp("created", bsoncxx::types::b_date(created)),
@@ -134,22 +137,12 @@ namespace AwsMock::Database::Entity::S3 {
         region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
         name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
         owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
+        arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
+        size = mResult.value()["size"].get_int64().value;
+        keys = mResult.value()["keys"].get_int64().value;
         versionStatus = BucketVersionStatusFromString(bsoncxx::string::to_string(mResult.value()["versionStatus"].get_string().value));
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
-
-        // Deprecated (should be removed)
-        if (mResult.value().find("notifications") != mResult.value().end()) {
-            bsoncxx::array::view notificationView{mResult.value()["notifications"].get_array().value};
-            for (const bsoncxx::array::element &notificationElement: notificationView) {
-                BucketNotification notification{
-                        .event = bsoncxx::string::to_string(notificationElement["event"].get_string().value),
-                        .notificationId = bsoncxx::string::to_string(notificationElement["notificationId"].get_string().value),
-                        .queueArn = bsoncxx::string::to_string(notificationElement["queueArn"].get_string().value),
-                        .lambdaArn = bsoncxx::string::to_string(notificationElement["lambdaArn"].get_string().value)};
-                notifications.push_back(notification);
-            }
-        }
 
         // SQS queue notification configuration
         if (mResult.value().find("queueNotifications") != mResult.value().end()) {
@@ -170,8 +163,8 @@ namespace AwsMock::Database::Entity::S3 {
         }
 
         // Lambda function notification configuration
-        if (mResult.value().find("lambdaNotifications") != mResult.value().end()) {
-            bsoncxx::array::view notificationView{mResult.value()["lambdaNotifications"].get_array().value};
+        if (mResult.value().find("lambdaConfigurations") != mResult.value().end()) {
+            bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value};
             for (const bsoncxx::array::element &notificationElement: notificationView) {
                 LambdaNotification notification;
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
@@ -191,6 +184,8 @@ namespace AwsMock::Database::Entity::S3 {
         jsonObject.set("name", name);
         jsonObject.set("owner", owner);
         jsonObject.set("versionStatus", BucketVersionStatusToString(versionStatus));
+        jsonObject.set("size", size);
+        jsonObject.set("keys", keys);
 
         // Bucket notifications (deprecated)
         if (!notifications.empty()) {
@@ -238,15 +233,9 @@ namespace AwsMock::Database::Entity::S3 {
         std::string versionStatusStr;
         Core::JsonUtils::GetJsonValueString("versionStatus", jsonObject, versionStatusStr);
         versionStatus = BucketVersionStatusFromString(versionStatusStr);
+        Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
+        Core::JsonUtils::GetJsonValueLong("keys", jsonObject, keys);
 
-        if (jsonObject->has("notifications")) {
-            Poco::JSON::Array::Ptr jsonNotificationArray = jsonObject->getArray("notifications");
-            for (int i = 0; i < jsonNotificationArray->size(); i++) {
-                BucketNotification nofication;
-                nofication.FromJsonObject(jsonNotificationArray->getObject(i));
-                notifications.emplace_back(nofication);
-            }
-        }
 
         if (jsonObject->has("queueNotifications")) {
             Poco::JSON::Array::Ptr jsonNotificationArray = jsonObject->getArray("queueNotifications");
@@ -254,6 +243,15 @@ namespace AwsMock::Database::Entity::S3 {
                 QueueNotification notification;
                 notification.FromJsonObject(jsonNotificationArray->getObject(i));
                 queueNotifications.emplace_back(notification);
+            }
+        }
+
+        if (jsonObject->has("topicNotifications")) {
+            Poco::JSON::Array::Ptr jsonNotificationArray = jsonObject->getArray("topicNotifications");
+            for (int i = 0; i < jsonNotificationArray->size(); i++) {
+                TopicNotification topicNotification;
+                topicNotification.FromJsonObject(jsonNotificationArray->getObject(i));
+                topicNotifications.emplace_back(topicNotification);
             }
         }
     }

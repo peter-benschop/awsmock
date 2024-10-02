@@ -6,7 +6,11 @@
 
 namespace AwsMock::Core {
 
-    std::string AwsUtils::CreateS3Arn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key) {
+    std::string AwsUtils::CreateS3BucketArn(const std::string &region, const std::string &accountId, const std::string &bucket) {
+        return CreateArn("s3", region, accountId, bucket);
+    }
+
+    std::string AwsUtils::CreateS3ObjectArn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key) {
         return CreateArn("s3", region, accountId, bucket + "/" + key);
     }
 

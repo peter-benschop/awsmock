@@ -23,8 +23,6 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 #include <awsmock/dto/transfer/CreateServerResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
@@ -37,6 +35,8 @@
 #include <awsmock/dto/transfer/StartServerRequest.h>
 #include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/dto/transfer/mapper/Mapper.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/TransferDatabase.h>
 
 #define TRANSFER_DEFAULT_FTP_PORT 21
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferService() : _transferDatabase(Database::TransferDatabase::instance()){};
+        explicit TransferService() : _transferDatabase(Database::TransferDatabase::instance()) {};
 
         /**
          * @brief Create transfer server request

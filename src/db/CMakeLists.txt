@@ -27,9 +27,10 @@ set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memory
 set(SSM_SOURCES src/entity/ssm/Parameter.cpp src/repository/SSMDatabase.cpp src/memorydb/SSMMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
 set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp)
+set(MONITORING_SOURCES src/entity/monitoring/Counter.cpp src/repository/MonitoringDatabase.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
-        ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES})
+        ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 add_subdirectory(tst)
@@ -37,7 +38,10 @@ add_subdirectory(tst)
 # Includes
 include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 
-add_library(${LIBRARY} SHARED ${SOURCES})
+add_library(${LIBRARY} SHARED ${SOURCES}
+        include/awsmock/entity/monitoring/Counter.h
+        src/entity/monitoring/Counter.cpp
+        include/awsmock/repository/MonitoringDatabase.h)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 

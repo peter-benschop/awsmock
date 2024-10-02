@@ -22,8 +22,8 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Task.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/docker/DockerService.h>
 

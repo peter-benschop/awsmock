@@ -30,7 +30,8 @@ namespace AwsMock::Service {
         try {
 
             // Update database
-            _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner});
+            std::string arn = Core::AwsUtils::CreateS3BucketArn(region, accountId, s3Request.name);
+            _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner, .arn = arn});
 
             createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::CreateArn("s3", region, accountId, s3Request.name));
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
@@ -41,6 +42,38 @@ namespace AwsMock::Service {
             throw Core::ServiceException(exc.message());
         }
         return createBucketResponse;
+    }
+
+    void S3Service::UpdateBucket(const Dto::S3::UpdateBucketRequest &s3Request) {
+        log_trace << "Update bucket request, s3Request: " << s3Request.ToString();
+
+        // Get region
+        std::string region = s3Request.bucket.region;
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
+
+        // Check existence
+        if (_database.BucketExists({.region = region, .name = s3Request.bucket.bucketName})) {
+            log_warning << "Bucket exists already, region: " << region << " name: " << s3Request.bucket.bucketName;
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, s3Request.bucket.bucketName);
+            log_debug << "Got bucket: " << s3Request.bucket.bucketName;
+            return;
+        }
+
+        Dto::S3::CreateBucketResponse createBucketResponse;
+
+        try {
+
+            // MApp DTO to entity
+            Database::Entity::S3::Bucket bucket = Dto::S3::Mapper::map(s3Request.bucket);
+
+            // Update database
+            _database.UpdateBucket(bucket);
+            log_info << "Bucket updated, bucket: " << s3Request.bucket.bucketName;
+
+        } catch (Poco::Exception &exc) {
+            log_error << "S3 create bucket failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
     Dto::S3::GetMetadataResponse S3Service::GetBucketMetadata(Dto::S3::GetMetadataRequest &request) {
@@ -68,6 +101,28 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_warning << "S3 get object metadata failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::S3::GetBucketResponse S3Service::GetBucket(Dto::S3::GetBucketRequest &request) {
+        log_trace << "Get bucket request, s3Request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucketName})) {
+            log_info << "Bucket " << request.bucketName << " does not exist";
+            throw Core::NotFoundException("Bucket does not exist!");
+        }
+
+        try {
+
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
+            log_info << "Bucket returned, bucket: " << request.bucketName;
+
+            return Dto::S3::Mapper::map(request, bucket);
+
+        } catch (Poco::Exception &ex) {
+            log_warning << "S3 get bucket failed, message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
     }
@@ -199,8 +254,8 @@ namespace AwsMock::Service {
             for (const auto &bucket: bucketList) {
                 Dto::S3::BucketCounter bucketCounter;
                 bucketCounter.bucketName = bucket.name;
-                bucketCounter.keys = _database.ObjectCount(request.region, bucket.name);
-                bucketCounter.size = _database.BucketSize(request.region, bucket.name);
+                bucketCounter.keys = bucket.keys;
+                bucketCounter.size = bucket.size;
                 listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
             }
             log_debug << "Count all buckets, size: " << bucketList.size();
@@ -755,7 +810,7 @@ namespace AwsMock::Service {
 
                 // Create the event record
                 Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
@@ -780,7 +835,7 @@ namespace AwsMock::Service {
 
                 // Create the event record
                 Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
@@ -805,7 +860,7 @@ namespace AwsMock::Service {
 
                 // Create the event record
                 Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 

@@ -13,7 +13,7 @@ option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation 
 file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER)
 string(STRIP "${PROJECT_VER}" PROJECT_VERSION)
 string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
-configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" @ONLY)
+#configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" @ONLY)
 
 # Build message
 message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")

@@ -11,8 +11,8 @@
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
-#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
 

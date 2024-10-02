@@ -4,7 +4,7 @@ set(LIBRARY_STATIC awsmockdto_static)
 
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp src/common/Services.cpp src/common/Infrastructure.cpp
         src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
-        src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp)
+        src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp src/common/MonitoringClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
         src/sqs/GetQueueUrlRequest.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp
@@ -30,7 +30,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
         src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/ListBucketCounterRequest.cpp src/s3/ListBucketCounterResponse.cpp
-        src/s3/model/ObjectCounter.cpp src/s3/ListObjectCounterRequest.cpp src/s3/ListObjectCounterResponse.cpp)
+        src/s3/model/ObjectCounter.cpp src/s3/ListObjectCounterRequest.cpp src/s3/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
+        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp src/lambda/model/DeadLetterConfig.cpp
@@ -55,7 +56,7 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/AdminConfirmUserRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp src/cognito/DescribeUserPoolDomainRequest.cpp
         src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp src/cognito/AdminRemoveUserFromGroupRequest.cpp
         src/cognito/AdminEnableUserRequest.cpp src/cognito/AdminDisableUserRequest.cpp src/cognito/ResponseToAuthChallengeRequest.cpp
-        src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp)
+        src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp src/cognito/AdminGetUserRequest.cpp src/cognito/AdminGetUserResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
@@ -80,9 +81,10 @@ set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ss
         src/ssm/GetParameterResponse.cpp src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
         src/ssm/DescribeParametersResponse.cpp)
 set(MODULE_SOURCES src/module/Module.cpp src/module/GatewayConfig.cpp src/module/mapper/Mapper.cpp)
+set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES})
+        ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

@@ -12,7 +12,7 @@
 #include "awsmock/core/config/Configuration.h"
 #include "awsmock/service/docker/DockerService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>

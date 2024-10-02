@@ -9,8 +9,8 @@ namespace AwsMock::Manager {
     boost::beast::http::response<boost::beast::http::string_body> Handler::HandleGetRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
-        Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
+        Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
+        Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
 
         std::string target = request.base()["Target"];
         std::string action = request.base()["Action"];
@@ -104,8 +104,8 @@ namespace AwsMock::Manager {
 
     boost::beast::http::response<boost::beast::http::string_body> Handler::HandlePutRequest(boost::beast::http::request<boost::beast::http::string_body> &request) {
 
-        Core::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
-        Core::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
+        Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
+        Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
 
         std::string target = request.base()["Target"];
         std::string action = request.base()["Action"];

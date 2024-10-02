@@ -2,13 +2,13 @@
 // Created by vogje01 on 07/01/2023.
 //
 
-#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricService.h>
 
-namespace AwsMock::Core {
+namespace AwsMock::Monitoring {
 
     boost::mutex MetricService::_mutex;
 
-    MetricService::MetricService() : Core::Timer("MetricServer") {
+    MetricService::MetricService() : Core::Timer("MetricServer"), _database(Database::MonitoringDatabase::instance()) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         _port = configuration.getInt("awsmock.service.monitoring.port", 9091);
@@ -117,6 +117,8 @@ namespace AwsMock::Core {
         }
         auto counter = GetCounter(name);
         counter->inc(value);
+        _database.IncCounter(name, value);
+
         log_trace << "Counter incremented, name: " << name;
     }
 
@@ -126,6 +128,7 @@ namespace AwsMock::Core {
             AddCounter(name, labelName, labelValue);
         }
         _counterMap[name]->labels({labelValue}).inc((double) value);
+        _database.IncCounter(name, value, labelName, labelValue);
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
     }
 
@@ -172,6 +175,8 @@ namespace AwsMock::Core {
             AddGauge(name);
         }
         _gaugeMap[name]->set((double) value);
+        _database.SetGauge(name, value);
+
         log_trace << "Gauge value set, name: " << name;
     }
 
@@ -181,6 +186,7 @@ namespace AwsMock::Core {
             AddGauge(name, labelName, labelValue);
         }
         _gaugeMap[name]->labels({labelValue}).set((double) value);
+        _database.SetGauge(name, value, labelName, labelValue);
         log_trace << "Gauge value set, name: " << name;
     }
 
@@ -194,4 +200,4 @@ namespace AwsMock::Core {
                }) != _gaugeMap.end();
     }
 
-}// namespace AwsMock::Core
+}// namespace AwsMock::Monitoring

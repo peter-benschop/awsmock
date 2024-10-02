@@ -98,6 +98,21 @@ namespace AwsMock::Database::Entity::S3 {
         std::string owner;
 
         /**
+         * AWS ARN
+         */
+        std::string arn;
+
+        /**
+         * Size in bytes
+         */
+        long size;
+
+        /**
+         * Number of object keys
+         */
+        long keys;
+
+        /**
          * Bucket notifications
          */
         std::vector<BucketNotification> notifications;

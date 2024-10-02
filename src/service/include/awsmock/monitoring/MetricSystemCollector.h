@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
-#define AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
+#ifndef AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
+#define AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
 
 // C includes
 #include <sys/times.h>
@@ -15,16 +15,16 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/Timer.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
 
 // System counter
 
-namespace AwsMock::Core {
+namespace AwsMock::Monitoring {
 
     /**
      * @brief Collect system information like CPU and Memory.
@@ -98,6 +98,6 @@ namespace AwsMock::Core {
         int _period = 60;
     };
 
-}// namespace AwsMock::Core
+}// namespace AwsMock::Monitoring
 
-#endif// AWSMOCK_CORE_METRIC_SYSTEM_COLLECTOR_H
+#endif// AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H

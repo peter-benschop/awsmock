@@ -13,13 +13,13 @@
 #include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/sqs/SQSService.h>
 

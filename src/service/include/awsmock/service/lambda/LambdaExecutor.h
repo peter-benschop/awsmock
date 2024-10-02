@@ -13,9 +13,9 @@
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Task.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
 namespace AwsMock::Service {
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         /**
          * Metric module
          */
-        Core::MetricService &_metricService = Core::MetricService::instance();
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
     };
 
 }// namespace AwsMock::Service

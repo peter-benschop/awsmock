@@ -30,6 +30,8 @@
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
 #include <awsmock/dto/s3/DeleteObjectsRequest.h>
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
+#include <awsmock/dto/s3/GetBucketRequest.h>
+#include <awsmock/dto/s3/GetBucketResponse.h>
 #include <awsmock/dto/s3/GetMetadataRequest.h>
 #include <awsmock/dto/s3/GetMetadataResponse.h>
 #include <awsmock/dto/s3/GetObjectRequest.h>
@@ -52,6 +54,7 @@
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/dto/s3/UpdateBucketRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyResponse.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
@@ -110,6 +113,18 @@ namespace AwsMock::Service {
         Dto::S3::GetMetadataResponse GetBucketMetadata(Dto::S3::GetMetadataRequest &request);
 
         /**
+         * @brief Returns the S3 bucket.
+         *
+         * @par
+         * The full bucket, with all attributes and notifications is returned.
+         *
+         * @param request get bucket request
+         * @return GetBucketResponse
+         * @see GetBucketResponse
+         */
+        Dto::S3::GetBucketResponse GetBucket(Dto::S3::GetBucketRequest &request);
+
+        /**
          * @brief Returns the meta data of an S3 object
          *
          * @param request get metadata request
@@ -124,6 +139,13 @@ namespace AwsMock::Service {
          * @return CreateBucketResponse
          */
         Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request);
+
+        /**
+         * @brief Updates a bucket
+         *
+         * @param s3Request S3 update request
+         */
+        void UpdateBucket(const Dto::S3::UpdateBucketRequest &s3Request);
 
         /**
          * @brief Lists all buckets

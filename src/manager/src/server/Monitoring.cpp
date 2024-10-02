@@ -2,7 +2,6 @@
 // Created by vogje01 on 6/3/24.
 //
 
-#include "awsmock/core/monitoring/MetricSystemCollector.h"
 #include <awsmock/server/Monitoring.h>
 
 namespace AwsMock::Manager {
@@ -27,7 +26,7 @@ namespace AwsMock::Manager {
 
         log_trace << "Manager monitoring starting";
 
-        Core::MetricService &metricService = Core::MetricService::instance();
+        Monitoring::MetricService &metricService = Monitoring::MetricService::instance();
         Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
         for (const auto &module: modules) {
             if (module.status == ModuleStatus::ACTIVE && module.state == ModuleState::RUNNING) {

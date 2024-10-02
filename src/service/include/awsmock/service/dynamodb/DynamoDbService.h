@@ -22,9 +22,6 @@
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/dto/dynamodb/DeleteItemRequest.h>
@@ -45,6 +42,9 @@
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 
 namespace AwsMock::Service {

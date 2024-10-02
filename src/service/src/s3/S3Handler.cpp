@@ -4,6 +4,7 @@
 namespace AwsMock::Service {
 
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
 
         // Get the command
@@ -260,7 +261,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Core::MetricServiceTimer measure(S3_SERVICE_TIMER);
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -519,6 +520,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -633,6 +635,36 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
+                case Dto::Common::S3CommandType::GET_BUCKET: {
+
+                    // Get object request
+                    log_debug << "S3 get bucket request";
+
+                    // Build request
+                    Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+
+                    // Get object versions
+                    Dto::S3::GetBucketResponse s3Response = _s3Service.GetBucket(s3Request);
+
+                    log_info << "Get bucket, name: " << s3Request.bucketName;
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
+
+                case Dto::Common::S3CommandType::UPDATE_BUCKET: {
+
+                    // Get object request
+                    log_debug << "S3 update bucket request";
+
+                    // Build request
+                    Dto::S3::UpdateBucketRequest s3Request = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+
+                    // Get object versions
+                    //Dto::S3::GetBucketResponse s3Response = _s3Service.UpdateBucket(s3Request);
+
+                    log_info << "Update bucket, name: " << s3Request.bucket.bucketName;
+                    return SendOkResponse(request, {});
+                }
+
                     // Should not happen
                 case Dto::Common::S3CommandType::CREATE_BUCKET:
                 case Dto::Common::S3CommandType::LIST_BUCKETS:
@@ -674,6 +706,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -743,6 +776,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_trace << "S3 HEAD request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;

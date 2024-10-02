@@ -42,7 +42,7 @@ namespace AwsMock::Core {
         std::string s3Arn = "arn:aws:s3:" + _region + ":" + _accountId + ":" + bucket + "/" + key;
 
         // act
-        std::string result = AwsUtils::CreateS3Arn(_region, _accountId, bucket, key);
+        std::string result = AwsUtils::CreateS3ObjectArn(_region, _accountId, bucket, key);
 
         // assert
         EXPECT_STREQ(result.c_str(), s3Arn.c_str());

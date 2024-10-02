@@ -22,9 +22,6 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -56,6 +53,9 @@
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>

@@ -9,7 +9,7 @@
 #include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
-#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3Monitoring.h>
 #include <awsmock/service/s3/S3Service.h>
