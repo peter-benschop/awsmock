@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.15.7](https://github.com/jensvogt/awsmock/compare/v0.15.6...v0.15.7) (2024-10-02)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** add SQS message list ([a82f4db](https://github.com/jensvogt/awsmock/commit/a82f4db190208348908cb7e1d3768c21381ca561))
+
+## [0.15.6](https://github.com/jensvogt/awsmock/compare/v0.15.5...v0.15.6) (2024-09-29)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** add SQS message list ([17c47c7](https://github.com/jensvogt/awsmock/commit/17c47c7cf5b76c6b4810555759e874836d91b07e))
+* **628-sqs-receive-message-spoils-statistics:** add SQS message list ([1e6288d](https://github.com/jensvogt/awsmock/commit/1e6288d372a194cf656ee7347f33165ad850de03))
+
 ## [0.15.5](https://github.com/jensvogt/awsmock/compare/v0.15.4...v0.15.5) (2024-09-28)
 
 
