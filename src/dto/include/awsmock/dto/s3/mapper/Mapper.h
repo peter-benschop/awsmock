@@ -10,6 +10,7 @@
 #include <awsmock/dto/s3/GetBucketResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
+#include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -54,6 +55,18 @@ namespace AwsMock::Dto::S3 {
          */
         static Dto::S3::GetBucketResponse map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket);
 
+        /**
+         * @brief Maps a S3 DTO to a bucket entity
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param request get bucket request
+         * @param bucket bucket entity
+         * @return GetBucketResponse
+         * @see GetBucketResponse
+         */
+        static Database::Entity::S3::Bucket map(const Dto::S3::Bucket &bucketDto);
+
       private:
 
         /**
@@ -68,7 +81,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Maps a S3 topic configuration entity list to a queue configuration DTO
          *
-         * @param topicConfiguration topic confoguration
+         * @param topicConfiguration topic configuration
          * @return TopicConfiguration
          * @see TopicConfiguration
          */
@@ -90,6 +103,15 @@ namespace AwsMock::Dto::S3 {
          * @return NotificationEventTypes
          */
         static std::vector<Dto::S3::NotificationEventType> map(const std::vector<std::string> &eventStrs);
+
+        /**
+         * @brief Maps a S3 queue configuration DTO list to a queue configuration entity
+         *
+         * @param lambdaConfigurations list of lambda configuration
+         * @return LambdaConfiguration
+         * @see LambdaConfiguration
+         */
+        static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfiguration);
     };
 
 }// namespace AwsMock::Dto::S3

@@ -47,6 +47,20 @@ namespace AwsMock::Dto::S3 {
         return response;
     }
 
+    Database::Entity::S3::Bucket Mapper::map(const Dto::S3::Bucket &bucketDto) {
+        Database::Entity::S3::Bucket bucket;
+        bucket.region = bucketDto.region;
+        bucket.name = bucketDto.bucketName;
+        bucket.owner = bucketDto.owner;
+        bucket.size = bucketDto.size;
+        bucket.keys = bucketDto.keys;
+        bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(bucketDto.versionStatus);
+        //bucket.lambdaNotifications = map();
+        bucket.created = bucketDto.created;
+        bucket.modified = bucketDto.modified;
+        return bucket;
+    }
+
     std::vector<Dto::S3::LambdaConfiguration> Mapper::map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaNotifications) {
         std::vector<LambdaConfiguration> lambdaConfigurations;
         for (const auto &lambdaNotification: lambdaNotifications) {
@@ -57,6 +71,18 @@ namespace AwsMock::Dto::S3 {
             lambdaConfigurations.emplace_back(lambdaConfiguration);
         }
         return lambdaConfigurations;
+    }
+
+    std::vector<Database::Entity::S3::LambdaNotification> Mapper::map(const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
+        std::vector<Database::Entity::S3::LambdaNotification> lambdaNotifications;
+        for (const auto &lambdaConfiguration: lambdaConfigurations) {
+            Database::Entity::S3::LambdaNotification lambdaNotification;
+            lambdaNotification.id = lambdaConfiguration.id;
+            lambdaNotification.lambdaArn = lambdaConfiguration.lambdaArn;
+            //lambdaNotification.events = map(lambdaConfiguration.events);
+            lambdaNotifications.emplace_back(lambdaNotification);
+        }
+        return lambdaNotifications;
     }
 
     std::vector<Dto::S3::QueueConfiguration> Mapper::map(const std::vector<Database::Entity::S3::QueueNotification> &queueNotifications) {

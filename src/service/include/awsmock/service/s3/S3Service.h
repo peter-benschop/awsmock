@@ -54,6 +54,7 @@
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
+#include <awsmock/dto/s3/UpdateBucketRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyResponse.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
@@ -138,6 +139,13 @@ namespace AwsMock::Service {
          * @return CreateBucketResponse
          */
         Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request);
+
+        /**
+         * @brief Updates a bucket
+         *
+         * @param s3Request S3 update request
+         */
+        void UpdateBucket(const Dto::S3::UpdateBucketRequest &s3Request);
 
         /**
          * @brief Lists all buckets

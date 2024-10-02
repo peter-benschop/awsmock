@@ -13,6 +13,7 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/core/monitoring/MetricServiceTimer.h>
@@ -23,6 +24,8 @@
 #include <awsmock/dto/cognito/AdminDeleteUserRequest.h>
 #include <awsmock/dto/cognito/AdminDisableUserRequest.h>
 #include <awsmock/dto/cognito/AdminEnableUserRequest.h>
+#include <awsmock/dto/cognito/AdminGetUserRequest.h>
+#include <awsmock/dto/cognito/AdminGetUserResponse.h>
 #include <awsmock/dto/cognito/AdminRemoveUserFromGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
@@ -191,62 +194,12 @@ namespace AwsMock::Service {
         void DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request);
 
         /**
-         * @brief Create a new cognito user
-         *
-         * @param request create user request
-         * @return AdminCreateUserResponse DTO
-         */
-        Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
-
-        /**
          * @brief List cognito users
          *
          * @param request list user request
          * @return ListUsersResponse DTO
          */
         Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
-
-        /**
-         * @brief Adds a user to a group
-         *
-         * @param request add user to group request
-         */
-        void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request);
-
-        /**
-         * @brief Removes a user from a group
-         *
-         * @param request remove user from group request
-         */
-        void AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request);
-
-        /**
-         * @brief Lists the users in a group
-         *
-         * @param request list user in group request
-         */
-        Dto::Cognito::ListUsersInGroupResponse ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request);
-
-        /**
-         * @brief Enable a user
-         *
-         * @param request enable user request
-         */
-        void AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request);
-
-        /**
-         * @brief Disable a user
-         *
-         * @param request disable user request
-         */
-        void AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request);
-
-        /**
-         * @brief Deletes a cognito user
-         *
-         * @param request delete user request
-         */
-        void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
 
         /**
          * @brief Create a new cognito user pool
@@ -318,6 +271,64 @@ namespace AwsMock::Service {
          * @see GlobalSignOutRequest
          */
         void GlobalSignOut(Dto::Cognito::GlobalSignOutRequest &request);
+
+        /**
+         * @brief Create a new cognito user
+         *
+         * @param request create user request
+         * @return AdminCreateUserResponse DTO
+         */
+        Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request);
+
+        /**
+         * @brief Get a local cognito user
+         *
+         * @param request get user request
+         * @return AdminGetUserResponse DTO
+         */
+        Dto::Cognito::AdminGetUserResponse AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request);
+
+        /**
+         * @brief Adds a user to a group
+         *
+         * @param request add user to group request
+         */
+        void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request);
+
+        /**
+         * @brief Removes a user from a group
+         *
+         * @param request remove user from group request
+         */
+        void AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request);
+
+        /**
+         * @brief Lists the users in a group
+         *
+         * @param request list user in group request
+         */
+        Dto::Cognito::ListUsersInGroupResponse ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request);
+
+        /**
+         * @brief Enable a user
+         *
+         * @param request enable user request
+         */
+        void AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request);
+
+        /**
+         * @brief Disable a user
+         *
+         * @param request disable user request
+         */
+        void AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request);
+
+        /**
+         * @brief Deletes a cognito user
+         *
+         * @param request delete user request
+         */
+        void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request);
 
       private:
 

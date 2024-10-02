@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_GET_BUCKET_REQUEST_H
-#define AWSMOCK_DTO_S3_GET_BUCKET_REQUEST_H
+#ifndef AWSMOCK_DTO_S3_UPDATE_BUCKET_REQUEST_H
+#define AWSMOCK_DTO_S3_UPDATE_BUCKET_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -61,4 +61,4 @@ namespace AwsMock::Dto::S3 {
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_GET_BUCKET_REQUEST_H
+#endif// AWSMOCK_DTO_S3_UPDATE_BUCKET_REQUEST_H

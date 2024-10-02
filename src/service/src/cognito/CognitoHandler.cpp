@@ -192,19 +192,6 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request);
 
-            } else if (action == "AdminCreateUser") {
-
-                Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
-                cognitoRequest.FromJson(clientCommand.payload);
-                cognitoRequest.region = clientCommand.region;
-                cognitoRequest.requestId = clientCommand.requestId;
-                cognitoRequest.user = clientCommand.user;
-                log_debug << "Got admin create user request, json: " << cognitoRequest.ToString();
-
-                Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
-                log_info << "User created, userPoolId: " << cognitoRequest.userPoolId;
-
-                return SendOkResponse(request, cognitoResponse.ToJson());
             } else if (action == "ListUsers") {
 
                 Dto::Cognito::ListUsersRequest cognitoRequest{};
@@ -218,48 +205,6 @@ namespace AwsMock::Service {
                 log_info << "Users listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
 
                 return SendOkResponse(request, cognitoResponse.ToJson());
-
-            } else if (action == "AdminEnableUser") {
-
-                Dto::Cognito::AdminEnableUserRequest cognitoRequest{};
-                cognitoRequest.FromJson(clientCommand.payload);
-                cognitoRequest.region = clientCommand.region;
-                cognitoRequest.requestId = clientCommand.requestId;
-                cognitoRequest.user = clientCommand.user;
-                log_debug << "Got admin enable user request, json: " << cognitoRequest.ToString();
-
-                _cognitoService.AdminEnableUser(cognitoRequest);
-                log_info << "User enabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
-
-                return SendOkResponse(request);
-
-            } else if (action == "AdminDisableUser") {
-
-                Dto::Cognito::AdminDisableUserRequest cognitoRequest{};
-                cognitoRequest.FromJson(clientCommand.payload);
-                cognitoRequest.region = clientCommand.region;
-                cognitoRequest.requestId = clientCommand.requestId;
-                cognitoRequest.user = clientCommand.user;
-                log_debug << "Got admin disable user request, json: " << cognitoRequest.ToString();
-
-                _cognitoService.AdminDisableUser(cognitoRequest);
-                log_info << "User disabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
-
-                return SendOkResponse(request);
-
-            } else if (action == "AdminDeleteUser") {
-
-                Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
-                cognitoRequest.FromJson(clientCommand.payload);
-                cognitoRequest.region = clientCommand.region;
-                cognitoRequest.requestId = clientCommand.requestId;
-                cognitoRequest.user = clientCommand.user;
-                log_debug << "Got admin delete user request, json: " << cognitoRequest.ToString();
-
-                _cognitoService.AdminDeleteUser(cognitoRequest);
-                log_info << "User deleted, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
-
-                return SendOkResponse(request);
 
             } else if (action == "CreateGroup") {
 
@@ -290,21 +235,6 @@ namespace AwsMock::Service {
                 log_info << "Groups listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << serviceResponse.groups.size();
 
                 return SendOkResponse(request, serviceResponse.ToJson());
-
-            } else if (action == "AdminAddUserToGroup") {
-
-                Dto::Cognito::AdminAddUserToGroupRequest cognitoRequest{};
-                cognitoRequest.FromJson(clientCommand.payload);
-                cognitoRequest.region = clientCommand.region;
-                cognitoRequest.requestId = clientCommand.requestId;
-                cognitoRequest.user = clientCommand.user;
-
-                log_debug << "Add user to group request, json: " << cognitoRequest.ToString();
-
-                _cognitoService.AdminAddUserToGroup(cognitoRequest);
-                log_info << "Add user to group, userPoolId: " << cognitoRequest.userPoolId;
-
-                return SendOkResponse(request);
 
             } else if (action == "ListUsersInGroup") {
 
@@ -423,6 +353,91 @@ namespace AwsMock::Service {
                 log_info << "Global sign out, accessToken: " << cognitoRequest.accessToken;
 
                 return SendOkResponse(request, {}, headers);
+
+            } else if (action == "AdminCreateUser") {
+
+                Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin create user request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
+                log_info << "User created, userPoolId: " << cognitoRequest.userPoolId;
+
+                return SendOkResponse(request, cognitoResponse.ToJson());
+
+            } else if (action == "AdminGetUser") {
+
+                Dto::Cognito::AdminGetUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin get user request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::AdminGetUserResponse cognitoResponse = _cognitoService.AdminGetUser(cognitoRequest);
+                log_info << "User returned, userPoolId: " << cognitoRequest.userPoolId << " username: " << cognitoRequest.user;
+
+                return SendOkResponse(request, cognitoResponse.ToJson());
+
+            } else if (action == "AdminEnableUser") {
+
+                Dto::Cognito::AdminEnableUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin enable user request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminEnableUser(cognitoRequest);
+                log_info << "User enabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
+
+                return SendOkResponse(request);
+
+            } else if (action == "AdminDisableUser") {
+
+                Dto::Cognito::AdminDisableUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin disable user request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminDisableUser(cognitoRequest);
+                log_info << "User disabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
+
+                return SendOkResponse(request);
+
+            } else if (action == "AdminDeleteUser") {
+
+                Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got admin delete user request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminDeleteUser(cognitoRequest);
+                log_info << "User deleted, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
+
+                return SendOkResponse(request);
+
+            } else if (action == "AdminAddUserToGroup") {
+
+                Dto::Cognito::AdminAddUserToGroupRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Add user to group request, json: " << cognitoRequest.ToString();
+
+                _cognitoService.AdminAddUserToGroup(cognitoRequest);
+                log_info << "Add user to group, userPoolId: " << cognitoRequest.userPoolId;
+
+                return SendOkResponse(request);
 
             } else {
 

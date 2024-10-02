@@ -404,6 +404,43 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::AdminGetUserResponse CognitoService::AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) {
+        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "admin_get_user");
+        log_debug << "Admin get user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+
+        if (!_database.UserPoolExists(request.userPoolId)) {
+            throw Core::BadRequestException("User pool does not exists, userPoolId: " + request.userPoolId);
+        }
+
+        if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            throw Core::BadRequestException("User exists exists already, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+        }
+
+        try {
+            Database::Entity::Cognito::User user = {
+                    .region = request.region,
+                    .userPoolId = request.userPoolId,
+                    .userName = request.userName,
+                    .enabled = true,
+                    .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
+            };
+
+            user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
+            Dto::Cognito::AdminGetUserResponse response = {
+                    {.region = user.region},
+                    user.userName,
+                    user.enabled};
+            log_trace << "Get admin user response: " + response.ToJson();
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Get admin user request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void CognitoService::AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request) {
         Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "add_user_to_group");
         log_debug << "Admin add user to group request, request: " << request.ToString();

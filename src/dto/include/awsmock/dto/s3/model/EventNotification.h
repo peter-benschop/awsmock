@@ -10,13 +10,14 @@
 #include <vector>
 
 // AwsMock includes
-#include "UserIdentity.h"
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/lambda/model/UserIdentity.h>
+#include <awsmock/dto/s3/model/Bucket.h>
+#include <awsmock/dto/s3/model/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -197,85 +198,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-    struct Bucket {
-
-        /**
-         * Bucket name
-         */
-        std::string name;
-
-        /**
-         * Owner
-         */
-        OwnerIdentity ownerIdentity;
-
-        /**
-         * ARN
-         */
-        std::string arn;
-
-        /**
-         * Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
-
-            try {
-
-                Poco::JSON::Object rootJson;
-                rootJson.set("name", name);
-                rootJson.set("ownerIdentity", ownerIdentity.ToJsonObject());
-                rootJson.set("arn", arn);
-                return rootJson;
-
-            } catch (Poco::Exception &exc) {
-                throw Core::JsonException(exc.message());
-            }
-        }
-
-        /**
-         * Converts a JSON representation to s DTO.
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject) {
-
-            try {
-                Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
-                Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
-                if (jsonObject->has("ownerIdentity")) {
-                    ownerIdentity.FromJson(jsonObject->getObject("ownerIdentity"));
-                }
-
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
-            }
-        }
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << (*this);
-            return ss.str();
-        }
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Bucket &s) {
-            os << "Bucket={name='" + s.name + "' ownerIdentity='" + s.ownerIdentity.ToString() + "' arn='" + s.arn + "'}";
-            return os;
-        }
-    };
-
     struct Object {
 
         /**
@@ -422,7 +344,8 @@ namespace AwsMock::Dto::S3 {
                 Core::JsonUtils::GetJsonValueString("s3SchemaVersion", jsonObject, s3SchemaVersion);
                 Core::JsonUtils::GetJsonValueString("configurationId", jsonObject, configurationId);
                 if (jsonObject->has("bucket")) {
-                    bucket.FromJson(jsonObject->getObject("bucket"));
+                    // TODO: FIx me
+                    //bucket.FromJson(jsonObject->getObject("bucket"));
                 }
                 if (jsonObject->has("object")) {
                     object.FromJson(jsonObject->getObject("object"));

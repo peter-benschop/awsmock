@@ -44,6 +44,38 @@ namespace AwsMock::Service {
         return createBucketResponse;
     }
 
+    void S3Service::UpdateBucket(const Dto::S3::UpdateBucketRequest &s3Request) {
+        log_trace << "Update bucket request, s3Request: " << s3Request.ToString();
+
+        // Get region
+        std::string region = s3Request.bucket.region;
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
+
+        // Check existence
+        if (_database.BucketExists({.region = region, .name = s3Request.bucket.bucketName})) {
+            log_warning << "Bucket exists already, region: " << region << " name: " << s3Request.bucket.bucketName;
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, s3Request.bucket.bucketName);
+            log_debug << "Got bucket: " << s3Request.bucket.bucketName;
+            return;
+        }
+
+        Dto::S3::CreateBucketResponse createBucketResponse;
+
+        try {
+
+            // MApp DTO to entity
+            Database::Entity::S3::Bucket bucket = Dto::S3::Mapper::map(s3Request.bucket);
+
+            // Update database
+            _database.UpdateBucket(bucket);
+            log_info << "Bucket updated, bucket: " << s3Request.bucket.bucketName;
+
+        } catch (Poco::Exception &exc) {
+            log_error << "S3 create bucket failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     Dto::S3::GetMetadataResponse S3Service::GetBucketMetadata(Dto::S3::GetMetadataRequest &request) {
         log_trace << "Get bucket metadata request, s3Request: " << request.ToString();
 
@@ -778,7 +810,7 @@ namespace AwsMock::Service {
 
                 // Create the event record
                 Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
@@ -803,7 +835,7 @@ namespace AwsMock::Service {
 
                 // Create the event record
                 Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
@@ -828,7 +860,7 @@ namespace AwsMock::Service {
 
                 // Create the event record
                 Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.name = bucketEntity.name};
+                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
