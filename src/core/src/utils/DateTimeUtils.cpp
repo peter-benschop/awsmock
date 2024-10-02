@@ -23,6 +23,15 @@ namespace AwsMock::Core {
         return std::format("{:%FT%TZ}", system_clock::now());
     }
 
+    system_clock::time_point DateTimeUtils::FromISO8601(const std::string &dateString) {
+        std::tm t = {};
+        // F: Equivalent to %Y-%m-%d, the ISO 8601 date format.
+        // T: ISO 8601 time format (HH:MM:SS), equivalent to %H:%M:%S
+        // z: ISO 8601 offset from UTC in timezone (1 minute=1, 1 hour=100). If timezone cannot be determined, no characters
+        strptime(dateString.c_str(), "%FT%TZ", &t);
+        return std::chrono::system_clock::from_time_t(mktime(&t));
+    }
+
     std::string DateTimeUtils::HttpFormat() {
         char buf[256];
         time_t timeT = system_clock::to_time_t(system_clock::now());

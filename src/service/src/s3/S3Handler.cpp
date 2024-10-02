@@ -4,6 +4,7 @@
 namespace AwsMock::Service {
 
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
 
         // Get the command
@@ -260,7 +261,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Core::MetricServiceTimer measure(S3_SERVICE_TIMER);
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -519,6 +520,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -704,6 +706,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -773,6 +776,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_trace << "S3 HEAD request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;

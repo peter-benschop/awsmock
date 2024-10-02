@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
 
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "create_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
 
         // Check existence
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_topics");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_topics");
         log_trace << "List all topics request, region: " << region;
 
         try {
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
         log_trace << "Delete topic request, region: " << region << " topicArn: " << topicArn;
 
         Dto::SNS::DeleteTopicResponse response;
@@ -81,7 +81,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "publish");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "publish");
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "subscribe");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "subscribe");
         log_trace << "Subscribe request: " << request.ToString();
 
         try {
@@ -163,7 +163,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::UnsubscribeResponse SNSService::Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "unsubscribe");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "unsubscribe");
         log_trace << "Unsubscribe request: " << request.ToString();
 
         try {
@@ -199,7 +199,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListSubscriptionsByTopicResponse SNSService::ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_subscriptions");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_subscriptions");
         log_trace << "List subscriptions request: " << request.ToString();
 
         // Check existence
@@ -227,7 +227,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::GetTopicAttributesResponse SNSService::GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_attributes");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_attributes");
         log_trace << "Get topic attributes request: " << request.ToString();
 
         try {
@@ -250,7 +250,7 @@ namespace AwsMock::Service {
     }
 
     void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscriptions");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();
 
         Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
@@ -268,7 +268,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::TagResourceResponse SNSService::TagResource(const Dto::SNS::TagResourceRequest &request) {
-        Core::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "tag_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "tag_topic");
         log_trace << "Tag topic request: " << request.ToString();
 
         try {

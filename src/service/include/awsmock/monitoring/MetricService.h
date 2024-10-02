@@ -2,8 +2,8 @@
 // Created by vogje01 on 07/01/2023.
 //
 
-#ifndef AWSMOCK_CORE_METRIC_SERVICE_H
-#define AWSMOCK_CORE_METRIC_SERVICE_H
+#ifndef AWSMOCK_MONITORING_METRIC_SERVICE_H
+#define AWSMOCK_MONITORING_METRIC_SERVICE_H
 
 // C includes
 // C++ Standard includes
@@ -21,11 +21,12 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/Timer.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/repository/MonitoringDatabase.h>
 
-namespace AwsMock::Core {
+namespace AwsMock::Monitoring {
 
     using std::chrono::high_resolution_clock;
     using std::chrono::time_point;
@@ -186,31 +187,6 @@ namespace AwsMock::Core {
         Poco::Prometheus::Counter *GetCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
-         * @brief Returns a timer key string.
-         *
-         * @param name name of the timer.
-         * @param labelName label name of the timer.
-         * @param labelValue label value of the timer.
-         */
-        static std::string GetTimerKey(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Returns a thread safe timer key string.
-         *
-         * @param name name of the timer.
-         */
-        static std::string GetTimerStartKey(const std::string &name);
-
-        /**
-         * @brief Returns a thread safe timer key string.
-         *
-         * @param name name of the timer.
-         * @param labelName label name of the timer.
-         * @param labelValue label value of the timer.
-         */
-        static std::string GetTimerStartKey(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
          * @brief Adds a gauge to the map.
          *
          * @param name name of the gauge
@@ -291,8 +267,13 @@ namespace AwsMock::Core {
          * Mutex
          */
         static boost::mutex _mutex;
+
+        /**
+         * Database
+         */
+        Database::MonitoringDatabase &_database;
     };
 
-}// namespace AwsMock::Core
+}// namespace AwsMock::Monitoring
 
-#endif// AWSMOCK_CORE_METRIC_SERVICE_H
+#endif// AWSMOCK_MONITORING_METRIC_SERVICE_H

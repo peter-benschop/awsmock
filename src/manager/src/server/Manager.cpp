@@ -18,8 +18,8 @@ namespace AwsMock::Manager {
 
     void Manager::InitializeMonitoring() {
         int period = Core::Configuration::instance().getInt("awsmock.service.monitoring.period", 60);
-        Core::MetricService::instance().Start(period);
-        Core::MetricSystemCollector::instance().Start(period);
+        Monitoring::MetricService::instance().Start(period);
+        Monitoring::MetricSystemCollector::instance().Start(period);
     }
 
     void Manager::InitializeDatabase() {

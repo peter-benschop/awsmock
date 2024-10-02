@@ -27,11 +27,11 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
+#include <awsmock/monitoring/MetricDefinition.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define DEFAULT_TRANSFER_BASE_DIR "/home/awsmock/data/transfer"
@@ -296,7 +296,7 @@ namespace AwsMock::FtpServer {
         /**
          * Metric service
          */
-        Core::MetricService &_metricService = Core::MetricService::instance();
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * Completion handler

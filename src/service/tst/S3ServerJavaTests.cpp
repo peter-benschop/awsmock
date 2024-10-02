@@ -94,7 +94,7 @@ namespace AwsMock::Service {
 
         std::string _region, _baseUrl;
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Core::MetricService &_metricService = Core::MetricService::instance();
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };

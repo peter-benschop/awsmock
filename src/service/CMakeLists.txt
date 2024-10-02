@@ -21,9 +21,11 @@ set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ft
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp)
 set(DOCKER_SOURCES src/docker/DockerService.cpp)
 set(MODULE_SOURCES src/module/ModuleService.cpp)
+set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp
+        src/monitoring/MonitoringService.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES}
-        ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES})
+        ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

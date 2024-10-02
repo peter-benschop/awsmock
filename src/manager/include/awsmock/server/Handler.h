@@ -15,11 +15,11 @@
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricServiceTimer.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Manager {

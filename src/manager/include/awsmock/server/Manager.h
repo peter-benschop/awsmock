@@ -14,8 +14,8 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/monitoring/MetricService.h>
-#include <awsmock/core/monitoring/MetricSystemCollector.h>
+#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/server/Handler.h>
 #include <awsmock/server/Listener.h>
 #include <awsmock/server/Monitoring.h>

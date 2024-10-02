@@ -2,13 +2,13 @@
 // Created by vogje01 on 01/05/2023.
 //
 
-#include <awsmock/core/monitoring/MetricSystemCollector.h>
+#include <awsmock/monitoring/MetricSystemCollector.h>
 
-namespace AwsMock::Core {
+namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::Initialize() {
         FILE *file;
-        struct tms timeSample {};
+        struct tms timeSample{};
         char line[128];
 
         lastCPU = times(&timeSample);
@@ -41,18 +41,18 @@ namespace AwsMock::Core {
         while (ifs) {
             std::getline(ifs, line);
 
-            if (StringUtils::Contains(line, "VmSize:")) {
-                double value = std::stod(StringUtils::Split(line, ':')[1]);
+            if (Core::StringUtils::Contains(line, "VmSize:")) {
+                double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
                 MetricService::instance().SetGauge(VIRTUAL_MEMORY, value);
                 log_trace << "Virtual memory: " << value;
             }
-            if (StringUtils::Contains(line, "VmRSS:")) {
-                double value = std::stod(StringUtils::Split(line, ':')[1]);
+            if (Core::StringUtils::Contains(line, "VmRSS:")) {
+                double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
                 MetricService::instance().SetGauge(REAL_MEMORY, value);
                 log_trace << "Real Memory: " << value;
             }
-            if (StringUtils::Contains(line, "Threads:")) {
-                double value = std::stod(StringUtils::Split(line, ':')[1]);
+            if (Core::StringUtils::Contains(line, "Threads:")) {
+                double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
                 MetricService::instance().SetGauge(TOTAL_THREADS, value);
                 log_trace << "Total Threads: " << value;
             }
@@ -60,7 +60,7 @@ namespace AwsMock::Core {
         ifs.close();
 
         clock_t now;
-        struct tms timeSample {};
+        struct tms timeSample{};
         now = times(&timeSample);
         double totalPercent, userPercent, systemPercent;
 
@@ -97,4 +97,4 @@ namespace AwsMock::Core {
         log_trace << "System collector finished";
     }
 
-}// namespace AwsMock::Core
+}// namespace AwsMock::Monitoring

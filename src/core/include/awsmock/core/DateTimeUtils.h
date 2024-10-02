@@ -67,6 +67,13 @@ namespace AwsMock::Core {
         static std::string ISO8601Now();
 
         /**
+         * @brief Convert a ISO8601 timestamp into a system time point.
+         * @param dateString
+         * @return
+         */
+        static system_clock::time_point FromISO8601(const std::string &dateString);
+
+        /**
          * @brief Returns the current time in HTTP format.
          *
          * @pre

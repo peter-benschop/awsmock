@@ -7,8 +7,8 @@
 
 // AwsMock includes
 #include <awsmock/core/Timer.h>
-#include <awsmock/core/monitoring/MetricDefinition.h>
-#include <awsmock/core/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricDefinition.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Service {
@@ -52,7 +52,7 @@ namespace AwsMock::Service {
         /**
          * Metric service
          */
-        Core::MetricService &_metricService = Core::MetricService::instance();
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * Database connection

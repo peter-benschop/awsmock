@@ -16,6 +16,7 @@ namespace AwsMock::Service {
             {"cognito-idp", std::make_shared<CognitoHandler>()},
             {"cognito-identity", std::make_shared<CognitoHandler>()},
             {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
+            {"monitoring", std::make_shared<MonitoringHandler>()},
             {"kms", std::make_shared<KMSHandler>()},
             {"ssm", std::make_shared<SSMHandler>()},
             {"dynamodb", std::make_shared<DynamoDbHandler>()}};
@@ -97,8 +98,8 @@ namespace AwsMock::Service {
         // Ping request
         if (request.method() == http::verb::connect) {
             log_debug << "Handle CONNECT request";
-            Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
-            Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
+            Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
+            Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
             return Core::HttpUtils::Ok(request);
         }
 
@@ -130,32 +131,32 @@ namespace AwsMock::Service {
                 switch (request.method()) {
                     case http::verb::get: {
                         log_debug << "Handle GET request";
-                        Core::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
-                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
+                        Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
                         return handler->HandleGetRequest(request, authKey.region, "none");
                     }
                     case http::verb::put: {
                         log_debug << "Handle PUT request";
-                        Core::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
-                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
+                        Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
                         return handler->HandlePutRequest(request, authKey.region, "none");
                     }
                     case http::verb::post: {
                         log_debug << "Handle POST request";
-                        Core::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
-                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
+                        Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
                         return handler->HandlePostRequest(request, authKey.region, "none");
                     }
                     case http::verb::delete_: {
                         log_debug << "Handle DELETE request";
-                        Core::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
-                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
+                        Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
                         return handler->HandleDeleteRequest(request, authKey.region, "none");
                     }
                     case http::verb::head: {
                         log_debug << "Handle HEAD request";
-                        Core::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
-                        Core::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
+                        Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
                         return handler->HandleHeadRequest(request, authKey.region, "none");
                     }
                 }

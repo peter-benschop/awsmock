@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.name;
 
         if (_database.UserPoolExists(request.region, request.name)) {
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::UpdateUserPool(const Dto::Cognito::UpdateUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool");
         log_debug << "Create user pool request, region:  " << request.region << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -75,7 +75,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
         log_debug << "List user pools request, maxResults: " << request.maxResults;
 
         try {
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::DescribeUserPoolResponse CognitoService::DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool");
         log_debug << "Describe user pool request, userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -112,7 +112,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool");
         log_debug << "Delete user pool request, userPoolId:  " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -132,7 +132,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::CreateUserPoolDomainResponse CognitoService::CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_domain");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_domain");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.domain;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -162,7 +162,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::UpdateUserPoolDomainResponse CognitoService::UpdateUserPoolDomain(const Dto::Cognito::UpdateUserPoolDomainRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool_domain");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool_domain");
         log_debug << "Update user pool domain request, userPoolId: " << request.userPoolId << " domain: " << request.domain;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -189,7 +189,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::DescribeUserPoolDomainResponse CognitoService::DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_domain");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_domain");
         log_debug << "Describe user pool domain request, domain: " << request.domain;
 
         try {
@@ -205,7 +205,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::CreateUserPoolClientResponse CognitoService::CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_client");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_client");
         log_debug << "Create user pool client request, clientName: " << request.clientName;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -243,7 +243,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUserPoolClientsResponse CognitoService::ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool_clients");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool_clients");
         log_debug << "List user pools clients request, userPoolId: " << request.userPoolId << " maxResults: " << request.maxResults;
 
         try {
@@ -259,7 +259,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::DescribeUserPoolClientResponse CognitoService::DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_client");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_client");
         log_debug << "Describe user pool client request, userPoolId: " << request.userPoolId << " clientId: " << request.clientId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -292,7 +292,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::UpdateUserPoolClient(const Dto::Cognito::UpdateUserPoolClientRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool_client");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool_client");
         log_debug << "Update user pool client request, userPoolId: " << request.userPoolId << " clientId: " << request.clientId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -339,7 +339,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool_client");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user_pool_client");
         log_debug << "Delete user pool client request, userPoolId:  " << request.userPoolId << " clientId: " << request.clientId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -368,7 +368,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::AdminCreateUserResponse CognitoService::AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user");
         log_debug << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -405,7 +405,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::AdminGetUserResponse CognitoService::AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "admin_get_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "admin_get_user");
         log_debug << "Admin get user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -442,7 +442,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "add_user_to_group");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "add_user_to_group");
         log_debug << "Admin add user to group request, request: " << request.ToString();
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -477,7 +477,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "add_user_to_group");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "add_user_to_group");
         log_debug << "Admin add user to group request, request: " << request.ToString();
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -515,7 +515,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUsersResponse CognitoService::ListUsers(const Dto::Cognito::ListUsersRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user");
         log_debug << "List users request, region: " << request.region << " userPoolId: " << request.userPoolId;
 
         Dto::Cognito::ListUsersResponse response{};
@@ -534,7 +534,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUsersInGroupResponse CognitoService::ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_users_in_group");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_users_in_group");
         log_debug << "Admin add user to group request, request: " << request.ToString();
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -560,7 +560,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "enable_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "enable_user");
         log_debug << "Admin enable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -584,7 +584,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "disable_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "disable_user");
         log_debug << "Admin disable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -608,7 +608,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_user");
         log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -632,7 +632,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::CreateGroupResponse CognitoService::CreateGroup(const Dto::Cognito::CreateGroupRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_group");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_group");
         log_debug << "Create group request, region:  " << request.region << " name: " << request.groupName;
 
         if (_database.GroupExists(request.region, request.groupName)) {
@@ -655,7 +655,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListGroupsResponse CognitoService::ListGroups(const Dto::Cognito::ListGroupsRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_groups");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_groups");
         log_debug << "List groups request, userPoolId: " << request.userPoolId << " maxResults: " << request.limit;
 
         try {
@@ -671,7 +671,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::DeleteGroup(const Dto::Cognito::DeleteGroupRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_group");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "delete_group");
         log_debug << "Delete group request, region:  " << request.region << " name: " << request.groupName;
 
         if (!_database.GroupExists(request.region, request.groupName)) {
@@ -691,7 +691,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::SignUpResponse CognitoService::SignUp(const Dto::Cognito::SignUpRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "signup_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "signup_user");
         log_debug << "Signup user request, region:  " << request.region << " userName: " << request.userName << " clientId: " << request.clientId;
 
         if (_database.UserExists(request.region, request.userName)) {
@@ -725,7 +725,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "confirm_user");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "confirm_user");
         log_debug << "Confirm user request, region:  " << request.region << " name: " << request.userName;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
@@ -746,7 +746,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::InitiateAuthResponse CognitoService::InitiateAuth(Dto::Cognito::InitiateAuthRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "initiate_auth");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "initiate_auth");
         log_debug << "Confirm initiate auth request, region:  " << request.region << " clientId: " << request.clientId;
 
         if (!_database.ClientIdExists(request.region, request.clientId)) {
@@ -774,7 +774,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::RespondToAuthChallengeResponse CognitoService::RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "respond_to_auth_challenge");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "respond_to_auth_challenge");
         log_debug << "Respond to auth challenge request, region:  " << request.region << " clientId: " << request.clientId;
 
         if (!_database.ClientIdExists(request.region, request.clientId)) {
@@ -793,7 +793,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoService::GlobalSignOut(Dto::Cognito::GlobalSignOutRequest &request) {
-        Core::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "global_sign_out");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "global_sign_out");
         log_debug << "Global sign out request, region:  " << request.region << " accessToken: " << request.accessToken;
     }
 

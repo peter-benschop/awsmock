@@ -10,9 +10,8 @@ set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseExce
         src/exception/JsonException.cpp src/exception/NotFoundException.cpp
         src/exception/ForbiddenException.cpp src/exception/UnauthorizedException.cpp src/exception/BadRequestException.cpp)
 set(LOGGING_SOURCES src/logging/LogStream.cpp)
-set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp)
 
-set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
+set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES})
 
 # Test directory
 add_subdirectory(tst)

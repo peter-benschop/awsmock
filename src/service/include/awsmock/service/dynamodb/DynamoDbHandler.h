@@ -13,8 +13,8 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
-#include <awsmock/core/monitoring/MetricService.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
+#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
