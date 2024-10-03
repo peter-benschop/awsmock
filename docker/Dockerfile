@@ -17,7 +17,7 @@ RUN rm -rf /usr/src
 # Stick to alpine 3.19 as 3.20 has not support for aws-cli (missing python3.12 compat)
 FROM alpine:latest
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread
+RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread curl
 
 # Make dirctories
 RUN mkdir -p /home/awsmock/data/s3 && \

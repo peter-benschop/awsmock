@@ -31,6 +31,11 @@ namespace AwsMock::Dto::Cognito {
         Database::Entity::Cognito::UserList users;
 
         /**
+         * User entities
+         */
+        long total;
+
+        /**
          * @brief Convert to a JSON string.
          *
          * @return user pools json string

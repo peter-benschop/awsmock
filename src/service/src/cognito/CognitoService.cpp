@@ -522,9 +522,11 @@ namespace AwsMock::Service {
         Dto::Cognito::ListUsersResponse response{};
 
         try {
-
+            long total = _database.CountUsers(request.region, request.userPoolId);
             Database::Entity::Cognito::UserList users = _database.ListUsers(request.region, request.userPoolId);
             response.users = users;
+            response.total = total;
+
             log_trace << "Users list outcome: " + response.ToJson();
             return response;
 

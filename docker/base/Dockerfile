@@ -2,7 +2,7 @@ FROM alpine:latest
 
 RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers  \
     libarchive libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev pandoc icu-libs doxygen \
-    boost-program_options boost-filesystem boost-thread
+    boost-program_options boost-filesystem boost-thread curl curl-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
