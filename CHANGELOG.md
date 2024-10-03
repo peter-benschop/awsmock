@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.9](https://github.com/jensvogt/awsmock/compare/v0.15.8...v0.15.9) (2024-10-03)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** fix curl issues ([b080e2f](https://github.com/jensvogt/awsmock/commit/b080e2f9774c390f0df13a735c8c6c760eb5f880))
+* **628-sqs-receive-message-spoils-statistics:** fix curl issues ([37092aa](https://github.com/jensvogt/awsmock/commit/37092aafcb6748845a54c47afdb44d7f567a08e8))
+* **628-sqs-receive-message-spoils-statistics:** fix time zone issues ([8d771d2](https://github.com/jensvogt/awsmock/commit/8d771d2eb83c6b4d3d4e60e8b994ff0ec136fdfe))
+
 ## [0.15.8](https://github.com/jensvogt/awsmock/compare/v0.15.7...v0.15.8) (2024-10-02)
 
 
