@@ -21,6 +21,6 @@ add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SO
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoPrometheus PocoUtil PocoFoundation PocoNet PocoJSON PocoZip
-        gtest pthread ssl crypto z archive tbb)
+        gtest pthread ssl crypto z archive tbb curl)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

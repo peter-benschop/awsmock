@@ -22,10 +22,12 @@ namespace AwsMock::Dto::Cognito {
                 usersArray.add(userJson);
             }
             rootObject.set("Users", usersArray);
+            rootObject.set("Total", total);
 
             return Core::JsonUtils::ToJsonString(rootObject);
 
         } catch (Poco::Exception &exc) {
+            log_error << exc.displayText();
             throw Core::JsonException(exc.message());
         }
     }
