@@ -30,6 +30,16 @@ namespace AwsMock::Dto::Cognito {
         int maxResults{};
 
         /**
+         * Page index
+         */
+        int pageIndex{};
+
+        /**
+         * Page index
+         */
+        std::vector<std::string> sortColumns{};
+
+        /**
          * Convert from a JSON object.
          *
          * @param payload json string object

@@ -14,14 +14,17 @@ namespace AwsMock::Dto::Monitoring {
             if (!counters.empty()) {
                 Poco::JSON::Array jsonArray;
                 for (const auto &counter: counters) {
-                    jsonArray.add(counter.ToJsonObject());
+                    Poco::JSON::Array counterArray;
+                    counterArray.add(counter.timestamp.time_since_epoch().count() / 1000000);
+                    counterArray.add(counter.performanceValue);
+                    jsonArray.add(counterArray);
                 }
                 rootJson.set("counters", jsonArray);
             }
             return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
-            log_error << exc.message();
+            log_error << exc.displayText();
             throw Core::JsonException(exc.message());
         }
     }

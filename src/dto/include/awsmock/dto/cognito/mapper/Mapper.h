@@ -69,10 +69,11 @@ namespace AwsMock::Dto::Cognito {
          *
          * @param request original request
          * @param userPoolList cognito user pool entity list
+         * @param total total number of user pools
          * @return ListUserPoolResponse
          * @see ListUserPoolResponse
          */
-        static Dto::Cognito::ListUserPoolResponse map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList);
+        static Dto::Cognito::ListUserPoolResponse map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, long total);
 
         /**
          * @brief Maps a list of cognito user pool clients to a list user pool clients response

@@ -21,7 +21,7 @@ RUN cd /usr/src && \
     cmake . && \
     cmake --install .
 
-    # Install Poco framework
+# Install Poco framework
 RUN cd /usr/src && \
     git clone -b poco-1.13.3 https://github.com/pocoproject/poco.git && \
     cd poco && \
@@ -37,6 +37,14 @@ RUN cd /usr/src && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
+    cmake --install . --prefix /usr/local
+
+# Install date/tz library
+RUN cd /usr/src && \
+    git clone https://github.com/HowardHinnant/date.git && \
+    cd date && \
+    cmake . && \
+    cmake --build . --config Release -j 8 && \
     cmake --install . --prefix /usr/local
 
 # Cleanup
