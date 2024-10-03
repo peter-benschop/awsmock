@@ -114,5 +114,8 @@ EXPOSE 6000-6010 6000-6010
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
 ENV AWSMOCK_MONGODB_ACTIVE=false
+ENV TZ=Europe/Berlin
+RUN apk add --no-cache tzdata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 CMD ["/usr/bin/awsmockmgr"]
