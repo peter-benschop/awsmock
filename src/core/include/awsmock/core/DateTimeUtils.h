@@ -9,6 +9,9 @@
 #include <chrono>
 #include <string>
 
+// TZ library includes
+#include <date/date.h>
+
 // Boost includes
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -16,6 +19,9 @@
 #include <Poco/DateTime.h>
 #include <Poco/DateTimeFormat.h>
 #include <Poco/DateTimeFormatter.h>
+
+// AwsMock includes
+#include <awsmock/core/date/tz.h>
 
 namespace AwsMock::Core {
 
@@ -101,6 +107,11 @@ namespace AwsMock::Core {
          * @return time_point as Unix epoch timestamp
          */
         static long UnixTimestamp(const system_clock::time_point &timePoint);
+
+        /**
+         *
+         */
+        static system_clock::time_point LocalDateTimeNow();
     };
 
 }// namespace AwsMock::Core

@@ -6,10 +6,10 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    Dto::Cognito::ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList) {
+    Dto::Cognito::ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, long total) {
 
         Dto::Cognito::ListUserPoolResponse response;
-
+        response.total = total;
         for (const auto &userPool: userPoolList) {
             response.userPools.emplace_back(Mapper::map(userPool));
         }

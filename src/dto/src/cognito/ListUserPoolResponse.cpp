@@ -22,6 +22,7 @@ namespace AwsMock::Dto::Cognito {
                 userPoolArray.add(userPoolJson);
             }
             rootObject.set("UserPools", userPoolArray);
+            rootObject.set("Total", total);
 
             return Core::JsonUtils::ToJsonString(rootObject);
 

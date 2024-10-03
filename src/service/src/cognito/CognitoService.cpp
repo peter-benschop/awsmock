@@ -80,9 +80,10 @@ namespace AwsMock::Service {
 
         try {
 
+            long total = _database.CountUserPools(request.region);
             std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list count: " << userPools.size();
-            return Dto::Cognito::Mapper::map(request, userPools);
+            return Dto::Cognito::Mapper::map(request, userPools, total);
 
         } catch (Poco::Exception &ex) {
             log_error << "User pool list request failed, message: " << ex.message();

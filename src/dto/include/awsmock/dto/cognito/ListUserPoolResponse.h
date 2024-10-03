@@ -32,6 +32,11 @@ namespace AwsMock::Dto::Cognito {
         std::vector<UserPool> userPools;
 
         /**
+         * Total number of user pools
+         */
+        long total;
+
+        /**
          * Convert to a JSON string.
          *
          * @return user pools json string

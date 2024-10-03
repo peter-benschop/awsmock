@@ -21,7 +21,7 @@ namespace AwsMock::Database {
 
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
-                document.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
+                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
 
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
                 document.append(kvp("value", value));
-                document.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
+                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
@@ -76,7 +76,6 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto insert_one_result = _monitoringCollection.insert_one(document.extract());
                 log_trace << "Gauge set, oid: " << insert_one_result->inserted_id().get_string().value;
-                session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -97,10 +96,10 @@ namespace AwsMock::Database {
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end)))));
-                if (labelName.empty()) {
+                if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
-                if (labelValue.empty()) {
+                if (!labelValue.empty()) {
                     document.append(kvp("labelValue", labelValue));
                 }
 
@@ -114,6 +113,7 @@ namespace AwsMock::Database {
                     Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::rolling_mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
                     result.emplace_back(counter);
                 }
+                log_info << "name: " << name << " start: " << result.front().timestamp << " end: " << result.back().timestamp;
                 return result;
 
             } catch (const mongocxx::exception &exc) {

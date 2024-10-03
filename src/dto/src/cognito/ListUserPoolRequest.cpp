@@ -14,7 +14,16 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
+            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
             Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
+            Core::JsonUtils::GetJsonValueInt("PageIndex", rootObject, pageIndex);
+
+            if (rootObject->has("SortColumns")) {
+                Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("SortColumns");
+                for (const auto &it: *jsonArray) {
+                    sortColumns.emplace_back(it.extract<std::string>());
+                }
+            }
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
