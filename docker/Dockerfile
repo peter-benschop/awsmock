@@ -71,10 +71,10 @@ RUN ln -s /usr/lib/libbson-1.0.so.0 /usr/lib/libbson-1.0.so
 COPY --from=build /usr/local/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
 RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
-COPY --from=build /usr/local/lib/libmongocxx.so.3.11.0-pre /usr/lib/
-RUN ln -s /usr/lib/libmongocxx.so.3.11.0-pre /usr/lib/libmongocxx.so._noabi
-COPY --from=build /usr/local/lib/libbsoncxx.so.3.11.0-pre /usr/lib/
-RUN ln -s /usr/lib/libbsoncxx.so.3.11.0-pre /usr/lib/libbsoncxx.so._noabi
+COPY --from=build /usr/local/lib/libmongocxx.so.3.12.0-pre /usr/lib/
+RUN ln -s /usr/lib/libmongocxx.so.3.12.0-pre /usr/lib/libmongocxx.so._noabi
+COPY --from=build /usr/local/lib/libbsoncxx.so.3.12.0-pre /usr/lib/
+RUN ln -s /usr/lib/libbsoncxx.so.3.12.0-pre /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
 
 # Install boost
