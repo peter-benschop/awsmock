@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.8](https://github.com/jensvogt/awsmock/compare/v0.15.7...v0.15.8) (2024-10-02)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** add SQS message list ([cafd099](https://github.com/jensvogt/awsmock/commit/cafd099fc500a8271b88ea0c097a5b4cddcaf0c5))
+
 ## [0.15.7](https://github.com/jensvogt/awsmock/compare/v0.15.6...v0.15.7) (2024-10-02)
 
 
