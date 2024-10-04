@@ -135,7 +135,7 @@ namespace AwsMock::Service {
                 dynamoDeleteRequest.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
                 dynamoDeleteRequest.headers["Content-Type"] = "application/x-amz-json-1.0";
                 dynamoDeleteRequest.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
-                dynamoDeleteRequest.headers["X-Amz-Date"] = Core::DateTimeUtils::ISO8601Now();
+                dynamoDeleteRequest.headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
                 dynamoDeleteRequest.headers["X-Amz-Security-Token"] = "none";
                 SendAuthorizedDynamoDbRequest(dynamoDeleteRequest.body, dynamoDeleteRequest.headers);
             }

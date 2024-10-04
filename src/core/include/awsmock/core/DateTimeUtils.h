@@ -55,25 +55,25 @@ namespace AwsMock::Core {
          * @brief Returns the time_point in ISO8001 format
          *
          * @pre
-         * Format is according to ISO8601, for instance: '2024-04-28T15:07:37.035332Z'.
+         * Format is according to ToISO8601, for instance: '2024-04-28T15:07:37.035332Z'.
          *
          * @param timePoint point in time
          * @return time_point in ISO 8601 format
          */
-        static std::string ISO8601(const system_clock::time_point &timePoint);
+        static std::string ToISO8601(const system_clock::time_point &timePoint);
 
         /**
          * @brief Returns the current date time in ISO8001 format
          *
          * @pre
-         * Format is according to ISO8601, for instance: '2024-04-28T15:07:37.035332Z'.
+         * Format is according to ToISO8601, for instance: '2024-04-28T15:07:37.035332Z'.
          *
          * @return time_point in ISO 8601 format
          */
-        static std::string ISO8601Now();
+        static std::string NowISO8601();
 
         /**
-         * @brief Convert a ISO8601 timestamp into a system time point.
+         * @brief Convert a ToISO8601 timestamp into a system time point.
          * @param dateString
          * @return
          */
@@ -101,12 +101,20 @@ namespace AwsMock::Core {
         static std::string HttpFormat(const system_clock::time_point &timePoint);
 
         /**
-         * @brief Returns the time_point in Unix epoch timestamp
+         * @brief Returns the time_point in Unix epoch timestamp (UTC)
          *
          * @param timePoint point in time
          * @return time_point as Unix epoch timestamp
          */
         static long UnixTimestamp(const system_clock::time_point &timePoint);
+
+        /**
+         * @brief Returns the time_point in Unix epoch timestamp (LocalTime)
+         *
+         * @param timePoint point in time
+         * @return time_point as Unix epoch timestamp in local time
+         */
+        static long UnixTimestampLocal(const system_clock::time_point &timePoint);
 
         /**
          *

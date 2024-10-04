@@ -254,17 +254,14 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
 
-        log_debug << "Handle OPTIONS request";
-
         // Prepare the response message
-        std::string referer = request.base()[http::field::referer].substr(0, request.base()[http::field::referer].length() - 1);
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::allow, "*/*");
-        response.set(http::field::access_control_allow_origin, referer);
+        response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "*");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::access_control_max_age, "86400");
@@ -273,7 +270,6 @@ namespace AwsMock::Service {
         response.set(http::field::connection, "Keep-Alive");
 
         // Send the response to the client
-        log_debug << "Handle OPTIONS request finished";
         return response;
     }
 

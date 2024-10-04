@@ -580,7 +580,7 @@ namespace AwsMock::Service {
             if (!messageList.empty()) {
 
                 // Update queue
-                queue.attributes.approximateNumberOfMessagesNotVisible += messageList.size();
+                queue.attributes.approximateNumberOfMessagesNotVisible += static_cast<long>(messageList.size());
                 queue = _sqsDatabase.UpdateQueue(queue);
 
                 response.messageList = messageList;
@@ -607,6 +607,7 @@ namespace AwsMock::Service {
             Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.pageSize, request.pageIndex);
 
             Dto::SQS::ListMessagesResponse listMessagesResponse;
+            listMessagesResponse.total = total;
             for (const auto &message: messages) {
                 Dto::SQS::MessageEntry messageEntry;
                 messageEntry.region = request.region;
@@ -615,6 +616,8 @@ namespace AwsMock::Service {
                 messageEntry.body = message.body;
                 messageEntry.receiptHandle = message.receiptHandle;
                 messageEntry.md5Sum = message.md5Body;
+                messageEntry.created = message.created;
+                messageEntry.modified = message.modified;
                 listMessagesResponse.messages.emplace_back(messageEntry);
             }
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();

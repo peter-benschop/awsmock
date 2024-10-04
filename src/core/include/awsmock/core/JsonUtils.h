@@ -11,8 +11,8 @@
 // Poco includes
 #include <Poco/Dynamic/Var.h>
 #include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
 #include <Poco/JSON/Object.h>
+#include <Poco/JSON/Parser.h>
 
 // Boost includes
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -42,6 +42,15 @@ namespace AwsMock::Core {
         static void GetJsonValueString(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::string &attribute);
 
         /**
+         * @brief Sets the supplied JSON value in the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueString(Poco::JSON::Object &jsonObject, const std::string &name, const std::string &value);
+
+        /**
          * @brief Extracts the supplied JSON value from the object.
          *
          * @param name name of the JSON attribute
@@ -49,6 +58,15 @@ namespace AwsMock::Core {
          * @param attribute JSON attribute
          */
         static void GetJsonValueLong(const std::string &name, Poco::JSON::Object::Ptr jsonObject, long &attribute);
+
+        /**
+         * @brief Sets the supplied JSON value in the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueLong(Poco::JSON::Object &jsonObject, const std::string &name, long value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -60,6 +78,15 @@ namespace AwsMock::Core {
         static void GetJsonValueDouble(const std::string &name, Poco::JSON::Object::Ptr jsonObject, double &attribute);
 
         /**
+         * @brief Sets the supplied JSON value in the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueDouble(Poco::JSON::Object &jsonObject, const std::string &name, double value);
+
+        /**
          * @brief Extracts the supplied JSON value from the object.
          *
          * @param name name of the JSON attribute
@@ -67,6 +94,15 @@ namespace AwsMock::Core {
          * @param attribute JSON attribute
          */
         static void GetJsonValueFloat(const std::string &name, Poco::JSON::Object::Ptr jsonObject, float &attribute);
+
+        /**
+         * @brief Sets the supplied JSON value in the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueFloat(Poco::JSON::Object &jsonObject, const std::string &name, float value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -78,6 +114,15 @@ namespace AwsMock::Core {
         static void GetJsonValueInt(const std::string &name, Poco::JSON::Object::Ptr jsonObject, int &attribute);
 
         /**
+         * @brief Sets the supplied JSON value int the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueInt(Poco::JSON::Object &jsonObject, const std::string &name, int value);
+
+        /**
          * @brief Extracts the supplied JSON value from the object.
          *
          * @param name name of the JSON attribute
@@ -85,6 +130,15 @@ namespace AwsMock::Core {
          * @param attribute JSON attribute
          */
         static void GetJsonValueBool(const std::string &name, Poco::JSON::Object::Ptr jsonObject, bool &attribute);
+
+        /**
+         * @brief Sets the supplied JSON value in the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueBool(Poco::JSON::Object &jsonObject, const std::string &name, bool value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.

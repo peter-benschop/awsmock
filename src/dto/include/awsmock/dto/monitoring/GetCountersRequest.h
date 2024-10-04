@@ -48,6 +48,11 @@ namespace AwsMock::Dto::Monitoring {
         std::string labelValue;
 
         /**
+         * Stepping
+         */
+        int step;
+
+        /**
          * Start time
          */
         system_clock::time_point start;

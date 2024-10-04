@@ -538,7 +538,7 @@ namespace AwsMock::Core {
         static std::string GetDateString();
 
         /**
-         * @brief Returns the date time string in ISO8601 format
+         * @brief Returns the date time string in ToISO8601 format
          *
          * Return the time in zone UTC
          *

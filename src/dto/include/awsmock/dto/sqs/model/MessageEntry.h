@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_SQS_MESSAGE_ENTRY_H
 
 // C++ includes
+#include <chrono>
 #include <map>
 #include <string>
 #include <vector>
@@ -19,6 +20,8 @@
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief SQS message entry as used by the SendMessageBatch
@@ -66,6 +69,16 @@ namespace AwsMock::Dto::SQS {
          * MD5 sum
          */
         std::string md5Sum;
+
+        /**
+         * Created time stamp
+         */
+        system_clock::time_point created = Core::DateTimeUtils::LocalDateTimeNow();
+
+        /**
+         * Created time stamp
+         */
+        system_clock::time_point modified;
 
         /**
          * @brief Converts the DTO to a JSON string.

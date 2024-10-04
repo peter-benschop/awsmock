@@ -218,8 +218,9 @@ namespace AwsMock::Database {
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
             mongocxx::options::find opts;
-            opts.limit(maxKeys);
-
+            if (maxKeys > 0) {
+                opts.limit(maxKeys);
+            }
             auto objectCursor = _objectCollection.find(make_document(kvp("region", region), kvp("bucket", bucket)), opts);
             for (auto object: objectCursor) {
                 Entity::S3::Object result;

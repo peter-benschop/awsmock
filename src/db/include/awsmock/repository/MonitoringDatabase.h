@@ -52,8 +52,8 @@ namespace AwsMock::Database {
          * @brief Singleton instance
          */
         static MonitoringDatabase &instance() {
-            static MonitoringDatabase s3Database;
-            return s3Database;
+            static MonitoringDatabase monitoringDatabase;
+            return monitoringDatabase;
         }
 
         /**
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
         /**
          * Performance collection name
          */
-        std::string _performanceCollectionName;
+        std::string _monitoringCollectionName;
     };
 
 }// namespace AwsMock::Database

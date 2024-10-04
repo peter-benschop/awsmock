@@ -13,7 +13,7 @@ namespace AwsMock::Service {
         try {
 
             // Get counters from database
-            response.counters = _database.GetRollingMean(request.name, request.start, request.end, 5);
+            response.counters = _database.GetRollingMean(request.name, request.start, request.end, request.step);
 
             log_trace << "Monitoring create bucket count: " << response.counters.size();
 

@@ -13,8 +13,8 @@ namespace AwsMock::Dto::Module {
             moduleJson.set("executable", executable);
             moduleJson.set("port", port);
             moduleJson.set("state", Database::Entity::Module::ModuleStateToString(status));
-            moduleJson.set("created", Core::DateTimeUtils::ISO8601(created));
-            moduleJson.set("modified", Core::DateTimeUtils::ISO8601(modified));
+            moduleJson.set("created", Core::DateTimeUtils::ToISO8601(created));
+            moduleJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
             return Core::JsonUtils::ToJsonString(moduleJson);
 
@@ -32,8 +32,8 @@ namespace AwsMock::Dto::Module {
                 serviceJson.set("name", service.name);
                 serviceJson.set("port", service.port);
                 serviceJson.set("state", Database::Entity::Module::ModuleStateToString(service.state));
-                serviceJson.set("created", Core::DateTimeUtils::ISO8601(service.created));
-                serviceJson.set("modified", Core::DateTimeUtils::ISO8601(service.modified));
+                serviceJson.set("created", Core::DateTimeUtils::ToISO8601(service.created));
+                serviceJson.set("modified", Core::DateTimeUtils::ToISO8601(service.modified));
                 moduleJsonArray.add(serviceJson);
             }
 
@@ -53,8 +53,8 @@ namespace AwsMock::Dto::Module {
                 moduleJson.set("name", module.name);
                 moduleJson.set("port", module.port);
                 moduleJson.set("status", Database::Entity::Module::ModuleStateToString(module.status));
-                moduleJson.set("created", Core::DateTimeUtils::ISO8601(module.created));
-                moduleJson.set("modified", Core::DateTimeUtils::ISO8601(module.modified));
+                moduleJson.set("created", Core::DateTimeUtils::ToISO8601(module.created));
+                moduleJson.set("modified", Core::DateTimeUtils::ToISO8601(module.modified));
                 moduleJsonArray.add(moduleJson);
             }
 

@@ -23,7 +23,7 @@ namespace AwsMock::Dto::S3 {
             content.size = it.size;
             content.owner = owner;
             content.storageClass = "STANDARD";
-            content.lastModified = Core::DateTimeUtils::ISO8601(it.modified);
+            content.lastModified = Core::DateTimeUtils::ToISO8601(it.modified);
             contents.push_back(content);
         }
     }

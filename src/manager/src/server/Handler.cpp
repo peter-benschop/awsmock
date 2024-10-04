@@ -48,11 +48,10 @@ namespace AwsMock::Manager {
             } else if (action == "export") {
 
                 // Get options
-                std::string tmp = Core::HttpUtils::GetHeaderValue(request, "pretty");
-                bool prettyPrint = false;
-                if (Core::HttpUtils::HasHeader(request, "pretty")) {
+                bool prettyPrint = true;
+                /*if (Core::HttpUtils::HasHeader(request, "pretty")) {
                     prettyPrint = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "pretty"));
-                }
+                }*/
                 bool includeObjects = false;
                 if (Core::HttpUtils::HasHeader(request, "include-objects")) {
                     includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "include-objects"));
@@ -179,6 +178,9 @@ namespace AwsMock::Manager {
         response.set(boost::beast::http::field::server, "awsmock");
         response.set(boost::beast::http::field::content_type, "application/json");
         response.set(boost::beast::http::field::content_length, std::to_string(body.size()));
+        response.set(boost::beast::http::field::access_control_allow_origin, "http://localhost:4200");
+        response.set(boost::beast::http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(boost::beast::http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
         response.body() = body;
@@ -196,6 +198,9 @@ namespace AwsMock::Manager {
         response.set(boost::beast::http::field::server, "awsmock");
         response.set(boost::beast::http::field::content_type, "application/json");
         response.set(boost::beast::http::field::content_length, std::to_string(body.size()));
+        response.set(boost::beast::http::field::access_control_allow_origin, "http://localhost:4200");
+        response.set(boost::beast::http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(boost::beast::http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
         response.body() = body;

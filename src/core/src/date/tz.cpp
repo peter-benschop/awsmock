@@ -3648,6 +3648,7 @@ namespace date {
 
     const time_zone *
     tzdb::current_zone() const {
+
         // On some OS's a file called /etc/localtime may
         // exist and it may be either a real file
         // containing time zone details or a symlink to such a file.

@@ -71,13 +71,16 @@ namespace AwsMock::Database::Entity::SQS {
 
     Poco::JSON::Object Queue::ToJsonObject() const {
 
+        using Core::JsonUtils;
+
         try {
             Poco::JSON::Object jsonObject;
-            jsonObject.set("region", region);
-            jsonObject.set("name", name);
-            jsonObject.set("owner", owner);
-            jsonObject.set("queueUrl", queueUrl);
-            jsonObject.set("queueArn", queueArn);
+            JsonUtils::SetJsonValueString(jsonObject, "region", region);
+            JsonUtils::SetJsonValueString(jsonObject, "name", name);
+            JsonUtils::SetJsonValueString(jsonObject, "owner", owner);
+            JsonUtils::SetJsonValueString(jsonObject, "queueUrl", queueUrl);
+            JsonUtils::SetJsonValueString(jsonObject, "queueArn", queueArn);
+
             jsonObject.set("attributes", attributes.ToJsonObject());
 
             // Tags array

@@ -14,7 +14,7 @@ namespace AwsMock::Dto::S3 {
 
         // ETag
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
 
         return Core::XmlUtils::ToXmlString(pDoc);
     }
@@ -24,7 +24,7 @@ namespace AwsMock::Dto::S3 {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("ETag", eTag);
-            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+            rootJson.set("LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
             rootJson.set("ChecksumCRC32", checksumCRC32);
             rootJson.set("ChecksumCRC32C", checksumCRC32C);
             rootJson.set("ChecksumSHA1", checksumSHA1);

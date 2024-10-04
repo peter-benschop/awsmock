@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::Monitoring {
         jsonObject.set("labelName", labelName);
         jsonObject.set("labelValue", labelValue);
         jsonObject.set("value", performanceValue);
-        jsonObject.set("timestamp", Core::DateTimeUtils::ISO8601(timestamp));
+        jsonObject.set("timestamp", Core::DateTimeUtils::ToISO8601(timestamp));
         return jsonObject;
     }
 

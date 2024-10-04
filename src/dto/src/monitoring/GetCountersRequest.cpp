@@ -22,16 +22,20 @@ namespace AwsMock::Dto::Monitoring {
                 request.name = rootObject->get("name").convert<std::string>();
             }
             if (!rootObject->get("labelName").isEmpty()) {
-                request.name = rootObject->get("labelName").convert<std::string>();
+                request.labelName = rootObject->get("labelName").convert<std::string>();
             }
             if (!rootObject->get("labelValue").isEmpty()) {
-                request.name = rootObject->get("labelValue").convert<std::string>();
+                request.labelValue = rootObject->get("labelValue").convert<std::string>();
+            }
+            if (!rootObject->get("step").isEmpty()) {
+                request.step = rootObject->get("step").convert<int>();
             }
 
             request.start = Core::DateTimeUtils::FromISO8601(rootObject->get("start").convert<std::string>());
             request.end = Core::DateTimeUtils::FromISO8601(rootObject->get("end").convert<std::string>());
 
             return request;
+
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
@@ -46,6 +50,9 @@ namespace AwsMock::Dto::Monitoring {
             rootJson.set("name", name);
             rootJson.set("labelName", labelName);
             rootJson.set("labelValue", labelValue);
+            rootJson.set("start", Core::DateTimeUtils::ToISO8601(start));
+            rootJson.set("end", Core::DateTimeUtils::ToISO8601(end));
+            rootJson.set("step", step);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

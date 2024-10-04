@@ -134,8 +134,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
             jsonObject.set("keySchemas", jsonKeySchemasArray);
         }
 
-        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
+        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
         return jsonObject;
     }

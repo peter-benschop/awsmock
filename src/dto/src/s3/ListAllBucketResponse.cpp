@@ -39,7 +39,7 @@ namespace AwsMock::Dto::S3 {
 
             pCreated = pDoc->createElement("CreationDate");
             pBucket->appendChild(pCreated);
-            pCreatedText = pDoc->createTextNode(Core::DateTimeUtils::ISO8601(it.created));
+            pCreatedText = pDoc->createTextNode(Core::DateTimeUtils::ToISO8601(it.created));
             pCreated->appendChild(pCreatedText);
         }
 

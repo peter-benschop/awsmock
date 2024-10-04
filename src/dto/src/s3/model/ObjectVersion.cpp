@@ -15,7 +15,7 @@ namespace AwsMock::Dto::S3 {
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "StorageClass", storageClass);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsLatest", isLatest);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Size", size);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
         pRoot->appendChild(owner.ToXmlElement(pDoc));
 
         // Checksums
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::S3 {
             rootJson.set("IsLatest", isLatest);
             rootJson.set("Size", size);
             rootJson.set("ChecksumAlgorithm", Core::JsonUtils::GetJsonStringArray(checksumAlgorithms));
-            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+            rootJson.set("LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
             rootJson.set("Owner", owner.ToJsonObject());
             rootJson.set("RestoreStatue", restoreStatue.ToJsonObject());
             return rootJson;

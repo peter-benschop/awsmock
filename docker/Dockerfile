@@ -19,6 +19,11 @@ FROM alpine:latest
 
 RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread curl
 
+# Fix timezones
+ENV TZ=Europe/Berlin
+RUN apk add -U tzdata
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Make dirctories
 RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/data/lambda && \
@@ -114,8 +119,5 @@ EXPOSE 6000-6010 6000-6010
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
 ENV AWSMOCK_MONGODB_ACTIVE=false
-ENV TZ=Europe/Berlin
-RUN apk add --no-cache tzdata
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 CMD ["/usr/bin/awsmockmgr"]
