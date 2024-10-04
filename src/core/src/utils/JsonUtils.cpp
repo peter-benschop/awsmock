@@ -9,10 +9,20 @@ namespace AwsMock::Core {
         }
     }
 
+    void JsonUtils::SetJsonValueString(Poco::JSON::Object &jsonObject, const std::string &name, const std::string &value) {
+        if (!value.empty()) {
+            jsonObject.set(name, value);
+        }
+    }
+
     void JsonUtils::GetJsonValueLong(const std::string &name, Poco::JSON::Object::Ptr jsonObject, long &attribute) {
         if (jsonObject->has(name)) {
             attribute = jsonObject->get(name).convert<long>();
         }
+    }
+
+    void JsonUtils::SetJsonValueLong(Poco::JSON::Object &jsonObject, const std::string &name, long value) {
+        jsonObject.set(name, value);
     }
 
     void JsonUtils::GetJsonValueDouble(const std::string &name, Poco::JSON::Object::Ptr jsonObject, double &attribute) {
@@ -21,10 +31,18 @@ namespace AwsMock::Core {
         }
     }
 
+    void JsonUtils::SetJsonValueDouble(Poco::JSON::Object &jsonObject, const std::string &name, double value) {
+        jsonObject.set(name, value);
+    }
+
     void JsonUtils::GetJsonValueFloat(const std::string &name, Poco::JSON::Object::Ptr jsonObject, float &attribute) {
         if (jsonObject->has(name)) {
             attribute = jsonObject->get(name).convert<float>();
         }
+    }
+
+    void JsonUtils::SetJsonValueFloat(Poco::JSON::Object &jsonObject, const std::string &name, float value) {
+        jsonObject.set(name, value);
     }
 
     void JsonUtils::GetJsonValueInt(const std::string &name, Poco::JSON::Object::Ptr jsonObject, int &attribute) {
@@ -33,10 +51,18 @@ namespace AwsMock::Core {
         }
     }
 
+    void JsonUtils::SetJsonValueInt(Poco::JSON::Object &jsonObject, const std::string &name, int value) {
+        jsonObject.set(name, value);
+    }
+
     void JsonUtils::GetJsonValueBool(const std::string &name, Poco::JSON::Object::Ptr jsonObject, bool &attribute) {
         if (jsonObject->has(name)) {
             attribute = jsonObject->get(name).convert<bool>();
         }
+    }
+
+    void JsonUtils::SetJsonValueBool(Poco::JSON::Object &jsonObject, const std::string &name, bool value) {
+        jsonObject.set(name, value);
     }
 
     void JsonUtils::GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute) {

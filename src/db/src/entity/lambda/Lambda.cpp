@@ -189,8 +189,8 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("code", code.ToJsonObject());
             jsonObject.set("state", LambdaStateToString(state));
             jsonObject.set("stateReason", stateReason);
-            jsonObject.set("lastStarted", Core::DateTimeUtils::ISO8601(lastStarted));
-            jsonObject.set("lastInvocation", Core::DateTimeUtils::ISO8601(lastInvocation));
+            jsonObject.set("lastStarted", Core::DateTimeUtils::ToISO8601(lastStarted));
+            jsonObject.set("lastInvocation", Core::DateTimeUtils::ToISO8601(lastInvocation));
 
             // Tags
             if (!tags.empty()) {

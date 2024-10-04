@@ -80,11 +80,13 @@ namespace AwsMock::Database::Entity::SQS {
 
     Poco::JSON::Object RedrivePolicy::ToJsonObject() const {
 
+        using Core::JsonUtils;
+
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("deadLetterTargetArn", deadLetterTargetArn);
-            jsonObject.set("maxReceiveCount", maxReceiveCount);
+            JsonUtils::SetJsonValueString(jsonObject, "deadLetterTargetArn", deadLetterTargetArn);
+            JsonUtils::SetJsonValueInt(jsonObject, "maxReceiveCount", maxReceiveCount);
             return jsonObject;
 
         } catch (Poco::Exception &e) {

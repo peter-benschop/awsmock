@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("Runtime", runtime);
             rootJson.set("FunctionName", functionName);
             // TODO: ImageConfig
-            rootJson.set("LastModified", Core::DateTimeUtils::ISO8601(lastModified));
+            rootJson.set("LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
             rootJson.set("LastUpdateStatus", lastUpdateStatusReason);
             rootJson.set("LastUpdateStatusCode", lastUpdateStatusReasonCode);
             rootJson.set("State", state);

@@ -28,6 +28,8 @@ namespace AwsMock::Dto::SQS {
             rootJson.set("receiptHandle", receiptHandle);
             rootJson.set("body", body);
             rootJson.set("md5OfBody", md5Sum);
+            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
+            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
             if (!messageAttributes.empty()) {
                 Poco::JSON::Array jsonMessageAttributeArray;

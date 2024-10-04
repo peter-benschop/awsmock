@@ -111,12 +111,12 @@ namespace AwsMock::Database::Entity::KMS {
         jsonObject.set("rsaPrivateKey", rsaPrivateKey);
         jsonObject.set("rsaPublicKey", rsaPublicKey);
         jsonObject.set("pendingWindowInDays", pendingWindowInDays);
-        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
+        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
         // Scheduled deletion
         if (scheduledDeletion.time_since_epoch().count() > 0) {
-            jsonObject.set("scheduledDeletion", Core::DateTimeUtils::ISO8601(scheduledDeletion));
+            jsonObject.set("scheduledDeletion", Core::DateTimeUtils::ToISO8601(scheduledDeletion));
         }
 
         // Tags array

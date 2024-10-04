@@ -116,9 +116,9 @@ namespace AwsMock::Database::Entity::SQS {
             jsonObject.set("md5Body", md5Body);
             jsonObject.set("md5UserAttr", md5UserAttr);
             jsonObject.set("md5SystemAttr", md5SystemAttr);
-            jsonObject.set("reset", Core::DateTimeUtils::ISO8601(reset));
-            jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
-            jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
+            jsonObject.set("reset", Core::DateTimeUtils::ToISO8601(reset));
+            jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
+            jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
             // Message attributes
             if (!messageAttributes.empty()) {

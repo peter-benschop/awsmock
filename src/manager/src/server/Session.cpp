@@ -21,14 +21,13 @@ namespace AwsMock::Manager {
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
-        int maxBody = Core::Configuration::instance().getInt("awsmock.manager.http.max.body");
-        parser_->body_limit(maxBody);
+        parser_->body_limit(boost::none);
 
         // Set the timeout.
         stream_.expires_after(std::chrono::seconds(30));
 
         // Read a request using the parser-oriented interface
-        boost::beast::http::async_read(stream_, buffer_, *parser_, boost::beast::bind_front_handler(&Session::OnRead, shared_from_this()));
+        http::async_read(stream_, buffer_, *parser_, boost::beast::bind_front_handler(&Session::OnRead, this->shared_from_this()));
     }
 
     void Session::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
@@ -36,7 +35,7 @@ namespace AwsMock::Manager {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == boost::beast::http::error::end_of_stream)
+        if (ec == http::error::end_of_stream)
             return DoClose();
 
         if (ec) {
@@ -52,7 +51,7 @@ namespace AwsMock::Manager {
             DoRead();
     }
 
-    void Session::QueueWrite(boost::beast::http::message_generator response) {
+    void Session::QueueWrite(http::message_generator response) {
 
         // Allocate and store the work
         response_queue_.push(std::move(response));
@@ -67,58 +66,54 @@ namespace AwsMock::Manager {
     // The concrete type of the response message (which depends on the
     // request), is type-erased in message_generator.
     template<class Body, class Allocator>
-    boost::beast::http::message_generator Session::HandleRequest(boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> &&req) {
-
-        // Returns a bad request response
-        auto const bad_request =
-                [&req](boost::beast::string_view why) {
-                    boost::beast::http::response<boost::beast::http::dynamic_body> res{boost::beast::http::status::bad_request, req.version()};
-                    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-                    res.set(boost::beast::http::field::content_type, "text/html");
-                    res.keep_alive(req.keep_alive());
-                    // Body
-                    boost::beast::net::streambuf sb;
-                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(res.body().size()), res.body().cdata()));
-                    res.prepare_payload();
-                    return res;
-                };
+    http::message_generator Session::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
 
         // Make sure we can handle the method
-        if (req.method() != boost::beast::http::verb::get && req.method() != boost::beast::http::verb::put) {
-            return bad_request("Unknown HTTP-method");
+        if (request.method() != http::verb::get && request.method() != http::verb::put && request.method() != http::verb::options) {
+            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
+        }
+
+        // Ping request
+        if (request.method() == http::verb::connect) {
+            log_debug << "Handle CONNECT request";
+            Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
+            Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
+            return Core::HttpUtils::Ok(request);
         }
 
         // Request path must be absolute and not contain "..".
-        if (req.target().empty() || req.target()[0] != '/' || req.target().find("..") != boost::beast::string_view::npos) {
-            return bad_request("Illegal request-target");
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
+            return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
-        boost::beast::http::response<boost::beast::http::string_body> res;
+        // Process OPTIONS requests
+        if (request.method() == http::verb::options) {
 
-        switch (req.method()) {
-            case boost::beast::http::verb::get: {
-                log_debug << "Handle GET request";
-                Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
-                Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
-                res = _handler.HandleGetRequest(req);
-                break;
-            }
-            case boost::beast::http::verb::put: {
-                log_debug << "Handle PUT request";
-                Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
-                Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
-                res = _handler.HandlePutRequest(req);
-                break;
-            }
-            case boost::beast::http::verb::post: {
-                log_debug << "Handle POST request";
-                Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
-                Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
-                res = _handler.HandlePostRequest(req);
-                break;
+            return HandleOptionsRequest(request);
+
+        } else {
+            switch (request.method()) {
+                case http::verb::get: {
+                    log_debug << "Handle GET request";
+                    Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
+                    Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
+                    return _handler.HandleGetRequest(request);
+                }
+                case http::verb::put: {
+                    log_debug << "Handle PUT request";
+                    Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
+                    Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
+                    return _handler.HandlePutRequest(request);
+                }
+                case http::verb::post: {
+                    log_debug << "Handle POST request";
+                    Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
+                    Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
+                    return _handler.HandlePostRequest(request);
+                }
             }
         }
-        return res;
+        return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
     }
 
     // Called to start/continue the write-loop. Should not be called when
@@ -126,7 +121,7 @@ namespace AwsMock::Manager {
     void Session::DoWrite() {
         if (!response_queue_.empty()) {
             bool keep_alive = response_queue_.front().keep_alive();
-            boost::beast::async_write(stream_, std::move(response_queue_.front()), boost::beast::bind_front_handler(&Session::OnWrite, shared_from_this(), keep_alive));
+            async_write(stream_, std::move(response_queue_.front()), boost::beast::bind_front_handler(&Session::OnWrite, shared_from_this(), keep_alive));
         }
     }
 
@@ -142,6 +137,7 @@ namespace AwsMock::Manager {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
             return DoClose();
         }
+        return DoClose();
 
         // Resume the read if it has been paused
         if (response_queue_.size() == queue_limit)
@@ -153,11 +149,36 @@ namespace AwsMock::Manager {
     }
 
     void Session::DoClose() {
+
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        stream_.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+        ec = stream_.socket().shutdown(boost::beast::net::ip::tcp::socket::shutdown_send, ec);
+        if (ec) {
+            //  log_error << "Could not shutdown socket, message: " << ec.message();
+        }
 
         // At this point the connection is closed gracefully
+    }
+
+    http::response<http::string_body> Session::HandleOptionsRequest(const http::request<http::string_body> &request) {
+
+        // Prepare the response message
+        http::response<http::string_body> response{http::status::no_content, request.version()};
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::allow, "*/*");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::access_control_max_age, "86400");
+        response.set(http::field::vary, "Accept-Encoding, Origin");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
+
+        // Send the response to the client
+        return response;
     }
 
 }// namespace AwsMock::Manager

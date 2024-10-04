@@ -76,8 +76,8 @@ namespace AwsMock::Database::Entity::S3 {
         jsonObject.set("contentType", contentType);
         jsonObject.set("internalName", internalName);
         jsonObject.set("versionId", versionId);
-        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
+        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
         if (!metadata.empty()) {
             Poco::JSON::Array jsonMetadataArray;

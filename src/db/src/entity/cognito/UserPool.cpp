@@ -104,8 +104,8 @@ namespace AwsMock::Database::Entity::Cognito {
         jsonObject.set("kmsKey", kmsKey);
         jsonObject.set("arn", arn);
         jsonObject.set("domain", domain.domain);
-        jsonObject.set("created", Core::DateTimeUtils::ISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ISO8601(modified));
+        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
         return jsonObject;
     }

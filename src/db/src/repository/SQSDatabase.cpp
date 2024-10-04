@@ -220,8 +220,12 @@ namespace AwsMock::Database {
 
             mongocxx::options::find opts;
             opts.sort(make_document(kvp("_id", 1)));
-            opts.limit(maxResults);
-            opts.skip(skipCount);
+            if (maxResults > 0) {
+                opts.limit(maxResults);
+            }
+            if (skipCount > 0) {
+                opts.skip(skipCount);
+            }
 
             auto queueCursor = _queueCollection.find(query.view(), opts);
             for (auto queue: queueCursor) {
@@ -595,8 +599,12 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
             mongocxx::options::find opts;
-            opts.limit(pageSize);
-            opts.skip(pageSize * pageIndex);
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+            }
+            if (pageIndex * pageSize > 0) {
+                opts.skip(pageSize * pageIndex);
+            }
 
             auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn)), opts);
             for (auto message: messageCursor) {
@@ -627,7 +635,9 @@ namespace AwsMock::Database {
                 session.start_transaction();
 
                 mongocxx::options::find opts;
-                opts.limit(maxMessages);
+                if (maxMessages > 0) {
+                    opts.limit(maxMessages);
+                }
 
                 // Get the cursor
                 auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn),

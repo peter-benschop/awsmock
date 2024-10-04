@@ -92,7 +92,20 @@ namespace AwsMock::Service {
 
         Dto::Common::Infrastructure infrastructure;
 
-        for (const auto &module: modules) {
+        Dto::Module::Module::ModuleList moduleList = modules;
+        if (moduleList.empty()) {
+            moduleList.emplace_back((Dto::Module::Module){.name = "s3"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "sqs"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "sns"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "lambda"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "cognito"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "dynanmodb"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "secretsmanager"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "transfer"});
+            moduleList.emplace_back((Dto::Module::Module){.name = "kms"});
+        }
+
+        for (const auto &module: moduleList) {
 
             if (module.name == "s3") {
 
@@ -130,7 +143,7 @@ namespace AwsMock::Service {
                 infrastructure.cognitoUserGroups = _cognitoDatabase.ListGroups();
                 infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
 
-            } else if (module.name == "dynanomdb") {
+            } else if (module.name == "dynanmodb") {
 
                 Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
                 infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();

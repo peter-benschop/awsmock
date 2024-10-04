@@ -78,14 +78,17 @@ namespace AwsMock::Database::Entity::SNS {
 
     Poco::JSON::Object Topic::ToJsonObject() const {
 
+        using Core::JsonUtils;
+        
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("region", region);
-            jsonObject.set("topicName", topicName);
-            jsonObject.set("owner", owner);
-            jsonObject.set("topicUrl", topicUrl);
-            jsonObject.set("topicArn", topicArn);
+            JsonUtils::SetJsonValueString(jsonObject, "region", region);
+            JsonUtils::SetJsonValueString(jsonObject, "topicName", topicName);
+            JsonUtils::SetJsonValueString(jsonObject, "owner", owner);
+            JsonUtils::SetJsonValueString(jsonObject, "topicUrl", topicUrl);
+            JsonUtils::SetJsonValueString(jsonObject, "topicArn", topicArn);
+            JsonUtils::SetJsonValueString(jsonObject, "region", region);
             jsonObject.set("topicAttribute", topicAttribute.ToJsonObject());
 
             // Subscription array

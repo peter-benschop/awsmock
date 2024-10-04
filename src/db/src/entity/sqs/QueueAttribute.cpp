@@ -42,20 +42,23 @@ namespace AwsMock::Database::Entity::SQS {
 
     Poco::JSON::Object QueueAttribute::ToJsonObject() const {
 
+        using Core::JsonUtils;
+
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("delaySeconds", delaySeconds);
-            jsonObject.set("maxMessageSize", maxMessageSize);
-            jsonObject.set("messageRetentionPeriod", messageRetentionPeriod);
-            jsonObject.set("policy", policy);
-            jsonObject.set("receiveMessageWaitTime", receiveMessageWaitTime);
-            jsonObject.set("visibilityTimeout", visibilityTimeout);
+            JsonUtils::SetJsonValueInt(jsonObject, "delaySeconds", delaySeconds);
+            JsonUtils::SetJsonValueInt(jsonObject, "maxMessageSize", maxMessageSize);
+            JsonUtils::SetJsonValueInt(jsonObject, "messageRetentionPeriod", messageRetentionPeriod);
+            JsonUtils::SetJsonValueString(jsonObject, "policy", policy);
+            JsonUtils::SetJsonValueInt(jsonObject, "receiveMessageWaitTime", receiveMessageWaitTime);
+            JsonUtils::SetJsonValueInt(jsonObject, "visibilityTimeout", visibilityTimeout);
+            JsonUtils::SetJsonValueString(jsonObject, "redriveAllowPolicy", redriveAllowPolicy);
+            JsonUtils::SetJsonValueInt(jsonObject, "approximateNumberOfMessages", approximateNumberOfMessages);
+            JsonUtils::SetJsonValueInt(jsonObject, "approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed);
+            JsonUtils::SetJsonValueInt(jsonObject, "approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible);
             jsonObject.set("redrivePolicy", redrivePolicy.ToJsonObject());
-            jsonObject.set("redriveAllowPolicy", redriveAllowPolicy);
-            jsonObject.set("approximateNumberOfMessages", approximateNumberOfMessages);
-            jsonObject.set("approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed);
-            jsonObject.set("approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible);
+
             return jsonObject;
 
         } catch (Poco::Exception &e) {

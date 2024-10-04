@@ -46,14 +46,14 @@ namespace AwsMock::Database::Entity::SNS {
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("deliveryPolicy", deliveryPolicy);
-            jsonObject.set("displayName", displayName);
-            jsonObject.set("fifoTopic", fifoTopic);
-            jsonObject.set("policy", policy);
-            jsonObject.set("signatureVersion", signatureVersion);
-            jsonObject.set("tracingConfig", tracingConfig);
-            jsonObject.set("kmsMasterKeyId", kmsMasterKeyId);
-            jsonObject.set("contentBasedDeduplication", contentBasedDeduplication);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "deliveryPolicy", deliveryPolicy);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "displayName", displayName);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "policy", policy);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "signatureVersion", signatureVersion);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "tracingConfig", tracingConfig);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "kmsMasterKeyId", kmsMasterKeyId);
+            Core::JsonUtils::SetJsonValueBool(jsonObject, "fifoTopic", fifoTopic);
+            Core::JsonUtils::SetJsonValueBool(jsonObject, "contentBasedDeduplication", contentBasedDeduplication);
             return jsonObject;
 
         } catch (Poco::Exception &e) {

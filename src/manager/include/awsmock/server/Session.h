@@ -19,6 +19,9 @@
 
 namespace AwsMock::Manager {
 
+    namespace http = boost::beast::http;
+    namespace ip = boost::asio::ip;
+
     /**
      * @brief HTTP session manager
      *
@@ -61,7 +64,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Queue write callback
          */
-        void QueueWrite(boost::beast::http::message_generator response);
+        void QueueWrite(http::message_generator response);
 
         /**
          * @brief Return a response for the given request.
@@ -70,11 +73,19 @@ namespace AwsMock::Manager {
          *
          * @tparam Body HTTP body
          * @tparam Allocator allocator
-         * @param req HTTP request
+         * @param request HTTP request
          * @return
          */
         template<class Body, class Allocator>
-        boost::beast::http::message_generator HandleRequest(boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> &&req);
+        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
+
+        /**
+         * @brief Handles options request
+         *
+         * @param request HTTP request
+         * @return options response
+         */
+        static http::response<http::string_body> HandleOptionsRequest(const http::request<http::string_body> &request);
 
         /**
          * @brief Called to start/continue the write-loop.
@@ -115,12 +126,12 @@ namespace AwsMock::Manager {
         /**
          * HTTP request queue
          */
-        std::queue<boost::beast::http::message_generator> response_queue_;
+        std::queue<http::message_generator> response_queue_;
 
         /**
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
          */
-        boost::optional<boost::beast::http::request_parser<boost::beast::http::string_body>> parser_;
+        boost::optional<http::request_parser<http::string_body>> parser_;
 
         /**
          * HTTP request handler

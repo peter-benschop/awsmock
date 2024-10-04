@@ -7,21 +7,24 @@
 
 namespace AwsMock::Database {
 
-    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _performanceCollectionName("monitoring") {}
+    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring") {}
 
     void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
+
+        if (name.empty()) {
+            log_warning << "empty name";
+        }
 
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_performanceCollectionName];
+            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
 
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
-                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
 
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
@@ -36,6 +39,7 @@ namespace AwsMock::Database {
                     value += mResult.value()["value"].get_double().value;
                 }
                 document.append(kvp("value", value));
+                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
 
                 auto insert_one_result = _monitoringCollection.insert_one(document.extract());
                 log_trace << "Counter incremented, oid: " << insert_one_result->inserted_id().get_string().value;
@@ -51,16 +55,18 @@ namespace AwsMock::Database {
 
     void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
 
+        if (name.empty()) {
+            log_warning << "empty name";
+        }
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_performanceCollectionName];
+            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
 
-                mongocxx::options::update opts;
-                opts.upsert(true);
+                system_clock::time_point now = Core::DateTimeUtils::LocalDateTimeNow();
 
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
@@ -75,7 +81,8 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 auto insert_one_result = _monitoringCollection.insert_one(document.extract());
-                log_trace << "Gauge set, oid: " << insert_one_result->inserted_id().get_string().value;
+                session.commit_transaction();
+                //log_debug << "Gauge set, oid: " << insert_one_result->inserted_id().get_string().value;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -87,10 +94,11 @@ namespace AwsMock::Database {
 
     std::vector<Database::Entity::Monitoring::Counter> MonitoringDatabase::GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName, const std::string &labelValue) {
 
+        std::vector<Database::Entity::Monitoring::Counter> result;
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_performanceCollectionName];
+            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
 
             try {
                 bsoncxx::builder::basic::document document;
@@ -104,16 +112,14 @@ namespace AwsMock::Database {
                 }
 
                 // Find and accumulate
-                auto cursor = _monitoringCollection.find(document.extract());
                 boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::rolling_mean>> acc(boost::accumulators::tag::rolling_window::window_size = step);
-
-                std::vector<Database::Entity::Monitoring::Counter> result;
-                for (const auto &it: cursor) {
+                auto cursor = _monitoringCollection.find(document.extract());
+                for (auto it: cursor) {
                     acc(it["value"].get_double().value);
                     Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::rolling_mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
                     result.emplace_back(counter);
                 }
-                log_info << "name: " << name << " start: " << result.front().timestamp << " end: " << result.back().timestamp;
+                log_debug << "Counters, name: " << name << " count: " << result.size();
                 return result;
 
             } catch (const mongocxx::exception &exc) {
