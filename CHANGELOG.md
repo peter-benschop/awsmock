@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.11](https://github.com/jensvogt/awsmock/compare/v0.15.10...v0.15.11) (2024-10-05)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** add export infrastructure ([41b5f0c](https://github.com/jensvogt/awsmock/commit/41b5f0cff8b502196e0c600f71eb6ab8b0d770ba))
+* **628-sqs-receive-message-spoils-statistics:** add export infrastructure ([02facc1](https://github.com/jensvogt/awsmock/commit/02facc1f7621b8609b570fc09db8d0799f52e0b2))
+* **653-move-manager-apis-to-gateway:** refactor module service ([8bdefbe](https://github.com/jensvogt/awsmock/commit/8bdefbe878e1153e69822dddd95a54db0c845a83))
+
 ## [0.15.10](https://github.com/jensvogt/awsmock/compare/v0.15.9...v0.15.10) (2024-10-05)
 
 
