@@ -17,10 +17,11 @@ namespace AwsMock::Service {
                     Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
                     Dto::Monitoring::GetCountersResponse response = _monitoringService.GetCounters(monitoringRequest);
 
-                    log_info << "Get counters, name: " << monitoringRequest.name;
+                    log_info << "Get counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
                     return SendOkResponse(request, response.ToJson());
                 }
                 case Dto::Common::MonitoringCommandType::UNKNOWN:
+                    log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
             }
 
