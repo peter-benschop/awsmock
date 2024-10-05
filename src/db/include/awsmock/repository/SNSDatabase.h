@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SNS_DATABASE_H
 
 // C++ standard includes
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -27,6 +28,8 @@
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief SNS MongoDB database.
@@ -130,7 +133,7 @@ namespace AwsMock::Database {
          * @return updated SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic &topic);
+        Entity::SNS::Topic UpdateTopic(Entity::SNS::Topic &topic);
 
         /**
          * @brief Create a new topic or updates an existing topic

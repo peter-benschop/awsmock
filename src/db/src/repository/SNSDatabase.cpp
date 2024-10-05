@@ -248,7 +248,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::Topic SNSDatabase::UpdateTopic(const Entity::SNS::Topic &topic) {
+    Entity::SNS::Topic SNSDatabase::UpdateTopic(Entity::SNS::Topic &topic) {
 
         if (HasDatabase()) {
 
@@ -256,16 +256,21 @@ namespace AwsMock::Database {
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
             try {
 
                 session.start_transaction();
-                auto result =
-                        _topicCollection.replace_one(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)),
-                                                     topic.ToDocument());
+                topic.modified = system_clock::now();
+                auto mResult = _topicCollection.find_one_and_update(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument(), opts);
                 log_trace << "Topic updated: " << topic.ToString();
                 session.commit_transaction();
 
-                return GetTopicByArn(topic.topicArn);
+                if (mResult) {
+                    topic.FromDocument(mResult->view());
+                    return topic;
+                }
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -277,6 +282,7 @@ namespace AwsMock::Database {
 
             return _memoryDb.UpdateTopic(topic);
         }
+        return {};
     }
 
     Entity::SNS::Topic SNSDatabase::CreateOrUpdateTopic(Entity::SNS::Topic &topic) {
@@ -543,18 +549,28 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
+            auto session = client->start_session();
 
-            auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})),
-                                                                  message.ToDocument(),
-                                                                  opts);
-            log_trace << "Message updated, count: " << bsoncxx::to_json(mResult->view());
+            try {
 
-            if (!mResult) {
-                throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+                session.start_transaction();
+                message.modified = system_clock::now();
+                auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
+                log_trace << "Message updated, count: " << bsoncxx::to_json(mResult->view());
+                session.commit_transaction();
+
+                if (!mResult) {
+                    throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+                }
+
+                message.FromDocument(mResult->view());
+                return message;
+                
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "SNS Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
             }
-
-            message.FromDocument(mResult->view());
-            return message;
 
         } else {
 

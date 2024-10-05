@@ -105,28 +105,30 @@ namespace AwsMock::Database::Entity::SQS {
 
     Poco::JSON::Object Message::ToJsonObject() const {
 
+        using Core::JsonUtils;
+
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("queueArn", queueArn);
-            jsonObject.set("body", body);
-            jsonObject.set("status", MessageStatusToString(status));
-            jsonObject.set("messageId", messageId);
-            jsonObject.set("receiptHandle", receiptHandle);
-            jsonObject.set("md5Body", md5Body);
-            jsonObject.set("md5UserAttr", md5UserAttr);
-            jsonObject.set("md5SystemAttr", md5SystemAttr);
-            jsonObject.set("reset", Core::DateTimeUtils::ToISO8601(reset));
-            jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
-            jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            JsonUtils::SetJsonValueString(jsonObject, "queueArn", queueArn);
+            JsonUtils::SetJsonValueString(jsonObject, "body", body);
+            JsonUtils::SetJsonValueString(jsonObject, "status", MessageStatusToString(status));
+            JsonUtils::SetJsonValueString(jsonObject, "messageId", messageId);
+            JsonUtils::SetJsonValueString(jsonObject, "receiptHandle", receiptHandle);
+            JsonUtils::SetJsonValueString(jsonObject, "md5Body", md5Body);
+            JsonUtils::SetJsonValueString(jsonObject, "md5UserAttr", md5UserAttr);
+            JsonUtils::SetJsonValueString(jsonObject, "md5SystemAttr", md5SystemAttr);
+            JsonUtils::SetJsonValueDate(jsonObject, "reset", reset);
+            JsonUtils::SetJsonValueDate(jsonObject, "created", created);
+            JsonUtils::SetJsonValueDate(jsonObject, "modified", modified);
 
             // Message attributes
             if (!messageAttributes.empty()) {
                 Poco::JSON::Object jsonMessageAttributeObject;
                 for (const auto &attribute: messageAttributes) {
                     Poco::JSON::Object jsonAttributeObject;
-                    jsonAttributeObject.set("StringValue", attribute.attributeValue);
-                    jsonAttributeObject.set("DataType", attribute.attributeType);
+                    JsonUtils::SetJsonValueString(jsonAttributeObject, "StringValue", attribute.attributeValue);
+                    JsonUtils::SetJsonValueString(jsonAttributeObject, "DataType", MessageAttributeTypeToString(attribute.attributeType));
                     jsonMessageAttributeObject.set(attribute.attributeName, jsonAttributeObject);
                 }
                 jsonObject.set("MessageAttributes", jsonMessageAttributeObject);

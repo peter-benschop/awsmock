@@ -23,8 +23,8 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("queueArn", queueArn),
                 kvp("attributes", attributes.ToDocument()),
                 kvp("tags", tagsDoc),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return queueDoc;
     }
@@ -39,8 +39,8 @@ namespace AwsMock::Database::Entity::SQS {
             queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
             queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+            created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
             // Paging
             if (mResult.value().find("paginationToken") != mResult.value().end()) {
@@ -80,6 +80,8 @@ namespace AwsMock::Database::Entity::SQS {
             JsonUtils::SetJsonValueString(jsonObject, "owner", owner);
             JsonUtils::SetJsonValueString(jsonObject, "queueUrl", queueUrl);
             JsonUtils::SetJsonValueString(jsonObject, "queueArn", queueArn);
+            JsonUtils::SetJsonValueDate(jsonObject, "created", created);
+            JsonUtils::SetJsonValueDate(jsonObject, "created", created);
 
             jsonObject.set("attributes", attributes.ToJsonObject());
 

@@ -101,6 +101,10 @@ namespace AwsMock::Database {
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
 
             try {
+
+                mongocxx::options::find opts;
+                opts.sort(make_document(kvp("created", 1)));
+
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end)))));
@@ -113,12 +117,14 @@ namespace AwsMock::Database {
 
                 // Find and accumulate
                 boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::rolling_mean>> acc(boost::accumulators::tag::rolling_window::window_size = step);
-                auto cursor = _monitoringCollection.find(document.extract());
+                auto cursor = _monitoringCollection.find(document.extract(), opts);
                 for (auto it: cursor) {
                     acc(it["value"].get_double().value);
                     Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::rolling_mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
                     result.emplace_back(counter);
                 }
+                acc.drop<boost::accumulators::tag::rolling_mean>();
+
                 log_debug << "Counters, name: " << name << " count: " << result.size();
                 return result;
 

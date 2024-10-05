@@ -82,6 +82,10 @@ namespace AwsMock::Core {
         }
     }
 
+    void JsonUtils::SetJsonValueDate(Poco::JSON::Object &jsonObject, const std::string &name, const std::chrono::system_clock::time_point &value) {
+        jsonObject.set(name, Core::DateTimeUtils::ToISO8601(value));
+    }
+
     Poco::JSON::Array JsonUtils::GetJsonStringArray(const std::vector<std::string> &values) {
 
         Poco::JSON::Array jsonArray;

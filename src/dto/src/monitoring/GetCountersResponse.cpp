@@ -15,7 +15,7 @@ namespace AwsMock::Dto::Monitoring {
                 Poco::JSON::Array jsonArray;
                 for (const auto &counter: counters) {
                     Poco::JSON::Array counterArray;
-                    counterArray.add(Core::DateTimeUtils::UnixTimestamp(counter.timestamp));
+                    counterArray.add(Core::DateTimeUtils::ToISO8601(counter.timestamp));
                     counterArray.add(counter.performanceValue);
                     jsonArray.add(counterArray);
                 }

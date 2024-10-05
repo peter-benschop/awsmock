@@ -296,7 +296,7 @@ namespace AwsMock::Database {
         for (auto &messageId: _messages) {
             count += static_cast<long>(std::erase_if(_messages, [reset](const auto &item) {
                 auto const &[key, value] = item;
-                return value.created < Poco::Timestamp(reset.time_since_epoch().count() / 1000);
+                return value.created < reset;
             }));
         }
         log_debug << "Old resources deleted, timeout: " << timeout << " count: " << count;
