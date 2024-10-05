@@ -36,11 +36,9 @@ namespace AwsMock::Manager {
             Database::ConnectionPool &pool = Database::ConnectionPool::instance();
 
             // Options
-            mongocxx::options::client client_options;
             auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
-            client_options.server_api_opts(api);
             pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri)));
-            log_info << "MongoDB database initialized";
+            log_info << "MongoDB database initialized, version: " << mongocxx::v_noabi::options::server_api::version_to_string(api.get_version());
 
             // Create database indexes
             Database::ModuleDatabase::instance().CreateIndexes();
