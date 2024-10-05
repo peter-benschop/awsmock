@@ -48,6 +48,8 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            log_info << "Performance counter not available if you running the memory DB";
         }
     }
 
@@ -77,13 +79,14 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto insert_one_result = _monitoringCollection.insert_one(document.extract());
                 session.commit_transaction();
-                //log_debug << "Gauge set, oid: " << insert_one_result->inserted_id().get_string().value;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            log_info << "Performance counter not available if you running the memory DB";
         }
     }
 
@@ -127,6 +130,8 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            log_info << "Performance counter not available if you running the memory DB";
         }
         return {};
     }
