@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.13](https://github.com/jensvogt/awsmock/compare/v0.15.12...v0.15.13) (2024-10-05)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** refactor module service ([05021de](https://github.com/jensvogt/awsmock/commit/05021deb2df5a9bbdfbde03fe63be6f533484771))
+
 ## [0.15.12](https://github.com/jensvogt/awsmock/compare/v0.15.11...v0.15.12) (2024-10-05)
 
 
