@@ -118,6 +118,4 @@ EXPOSE 6000-6010 6000-6010
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-ENV AWSMOCK_MONGODB_ACTIVE=false
-
 CMD ["/usr/bin/awsmockmgr"]

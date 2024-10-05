@@ -440,6 +440,7 @@ namespace AwsMock::Service {
             system_clock::time_point reset = system_clock::now();
             if (queue.attributes.delaySeconds > 0) {
                 reset += std::chrono::seconds(queue.attributes.delaySeconds);
+                queue.attributes.approximateNumberOfMessagesDelayed++;
             } else {
                 reset += std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
