@@ -33,19 +33,6 @@ namespace AwsMock::Service {
                 _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
             }
 
-            // Set counter default userAttributes
-            queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessages(queue.queueArn);
-            queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::DELAYED);
-            queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INVISIBLE);
-
-            // Reset resources which have expired
-            //_sqsDatabase.ResetMessages(queue.queueUrl, queue.attributes.visibilityTimeout);
-
-            // Check retries
-            /*if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
-                _sqsDatabase.RedriveMessages(queue.queueUrl, queue.attributes.redrivePolicy);
-            }*/
-
             // Check delays
             if (queue.attributes.delaySeconds > 0) {
                 _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
