@@ -49,7 +49,7 @@ namespace AwsMock::Service {
             _baseUrl = "/api/s3/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -93,6 +93,7 @@ namespace AwsMock::Service {
         }
 
         std::string _region, _baseUrl;
+        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewayServer::GatewayServer() : AbstractServer("gateway") {
+    GatewayServer::GatewayServer(boost::asio::thread_pool &pool) : AbstractServer("gateway"), _pool(pool) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -38,36 +38,25 @@ namespace AwsMock::Service {
         // Set running
         Database::ModuleDatabase::instance().SetState("gateway", Database::Entity::Module::ModuleState::RUNNING);
 
-        // The io_context is required for all I/O
-        boost::asio::io_context ioc{_maxThreads};
-
         // Create and launch a listening port
         auto address = ip::make_address(_address);
         std::make_shared<GatewayListener>(ioc, ip::tcp::endpoint{address, _port})->Run();
 
-        // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
-        signals.async_wait(
-                [&](boost::beast::error_code const &, int) {
-                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
-                    // destroying the `io_context` and all the sockets in it.
-                    log_info << "Manager stopped on signal";
-                    ioc.stop();
-                });
-
-        boost::thread_group threadGroup;
         for (auto i = 0; i < _maxThreads; i++) {
-            threadGroup.create_thread(
-                    [ObjectPtr = &ioc] { return ObjectPtr->run(); });
+            _threadGroup.create_thread([ObjectPtr = &ioc] { return ObjectPtr->run(); });
         }
-        threadGroup.join_all();
+
+        log_info << "Gateway service started";
+        ioc.run();
+        log_info << "Gateway stopped";
     }
 
     void GatewayServer::Shutdown() {
-        /* _ioc.stop();
-        for (auto &t: _threads) {
-            t.join();
-        }*/
+        log_info << "Initialize gateway shutdown";
+        ioc.stop();
+        _threadGroup.interrupt_all();
+        _threadGroup.join_all();
+        log_info << "Gateway service stopped";
     }
 
 }// namespace AwsMock::Service

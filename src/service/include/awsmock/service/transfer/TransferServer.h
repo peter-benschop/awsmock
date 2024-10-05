@@ -44,9 +44,9 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          *
-         * @param configuration aws-mock configuration
+         * @param pool global thread pool
          */
-        explicit TransferServer(Core::Configuration &configuration);
+        explicit TransferServer(boost::asio::thread_pool &pool);
 
         /**
          * @brief Initialization
@@ -95,11 +95,6 @@ namespace AwsMock::Service {
         void CheckTransferServers();
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * Transfer database
          */
         Database::TransferDatabase &_transferDatabase;
@@ -108,6 +103,11 @@ namespace AwsMock::Service {
          * Transfer monitoring
          */
         std::shared_ptr<TransferMonitoring> _transferMonitoring;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * Rest port

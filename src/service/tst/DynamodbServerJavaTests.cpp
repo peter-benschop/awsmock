@@ -36,7 +36,7 @@ namespace AwsMock::Service {
             _baseUrl = "/api/dynamodb/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -71,6 +71,7 @@ namespace AwsMock::Service {
         }
 
         std::string _endpoint, _baseUrl;
+        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

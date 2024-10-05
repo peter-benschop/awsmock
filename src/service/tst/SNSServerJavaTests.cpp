@@ -43,7 +43,7 @@ namespace AwsMock::Service {
             _sqsBaseUrl = "/api/sqs/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -81,6 +81,7 @@ namespace AwsMock::Service {
         }
 
         std::string _snsBaseUrl, _sqsBaseUrl, _region;
+        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();

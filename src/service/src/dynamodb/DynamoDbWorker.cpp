@@ -7,7 +7,6 @@
 namespace AwsMock::Service {
 
     DynamoDbWorker::DynamoDbWorker(int timeout) : Core::Timer("dynamodb-worker", timeout) {
-        Start();
     }
 
     void DynamoDbWorker::Initialize() {

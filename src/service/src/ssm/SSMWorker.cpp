@@ -6,9 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SSMWorker::SSMWorker(int timeout) : Core::Timer("kms-worker", timeout) {
-        Start();
-    }
+    SSMWorker::SSMWorker(int timeout) : Core::Timer("kms-worker", timeout) {}
 
     void SSMWorker::Initialize() {
         log_debug << "SSMWorker initialized";

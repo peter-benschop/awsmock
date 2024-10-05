@@ -19,4 +19,8 @@ namespace AwsMock::Database {
         return _pool->try_acquire();
     }
 
+    void ConnectionPool::Shutdown() {
+        _pool.release();
+    }
+
 }// namespace AwsMock::Database

@@ -50,8 +50,10 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param pool global thread pool
          */
-        explicit DynamoDbServer();
+        explicit DynamoDbServer(boost::asio::thread_pool &pool);
 
         /**
          * @brief Initialization
@@ -110,6 +112,11 @@ namespace AwsMock::Service {
          * Monitoring
          */
         std::shared_ptr<DynamoDbWorker> _dynamoDbWorker;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * AWS region

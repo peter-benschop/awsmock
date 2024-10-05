@@ -8,6 +8,9 @@
 // GTest includes
 #include <gtest/gtest.h>
 
+// Boost includes
+#include <boost/asio/thread_pool.hpp>
+
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/config/Configuration.h>
@@ -44,7 +47,7 @@ namespace AwsMock::Service {
             _queueUrl = "http://sqs." + _region + "." + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -72,12 +75,13 @@ namespace AwsMock::Service {
                     }
                 }
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
             return receiptHandle;
         }
 
         std::string _endpoint, _queueUrl, _accountId;
+        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

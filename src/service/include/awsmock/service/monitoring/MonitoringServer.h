@@ -5,13 +5,18 @@
 #ifndef AWSMOCK_SERVICE_MONITORING_SERVER_H
 #define AWSMOCK_SERVICE_MONITORING_SERVER_H
 
+// Boost includes
+#include <boost/asio/post.hpp>
+#include <boost/asio/thread_pool.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
-//#include <awsmock/service/monitoring/MonitoringWorker.h>
 
 #define S3_DEFAULT_PORT 9500
 #define S3_DEFAULT_HOST "localhost"
@@ -35,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringServer();
+        explicit MonitoringServer(boost::asio::thread_pool &pool);
 
         /**
          * @brief Timer initialization
@@ -55,64 +60,24 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP manager instance
-         */
-        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
-
-        /**
-         * Monitoring worker
-         */
-        //        std::shared_ptr<S3Worker> _s3Worker;
-
-        /**
-         * Monitoring service
-         */
-        MonitoringService _monitoringService;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connection
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
-
-        /**
-         * Data directory
-         */
-        std::string _dataDir;
-
-        /**
          * Module name
          */
         std::string _module;
 
         /**
-         * Monitoring period
+         * Metric service
          */
-        int _monitoringPeriod;
+        std::shared_ptr<Monitoring::MetricService> _metricService;
 
         /**
-         * Worker period
+         * Monitoring system collector
          */
-        int _workerPeriod;
+        std::shared_ptr<Monitoring::MetricSystemCollector> _metricSystemCollector;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
     };
 
 }// namespace AwsMock::Service

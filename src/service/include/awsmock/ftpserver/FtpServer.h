@@ -58,12 +58,11 @@ namespace AwsMock::FtpServer {
          * For security reasons it might be desirable to bind to a specific IP
          * address. Use TransferFtpServer(const std::string&, uint16_t) for that purpose.
          *
-         * @param configuration: AwsMock configuration
          * @param serverName: server name
          * @param port: The port to StartServer the FTP manager on. Defaults to 21.
          * @param address: listen address
          */
-        explicit FtpServer(Core::Configuration &configuration, std::string serverName, int port, std::string address);
+        explicit FtpServer(std::string serverName, int port, std::string address);
 
         /**
          * Destructor
@@ -157,11 +156,6 @@ namespace AwsMock::FtpServer {
         [[nodiscard]] std::string getAddress() const;
 
       private:
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
 
         /**
          * Actual implementation

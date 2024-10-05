@@ -8,8 +8,8 @@
 
 namespace AwsMock::FtpServer {
 
-    FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, uint16_t port, Core::Configuration &configuration)
-        : _serverName(std::move(serverName)), _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0), _configuration(configuration) {}
+    FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, uint16_t port)
+        : _serverName(std::move(serverName)), _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0) {}
 
     FtpServerImpl::~FtpServerImpl() {
         stop();
@@ -24,7 +24,7 @@ namespace AwsMock::FtpServer {
     }
 
     bool FtpServerImpl::start(size_t thread_count) {
-        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, _configuration, [this]() { _openConnectionCount--; });
+        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { _openConnectionCount--; });
 
         // set up the acceptor to listen on the tcp port
         asio::error_code make_address_ec;
@@ -105,7 +105,7 @@ namespace AwsMock::FtpServer {
 
         ftp_session->start();
 
-        auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, _configuration, [this]() { _openConnectionCount--; });
+        auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { _openConnectionCount--; });
 
         _acceptor.async_accept(new_session->getSocket(), [this, new_session](auto ec) {
             _openConnectionCount++;

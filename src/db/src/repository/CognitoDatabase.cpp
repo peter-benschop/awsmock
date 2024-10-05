@@ -52,7 +52,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Cognito::UserPool CognitoDatabase::CreateUserPool(const Entity::Cognito::UserPool &userPool) {
+    Entity::Cognito::UserPool CognitoDatabase::CreateUserPool(Entity::Cognito::UserPool &userPool) {
 
         if (HasDatabase()) {
 
@@ -66,7 +66,8 @@ namespace AwsMock::Database {
                 auto result = _userPoolCollection.insert_one(userPool.ToDocument());
                 session.commit_transaction();
                 log_trace << "User pool created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetUserPoolById(result->inserted_id().get_oid().value);
+                userPool.oid = result->inserted_id().get_oid().value.to_string();
+                return userPool;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -204,9 +205,12 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Cognito::UserPool CognitoDatabase::UpdateUserPool(const Entity::Cognito::UserPool &userPool) {
+    Entity::Cognito::UserPool CognitoDatabase::UpdateUserPool(Entity::Cognito::UserPool &userPool) {
 
         if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
@@ -215,11 +219,15 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _userPoolCollection.replace_one(make_document(kvp("region", userPool.region), kvp("name", userPool.name)), userPool.ToDocument());
+                auto mResult = _userPoolCollection.find_one_and_update(make_document(kvp("region", userPool.region), kvp("name", userPool.name)), userPool.ToDocument(), opts);
                 session.commit_transaction();
 
-                log_trace << "Cognito user pool updated: " << userPool.ToString();
-                return GetUserPoolByRegionName(userPool.region, userPool.name);
+                if (mResult) {
+                    log_trace << "Cognito user pool updated: " << userPool.ToString();
+                    userPool.FromDocument(mResult->view());
+                    return userPool;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -363,9 +371,7 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
-                int64_t count = _userCollection.count_documents(make_document(kvp("region", region),
-                                                                              kvp("userPoolId", userPoolId),
-                                                                              kvp("userName", userName)));
+                int64_t count = _userCollection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
                 log_trace << "Cognito user exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -403,7 +409,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Cognito::User CognitoDatabase::CreateUser(const Entity::Cognito::User &user) {
+    Entity::Cognito::User CognitoDatabase::CreateUser(Entity::Cognito::User &user) {
 
         if (HasDatabase()) {
 
@@ -417,7 +423,8 @@ namespace AwsMock::Database {
                 auto result = _userCollection.insert_one(user.ToDocument());
                 session.commit_transaction();
                 log_trace << "User created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetUserById(result->inserted_id().get_oid().value);
+                user.oid = result->inserted_id().get_oid().value.to_string();
+                return user;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -609,9 +616,12 @@ namespace AwsMock::Database {
         return users;
     }
 
-    Entity::Cognito::User CognitoDatabase::UpdateUser(const Entity::Cognito::User &user) {
+    Entity::Cognito::User CognitoDatabase::UpdateUser(Entity::Cognito::User &user) {
 
         if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
@@ -620,10 +630,15 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _userCollection.replace_one(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)), user.ToDocument());
+                auto mResult = _userCollection.find_one_and_update(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)), user.ToDocument(), opts);
                 session.commit_transaction();
-                log_trace << "Cognito user updated: " << user.ToString();
-                return GetUserByUserName(user.region, user.userPoolId, user.userName);
+
+                if (mResult) {
+                    log_trace << "Cognito user updated: " << user.ToString();
+                    user.FromDocument(mResult->view());
+                    return user;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -777,7 +792,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Cognito::Group CognitoDatabase::CreateGroup(const Entity::Cognito::Group &group) {
+    Entity::Cognito::Group CognitoDatabase::CreateGroup(Entity::Cognito::Group &group) {
 
         if (HasDatabase()) {
 
@@ -791,7 +806,8 @@ namespace AwsMock::Database {
                 auto result = _groupCollection.insert_one(group.ToDocument());
                 session.commit_transaction();
                 log_trace << "Cognito group created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetGroupById(result->inserted_id().get_oid().value);
+                group.oid = result->inserted_id().get_oid().value.to_string();
+                return group;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

@@ -14,11 +14,9 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/server/Handler.h>
 #include <awsmock/server/Listener.h>
-#include <awsmock/server/Monitoring.h>
+#include <awsmock/service/monitoring/MonitoringServer.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
 #define DEFAULT_MONGO_DBUSER "admin"
@@ -56,11 +54,6 @@ namespace AwsMock::Manager {
         static void Initialize();
 
         /**
-         * @brief Initialize the Prometheus monitoring counters and StartServer the prometheus manager.
-         */
-        void StartModules();
-
-        /**
          * @brief Stops all currently running modules.
          */
         void StopModules();
@@ -86,6 +79,11 @@ namespace AwsMock::Manager {
          * Server map
          */
         Service::ServerMap _serverMap;
+
+        /**
+         * Thread group
+         */
+        boost::thread_group _threadGroup;
     };
 
 }// namespace AwsMock::Manager

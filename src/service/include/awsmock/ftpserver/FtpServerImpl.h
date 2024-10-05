@@ -27,9 +27,8 @@ namespace AwsMock::FtpServer {
          * @param serverName name of the manager
          * @param address listen address
          * @param port listen port
-         * @param configuration AwsMock configuration
          */
-        FtpServerImpl(std::string serverName, std::string address, uint16_t port, Core::Configuration &configuration);
+        FtpServerImpl(std::string serverName, std::string address, uint16_t port);
 
         /**
          * Copy (constructor disabled)
@@ -169,10 +168,5 @@ namespace AwsMock::FtpServer {
          * Name of the manager
          */
         std::string _serverName;
-
-        /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
     };
 }// namespace AwsMock::FtpServer

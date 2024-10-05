@@ -6,31 +6,32 @@
 
 namespace AwsMock::Service {
 
-    LambdaServer::LambdaServer(Core::Configuration &configuration) : AbstractServer("lambda"), _configuration(configuration), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda") {
+    LambdaServer::LambdaServer(boost::asio::thread_pool &pool) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda"), _pool(pool) {
 
         // Get HTTP configuration values
-        _port = _configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.lambda.http.host", LAMBDA_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.lambda.http.max.queue", LAMBDA_DEFAULT_QUEUE);
-        _maxThreads = _configuration.getInt("awsmock.service.lambda.http.max.threads", LAMBDA_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.lambda.http.timeout", LAMBDA_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
-        _workerPeriod = _configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.lambda.http.host", LAMBDA_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.lambda.http.max.queue", LAMBDA_DEFAULT_QUEUE);
+        _maxThreads = configuration.getInt("awsmock.service.lambda.http.max.threads", LAMBDA_DEFAULT_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.lambda.http.timeout", LAMBDA_DEFAULT_TIMEOUT);
+        _monitoringPeriod = configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
 
         // Directories
-        _lambdaDir = _configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
+        _lambdaDir = configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
         log_debug << "Lambda directory: " << _lambdaDir;
 
         // Sleeping period
-        _period = _configuration.getInt("awsmock.worker.lambda.period", 10000);
+        _period = configuration.getInt("awsmock.worker.lambda.period", 10000);
         log_debug << "Lambda manager period: " << _period;
 
         // Create environment
-        _region = _configuration.getString("awsmock.region");
+        _region = configuration.getString("awsmock.region");
 
         // lambda module connection
-        _lambdaServiceHost = _configuration.getString("awsmock.service.lambda.host", "localhost");
-        _lambdaServicePort = _configuration.getInt("awsmock.service.lambda.port", 9503);
+        _lambdaServiceHost = configuration.getString("awsmock.service.lambda.host", "localhost");
+        _lambdaServicePort = configuration.getInt("awsmock.service.lambda.port", 9503);
         log_debug << "Lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort;
 
         // Docker module
@@ -60,11 +61,8 @@ namespace AwsMock::Service {
         }
         log_info << "Lambda server starting";
 
-        // Start monitoring
-        _lambdaMonitoring->Start();
-
-        // Start monitoring
-        _lambdaWorker->Start();
+        boost::asio::post(_pool, [this] { _lambdaWorker->Start(); });
+        boost::asio::post(_pool, [this] { _lambdaMonitoring->Start(); });
 
         // Cleanup
         CleanupContainers();
@@ -79,7 +77,6 @@ namespace AwsMock::Service {
     void LambdaServer::Shutdown() {
         _lambdaMonitoring->Stop();
         _lambdaWorker->Stop();
-        //       StopHttpServer();
     }
 
     void LambdaServer::CleanupContainers() {

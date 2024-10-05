@@ -40,9 +40,9 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          *
-         * @param configuration aws-mock configuration
+         * @param pool global thread pool
          */
-        explicit SSMServer(Core::Configuration &configuration);
+        explicit SSMServer(boost::asio::thread_pool &pool);
 
         /**
          * @brief Initialization
@@ -62,11 +62,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * ssm database
          */
         Database::SSMDatabase &_ssmDatabase;
@@ -80,6 +75,11 @@ namespace AwsMock::Service {
          * SNS worker
          */
         std::shared_ptr<SSMWorker> _ssmWorker;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * Rest port

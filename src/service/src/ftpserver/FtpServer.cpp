@@ -8,9 +8,9 @@
 
 namespace AwsMock::FtpServer {
 
-    FtpServer::FtpServer(Core::Configuration &configuration, std::string serverName, int port, std::string address) : _configuration(configuration), _serverName(std::move(serverName)), _address(std::move(address)), _port(port) {
+    FtpServer::FtpServer(std::string serverName, int port, std::string address) : _serverName(std::move(serverName)), _address(std::move(address)), _port(port) {
 
-        _ftp_server = std::make_unique<FtpServerImpl>(_serverName, _address, _port, _configuration);
+        _ftp_server = std::make_unique<FtpServerImpl>(_serverName, _address, _port);
         log_debug << "FTP manager configured, name: " << _serverName << " endpoint: " << _address << ":" << port;
     }
 

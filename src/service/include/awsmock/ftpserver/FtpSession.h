@@ -79,7 +79,6 @@ namespace AwsMock::FtpServer {
         FtpSession(asio::io_service &io_service,
                    const UserDatabase &user_database,
                    std::string serverName,
-                   Core::Configuration &configuration,
                    const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
@@ -287,11 +286,6 @@ namespace AwsMock::FtpServer {
         // Member variables
         ////////////////////////////////////////////////////////
       private:
-
-        /**
-         * Configuration
-         */
-        const Core::Configuration &_configuration;
 
         /**
          * Metric service

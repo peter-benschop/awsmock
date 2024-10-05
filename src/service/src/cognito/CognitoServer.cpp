@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    CognitoServer::CognitoServer() : AbstractServer("cognito", 10), _module("cognito") {
+    CognitoServer::CognitoServer(boost::asio::thread_pool &pool) : AbstractServer("cognito", 10), _module("cognito"), _pool(pool) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -33,10 +33,7 @@ namespace AwsMock::Service {
         log_info << "Cognito module starting";
 
         // Start monitoring
-        _cognitoMonitoring->Start();
-
-        // Start REST module
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new CognitoHandlerFactory());
+        boost::asio::post(_pool, [this] { _cognitoMonitoring->Start(); });
 
         // Set running
         SetRunning();
@@ -47,7 +44,6 @@ namespace AwsMock::Service {
 
     void CognitoServer::Shutdown() {
         _cognitoMonitoring->Stop();
-        StopHttpServer();
     }
 
 }// namespace AwsMock::Service

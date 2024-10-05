@@ -38,11 +38,11 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
-         * @param configuration aws-mock configuration
+         * @param pool global thread pool
          */
-        explicit KMSServer(Core::Configuration &configuration);
+        explicit KMSServer(boost::asio::thread_pool &pool);
 
         /**
          * Initialization
@@ -62,11 +62,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * KMS database
          */
         Database::KMSDatabase &_kmsDatabase;
@@ -80,6 +75,11 @@ namespace AwsMock::Service {
          * SNS worker
          */
         std::shared_ptr<KMSWorker> _kmsWorker;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * Rest port

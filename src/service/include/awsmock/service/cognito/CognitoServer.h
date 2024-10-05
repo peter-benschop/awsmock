@@ -5,13 +5,13 @@
 #ifndef AWSMOCK_SERVICE_COGNITO_SERVER_H
 #define AWSMOCK_SERVICE_COGNITO_SERVER_H
 
-// Poco includes
-#include <Poco/Net/HTTPRequestHandlerFactory.h>
-#include <Poco/Net/HTTPServer.h>
+// Boost includes
+#include <boost/asio/post.hpp>
+#include <boost/asio/thread_pool.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/cognito/CognitoMonitoring.h>
@@ -36,9 +36,11 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
+         *
+         * @param pool global thread pool
          */
-        explicit CognitoServer();
+        explicit CognitoServer(boost::asio::thread_pool &pool);
 
         /**
          * Initialization
@@ -68,14 +70,14 @@ namespace AwsMock::Service {
         std::string _host;
 
         /**
-         * HTTP manager instance
-         */
-        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
-
-        /**
          * Cognito monitoring
          */
         std::shared_ptr<CognitoMonitoring> _cognitoMonitoring;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * HTTP max message queue length

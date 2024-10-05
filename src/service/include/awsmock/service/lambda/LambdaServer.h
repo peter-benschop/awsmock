@@ -45,9 +45,9 @@ namespace AwsMock::Service {
         /**
          * Constructor
          *
-         * @param configuration aws-mock configuration
+         * @param pool global thread pool
          */
-        explicit LambdaServer(Core::Configuration &configuration);
+        explicit LambdaServer(boost::asio::thread_pool &pool);
 
         /**
          * Initialization
@@ -89,11 +89,6 @@ namespace AwsMock::Service {
         Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * lambda database
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -117,6 +112,11 @@ namespace AwsMock::Service {
          * Lambda worker
          */
         std::shared_ptr<LambdaWorker> _lambdaWorker;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * Data dir

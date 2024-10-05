@@ -18,7 +18,19 @@ namespace AwsMock::Core {
         Initialize();
         log_debug << "Timer initialized, name: " << _name;
 
-        std::jthread(&Timer::DoWork, this, _stopSource).detach();
+        std::stop_token stopToken = _stopSource.get_token();
+        thread_local int i = 0;
+        while (!stopToken.stop_requested()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            if (stopToken.stop_requested()) {
+                break;
+            }
+            if (++i >= _timeout) {
+                Run();
+                i = 0;
+            }
+        }
+        //std::jthread(&Timer::DoWork, this, _stopSource).detach();
     }
 
     void Timer::DoWork(const std::stop_source &stopSource) {
