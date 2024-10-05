@@ -87,8 +87,6 @@ int main(int argc, char *argv[]) {
         std::string value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
-    } else {
-        AwsMock::Core::LogStream::SetSeverity("info");
     }
 
     // Set log file
