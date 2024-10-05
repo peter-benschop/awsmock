@@ -22,8 +22,9 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("status", MessageStatusToString(status)),
                 kvp("userAttributes", messageAttributesDoc),
                 kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("lastSend", bsoncxx::types::b_date(lastSend)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
         return messageDoc;
     }
 
@@ -37,9 +38,9 @@ namespace AwsMock::Database::Entity::SNS {
             message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
             status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
             messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-            lastSend = MongoUtils::FromBson(mResult.value()["reset"].get_date());
-            created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-            modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+            lastSend = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
+            created = bsoncxx::types::b_date(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
+            modified = bsoncxx::types::b_date(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
 
             if (mResult.value().find("userAttributes") != mResult.value().end()) {
                 bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
@@ -63,13 +64,15 @@ namespace AwsMock::Database::Entity::SNS {
         try {
 
             Poco::JSON::Object jsonObject;
-            jsonObject.set("region", region);
-            jsonObject.set("topicArn", topicArn);
-            jsonObject.set("targetArn", targetArn);
-            jsonObject.set("message", message);
-            jsonObject.set("status", MessageStatusToString(status));
-            jsonObject.set("messageId", messageId);
-            jsonObject.set("lastSend", Poco::DateTimeFormatter::format(lastSend, Poco::DateTimeFormat::ISO8601_FORMAT));
+            Core::JsonUtils::SetJsonValueString(jsonObject, "region", region);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "topicArn", topicArn);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "targetArn", targetArn);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "message", message);
+            Core::JsonUtils::SetJsonValueString(jsonObject, "status", MessageStatusToString(status));
+            Core::JsonUtils::SetJsonValueString(jsonObject, "messageId", messageId);
+            Core::JsonUtils::SetJsonValueDate(jsonObject, "lastSend", lastSend);
+            Core::JsonUtils::SetJsonValueDate(jsonObject, "created", created);
+            Core::JsonUtils::SetJsonValueDate(jsonObject, "modified", modified);
 
             // Attributes
             if (!attributes.empty()) {

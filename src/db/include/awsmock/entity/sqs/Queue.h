@@ -32,6 +32,7 @@ namespace AwsMock::Database::Entity::SQS {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * SQS queue entity
@@ -83,12 +84,12 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified;
 
         /**
          * Pagination token

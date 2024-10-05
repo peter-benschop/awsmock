@@ -312,8 +312,8 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto mResult =
-                        _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
+                queue.modified = system_clock::now();
+                auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Queue updated: " << queue.ToString();
 
@@ -521,6 +521,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
+                message.modified = system_clock::now();
                 auto mResult = messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
                 session.commit_transaction();
 

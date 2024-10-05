@@ -16,7 +16,7 @@ namespace AwsMock::Core {
     }
 
     std::string DateTimeUtils::ToISO8601(const system_clock::time_point &timePoint) {
-        return std::format("{:%FT%TZ}", timePoint);
+        return std::format("{:%FT%T}", timePoint);
     }
 
     std::string DateTimeUtils::NowISO8601() {

@@ -35,8 +35,8 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("subscriptions", subscriptionDocs),
                 kvp("attributes", topicAttribute.ToDocument()),
                 kvp("tags", tagsDoc),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return topicDoc;
     }
@@ -50,8 +50,8 @@ namespace AwsMock::Database::Entity::SNS {
         topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
         topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
         topicAttribute.FromDocument(mResult.value()["attributes"].get_document().view());
-        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
         // Subscriptions
         if (mResult.value().find("subscriptions") != mResult.value().end()) {
@@ -79,7 +79,7 @@ namespace AwsMock::Database::Entity::SNS {
     Poco::JSON::Object Topic::ToJsonObject() const {
 
         using Core::JsonUtils;
-        
+
         try {
 
             Poco::JSON::Object jsonObject;
@@ -89,6 +89,8 @@ namespace AwsMock::Database::Entity::SNS {
             JsonUtils::SetJsonValueString(jsonObject, "topicUrl", topicUrl);
             JsonUtils::SetJsonValueString(jsonObject, "topicArn", topicArn);
             JsonUtils::SetJsonValueString(jsonObject, "region", region);
+            JsonUtils::SetJsonValueDate(jsonObject, "created", created);
+            JsonUtils::SetJsonValueDate(jsonObject, "modified", modified);
             jsonObject.set("topicAttribute", topicAttribute.ToJsonObject());
 
             // Subscription array

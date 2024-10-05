@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SQS_DATABASE_H
 
 // C++ standard includes
+#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <string>
@@ -33,6 +34,8 @@
 
 namespace AwsMock::Database {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief SQS MongoDB database.
      *
@@ -48,7 +51,7 @@ namespace AwsMock::Database {
         explicit SQSDatabase();
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static SQSDatabase &instance() {
             static SQSDatabase sqsDatabase;

@@ -6,15 +6,10 @@
 #define AWSMOCK_DB_ENTITY_SNS_MESSAGE_H
 
 // C++ includes
+#include <chrono>
 #include <sstream>
 #include <string>
 #include <vector>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -39,6 +34,7 @@ namespace AwsMock::Database::Entity::SNS {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * SNS message status
@@ -117,17 +113,17 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Last send datetime
          */
-        Poco::DateTime lastSend;
+        system_clock::time_point lastSend;
 
         /**
          * Creation datetime
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modified datetime
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified;
 
         /**
          * Converts the entity to a MongoDB document

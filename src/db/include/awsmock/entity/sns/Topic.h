@@ -6,6 +6,7 @@
 #define AWSMOCK_DB_ENTITY_SNS_TOPIC_H
 
 // C++ includes
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -36,9 +37,10 @@ namespace AwsMock::Database::Entity::SNS {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
-     * SNS topic entity
+     * @brief SNS topic entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -92,12 +94,12 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified;
 
         /**
          * Checks whether a subscription with the given protocol/endpoint exists already.

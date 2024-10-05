@@ -17,6 +17,9 @@
 // Boost includes
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+// AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
+
 #define JSON_DEFAULT_INDENT 4
 
 namespace AwsMock::Core {
@@ -157,6 +160,15 @@ namespace AwsMock::Core {
          * @param attribute JSON attribute
          */
         static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::chrono::system_clock::time_point &attribute);
+
+        /**
+         * @brief Sets the supplied JSON value int the object.
+         *
+         * @param jsonObject JSON parentObject
+         * @param name name of the JSON attribute
+         * @param value JSON attribute
+         */
+        static void SetJsonValueDate(Poco::JSON::Object &jsonObject, const std::string &name, const std::chrono::system_clock::time_point &value);
 
         /**
          * @brief Creates a JSON string array.
