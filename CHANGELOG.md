@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.10](https://github.com/jensvogt/awsmock/compare/v0.15.9...v0.15.10) (2024-10-05)
+
+
+### Bug Fixes
+
+* **628-sqs-receive-message-spoils-statistics:** add export infrastructure ([f53d498](https://github.com/jensvogt/awsmock/commit/f53d498f399bef53e9d3bf3a474f499dbf1c6ad0))
+
 ## [0.15.9](https://github.com/jensvogt/awsmock/compare/v0.15.8...v0.15.9) (2024-10-03)
 
 
