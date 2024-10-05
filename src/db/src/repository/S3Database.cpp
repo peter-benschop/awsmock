@@ -237,9 +237,12 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Bucket S3Database::UpdateBucket(const Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::UpdateBucket(Entity::S3::Bucket &bucket) {
 
         if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -248,10 +251,16 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _bucketCollection.replace_one(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument());
+                bucket.modified = system_clock::now();
+                auto mResult = _bucketCollection.find_one_and_update(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument(), opts);
                 log_trace << "Bucket updated: " << bucket.ToString();
                 session.commit_transaction();
-                return GetBucketByRegionName(bucket.region, bucket.name);
+
+                if (mResult) {
+                    bucket.FromDocument(mResult->view());
+                    return bucket;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -265,7 +274,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Bucket S3Database::CreateOrUpdateBucket(const Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) {
 
         if (BucketExists(bucket)) {
             return UpdateBucket(bucket);
@@ -528,7 +537,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::CreateOrUpdateObject(const Entity::S3::Object &object) {
+    Entity::S3::Object S3Database::CreateOrUpdateObject(Entity::S3::Object &object) {
 
         if (ObjectExists(object)) {
             return UpdateObject(object);
@@ -537,9 +546,12 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::UpdateObject(const Entity::S3::Object &object) {
+    Entity::S3::Object S3Database::UpdateObject(Entity::S3::Object &object) {
 
         if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -548,14 +560,16 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto update_one_result =
-                        _objectCollection.replace_one(make_document(kvp("region", object.region),
-                                                                    kvp("bucket", object.bucket),
-                                                                    kvp("key", object.key)),
-                                                      object.ToDocument());
+                object.modified = system_clock::now();
+                auto mResult = _objectCollection.find_one_and_update(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument(), opts);
                 log_trace << "Object updated: " << object.ToString();
                 session.commit_transaction();
-                return GetObject(object.region, object.bucket, object.key);
+
+                if (mResult) {
+                    object.FromDocument(mResult->view());
+                    return object;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

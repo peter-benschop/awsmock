@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_S3_DATABASE_H
 
 // C++ standard includes
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -28,6 +29,8 @@
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief S3 MongoDB database.
@@ -152,7 +155,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket UpdateBucket(Entity::S3::Bucket &bucket);
 
         /**
          * @brief Returns the total bucket size.
@@ -170,7 +173,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateOrUpdateBucket(const Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket);
 
         /**
          * @brief Create a new S3 object in the S3 object table
@@ -188,7 +191,7 @@ namespace AwsMock::Database {
          * @return created or updated object entity
          * @throws DatabaseException
          */
-        Entity::S3::Object CreateOrUpdateObject(const Entity::S3::Object &object);
+        Entity::S3::Object CreateOrUpdateObject(Entity::S3::Object &object);
 
         /**
          * @brief Updates an existing object in the S3 object table
@@ -197,7 +200,7 @@ namespace AwsMock::Database {
          * @return updated object entity
          * @throws DatabaseException
          */
-        Entity::S3::Object UpdateObject(const Entity::S3::Object &object);
+        Entity::S3::Object UpdateObject(Entity::S3::Object &object);
 
         /**
          * @brief Check the existence of an object

@@ -127,6 +127,8 @@ namespace AwsMock::Database {
     Entity::SQS::Queue SQSMemoryDb::UpdateQueue(Entity::SQS::Queue &queue) {
         Poco::ScopedLock lock(sqsQueueMutex);
 
+        queue.modified = system_clock::now();
+
         std::string region = queue.region;
         std::string name = queue.name;
         auto it = find_if(_queues.begin(),
@@ -228,6 +230,8 @@ namespace AwsMock::Database {
     Entity::SQS::Message SQSMemoryDb::UpdateMessage(Entity::SQS::Message &message) {
         Poco::ScopedLock lock(_sqsMessageMutex);
 
+        message.modified = system_clock::now();
+
         std::string oid = message.oid;
         auto it =
                 find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
@@ -262,7 +266,7 @@ namespace AwsMock::Database {
     void SQSMemoryDb::ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) {
         Poco::ScopedLock lock(_sqsMessageMutex);
 
-        auto reset = std::chrono::high_resolution_clock::now() + std::chrono::seconds{visibility};
+        auto reset = system_clock::now() + std::chrono::seconds{visibility};
 
         // Get the cursor
         for (auto message: _messages) {
@@ -294,7 +298,7 @@ namespace AwsMock::Database {
         Poco::ScopedLock lock(_sqsMessageMutex);
 
         long count = 0;
-        auto now = std::chrono::high_resolution_clock::now();
+        auto now = system_clock::now();
         for (auto message: _messages) {
 
             if (message.second.queueArn == queueArn && message.second.status == Entity::SQS::MessageStatus::INVISIBLE && message.second.reset < std::chrono::system_clock::now()) {

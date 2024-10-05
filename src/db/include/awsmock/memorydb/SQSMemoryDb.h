@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SQS_MEMORYDB_H
 
 // C++ includes
+#include <chrono>
 #include <string>
 
 // Poco includes
@@ -22,6 +23,8 @@
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief SQS in-memory database.

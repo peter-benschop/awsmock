@@ -318,12 +318,12 @@ namespace AwsMock::Service {
         Core::DirUtils::EnsureDirectory(uploadDir);
 
         // Create database object
-        Database::Entity::S3::Object object = _database.CreateOrUpdateObject(
-                {.region = request.region,
-                 .bucket = request.bucket,
-                 .key = request.key,
-                 .owner = request.user,
-                 .metadata = request.metadata});
+        Database::Entity::S3::Object object = {.region = request.region,
+                                               .bucket = request.bucket,
+                                               .key = request.key,
+                                               .owner = request.user,
+                                               .metadata = request.metadata};
+        object = _database.CreateOrUpdateObject(object);
 
         log_info << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
         return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};

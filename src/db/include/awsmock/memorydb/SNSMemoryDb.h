@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
 
 // C++ includes
+#include <chrono>
 #include <string>
 
 // Poco includes
@@ -22,6 +23,8 @@
 
 namespace AwsMock::Database {
 
+    using std::chrono::system_clock;
+
     /**
      * SNS in-memory database.
      *
@@ -32,12 +35,12 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         SNSMemoryDb() = default;
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static SNSMemoryDb &instance() {
             static SNSMemoryDb snsMemoryDb;
@@ -45,7 +48,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Check existence of topic
+         * @brief Check existence of topic
          *
          * @param region AWS region
          * @param name topic name
@@ -55,7 +58,7 @@ namespace AwsMock::Database {
         bool TopicExists(const std::string &region, const std::string &name);
 
         /**
-         * Check existence of topic
+         * @brief Check existence of topic
          *
          * @param topicName topic ARN
          * @return true if topic already exists
@@ -64,7 +67,7 @@ namespace AwsMock::Database {
         bool TopicExists(const std::string &topicName);
 
         /**
-         * Create a new topic in the SNS topic table
+         * @brief Create a new topic in the SNS topic table
          *
          * @param topic topic entity
          * @return created SNS topic entity
@@ -73,7 +76,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic CreateTopic(const Entity::SNS::Topic &topic);
 
         /**
-         * Returns a topic by primary key
+         * @brief Returns a topic by primary key
          *
          * @param oid topic primary key
          * @return topic entity
@@ -82,7 +85,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic GetTopicById(const std::string &oid);
 
         /**
-         * Returns a topic by is ARN
+         * @brief Returns a topic by is ARN
          *
          * @param topicArn topic ARN
          * @return topic entity
@@ -91,7 +94,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic GetTopicByArn(const std::string &topicArn);
 
         /**
-         * Returns a topic by its region and name
+         * @brief Returns a topic by its region and name
          *
          * @param region AWS region
          * @param topicName topic name
@@ -101,7 +104,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic GetTopicByName(const std::string &region, const std::string &topicName);
 
         /**
-         * Return a list of topics with the given subscription ARN
+         * @brief Return a list of topics with the given subscription ARN
          *
          * @param subscriptionArn subscription ARN
          * @return topic with given topic ARN
@@ -109,16 +112,16 @@ namespace AwsMock::Database {
         Entity::SNS::TopicList GetTopicsBySubscriptionArn(const std::string &subscriptionArn);
 
         /**
-         * Updates an existing topic in the SNS topic table
+         * @brief Updates an existing topic in the SNS topic table
          *
          * @param topic topic entity
          * @return updated SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic UpdateTopic(const Entity::SNS::Topic &topic);
+        Entity::SNS::Topic UpdateTopic(Entity::SNS::Topic &topic);
 
         /**
-         * List all available topics
+         * @brief List all available topics
          *
          * @param region AWS region
          * @return list of SNS topics
@@ -127,7 +130,7 @@ namespace AwsMock::Database {
         Entity::SNS::TopicList ListTopics(const std::string &region = {});
 
         /**
-         * Counts the number of topics
+         * @brief Counts the number of topics
          *
          * @param region AWS region
          * @return number of topics
@@ -135,7 +138,7 @@ namespace AwsMock::Database {
         long CountTopics(const std::string &region = {});
 
         /**
-         * Deletes a topic.
+         * @brief Deletes a topic.
          *
          * @param topic topic entity
          * @throws DatabaseException
@@ -143,12 +146,12 @@ namespace AwsMock::Database {
         void DeleteTopic(const Entity::SNS::Topic &topic);
 
         /**
-         * Deletes all topics
+         * @brief Deletes all topics
          */
         void DeleteAllTopics();
 
         /**
-         * Check existence of message
+         * @brief Check existence of message
          *
          * @param id message ID
          * @return true if message already exists
@@ -157,7 +160,7 @@ namespace AwsMock::Database {
         bool MessageExists(const std::string &id);
 
         /**
-         * Creates a new message in the SQS message table
+         * @brief Creates a new message in the SQS message table
          *
          * @param message SQS message entity
          * @return saved message entity
@@ -166,7 +169,7 @@ namespace AwsMock::Database {
         Entity::SNS::Message CreateMessage(const Entity::SNS::Message &message);
 
         /**
-         * Returns a message by ID.
+         * @brief Returns a message by ID.
          *
          * @param oid message objectId
          * @return message entity
@@ -175,7 +178,7 @@ namespace AwsMock::Database {
         [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
 
         /**
-         * Count the number of message by state
+         * @brief Count the number of message by state
          *
          * @param region AWS region
          * @param topicArn ARN of the topic
@@ -183,7 +186,7 @@ namespace AwsMock::Database {
         long CountMessages(const std::string &region = {}, const std::string &topicArn = {});
 
         /**
-         * List all available resources
+         * @brief List all available resources
          *
          * @param region AWS region
          * @return list of SNS resources
@@ -192,7 +195,7 @@ namespace AwsMock::Database {
         Entity::SNS::MessageList ListMessages(const std::string &region = {});
 
         /**
-         * Updates a given message.
+         * @brief Updates a given message.
          *
          * @param message SNS message
          * @return updated message
@@ -200,7 +203,7 @@ namespace AwsMock::Database {
         Entity::SNS::Message UpdateMessage(Entity::SNS::Message &message);
 
         /**
-         * Count the number of message by state
+         * @brief Count the number of message by state
          *
          * @param region AWS region
          * @param topicArn ARN of the topic
@@ -209,7 +212,7 @@ namespace AwsMock::Database {
         long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status);
 
         /**
-         * Deletes a message.
+         * @brief Deletes a message.
          *
          * @param message message to delete
          * @throws Core::DatabaseException
@@ -217,7 +220,7 @@ namespace AwsMock::Database {
         void DeleteMessage(const Entity::SNS::Message &message);
 
         /**
-         * Bulk delete of resources.
+         * @brief Bulk delete of resources.
          *
          * @param region AWS region
          * @param topicArn topic ARN
@@ -227,7 +230,7 @@ namespace AwsMock::Database {
         void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
 
         /**
-          * Deletes old resources message.
+          * @brief Deletes old resources message.
           *
           * @param timeout timeout period
           * @throws Core::DatabaseException
@@ -235,7 +238,7 @@ namespace AwsMock::Database {
         void DeleteOldMessages(long timeout);
 
         /**
-         * Deletes a resources.
+         * @brief Deletes a resources.
          *
          * @throws Core::DatabaseException
          */
@@ -246,12 +249,12 @@ namespace AwsMock::Database {
         /**
          * SNS topic vector, when running without database
          */
-        std::map<std::string, Entity::SNS::Topic> _topics;
+        std::map<std::string, Entity::SNS::Topic> _topics{};
 
         /**
          * SNS message vector, when running without database
          */
-        std::map<std::string, Entity::SNS::Message> _messages;
+        std::map<std::string, Entity::SNS::Message> _messages{};
 
         /**
          * Topic mutex
