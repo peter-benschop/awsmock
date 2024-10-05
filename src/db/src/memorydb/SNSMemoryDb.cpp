@@ -98,8 +98,10 @@ namespace AwsMock::Database {
         return GetTopicById(oid);
     }
 
-    Entity::SNS::Topic SNSMemoryDb::UpdateTopic(const Entity::SNS::Topic &topic) {
+    Entity::SNS::Topic SNSMemoryDb::UpdateTopic(Entity::SNS::Topic &topic) {
         Poco::ScopedLock loc(_snsTopicMutex);
+
+        topic.modified = system_clock::now();
 
         std::string region = topic.region;
         std::string name = topic.topicName;
@@ -253,6 +255,8 @@ namespace AwsMock::Database {
 
     Entity::SNS::Message SNSMemoryDb::UpdateMessage(Entity::SNS::Message &message) {
         Poco::ScopedLock lock(_snsMessageMutex);
+
+        message.modified = system_clock::now();
 
         std::string oid = message.oid;
         auto it =

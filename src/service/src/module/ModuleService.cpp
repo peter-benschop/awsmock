@@ -179,13 +179,13 @@ namespace AwsMock::Service {
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
             std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
             if (!infrastructure.s3Buckets.empty()) {
-                for (const auto &bucket: infrastructure.s3Buckets) {
+                for (auto &bucket: infrastructure.s3Buckets) {
                     _s3Database->CreateOrUpdateBucket(bucket);
                 }
                 log_info << "S3 buckets imported, count: " << infrastructure.s3Buckets.size();
             }
             if (!infrastructure.s3Objects.empty()) {
-                for (const auto &object: infrastructure.s3Objects) {
+                for (auto &object: infrastructure.s3Objects) {
                     _s3Database->CreateOrUpdateObject(object);
                 }
                 log_info << "S3 objects imported, count: " << infrastructure.s3Objects.size();
