@@ -39,7 +39,7 @@ namespace AwsMock::Service {
             _baseUrl = "/api/cognito/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -76,6 +76,7 @@ namespace AwsMock::Service {
         }
 
         std::string _endpoint, _baseUrl;
+        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase _database = Database::CognitoDatabase();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

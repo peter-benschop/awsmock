@@ -40,7 +40,7 @@ namespace AwsMock::Service {
          *
          * @param configuration aws-mock configuration
          */
-        explicit SQSServer(Core::Configuration &configuration);
+        explicit SQSServer(boost::asio::thread_pool &pool);
 
         /**
          * Initialization
@@ -60,11 +60,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * SQS database
          */
         Database::SQSDatabase &_sqsDatabase;
@@ -78,6 +73,11 @@ namespace AwsMock::Service {
          * SQS worker
          */
         std::shared_ptr<SQSWorker> _sqsWorker;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * Rest port

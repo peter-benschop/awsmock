@@ -5,9 +5,12 @@
 #ifndef AWSMOCK_SERVICE_S3_SERVER_H
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
+// Boost includes
+#include <boost/asio/thread_pool.hpp>
+
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -40,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Server();
+        explicit S3Server(boost::asio::thread_pool &pool);
 
         /**
          * @brief Timer initialization
@@ -96,6 +99,11 @@ namespace AwsMock::Service {
          * S3 worker
          */
         std::shared_ptr<S3Worker> _s3Worker;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * S3 service

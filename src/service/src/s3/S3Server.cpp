@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server() : AbstractServer("s3"), _module("s3") {
+    S3Server::S3Server(boost::asio::thread_pool &pool) : AbstractServer("s3"), _module("s3"), _pool(pool) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -37,13 +37,14 @@ namespace AwsMock::Service {
         log_info << "S3 module starting";
 
         // Start worker thread
-        _s3Worker->Start();
-
-        // Start REST module
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new S3RequestHandlerFactory(_configuration));
+        boost::asio::post(_pool, [this] { _s3Worker->Start(); });
+        boost::asio::post(_pool, [this] { _s3Monitoring->Start(); });
+        //_s3Worker->Start();
 
         // Set running
         SetRunning();
+
+        //_pool.join();
     }
 
     void S3Server::Run() {

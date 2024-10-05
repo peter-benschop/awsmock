@@ -6,16 +6,16 @@
 
 namespace AwsMock::Service {
 
-    SQSServer::SQSServer(Core::Configuration &configuration) : AbstractServer("sqs"), _configuration(configuration), _sqsDatabase(Database::SQSDatabase::instance()) {
-
+    SQSServer::SQSServer(boost::asio::thread_pool &pool) : AbstractServer("sqs"), _sqsDatabase(Database::SQSDatabase::instance()), _pool(pool) {
         // HTTP manager configuration
-        _port = _configuration.getInt("awsmock.service.sqs.http.port", SQS_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.sqs.http.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = _configuration.getInt("awsmock.service.sqs.max.http.threads", SQS_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.sqs.http.timeout", SQS_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.sqs.monitoring.period", SQS_DEFAULT_MONITORING_PERIOD);
-        _workerPeriod = _configuration.getInt("awsmock.service.sqs.worker.period", SQS_DEFAULT_WORKER_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.sqs.http.port", SQS_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.sqs.http.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
+        _maxThreads = configuration.getInt("awsmock.service.sqs.max.http.threads", SQS_DEFAULT_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.sqs.http.timeout", SQS_DEFAULT_TIMEOUT);
+        _monitoringPeriod = configuration.getInt("awsmock.service.sqs.monitoring.period", SQS_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = configuration.getInt("awsmock.service.sqs.worker.period", SQS_DEFAULT_WORKER_PERIOD);
         log_debug << "SQS rest module initialized, endpoint: " << _host << ":" << _port;
 
         // Monitoring
@@ -36,7 +36,8 @@ namespace AwsMock::Service {
         log_info << "SQS server starting, port: " << _port;
 
         // Start worker thread
-        _sqsWorker->Start();
+        boost::asio::post(_pool, [this] { _sqsWorker->Start(); });
+        boost::asio::post(_pool, [this] { _sqsMonitoring->Start(); });
 
         // Set running
         SetRunning();

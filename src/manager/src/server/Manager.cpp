@@ -5,6 +5,7 @@
 #include <awsmock/server/Manager.h>
 
 namespace AwsMock::Manager {
+    int result;
 
     void Manager::Initialize() {
 
@@ -18,8 +19,8 @@ namespace AwsMock::Manager {
 
     void Manager::InitializeMonitoring() {
         int period = Core::Configuration::instance().getInt("awsmock.service.monitoring.period", 60);
-        Monitoring::MetricService::instance().Start(period);
-        Monitoring::MetricSystemCollector::instance().Start(period);
+        //Monitoring::MetricService::instance().Start(period);
+        // Monitoring::MetricSystemCollector::instance().Start(period);
     }
 
     void Manager::InitializeDatabase() {
@@ -77,14 +78,14 @@ namespace AwsMock::Manager {
         // Get last module configuration
         for (const auto &module: modules) {
             if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::S3Server>();
-                _serverMap[module.name]->Start();
+                //_serverMap[module.name] = std::make_shared<Service::S3Server>();
+                //_serverMap[module.name]->Start();
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SQSServer>(configuration);
-                _serverMap[module.name]->Start();
+                //                _serverMap[module.name] = std::make_shared<Service::SQSServer>(configuration);
+                //                _serverMap[module.name]->Start();
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SNSServer>(configuration);
-                _serverMap[module.name]->Start();
+                //                _serverMap[module.name] = std::make_shared<Service::SNSServer>(configuration);
+                //                _serverMap[module.name]->Start();
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::LambdaServer>(configuration);
                 _serverMap[module.name]->Start();
@@ -107,8 +108,8 @@ namespace AwsMock::Manager {
                 _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
                 _serverMap[module.name]->Start();
             } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::GatewayServer>();
-                _serverMap[module.name]->Start();
+                //_serverMap[module.name] = std::make_shared<Service::GatewayServer>();
+                //_serverMap[module.name]->Start();
             }
             log_debug << "Module " << module.name << " started";
         }
@@ -134,38 +135,53 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        int threads = Core::Configuration::instance().getInt("awsmock.manager.http.max.threads");
-        std::string hostAddress = Core::Configuration::instance().getString("awsmock.manager.http.address");
-        unsigned short port = Core::Configuration::instance().getInt("awsmock.manager.http.port");
+        Core::Configuration &configuration = Core::Configuration::instance();
+        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+        std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting();
+        for (const auto &module: existingModules) {
+            if (!moduleDatabase.ModuleExists(module.first)) {
+                moduleDatabase.CreateModule({.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE});
+            }
+            if (configuration.has("awsmock.service." + module.first + ".active") && configuration.getBool("awsmock.service." + module.first + ".active")) {
+                moduleDatabase.SetStatus(module.first, Database::Entity::Module::ModuleStatus::ACTIVE);
+            }
+        }
+        Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
 
-        ManagerMonitoring managerMonitoring(60);
-
-        // The io_context is required for all I/O
-        boost::asio::io_context ioc{threads};
-
-        // Create and launch a listening port
-        auto address = boost::asio::ip::make_address(hostAddress);
-        std::make_shared<Listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, _serverMap)->Run();
+        // Define thread pool size
+        boost::asio::thread_pool pool(256);
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
+        boost::asio::io_context ioc;
+        ioc.run();
+
         boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
         signals.async_wait(
                 [&](boost::beast::error_code const &, int) {
                     // Stop the `io_context`. This will cause `run()` to return immediately, eventually
                     // destroying the `io_context` and all the sockets in it.
                     log_info << "Manager stopped on signal";
+                    pool.stop();
                     ioc.stop();
                 });
 
-        boost::thread_group threadGroup;
-        for (auto i = 0; i < threads; i++) {
-            threadGroup.create_thread(
-                    [ObjectPtr = &ioc] { return ObjectPtr->run(); });
+        for (const auto &module: modules) {
+            if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::GatewayServer>(pool);
+                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::S3Server>(pool);
+                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+                _serverMap[module.name] = std::make_shared<Service::S3Server>(pool);
+            } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::SQSServer>(pool);
+                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::SNSServer>(pool);
+                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+            }
         }
-        threadGroup.join_all();
-
-        // Stop all services
-        StopModules();
+        pool.join();
 
         log_info << "So long, and thanks for all the fish!";
     }

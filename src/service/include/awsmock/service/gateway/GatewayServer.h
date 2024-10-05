@@ -8,6 +8,9 @@
 // C++ standard includes
 #include <string>
 
+// Boost includes
+#include <boost/asio/io_service.hpp>
+
 // AwsMock includes
 #include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
@@ -48,8 +51,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayServer();
-
+        explicit GatewayServer(boost::asio::thread_pool &pool);
 
         /**
          * @brief Timer initialization
@@ -66,14 +68,12 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-      protected:
+      private:
 
         /**
          * @brief Main method
          */
         void Run() override;
-
-      private:
 
         /**
          * Service database
@@ -114,6 +114,10 @@ namespace AwsMock::Service {
          * Thread pool
          */
         std::vector<std::thread> _threads;
+
+        boost::asio::thread_pool &_pool;
+
+        boost::asio::io_context ioc{10};
     };
 
 }// namespace AwsMock::Service

@@ -159,30 +159,6 @@ namespace AwsMock::Service {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers = {});
-
-        /**
-         * Send a HEAD response (HTTP state code 200)
-         *
-         * @param response HTTP response object
-         * @param headerMap HTTP header map values
-         */
-        //static void SendHeadResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &headerMap);
-
-        /**
-         * Send a DELETE response (HTTP state code 204) with an output stream.
-         *
-         * @param response HTTP response object
-         * @param extraHeader HTTP header map values, added to the default headers
-         */
-        //static void SendDeleteResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
-
-        /**
-         * Send a no content response, state: 204.
-         *
-         * @param response HTTP response
-         * @param extraHeader extra headers
-         */
-        //static void SendNoContentResponse(Poco::Net::HTTPServerResponse &response, const HeaderMap &extraHeader = {});
     };
 
 }// namespace AwsMock::Service

@@ -7,7 +7,6 @@
 namespace AwsMock::Service {
 
     void SQSWorker::Initialize() {
-
         log_debug << "SQSWorker initialized";
     }
 

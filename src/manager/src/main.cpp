@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     // Start manager
     AwsMock::Manager::Manager awsMockManager;
     AwsMock::Manager::Manager::Initialize();
-    awsMockManager.StartModules();
+    //awsMockManager.StartModules();
     awsMockManager.Run();
 
     return EXIT_SUCCESS;

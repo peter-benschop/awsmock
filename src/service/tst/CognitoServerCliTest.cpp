@@ -49,7 +49,7 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
             _gatewayServer->Initialize();
             _gatewayServer->Start();
         }
@@ -62,6 +62,7 @@ namespace AwsMock::Service {
         }
 
         std::string _endpoint, _accountId, _region;
+        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase &_database = Database::CognitoDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
