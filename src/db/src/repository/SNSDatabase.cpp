@@ -565,7 +565,7 @@ namespace AwsMock::Database {
 
                 message.FromDocument(mResult->view());
                 return message;
-                
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
