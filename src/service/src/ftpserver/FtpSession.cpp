@@ -8,21 +8,21 @@ namespace AwsMock::FtpServer {
     FtpSession::FtpSession(asio::io_service &io_service,
                            const UserDatabase &user_database,
                            std::string serverName,
-                           Core::Configuration &configuration,
                            const std::function<void()> &completion_handler)
         : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), command_socket_(io_service),
           command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
-          _ftpWorkingDirectory("/"), _configuration(configuration), _serverName(std::move(serverName)) {
+          _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
 
         // S3 module connection
-        _s3ServiceHost = _configuration.getString("awsmock.service.s3.host", "localhost");
-        _s3ServicePort = _configuration.getInt("awsmock.service.s3.port", 9500);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _s3ServiceHost = configuration.getString("awsmock.service.s3.host", "localhost");
+        _s3ServicePort = configuration.getInt("awsmock.service.s3.port", 9500);
         _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
 
         // Environment
-        _region = _configuration.getString("awsmock.region", DEFAULT_TRANSFER_REGION);
-        _bucket = _configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
-        _transferDir = _configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+        _region = configuration.getString("awsmock.region", DEFAULT_TRANSFER_REGION);
+        _bucket = configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
+        _transferDir = configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
 
         // S3 service
         _s3Service = std::make_shared<Service::S3Service>();

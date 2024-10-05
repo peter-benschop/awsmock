@@ -40,7 +40,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector() : Core::Timer("SystemCollector") {}
+        explicit MetricSystemCollector() : Core::Timer("SystemCollector", 60) {}
 
         /**
          * @brief Singleton instance

@@ -27,6 +27,11 @@ namespace AwsMock::Service {
         log_debug << "S3 module initialized, endpoint: " << _host << ":" << _port;
     }
 
+    S3Server::~S3Server() {
+        log_info << "S3 server stopping";
+        Stop();
+    }
+
     void S3Server::Initialize() {
 
         // Check module active
@@ -39,12 +44,9 @@ namespace AwsMock::Service {
         // Start worker thread
         boost::asio::post(_pool, [this] { _s3Worker->Start(); });
         boost::asio::post(_pool, [this] { _s3Monitoring->Start(); });
-        //_s3Worker->Start();
 
         // Set running
         SetRunning();
-
-        //_pool.join();
     }
 
     void S3Server::Run() {
@@ -53,7 +55,7 @@ namespace AwsMock::Service {
     void S3Server::Shutdown() {
         log_debug << "Shutdown initiated, s3";
         _s3Monitoring->Stop();
-        StopHttpServer();
+        _s3Worker->Stop();
     }
 
     void S3Server::CreateTransferBucket() {

@@ -114,6 +114,7 @@ namespace AwsMock::Service {
          * Thread pool
          */
         std::vector<std::thread> _threads;
+        boost::thread_group _threadGroup;
 
         boost::asio::thread_pool &_pool;
 

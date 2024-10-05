@@ -50,7 +50,6 @@ namespace AwsMock::Service {
     void SNSServer::Shutdown() {
         _snsWorker->Stop();
         _snsMonitoring->Stop();
-        StopHttpServer();
     }
 
 }// namespace AwsMock::Service

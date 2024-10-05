@@ -17,11 +17,11 @@ namespace AwsMock::Database {
             {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-            /*{"database", {.name = "database", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}*/};
+            {"monitoring", {.name = "monitoring", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
 
     void ModuleDatabase::Initialize() {
 
-        for (const auto &module: _existingModules) {
+        for (auto &module: _existingModules) {
             if (HasDatabase()) {
 
                 if (!ModuleExists(module.first)) {
@@ -98,8 +98,7 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
-            mongocxx::stdx::optional<bsoncxx::document::value>
-                    mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
+            auto mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult) {
                 Entity::Module::Module module;
                 module.FromDocument(mResult->view());
@@ -177,7 +176,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Module::Module ModuleDatabase::CreateModule(const Entity::Module::Module &module) {
+    Entity::Module::Module ModuleDatabase::CreateModule(Entity::Module::Module &module) {
 
         if (HasDatabase()) {
 
@@ -185,9 +184,14 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                auto result = _moduleCollection.insert_one(module.ToDocument());
-                log_trace << "Module created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetModuleById(result->inserted_id().get_oid().value);
+                auto mResult = _moduleCollection.insert_one(module.ToDocument());
+                log_trace << "Module created, oid: " << mResult->inserted_id().get_oid().value.to_string();
+
+                if (mResult) {
+                    module.oid = mResult->inserted_id().get_oid().value.to_string();
+                    return module;
+                }
+                return {};
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Create module failed, error: " << e.what();
@@ -200,16 +204,24 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Module::Module ModuleDatabase::UpdateModule(const Entity::Module::Module &module) {
+    Entity::Module::Module ModuleDatabase::UpdateModule(Entity::Module::Module &module) {
 
         if (HasDatabase()) {
 
             try {
+                mongocxx::options::find_one_and_update opts{};
+                opts.return_document(mongocxx::options::return_document::k_after);
+
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                auto mResult = _moduleCollection.replace_one(make_document(kvp("name", module.name)), module.ToDocument());
+                auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
                 log_trace << "Module updated: " << module.ToString();
-                return GetModuleByName(module.name);
+
+                if (mResult) {
+                    module.FromDocument(mResult->view());
+                    return module;
+                }
+                return {};
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Update module failed, error: " << e.what();
@@ -302,7 +314,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Module::Module ModuleDatabase::CreateOrUpdateModule(const Entity::Module::Module &modules) {
+    Entity::Module::Module ModuleDatabase::CreateOrUpdateModule(Entity::Module::Module &modules) {
 
         if (ModuleExists(modules.name)) {
             return UpdateModule((modules));

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer() : AbstractServer("dynamodb", 10), _module("dynamodb"), _dockerService(DockerService::instance()) {
+    DynamoDbServer::DynamoDbServer(boost::asio::thread_pool &pool) : AbstractServer("dynamodb", 10), _module("dynamodb"), _dockerService(DockerService::instance()), _pool(pool) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -49,6 +49,9 @@ namespace AwsMock::Service {
         }
         log_info << "DynamoDb server started";
 
+        boost::asio::post(_pool, [this] { _dynamoDbWorker->Start(); });
+        boost::asio::post(_pool, [this] { _dynamoDbMonitoring->Start(); });
+
         // Cleanup
         CleanupContainers();
 
@@ -61,7 +64,7 @@ namespace AwsMock::Service {
 
     void DynamoDbServer::Shutdown() {
         _dynamoDbMonitoring->Stop();
-        StopHttpServer();
+        _dynamoDbWorker->Stop();
     }
 
     void DynamoDbServer::CleanupContainers() {

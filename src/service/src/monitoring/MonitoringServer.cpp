@@ -6,23 +6,22 @@
 
 namespace AwsMock::Service {
 
-    MonitoringServer::MonitoringServer() : AbstractServer("monitoring"), _module("monitoring") {
+    MonitoringServer::MonitoringServer(boost::asio::thread_pool &pool) : AbstractServer("monitoring"), _module("monitoring"), _pool(pool) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.s3.http.port", S3_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.s3.http.host", S3_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.s3.http.max.queue", S3_DEFAULT_QUEUE_SIZE);
-        _maxThreads = configuration.getInt("awsmock.service.s3.http.max.threads", S3_DEFAULT_MAX_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.s3.http.timeout", S3_DEFAULT_TIMEOUT);
 
-        log_debug << "S3 module initialized, endpoint: " << _host << ":" << _port;
+        _metricService = std::make_shared<Monitoring::MetricService>();
+        _metricSystemCollector = std::make_shared<Monitoring::MetricSystemCollector>();
+
+        log_debug << "Monitoring module initialized";
     }
 
     void MonitoringServer::Initialize() {
 
         // Start worker thread
-        //        _s3Worker->Start();
+        boost::asio::post(_pool, [this] { _metricService->Start(); });
+        boost::asio::post(_pool, [this] { _metricSystemCollector->Start(); });
 
         // Set running
         SetRunning();
@@ -32,8 +31,9 @@ namespace AwsMock::Service {
     }
 
     void MonitoringServer::Shutdown() {
-        log_debug << "Shutdown initiated, monitoring";
-        StopHttpServer();
+        log_info << "Shutdown initiated, monitoring";
+        _metricSystemCollector->Stop();
+        _metricService->Stop();
     }
 
 }// namespace AwsMock::Service

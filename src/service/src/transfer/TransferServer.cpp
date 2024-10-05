@@ -7,15 +7,16 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::Configuration &configuration) : AbstractServer("transfer"), _configuration(configuration), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer") {
+    TransferServer::TransferServer(boost::asio::thread_pool &pool) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer"), _pool(pool) {
 
         // REST manager configuration
-        _port = _configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.transfer.http.host", TRANSFER_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.transfer.http.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = _configuration.getInt("awsmock.service.transfer.http.max.threads", TRANSFER_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.transfer.http.timeout", TRANSFER_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.transfer.http.host", TRANSFER_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.transfer.http.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
+        _maxThreads = configuration.getInt("awsmock.service.transfer.http.max.threads", TRANSFER_DEFAULT_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.transfer.http.timeout", TRANSFER_DEFAULT_TIMEOUT);
+        _monitoringPeriod = configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
 
         // Monitoring
         _transferMonitoring = std::make_unique<TransferMonitoring>(_monitoringPeriod);
@@ -33,7 +34,7 @@ namespace AwsMock::Service {
         log_info << "Transfer module starting";
 
         // Start monitoring
-        _transferMonitoring->Start();
+        boost::asio::post(_pool, [this] { _transferMonitoring->Start(); });
 
         // Create transfer bucket
         CreateTransferBucket();
@@ -52,7 +53,6 @@ namespace AwsMock::Service {
 
     void TransferServer::Shutdown() {
         _transferMonitoring->Stop();
-        StopHttpServer();
     }
 
     void TransferServer::CreateTransferBucket() {
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
         // Create transfer manager thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(_configuration, server.serverId, server.port, server.listenAddress);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, server.port, server.listenAddress);
         _transferServerList[server.serverId] = _ftpServer;
 
         // Get base dir

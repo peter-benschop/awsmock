@@ -5,22 +5,14 @@
 #include <awsmock/server/Manager.h>
 
 namespace AwsMock::Manager {
-    int result;
 
     void Manager::Initialize() {
 
-        InitializeMonitoring();
         InitializeDatabase();
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
                  << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().getBool("awsmock.dockerized");
-    }
-
-    void Manager::InitializeMonitoring() {
-        int period = Core::Configuration::instance().getInt("awsmock.service.monitoring.period", 60);
-        //Monitoring::MetricService::instance().Start(period);
-        // Monitoring::MetricSystemCollector::instance().Start(period);
     }
 
     void Manager::InitializeDatabase() {
@@ -60,61 +52,6 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::StartModules() {
-
-        Core::Configuration &configuration = Core::Configuration::instance();
-        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting();
-        for (const auto &module: existingModules) {
-            if (!moduleDatabase.ModuleExists(module.first)) {
-                moduleDatabase.CreateModule({.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE});
-            }
-            if (configuration.has("awsmock.service." + module.first + ".active") && configuration.getBool("awsmock.service." + module.first + ".active")) {
-                moduleDatabase.SetStatus(module.first, Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-        }
-        Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
-
-        // Get last module configuration
-        for (const auto &module: modules) {
-            if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                //_serverMap[module.name] = std::make_shared<Service::S3Server>();
-                //_serverMap[module.name]->Start();
-            } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                //                _serverMap[module.name] = std::make_shared<Service::SQSServer>(configuration);
-                //                _serverMap[module.name]->Start();
-            } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                //                _serverMap[module.name] = std::make_shared<Service::SNSServer>(configuration);
-                //                _serverMap[module.name]->Start();
-            } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::LambdaServer>(configuration);
-                _serverMap[module.name]->Start();
-            } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::TransferServer>(configuration);
-                _serverMap[module.name]->Start();
-            } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::CognitoServer>();
-                _serverMap[module.name]->Start();
-            } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>();
-                _serverMap[module.name]->Start();
-            } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::KMSServer>(configuration);
-                _serverMap[module.name]->Start();
-            } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SSMServer>(configuration);
-                _serverMap[module.name]->Start();
-            } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(configuration);
-                _serverMap[module.name]->Start();
-            } else if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                //_serverMap[module.name] = std::make_shared<Service::GatewayServer>();
-                //_serverMap[module.name]->Start();
-            }
-            log_debug << "Module " << module.name << " started";
-        }
-    }
-
     void Manager::StopModules() {
 
         log_info << "Stopping services";
@@ -131,6 +68,13 @@ namespace AwsMock::Manager {
                 }
             }
         }
+
+        // Stop monitoring
+        Monitoring::MetricService::instance().Shutdown();
+        Monitoring::MetricSystemCollector::instance().Shutdown();
+
+        _threadGroup.interrupt_all();
+        _threadGroup.join_all();
     }
 
     void Manager::Run() {
@@ -140,7 +84,8 @@ namespace AwsMock::Manager {
         std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting();
         for (const auto &module: existingModules) {
             if (!moduleDatabase.ModuleExists(module.first)) {
-                moduleDatabase.CreateModule({.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE});
+                Database::Entity::Module::Module m = {.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE};
+                moduleDatabase.CreateModule(m);
             }
             if (configuration.has("awsmock.service." + module.first + ".active") && configuration.getBool("awsmock.service." + module.first + ".active")) {
                 moduleDatabase.SetStatus(module.first, Database::Entity::Module::ModuleStatus::ACTIVE);
@@ -152,8 +97,7 @@ namespace AwsMock::Manager {
         boost::asio::thread_pool pool(256);
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::io_context ioc;
-        ioc.run();
+        boost::asio::io_service ioc;
 
         boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
         signals.async_wait(
@@ -168,20 +112,49 @@ namespace AwsMock::Manager {
         for (const auto &module: modules) {
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::GatewayServer>(pool);
-                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::S3Server>(pool);
-                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
-                _serverMap[module.name] = std::make_shared<Service::S3Server>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::SQSServer>(pool);
-                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 _serverMap[module.name] = std::make_shared<Service::SNSServer>(pool);
-                boost::asio::post(pool, [obj = _serverMap[module.name]] { obj->Start(); });
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::LambdaServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::TransferServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::CognitoServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::KMSServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::SSMServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+            } else if (module.name == "monitoring" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                _serverMap[module.name] = std::make_shared<Service::MonitoringServer>(pool);
+                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
             }
         }
-        pool.join();
+
+        for (auto i = 0; i < 256; i++) {
+            _threadGroup.create_thread([ObjectPtr = &ioc] { return ObjectPtr->run(); });
+        }
+        ioc.run();
+
+        StopModules();
 
         log_info << "So long, and thanks for all the fish!";
     }

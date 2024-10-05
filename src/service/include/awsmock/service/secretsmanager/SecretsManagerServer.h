@@ -9,6 +9,10 @@
 #include <chrono>
 #include <string>
 
+// Boost includes
+#include <boost/asio/post.hpp>
+#include <boost/asio/thread_pool.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
@@ -38,11 +42,11 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          *
-         * @param configuration aws-mock configuration
+         * @param pool global thread pool
          */
-        explicit SecretsManagerServer(Core::Configuration &configuration);
+        explicit SecretsManagerServer(boost::asio::thread_pool &pool);
 
         /**
          * Timer initialization
@@ -62,11 +66,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Configuration
-         */
-        Core::Configuration &_configuration;
-
-        /**
          * Module database
          */
         Database::ModuleDatabase &_moduleDatabase;
@@ -75,6 +74,11 @@ namespace AwsMock::Service {
          * Monitoring
          */
         std::shared_ptr<SecretsManagerMonitoring> _secretsManagerMonitoring;
+
+        /**
+         * Global thread pool
+         */
+        boost::asio::thread_pool &_pool;
 
         /**
          * AWS region

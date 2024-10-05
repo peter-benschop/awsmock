@@ -42,8 +42,12 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param pool global thread pool
          */
         explicit S3Server(boost::asio::thread_pool &pool);
+
+        ~S3Server();
 
         /**
          * @brief Timer initialization

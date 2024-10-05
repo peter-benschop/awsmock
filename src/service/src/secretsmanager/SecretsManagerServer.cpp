@@ -6,19 +6,20 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::Configuration &configuration) : AbstractServer("secretsmanager", 10), _configuration(configuration), _moduleDatabase(Database::ModuleDatabase::instance()) {
+    SecretsManagerServer::SecretsManagerServer(boost::asio::thread_pool &pool) : AbstractServer("secretsmanager", 10), _moduleDatabase(Database::ModuleDatabase::instance()), _pool(pool) {
 
         // HTTP manager configuration
-        _port = _configuration.getInt("awsmock.service.secretsmanager.port", SECRETSMANAGER_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.secretsmanager.host", SECRETSMANAGER_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.secretsmanager.max.queue", SECRETSMANAGER_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = _configuration.getInt("awsmock.service.secretsmanager.max.threads", SECRETSMANAGER_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.secretsmanager.timeout", SECRETSMANAGER_DEFAULT_TIMEOUT);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.secretsmanager.monitoring.period", SECRETSMANAGER_DEFAULT_MONITORING_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.secretsmanager.port", SECRETSMANAGER_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.secretsmanager.host", SECRETSMANAGER_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.secretsmanager.max.queue", SECRETSMANAGER_DEFAULT_QUEUE_LENGTH);
+        _maxThreads = configuration.getInt("awsmock.service.secretsmanager.max.threads", SECRETSMANAGER_DEFAULT_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.secretsmanager.timeout", SECRETSMANAGER_DEFAULT_TIMEOUT);
+        _monitoringPeriod = configuration.getInt("awsmock.service.secretsmanager.monitoring.period", SECRETSMANAGER_DEFAULT_MONITORING_PERIOD);
         log_debug << "SecretsManager rest module initialized, endpoint: " << _host << ":" << _port;
 
         // Create environment
-        _region = _configuration.getString("awsmock.region");
+        _region = configuration.getString("awsmock.region");
 
         // Monitoring
         _secretsManagerMonitoring = std::make_unique<SecretsManagerMonitoring>(_monitoringPeriod);
@@ -36,20 +37,16 @@ namespace AwsMock::Service {
         log_info << "SecretsManager server starting, port: " << _port;
 
         // Start monitoring
-        _secretsManagerMonitoring->Start();
+        boost::asio::post(_pool, [this] { _secretsManagerMonitoring->Start(); });
 
         // Set running
         SetRunning();
-
-        // Start REST module
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new SecretsManagerRequestHandlerFactory(_configuration));
     }
 
     void SecretsManagerServer::Run() {
     }
 
     void SecretsManagerServer::Shutdown() {
-        StopHttpServer();
         _secretsManagerMonitoring->Stop();
     }
 

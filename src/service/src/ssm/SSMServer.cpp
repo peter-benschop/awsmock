@@ -6,16 +6,17 @@
 
 namespace AwsMock::Service {
 
-    SSMServer::SSMServer(Core::Configuration &configuration) : AbstractServer("kms", 10), _configuration(configuration), _ssmDatabase(Database::SSMDatabase::instance()) {
+    SSMServer::SSMServer(boost::asio::thread_pool &pool) : AbstractServer("kms", 10), _ssmDatabase(Database::SSMDatabase::instance()), _pool(pool) {
 
         // HTTP manager configuration
-        _port = _configuration.getInt("awsmock.service.kms.http.port", SSM_DEFAULT_PORT);
-        _host = _configuration.getString("awsmock.service.kms.http.host", SSM_DEFAULT_HOST);
-        _maxQueueLength = _configuration.getInt("awsmock.service.kms.http.max.queue", SSM_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = _configuration.getInt("awsmock.service.kms.http.max.threads", SSM_DEFAULT_THREADS);
-        _requestTimeout = _configuration.getInt("awsmock.service.kms.http.timeout", SSM_DEFAULT_TIMEOUT);
-        _workerPeriod = _configuration.getInt("awsmock.service.kms.worker.period", SSM_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = _configuration.getInt("awsmock.service.kms.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _port = configuration.getInt("awsmock.service.kms.http.port", SSM_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.kms.http.host", SSM_DEFAULT_HOST);
+        _maxQueueLength = configuration.getInt("awsmock.service.kms.http.max.queue", SSM_DEFAULT_QUEUE_LENGTH);
+        _maxThreads = configuration.getInt("awsmock.service.kms.http.max.threads", SSM_DEFAULT_THREADS);
+        _requestTimeout = configuration.getInt("awsmock.service.kms.http.timeout", SSM_DEFAULT_TIMEOUT);
+        _workerPeriod = configuration.getInt("awsmock.service.kms.worker.period", SSM_DEFAULT_WORKER_PERIOD);
+        _monitoringPeriod = configuration.getInt("awsmock.service.kms.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
         log_debug << "KMS rest module initialized, endpoint: " << _host << ":" << _port;
 
         // Monitoring
@@ -36,8 +37,9 @@ namespace AwsMock::Service {
         }
         log_info << "KMS module starting";
 
-        // Start REST module
-        //StartHttpServer(_maxQueueLength, _maxThreads, _requestTimeout, _host, _port, new KMSRequestHandlerFactory(_configuration));
+        // Start worker threads
+        boost::asio::post(_pool, [this] { _ssmWorker->Start(); });
+        boost::asio::post(_pool, [this] { _ssmMonitoring->Start(); });
 
         // Set running
         SetRunning();
@@ -50,7 +52,6 @@ namespace AwsMock::Service {
     void SSMServer::Shutdown() {
         _ssmWorker->Stop();
         _ssmMonitoring->Stop();
-        StopHttpServer();
     }
 
 }// namespace AwsMock::Service

@@ -42,31 +42,20 @@ namespace AwsMock::Service {
         auto address = ip::make_address(_address);
         std::make_shared<GatewayListener>(ioc, ip::tcp::endpoint{address, _port})->Run();
 
-        // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
-        signals.async_wait(
-                [&](boost::beast::error_code const &, int) {
-                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
-                    // destroying the `io_context` and all the sockets in it.
-                    log_info << "Manager stopped on signal";
-                    ioc.stop();
-                });
-
-        boost::thread_group threadGroup;
         for (auto i = 0; i < _maxThreads; i++) {
-            threadGroup.create_thread(
-                    [ObjectPtr = &ioc] { return ObjectPtr->run(); });
+            _threadGroup.create_thread([ObjectPtr = &ioc] { return ObjectPtr->run(); });
         }
+
         log_info << "Gateway service started";
-        threadGroup.join_all();
+        ioc.run();
+        log_info << "Gateway stopped";
     }
 
     void GatewayServer::Shutdown() {
         log_info << "Initialize gateway shutdown";
         ioc.stop();
-        for (auto &t: _threads) {
-            t.join();
-        }
+        _threadGroup.interrupt_all();
+        _threadGroup.join_all();
         log_info << "Gateway service stopped";
     }
 

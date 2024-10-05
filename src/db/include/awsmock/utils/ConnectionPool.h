@@ -38,7 +38,7 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          *
          * @return singleton
          */
@@ -48,7 +48,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Configure the connection pool
+         * @brief Configure the connection pool
          *
          * @param instance MongoDB instance
          * @param pool connection pool
@@ -56,21 +56,26 @@ namespace AwsMock::Database {
         void configure(std::unique_ptr<mongocxx::instance> instance, std::unique_ptr<mongocxx::pool> pool);
 
         /**
-         * Return a connection from the pool
+         * @brief Return a connection from the pool
          *
          * @return connection from the pool
          */
         mongocxx::pool::entry GetConnection();
 
         /**
-         * Try to get a connection
+         * @brief Try to get a connection
          *
          * @return optional connection from the pool
          */
         bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection();
 
         /**
-         * Private constructor
+         * @brief Shutdown the connection pool
+         */
+        void Shutdown();
+
+        /**
+         * @brief Private constructor
          */
         ConnectionPool() = default;
 

@@ -7,13 +7,11 @@
 
 namespace AwsMock::Database {
 
+    typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean>> Accumulator;
+
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring") {}
 
     void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
-
-        if (name.empty()) {
-            log_warning << "empty name";
-        }
 
         if (HasDatabase()) {
 
@@ -55,9 +53,6 @@ namespace AwsMock::Database {
 
     void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
 
-        if (name.empty()) {
-            log_warning << "empty name";
-        }
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
@@ -116,18 +111,18 @@ namespace AwsMock::Database {
                 }
 
                 // Find and accumulate
-                boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::rolling_mean>> acc(boost::accumulators::tag::rolling_window::window_size = step);
                 auto cursor = _monitoringCollection.find(document.extract(), opts);
+                int i = 0;
+                Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
                 for (auto it: cursor) {
                     acc(it["value"].get_double().value);
-                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::rolling_mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
-                    result.emplace_back(counter);
+                    if (!(++i % step)) {
+                        Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                        result.emplace_back(counter);
+                    }
                 }
-                acc.drop<boost::accumulators::tag::rolling_mean>();
-
                 log_debug << "Counters, name: " << name << " count: " << result.size();
                 return result;
-
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());

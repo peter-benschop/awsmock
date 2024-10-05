@@ -71,7 +71,7 @@ namespace AwsMock::Database {
          * @param userPool cognito user pool entity to create
          * @return created cognito entity.
          */
-        Entity::Cognito::UserPool CreateUserPool(const Entity::Cognito::UserPool &userPool);
+        Entity::Cognito::UserPool CreateUserPool(Entity::Cognito::UserPool &userPool);
 
         /**
          * @brief Count all user pools
@@ -87,7 +87,7 @@ namespace AwsMock::Database {
          * @param userPool user pool entity
          * @return updated cognito user pool entity.
          */
-        Entity::Cognito::UserPool UpdateUserPool(const Entity::Cognito::UserPool &userPool);
+        Entity::Cognito::UserPool UpdateUserPool(Entity::Cognito::UserPool &userPool);
 
         /**
          * @brief Creates a new user pool or updates an existing user pool
@@ -186,7 +186,7 @@ namespace AwsMock::Database {
          * @param user cognito user entity to create
          * @return created cognito user entity.
          */
-        Entity::Cognito::User CreateUser(const Entity::Cognito::User &user);
+        Entity::Cognito::User CreateUser(Entity::Cognito::User &user);
 
         /**
          * @brief Returns a cognito user entity by primary key
@@ -251,7 +251,7 @@ namespace AwsMock::Database {
          * @param user user entity
          * @return updated cognito user entity.
          */
-        Entity::Cognito::User UpdateUser(const Entity::Cognito::User &user);
+        Entity::Cognito::User UpdateUser(Entity::Cognito::User &user);
 
         /**
          * @brief Creates a new user or updates an existing user
@@ -313,7 +313,7 @@ namespace AwsMock::Database {
          * @param group cognito group entity to create
          * @return created cognito group entity.
          */
-        Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);
+        Entity::Cognito::Group CreateGroup(Entity::Cognito::Group &group);
 
         /**
          * @brief Returns a list of cognito groups.

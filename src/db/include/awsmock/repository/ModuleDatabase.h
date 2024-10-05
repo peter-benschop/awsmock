@@ -119,7 +119,7 @@ namespace AwsMock::Database {
          * @param module module entity
          * @return created module
          */
-        Entity::Module::Module CreateModule(const Entity::Module::Module &module);
+        Entity::Module::Module CreateModule(Entity::Module::Module &module);
 
         /**
          * @brief Updates a module
@@ -127,7 +127,7 @@ namespace AwsMock::Database {
          * @param module module entity
          * @return updated module
          */
-        Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
+        Entity::Module::Module UpdateModule(Entity::Module::Module &module);
 
         /**
          * @brief Sets the state of module.
@@ -166,7 +166,7 @@ namespace AwsMock::Database {
          * @param modules modules entity
          * @return updated modules
          */
-        Entity::Module::Module CreateOrUpdateModule(const Entity::Module::Module &modules);
+        Entity::Module::Module CreateOrUpdateModule(Entity::Module::Module &modules);
 
         /**
          * @brief Counts the number of modules

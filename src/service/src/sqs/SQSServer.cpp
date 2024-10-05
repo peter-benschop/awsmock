@@ -48,7 +48,6 @@ namespace AwsMock::Service {
     void SQSServer::Shutdown() {
         _sqsMonitoring->Stop();
         _sqsWorker->Stop();
-        StopHttpServer();
     }
 
 }// namespace AwsMock::Service
