@@ -19,10 +19,11 @@ namespace AwsMock::Dto::Common {
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
-        if (Core::HttpUtils::HasHeader(request, "X-AwsMock-Target")) {
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
-            std::string target = Core::HttpUtils::GetHeaderValue(request, "X-AwsMock-Target");
-            command = MonitoringCommandTypeFromString(target);
+            std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
+            std::string action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+            command = MonitoringCommandTypeFromString(action);
         }
     }
 
