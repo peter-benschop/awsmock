@@ -75,9 +75,16 @@ namespace AwsMock::Core {
         /**
          * @brief Convert a ToISO8601 timestamp into a system time point.
          * @param dateString
-         * @return
+         * @return time_point
          */
         static system_clock::time_point FromISO8601(const std::string &dateString);
+
+        /**
+         * @brief Convert a ToISO8601 UTC timestamp into a system time point which is local time in Europe/Berlin.
+         * @param dateString
+         * @return time_point
+         */
+        static system_clock::time_point FromISO8601UTC(const std::string &dateString);
 
         /**
          * @brief Returns the current time in HTTP format.
@@ -115,6 +122,8 @@ namespace AwsMock::Core {
          * @return time_point as Unix epoch timestamp in local time
          */
         static long UnixTimestampLocal(const system_clock::time_point &timePoint);
+
+        static system_clock::time_point FromUnixtimestamp(long timestamp);
 
         /**
          *

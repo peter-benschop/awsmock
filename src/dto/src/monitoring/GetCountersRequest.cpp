@@ -31,8 +31,8 @@ namespace AwsMock::Dto::Monitoring {
                 request.step = rootObject->get("step").convert<int>();
             }
 
-            request.start = Core::DateTimeUtils::FromISO8601(rootObject->get("start").convert<std::string>());
-            request.end = Core::DateTimeUtils::FromISO8601(rootObject->get("end").convert<std::string>());
+            request.start = Core::DateTimeUtils::FromUnixtimestamp(rootObject->get("start").convert<long>());
+            request.end = Core::DateTimeUtils::FromUnixtimestamp(rootObject->get("end").convert<long>());
 
             return request;
 
