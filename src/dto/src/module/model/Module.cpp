@@ -2,19 +2,22 @@
 // Created by vogje01 on 10/23/23.
 //
 
-#include <awsmock/dto/module/Module.h>
+#include "awsmock/dto/module/model/Module.h"
 
 namespace AwsMock::Dto::Module {
 
     std::string Module::ToJson() const {
+
+        using Core::JsonUtils;
+
         try {
             Poco::JSON::Object moduleJson;
-            moduleJson.set("name", name);
-            moduleJson.set("executable", executable);
-            moduleJson.set("port", port);
-            moduleJson.set("state", Database::Entity::Module::ModuleStateToString(status));
-            moduleJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            moduleJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            JsonUtils::SetJsonValueString(moduleJson, "name", name);
+            JsonUtils::SetJsonValueString(moduleJson, "executable", executable);
+            JsonUtils::SetJsonValueInt(moduleJson, "port", port);
+            JsonUtils::SetJsonValueString(moduleJson, "state", Database::Entity::Module::ModuleStateToString(status));
+            JsonUtils::SetJsonValueDate(moduleJson, "created", created);
+            JsonUtils::SetJsonValueDate(moduleJson, "modified", modified);
 
             return Core::JsonUtils::ToJsonString(moduleJson);
 
@@ -25,15 +28,19 @@ namespace AwsMock::Dto::Module {
     }
 
     std::string Module::ToJson(const Database::Entity::Module::ModuleList &serviceList) {
+
+        using Core::JsonUtils;
+
         try {
+
             Poco::JSON::Array moduleJsonArray;
             for (const auto &service: serviceList) {
                 Poco::JSON::Object serviceJson;
-                serviceJson.set("name", service.name);
-                serviceJson.set("port", service.port);
-                serviceJson.set("state", Database::Entity::Module::ModuleStateToString(service.state));
-                serviceJson.set("created", Core::DateTimeUtils::ToISO8601(service.created));
-                serviceJson.set("modified", Core::DateTimeUtils::ToISO8601(service.modified));
+                JsonUtils::SetJsonValueString(serviceJson, "name", service.name);
+                JsonUtils::SetJsonValueInt(serviceJson, "port", service.port);
+                JsonUtils::SetJsonValueString(serviceJson, "state", Database::Entity::Module::ModuleStateToString(service.state));
+                JsonUtils::SetJsonValueDate(serviceJson, "created", service.created);
+                JsonUtils::SetJsonValueDate(serviceJson, "modified", service.modified);
                 moduleJsonArray.add(serviceJson);
             }
 
@@ -46,15 +53,19 @@ namespace AwsMock::Dto::Module {
     }
 
     std::string Module::ToJson(const ModuleList &moduleList) {
+
+        using Core::JsonUtils;
+
         try {
+
             Poco::JSON::Array moduleJsonArray;
             for (const auto &module: moduleList) {
                 Poco::JSON::Object moduleJson;
-                moduleJson.set("name", module.name);
-                moduleJson.set("port", module.port);
-                moduleJson.set("status", Database::Entity::Module::ModuleStateToString(module.status));
-                moduleJson.set("created", Core::DateTimeUtils::ToISO8601(module.created));
-                moduleJson.set("modified", Core::DateTimeUtils::ToISO8601(module.modified));
+                JsonUtils::SetJsonValueString(moduleJson, "name", module.name);
+                JsonUtils::SetJsonValueInt(moduleJson, "port", module.port);
+                JsonUtils::SetJsonValueString(moduleJson, "status", Database::Entity::Module::ModuleStateToString(module.status));
+                JsonUtils::SetJsonValueDate(moduleJson, "created", module.created);
+                JsonUtils::SetJsonValueDate(moduleJson, "modified", module.modified);
                 moduleJsonArray.add(moduleJson);
             }
 
@@ -76,7 +87,7 @@ namespace AwsMock::Dto::Module {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(payload);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
             Core::JsonUtils::GetJsonValueString("name", rootObject, module.name);

@@ -24,11 +24,11 @@
 #include <boost/program_options/variables_map.hpp>
 
 // AwsMock includes
+#include "awsmock/dto/module/model/GatewayConfig.h"
+#include "awsmock/dto/module/model/Module.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
-#include <awsmock/dto/module/GatewayConfig.h>
-#include <awsmock/dto/module/Module.h>
 #include <awsmock/dto/transfer/model/Server.h>
 #include <awsmock/dto/transfer/model/User.h>
 #include <awsmock/repository/ModuleDatabase.h>

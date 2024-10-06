@@ -2,11 +2,11 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#include <awsmock/dto/common/Infrastructure.h>
+#include <awsmock/dto/module/model/Infrastructure.h>
 
-namespace AwsMock::Dto::Common {
+namespace AwsMock::Dto::Module {
 
-    std::string Infrastructure::ToJson(bool prettyPrint) {
+    Poco::JSON::Object Infrastructure::ToJsonObject() {
 
         try {
 
@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &bucket: s3Buckets) {
                     jsonBucketArray.add(bucket.ToJsonObject());
                 }
-                infrastructureJson.set("s3-buckets", jsonBucketArray);
+                rootJson.set("s3-buckets", jsonBucketArray);
             }
 
             // S3 object array
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &object: s3Objects) {
                     jsonObjectArray.add(object.ToJsonObject());
                 }
-                infrastructureJson.set("s3-objects", jsonObjectArray);
+                rootJson.set("s3-objects", jsonObjectArray);
             }
 
             // SQS queue array
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &queue: sqsQueues) {
                     jsonQueueArray.add(queue.ToJsonObject());
                 }
-                infrastructureJson.set("sqs-queues", jsonQueueArray);
+                rootJson.set("sqs-queues", jsonQueueArray);
             }
 
             // SQS message array
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &message: sqsMessages) {
                     jsonSqsMessageArray.add(message.ToJsonObject());
                 }
-                infrastructureJson.set("sqs-resources", jsonSqsMessageArray);
+                rootJson.set("sqs-resources", jsonSqsMessageArray);
             }
 
             // SNS topic array
@@ -55,7 +55,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &topic: snsTopics) {
                     jsonTopicArray.add(topic.ToJsonObject());
                 }
-                infrastructureJson.set("sns-topics", jsonTopicArray);
+                rootJson.set("sns-topics", jsonTopicArray);
             }
 
             // SNS message array
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &message: snsMessages) {
                     jsonSnsMessageArray.add(message.ToJsonObject());
                 }
-                infrastructureJson.set("sns-resources", jsonSnsMessageArray);
+                rootJson.set("sns-resources", jsonSnsMessageArray);
             }
 
             // Lambda functions
@@ -73,7 +73,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &lambda: lambdas) {
                     jsonLambdaArray.add(lambda.ToJsonObject());
                 }
-                infrastructureJson.set("lambda-functions", jsonLambdaArray);
+                rootJson.set("lambda-functions", jsonLambdaArray);
             }
 
             // Transfer server
@@ -82,7 +82,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &transfer: transferServers) {
                     jsonTransferArray.add(transfer.ToJsonObject());
                 }
-                infrastructureJson.set("transfer-servers", jsonTransferArray);
+                rootJson.set("transfer-servers", jsonTransferArray);
             }
 
             // Cognito user pools
@@ -91,7 +91,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &userPool: cognitoUserPools) {
                     jsonCognitoUserPoolArray.add(userPool.ToJsonObject());
                 }
-                infrastructureJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
+                rootJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
             }
 
             // Cognito users
@@ -100,7 +100,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &user: cognitoUsers) {
                     jsonCognitoUserArray.add(user.ToJsonObject());
                 }
-                infrastructureJson.set("cognito-users", jsonCognitoUserArray);
+                rootJson.set("cognito-users", jsonCognitoUserArray);
             }
 
             // DynamoDb tables
@@ -109,7 +109,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &table: dynamoDbTables) {
                     jsonDynamoDbTableArray.add(table.ToJsonObject());
                 }
-                infrastructureJson.set("dynamodb-tables", jsonDynamoDbTableArray);
+                rootJson.set("dynamodb-tables", jsonDynamoDbTableArray);
             }
 
             // DynamoDb items
@@ -118,7 +118,7 @@ namespace AwsMock::Dto::Common {
                 for (const auto &item: dynamoDbItems) {
                     jsonDynamoDbItemArray.add(item.ToJsonObject());
                 }
-                infrastructureJson.set("dynamodb-items", jsonDynamoDbItemArray);
+                rootJson.set("dynamodb-items", jsonDynamoDbItemArray);
             }
 
             // SecretsManager secrets
@@ -127,13 +127,10 @@ namespace AwsMock::Dto::Common {
                 for (const auto &secret: secrets) {
                     jsonSecretsArray.add(secret.ToJsonObject());
                 }
-                infrastructureJson.set("secretsmanager-secrets", jsonSecretsArray);
+                rootJson.set("secretsmanager-secrets", jsonSecretsArray);
             }
-
-            // Add infrastructure JSON to root JSON
-            rootJson.set("infrastructure", infrastructureJson);
-
-            return Core::JsonUtils::ToJsonString(rootJson, prettyPrint);
+            
+            return rootJson;
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -256,4 +253,4 @@ namespace AwsMock::Dto::Common {
             throw Core::JsonException(exc.message());
         }
     }
-}// namespace AwsMock::Dto::Common
+}// namespace AwsMock::Dto::Module

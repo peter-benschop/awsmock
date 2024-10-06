@@ -64,92 +64,80 @@ namespace AwsMock::Service {
         return Dto::Module::Mapper::map(_moduleDatabase.ListModules());
     }
 
-    std::string ModuleService::ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool prettyPrint, bool includeObjects) {
+    Dto::Module::ExportInfrastructureResponse ModuleService::ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request) {
 
-        Dto::Common::Infrastructure infrastructure;
+        Dto::Module::Infrastructure infrastructure;
 
-        Dto::Module::Module::ModuleList moduleList = modules;
-        if (moduleList.empty()) {
-            moduleList.emplace_back((Dto::Module::Module){.name = "s3"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "sqs"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "sns"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "lambda"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "cognito"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "dynanmodb"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "secretsmanager"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "transfer"});
-            moduleList.emplace_back((Dto::Module::Module){.name = "kms"});
-        }
+        for (const auto &module: request.modules) {
 
-        for (const auto &module: moduleList) {
-
-            if (module.name == "s3") {
+            if (module == "s3") {
 
                 Database::S3Database &_s3Database = Database::S3Database::instance();
                 infrastructure.s3Buckets = _s3Database.ListBuckets();
-                if (includeObjects) {
+                if (request.includeObjects) {
                     infrastructure.s3Objects = _s3Database.ListObjects();
                 }
 
-            } else if (module.name == "sqs") {
+            } else if (module == "sqs") {
 
                 Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
                 infrastructure.sqsQueues = _sqsDatabase.ListQueues(-1, "", "");
-                if (includeObjects) {
+                if (request.includeObjects) {
                     infrastructure.sqsMessages = _sqsDatabase.ListMessages();
                 }
 
-            } else if (module.name == "sns") {
+            } else if (module == "sns") {
 
                 Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
                 infrastructure.snsTopics = _snsDatabase.ListTopics();
-                if (includeObjects) {
+                if (request.includeObjects) {
                     infrastructure.snsMessages = _snsDatabase.ListMessages();
                 }
 
-            } else if (module.name == "lambda") {
+            } else if (module == "lambda") {
 
                 Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
                 infrastructure.lambdas = _lambdaDatabase.ListLambdas();
 
-            } else if (module.name == "cognito") {
+            } else if (module == "cognito") {
 
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
                 infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
                 infrastructure.cognitoUserGroups = _cognitoDatabase.ListGroups();
                 infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
 
-            } else if (module.name == "dynanmodb") {
+            } else if (module == "dynanmodb") {
 
                 Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
                 infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
-                if (includeObjects) {
+                if (request.includeObjects) {
                     infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
                 }
 
-            } else if (module.name == "secretsmanager") {
+            } else if (module == "secretsmanager") {
 
                 Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
                 infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
 
-            } else if (module.name == "transfer") {
+            } else if (module == "transfer") {
 
                 Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
                 infrastructure.transferServers = _transferDatabase.ListServers();
 
-            } else if (module.name == "kms") {
+            } else if (module == "kms") {
 
                 Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
                 infrastructure.kmsKeys = _kmsDatabase.ListKeys();
             }
         }
-        return infrastructure.ToJson(prettyPrint);
+        Dto::Module::ExportInfrastructureResponse response{.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
+        return response;
     }
 
     void ModuleService::ImportInfrastructure(const std::string &jsonString) {
         log_info << "Importing services, length: " << jsonString.length();
 
-        Dto::Common::Infrastructure infrastructure;
+        Dto::Module::Infrastructure infrastructure;
         infrastructure.FromJson(jsonString);
 
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {

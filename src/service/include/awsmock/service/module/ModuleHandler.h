@@ -13,11 +13,11 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
+#include "awsmock/dto/module/model/GatewayConfig.h"
+#include "awsmock/dto/module/model/Module.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Services.h>
-#include <awsmock/dto/module/GatewayConfig.h>
-#include <awsmock/dto/module/Module.h>
 #include <awsmock/dto/transfer/ListUsersRequest.h>
 #include <awsmock/dto/transfer/model/Server.h>
 #include <awsmock/monitoring/MetricDefinition.h>
