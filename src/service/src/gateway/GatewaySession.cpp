@@ -16,10 +16,11 @@ namespace AwsMock::Service {
             {"cognito-idp", std::make_shared<CognitoHandler>()},
             {"cognito-identity", std::make_shared<CognitoHandler>()},
             {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
-            {"monitoring", std::make_shared<MonitoringHandler>()},
             {"kms", std::make_shared<KMSHandler>()},
             {"ssm", std::make_shared<SSMHandler>()},
-            {"dynamodb", std::make_shared<DynamoDbHandler>()}};
+            {"dynamodb", std::make_shared<DynamoDbHandler>()},
+            {"monitoring", std::make_shared<MonitoringHandler>()},
+            {"manager", std::make_shared<MonitoringHandler>()}};
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -116,16 +117,28 @@ namespace AwsMock::Service {
 
         } else {
 
-            // Verify AWS signature
-            if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
-                log_warning << "AWS signature could not be verified";
-                return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
+            std::shared_ptr<AbstractHandler> handler;
+            std::string region = Core::Configuration::instance().getString("awsmock.region");
+            if (Core::HttpUtils::HasHeader(request, "x-awsmock-Target")) {
+
+                std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-Target");
+                handler = _routingTable[target];
+
+            } else {
+
+                // Verify AWS signature
+                if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
+                    log_warning << "AWS signature could not be verified";
+                    return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
+                }
+
+                // Get the module from the authorization key, or the target header field.
+                Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
+
+                region = authKey.region;
+                handler = _routingTable[authKey.module];
             }
 
-            // Get the module from the authorization key, or the target header field.
-            Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
-
-            std::shared_ptr<AbstractHandler> handler = _routingTable[authKey.module];
             if (handler) {
 
                 switch (request.method()) {
@@ -133,31 +146,31 @@ namespace AwsMock::Service {
                         log_debug << "Handle GET request";
                         Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                        return handler->HandleGetRequest(request, authKey.region, "none");
+                        return handler->HandleGetRequest(request, region, "none");
                     }
                     case http::verb::put: {
                         log_debug << "Handle PUT request";
                         Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                        return handler->HandlePutRequest(request, authKey.region, "none");
+                        return handler->HandlePutRequest(request, region, "none");
                     }
                     case http::verb::post: {
                         log_debug << "Handle POST request";
                         Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                        return handler->HandlePostRequest(request, authKey.region, "none");
+                        return handler->HandlePostRequest(request, region, "none");
                     }
                     case http::verb::delete_: {
                         log_debug << "Handle DELETE request";
                         Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                        return handler->HandleDeleteRequest(request, authKey.region, "none");
+                        return handler->HandleDeleteRequest(request, region, "none");
                     }
                     case http::verb::head: {
                         log_debug << "Handle HEAD request";
                         Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                        return handler->HandleHeadRequest(request, authKey.region, "none");
+                        return handler->HandleHeadRequest(request, region, "none");
                     }
                 }
             }
@@ -186,7 +199,6 @@ namespace AwsMock::Service {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
             return DoClose();
         }
-        return DoClose();
 
         // Resume the read if it has been paused
         if (response_queue_.size() == _queueLimit)

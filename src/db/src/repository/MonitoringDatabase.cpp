@@ -12,6 +12,7 @@ namespace AwsMock::Database {
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring") {}
 
     void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
+        log_trace << "Set counter value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;
 
         if (HasDatabase()) {
 
@@ -40,7 +41,6 @@ namespace AwsMock::Database {
                 document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
 
                 auto insert_one_result = _monitoringCollection.insert_one(document.extract());
-                log_trace << "Counter incremented, oid: " << insert_one_result->inserted_id().get_string().value;
                 session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
@@ -54,6 +54,7 @@ namespace AwsMock::Database {
     }
 
     void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
+        log_trace << "Set gauge value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;
 
         if (HasDatabase()) {
 
@@ -91,6 +92,7 @@ namespace AwsMock::Database {
     }
 
     std::vector<Database::Entity::Monitoring::Counter> MonitoringDatabase::GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName, const std::string &labelValue) {
+        log_trace << "Get rolling mean, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
 
         std::vector<Database::Entity::Monitoring::Counter> result;
         if (HasDatabase()) {
