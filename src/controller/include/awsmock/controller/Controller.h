@@ -34,7 +34,7 @@
 #include <awsmock/repository/ModuleDatabase.h>
 
 #define AWSMOCKCTL_DEFAULT_HOST "localhost"
-#define AWSMOCKCTL_DEFAULT_PORT 4567
+#define AWSMOCKCTL_DEFAULT_PORT 4566
 #define AWSMOCKCTL_DEFAULT_USER "none"
 #define AWSMOCKCTL_DEFAULT_CLIENT "00000000"
 #define AWSMOCKCTL_DEFAULT_REGION "eu-central-1"

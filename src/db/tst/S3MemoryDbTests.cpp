@@ -278,7 +278,8 @@ namespace AwsMock::Database {
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            _servicedatabase.CreateObject({.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER});
+            Entity::S3::Object object = {.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER};
+            object = _servicedatabase.CreateObject(object);
         }
 
         // act
@@ -296,7 +297,8 @@ namespace AwsMock::Database {
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            _servicedatabase.CreateObject({.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER});
+            Entity::S3::Object object = {.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER};
+            object = _servicedatabase.CreateObject(object);
         }
 
         // act

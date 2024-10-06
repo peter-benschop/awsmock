@@ -94,7 +94,7 @@ namespace AwsMock::Database {
          * @return created SQS queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue CreateQueue(const Entity::SQS::Queue &queue);
+        Entity::SQS::Queue CreateQueue(Entity::SQS::Queue &queue);
 
         /**
          * @brief Returns a queue by primary key
@@ -216,7 +216,7 @@ namespace AwsMock::Database {
          * @return saved message entity
          * @throws Core::DatabaseException
          */
-        Entity::SQS::Message CreateMessage(const Entity::SQS::Message &message);
+        Entity::SQS::Message CreateMessage(Entity::SQS::Message &message);
 
         /**
          * @brief Checks whether the message exists by receipt handle.

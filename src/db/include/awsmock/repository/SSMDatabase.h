@@ -113,7 +113,7 @@ namespace AwsMock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter CreateParameter(const Entity::SSM::Parameter &parameter);
+        Entity::SSM::Parameter CreateParameter(Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Updates a parameter
@@ -122,7 +122,7 @@ namespace AwsMock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter UpdateParameter(const Entity::SSM::Parameter &parameter);
+        Entity::SSM::Parameter UpdateParameter(Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Deletes a parameter

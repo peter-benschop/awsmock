@@ -6,9 +6,6 @@
 
 namespace AwsMock::Service {
 
-    ModuleMonitoring::ModuleMonitoring(int timeout) : Core::Timer("manager-monitoring", timeout) {
-    }
-
     void ModuleMonitoring::Initialize() {
         UpdateCounter();
     }

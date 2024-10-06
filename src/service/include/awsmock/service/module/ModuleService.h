@@ -25,9 +25,9 @@
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
-#include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/kms/KMSServer.h>
 #include <awsmock/service/lambda/LambdaServer.h>
+#include <awsmock/service/module/ModuleMap.h>
 #include <awsmock/service/s3/S3Server.h>
 #include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 #include <awsmock/service/sns/SNSServer.h>
@@ -51,7 +51,7 @@ namespace AwsMock::Service {
          *
          * @param serverMap module map
          */
-        explicit ModuleService(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleDatabase(Database::ModuleDatabase::instance()) {};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
          * @brief Return all list of all modules
@@ -112,11 +112,6 @@ namespace AwsMock::Service {
         static void CleanObjects(const Dto::Module::Module::ModuleList &modules);
 
       private:
-
-        /**
-         * Server map
-         */
-        Service::ServerMap &_serverMap;
 
         /**
          * Module database

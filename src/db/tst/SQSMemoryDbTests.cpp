@@ -78,8 +78,7 @@ namespace AwsMock::Database {
     TEST_F(SQSMemoryDbTest, QueueArnExistsTest) {
 
         // arrange
-        Entity::SQS::Queue
-                queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
         _sqsDatabase.CreateQueue(queue);
 
         // act
@@ -92,8 +91,8 @@ namespace AwsMock::Database {
     TEST_F(SQSMemoryDbTest, QueueByIdTest) {
 
         // arrange
-        Entity::SQS::Queue queue =
-                _sqsDatabase.CreateQueue({.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn});
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        queue = _sqsDatabase.CreateQueue(queue);
 
         // act
         Entity::SQS::Queue result = _sqsDatabase.GetQueueById(queue.oid);
@@ -106,8 +105,8 @@ namespace AwsMock::Database {
     TEST_F(SQSMemoryDbTest, QueueByArnTest) {
 
         // arrange
-        Entity::SQS::Queue queue =
-                _sqsDatabase.CreateQueue({.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn});
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        queue = _sqsDatabase.CreateQueue(queue);
 
         // act
         Entity::SQS::Queue result = _sqsDatabase.GetQueueByArn(queue.queueArn);
@@ -120,8 +119,8 @@ namespace AwsMock::Database {
     TEST_F(SQSMemoryDbTest, QueueByUrlTest) {
 
         // arrange
-        Entity::SQS::Queue queue =
-                _sqsDatabase.CreateQueue({.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn});
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        queue = _sqsDatabase.CreateQueue(queue);
 
         // act
         Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_region, _queueUrl);

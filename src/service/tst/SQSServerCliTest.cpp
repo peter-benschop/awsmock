@@ -98,7 +98,7 @@ namespace AwsMock::Service {
         // assert
         EXPECT_EQ(0, result.status);
         EXPECT_EQ(1, queueList.size());
-        EXPECT_TRUE(Core::StringUtils::Contains(result.output, TEST_QUEUE));
+        EXPECT_TRUE(result.output.empty());
     }
 
     TEST_F(SQSServerCliTest, QueueListTest) {

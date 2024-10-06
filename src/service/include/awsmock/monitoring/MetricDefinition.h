@@ -71,4 +71,7 @@
 #define KMS_DECRYPTION_COUNT "kms_decryption_counter"
 #define KMS_SERVICE_TIMER "kms_service_timer"
 
+#define SSM_PARAMETER_COUNT "ssm_parameter_counter"
+#define SSM_SERVICE_TIMER "ssm_service_timer"
+
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H

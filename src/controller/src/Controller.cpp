@@ -10,8 +10,8 @@ namespace AwsMock::Controller {
 
         // Initialize database
         Core::Configuration &configuration = Core::Configuration::instance();
-        _host = configuration.getString("awsmock.manager.host", AWSMOCKCTL_DEFAULT_HOST);
-        _port = configuration.getInt("awsmock.manager.port", AWSMOCKCTL_DEFAULT_PORT);
+        _host = configuration.getString("awsmock.service.gateway.http.host", AWSMOCKCTL_DEFAULT_HOST);
+        _port = configuration.getInt("awsmock.service.gateway.http.port", AWSMOCKCTL_DEFAULT_PORT);
         _baseUrl = "http://" + _host + ":" + std::to_string(_port);
 
         // Get user/clientId/region
@@ -429,8 +429,8 @@ namespace AwsMock::Controller {
     void AwsMockCtl::AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) {
         headers["User"] = _user;
         headers["Region"] = _region;
-        headers["Target"] = "module";
-        headers["Action"] = action;
+        headers["x-awsmock-target"] = "module";
+        headers["x-awsmock-action"] = action;
     }
 
     Dto::Module::Module::ModuleList AwsMockCtl::GetAllModules() {

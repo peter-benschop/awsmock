@@ -10,7 +10,7 @@ namespace AwsMock::Service {
         return _database.BucketExists({.region = region, .name = bucket});
     }
 
-    Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) {
+    Dto::S3::CreateBucketResponse S3Service::CreateBucket(Dto::S3::CreateBucketRequest &s3Request) {
         log_trace << "Create bucket request, s3Request: " << s3Request.ToString();
 
         // Get region
@@ -31,7 +31,8 @@ namespace AwsMock::Service {
 
             // Update database
             std::string arn = Core::AwsUtils::CreateS3BucketArn(region, accountId, s3Request.name);
-            _database.CreateBucket({.region = region, .name = s3Request.name, .owner = s3Request.owner, .arn = arn});
+            Database::Entity::S3::Bucket bucket = {.region = region, .name = s3Request.name, .owner = s3Request.owner, .arn = arn};
+            bucket = _database.CreateBucket(bucket);
 
             createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::CreateArn("s3", region, accountId, s3Request.name));
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();

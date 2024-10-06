@@ -79,7 +79,7 @@ namespace AwsMock::Database {
          * @return created SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic CreateTopic(const Entity::SNS::Topic &topic);
+        Entity::SNS::Topic CreateTopic(Entity::SNS::Topic &topic);
 
         /**
          * @brief Returns a topic by primary key
@@ -190,7 +190,7 @@ namespace AwsMock::Database {
          * @return saved message entity
          * @throws Core::DatabaseException
          */
-        Entity::SNS::Message CreateMessage(const Entity::SNS::Message &message);
+        Entity::SNS::Message CreateMessage(Entity::SNS::Message &message);
 
         /**
          * @brief Returns a message by ID.

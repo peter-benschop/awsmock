@@ -6,9 +6,6 @@
 
 namespace AwsMock::Service {
 
-    SNSMonitoring::SNSMonitoring(int timeout) : Core::Timer("sns-monitoring", timeout) {
-    }
-
     void SNSMonitoring::Initialize() {
         UpdateCounter();
     }

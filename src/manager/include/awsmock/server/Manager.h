@@ -11,12 +11,21 @@
 // MongoDB includes
 #include <mongocxx/instance.hpp>
 
+// Boost includes
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/beast/core.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/server/Handler.h>
-#include <awsmock/server/Listener.h>
+#include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/lambda/LambdaServer.h>
+#include <awsmock/service/module/ModuleMap.h>
 #include <awsmock/service/monitoring/MonitoringServer.h>
+#include <awsmock/service/s3/S3Server.h>
+#include <awsmock/service/sns/SNSServer.h>
+#include <awsmock/service/sqs/SQSServer.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
 #define DEFAULT_MONGO_DBUSER "admin"
@@ -66,19 +75,9 @@ namespace AwsMock::Manager {
       private:
 
         /**
-         * @brief Initialize the Prometheus monitoring counters and StartServer the prometheus manager.
-         */
-        static void InitializeMonitoring();
-
-        /**
          * @brief Initialize database
          */
         static void InitializeDatabase();
-
-        /**
-         * Server map
-         */
-        Service::ServerMap _serverMap;
 
         /**
          * Thread group

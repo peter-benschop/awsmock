@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit DynamoDbMonitoring(int timeout);
+        explicit DynamoDbMonitoring(int timeout) : Core::Timer("dynamodb-monitoring", timeout) {};
 
         /**
          * Initialization

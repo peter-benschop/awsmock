@@ -56,7 +56,8 @@ namespace AwsMock::Service {
             attributes.queueArn = queueArn;
 
             // Update database
-            Database::Entity::SQS::Queue queue = _sqsDatabase.CreateQueue({.region = request.region, .name = request.queueName, .owner = request.owner, .queueUrl = queueUrl, .queueArn = queueArn, .attributes = attributes, .tags = request.tags});
+            Database::Entity::SQS::Queue queue = {.region = request.region, .name = request.queueName, .owner = request.owner, .queueUrl = queueUrl, .queueArn = queueArn, .attributes = attributes, .tags = request.tags};
+            queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << queue.ToString();
 
             return {.region = queue.region, .name = queue.name, .owner = queue.owner, .queueUrl = queue.queueUrl, .queueArn = queue.queueArn};
@@ -78,7 +79,8 @@ namespace AwsMock::Service {
                 // Get total number
                 long total = _sqsDatabase.CountQueues(request.region);
                 Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.maxResults, request.queueNamePrefix, request.nextToken, request.region);
-                Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList, .nextToken = queueList.back().oid, .total = total};
+                std::string nextToken = queueList.size() > 0 ? queueList.back().oid : "";
+                Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList, .nextToken = nextToken, .total = total};
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
                 return listQueueResponse;
 
@@ -455,18 +457,18 @@ namespace AwsMock::Service {
             // Update database
             queue.attributes.approximateNumberOfMessages++;
             queue = _sqsDatabase.UpdateQueue(queue);
-            Database::Entity::SQS::Message message = _sqsDatabase.CreateMessage(
-                    {.queueArn = queue.queueArn,
-                     .body = request.body,
-                     .status = Database::Entity::SQS::MessageStatus::INITIAL,
-                     .reset = reset,
-                     .messageId = messageId,
-                     .receiptHandle = receiptHandle,
-                     .md5Body = md5Body,
-                     .md5UserAttr = md5UserAttr,
-                     .md5SystemAttr = md5SystemAttr,
-                     .attributes = attributes,
-                     .messageAttributes = messageAttributes});
+            Database::Entity::SQS::Message message = {.queueArn = queue.queueArn,
+                                                      .body = request.body,
+                                                      .status = Database::Entity::SQS::MessageStatus::INITIAL,
+                                                      .reset = reset,
+                                                      .messageId = messageId,
+                                                      .receiptHandle = receiptHandle,
+                                                      .md5Body = md5Body,
+                                                      .md5UserAttr = md5UserAttr,
+                                                      .md5SystemAttr = md5SystemAttr,
+                                                      .attributes = attributes,
+                                                      .messageAttributes = messageAttributes};
+            message = _sqsDatabase.CreateMessage(message);
             log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId << " md5Body: " << md5Body;
 
             // Find Lambdas with this as event source

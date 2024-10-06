@@ -7,7 +7,6 @@
 namespace AwsMock::Service {
 
     void CognitoMonitoring::Initialize() {
-        //UpdateCounter();
     }
 
     void CognitoMonitoring::Run() {

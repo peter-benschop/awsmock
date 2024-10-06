@@ -18,11 +18,17 @@
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/GatewayConfig.h>
 #include <awsmock/dto/module/Module.h>
+#include <awsmock/dto/transfer/ListUsersRequest.h>
+#include <awsmock/dto/transfer/model/Server.h>
 #include <awsmock/monitoring/MetricDefinition.h>
 #include <awsmock/monitoring/MetricServiceTimer.h>
+#include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/module/ModuleService.h>
+#include <awsmock/service/transfer/TransferService.h>
 
 namespace AwsMock::Service {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief HTTP handler
@@ -38,7 +44,7 @@ namespace AwsMock::Service {
          *
          * @param serverMap currently running servers
          */
-        explicit ModuleHandler(Service::ServerMap &serverMap) : _serverMap(serverMap), _moduleService(serverMap) {};
+        explicit ModuleHandler() = default;
 
         /**
          * @brief Handler HTTP GET requests.
@@ -48,7 +54,7 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @return HTTP response structure
          */
-        boost::beast::http::response<boost::beast::http::dynamic_body> HandleGetRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief Handler HTTP POST requests.
@@ -58,7 +64,7 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @return HTTP response structure
          */
-        boost::beast::http::response<boost::beast::http::dynamic_body> HandlePostRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request);
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
       private:
 
@@ -66,11 +72,6 @@ namespace AwsMock::Service {
          * Module service
          */
         ModuleService _moduleService;
-
-        /**
-         * Server nmap
-         */
-        ServerMap _serverMap;
     };
 
 }// namespace AwsMock::Service

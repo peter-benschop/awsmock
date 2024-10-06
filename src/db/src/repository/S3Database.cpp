@@ -45,7 +45,7 @@ namespace AwsMock::Database {
         return BucketExists(bucket.region, bucket.name);
     }
 
-    Entity::S3::Bucket S3Database::CreateBucket(const Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::CreateBucket(Entity::S3::Bucket &bucket) {
 
         if (HasDatabase()) {
 
@@ -57,10 +57,11 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
-                log_trace << "Bucket created, oid: "
-                          << insert_one_result->inserted_id().get_oid().value.to_string();
+                log_trace << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
-                return GetBucketById(insert_one_result->inserted_id().get_oid().value);
+
+                bucket.oid = insert_one_result->inserted_id().get_oid().value.to_string();
+                return bucket;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -128,16 +129,14 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
-                    mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-            if (mResult->empty()) {
-                return {};
+            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+            if (mResult) {
+                Entity::S3::Bucket result;
+                result.FromDocument(mResult->view());
+                log_trace << "Got bucket: " << result.ToString();
+                return result;
             }
-
-            Entity::S3::Bucket result;
-            result.FromDocument(mResult->view());
-            log_trace << "Got bucket: " << result.ToString();
-            return result;
+            return {};
 
         } else {
 
@@ -473,7 +472,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::CreateObject(const Entity::S3::Object &object) {
+    Entity::S3::Object S3Database::CreateObject(Entity::S3::Object &object) {
 
         if (HasDatabase()) {
 
@@ -485,12 +484,16 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
+                object.oid = insert_one_result->inserted_id().get_oid().value.to_string();
+
+                // Update bucket counters
                 Entity::S3::Bucket bucket = GetBucketByRegionName(object.region, object.bucket);
                 bucket.size += object.size;
                 bucket.keys++;
                 UpdateBucket(bucket);
                 session.commit_transaction();
-                return GetObjectById(insert_one_result->inserted_id().get_oid().value);
+
+                return object;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

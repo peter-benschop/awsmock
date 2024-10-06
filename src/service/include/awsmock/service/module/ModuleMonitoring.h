@@ -34,7 +34,7 @@ namespace AwsMock::Service {
          * @brief Constructor
          * @param timeout monitoring period
          */
-        explicit ModuleMonitoring(int timeout);
+        explicit ModuleMonitoring(int timeout) : Core::Timer("module-monitoring", timeout) {};
 
         /**
          * @brief Initialization
