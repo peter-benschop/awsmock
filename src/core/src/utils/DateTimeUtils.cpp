@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/DateTimeUtils.h>
+#include <iostream>
 
 namespace AwsMock::Core {
 
@@ -31,6 +32,20 @@ namespace AwsMock::Core {
         strptime(dateString.c_str(), "%FT%T", &t);
         t.tm_hour = t.tm_hour + 1;
         return std::chrono::system_clock::from_time_t(mktime(&t));
+    }
+
+    system_clock::time_point DateTimeUtils::FromISO8601UTC(const std::string &dateString) {
+        std::tm t = {};
+        // F: Equivalent to %Y-%m-%d, the ISO 8601 date format.
+        // T: ISO 8601 time format (HH:MM:SS), equivalent to %H:%M:%S
+        // z: ISO 8601 offset from UTC in timezone (1 minute=1, 1 hour=100). If timezone cannot be determined, no characters
+        strptime(dateString.c_str(), "%FT%TZ", &t);
+        return std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::system_clock::from_time_t(mktime(&t))};
+    }
+
+    system_clock::time_point DateTimeUtils::FromUnixtimestamp(long timestamp) {
+        std::chrono::system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
+        return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::hours(2)};
     }
 
     std::string DateTimeUtils::HttpFormat() {
