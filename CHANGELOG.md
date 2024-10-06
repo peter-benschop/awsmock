@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.15](https://github.com/jensvogt/awsmock/compare/v0.15.14...v0.15.15) (2024-10-06)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** fix some timezone issues ([68215c4](https://github.com/jensvogt/awsmock/commit/68215c47f878163fb1f5b6aa67ee3cd9906bee39))
+
 ## [0.15.14](https://github.com/jensvogt/awsmock/compare/v0.15.13...v0.15.14) (2024-10-06)
 
 
