@@ -129,7 +129,7 @@ namespace AwsMock::Dto::Module {
                 }
                 rootJson.set("secretsmanager-secrets", jsonSecretsArray);
             }
-            
+
             return rootJson;
 
         } catch (Poco::Exception &exc) {
