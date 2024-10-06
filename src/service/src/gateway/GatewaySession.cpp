@@ -20,7 +20,7 @@ namespace AwsMock::Service {
             {"ssm", std::make_shared<SSMHandler>()},
             {"dynamodb", std::make_shared<DynamoDbHandler>()},
             {"monitoring", std::make_shared<MonitoringHandler>()},
-            {"manager", std::make_shared<MonitoringHandler>()}};
+            {"module", std::make_shared<ModuleHandler>()}};
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -199,6 +199,7 @@ namespace AwsMock::Service {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
             return DoClose();
         }
+        return DoClose();
 
         // Resume the read if it has been paused
         if (response_queue_.size() == _queueLimit)

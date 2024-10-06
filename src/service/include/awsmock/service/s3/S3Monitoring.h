@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit S3Monitoring(int timeout);
+        explicit S3Monitoring(int timeout) : Core::Timer("s3-monitoring", timeout) {};
 
         /**
          * Initialization

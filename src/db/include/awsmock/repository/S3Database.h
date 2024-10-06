@@ -115,7 +115,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket);
 
         /**
          * @brief List all buckets
@@ -182,7 +182,7 @@ namespace AwsMock::Database {
          * @return created object entity
          * @throws DatabaseException
          */
-        Entity::S3::Object CreateObject(const Entity::S3::Object &object);
+        Entity::S3::Object CreateObject(Entity::S3::Object &object);
 
         /**
          * @brief Create a new S3 object in the S3 object table, if it does not exist, otherwise update the exiting object.

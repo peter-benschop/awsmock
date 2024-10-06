@@ -20,7 +20,7 @@ set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMWorker.c
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp)
 set(DOCKER_SOURCES src/docker/DockerService.cpp)
-set(MODULE_SOURCES src/module/ModuleService.cpp src/module/ModuleHandler.cpp src/module/ModuleMonitoring.cpp)
+set(MODULE_SOURCES src/module/ModuleService.cpp src/module/ModuleHandler.cpp src/module/ModuleMonitoring.cpp src/module/ModuleMap.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp
         src/monitoring/MonitoringService.cpp)
 

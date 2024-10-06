@@ -60,7 +60,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SNS::Topic SNSDatabase::CreateTopic(const Entity::SNS::Topic &topic) {
+    Entity::SNS::Topic SNSDatabase::CreateTopic(Entity::SNS::Topic &topic) {
 
         if (HasDatabase()) {
 
@@ -75,7 +75,8 @@ namespace AwsMock::Database {
                 session.commit_transaction();
                 log_trace << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string();
 
-                return GetTopicById(result->inserted_id().get_oid().value);
+                topic.oid = result->inserted_id().get_oid().value.to_string();
+                return topic;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -397,7 +398,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SNS::Message SNSDatabase::CreateMessage(const Entity::SNS::Message &message) {
+    Entity::SNS::Message SNSDatabase::CreateMessage(Entity::SNS::Message &message) {
 
         if (HasDatabase()) {
 
@@ -412,7 +413,8 @@ namespace AwsMock::Database {
                 log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
 
-                return GetMessageById(result->inserted_id().get_oid().value);
+                message.oid = result->inserted_id().get_oid().value.to_string();
+                return message;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSMonitoring(int timeout);
+        explicit SQSMonitoring(int timeout) : Core::Timer("sqs-monitoring", timeout) {}
 
         /**
          * @brief Initialization

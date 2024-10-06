@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SNSMonitoring(int timeout);
+        explicit SNSMonitoring(int timeout) : Core::Timer("sns-monitoring", timeout) {};
 
         /**
          * Initialization

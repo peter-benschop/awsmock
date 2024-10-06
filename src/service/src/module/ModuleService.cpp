@@ -2,7 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include "awsmock/service/module/ModuleService.h"
+#include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Service {
 
@@ -15,6 +15,7 @@ namespace AwsMock::Service {
 
     Dto::Module::Module::ModuleList ModuleService::StartModules(Dto::Module::Module::ModuleList &modules) {
 
+        ModuleMap moduleMap = ModuleMap::instance();
         for (auto const &m: modules) {
 
             // Set state
@@ -26,33 +27,8 @@ namespace AwsMock::Service {
 
                 if (module.name == "database") {
                     _moduleDatabase.StartDatabase();
-                } else if (module.name == "s3") {
-                    auto s3server = _serverMap[module.name];
-                    s3server->Start();
-                } else if (module.name == "sqs") {
-                    auto sqsServer = _serverMap[module.name];
-                    sqsServer->Start();
-                } else if (module.name == "sns") {
-                    auto snsServer = _serverMap[module.name];
-                    snsServer->Start();
-                } else if (module.name == "lambda") {
-                    auto lambdaServer = _serverMap[module.name];
-                    lambdaServer->Start();
-                } else if (module.name == "transfer") {
-                    auto transferServer = _serverMap[module.name];
-                    transferServer->Start();
-                } else if (module.name == "cognito") {
-                    auto cognitoServer = _serverMap[module.name];
-                    cognitoServer->Start();
-                } else if (module.name == "dynamodb") {
-                    auto dynamoDbServer = _serverMap[module.name];
-                    dynamoDbServer->Start();
-                } else if (module.name == "kms") {
-                    auto kmsServer = _serverMap[module.name];
-                    kmsServer->Start();
-                } else if (module.name == "gateway") {
-                    auto gatewayServer = _serverMap[module.name];
-                    gatewayServer->Start();
+                } else {
+                    moduleMap.GetModule(module.name)->Start();
                 }
                 log_info << "Module " << m.name << " started";
             }
@@ -75,7 +51,7 @@ namespace AwsMock::Service {
                 if (m.name == "database") {
                     _moduleDatabase.StopDatabase();
                 } else {
-                    for (const auto &server: _serverMap) {
+                    for (const auto &server: ModuleMap::instance().GetModuleMap()) {
                         if (m.name == server.first) {
                             server.second->Stop();
                         }

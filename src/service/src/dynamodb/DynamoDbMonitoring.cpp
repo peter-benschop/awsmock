@@ -6,9 +6,6 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbMonitoring::DynamoDbMonitoring(int timeout) : Core::Timer("dynamodb-monitoring", timeout) {
-    }
-
     void DynamoDbMonitoring::Initialize() {
         UpdateCounter();
     }

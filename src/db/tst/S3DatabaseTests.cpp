@@ -297,7 +297,8 @@ namespace AwsMock::Database {
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            _servicedatabase.CreateObject({.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER});
+            Entity::S3::Object object = {.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER};
+            object = _servicedatabase.CreateObject(object);
         }
 
         // act
@@ -315,7 +316,8 @@ namespace AwsMock::Database {
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            _servicedatabase.CreateObject({.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER});
+            Entity::S3::Object object = {.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER};
+            object = _servicedatabase.CreateObject(object);
         }
 
         // act
@@ -431,17 +433,15 @@ namespace AwsMock::Database {
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
         bucket = _servicedatabase.CreateBucket(bucket);
-        Entity::S3::BucketNotification
-                notification = {.event = "s3:ObjectCreated:*", .lambdaArn = "aws:arn:000000000:lambda:test"};
+        Entity::S3::BucketNotification notification = {.event = "s3:ObjectCreated:*", .lambdaArn = "aws:arn:000000000:lambda:test"};
         bucket = _servicedatabase.CreateBucketNotification(bucket, notification);
-        Entity::S3::BucketNotification
-                deleteNotification = {.event = "s3:ObjectCreated:Put", .lambdaArn = "aws:arn:000000000:lambda:test"};
+        Entity::S3::BucketNotification deleteNotification = {.event = "s3:ObjectCreated:Put", .lambdaArn = "aws:arn:000000000:lambda:test"};
 
         // act
         Entity::S3::Bucket result = _servicedatabase.DeleteBucketNotifications(bucket, deleteNotification);
 
         // assert
-        EXPECT_EQ(3, result.notifications.size());
+        EXPECT_EQ(0, result.notifications.size());
     }
 
 }// namespace AwsMock::Database

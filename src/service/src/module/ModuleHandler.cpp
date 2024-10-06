@@ -6,14 +6,14 @@
 
 namespace AwsMock::Service {
 
-    boost::beast::http::response<boost::beast::http::dynamic_body> ModuleHandler::HandleGetRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request) {
+    boost::beast::http::response<boost::beast::http::dynamic_body> ModuleHandler::HandleGetRequest(const boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
         Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
 
-        std::string target = request.base()["Target"];
-        std::string action = request.base()["Action"];
+        std::string target = request.base()["x-awsmock-target"];
+        std::string action = request.base()["x-awsmock-action"];
         std::string payload = Core::HttpUtils::GetBodyAsString(request);
         log_debug << "Found action and target, target: " << target << " action: " << action;
 
@@ -91,14 +91,14 @@ namespace AwsMock::Service {
         }
     }
 
-    boost::beast::http::response<boost::beast::http::dynamic_body> ModuleHandler::HandlePostRequest(boost::beast::http::request<boost::beast::http::dynamic_body> &request) {
+    boost::beast::http::response<boost::beast::http::dynamic_body> ModuleHandler::HandlePostRequest(const boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
         Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
         try {
 
-            std::string target = request.base()["Target"];
-            std::string action = request.base()["Action"];
+            std::string target = request.base()["x-awsmock-target"];
+            std::string action = request.base()["x-awsmock-action"];
             std::string payload = Core::HttpUtils::GetBodyAsString(request);
             log_debug << "Found action and target, target: " << target << " action: " << action;
 

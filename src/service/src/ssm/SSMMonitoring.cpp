@@ -6,10 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SSMMonitoring::SSMMonitoring(int timeout) : Core::Timer("kms-monitoring", timeout) {}
-
     void SSMMonitoring::Initialize() {
-        //UpdateCounter();
     }
 
     void SSMMonitoring::Run() {

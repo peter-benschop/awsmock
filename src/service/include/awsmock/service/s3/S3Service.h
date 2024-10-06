@@ -138,7 +138,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 create request
          * @return CreateBucketResponse
          */
-        Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request);
+        Dto::S3::CreateBucketResponse CreateBucket(Dto::S3::CreateBucketRequest &s3Request);
 
         /**
          * @brief Updates a bucket

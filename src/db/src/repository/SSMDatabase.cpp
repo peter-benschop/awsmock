@@ -152,7 +152,7 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::SSM::Parameter SSMDatabase::CreateParameter(const Entity::SSM::Parameter &parameter) {
+    Entity::SSM::Parameter SSMDatabase::CreateParameter(Entity::SSM::Parameter &parameter) {
 
         if (HasDatabase()) {
 
@@ -167,7 +167,8 @@ namespace AwsMock::Database {
                 session.commit_transaction();
                 log_trace << "Parameter created, oid: " << result->inserted_id().get_oid().value.to_string();
 
-                return GetParameterById(result->inserted_id().get_oid().value);
+                parameter.oid = result->inserted_id().get_oid().value.to_string();
+                return parameter;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -181,9 +182,12 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SSM::Parameter SSMDatabase::UpdateParameter(const Entity::SSM::Parameter &parameter) {
+    Entity::SSM::Parameter SSMDatabase::UpdateParameter(Entity::SSM::Parameter &parameter) {
 
         if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
@@ -192,10 +196,15 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _parameterCollection.replace_one(make_document(kvp("name", parameter.parameterName)), parameter.ToDocument());
+                auto mResult = _parameterCollection.find_one_and_update(make_document(kvp("name", parameter.parameterName)), parameter.ToDocument(), opts);
                 log_trace << "Parameter updated: " << parameter.ToString();
                 session.commit_transaction();
-                return GetParameterById(parameter.oid);
+
+                if (mResult) {
+                    parameter.FromDocument(mResult->view());
+                    return parameter;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

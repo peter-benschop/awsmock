@@ -6,8 +6,6 @@
 
 namespace AwsMock::Service {
 
-    SQSMonitoring::SQSMonitoring(int timeout) : Core::Timer("sqs-monitoring", timeout) {}
-
     void SQSMonitoring::Initialize() {
         UpdateCounter();
         CollectWaitingTimeStatistics();

@@ -64,7 +64,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SQS::Queue SQSDatabase::CreateQueue(const Entity::SQS::Queue &queue) {
+    Entity::SQS::Queue SQSDatabase::CreateQueue(Entity::SQS::Queue &queue) {
 
         if (HasDatabase()) {
 
@@ -79,7 +79,8 @@ namespace AwsMock::Database {
                 log_trace << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
 
-                return GetQueueById(result->inserted_id().get_oid().value);
+                queue.oid = result->inserted_id().get_oid().value.to_string();
+                return queue;
 
             } catch (mongocxx::exception &e) {
                 session.abort_transaction();
@@ -420,7 +421,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SQS::Message SQSDatabase::CreateMessage(const Entity::SQS::Message &message) {
+    Entity::SQS::Message SQSDatabase::CreateMessage(Entity::SQS::Message &message) {
 
         if (HasDatabase()) {
 
@@ -434,7 +435,9 @@ namespace AwsMock::Database {
                 auto result = messageCollection.insert_one(message.ToDocument());
                 session.commit_transaction();
                 log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetMessageById(result->inserted_id().get_oid().value);
+
+                message.oid = result->inserted_id().get_oid().value.to_string();
+                return message;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

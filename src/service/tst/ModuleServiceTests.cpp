@@ -35,7 +35,7 @@ namespace AwsMock::Service {
             _serverMap = {
                     {"s3", _s3Server},
                     {"sqs", _sqsServer}};
-            _service = std::make_shared<ModuleService>(_serverMap);
+            _service = std::make_shared<ModuleService>();
         }
 
         void TearDown() override {

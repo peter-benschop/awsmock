@@ -54,14 +54,15 @@ namespace AwsMock::Manager {
 
         log_info << "Stopping services";
 
+        Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
         for (const auto &module: modules) {
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                 log_info << "Stopping module: " << module.name;
                 moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
-                if (_serverMap.contains(module.name)) {
-                    _serverMap[module.name]->Stop();
+                if (moduleMap.HasModule(module.name)) {
+                    moduleMap.GetModule(module.name)->Stop();
                     log_debug << "Module " << module.name << " stopped";
                 }
             }
@@ -107,43 +108,44 @@ namespace AwsMock::Manager {
                     ioc.stop();
                 });
 
+        Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         for (const auto &module: modules) {
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::GatewayServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::S3Server>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SQSServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::SQSServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SNSServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::LambdaServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::TransferServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::CognitoServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::DynamoDbServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::KMSServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SSMServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::SecretsManagerServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "monitoring" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                _serverMap[module.name] = std::make_shared<Service::MonitoringServer>(pool);
-                boost::asio::post(ioc, [obj = _serverMap[module.name]] { obj->Start(); });
+                moduleMap.AddModule(module.name, std::make_shared<Service::MonitoringServer>(pool));
+                boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             }
         }
 
