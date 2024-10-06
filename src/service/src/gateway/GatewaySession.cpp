@@ -119,9 +119,9 @@ namespace AwsMock::Service {
 
             std::shared_ptr<AbstractHandler> handler;
             std::string region = Core::Configuration::instance().getString("awsmock.region");
-            if (Core::HttpUtils::HasHeader(request, "x-awsmock-Target")) {
+            if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
-                std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-Target");
+                std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
                 handler = _routingTable[target];
 
             } else {

@@ -12,12 +12,14 @@
 #include <Poco/Net/HTTPResponse.h>
 
 // AwsMock includes
+#include "awsmock/dto/module/model/Infrastructure.h"
+#include "awsmock/dto/module/model/Module.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/dto/common/Infrastructure.h>
 #include <awsmock/dto/common/Services.h>
-#include <awsmock/dto/module/Module.h>
+#include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/ExportInfrastructureResponse.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
@@ -84,7 +86,7 @@ namespace AwsMock::Service {
          * @param includeObjects include objects in the export
          * @return JSON string
          */
-        static std::string ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool prettyPrint = false, bool includeObjects = false);
+        Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request);
 
         /**
          * @brief Import the infrastructure

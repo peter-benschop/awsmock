@@ -4,7 +4,7 @@
 namespace AwsMock::Service {
 
     http::response<http::dynamic_body> MonitoringHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        log_debug << "Monitoring POST request, URI: " << request.target() << " region: " << region << " user: " << user;
+        log_trace << "Monitoring POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::MonitoringClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
@@ -17,7 +17,7 @@ namespace AwsMock::Service {
                     Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
                     Dto::Monitoring::GetCountersResponse response = _monitoringService.GetCounters(monitoringRequest);
 
-                    log_info << "Get counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
+                    log_debug << "Get counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
                     return SendOkResponse(request, response.ToJson());
                 }
                 case Dto::Common::MonitoringCommandType::UNKNOWN:

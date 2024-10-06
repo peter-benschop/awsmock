@@ -6,7 +6,7 @@
 #define AWSMOCK_DTO_MODULE_MAPPER_H
 
 // AwsMock includes
-#include <awsmock/dto/module/Module.h>
+#include "awsmock/dto/module/model/Module.h"
 #include <awsmock/entity/module/Module.h>
 
 namespace AwsMock::Dto::Module {

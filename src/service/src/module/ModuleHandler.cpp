@@ -45,23 +45,6 @@ namespace AwsMock::Service {
                 std::string body = Dto::Module::Module::ToJson(modules);
                 return SendOkResponse(request, body);
 
-            } else if (action == "export") {
-
-                // Get options
-                bool prettyPrint = true;
-                /*if (Core::HttpUtils::HasHeader(request, "pretty")) {
-                    prettyPrint = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "pretty"));
-                }*/
-                bool includeObjects = false;
-                if (Core::HttpUtils::HasHeader(request, "include-objects")) {
-                    includeObjects = boost::lexical_cast<bool>(Core::HttpUtils::GetHeaderValue(request, "include-objects"));
-                }
-
-                // Get modules
-                Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
-                std::string infrastructureJson = AwsMock::Service::ModuleService::ExportInfrastructure(modules, prettyPrint, includeObjects);
-                return SendOkResponse(request, infrastructureJson);
-
             } else if (action == "clean") {
 
                 Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
@@ -139,6 +122,16 @@ namespace AwsMock::Service {
                 Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
                 AwsMock::Service::ModuleService::CleanObjects(modules);
                 return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
+
+            } else if (action == "export") {
+
+                // Get options
+                Dto::Module::ExportInfrastructureRequest moduleRequest;
+                moduleRequest.FromJson(payload);
+
+                // Get modules
+                Dto::Module::ExportInfrastructureResponse moduleResponse = _moduleService.ExportInfrastructure(moduleRequest);
+                return SendOkResponse(request, moduleResponse.ToJson());
 
             } else {
                 return SendBadRequestError(request, "Unknown action");

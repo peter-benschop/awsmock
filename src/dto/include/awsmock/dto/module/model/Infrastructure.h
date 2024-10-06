@@ -17,30 +17,30 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/entity/cognito/Group.h>
-#include <awsmock/entity/cognito/User.h>
-#include <awsmock/entity/cognito/UserPool.h>
-#include <awsmock/entity/dynamodb/Item.h>
-#include <awsmock/entity/dynamodb/Table.h>
-#include <awsmock/entity/kms/Key.h>
-#include <awsmock/entity/lambda/Lambda.h>
-#include <awsmock/entity/s3/Bucket.h>
-#include <awsmock/entity/s3/Object.h>
-#include <awsmock/entity/secretsmanager/Secret.h>
-#include <awsmock/entity/sns/Message.h>
-#include <awsmock/entity/sns/Topic.h>
-#include <awsmock/entity/sqs/Message.h>
-#include <awsmock/entity/sqs/Queue.h>
-#include <awsmock/entity/transfer/Transfer.h>
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/exception/JsonException.h"
+#include "awsmock/core/exception/ServiceException.h"
+#include "awsmock/entity/cognito/Group.h"
+#include "awsmock/entity/cognito/User.h"
+#include "awsmock/entity/cognito/UserPool.h"
+#include "awsmock/entity/dynamodb/Item.h"
+#include "awsmock/entity/dynamodb/Table.h"
+#include "awsmock/entity/kms/Key.h"
+#include "awsmock/entity/lambda/Lambda.h"
+#include "awsmock/entity/s3/Bucket.h"
+#include "awsmock/entity/s3/Object.h"
+#include "awsmock/entity/secretsmanager/Secret.h"
+#include "awsmock/entity/sns/Message.h"
+#include "awsmock/entity/sns/Topic.h"
+#include "awsmock/entity/sqs/Message.h"
+#include "awsmock/entity/sqs/Queue.h"
+#include "awsmock/entity/transfer/Transfer.h"
 
-namespace AwsMock::Dto::Common {
+namespace AwsMock::Dto::Module {
 
     /**
-     * Infrastructure
+     * @brief Infrastructure
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -122,21 +122,21 @@ namespace AwsMock::Dto::Common {
         Database::Entity::KMS::KeyList kmsKeys;
 
         /**
-         * JSON representation
+         * @brief JSON representation
          *
          * @param prettyPrint pretty print, if true JSON indent=4
          * @return Infrastructure as JSON string
          */
-        std::string ToJson(bool prettyPrint = false);
+        Poco::JSON::Object ToJsonObject();
 
         /**
-         * From JSON representation
+         * @brief From JSON representation
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
     };
 
-}// namespace AwsMock::Dto::Common
+}// namespace AwsMock::Dto::Module
 
 #endif// AWSMOCK_DTO_COMMON_INFRASTRUCTURE_H

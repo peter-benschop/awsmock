@@ -2,7 +2,7 @@
 // Created by vogje01 on 10/23/23.
 //
 
-#include <awsmock/dto/module/GatewayConfig.h>
+#include "awsmock/dto/module/model/GatewayConfig.h"
 
 namespace AwsMock::Dto::Module {
 
