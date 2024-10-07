@@ -11,7 +11,7 @@ namespace AwsMock::Dto::Module {
         try {
 
             Poco::JSON::Object rootJson;
-            rootJson.set("includeObjects", includeObjects);
+            rootJson.set("onlyObjects", includeObjects);
             rootJson.set("prettyPrint", prettyPrint);
             rootJson.set("infrastructure", infrastructure.ToJsonObject());
 
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Module {
         try {
 
             Poco::JSON::Object rootJson;
-            rootJson.set("includeObjects", includeObjects);
+            rootJson.set("onlyObjects", includeObjects);
             rootJson.set("prettyPrint", prettyPrint);
             rootJson.set("infrastructure", infrastructure.ToJsonObject());
 

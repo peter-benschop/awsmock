@@ -15,12 +15,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/Timer.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
+#include "MetricDefinition.h"
+#include "MetricService.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/StringUtils.h"
+#include "awsmock/core/Timer.h"
+#include "awsmock/core/config/Configuration.h"
 
 // System counter
 
@@ -33,14 +33,14 @@ namespace AwsMock::Monitoring {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MetricSystemCollector : public Core::Timer {
+    class MetricSystemCollector {
 
       public:
 
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector() : Core::Timer("SystemCollector", 60) {}
+        explicit MetricSystemCollector() = default;
 
         /**
          * @brief Singleton instance
@@ -53,17 +53,17 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Initialization
          */
-        void Initialize() override;
+        void Initialize();
 
         /**
          * @brief Runnable method
          */
-        void Run() override;
+        void Run();
 
         /**
          * @brief Shutdown
          */
-        void Shutdown() override;
+        void Shutdown();
 
       private:
 

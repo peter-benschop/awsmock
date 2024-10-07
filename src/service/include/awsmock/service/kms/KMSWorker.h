@@ -27,36 +27,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSWorker : public Core::Timer {
+    class KMSWorker {
 
       public:
 
         /**
          * Constructor
          */
-        explicit KMSWorker(int timeout);
-
-        /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit KMSWorker() = default;
 
         /**
          * Delete keys which are pending for deletion
          */
         void DeleteKeys();
+
+      private:
 
         /**
          * Database connection

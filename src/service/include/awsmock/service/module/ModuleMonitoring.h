@@ -6,11 +6,10 @@
 #define AWSMOCK_SERVICE_MODULE_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/monitoring/MetricSystemCollector.h>
 
 namespace AwsMock::Service {
 
@@ -26,7 +25,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleMonitoring : public Core::Timer {
+    class ModuleMonitoring {
 
       public:
 
@@ -34,29 +33,14 @@ namespace AwsMock::Service {
          * @brief Constructor
          * @param timeout monitoring period
          */
-        explicit ModuleMonitoring(int timeout) : Core::Timer("module-monitoring", timeout) {};
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit ModuleMonitoring() = default;
 
         /**
          * Update the counter
          */
         void UpdateCounter();
+
+      private:
 
         /**
          * Module database connection

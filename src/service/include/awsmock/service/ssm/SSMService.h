@@ -14,6 +14,9 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
+#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -26,9 +29,6 @@
 #include <awsmock/dto/ssm/PutParameterRequest.h>
 #include <awsmock/dto/ssm/PutParameterResponse.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/SSMDatabase.h>
 
 #define DEFAULT_SSM_ACCOUNT_ID "000000000000"

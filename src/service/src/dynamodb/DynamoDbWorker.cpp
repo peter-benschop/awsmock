@@ -6,10 +6,7 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbWorker::DynamoDbWorker(int timeout) : Core::Timer("dynamodb-worker", timeout) {
-    }
-
-    void DynamoDbWorker::Initialize() {
+    DynamoDbWorker::DynamoDbWorker() {
 
         // DynamoDB docker host, port
         _dockerHost = Core::Configuration::instance().getString("awsmock.dynamodb.host");
@@ -22,12 +19,6 @@ namespace AwsMock::Service {
         //SynchronizeTables();
         log_debug << "DynamoDbWorker initialized";
     }
-
-    void DynamoDbWorker::Run() {
-        //SynchronizeTables();
-    }
-
-    void DynamoDbWorker::Shutdown() {}
 
     // TODO: Fix authorization
     [[maybe_unused]] void DynamoDbWorker::SynchronizeTables() {

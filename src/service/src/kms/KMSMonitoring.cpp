@@ -6,16 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void KMSMonitoring::Initialize() {
-        //UpdateCounter();
-    }
-
-    void KMSMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void KMSMonitoring::Shutdown() {}
-
     void KMSMonitoring::UpdateCounter() {
         log_trace << "KMS monitoring starting";
 

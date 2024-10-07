@@ -16,7 +16,10 @@ namespace AwsMock::Service {
         _maxQueueLength = configuration.getInt("awsmock.service.gateway.http.max.queue", GATEWAY_MAX_QUEUE);
         _maxThreads = configuration.getInt("awsmock.service.gateway.http.max.threads", GATEWAY_MAX_THREADS);
         _requestTimeout = configuration.getInt("awsmock.service.gateway.http.timeout", GATEWAY_TIMEOUT);
-        log_debug << "GatewayServer initialized";
+        log_debug << "Gateway server initialized";
+
+        boost::thread(&GatewayServer::Run, this).detach();
+        log_debug << "Gateway server started";
     }
 
     void GatewayServer::Initialize() {

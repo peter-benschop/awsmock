@@ -9,20 +9,14 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/sns/SNSMonitoring.h>
 #include <awsmock/service/sns/SNSWorker.h>
 
-#define SNS_DEFAULT_PORT 9502
-#define SNS_DEFAULT_HOST "localhost"
-#define SNS_DEFAULT_QUEUE_LENGTH 250
-#define SNS_DEFAULT_THREADS 50
-#define SNS_DEFAULT_TIMEOUT 120
 #define SNS_DEFAULT_WORKER_PERIOD 300
 #define SNS_DEFAULT_MONITORING_PERIOD 300
 
@@ -38,78 +32,41 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param pool thread pool
+         * @brief Constructor
          */
-        explicit SNSServer(boost::asio::thread_pool &pool);
+        explicit SNSServer();
 
         /**
-         * Initialization
+         * @brief Initialization
          */
         void Initialize() override;
 
       protected:
 
         /**
-         * Main method
+         * @brief Main method
          */
         void Run() override;
 
         /**
-         * Shutdown
+         * @brief Shutdown
          */
         void Shutdown() override;
 
       private:
 
         /**
-         * SNS database
+         * @brief SNS monitoring
          */
-        Database::SNSDatabase &_snsDatabase;
+        SNSMonitoring _snsMonitoring;
 
         /**
-         * SNS monitoring
+         * @brief SNS worker
          */
-        std::shared_ptr<SNSMonitoring> _snsMonitoring;
+        SNSWorker _snsWorker;
 
         /**
-         * SNS worker
-         */
-        std::shared_ptr<SNSWorker> _snsWorker;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connections
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
-
-        /**
-         * SNS server period
+         * @brief SNS server period
          *
          * <p>
          * Used for the background threads (cleanup, reset, retention, etc.)
@@ -118,7 +75,7 @@ namespace AwsMock::Service {
         int _workerPeriod;
 
         /**
-         * SNS monitoring period
+         * @brief SNS monitoring period
          */
         int _monitoringPeriod;
     };

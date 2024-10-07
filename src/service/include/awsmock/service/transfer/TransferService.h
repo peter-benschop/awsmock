@@ -18,6 +18,8 @@
 
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/StringUtils.h>
@@ -35,8 +37,6 @@
 #include <awsmock/dto/transfer/StartServerRequest.h>
 #include <awsmock/dto/transfer/StopServerRequest.h>
 #include <awsmock/dto/transfer/mapper/Mapper.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/TransferDatabase.h>
 
 #define TRANSFER_DEFAULT_FTP_PORT 21

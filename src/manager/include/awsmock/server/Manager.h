@@ -60,7 +60,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialization
          */
-        static void Initialize();
+        void Initialize();
 
         /**
          * @brief Stops all currently running modules.
@@ -77,12 +77,27 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialize database
          */
-        static void InitializeDatabase();
+        void InitializeDatabase();
+
+        /**
+         * @brief Initialize monitoring
+         */
+        void InitializeMonitoring();
 
         /**
          * Thread group
          */
         boost::thread_group _threadGroup;
+
+        /**
+         * Metric server
+         */
+        Monitoring::MetricService _metricService;
+
+        /**
+         * Metric server
+         */
+        Service::MonitoringServer _monitoringServer;
     };
 
 }// namespace AwsMock::Manager

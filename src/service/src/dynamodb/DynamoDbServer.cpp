@@ -6,41 +6,19 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(boost::asio::thread_pool &pool) : AbstractServer("dynamodb", 10), _module("dynamodb"), _dockerService(DockerService::instance()), _pool(pool) {
+    DynamoDbServer::DynamoDbServer() : AbstractServer("dynamodb", 10), _dockerService(DockerService::instance()) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
-        _region = configuration.getString("awsmock.region");
-        _port = configuration.getInt("awsmock.service.dynamodb.port", DYNAMODB_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.dynamodb.host", DYNAMODB_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.dynamodb.max.queue", DYNAMODB_DEFAULT_QUEUE);
-        _maxThreads = configuration.getInt("awsmock.service.dynamodb.max.threads", DYNAMODB_DEFAULT_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.dynamodb.timeout", DYNAMODB_DEFAULT_TIMEOUT);
         _workerPeriod = configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
         _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
         _dockerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
         _dockerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
         log_debug << "DynamoDB docker endpoint: " << _dockerHost << ":" << _dockerPort;
 
-        // Sleeping period
-        _period = configuration.getInt("awsmock.worker.dynamodb.period", 10000);
-        log_debug << "DynamoDB server period: " << _period;
-
         // Docker module
         _dockerService = DockerService::instance();
         log_debug << "DynamoDbServer initialized";
-
-        // Monitoring
-        _dynamoDbMonitoring = std::make_shared<DynamoDbMonitoring>(_monitoringPeriod);
-
-        // Worker
-        _dynamoDbWorker = std::make_shared<DynamoDbWorker>(_workerPeriod);
-
-        // Start DynamoDb docker image
-        StartLocalDynamoDb();
-    }
-
-    void DynamoDbServer::Initialize() {
 
         // Check module active
         if (!IsActive("dynamodb")) {
@@ -49,8 +27,14 @@ namespace AwsMock::Service {
         }
         log_info << "DynamoDb server started";
 
-        boost::asio::post(_pool, [this] { _dynamoDbWorker->Start(); });
-        boost::asio::post(_pool, [this] { _dynamoDbMonitoring->Start(); });
+        // Start DynamoDB monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-dynamodb-counters", [this] { this->_dynamoDbMonitoring.UpdateCounter(); }, _monitoringPeriod);
+
+        // Start synchronizing tables
+        //Core::PeriodicScheduler::instance().AddTask("dynamodb-sync-tables", [this] { this->_dynamoDbWorker.SynchronizeTables(); }, _workerPeriod);
+
+        // Start DynamoDb docker image
+        StartLocalDynamoDb();
 
         // Cleanup
         CleanupContainers();
@@ -59,12 +43,13 @@ namespace AwsMock::Service {
         SetRunning();
     }
 
+    void DynamoDbServer::Initialize() {
+    }
+
     void DynamoDbServer::Run() {
     }
 
     void DynamoDbServer::Shutdown() {
-        _dynamoDbMonitoring->Stop();
-        _dynamoDbWorker->Stop();
     }
 
     void DynamoDbServer::CleanupContainers() {

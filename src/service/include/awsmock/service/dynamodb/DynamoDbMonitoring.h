@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_DYNAMODB_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,36 +18,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbMonitoring : public Core::Timer {
+    class DynamoDbMonitoring {
 
       public:
 
         /**
          * Constructor
          */
-        explicit DynamoDbMonitoring(int timeout) : Core::Timer("dynamodb-monitoring", timeout) {};
-
-        /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit DynamoDbMonitoring() = default;
 
         /**
          * Update counters
          */
         void UpdateCounter();
+
+      private:
 
         /**
          * Metric service
@@ -58,11 +43,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

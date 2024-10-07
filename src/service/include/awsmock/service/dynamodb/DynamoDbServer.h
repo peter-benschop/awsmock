@@ -9,27 +9,23 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/docker/DockerService.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/monitoring/MetricService.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/docker/DockerService.h>
 #include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
 #include <awsmock/service/dynamodb/DynamoDbWorker.h>
 
-#define DYNAMODB_DEFAULT_PORT 9507
-#define DYNAMODB_DEFAULT_HOST "localhost"
-#define DYNAMODB_DEFAULT_QUEUE 150
-#define DYNAMODB_DEFAULT_THREADS 50
-#define DYNAMODB_DEFAULT_TIMEOUT 120
 #define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
 #define DYNAMODB_DEFAULT_WORKER_PERIOD 300
 #define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
 #define DYNAMODB_DOCKER_TAG std::string("latest")
 #define DYNAMODB_DOCKER_PORT 8000
-#define DYNAMODB_EXTERNAL_PORT 8000
 #define DYNAMODB_DOCKER_HOST "localhost"
 #define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
                              "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
@@ -50,10 +46,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param pool global thread pool
          */
-        explicit DynamoDbServer(boost::asio::thread_pool &pool);
+        explicit DynamoDbServer();
 
         /**
          * @brief Initialization
@@ -106,52 +100,12 @@ namespace AwsMock::Service {
         /**
          * Monitoring
          */
-        std::shared_ptr<DynamoDbMonitoring> _dynamoDbMonitoring;
+        DynamoDbMonitoring _dynamoDbMonitoring;
 
         /**
          * Monitoring
          */
-        std::shared_ptr<DynamoDbWorker> _dynamoDbWorker;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * Sleeping period in ms
-         */
-        int _period;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connection
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+        DynamoDbWorker _dynamoDbWorker;
 
         /**
          * Monitoring period
@@ -172,11 +126,6 @@ namespace AwsMock::Service {
          * Dynamo DB docker host
          */
         int _dockerPort;
-
-        /**
-         * Module name
-         */
-        std::string _module;
     };
 
 }// namespace AwsMock::Service

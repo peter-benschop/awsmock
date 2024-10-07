@@ -28,7 +28,6 @@
 
 namespace AwsMock::Database {
 
-
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
@@ -77,7 +76,7 @@ namespace AwsMock::Database {
         void SetGauge(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {});
 
         /**
-         * @brief returns the rolling mean
+         * @brief Returns the rolling mean
          *
          * @param name counter name
          * @param start start timestamp
@@ -88,6 +87,14 @@ namespace AwsMock::Database {
          * @return list of counter values
          */
         std::vector<Database::Entity::Monitoring::Counter> GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {});
+
+        /**
+         * @brief Deletes old monitoring data
+         *
+         * @param retentionPeriod retention period in days
+         * @return number of deleted data rows
+         */
+        long DeleteOldMonitoringData(int retentionPeriod);
 
       private:
 

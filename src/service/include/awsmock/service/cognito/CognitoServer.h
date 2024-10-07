@@ -12,15 +12,13 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/cognito/CognitoMonitoring.h>
 #include <awsmock/service/common/AbstractServer.h>
 
-#define COGNITO_DEFAULT_PORT 9505
-#define COGNITO_DEFAULT_HOST "localhost"
-#define COGNITO_DEFAULT_QUEUE_SIZE 250
-#define COGNITO_DEFAULT_MAX_THREADS 50
 #define COGNITO_DEFAULT_TIMEOUT 900
 #define COGNITO_DEFAULT_MONITORING_PERIOD 300
 
@@ -37,10 +35,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param pool global thread pool
          */
-        explicit CognitoServer(boost::asio::thread_pool &pool);
+        explicit CognitoServer();
 
         /**
          * Initialization
@@ -60,39 +56,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
          * Cognito monitoring
          */
-        std::shared_ptr<CognitoMonitoring> _cognitoMonitoring;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connection
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+        CognitoMonitoring _cognitoMonitoring;
 
         /**
          * Cognito module name

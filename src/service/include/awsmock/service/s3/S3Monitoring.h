@@ -6,9 +6,8 @@
 #define AWSMOCK_SERVICE_S3_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Service {
@@ -18,36 +17,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Monitoring : public Core::Timer {
+    class S3Monitoring {
 
       public:
 
         /**
          * Constructor
          */
-        explicit S3Monitoring(int timeout) : Core::Timer("s3-monitoring", timeout) {};
-
-        /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit S3Monitoring() = default;
 
         /**
          * Update counters
          */
         void UpdateCounter();
+
+      private:
 
         /**
          * Metric service
@@ -58,11 +42,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::S3Database &_s3Database = Database::S3Database::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

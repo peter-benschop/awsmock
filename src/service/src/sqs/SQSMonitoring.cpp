@@ -6,18 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void SQSMonitoring::Initialize() {
-        UpdateCounter();
-        CollectWaitingTimeStatistics();
-    }
-
-    void SQSMonitoring::Run() {
-        UpdateCounter();
-        CollectWaitingTimeStatistics();
-    }
-
-    void SQSMonitoring::Shutdown() {}
-
     void SQSMonitoring::UpdateCounter() {
         log_trace << "SQS counter update starting";
 

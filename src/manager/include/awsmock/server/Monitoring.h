@@ -6,10 +6,10 @@
 #define AWSMOCK_MANAGER_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
+#include "awsmock/service/monitoring/MetricSystemCollector.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
 namespace AwsMock::Manager {

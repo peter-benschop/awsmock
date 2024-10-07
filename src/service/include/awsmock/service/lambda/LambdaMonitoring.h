@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_LAMBDA_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,36 +18,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaMonitoring : public Core::Timer {
+    class LambdaMonitoring {
 
       public:
 
         /**
          * Constructor
          */
-        explicit LambdaMonitoring(int timeout) : Core::Timer("lambda-monitoring", timeout) {}
-
-        /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit LambdaMonitoring() = default;
 
         /**
          * Update counters
          */
         void UpdateCounter();
+
+      private:
 
         /**
          * Metric service
@@ -58,11 +43,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

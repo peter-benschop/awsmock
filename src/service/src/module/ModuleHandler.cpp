@@ -45,15 +45,7 @@ namespace AwsMock::Service {
                 std::string body = Dto::Module::Module::ToJson(modules);
                 return SendOkResponse(request, body);
 
-            } else if (action == "clean") {
-
-                Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
-                AwsMock::Service::ModuleService::CleanInfrastructure(modules);
-                return SendOkResponse(request);
-
             } else if (action == "show-ftp-users") {
-
-                std::string region = Core::Configuration::instance().getString("awsmock.region", "eu-central-1");
 
                 Dto::Transfer::Server server;
                 server.FromJson(payload);
@@ -75,9 +67,9 @@ namespace AwsMock::Service {
     }
 
     boost::beast::http::response<boost::beast::http::dynamic_body> ModuleHandler::HandlePostRequest(const boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "POST");
+        Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
 
-        Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "PUT");
-        Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "PUT");
         try {
 
             std::string target = request.base()["x-awsmock-target"];
@@ -119,13 +111,21 @@ namespace AwsMock::Service {
 
             } else if (action == "clean-objects") {
 
-                Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
-                AwsMock::Service::ModuleService::CleanObjects(modules);
-                return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
+                // Get request body
+                Dto::Module::CleanInfrastructureRequest moduleRequest;
+                moduleRequest.FromJson(payload);
+
+                // Get modules
+                if (moduleRequest.onlyObjects) {
+                    AwsMock::Service::ModuleService::CleanObjects(moduleRequest);
+                } else {
+                    AwsMock::Service::ModuleService::CleanInfrastructure(moduleRequest);
+                }
+                return SendOkResponse(request);
 
             } else if (action == "export") {
 
-                // Get options
+                // Get request body
                 Dto::Module::ExportInfrastructureRequest moduleRequest;
                 moduleRequest.FromJson(payload);
 

@@ -14,6 +14,7 @@
 
 // AwsMock includes
 #include "awsmock/service/docker/DockerService.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -40,7 +41,6 @@
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/lambda/LambdaCreator.h>

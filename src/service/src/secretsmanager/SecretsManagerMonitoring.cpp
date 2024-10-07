@@ -6,19 +6,9 @@
 
 namespace AwsMock::Service {
 
-    void SecretsManagerMonitoring::Initialize() {
-        UpdateCounter();
-    }
-
-    void SecretsManagerMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void SecretsManagerMonitoring::Shutdown() {}
-
     void SecretsManagerMonitoring::UpdateCounter() {
         long secrets = _secretsManagerDatabase.CountSecrets();
-        _metricService.SetGauge(SECRETSMANAGER_SECRETS_COUNT, secrets);
+        _metricService.SetGauge(SECRETSMANAGER_SECRETS_COUNT, static_cast<double>(secrets));
         log_trace << "Secrets manager update counter finished";
     }
 }// namespace AwsMock::Service

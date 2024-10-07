@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <chrono>
+#include <iostream>
 #include <string>
 
 // TZ library includes
@@ -21,6 +22,7 @@
 #include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/date/tz.h>
 
 namespace AwsMock::Core {
@@ -123,12 +125,28 @@ namespace AwsMock::Core {
          */
         static long UnixTimestampLocal(const system_clock::time_point &timePoint);
 
+        /**
+         * @brief Get the localtime from unix timestamp
+         *
+         * @param timestamp UNIX timestamp
+         * @return system_clock::time_point
+         */
         static system_clock::time_point FromUnixtimestamp(long timestamp);
 
         /**
+         * @brief Get the current local time
          *
+         * @return local time.
          */
         static system_clock::time_point LocalDateTimeNow();
+
+        /**
+         * @brief Gets the difference in seconds between now and the given time in '00:00:00'
+         *
+         * @param timeString time in format '00:00:00'
+         * @return number of seconds between now and the given time
+         */
+        static int GetSecondsUntilMidnight();
     };
 
 }// namespace AwsMock::Core

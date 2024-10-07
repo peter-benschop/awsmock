@@ -14,6 +14,9 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
+#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -32,9 +35,6 @@
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
 #include <awsmock/dto/kms/model/ListKey.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
 

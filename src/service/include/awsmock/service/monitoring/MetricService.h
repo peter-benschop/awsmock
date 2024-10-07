@@ -21,10 +21,10 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/Timer.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/repository/MonitoringDatabase.h>
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/Timer.h"
+#include "awsmock/core/config/Configuration.h"
+#include "awsmock/repository/MonitoringDatabase.h"
 
 namespace AwsMock::Monitoring {
 
@@ -43,7 +43,7 @@ namespace AwsMock::Monitoring {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MetricService : public Core::Timer {
+    class MetricService {
 
       public:
 
@@ -68,17 +68,17 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Initialization
          */
-        void Initialize() override;
+        void Initialize();
 
         /**
          * @brief Run main loop
          */
-        void Run() override;
+        void Run();
 
         /**
          * @brief Gracefully shutdown
          */
-        void Shutdown() override;
+        void Shutdown();
 
         /**
          * @brief Increments a counter.

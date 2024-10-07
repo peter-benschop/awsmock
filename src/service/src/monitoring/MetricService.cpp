@@ -2,13 +2,13 @@
 // Created by vogje01 on 07/01/2023.
 //
 
-#include <awsmock/monitoring/MetricService.h>
+#include "awsmock/service/monitoring/MetricService.h"
 
 namespace AwsMock::Monitoring {
 
     boost::mutex MetricService::_mutex;
 
-    MetricService::MetricService() : Core::Timer("MetricServer", 60), _database(Database::MonitoringDatabase::instance()) {
+    MetricService::MetricService() : _database(Database::MonitoringDatabase::instance()) {
 
         Core::Configuration &configuration = Core::Configuration::instance();
         _port = configuration.getInt("awsmock.service.monitoring.port", 9091);

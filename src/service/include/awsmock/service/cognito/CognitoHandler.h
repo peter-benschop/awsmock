@@ -10,10 +10,10 @@
 
 // AwsMock includes
 #include "awsmock/core/config/Configuration.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/dto/common/CognitoClientCommand.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 

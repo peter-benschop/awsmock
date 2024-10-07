@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_COGNITO_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/CognitoDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,51 +18,31 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoMonitoring : public Core::Timer {
+    class CognitoMonitoring {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit CognitoMonitoring(int timeout) : Core::Timer("cognito-monitoring", timeout) {}
+        explicit CognitoMonitoring() = default;
 
         /**
-         * Initialization
+         * @brief Update counters
          */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+        void UpdateCounter();
 
       private:
 
         /**
-         * Update counters
-         */
-        void UpdateCounter();
-
-        /**
-         * Metric service
+         * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

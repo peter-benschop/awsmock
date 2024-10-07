@@ -6,16 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void ModuleMonitoring::Initialize() {
-        UpdateCounter();
-    }
-
-    void ModuleMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void ModuleMonitoring::Shutdown() {}
-
     void ModuleMonitoring::UpdateCounter() {
 
         using namespace Database::Entity::Module;

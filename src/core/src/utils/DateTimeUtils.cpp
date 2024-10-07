@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/DateTimeUtils.h>
-#include <iostream>
 
 namespace AwsMock::Core {
 
@@ -74,6 +73,15 @@ namespace AwsMock::Core {
 
     system_clock::time_point DateTimeUtils::LocalDateTimeNow() {
         return system_clock::time_point(date::make_zoned(date::current_zone(), system_clock::now()).get_local_time().time_since_epoch());
+    }
+
+    int DateTimeUtils::GetSecondsUntilMidnight() {
+        using namespace std;
+        using namespace std::chrono;
+
+        auto now = system_clock::now();
+        auto today = floor<days>(now);
+        return 24 * 2600 - static_cast<int>(duration_cast<seconds>(now - today).count());
     }
 
 };// namespace AwsMock::Core

@@ -348,7 +348,7 @@ namespace AwsMock::Controller {
 
         // Options headers
         headers["pretty"] = pretty ? "1" : "0";
-        headers["includeObjects"] = includeObjects ? "1" : "0";
+        headers["onlyObjects"] = includeObjects ? "1" : "0";
 
         Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
         if (response.statusCode != boost::beast::http::status::ok) {

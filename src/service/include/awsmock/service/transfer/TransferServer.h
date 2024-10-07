@@ -11,24 +11,18 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
-#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/transfer/TransferMonitoring.h>
 
-#define TRANSFER_DEFAULT_PORT 9504
-#define TRANSFER_DEFAULT_HOST "localhost"
-#define TRANSFER_DEFAULT_QUEUE_LENGTH 250
-#define TRANSFER_DEFAULT_THREADS 50
-#define TRANSFER_DEFAULT_TIMEOUT 120
 #define TRANSFER_DEFAULT_MONITORING_PERIOD 300
-
 #define DEFAULT_BASE_DIR "transfer"
-#define DEFAULT_TRANSFER_BUCKET "transfer-bucket"
 
 namespace AwsMock::Service {
 
@@ -43,10 +37,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param pool global thread pool
          */
-        explicit TransferServer(boost::asio::thread_pool &pool);
+        explicit TransferServer();
 
         /**
          * @brief Initialization
@@ -102,37 +94,7 @@ namespace AwsMock::Service {
         /**
          * Transfer monitoring
          */
-        std::shared_ptr<TransferMonitoring> _transferMonitoring;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connection
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+        TransferMonitoring _transferMonitoring;
 
         /**
          * AWS region
@@ -178,11 +140,6 @@ namespace AwsMock::Service {
          * Actual FTP manager
          */
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
-
-        /**
-         * Module name
-         */
-        std::string _module;
 
         /**
          * Monitoring period

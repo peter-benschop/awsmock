@@ -6,24 +6,11 @@
 
 namespace AwsMock::Service {
 
-    CognitoServer::CognitoServer(boost::asio::thread_pool &pool) : AbstractServer("cognito", 10), _module("cognito"), _pool(pool) {
+    CognitoServer::CognitoServer() : AbstractServer("cognito", 10) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.cognito.http.port", COGNITO_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.cognito.http.host", COGNITO_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.cognito.http.max.queue", COGNITO_DEFAULT_QUEUE_SIZE);
-        _maxThreads = configuration.getInt("awsmock.service.cognito.http.max.threads", COGNITO_DEFAULT_MAX_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.cognito.http.timeout", COGNITO_DEFAULT_TIMEOUT);
         _monitoringPeriod = configuration.getInt("awsmock.service.cognito.monitoring.period", COGNITO_DEFAULT_MONITORING_PERIOD);
-
-        // Monitoring
-        _cognitoMonitoring = std::make_unique<CognitoMonitoring>(_monitoringPeriod);
-
-        log_debug << "Cognito module initialized, endpoint: " << _host << ":" << _port;
-    }
-
-    void CognitoServer::Initialize() {
 
         // Check module active
         if (!IsActive("cognito")) {
@@ -32,18 +19,19 @@ namespace AwsMock::Service {
         }
         log_info << "Cognito module starting";
 
-        // Start monitoring
-        boost::asio::post(_pool, [this] { _cognitoMonitoring->Start(); });
+        // Start DynamoDB monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-dynamodb-counters", [this] { this->_cognitoMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Set running
         SetRunning();
-    }
 
+        log_debug << "Cognito server started";
+    }
+    void CognitoServer::Initialize() {
+    }
     void CognitoServer::Run() {
     }
-
     void CognitoServer::Shutdown() {
-        _cognitoMonitoring->Stop();
     }
 
 }// namespace AwsMock::Service

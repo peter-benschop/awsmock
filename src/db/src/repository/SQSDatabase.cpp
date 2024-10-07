@@ -1004,12 +1004,17 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto queueCollection = (*client)[_databaseName][_collectionNameQueue];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
                 auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
+
+                // Adjust queue counters
+                //queueCollection.update_many({}, make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(-1))))));
+
                 session.commit_transaction();
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
 
@@ -1031,12 +1036,17 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto queueCollection = (*client)[_databaseName][_collectionNameQueue];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
                 auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+
+                // Adjust queue counters
+                //queueCollection.update_many({}, make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(-1))))));
+
                 session.commit_transaction();
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(receiptHandle, 0, 40) << "... count: " << result->deleted_count();
 
@@ -1058,12 +1068,19 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto queueCollection = (*client)[_databaseName][_collectionNameQueue];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
                 auto result = messageCollection.delete_many({});
+
+                // Adjust queue counters
+                queueCollection.update_many({},
+                                            make_document(kvp("$set", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(0)),
+                                                                                    kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(0)),
+                                                                                    kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(0))))));
                 session.commit_transaction();
                 log_debug << "All resources deleted, count: " << result->deleted_count();
 

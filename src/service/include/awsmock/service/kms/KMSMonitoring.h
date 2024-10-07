@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_KMS_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/KMSDatabase.h>
 
 namespace AwsMock::Service {
@@ -21,36 +21,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSMonitoring : public Core::Timer {
+    class KMSMonitoring {
 
       public:
 
         /**
          * Constructor
          */
-        explicit KMSMonitoring(int timeout) : Core::Timer("kms-monitoring", timeout) {}
-
-        /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit KMSMonitoring() = default;
 
         /**
          * Update counters
          */
         void UpdateCounter();
+
+      private:
 
         /**
          * Metric service
@@ -61,11 +46,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

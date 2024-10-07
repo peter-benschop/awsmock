@@ -257,7 +257,6 @@ namespace AwsMock::Service {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         }
-        return SendBadRequestError(request, "Unknown method");
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -538,8 +537,8 @@ namespace AwsMock::Service {
                         Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
                         Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
-                        return SendOkResponse(request, result.ToXml());
                         log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                        return SendOkResponse(request, result.ToXml());
 
                     } else {
 

@@ -6,48 +6,38 @@
 
 namespace AwsMock::Service {
 
-    SQSServer::SQSServer(boost::asio::thread_pool &pool) : AbstractServer("sqs"), _sqsDatabase(Database::SQSDatabase::instance()), _pool(pool) {
+    SQSServer::SQSServer() : AbstractServer("sqs") {
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.sqs.http.port", SQS_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.sqs.http.host", SQS_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.sqs.http.max.queue", SQS_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = configuration.getInt("awsmock.service.sqs.max.http.threads", SQS_DEFAULT_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.sqs.http.timeout", SQS_DEFAULT_TIMEOUT);
         _monitoringPeriod = configuration.getInt("awsmock.service.sqs.monitoring.period", SQS_DEFAULT_MONITORING_PERIOD);
         _workerPeriod = configuration.getInt("awsmock.service.sqs.worker.period", SQS_DEFAULT_WORKER_PERIOD);
-        log_debug << "SQS rest module initialized, endpoint: " << _host << ":" << _port;
-
-        // Monitoring
-        _sqsMonitoring = std::make_unique<SQSMonitoring>(_monitoringPeriod);
-
-        // Worker thread
-        _sqsWorker = std::make_unique<SQSWorker>(_workerPeriod);
-        log_debug << "SQSServer initialized";
-    }
-
-    void SQSServer::Initialize() {
 
         // Check module active
         if (!IsActive("sqs")) {
             log_info << "SQS module inactive";
             return;
         }
-        log_info << "SQS server starting, port: " << _port;
+        log_info << "SQS server starting";
 
-        // Start worker thread
-        boost::asio::post(_pool, [this] { _sqsWorker->Start(); });
-        boost::asio::post(_pool, [this] { _sqsMonitoring->Start(); });
+        // Start SQS monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-sqs-counters", [this] { this->_sqsMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        Core::PeriodicScheduler::instance().AddTask("monitoring-sqs-wait-time", [this] { this->_sqsMonitoring.CollectWaitingTimeStatistics(); }, _monitoringPeriod);
+
+        // Start reset messages task
+        Core::PeriodicScheduler::instance().AddTask("sqs-reset-messages", [this] { this->_sqsWorker.ResetMessages(); }, _workerPeriod);
 
         // Set running
         SetRunning();
+
+        log_debug << "SQS server initialized";
+    }
+
+    void SQSServer::Initialize() {
     }
 
     void SQSServer::Run() {}
 
     void SQSServer::Shutdown() {
-        _sqsMonitoring->Stop();
-        _sqsWorker->Stop();
     }
 
 }// namespace AwsMock::Service

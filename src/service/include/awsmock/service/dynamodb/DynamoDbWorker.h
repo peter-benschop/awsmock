@@ -12,7 +12,6 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/DynamoDbResponse.h>
 #include <awsmock/dto/dynamodb/ListTableRequest.h>
@@ -29,38 +28,23 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbWorker : public Core::Timer {
+    class DynamoDbWorker {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit DynamoDbWorker(int timeout);
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit DynamoDbWorker();
 
         /**
          * @brief Synchronize tables.
          *
          * Loops over all DynamoDB tables an updates the MongoDB backend.
          */
-        [[maybe_unused]] void SynchronizeTables();
+        void SynchronizeTables();
+
+      private:
 
         /**
          * Database connection

@@ -2,11 +2,11 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/CleanInfrastructureRequest.h>
 
 namespace AwsMock::Dto::Module {
 
-    void ExportInfrastructureRequest::FromJson(const std::string &payload) {
+    void CleanInfrastructureRequest::FromJson(const std::string &payload) {
 
         using Core::JsonUtils;
 
@@ -16,8 +16,7 @@ namespace AwsMock::Dto::Module {
 
         try {
 
-            JsonUtils::GetJsonValueBool("onlyObjects", rootObject, includeObjects);
-            JsonUtils::GetJsonValueBool("prettyPrint", rootObject, prettyPrint);
+            JsonUtils::GetJsonValueBool("onlyObjects", rootObject, onlyObjects);
 
             if (rootObject->has("modules")) {
                 Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("modules");
@@ -32,15 +31,14 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    std::string ExportInfrastructureRequest::ToJson() const {
+    std::string CleanInfrastructureRequest::ToJson() const {
 
         using Core::JsonUtils;
 
         try {
 
             Poco::JSON::Object rootJson;
-            JsonUtils::SetJsonValueBool(rootJson, "onlyObjects", includeObjects);
-            JsonUtils::SetJsonValueBool(rootJson, "prettyPrint", prettyPrint);
+            JsonUtils::SetJsonValueBool(rootJson, "onlyObjects", onlyObjects);
 
             if (!modules.empty()) {
                 Poco::JSON::Array jsonArray;
@@ -58,14 +56,14 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    std::string ExportInfrastructureRequest::ToString() const {
+    std::string CleanInfrastructureRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ExportInfrastructureRequest &r) {
-        os << "ExportInfrastructureRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const CleanInfrastructureRequest &r) {
+        os << "CleanInfrastructureRequest=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Module

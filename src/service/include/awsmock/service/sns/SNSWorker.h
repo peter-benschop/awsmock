@@ -14,7 +14,7 @@
 namespace AwsMock::Service {
 
     /**
-     * SNS worker thread
+     * @brief SNS worker thread
      *
      * <p>
      * Used as background thread to do maintenance work, like resetting topics, deleted old message etc.
@@ -22,46 +22,26 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSWorker : public Core::Timer {
+    class SNSWorker {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit SNSWorker(int timeout) : Core::Timer("sns-worker", timeout) {}
+        explicit SNSWorker() = default;
 
         /**
-         * Initialization
+         * @brief Delete resources, which are over the retention period.
          */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+        void DeleteOldMessages();
 
       private:
 
         /**
-         * Delete resources, which are over the retention period.
-         */
-        void DeleteOldMessages();
-
-        /**
-         * Database connection
+         * @brief Database connection
          */
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-
-        /**
-         * Message timeout in seconds
-         */
-        int _messageTimeout{};
     };
 
 }// namespace AwsMock::Service

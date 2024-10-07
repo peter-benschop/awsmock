@@ -11,10 +11,10 @@
 #include <boost/lexical_cast.hpp>
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerCmdHandler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>

@@ -21,31 +21,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaWorker : public Core::Timer {
+    class LambdaWorker {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit LambdaWorker(int timeout) : Core::Timer("lambda-worker", timeout) {}
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit LambdaWorker() = default;
 
         /**
          * @brief Remove expired lambda functions
@@ -53,7 +36,9 @@ namespace AwsMock::Service {
          * @par
          * Loops over all lambda functions and removes the lambda container, when the lambdas are expired.
          */
-        [[maybe_unused]] void RemoveExpiredLambdas();
+        void RemoveExpiredLambdas();
+
+      private:
 
         /**
          * Database connection
