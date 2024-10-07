@@ -33,8 +33,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.dynamodb.http.port", std::to_string(DYNAMODB_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.dynamodb.http.host", DYNAMODB_DEFAULT_HOST);
+            std::string _port = _configuration.getString("awsmock.service.dynamodb.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
+            std::string _host = _configuration.getString("awsmock.service.dynamodb.http.host", GATEWAY_DEFAULT_HOST);
 
             // Setup gateway
             _configuration.setString("awsmock.service.gateway.http.port", _port);
