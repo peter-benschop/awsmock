@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include "awsmock/core/config/Configuration.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
@@ -19,7 +20,6 @@
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/KMSDatabase.h>
 
 namespace AwsMock::Service {

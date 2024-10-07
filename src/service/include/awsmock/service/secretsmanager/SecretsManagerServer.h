@@ -16,20 +16,17 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/secretsmanager/SecretsManagerMonitoring.h>
 
-#define SECRETSMANAGER_DEFAULT_PORT 9507
-#define SECRETSMANAGER_DEFAULT_HOST "localhost"
-#define SECRETSMANAGER_DEFAULT_QUEUE_LENGTH 250
-#define SECRETSMANAGER_DEFAULT_THREADS 50
-#define SECRETSMANAGER_DEFAULT_TIMEOUT 120
 #define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
     /**
-     * Secret manager server.
+     * @brief Secret manager server.
      *
      * <p>
      * Default endpoint is localhost:9507. The server supports 50 concurrent threads and support are queue length of 250.
@@ -43,10 +40,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param pool global thread pool
          */
-        explicit SecretsManagerServer(boost::asio::thread_pool &pool);
+        explicit SecretsManagerServer();
 
         /**
          * Timer initialization
@@ -66,49 +61,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Module database
-         */
-        Database::ModuleDatabase &_moduleDatabase;
-
-        /**
          * Monitoring
          */
-        std::shared_ptr<SecretsManagerMonitoring> _secretsManagerMonitoring;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * AWS region
-         */
-        std::string _region;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connections
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+        SecretsManagerMonitoring _secretsManagerMonitoring;
 
         /**
          * Monitoring period

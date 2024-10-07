@@ -6,16 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void LambdaMonitoring::Initialize() {
-        UpdateCounter();
-    }
-
-    void LambdaMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void LambdaMonitoring::Shutdown() {}
-
     void LambdaMonitoring::UpdateCounter() {
         log_trace << "Lambda monitoring starting";
 

@@ -6,29 +6,13 @@
 
 namespace AwsMock::Service {
 
-    KMSServer::KMSServer(boost::asio::thread_pool &pool) : AbstractServer("kms", 10), _kmsDatabase(Database::KMSDatabase::instance()), _pool(pool) {
+    KMSServer::KMSServer() : AbstractServer("kms", 10), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.kms.http.port", KMS_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.kms.http.host", KMS_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.kms.http.max.queue", KMS_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = configuration.getInt("awsmock.service.kms.http.max.threads", KMS_DEFAULT_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.kms.http.timeout", KMS_DEFAULT_TIMEOUT);
         _workerPeriod = configuration.getInt("awsmock.service.kms.worker.period", KMS_DEFAULT_WORKER_PERIOD);
         _monitoringPeriod = configuration.getInt("awsmock.service.kms.monitoring.period", KMS_DEFAULT_MONITORING_PERIOD);
-        log_debug << "KMS rest module initialized, endpoint: " << _host << ":" << _port;
-
-        // Monitoring
-        _kmsMonitoring = std::make_unique<KMSMonitoring>(_monitoringPeriod);
-
-        // Worker
-        _kmsWorker = std::make_unique<KMSWorker>(_workerPeriod);
-
-        log_debug << "KMSServer initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
-    }
-
-    void KMSServer::Initialize() {
+        log_debug << "KMS server initialized";
 
         // Check module active
         if (!IsActive("sns")) {
@@ -37,11 +21,19 @@ namespace AwsMock::Service {
         }
         log_info << "KMS module starting";
 
-        boost::asio::post(_pool, [this] { _kmsWorker->Start(); });
-        boost::asio::post(_pool, [this] { _kmsMonitoring->Start(); });
+        // Start lambda monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-lambda-counters", [this] { this->_kmsMonitoring.UpdateCounter(); }, _monitoringPeriod);
+
+        // Start delete old keys
+        Core::PeriodicScheduler::instance().AddTask("lambda-remove-lambdas", [this] { this->_kmsWorker.DeleteKeys(); }, _workerPeriod);
 
         // Set running
         SetRunning();
+
+        log_debug << "KMSServer initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+    }
+
+    void KMSServer::Initialize() {
     }
 
     void KMSServer::Run() {
@@ -49,8 +41,6 @@ namespace AwsMock::Service {
     }
 
     void KMSServer::Shutdown() {
-        _kmsWorker->Stop();
-        _kmsMonitoring->Stop();
     }
 
 }// namespace AwsMock::Service

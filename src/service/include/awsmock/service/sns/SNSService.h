@@ -14,6 +14,7 @@
 #include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -37,7 +38,6 @@
 #include <awsmock/dto/sns/UnsubscribeResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
-#include <awsmock/monitoring/MetricDefinition.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/sqs/SQSService.h>
 

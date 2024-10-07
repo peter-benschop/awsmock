@@ -6,15 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void CognitoMonitoring::Initialize() {
-    }
-
-    void CognitoMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void CognitoMonitoring::Shutdown() {}
-
     void CognitoMonitoring::UpdateCounter() {
         log_trace << "Cognito monitoring starting";
 
@@ -23,11 +14,11 @@ namespace AwsMock::Service {
         _metricService.SetGauge(COGNITO_USER_COUNT, users);
         _metricService.SetGauge(COGNITO_USERPOOL_COUNT, userPools);
 
-        // Count users per userpool
-        for (const auto &userpool: _cognitoDatabase.ListUserPools()) {
-            std::string labelValue = Poco::replace(userpool.name, "-", "_");
-            long usersPerUserPool = _cognitoDatabase.CountUsers(userpool.region, userpool.userPoolId);
-            _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userpool", labelValue, usersPerUserPool);
+        // Count users per user pool
+        for (const auto &userPool: _cognitoDatabase.ListUserPools()) {
+            std::string labelValue = Poco::replace(userPool.name, "-", "_");
+            long usersPerUserPool = _cognitoDatabase.CountUsers(userPool.region, userPool.userPoolId);
+            _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", labelValue, usersPerUserPool);
         }
         log_trace << "Cognito monitoring finished";
     }

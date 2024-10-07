@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_SNS_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/SNSDatabase.h>
 
 namespace AwsMock::Service {

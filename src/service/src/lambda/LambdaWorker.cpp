@@ -6,17 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void LambdaWorker::Initialize() {
-
-        log_debug << "LambdaWorker initialized";
-    }
-
-    void LambdaWorker::Run() {
-        RemoveExpiredLambdas();
-    }
-
-    void LambdaWorker::Shutdown() {}
-
     void LambdaWorker::RemoveExpiredLambdas() {
 
         // Get lambda list

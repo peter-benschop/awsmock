@@ -6,16 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void DynamoDbMonitoring::Initialize() {
-        UpdateCounter();
-    }
-
-    void DynamoDbMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void DynamoDbMonitoring::Shutdown() {}
-
     void DynamoDbMonitoring::UpdateCounter() {
         log_trace << "Dynamodb monitoring starting";
 

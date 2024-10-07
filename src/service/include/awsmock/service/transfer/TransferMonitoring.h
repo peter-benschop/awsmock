@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_TRANSFER_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/repository/TransferDatabase.h>
 
 namespace AwsMock::Service {

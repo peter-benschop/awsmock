@@ -6,25 +6,16 @@
 
 namespace AwsMock::Service {
 
-    LambdaServer::LambdaServer(boost::asio::thread_pool &pool) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _module("lambda"), _pool(pool) {
+    LambdaServer::LambdaServer() : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.lambda.http.port", LAMBDA_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.lambda.http.host", LAMBDA_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.lambda.http.max.queue", LAMBDA_DEFAULT_QUEUE);
-        _maxThreads = configuration.getInt("awsmock.service.lambda.http.max.threads", LAMBDA_DEFAULT_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.lambda.http.timeout", LAMBDA_DEFAULT_TIMEOUT);
         _monitoringPeriod = configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
         _workerPeriod = configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
 
         // Directories
         _lambdaDir = configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
         log_debug << "Lambda directory: " << _lambdaDir;
-
-        // Sleeping period
-        _period = configuration.getInt("awsmock.worker.lambda.period", 10000);
-        log_debug << "Lambda manager period: " << _period;
 
         // Create environment
         _region = configuration.getString("awsmock.region");
@@ -34,17 +25,17 @@ namespace AwsMock::Service {
         _lambdaServicePort = configuration.getInt("awsmock.service.lambda.port", 9503);
         log_debug << "Lambda module endpoint: http://" << _lambdaServiceHost << ":" << _lambdaServicePort;
 
-        // Docker module
-        _dockerService = std::make_unique<Service::DockerService>();
-
-        // Monitoring
-        _lambdaMonitoring = std::make_unique<LambdaMonitoring>(_monitoringPeriod);
-
-        // Worker thread
-        _lambdaWorker = std::make_unique<LambdaWorker>(_workerPeriod);
-
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
+
+        // Cleanup
+        CleanupContainers();
+
+        // Start lambda monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-lambda-counters", [this] { this->_lambdaMonitoring.UpdateCounter(); }, _monitoringPeriod);
+
+        // Start delete old message task
+        Core::PeriodicScheduler::instance().AddTask("lambda-remove-lambdas", [this] { this->_lambdaWorker.RemoveExpiredLambdas(); }, _workerPeriod);
 
         // Set running
         SetRunning();
@@ -53,34 +44,16 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::Initialize() {
-
-        // Check module active
-        if (!IsActive("lambda")) {
-            log_info << "Lambda module inactive";
-            return;
-        }
-        log_info << "Lambda server starting";
-
-        boost::asio::post(_pool, [this] { _lambdaWorker->Start(); });
-        boost::asio::post(_pool, [this] { _lambdaMonitoring->Start(); });
-
-        // Cleanup
-        CleanupContainers();
-
-        // Start all lambda functions
-        // StartLambdaFunctions();
     }
 
     void LambdaServer::Run() {
     }
 
     void LambdaServer::Shutdown() {
-        _lambdaMonitoring->Stop();
-        _lambdaWorker->Stop();
     }
 
     void LambdaServer::CleanupContainers() {
-        _dockerService->PruneContainers();
+        _dockerService.PruneContainers();
         log_debug << "Docker containers cleaned up";
     }
 

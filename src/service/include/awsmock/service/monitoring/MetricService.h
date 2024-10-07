@@ -21,10 +21,10 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/Timer.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/repository/MonitoringDatabase.h>
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/Timer.h"
+#include "awsmock/core/config/Configuration.h"
+#include "awsmock/repository/MonitoringDatabase.h"
 
 namespace AwsMock::Monitoring {
 

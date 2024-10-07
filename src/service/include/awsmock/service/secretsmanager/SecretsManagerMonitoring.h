@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_SECRETSMANAGER_MONITORING_H
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/Timer.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
 namespace AwsMock::Service {
@@ -18,51 +18,31 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerMonitoring : public Core::Timer {
+    class SecretsManagerMonitoring {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit SecretsManagerMonitoring(int timeout) : Core::Timer("secretsmanager-monitoring", timeout) {}
+        explicit SecretsManagerMonitoring() = default;
 
         /**
-         * Initialization
+         * @brief Update counters
          */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+        void UpdateCounter();
 
       private:
 
         /**
-         * Update counters
-         */
-        void UpdateCounter();
-
-        /**
-         * Metric service
+         * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

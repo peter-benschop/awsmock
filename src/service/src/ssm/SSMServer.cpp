@@ -10,8 +10,8 @@ namespace AwsMock::Service {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.kms.worker.period", SSM_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.kms.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = configuration.getInt("awsmock.service.ssm.worker.period", SSM_DEFAULT_WORKER_PERIOD);
+        _monitoringPeriod = configuration.getInt("awsmock.service.ssm.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
         log_debug << "SSM server initialized";
 
         // Check module active
@@ -23,7 +23,7 @@ namespace AwsMock::Service {
 
         // Monitoring
         // Start SNS monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-s3-counters", [this] { this->_ssmMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        Core::PeriodicScheduler::instance().AddTask("monitoring-ssm-counters", [this] { this->_ssmMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
         //Core::PeriodicScheduler::instance().AddTask("s3-sync-directories", [this] { this->_ssmWorker.SyncObjects(); }, _workerPeriod);
@@ -31,14 +31,11 @@ namespace AwsMock::Service {
         // Set running
         SetRunning();
 
-        log_debug << "KMSServer initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+        log_debug << "SSM server started, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
 
     void SSMServer::Initialize() {
-
-
-        // Set running
-        SetRunning();
+        // Intentionally left empty
     }
 
     void SSMServer::Run() {
@@ -46,6 +43,7 @@ namespace AwsMock::Service {
     }
 
     void SSMServer::Shutdown() {
+        // Intentionally left empty
     }
 
 }// namespace AwsMock::Service

@@ -15,13 +15,13 @@
 // AwsMock includes
 #include "awsmock/dto/module/model/GatewayConfig.h"
 #include "awsmock/dto/module/model/Module.h"
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/transfer/ListUsersRequest.h>
 #include <awsmock/dto/transfer/model/Server.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/transfer/TransferService.h>

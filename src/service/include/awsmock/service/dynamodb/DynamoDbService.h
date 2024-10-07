@@ -14,6 +14,9 @@
 
 // AwsMock includes
 #include "awsmock/service/docker/DockerService.h"
+#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "awsmock/service/monitoring/MetricService.h"
+#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
@@ -42,9 +45,6 @@
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricServiceTimer.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 
 namespace AwsMock::Service {

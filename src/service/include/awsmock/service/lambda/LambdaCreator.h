@@ -16,6 +16,7 @@
 #include <boost/beast/core/detail/base64.hpp>
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
@@ -23,7 +24,6 @@
 #include <awsmock/core/Task.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/lambda/Lambda.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/docker/DockerService.h>
 

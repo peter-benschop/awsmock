@@ -129,25 +129,25 @@ namespace AwsMock::Manager {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(pool));
+                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(pool));
+                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>(pool));
+                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>(pool));
+                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(pool));
+                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>());
                 boost::asio::post(ioc, [obj = moduleMap.GetModule(module.name)] { obj->Start(); });
             }
         }

@@ -41,10 +41,10 @@ namespace AwsMock::Dto::Common {
 
             GetCommandFromUserAgent(method, userAgent);
 
-        } else if (Core::HttpUtils::HasHeader(request, "X-AwsMock-Target")) {
+        } else if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
-            std::string target = Core::HttpUtils::GetHeaderValue(request, "X-AwsMock-Target");
-            command = S3CommandTypeFromString(target);
+            std::string action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+            command = S3CommandTypeFromString(action);
 
         } else {
             switch (method) {

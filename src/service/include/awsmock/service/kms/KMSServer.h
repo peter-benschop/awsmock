@@ -9,20 +9,15 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/kms/KMSMonitoring.h>
 #include <awsmock/service/kms/KMSWorker.h>
 
-#define KMS_DEFAULT_PORT 9502
-#define KMS_DEFAULT_HOST "localhost"
-#define KMS_DEFAULT_QUEUE_LENGTH 250
-#define KMS_DEFAULT_THREADS 50
-#define KMS_DEFAULT_TIMEOUT 120
 #define KMS_DEFAULT_WORKER_PERIOD 3600
 #define KMS_DEFAULT_MONITORING_PERIOD 300
 
@@ -39,10 +34,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param pool global thread pool
          */
-        explicit KMSServer(boost::asio::thread_pool &pool);
+        explicit KMSServer();
 
         /**
          * Initialization
@@ -69,45 +62,15 @@ namespace AwsMock::Service {
         /**
          * SNS monitoring
          */
-        std::shared_ptr<KMSMonitoring> _kmsMonitoring;
+        KMSMonitoring _kmsMonitoring;
 
         /**
          * SNS worker
          */
-        std::shared_ptr<KMSWorker> _kmsWorker;
+        KMSWorker _kmsWorker;
 
         /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connections
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
-
-        /**
-         * SNS server period
+         * KMS server period
          *
          * <p>
          * Used for the background threads (cleanup, reset, retention, etc.)
@@ -116,7 +79,7 @@ namespace AwsMock::Service {
         int _workerPeriod;
 
         /**
-         * SNS monitoring period
+         * KMS monitoring period
          */
         int _monitoringPeriod;
     };

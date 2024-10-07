@@ -11,13 +11,13 @@
 #include <boost/bind/bind.hpp>
 
 // AwsMock includes
+#include "MetricService.h"
+#include "MetricSystemCollector.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
 #include <awsmock/service/monitoring/MonitoringWorker.h>

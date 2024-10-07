@@ -15,12 +15,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/Timer.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/monitoring/MetricDefinition.h>
-#include <awsmock/monitoring/MetricService.h>
+#include "MetricDefinition.h"
+#include "MetricService.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/StringUtils.h"
+#include "awsmock/core/Timer.h"
+#include "awsmock/core/config/Configuration.h"
 
 // System counter
 

@@ -7,9 +7,9 @@
 
 // AwsMock includes
 #include "awsmock/core/config/Configuration.h"
+#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/KMSClientCommand.h>
-#include <awsmock/monitoring/MetricService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/kms/KMSService.h>
 
