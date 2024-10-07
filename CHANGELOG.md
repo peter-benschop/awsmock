@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.16](https://github.com/jensvogt/awsmock/compare/v0.15.15...v0.15.16) (2024-10-07)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** streamline server startup ([e6b8797](https://github.com/jensvogt/awsmock/commit/e6b8797585095673f333439750d4064b4b150fd8))
+* **653-move-manager-apis-to-gateway:** streamline server startup ([f0793d3](https://github.com/jensvogt/awsmock/commit/f0793d34980ffbc0ce6280f47a7a308ad57a9bc4))
+
 ## [0.15.15](https://github.com/jensvogt/awsmock/compare/v0.15.14...v0.15.15) (2024-10-06)
 
 
