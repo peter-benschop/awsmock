@@ -6,17 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void S3Worker::Initialize() {
-        log_debug << "S3Worker initialized";
-    }
-
-    void S3Worker::Run() {
-        //TODO: fix, there seems to be some confusion when services are running.
-        SyncObjects();
-    }
-
-    void S3Worker::Shutdown() {}
-
     void S3Worker::SyncObjects() {
 
         std::string region = Core::Configuration::instance().getString("awsmock.region");

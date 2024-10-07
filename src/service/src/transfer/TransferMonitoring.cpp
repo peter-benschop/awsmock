@@ -6,21 +6,11 @@
 
 namespace AwsMock::Service {
 
-    void TransferMonitoring::Initialize() {
-        UpdateCounter();
-    }
-
-    void TransferMonitoring::Run() {
-        UpdateCounter();
-    }
-
-    void TransferMonitoring::Shutdown() {}
-
     void TransferMonitoring::UpdateCounter() {
         log_trace << "Transfer monitoring starting";
 
         long servers = _transferDatabase.CountServers();
-        _metricService.SetGauge(TRANSFER_SERVER_COUNT, servers);
+        _metricService.SetGauge(TRANSFER_SERVER_COUNT, static_cast<double>(servers));
 
         log_trace << "Transfer monitoring finished";
     }

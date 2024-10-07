@@ -2,8 +2,8 @@
 // Created by vogje01 on 10/6/24.
 //
 
-#ifndef AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
-#define AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
+#ifndef AWSMOCK_DTO_CLEAN_INFRASTRUCTURE_REQUEST_H
+#define AWSMOCK_DTO_CLEAN_INFRASTRUCTURE_REQUEST_H
 
 // C++ includes
 #include <string>
@@ -17,20 +17,19 @@
 namespace AwsMock::Dto::Module {
 
     /**
-     * @brief Export infrastructure request
+     * @brief Clean infrastructure request
      *
      * Example:
      * @code{.json}
      * {
      *   "modules": ["string", ...],
      *   "onlyObjects": bool,
-     *   "prettyPrint": bool,
      * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ExportInfrastructureRequest {
+    struct CleanInfrastructureRequest {
 
         /**
          * Modules
@@ -38,9 +37,9 @@ namespace AwsMock::Dto::Module {
         std::vector<std::string> modules;
 
         /**
-         * Include objects
+         * Only objects
          */
-        bool includeObjects;
+        bool onlyObjects;
 
         /**
          * Pretty print
@@ -73,9 +72,9 @@ namespace AwsMock::Dto::Module {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ExportInfrastructureRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const CleanInfrastructureRequest &r);
     };
 
 }// namespace AwsMock::Dto::Module
 
-#endif//AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
+#endif//AWSMOCK_DTO_CLEAN_INFRASTRUCTURE_REQUEST_H

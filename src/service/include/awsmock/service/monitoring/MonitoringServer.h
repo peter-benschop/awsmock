@@ -8,21 +8,20 @@
 // Boost includes
 #include <boost/asio/post.hpp>
 #include <boost/asio/thread_pool.hpp>
+#include <boost/bind/bind.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/monitoring/MetricService.h>
 #include <awsmock/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
+#include <awsmock/service/monitoring/MonitoringWorker.h>
 
-#define S3_DEFAULT_PORT 9500
-#define S3_DEFAULT_HOST "localhost"
-#define S3_DEFAULT_QUEUE_SIZE 250
-#define S3_DEFAULT_MAX_THREADS 50
-#define S3_DEFAULT_TIMEOUT 900
 #define S3_DEFAULT_MONITORING_PERIOD 300
 #define S3_DEFAULT_WORKER_PERIOD 3600
 
@@ -40,7 +39,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringServer(boost::asio::thread_pool &pool);
+        explicit MonitoringServer();
 
         /**
          * @brief Timer initialization
@@ -60,24 +59,19 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Module name
+         * Monitoring system collector
          */
-        std::string _module;
-
-        /**
-         * Metric service
-         */
-        std::shared_ptr<Monitoring::MetricService> _metricService;
+        AwsMock::Monitoring::MetricService _metricService;
 
         /**
          * Monitoring system collector
          */
-        std::shared_ptr<Monitoring::MetricSystemCollector> _metricSystemCollector;
+        AwsMock::Monitoring::MetricSystemCollector _metricSystemCollector;
 
         /**
-         * Global thread pool
+         * Monitoring system collector
          */
-        boost::asio::thread_pool &_pool;
+        Monitoring::MonitoringWorker _monitoringWorker;
     };
 
 }// namespace AwsMock::Service

@@ -137,4 +137,33 @@ namespace AwsMock::Database {
         }
         return {};
     }
+
+    long MonitoringDatabase::DeleteOldMonitoringData(int retentionPeriod) {
+        log_trace << "Deleting old monitoring data, retention:: " << retentionPeriod;
+
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
+            auto session = client->start_session();
+
+            try {
+                // Find and delete counters
+                session.start_transaction();
+                auto retention = system_clock::now() - std::chrono::hours(retentionPeriod * 24);
+                auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
+                log_debug << "Counters deleted, name: " << mResult.value().deleted_count();
+                session.commit_transaction();
+                return mResult.value().deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        } else {
+            log_info << "Performance counter not available if you running the memory DB";
+        }
+        return 0;
+    }
 }// namespace AwsMock::Database

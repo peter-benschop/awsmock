@@ -6,18 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void S3Monitoring::Initialize() {
-        UpdateCounter();
-    }
-
-    void S3Monitoring::Run() {
-        UpdateCounter();
-    }
-
-    void S3Monitoring::Shutdown() {
-        log_debug << "Shutting down, thread: s3-monitoring";
-    }
-
     void S3Monitoring::UpdateCounter() {
         log_trace << "S3 Monitoring starting";
 

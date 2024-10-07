@@ -6,16 +6,6 @@
 
 namespace AwsMock::Service {
 
-    void SQSWorker::Initialize() {
-        log_debug << "SQSWorker initialized";
-    }
-
-    void SQSWorker::Run() {
-        ResetMessages();
-    }
-
-    void SQSWorker::Shutdown() {}
-
     void SQSWorker::ResetMessages() {
 
         Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();

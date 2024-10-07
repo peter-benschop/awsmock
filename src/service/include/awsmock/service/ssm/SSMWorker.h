@@ -26,36 +26,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SSMWorker : public Core::Timer {
+    class SSMWorker {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit SSMWorker(int timeout);
+        explicit SSMWorker() = default;
 
         /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
-
-      private:
-
-        /**
-         * Delete keys which are pending for deletion
+         * @brief Delete keys which are pending for deletion
          */
         void DeleteKeys();
+
+      private:
 
         /**
          * Database connection

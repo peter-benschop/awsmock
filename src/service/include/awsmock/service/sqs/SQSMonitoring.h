@@ -18,31 +18,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSMonitoring : public Core::Timer {
+    class SQSMonitoring {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SQSMonitoring(int timeout) : Core::Timer("sqs-monitoring", timeout) {}
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit SQSMonitoring() = default;
 
         /**
          * @brief Collect waiting time statistics
@@ -56,6 +39,8 @@ namespace AwsMock::Service {
          * @brief Update counters
          */
         void UpdateCounter();
+
+      private:
 
         /**
          * Metric service

@@ -7,24 +7,11 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(boost::asio::thread_pool &pool) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _module("transfer"), _pool(pool) {
+    TransferServer::TransferServer() : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
 
         // REST manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.transfer.http.port", TRANSFER_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.transfer.http.host", TRANSFER_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.transfer.http.max.queue", TRANSFER_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = configuration.getInt("awsmock.service.transfer.http.max.threads", TRANSFER_DEFAULT_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.transfer.http.timeout", TRANSFER_DEFAULT_TIMEOUT);
         _monitoringPeriod = configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
-
-        // Monitoring
-        _transferMonitoring = std::make_unique<TransferMonitoring>(_monitoringPeriod);
-
-        log_info << "Transfer manager initialized";
-    }
-
-    void TransferServer::Initialize() {
 
         // Check module active
         if (!IsActive("transfer")) {
@@ -33,8 +20,8 @@ namespace AwsMock::Service {
         }
         log_info << "Transfer module starting";
 
-        // Start monitoring
-        boost::asio::post(_pool, [this] { _transferMonitoring->Start(); });
+        // Start SNS monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-s3-counters", [this] { this->_transferMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Create transfer bucket
         CreateTransferBucket();
@@ -44,6 +31,13 @@ namespace AwsMock::Service {
 
         // Set running
         SetRunning();
+
+        log_info << "Transfer server initialized";
+    }
+
+    void TransferServer::Initialize() {
+
+
         log_debug << "All online transfer servers started";
     }
 
@@ -52,7 +46,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::Shutdown() {
-        _transferMonitoring->Stop();
+        // Intentionally left empty
     }
 
     void TransferServer::CreateTransferBucket() {

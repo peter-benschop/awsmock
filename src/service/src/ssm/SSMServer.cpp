@@ -6,40 +6,36 @@
 
 namespace AwsMock::Service {
 
-    SSMServer::SSMServer(boost::asio::thread_pool &pool) : AbstractServer("kms", 10), _ssmDatabase(Database::SSMDatabase::instance()), _pool(pool) {
+    SSMServer::SSMServer() : AbstractServer("kms", 10) {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.kms.http.port", SSM_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.kms.http.host", SSM_DEFAULT_HOST);
-        _maxQueueLength = configuration.getInt("awsmock.service.kms.http.max.queue", SSM_DEFAULT_QUEUE_LENGTH);
-        _maxThreads = configuration.getInt("awsmock.service.kms.http.max.threads", SSM_DEFAULT_THREADS);
-        _requestTimeout = configuration.getInt("awsmock.service.kms.http.timeout", SSM_DEFAULT_TIMEOUT);
         _workerPeriod = configuration.getInt("awsmock.service.kms.worker.period", SSM_DEFAULT_WORKER_PERIOD);
         _monitoringPeriod = configuration.getInt("awsmock.service.kms.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
-        log_debug << "KMS rest module initialized, endpoint: " << _host << ":" << _port;
+        log_debug << "SSM server initialized";
+
+        // Check module active
+        if (!IsActive("ssm")) {
+            log_info << "SSM module inactive";
+            return;
+        }
+        log_info << "SSM server starting";
 
         // Monitoring
-        _ssmMonitoring = std::make_unique<SSMMonitoring>(_monitoringPeriod);
+        // Start SNS monitoring update counters
+        Core::PeriodicScheduler::instance().AddTask("monitoring-s3-counters", [this] { this->_ssmMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
-        // Worker
-        _ssmWorker = std::make_unique<SSMWorker>(_workerPeriod);
+        // Start delete old message task
+        //Core::PeriodicScheduler::instance().AddTask("s3-sync-directories", [this] { this->_ssmWorker.SyncObjects(); }, _workerPeriod);
+
+        // Set running
+        SetRunning();
 
         log_debug << "KMSServer initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
 
     void SSMServer::Initialize() {
 
-        // Check module active
-        if (!IsActive("sns")) {
-            log_info << "KMS module inactive";
-            return;
-        }
-        log_info << "KMS module starting";
-
-        // Start worker threads
-        boost::asio::post(_pool, [this] { _ssmWorker->Start(); });
-        boost::asio::post(_pool, [this] { _ssmMonitoring->Start(); });
 
         // Set running
         SetRunning();
@@ -50,8 +46,6 @@ namespace AwsMock::Service {
     }
 
     void SSMServer::Shutdown() {
-        _ssmWorker->Stop();
-        _ssmMonitoring->Stop();
     }
 
 }// namespace AwsMock::Service

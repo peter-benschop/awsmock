@@ -11,18 +11,13 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/monitoring/MetricService.h>
-#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/ssm/SSMMonitoring.h>
 #include <awsmock/service/ssm/SSMWorker.h>
 
-#define SSM_DEFAULT_PORT 9509
-#define SSM_DEFAULT_HOST "localhost"
-#define SSM_DEFAULT_QUEUE_LENGTH 250
-#define SSM_DEFAULT_THREADS 50
-#define SSM_DEFAULT_TIMEOUT 120
 #define SSM_DEFAULT_WORKER_PERIOD 3600
 #define SSM_DEFAULT_MONITORING_PERIOD 300
 
@@ -39,10 +34,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param pool global thread pool
          */
-        explicit SSMServer(boost::asio::thread_pool &pool);
+        explicit SSMServer();
 
         /**
          * @brief Initialization
@@ -62,49 +55,14 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * ssm database
-         */
-        Database::SSMDatabase &_ssmDatabase;
-
-        /**
          * SNS monitoring
          */
-        std::shared_ptr<SSMMonitoring> _ssmMonitoring;
+        SSMMonitoring _ssmMonitoring;
 
         /**
          * SNS worker
          */
-        std::shared_ptr<SSMWorker> _ssmWorker;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connections
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+        SSMWorker _ssmWorker;
 
         /**
          * SNS server period

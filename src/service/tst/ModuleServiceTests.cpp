@@ -29,22 +29,16 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
-            _s3Server = std::make_shared<S3Server>(_pool);
-            _sqsServer = std::make_shared<SQSServer>(_pool);
-
-            _serverMap = {
-                    {"s3", _s3Server},
-                    {"sqs", _sqsServer}};
+            _s3Server = std::make_shared<S3Server>();
+            _sqsServer = std::make_shared<SQSServer>();
             _service = std::make_shared<ModuleService>();
         }
 
         void TearDown() override {
             _s3Server->Stop();
             _sqsServer->Stop();
-            _serverMap.clear();
         }
 
-        Service::ServerMap _serverMap;
         boost::asio::thread_pool _pool = (10);
         std::shared_ptr<ModuleService> _service;
         std::shared_ptr<S3Server> _s3Server;

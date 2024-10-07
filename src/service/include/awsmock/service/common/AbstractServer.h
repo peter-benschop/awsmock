@@ -50,23 +50,6 @@ namespace AwsMock::Service {
          */
         explicit AbstractServer(std::string name);
 
-        /**
-         * @brief Start the HTTP manager
-         *
-         * @param maxQueueLength maximal request queue length
-         * @param maxThreads maximal number of worker threads
-         * @param requestTimeout request timeout in seconds
-         * @param host HTTP host name
-         * @param port HTTP port
-         * @param requestFactory HTTP request factory
-         */
-        void StartHttpServer(int maxQueueLength, int maxThreads, int requestTimeout, const std::string &host, int port, Poco::Net::HTTPRequestHandlerFactory *requestFactory);
-
-        /**
-         * @brief Stops the HTTP manager
-         */
-        void StopHttpServer();
-
       protected:
 
         /**
@@ -81,17 +64,6 @@ namespace AwsMock::Service {
          */
         void SetRunning();
 
-        /**
-         * @brief Main loop
-         */
-        void Run() override = 0;
-
-
-        /**
-         * @brief Stop the server
-         */
-        void Shutdown() override;
-
       private:
 
         /**
@@ -103,22 +75,7 @@ namespace AwsMock::Service {
          * Service database
          */
         Database::ModuleDatabase &_moduleDatabase;
-
-        /**
-         * Shutdown mutex
-         */
-        Poco::Mutex _mutex;
-
-        /**
-         * HTTP manager instance
-         */
-        std::shared_ptr<Poco::Net::HTTPServer> _httpServer;
     };
-
-    /**
-     * Server map
-     */
-    typedef std::map<std::string, std::shared_ptr<Service::AbstractServer>> ServerMap;
 
 }// namespace AwsMock::Service
 

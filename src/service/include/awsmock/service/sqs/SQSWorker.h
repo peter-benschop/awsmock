@@ -18,31 +18,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSWorker : public Core::Timer {
+    class SQSWorker {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SQSWorker(int timeout) : Core::Timer("sqs-worker", timeout) {}
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit SQSWorker() = default;
 
         /**
          * @brief Reset resources
@@ -54,6 +37,8 @@ namespace AwsMock::Service {
          * Checks also the expiration date and removed the resources, which are older than the max retention period.
          */
         [[maybe_unused]] void ResetMessages();
+
+      private:
 
         /**
          * Database connection

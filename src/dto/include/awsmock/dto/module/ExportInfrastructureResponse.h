@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Module {
      * @code{.json}
      * {
      *   "modules": ["string", ...],
-     *   "includeObjects": bool,
+     *   "onlyObjects": bool,
      *   "prettyPrint": bool,
      * }
      * @endcode
@@ -76,5 +76,7 @@ namespace AwsMock::Dto::Module {
          */
         friend std::ostream &operator<<(std::ostream &os, ExportInfrastructureResponse &r);
     };
+
 }// namespace AwsMock::Dto::Module
+
 #endif// AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_RESPONSE_H

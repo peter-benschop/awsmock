@@ -10,24 +10,21 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/sqs/SQSMonitoring.h>
 #include <awsmock/service/sqs/SQSWorker.h>
 
-#define SQS_DEFAULT_PORT 9501
-#define SQS_DEFAULT_HOST "localhost"
-#define SQS_DEFAULT_QUEUE_LENGTH 250
-#define SQS_DEFAULT_THREADS 50
-#define SQS_DEFAULT_TIMEOUT 120
 #define SQS_DEFAULT_MONITORING_PERIOD 300
 #define SQS_DEFAULT_WORKER_PERIOD 30
 
 namespace AwsMock::Service {
 
     /**
-     * SQS server
+     * @brief SQS server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -36,11 +33,9 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
-         *
-         * @param configuration aws-mock configuration
+         * @brief Constructor
          */
-        explicit SQSServer(boost::asio::thread_pool &pool);
+        explicit SQSServer();
 
         /**
          * Initialization
@@ -60,49 +55,14 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * SQS database
-         */
-        Database::SQSDatabase &_sqsDatabase;
-
-        /**
          * SQS monitoring
          */
-        std::shared_ptr<SQSMonitoring> _sqsMonitoring;
+        SQSMonitoring _sqsMonitoring;
 
         /**
          * SQS worker
          */
-        std::shared_ptr<SQSWorker> _sqsWorker;
-
-        /**
-         * Global thread pool
-         */
-        boost::asio::thread_pool &_pool;
-
-        /**
-         * Rest port
-         */
-        int _port;
-
-        /**
-         * Rest host
-         */
-        std::string _host;
-
-        /**
-         * HTTP max message queue length
-         */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connections
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout in seconds
-         */
-        int _requestTimeout;
+        SQSWorker _sqsWorker;
 
         /**
          * SQS monitoring period

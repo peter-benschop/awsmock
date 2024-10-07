@@ -6,7 +6,6 @@
 #define AWSMOCK_SERVICE_SSM_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
 #include <awsmock/monitoring/MetricDefinition.h>
 #include <awsmock/monitoring/MetricService.h>
 #include <awsmock/repository/SSMDatabase.h>
@@ -21,51 +20,31 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SSMMonitoring : public Core::Timer {
+    class SSMMonitoring {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit SSMMonitoring(int timeout) : Core::Timer("ssm-monitoring", timeout) {}
+        explicit SSMMonitoring() = default;
 
         /**
-         * Initialization
+         * @brief Update counters
          */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+        void UpdateCounter();
 
       private:
 
         /**
-         * Update counters
-         */
-        void UpdateCounter();
-
-        /**
-         * Metric service
+         * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
-
-        /**
-         * Period
-         */
-        int _period{};
     };
 
 }// namespace AwsMock::Service

@@ -12,7 +12,6 @@
 #include <boost/filesystem.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Service {
@@ -26,36 +25,21 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Worker : public Core::Timer {
+    class S3Worker {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit S3Worker(int timeout) : Core::Timer("s3-worker", timeout) {}
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
-
-      private:
+        explicit S3Worker() = default;
 
         /**
          * @brief Synchronize S3 object between filesystem and database.
          */
         [[maybe_unused]] void SyncObjects();
+
+      private:
 
         /**
          * Database connection

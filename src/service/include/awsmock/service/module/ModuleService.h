@@ -18,6 +18,7 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/Services.h>
+#include <awsmock/dto/module/CleanInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
@@ -100,9 +101,9 @@ namespace AwsMock::Service {
          *
          * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
          *
-         * @param modules module list
+         * @param request clean infrastructure request
          */
-        static void CleanInfrastructure(const Dto::Module::Module::ModuleList &modules);
+        static void CleanInfrastructure(const Dto::Module::CleanInfrastructureRequest &request);
 
         /**
          * @brief Cleans the objects from the infrastructure.
@@ -111,7 +112,7 @@ namespace AwsMock::Service {
          *
          * @param modules modules list
          */
-        static void CleanObjects(const Dto::Module::Module::ModuleList &modules);
+        static void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request);
 
       private:
 
