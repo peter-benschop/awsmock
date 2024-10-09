@@ -27,10 +27,12 @@ namespace AwsMock::Monitoring {
     void MetricService::Run() {}
 
     void MetricService::Shutdown() {
+        log_info << "Starting metric server shutdown";
         if (_server != nullptr) {
             _server->stop();
-            log_info << "Metric module has been shutdown";
+            log_info << "Prometheus stopped";
         }
+        log_info << "Metric module has been shutdown";
     }
 
     void MetricService::AddCounter(const std::string &name) {

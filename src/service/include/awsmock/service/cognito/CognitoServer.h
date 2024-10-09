@@ -36,22 +36,22 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit CognitoServer();
+        explicit CognitoServer(Core::PeriodicScheduler &scheduler);
 
         /**
          * Initialization
          */
-        void Initialize() override;
+        void Initialize();
 
         /**
          * Main method
          */
-        void Run() override;
+        void Run();
 
         /**
          * Shutdown
          */
-        void Shutdown() override;
+        void Shutdown();
 
       private:
 

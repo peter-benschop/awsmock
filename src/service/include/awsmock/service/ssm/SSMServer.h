@@ -24,7 +24,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief SSM HTTP server
+     * @brief SSM module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -35,37 +35,22 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SSMServer();
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
+        explicit SSMServer(Core::PeriodicScheduler &scheduler);
 
       private:
 
         /**
-         * SNS monitoring
+         * SSM monitoring
          */
         SSMMonitoring _ssmMonitoring;
 
         /**
-         * SNS worker
+         * SSM worker
          */
         SSMWorker _ssmWorker;
 
         /**
-         * SNS server period
+         * SSM server period
          *
          * <p>
          * Used for the background threads (cleanup, reset, retention, etc.)

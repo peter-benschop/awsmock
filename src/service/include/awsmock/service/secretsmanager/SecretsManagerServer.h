@@ -26,11 +26,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief Secret manager server.
-     *
-     * <p>
-     * Default endpoint is localhost:9507. The server supports 50 concurrent threads and support are queue length of 250.
-     * </p>
+     * @brief Secret manager module server.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -41,22 +37,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerServer();
-
-        /**
-         * Timer initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+        explicit SecretsManagerServer(Core::PeriodicScheduler &scheduler);
 
       private:
 

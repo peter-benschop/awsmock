@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_CORE_THREAD_POOL_H
 #define AWSMOCK_CORE_THREAD_POOL_H
 
-/*#include <boost/asio/io_service.hpp>
+/*#include <boost/asio/_io_service.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/thread_pool.hpp>
 #include <boost/beast/core.hpp>
@@ -16,7 +16,7 @@
 // https://gist.github.com/autosquid/c5e5b3964524130d1c4d
 /*namespace AwsMock::Core {
 
-    typedef std::unique_ptr<boost::asio::io_service::work> asio_worker;
+    typedef std::unique_ptr<boost::asio::_io_service::work> asio_worker;
 
     // the actual thread pool
     struct ThreadPool {
@@ -55,7 +55,7 @@
 
       private:
 
-        boost::asio::io_service service;//< the io_service we are wrapping
+        boost::asio::_io_service service;//< the _io_service we are wrapping
         asio_worker working{};
         boost::thread_group g;//< need to keep track of threads so we can join them
     };

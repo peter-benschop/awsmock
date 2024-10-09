@@ -43,9 +43,7 @@ namespace AwsMock::Service {
             _sqsBaseUrl = "/api/sqs/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
         }
 
         void TearDown() override {
@@ -53,7 +51,6 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _gatewayServer->Shutdown();
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
@@ -81,7 +78,7 @@ namespace AwsMock::Service {
         }
 
         std::string _snsBaseUrl, _sqsBaseUrl, _region;
-        boost::asio::thread_pool _pool = (10);
+        boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();

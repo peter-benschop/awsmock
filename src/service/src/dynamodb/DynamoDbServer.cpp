@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer() : AbstractServer("dynamodb", 10), _dockerService(DockerService::instance()) {
+    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb", 10), _dockerService(DockerService::instance()) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -28,10 +28,10 @@ namespace AwsMock::Service {
         log_info << "DynamoDb server started";
 
         // Start DynamoDB monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-dynamodb-counters", [this] { this->_dynamoDbMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->_dynamoDbMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing tables
-        //Core::PeriodicScheduler::instance().AddTask("dynamodb-sync-tables", [this] { this->_dynamoDbWorker.SynchronizeTables(); }, _workerPeriod);
+        //scheduler.AddTask("dynamodb-sync-tables", [this] { this->_dynamoDbWorker.SynchronizeTables(); }, _workerPeriod);
 
         // Start DynamoDb docker image
         StartLocalDynamoDb();

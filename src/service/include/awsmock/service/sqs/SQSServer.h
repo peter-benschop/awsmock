@@ -24,7 +24,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief SQS server
+     * @brief SQS module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -35,22 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSServer();
-
-        /**
-         * Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * Main method
-         */
-        void Run() override;
-
-        /**
-         * Shutdown
-         */
-        void Shutdown() override;
+        explicit SQSServer(Core::PeriodicScheduler &scheduler);
 
       private:
 

@@ -24,10 +24,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief S3 HTTP server
-     *
-     * The S3 HTTP server gates the requests from the gateway, which acts like a API gateway. The S3 default port is 9500 and can set in the AwsMOck configuration file
-     * `/etc/awsmock.properties`
+     * @brief S3 module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -38,22 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Server();
-
-        /**
-         * @brief Timer initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Timer main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
+        explicit S3Server(Core::PeriodicScheduler &scheduler);
 
       private:
 

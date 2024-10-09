@@ -49,20 +49,20 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            //            _gatewayServer->Initialize();
+            //            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllGroups();
             _database.DeleteAllUserPools();
-            _gatewayServer->Shutdown();
+            //      _gatewayServer->Shutdown();
         }
 
         std::string _endpoint, _accountId, _region;
-        boost::asio::thread_pool _pool = (10);
+        boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase &_database = Database::CognitoDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

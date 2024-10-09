@@ -39,16 +39,13 @@ namespace AwsMock::Service {
             _baseUrl = "/api/cognito/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllGroups();
             _database.DeleteAllUserPools();
-            _gatewayServer->Shutdown();
         }
 
         static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {
@@ -76,7 +73,7 @@ namespace AwsMock::Service {
         }
 
         std::string _endpoint, _baseUrl;
-        boost::asio::thread_pool _pool = (10);
+        boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase _database = Database::CognitoDatabase();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

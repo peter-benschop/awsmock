@@ -52,9 +52,9 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            //            _gatewayServer->Initialize();
+            //_gatewayServer->Start();
         }
 
         void TearDown() override {
@@ -64,11 +64,11 @@ namespace AwsMock::Service {
             } catch (Core::ServiceException &ex) {
                 // Do nothing
             }
-            _gatewayServer->Stop();
+            // _gatewayServer->Stop();
         }
 
         std::string _endpoint, _accountId;
-        boost::asio::thread_pool _pool = (10);
+        boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         Service::LambdaService _lambdaService;

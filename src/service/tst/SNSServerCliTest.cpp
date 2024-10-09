@@ -37,9 +37,7 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
         }
 
         void TearDown() override {
@@ -47,7 +45,7 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _gatewayServer->Stop();
+            //  _gatewayServer->Stop();
         }
 
         static std::string GetTopicArn(const std::string &jsonString) {
@@ -85,7 +83,7 @@ namespace AwsMock::Service {
                 Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
             return messageId;
         }
@@ -102,7 +100,7 @@ namespace AwsMock::Service {
                 Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
             return queueUrl;
         }
@@ -119,13 +117,13 @@ namespace AwsMock::Service {
                 Core::JsonUtils::GetJsonValueString("SubscriptionArn", rootObject, subscriptionArn);
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
             return subscriptionArn;
         }
 
         std::string _endpoint;
-        boost::asio::thread_pool _pool = (10);
+        boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
