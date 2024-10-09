@@ -152,7 +152,7 @@ namespace AwsMock::Database {
         }
 
         // act
-        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(5, "", "", _region);
+        Entity::SQS::QueueList result = _sqsDatabase.ListQueues({}, 5, 0, {}, _region);
 
         // assert
         EXPECT_EQ(result.size(), 5);
@@ -169,9 +169,8 @@ namespace AwsMock::Database {
         }
 
         // act
-        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(5, "", "", _region);
-        std::string nextToken = result.back().paginationToken;
-        Entity::SQS::QueueList result2 = _sqsDatabase.ListQueues(5, "", nextToken, _region);
+        Entity::SQS::QueueList result = _sqsDatabase.ListQueues({}, 5, 0, {}, _region);
+        Entity::SQS::QueueList result2 = _sqsDatabase.ListQueues({}, 5, 1, {}, _region);
 
         // assert
         EXPECT_EQ(result2.size(), 5);
