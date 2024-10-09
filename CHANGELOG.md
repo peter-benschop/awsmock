@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.17](https://github.com/jensvogt/awsmock/compare/v0.15.16...v0.15.17) (2024-10-09)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** adding sorting for SQS queues ([5a50884](https://github.com/jensvogt/awsmock/commit/5a5088491bc5c3682d922a6869756bda8310d21d))
+* **653-move-manager-apis-to-gateway:** adding sorting for SQS queues ([d412ae3](https://github.com/jensvogt/awsmock/commit/d412ae321b84b4a6d11b08498261a60510a1063a))
+* **653-move-manager-apis-to-gateway:** streamline server startup ([e195749](https://github.com/jensvogt/awsmock/commit/e195749eae24f682999468992e9ed792da99da8b))
+
 ## [0.15.16](https://github.com/jensvogt/awsmock/compare/v0.15.15...v0.15.16) (2024-10-07)
 
 
