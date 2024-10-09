@@ -78,7 +78,7 @@ namespace AwsMock::Service {
 
                 // Get total number
                 long total = _sqsDatabase.CountQueues(request.region);
-                Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.maxResults, request.queueNamePrefix, request.nextToken, request.region);
+                Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 std::string nextToken = queueList.size() > 0 ? queueList.back().oid : "";
                 Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList, .nextToken = nextToken, .total = total};
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
@@ -123,7 +123,7 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.pageSize, {}, std::to_string(request.pageSize * request.pageIndex), request.region);
+            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, request.sortColumns, request.region);
 
             Dto::SQS::ListQueueCountersResponse listQueueResponse;
             listQueueResponse.total = _sqsDatabase.CountQueues(request.region);

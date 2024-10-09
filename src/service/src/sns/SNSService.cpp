@@ -322,4 +322,26 @@ namespace AwsMock::Service {
         _sqsService.SendMessage(sendMessageRequest);
     }
 
+    Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_messages");
+        log_trace << "List all messages request, region: " << request.region << " topicArn: " << request.topicArn;
+
+        try {
+
+            long total = _snsDatabase.CountMessages(request.region, request.topicArn);
+
+            Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex);
+
+            Dto::SNS::ListMessagesResponse listMessageResponse = Dto::SNS::Mapper::map(request, messageList);
+            listMessageResponse.total = total;
+            log_trace << "SNS list messages, response: " << listMessageResponse.ToJson();
+
+            return listMessageResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "SNS list topics request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
 }// namespace AwsMock::Service

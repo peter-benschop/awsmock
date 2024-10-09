@@ -38,6 +38,7 @@ namespace AwsMock::Dto::Common {
         LIST_SUBSCRIPTIONS_BY_TOPIC,
         TAG_RESOURCE,
         DELETE_TOPIC,
+        LIST_MESSAGES,
         UNKNOWN
     };
 
@@ -51,6 +52,7 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
             {SNSCommandType::TAG_RESOURCE, "tag-resource"},
             {SNSCommandType::DELETE_TOPIC, "delete-topic"},
+            {SNSCommandType::LIST_MESSAGES, "list-messages"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {

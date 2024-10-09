@@ -36,12 +36,19 @@ namespace AwsMock::Dto::Common {
 
         std::string cmd;
         std::string cType = request["Content-Type"];
-        if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
+            // awsmock command from UI
+            cmd = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+
+        } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
+
+            // AWS CLI
             cmd = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
+            // AWS Java SDK
             std::string headerValue = request["X-Amz-Target"];
             cmd = Core::StringUtils::Split(headerValue, '.')[1];
         }

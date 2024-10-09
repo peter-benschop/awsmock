@@ -231,19 +231,32 @@ namespace AwsMock::Database {
         return count;
     }
 
-    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region) {
+    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) {
 
         Entity::SNS::MessageList messageList;
-        if (region.empty()) {
+        if (region.empty() && topicArn.empty()) {
 
             for (const auto &message: _messages) {
                 messageList.emplace_back(message.second);
             }
 
-        } else {
+        } else if (topicArn.empty()) {
 
             for (const auto &message: _messages) {
                 if (message.second.region == region) {
+                    messageList.emplace_back(message.second);
+                }
+            }
+        } else if (region.empty()) {
+
+            for (const auto &message: _messages) {
+                if (message.second.topicArn == topicArn) {
+                    messageList.emplace_back(message.second);
+                }
+            }
+        } else {
+            for (const auto &message: _messages) {
+                if (message.second.region == region && message.second.topicArn == topicArn) {
                     messageList.emplace_back(message.second);
                 }
             }

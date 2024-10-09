@@ -24,6 +24,8 @@
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
 #include <awsmock/dto/sns/GetTopicAttributesRequest.h>
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
+#include <awsmock/dto/sns/ListMessagesRequest.h>
+#include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
@@ -36,6 +38,7 @@
 #include <awsmock/dto/sns/TagResourceResponse.h>
 #include <awsmock/dto/sns/UnsubscribeRequest.h>
 #include <awsmock/dto/sns/UnsubscribeResponse.h>
+#include <awsmock/dto/sns/mapper/Mapper.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
@@ -135,6 +138,16 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
+
+        /**
+         * @brief List messages
+         *
+         * @param request list messages request
+         * @return ListmessagesResponse
+         * @see ListmessagesResponse
+         * @throws ServiceException
+         */
+        Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request);
 
       private:
 

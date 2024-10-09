@@ -19,12 +19,13 @@
 #include <mongocxx/options/find_one_and_update.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -146,14 +147,15 @@ namespace AwsMock::Database {
         /**
          * @brief List available queues, using paging
          *
-         * @param maxResults maximal number of results
          * @param prefix queue name prefix
-         * @param nextToken next token
+         * @param pageSize maximal number of results
+         * @param pageIndex pge index
+         * @param sortColumns vector of sort columns
          * @param region AWS region
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(int maxResults, const std::string &prefix, const std::string &nextToken, const std::string &region = {});
+        Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {});
 
         /**
          * @brief List all available queues

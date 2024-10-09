@@ -72,9 +72,6 @@ namespace AwsMock::Service {
 
         // arrange
 
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::microseconds(1000));
-        }
         // act
         Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
         EXPECT_EQ(0, result.status);
