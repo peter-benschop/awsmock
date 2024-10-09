@@ -15,8 +15,24 @@ namespace AwsMock::Dto::SQS {
         try {
 
             // Values
+            Core::JsonUtils::GetJsonValueString("region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("prefix", rootObject, prefix);
             Core::JsonUtils::GetJsonValueInt("pageSize", rootObject, pageSize);
             Core::JsonUtils::GetJsonValueInt("pageIndex", rootObject, pageIndex);
+
+            if (!rootObject->get("sortColumns").isEmpty()) {
+
+                Poco::JSON::Array::Ptr sortColumnArray = rootObject->getArray("sortColumns");
+                if (sortColumnArray != nullptr) {
+                    for (int i = 0; i < sortColumnArray->size(); i++) {
+                        Core::SortColumn sortColumn;
+                        Poco::JSON::Object::Ptr jsonColumnObject = sortColumnArray->getObject(i);
+                        Core::JsonUtils::GetJsonValueString("column", jsonColumnObject, sortColumn.column);
+                        Core::JsonUtils::GetJsonValueInt("sortDirection", jsonColumnObject, sortColumn.sortDirection);
+                        sortColumns.emplace_back(sortColumn);
+                    }
+                }
+            }
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -29,8 +45,17 @@ namespace AwsMock::Dto::SQS {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
+            rootJson.set("prefix", prefix);
             rootJson.set("pageSize", pageSize);
             rootJson.set("pageIndex", pageIndex);
+
+            if (!sortColumns.empty()) {
+                Poco::JSON::Array jsonArray;
+                for (const auto &sortColumn: sortColumns) {
+                    jsonArray.add(sortColumn);
+                }
+                rootJson.set("sortColumns", sortColumns);
+            }
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

@@ -231,10 +231,23 @@ namespace AwsMock::Database {
          * @brief List all available resources
          *
          * @param region AWS region
-         * @return list of SNS resources
+         * @param topicArn AWS topic ARN
+         * @return list of SNS messages
          * @throws DatabaseException
          */
-        Entity::SNS::MessageList ListMessages(const std::string &region = {});
+        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {});
+
+        /**
+         * @brief Paged list all available messages
+         *
+         * @param region AWS region
+         * @param topicArn AWS topic ARN
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @return list of SNS messages
+         * @throws DatabaseException
+         */
+        Entity::SNS::MessageList ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex);
 
         /**
          * @brief Updates an existing message

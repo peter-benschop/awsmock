@@ -508,35 +508,71 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region) {
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn) {
 
         Entity::SNS::MessageList messageList;
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-            if (region.empty()) {
 
-                auto messageCursor = _messageCollection.find(make_document());
-                for (auto message: messageCursor) {
-                    Entity::SNS::Message result;
-                    result.FromDocument(message);
-                    messageList.push_back(result);
-                }
+            bsoncxx::builder::basic::document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
 
-            } else {
+            if (!topicArn.empty()) {
+                query.append(kvp("topicArn", topicArn));
+            }
 
-                auto messageCursor = _messageCollection.find(make_document(kvp("region", region)));
-                for (auto message: messageCursor) {
-                    Entity::SNS::Message result;
-                    result.FromDocument(message);
-                    messageList.push_back(result);
-                }
+            auto messageCursor = _messageCollection.find(query.extract());
+            for (auto message: messageCursor) {
+                Entity::SNS::Message result;
+                result.FromDocument(message);
+                messageList.push_back(result);
             }
 
         } else {
 
-            messageList = _memoryDb.ListMessages(region);
+            messageList = _memoryDb.ListMessages(region, topicArn);
+        }
+        log_trace << "Got message list, size: " << messageList.size();
+        return messageList;
+    }
+
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex) {
+
+        Entity::SNS::MessageList messageList;
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+            mongocxx::options::find opts;
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+            }
+            if (pageIndex > 0) {
+                opts.skip(pageIndex * pageSize);
+            }
+            bsoncxx::builder::basic::document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!topicArn.empty()) {
+                query.append(kvp("topicArn", topicArn));
+            }
+
+            auto messageCursor = _messageCollection.find(query.extract(), opts);
+            for (auto message: messageCursor) {
+                Entity::SNS::Message result;
+                result.FromDocument(message);
+                messageList.push_back(result);
+            }
+
+        } else {
+
+            messageList = _memoryDb.ListMessages(region, topicArn);
         }
         log_trace << "Got message list, size: " << messageList.size();
         return messageList;
@@ -656,7 +692,7 @@ namespace AwsMock::Database {
 
     void SNSDatabase::DeleteOldMessages(long timeout) {
 
-        const std::chrono::system_clock::time_point reset = std::chrono::system_clock::now() - std::chrono::seconds{timeout};
+        const std::chrono::system_clock::time_point reset = std::chrono::system_clock::now() - std::chrono::days{timeout};
 
         if (HasDatabase()) {
 

@@ -24,6 +24,7 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 
 namespace AwsMock::Dto::SQS {
@@ -36,6 +37,11 @@ namespace AwsMock::Dto::SQS {
         std::string region;
 
         /**
+         * Prefix
+         */
+        std::string prefix;
+
+        /**
          * Page size
          */
         int pageSize;
@@ -44,6 +50,11 @@ namespace AwsMock::Dto::SQS {
          * Page index
          */
         int pageIndex;
+
+        /**
+         * Sort column
+         */
+        std::vector<Core::SortColumn> sortColumns;
 
         /**
          * @brief Convert from JSON representation

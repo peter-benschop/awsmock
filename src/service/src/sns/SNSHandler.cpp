@@ -106,6 +106,7 @@ namespace AwsMock::Service {
                     log_info << "Topic tagged, resourceArn: " << resourceArn;
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
+
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
 
                     std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TopicArn");
@@ -115,6 +116,20 @@ namespace AwsMock::Service {
 
                     log_info << "Topic deleted, topicArn: " << topicArn;
                     return SendOkResponse(request, snsResponse.ToXml());
+                }
+
+                case Dto::Common::SNSCommandType::LIST_MESSAGES: {
+
+                    Dto::SNS::ListMessagesRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+                    snsRequest.region = region;
+
+                    log_debug << "Topic ARN: " << snsRequest.topicArn;
+
+                    Dto::SNS::ListMessagesResponse snsResponse = _snsService.ListMessages(snsRequest);
+
+                    log_info << "List messages, topicArn: " << snsRequest.topicArn;
+                    return SendOkResponse(request, snsResponse.ToJson());
                 }
 
                 default:

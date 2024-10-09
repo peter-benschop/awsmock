@@ -197,10 +197,12 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SQS::QueueList SQSDatabase::ListQueues(int maxResults, const std::string &prefix, const std::string &nextToken, const std::string &region) {
+    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) {
 
         Entity::SQS::QueueList queueList;
         if (HasDatabase()) {
+
+            mongocxx::options::find opts;
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
@@ -213,19 +215,20 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
 
-            long skipCount = 0;
-            if (!nextToken.empty()) {
-                skipCount = std::stol(nextToken);
-                log_debug << "Skip count, count: " << skipCount;
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+            }
+            if (pageIndex > 0) {
+                opts.skip(pageIndex * pageSize);
             }
 
-            mongocxx::options::find opts;
             opts.sort(make_document(kvp("_id", 1)));
-            if (maxResults > 0) {
-                opts.limit(maxResults);
-            }
-            if (skipCount > 0) {
-                opts.skip(skipCount);
+            if (!sortColumns.empty()) {
+                bsoncxx::builder::basic::document sort;
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                }
+                opts.sort(sort.extract());
             }
 
             auto queueCursor = _queueCollection.find(query.view(), opts);
