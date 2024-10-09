@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    KMSServer::KMSServer() : AbstractServer("kms", 10), _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSServer::KMSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms", 10), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -22,10 +22,10 @@ namespace AwsMock::Service {
         log_info << "KMS module starting";
 
         // Start lambda monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-lambda-counters", [this] { this->_kmsMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-lambda-counters", [this] { this->_kmsMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old keys
-        Core::PeriodicScheduler::instance().AddTask("lambda-remove-lambdas", [this] { this->_kmsWorker.DeleteKeys(); }, _workerPeriod);
+        scheduler.AddTask("lambda-remove-lambdas", [this] { this->_kmsWorker.DeleteKeys(); }, _workerPeriod);
 
         // Set running
         SetRunning();

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer() : AbstractServer("secretsmanager", 10) {
+    SecretsManagerServer::SecretsManagerServer(Core::PeriodicScheduler &scheduler) : AbstractServer("secretsmanager", 10) {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -21,19 +21,10 @@ namespace AwsMock::Service {
         log_info << "SecretsManager server starting";
 
         // Start secrets manager monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-sns-counters", [this] { this->_secretsManagerMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-sns-counters", [this] { this->_secretsManagerMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Set running
         SetRunning();
-    }
-
-    void SecretsManagerServer::Initialize() {
-    }
-
-    void SecretsManagerServer::Run() {
-    }
-
-    void SecretsManagerServer::Shutdown() {
     }
 
 }// namespace AwsMock::Service

@@ -11,14 +11,14 @@
 #include <boost/bind/bind.hpp>
 
 // AwsMock includes
-#include "MetricService.h"
-#include "MetricSystemCollector.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
 #include <awsmock/service/monitoring/MonitoringWorker.h>
 
@@ -28,7 +28,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief Monitoring HTTP server
+     * @brief Monitoring module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -39,22 +39,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringServer();
-
-        /**
-         * @brief Timer initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Timer main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
+        explicit MonitoringServer(Core::PeriodicScheduler &scheduler);
 
       private:
 

@@ -77,7 +77,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialize database
          */
-        void InitializeDatabase();
+        static void InitializeDatabase();
 
         /**
          * @brief Initialize monitoring
@@ -92,12 +92,12 @@ namespace AwsMock::Manager {
         /**
          * Metric server
          */
-        Monitoring::MetricService _metricService;
+        //Monitoring::MetricService _metricService;
 
         /**
          * Metric server
          */
-        Service::MonitoringServer _monitoringServer;
+        //Service::MonitoringServer _monitoringServer;
     };
 
 }// namespace AwsMock::Manager

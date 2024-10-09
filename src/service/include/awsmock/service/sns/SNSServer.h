@@ -23,7 +23,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief SNS server thread
+     * @brief SNS module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -34,24 +34,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSServer();
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-      protected:
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
+        explicit SNSServer(Core::PeriodicScheduler &scheduler);
 
       private:
 

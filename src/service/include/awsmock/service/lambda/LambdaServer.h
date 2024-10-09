@@ -40,24 +40,24 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit LambdaServer();
+        explicit LambdaServer(Core::PeriodicScheduler &scheduler);
 
         /**
          * Initialization
          */
-        void Initialize() override;
+        void Initialize();
 
       protected:
 
         /**
          * Main method
          */
-        void Run() override;
+        void Run();
 
         /**
          * Shutdown
          */
-        void Shutdown() override;
+        void Shutdown();
 
       private:
 

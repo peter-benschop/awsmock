@@ -47,24 +47,24 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbServer();
+        explicit DynamoDbServer(Core::PeriodicScheduler &scheduler);
 
         /**
          * @brief Initialization
          */
-        void Initialize() override;
+        void Initialize();
 
       protected:
 
         /**
          * @brief Main method
          */
-        void Run() override;
+        void Run();
 
         /**
          * @brief Shutdown
          */
-        void Shutdown() override;
+        void Shutdown();
 
       private:
 

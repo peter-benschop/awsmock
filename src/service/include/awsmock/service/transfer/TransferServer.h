@@ -27,7 +27,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief Transfer server HTTP server
+     * @brief Transfer module server
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -38,22 +38,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferServer();
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
+        explicit TransferServer(Core::PeriodicScheduler &scheduler);
 
       private:
 
@@ -132,6 +117,11 @@ namespace AwsMock::Service {
         std::string _serverId;
 
         /**
+         * Monitoring period
+         */
+        int _monitoringPeriod;
+
+        /**
          * List of transfer servers
          */
         std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
@@ -140,11 +130,6 @@ namespace AwsMock::Service {
          * Actual FTP manager
          */
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
-
-        /**
-         * Monitoring period
-         */
-        int _monitoringPeriod;
     };
 
 }// namespace AwsMock::Service

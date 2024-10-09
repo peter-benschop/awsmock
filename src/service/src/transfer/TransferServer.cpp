@@ -7,7 +7,7 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer() : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
+    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
 
         // REST manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -18,10 +18,10 @@ namespace AwsMock::Service {
             log_info << "Transfer module inactive";
             return;
         }
-        log_info << "Transfer module starting";
+        log_info << "Transfer server starting";
 
         // Start SNS monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-s3-counters", [this] { this->_transferMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-transfer-counters", [this] { this->_transferMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Create transfer bucket
         CreateTransferBucket();
@@ -33,20 +33,6 @@ namespace AwsMock::Service {
         SetRunning();
 
         log_info << "Transfer server initialized";
-    }
-
-    void TransferServer::Initialize() {
-
-
-        log_debug << "All online transfer servers started";
-    }
-
-    void TransferServer::Run() {
-        // Intentionally left empty
-    }
-
-    void TransferServer::Shutdown() {
-        // Intentionally left empty
     }
 
     void TransferServer::CreateTransferBucket() {

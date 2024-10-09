@@ -47,15 +47,19 @@ namespace AwsMock::Service {
             _queueUrl = "http://sqs." + _region + "." + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            // Start gateway server
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _thread = boost::thread([&]() {
+                boost::asio::io_service::work work(_ios);
+                _ios.run();
+            });
         }
 
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            _gatewayServer->Stop();
+            _ios.stop();
+            _thread.join();
         }
 
         static std::string GetReceiptHandle(const std::string &jsonString) {
@@ -80,8 +84,9 @@ namespace AwsMock::Service {
             return receiptHandle;
         }
 
+        boost::thread _thread;
+        boost::asio::io_service _ios{10};
         std::string _endpoint, _queueUrl, _accountId;
-        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;

@@ -12,23 +12,13 @@
 #include <boost/asio/io_service.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/lambda/model/InvocationNotification.h>
-#include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewayListener.h>
-#include <awsmock/service/lambda/LambdaCreator.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
-#include <awsmock/service/s3/S3Service.h>
 
 #define GATEWAY_DEFAULT_HOST "localhost"
 #define GATEWAY_DEFAULT_ADDRESS "0.0.0.0"
-#define GATEWAY_MAX_QUEUE 250
-#define GATEWAY_MAX_THREADS 50
-#define GATEWAY_TIMEOUT 900
 
 namespace AwsMock::Service {
 
@@ -51,34 +41,9 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayServer(boost::asio::thread_pool &pool);
-
-        /**
-         * @brief Timer initialization
-         */
-        void Initialize() override;
-
-        /**
-         * @brief Start
-         */
-        void Start() override;
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown() override;
+        explicit GatewayServer(boost::asio::io_service &ios);
 
       private:
-
-        /**
-         * @brief Main method
-         */
-        void Run() override;
-
-        /**
-         * Service database
-         */
-        std::unique_ptr<Database::ModuleDatabase> _serviceDatabase;
 
         /**
          * Rest port
@@ -96,29 +61,9 @@ namespace AwsMock::Service {
         std::string _address;
 
         /**
-         * HTTP max message queue length
+         * Boost IO service
          */
-        int _maxQueueLength;
-
-        /**
-         * HTTP max concurrent connection
-         */
-        int _maxThreads;
-
-        /**
-         * HTTP request timeout
-         */
-        int _requestTimeout;
-
-        /**
-         * Thread pool
-         */
-        std::vector<std::thread> _threads;
-        boost::thread_group _threadGroup;
-
-        boost::asio::thread_pool &_pool;
-
-        boost::asio::io_context ioc{10};
+        boost::asio::io_context &_ios;
     };
 
 }// namespace AwsMock::Service

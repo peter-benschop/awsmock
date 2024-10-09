@@ -6,35 +6,21 @@
 
 namespace AwsMock::Service {
 
-    MonitoringServer::MonitoringServer() : AbstractServer("monitoring") {
-        log_debug << "Monitoring module initialized";
-    }
-
-    void MonitoringServer::Initialize() {
+    MonitoringServer::MonitoringServer(Core::PeriodicScheduler &scheduler) : AbstractServer("monitoring") {
 
         // Initialize metric server
         _metricService.Initialize();
 
         // Start monitoring system collector
         _metricSystemCollector.Initialize();
-        Core::PeriodicScheduler::instance().AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.Run(); }, 60);
+        scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.Run(); }, 60);
 
         // Start the database cleanup worker thread every day
-        Core::PeriodicScheduler::instance().AddTask("monitoring-cleanup-database", [this] { this->_monitoringWorker.DeleteMonitoringData(); }, 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
-
-        // TODO: Get the delay running
-        //std::this_thread::sleep_for(std::chrono::seconds(_delay));
+        scheduler.AddTask("monitoring-cleanup-database", [this] { this->_monitoringWorker.DeleteMonitoringData(); }, 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
 
         // Set running
         SetRunning();
-    }
-
-    void MonitoringServer::Run() {
-    }
-
-    void MonitoringServer::Shutdown() {
-        log_info << "Shutdown initiated, monitoring";
-        Core::PeriodicScheduler::instance().Shutdown();
+        log_debug << "Monitoring module initialized";
     }
 
 }// namespace AwsMock::Service

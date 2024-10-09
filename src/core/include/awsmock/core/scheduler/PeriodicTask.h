@@ -31,7 +31,7 @@ namespace AwsMock::Core {
             : ioService(ioService), interval(interval), task(std::move(task)), name(name), timer(ioService), _delay(delay) {
             log_debug << "Create PeriodicTask '" << name << "'";
 
-            // Schedule start to be run by the io_service
+            // Schedule start to be run by the _io_service
             ioService.post([this] { start(); });
         }
 

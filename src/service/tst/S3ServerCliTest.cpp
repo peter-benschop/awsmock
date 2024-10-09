@@ -40,23 +40,29 @@ namespace AwsMock::Service {
             std::string _host = _configuration.getString("awsmock.service.sqs.http.host", GATEWAY_DEFAULT_HOST);
 
             // Set test config
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _endpoint = "http://" + _host + ":" + _port;
+            std::string p = std::to_string(Core::RandomUtils::NextInt(32678, 65480));
+            _configuration.setString("awsmock.service.gateway.http.host", p);
+            _endpoint = "http://localhost:" + p;
+            std::cout << "port: " << p << std::endl;
 
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_pool);
-            _gatewayServer->Initialize();
-            _gatewayServer->Start();
+            // Start gateway server
+            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _thread = boost::thread([&]() {
+                boost::asio::io_service::work work(_ios);
+                _ios.run();
+            });
         }
 
         void TearDown() override {
             _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
-            _gatewayServer->Stop();
+            _ios.stop();
+            _thread.join();
         }
 
+        boost::thread _thread;
+        boost::asio::io_service _ios{10};
         std::string _endpoint, _accountId, _output, _region;
-        boost::asio::thread_pool _pool = (10);
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
@@ -66,6 +72,9 @@ namespace AwsMock::Service {
 
         // arrange
 
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::microseconds(1000));
+        }
         // act
         Core::ExecResult result = Core::TestUtils::SendCliCommand("aws s3 mb " + TEST_BUCKET + " --endpoint " + _endpoint);
         EXPECT_EQ(0, result.status);

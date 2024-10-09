@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    LambdaServer::LambdaServer() : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -32,10 +32,10 @@ namespace AwsMock::Service {
         CleanupContainers();
 
         // Start lambda monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-lambda-counters", [this] { this->_lambdaMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-lambda-counters", [this] { this->_lambdaMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
-        Core::PeriodicScheduler::instance().AddTask("lambda-remove-lambdas", [this] { this->_lambdaWorker.RemoveExpiredLambdas(); }, _workerPeriod);
+        scheduler.AddTask("lambda-remove-lambdas", [this] { this->_lambdaWorker.RemoveExpiredLambdas(); }, _workerPeriod);
 
         // Set running
         SetRunning();

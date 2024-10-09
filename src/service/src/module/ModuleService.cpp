@@ -28,7 +28,7 @@ namespace AwsMock::Service {
                 if (module.name == "database") {
                     _moduleDatabase.StartDatabase();
                 } else {
-                    moduleMap.GetModule(module.name)->Start();
+                    //moduleMap.GetModule(module.name)->Start();
                 }
                 log_info << "Module " << m.name << " started";
             }
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
                 } else {
                     for (const auto &server: ModuleMap::instance().GetModuleMap()) {
                         if (m.name == server.first) {
-                            server.second->Stop();
+                            //server.second->Stop();
                         }
                     }
                 }

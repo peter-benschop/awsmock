@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    CognitoServer::CognitoServer() : AbstractServer("cognito", 10) {
+    CognitoServer::CognitoServer(Core::PeriodicScheduler &scheduler) : AbstractServer("cognito", 10) {
 
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
@@ -20,7 +20,7 @@ namespace AwsMock::Service {
         log_info << "Cognito module starting";
 
         // Start DynamoDB monitoring update counters
-        Core::PeriodicScheduler::instance().AddTask("monitoring-dynamodb-counters", [this] { this->_cognitoMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->_cognitoMonitoring.UpdateCounter(); }, _monitoringPeriod);
 
         // Set running
         SetRunning();
