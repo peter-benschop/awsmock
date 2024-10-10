@@ -179,6 +179,11 @@ namespace AwsMock::Service {
          */
         typedef std::map<std::string, std::shared_ptr<AbstractHandler>> RoutingTable;
         static RoutingTable _routingTable;
+
+        /**
+         * Metric service
+         */
+        Monitoring::MetricService _metricService;
     };
 
 

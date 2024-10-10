@@ -7,22 +7,12 @@
 namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::Initialize() {
-        FILE *file;
-        struct tms timeSample{};
-        char line[128];
+        struct tms timeSample {};
 
         lastCPU = times(&timeSample);
         lastSysCPU = timeSample.tms_stime;
         lastUserCPU = timeSample.tms_utime;
-
-        file = fopen("/proc/cpuinfo", "r");
-        numProcessors = 0;
-        while (fgets(line, 128, file) != nullptr) {
-            if (strncmp(line, "processor", 9) == 0)
-                numProcessors++;
-        }
-        fclose(file);
-        numProcessors /= 2;
+        numProcessors = Core::SystemUtils::GetNumberOfCores() / 2;
         log_debug << "Got number of processors, numProcs: " << numProcessors;
     }
 
@@ -60,7 +50,7 @@ namespace AwsMock::Monitoring {
         ifs.close();
 
         clock_t now;
-        struct tms timeSample{};
+        struct tms timeSample {};
         now = times(&timeSample);
         double totalPercent, userPercent, systemPercent;
 

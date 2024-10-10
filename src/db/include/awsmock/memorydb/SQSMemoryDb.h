@@ -229,8 +229,9 @@ namespace AwsMock::Database {
          *
          * @param queueArn ARN of the queue
          * @param visibility visibilityTimeout period in seconds
+         * @return number of message resets
          */
-        [[maybe_unused]] void ResetMessages(const std::string &queueArn, long visibility);
+        long ResetMessages(const std::string &queueArn, long visibility);
 
         /**
          * @brief Redrive expired resources.
@@ -246,16 +247,18 @@ namespace AwsMock::Database {
          *
          * @param queueArn queue URL.
          * @param delay delay in seconds.
+         * @reset number of delayed messages
          */
-        void ResetDelayedMessages(const std::string &queueArn, long delay);
+        long ResetDelayedMessages(const std::string &queueArn, long delay);
 
         /**
          * @brief Any message, which has is older than the retention period is deleted.
          *
          * @param queueUrl queue URL.
          * @param retentionPeriod retention period in seconds.
+         * @return number of deleted messages
          */
-        void MessageRetention(const std::string &queueUrl, long retentionPeriod);
+        long MessageRetention(const std::string &queueUrl, long retentionPeriod);
 
         /**
           * @brief Returns a message by receipt handle.
@@ -298,25 +301,28 @@ namespace AwsMock::Database {
          * @brief Deletes all resources of a queue
          *
          * @param queue message queue to delete resources from
+         * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &queue);
+        long DeleteMessages(const std::string &queue);
 
         /**
          * @brief Deletes a message.
          *
          * @param message message to delete
+         * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        void DeleteMessage(const Entity::SQS::Message &message);
+        long DeleteMessage(const Entity::SQS::Message &message);
 
         /**
          * @brief Deletes a message by receipt handle.
          *
          * @param receiptHandle message receipt handle
+         * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        void DeleteMessage(const std::string &receiptHandle);
+        long DeleteMessage(const std::string &receiptHandle);
 
         /**
          * @brief Deletes a resources.

@@ -92,7 +92,8 @@ namespace AwsMock::Manager {
         Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
 
         // Define thread pool size
-        boost::asio::thread_pool pool(256);
+        int numberOfCores = Core::SystemUtils::GetNumberOfCores();
+        boost::asio::thread_pool pool(numberOfCores);
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_service ios;
@@ -106,7 +107,6 @@ namespace AwsMock::Manager {
                     // Stop the `io_context`. This will cause `run()` to return immediately, eventually
                     // destroying the `io_context` and all the sockets in it.
                     log_info << "Manager stopped on signal";
-
                     StopModules();
                     pool.stop();
                     ios.stop();
@@ -139,7 +139,7 @@ namespace AwsMock::Manager {
             }
         }
 
-        for (auto i = 0; i < 256; i++) {
+        for (auto i = 0; i < numberOfCores; i++) {
             _threadGroup.create_thread([ObjectPtr = &ios] { return ObjectPtr->run(); });
         }
         ios.run();

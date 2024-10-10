@@ -16,6 +16,7 @@
 // HTTP timer
 #define GATEWAY_HTTP_TIMER "gateway_http_timer"
 #define GATEWAY_HTTP_COUNTER "gateway_http_counter"
+#define GATEWAY_HTTP_QUEUE_LENGTH "gateway_http_queue_length"
 
 #define MODULE_HTTP_TIMER "manager_http_timer"
 #define MODULE_HTTP_COUNTER "manager_http_counter"

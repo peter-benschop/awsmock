@@ -248,14 +248,14 @@ namespace AwsMock::Service {
             if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
                 response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
             }
+            if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesDelayed")) {
+                response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
+            }
             if (CheckAttribute(request.attributeNames, "CreatedTimestamp")) {
                 response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
             }
             if (CheckAttribute(request.attributeNames, "LastModifiedTimestamp")) {
                 response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
-            }
-            if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
-                response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
             }
             if (CheckAttribute(request.attributeNames, "DelaySeconds")) {
                 response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
@@ -641,9 +641,13 @@ namespace AwsMock::Service {
                 log_error << "Message does not exist, receiptHandle: " << request.receiptHandle;
                 throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
             }
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
+
+            // Delete from database
+            _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
+            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
 
             // Update queue counters
-            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
             switch (message.status) {
                 case Database::Entity::SQS::MessageStatus::INITIAL:
@@ -658,12 +662,9 @@ namespace AwsMock::Service {
                 case Database::Entity::SQS::MessageStatus::UNKNOWN:
                     break;
             }
+
             queue = _sqsDatabase.UpdateQueue(queue);
             log_debug << "Queue counters updated, queue: " << queue.queueArn;
-
-            // Delete from database
-            _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
-            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -686,7 +687,24 @@ namespace AwsMock::Service {
                 }
 
                 // Delete from database
-                _sqsDatabase.DeleteMessage(entry.receiptHandle);
+                Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(entry.receiptHandle);
+                _sqsDatabase.DeleteMessage(message);
+
+                // Update queue counters
+                Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
+                switch (message.status) {
+                    case Database::Entity::SQS::MessageStatus::INITIAL:
+                        queue.attributes.approximateNumberOfMessages--;
+                        break;
+                    case Database::Entity::SQS::MessageStatus::INVISIBLE:
+                        queue.attributes.approximateNumberOfMessagesNotVisible--;
+                        break;
+                    case Database::Entity::SQS::MessageStatus::DELAYED:
+                        queue.attributes.approximateNumberOfMessagesDelayed--;
+                        break;
+                    case Database::Entity::SQS::MessageStatus::UNKNOWN:
+                        break;
+                }
             }
             log_debug << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size();
 
@@ -719,4 +737,20 @@ namespace AwsMock::Service {
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 
+    void SQSService::AdjustMessageCounters(const Database::Entity::SQS::Message &message, Database::Entity::SQS::Queue &queue) {
+        switch (message.status) {
+            case Database::Entity::SQS::MessageStatus::INITIAL:
+                queue.attributes.approximateNumberOfMessages--;
+                break;
+            case Database::Entity::SQS::MessageStatus::INVISIBLE:
+                queue.attributes.approximateNumberOfMessagesNotVisible--;
+                break;
+            case Database::Entity::SQS::MessageStatus::DELAYED:
+                queue.attributes.approximateNumberOfMessagesDelayed--;
+                break;
+            case Database::Entity::SQS::MessageStatus::UNKNOWN:
+                break;
+        }
+        _sqsDatabase.UpdateQueue(queue);
+    }
 }// namespace AwsMock::Service
