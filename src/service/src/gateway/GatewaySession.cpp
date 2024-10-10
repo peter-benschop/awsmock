@@ -75,6 +75,7 @@ namespace AwsMock::Service {
 
         // Allocate and store the work
         response_queue_.push(std::move(response));
+        //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, static_cast<double>(response_queue_.size()));
 
         // If there was no previous work, start the write loop
         if (response_queue_.size() == 1)
@@ -208,6 +209,7 @@ namespace AwsMock::Service {
         response_queue_.pop();
 
         DoWrite();
+        //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, response_queue_.size());
     }
 
     void GatewaySession::DoClose() {

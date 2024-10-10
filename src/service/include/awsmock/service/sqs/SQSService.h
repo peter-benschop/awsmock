@@ -81,7 +81,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Creates a new queue.
@@ -254,6 +254,14 @@ namespace AwsMock::Service {
          * @param value value to check for.
          */
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
+
+        /**
+         * Adjust queue counters after update/delete of messages
+         *
+         * @param message
+         * @param queue
+         */
+        void AdjustMessageCounters(const Database::Entity::SQS::Message &message, Database::Entity::SQS::Queue &queue);
 
         /**
          * SQS database connection

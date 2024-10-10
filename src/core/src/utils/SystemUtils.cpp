@@ -63,4 +63,19 @@ namespace AwsMock::Core {
         return getpid();
     }
 
+    int SystemUtils::GetNumberOfCores() {
+        FILE *file;
+        char line[128];
+
+        file = fopen("/proc/cpuinfo", "r");
+        int numCores = 0;
+        while (fgets(line, 128, file) != nullptr) {
+            if (strncmp(line, "processor", 9) == 0)
+                numCores++;
+        }
+        fclose(file);
+        log_debug << "Got number of processors, numProcs: " << numCores;
+        return numCores;
+    }
+
 }// namespace AwsMock::Core

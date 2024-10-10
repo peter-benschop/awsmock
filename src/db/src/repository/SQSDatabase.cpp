@@ -720,13 +720,15 @@ namespace AwsMock::Database {
         log_trace << "Messages received, queueArn: " << queueArn + " count: " << messageList.size();
     }
 
-    void SQSDatabase::ResetMessages(const std::string &queueArn, long visibility) {
+    long SQSDatabase::ResetMessages(const std::string &queueArn, long visibility) {
 
         if (HasDatabase()) {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             auto session = client->start_session();
+
+            auto reset = std::chrono::system_clock::now() - std::chrono::seconds{visibility};
 
             try {
 
@@ -742,10 +744,13 @@ namespace AwsMock::Database {
                                                   kvp("status",
                                                       Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
                                                   kvp("receiptHandle", ""),
-                                                  kvp("reset", bsoncxx::types::b_null())))));
+                                                  kvp("reset", bsoncxx::types::b_date(reset))))));
+
                 session.commit_transaction();
 
                 log_trace << "Message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
+
+                return result->upserted_count();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -754,8 +759,9 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.ResetMessages(queueArn, visibility);
+            return _memoryDb.ResetMessages(queueArn, visibility);
         }
+        return 0;
     }
 
     void SQSDatabase::RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) {
@@ -797,7 +803,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SQSDatabase::ResetDelayedMessages(const std::string &queueArn, long delay) {
+    long SQSDatabase::ResetDelayedMessages(const std::string &queueArn, long delay) {
 
         if (HasDatabase()) {
 
@@ -823,6 +829,8 @@ namespace AwsMock::Database {
 
                 log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
 
+                return result->upserted_count();
+
             } catch (mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Collection transaction exception: " << exc.what();
@@ -831,11 +839,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.ResetDelayedMessages(queueArn, delay);
+            return _memoryDb.ResetDelayedMessages(queueArn, delay);
         }
     }
 
-    void SQSDatabase::MessageRetention(const std::string &queueUrl, long retentionPeriod) {
+    long SQSDatabase::MessageRetention(const std::string &queueUrl, long retentionPeriod) {
 
         auto reset = std::chrono::system_clock::now() - std::chrono::seconds{retentionPeriod};
 
@@ -857,6 +865,8 @@ namespace AwsMock::Database {
 
                 log_trace << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueUrl;
 
+                return result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
@@ -864,7 +874,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.MessageRetention(queueUrl, retentionPeriod);
+            return _memoryDb.MessageRetention(queueUrl, retentionPeriod);
         }
     }
 
@@ -974,7 +984,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    void SQSDatabase::DeleteMessages(const std::string &queueArn) {
+    long SQSDatabase::DeleteMessages(const std::string &queueArn) {
 
         if (HasDatabase()) {
 
@@ -988,6 +998,7 @@ namespace AwsMock::Database {
                 auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
                 session.commit_transaction();
                 log_debug << "Messages deleted, queueArn: " << queueArn << " count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -997,11 +1008,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteMessages(queueArn);
+            return _memoryDb.DeleteMessages(queueArn);
         }
     }
 
-    void SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
+    long SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) {
 
         if (HasDatabase()) {
 
@@ -1020,6 +1031,7 @@ namespace AwsMock::Database {
 
                 session.commit_transaction();
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -1029,11 +1041,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteMessage(message);
+            return _memoryDb.DeleteMessage(message);
         }
     }
 
-    void SQSDatabase::DeleteMessage(const std::string &receiptHandle) {
+    long SQSDatabase::DeleteMessage(const std::string &receiptHandle) {
 
         if (HasDatabase()) {
 
@@ -1047,11 +1059,10 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
 
-                // Adjust queue counters
-                //queueCollection.update_many({}, make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(-1))))));
-
                 session.commit_transaction();
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(receiptHandle, 0, 40) << "... count: " << result->deleted_count();
+
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -1061,7 +1072,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteMessage(receiptHandle);
+            return _memoryDb.DeleteMessage(receiptHandle);
         }
     }
 

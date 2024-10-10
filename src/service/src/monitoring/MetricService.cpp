@@ -36,6 +36,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name) {
+        boost::mutex::scoped_lock lock(_mutex);
         try {
             if (!CounterExists(name)) {
                 _counterMap[name] = new Poco::Prometheus::Counter(name);
@@ -50,6 +51,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        boost::mutex::scoped_lock lock(_mutex);
         try {
             if (!CounterExists(name, labelName, labelValue)) {
                 _counterMap[name] = new Poco::Prometheus::Counter(name, {.labelNames{labelName}});
@@ -113,7 +115,6 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::IncrementCounter(const std::string &name, int value) {
-        boost::mutex::scoped_lock lock(_mutex);
         if (!CounterExists(name)) {
             AddCounter(name);
         }
@@ -125,7 +126,6 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value) {
-        boost::mutex::scoped_lock lock(_mutex);
         if (!CounterExists(name, labelName, labelValue)) {
             AddCounter(name, labelName, labelValue);
         }
@@ -135,6 +135,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddGauge(const std::string &name) {
+        boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
             _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
             _gaugeMap[name]->clear();
@@ -145,6 +146,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
             _gaugeMap[name] = new Poco::Prometheus::Gauge(name, {.labelNames{labelName}});
             log_trace << "Gauge added, name: " << name;
@@ -172,7 +174,6 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::SetGauge(const std::string &name, double value) {
-        boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
             AddGauge(name);
         }
@@ -183,7 +184,6 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) {
-        boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name, labelName, labelValue)) {
             AddGauge(name, labelName, labelValue);
         }

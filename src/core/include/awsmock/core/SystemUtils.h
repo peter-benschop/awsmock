@@ -112,6 +112,13 @@ namespace AwsMock::Core {
          * @return PID of the current process
          */
         static int GetPid();
+
+        /**
+         * @brief Returns the number of CPU cores
+         *
+         * @return number of CPU cores
+         */
+        static int GetNumberOfCores();
     };
 
 }// namespace AwsMock::Core
