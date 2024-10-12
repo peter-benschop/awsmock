@@ -219,6 +219,14 @@ namespace AwsMock::Database {
         long CountMessages(const std::string &region = {}, const std::string &topicUrl = {});
 
         /**
+         * @brief  Count the number of message by state
+         *
+         * @param queueArn ARN of the queue
+         * @return total message size
+         */
+        long CountMessagesSize(const std::string &queueArn = {});
+
+        /**
          * @brief Count the number of message by state
          *
          * @param region AWS region

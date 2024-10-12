@@ -24,6 +24,8 @@
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
 #include <awsmock/dto/sns/GetTopicAttributesRequest.h>
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
+#include <awsmock/dto/sns/GetTopicDetailsRequest.h>
+#include <awsmock/dto/sns/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/ListMessagesRequest.h>
 #include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
@@ -61,7 +63,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
 
         /**
          * @brief Creates a new queue
@@ -118,8 +120,20 @@ namespace AwsMock::Service {
          *
          * @param request get topic attributes request DTO
          * @return GetTopicAttributesResponse DTO
+         * @see GetTopicAttributesRequest
+         * @see GetTopicAttributesResponse
          */
         Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request);
+
+        /**
+         * @brief Returns the topic details.
+         *
+         * @param request get topic details request DTO
+         * @return GetTopicDetailsResponse DTO
+         * @see GetTopicDetailsRequest
+         * @see GetTopicDetailsResponse
+         */
+        Dto::SNS::GetTopicDetailsResponse GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request);
 
         /**
          * Returns a list of subscriptions for a topic

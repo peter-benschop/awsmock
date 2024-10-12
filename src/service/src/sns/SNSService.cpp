@@ -251,6 +251,38 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::GetTopicDetailsResponse SNSService::GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request) {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_details");
+        log_trace << "Get topic details request: " << request.ToString();
+
+        try {
+
+            // Check existence
+            if (!_snsDatabase.TopicExists(request.topicArn)) {
+                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            long messageCount = _snsDatabase.CountMessages({}, request.topicArn);
+            long messagesSize = _snsDatabase.CountMessagesSize(request.topicArn);
+
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            return {
+                    .region = topic.region,
+                    .topicName = topic.topicName,
+                    .topicArn = topic.topicArn,
+                    .messageCount = messageCount,
+                    .size = messagesSize,
+                    .owner = topic.owner,
+                    .created = topic.created,
+                    .modified = topic.modified,
+            };
+
+        } catch (Poco::Exception &ex) {
+            log_error << "SNS get topic attributes failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();

@@ -464,8 +464,7 @@ namespace AwsMock::Database {
                 } else {
                     count = _messageCollection.count_documents({});
                 }
-                log_trace << "Count resources, region: " << region << " arn: " << topicArn << " result: "
-                          << count;
+                log_trace << "Count resources, region: " << region << " arn: " << topicArn << " result: " << count;
                 return count;
 
             } catch (const mongocxx::exception &exc) {
@@ -479,9 +478,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SNSDatabase::CountMessagesByStatus(const std::string &region,
-                                            const std::string &topicArn,
-                                            Entity::SNS::MessageStatus status) {
+    long SNSDatabase::CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) {
 
         if (HasDatabase()) {
 
@@ -505,6 +502,42 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.CountMessagesByStatus(region, topicArn, status);
+        }
+    }
+
+    long SNSDatabase::CountMessagesSize(const std::string &topicArn) {
+
+        if (HasDatabase()) {
+
+            try {
+
+                long count;
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+                mongocxx::pipeline p{};
+                if (!topicArn.empty()) {
+                    p.match(make_document(kvp("topicArn", topicArn)));
+                }
+                p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
+                p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
+
+                auto totalSizeCursor = _messageCollection.aggregate(p);
+                auto t = *totalSizeCursor.begin();
+                if (!t.empty()) {
+                    log_info << "Total size: " << t["totalSize"].get_int64().value;
+                    return t["totalSize"].get_int64().value;
+                }
+                return 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "SNS Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+
+        } else {
+
+            return _memoryDb.CountMessages(topicArn);
         }
     }
 

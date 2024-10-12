@@ -614,7 +614,7 @@ namespace AwsMock::Service {
                     // Get object versions
                     Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
 
-                    log_info << "List object counters";
+                    log_debug << "List object counters";
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
