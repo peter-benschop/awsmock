@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.21](https://github.com/jensvogt/awsmock/compare/v0.15.20...v0.15.21) (2024-10-12)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** add get SQS queue details ([88244e0](https://github.com/jensvogt/awsmock/commit/88244e0339488f8dee658d64a273c58a8ebe8add))
+
 ## [0.15.20](https://github.com/jensvogt/awsmock/compare/v0.15.19...v0.15.20) (2024-10-12)
 
 
