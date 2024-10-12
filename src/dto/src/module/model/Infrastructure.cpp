@@ -248,6 +248,16 @@ namespace AwsMock::Dto::Module {
                 }
             }
 
+            // Lambdas
+            if (infrastructureObject->has("lambdas")) {
+                Poco::JSON::Array::Ptr lambdasArray = infrastructureObject->getArray("lambdas");
+                for (int i = 0; i < lambdasArray->size(); i++) {
+                    Database::Entity::Lambda::Lambda lambdaObject;
+                    lambdaObject.FromJsonObject(lambdasArray->getObject(i));
+                    lambdas.emplace_back(lambdaObject);
+                }
+            }
+
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());

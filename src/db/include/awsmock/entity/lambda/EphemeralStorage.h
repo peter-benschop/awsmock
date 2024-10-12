@@ -20,6 +20,10 @@
 #include <bsoncxx/json.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+
 namespace AwsMock::Database::Entity::Lambda {
 
     using bsoncxx::to_json;
@@ -55,6 +59,13 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @brief Converts the JSON object to and entity
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * @brief Converts the entity to a JSON object

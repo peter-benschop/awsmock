@@ -16,11 +16,30 @@ namespace AwsMock::Database::Entity::Lambda {
         return ephemeralStorageDocument;
     }
 
+    void EphemeralStorage::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        try {
+
+            Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
+
+        } catch (Poco::Exception &e) {
+            log_error << "JSON Exception" << e.message();
+            throw Core::JsonException(e.message());
+        }
+    }
+
     Poco::JSON::Object EphemeralStorage::ToJsonObject() const {
 
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("size", size);
-        return jsonObject;
+        try {
+
+            Poco::JSON::Object jsonObject;
+            jsonObject.set("size", size);
+            return jsonObject;
+
+        } catch (Poco::Exception &e) {
+            log_error << "JSON Exception" << e.message();
+            throw Core::JsonException(e.message());
+        }
     }
 
     std::string EphemeralStorage::ToString() const {

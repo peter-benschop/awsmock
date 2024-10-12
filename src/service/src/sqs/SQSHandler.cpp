@@ -143,7 +143,19 @@ namespace AwsMock::Service {
                     sqsRequest.region = clientCommand.region;
 
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
-                    log_info << "List queue Counters";
+                    log_info << "List queue counters";
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
+                case Dto::Common::SqsCommandType::LIST_QUEUE_TAGS: {
+
+                    Dto::SQS::ListQueueTagsRequest sqsRequest{};
+                    sqsRequest.FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+
+                    Dto::SQS::ListQueueTagsResponse sqsResponse = _sqsService.ListQueueTags(sqsRequest);
+                    log_info << "List queue tags";
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }

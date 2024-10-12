@@ -212,6 +212,50 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
+    void Lambda::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        try {
+
+            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
+            Core::JsonUtils::GetJsonValueString("user", jsonObject, user);
+            Core::JsonUtils::GetJsonValueString("function", jsonObject, function);
+            Core::JsonUtils::GetJsonValueString("runtime", jsonObject, runtime);
+            Core::JsonUtils::GetJsonValueString("role", jsonObject, role);
+            Core::JsonUtils::GetJsonValueString("handler", jsonObject, handler);
+            Core::JsonUtils::GetJsonValueLong("memorySize", jsonObject, memorySize);
+            Core::JsonUtils::GetJsonValueLong("codeSize", jsonObject, codeSize);
+            Core::JsonUtils::GetJsonValueString("imageId", jsonObject, imageId);
+            Core::JsonUtils::GetJsonValueString("containerId", jsonObject, containerId);
+            Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
+            Core::JsonUtils::GetJsonValueString("codeSha256", jsonObject, codeSha256);
+            Core::JsonUtils::GetJsonValueInt("hostPort", jsonObject, hostPort);
+            Core::JsonUtils::GetJsonValueInt("timeout", jsonObject, timeout);
+            Core::JsonUtils::GetJsonValueInt("concurrency", jsonObject, concurrency);
+            Core::JsonUtils::GetJsonValueString("stateReason", jsonObject, stateReason);
+            Core::JsonUtils::GetJsonValueDate("lastStarted", jsonObject, lastStarted);
+            Core::JsonUtils::GetJsonValueDate("lastInvocation", jsonObject, lastInvocation);
+            std::string tmp;
+            Core::JsonUtils::GetJsonValueString("arn", jsonObject, tmp);
+            if (!tmp.empty()) {
+                state = LambdaStateFromString(tmp);
+            }
+
+            // Ephemeral storage
+            if (jsonObject->has("ephemeralStorage")) {
+                ephemeralStorage.FromJsonObject(jsonObject->getObject("ephemeralStorage"));
+            }
+
+            // Environment
+            if (jsonObject->has("environment")) {
+                environment.FromJsonObject(jsonObject->getObject("environment"));
+            }
+
+        } catch (Poco::Exception &e) {
+            log_error << "JSON Exception" << e.message();
+            throw Core::JsonException(e.message());
+        }
+    }
+
     std::string Lambda::ToString() const {
         std::stringstream ss;
         ss << (*this);

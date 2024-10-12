@@ -371,7 +371,7 @@ namespace AwsMock::Database {
          * @param keys vector of object keys
          * @throws DatabaseException
          */
-        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
+        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys = {});
 
         /**
          * @brief Deletes all objects

@@ -837,9 +837,15 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket),
-                                                                          kvp("key", make_document(kvp("$in", array)))));
-                log_debug << "Objects deleted, count: " << result->result().deleted_count();
+                if (keys.empty()) {
+                    auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket)));
+                    log_debug << "Objects deleted, count: " << result->result().deleted_count();
+                } else {
+                    auto result = _objectCollection.delete_many(make_document(kvp("bucket", bucket),
+                                                                              kvp("key", make_document(kvp("$in", array)))));
+                    log_debug << "Objects deleted, count: " << result->result().deleted_count();
+                }
+
                 session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {

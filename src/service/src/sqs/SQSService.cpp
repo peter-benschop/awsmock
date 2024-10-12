@@ -146,6 +146,28 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SQS::ListQueueTagsResponse SQSService::ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_tags");
+        log_trace << "List all queues tags request";
+
+        try {
+
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+
+            Dto::SQS::ListQueueTagsResponse listQueueTagsResponse;
+            listQueueTagsResponse.total = queue.tags.size();
+            for (const auto &tag: queue.tags) {
+                listQueueTagsResponse.tags = queue.tags;
+            }
+            log_trace << "SQS create queue tags list response: " << listQueueTagsResponse.ToJson();
+            return listQueueTagsResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "purge_queue");
         log_trace << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;

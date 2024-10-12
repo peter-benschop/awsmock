@@ -251,34 +251,25 @@ namespace AwsMock::Service {
     void ModuleService::CleanInfrastructure(const Dto::Module::CleanInfrastructureRequest &request) {
         log_info << "Cleaning services, length: " << request.modules.size();
 
+        CleanObjects(request);
+
+        // Clean only objects
+        if (request.onlyObjects) {
+            return;
+        }
         for (const auto &m: request.modules) {
 
             if (m == "s3") {
-                Database::S3Database::instance().DeleteAllObjects();
                 Database::S3Database::instance().DeleteAllBuckets();
             } else if (m == "sqs") {
-                Database::SQSDatabase::instance().DeleteAllMessages();
                 Database::SQSDatabase::instance().DeleteAllQueues();
             } else if (m == "sns") {
-                Database::SNSDatabase::instance().DeleteAllMessages();
                 Database::SNSDatabase::instance().DeleteAllTopics();
-            } else if (m == "lambda") {
-                Database::LambdaDatabase::instance().DeleteAllLambdas();
-            } else if (m == "cognito") {
-                Database::CognitoDatabase::instance().DeleteAllUsers();
-                Database::CognitoDatabase::instance().DeleteAllUserPools();
-                Database::CognitoDatabase::instance().DeleteAllGroups();
             } else if (m == "dynamodb") {
                 Service::DynamoDbService _dynamoDbService;
                 _dynamoDbService.DeleteAllTables();
             } else if (m == "transfer") {
                 Database::TransferDatabase::instance().DeleteAllTransfers();
-            } else if (m == "secretsmanager") {
-                Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
-            } else if (m == "kms") {
-                Database::KMSDatabase::instance().DeleteAllKeys();
-            } else if (m == "ssm") {
-                Database::SSMDatabase::instance().DeleteAllParameters();
             }
         }
     }
@@ -301,14 +292,14 @@ namespace AwsMock::Service {
                 Database::CognitoDatabase::instance().DeleteAllGroups();
             } else if (m == "dynamodb") {
                 Database::DynamoDbDatabase::instance().DeleteAllItems();
-            } else if (m == "transfer") {
-                Database::TransferDatabase::instance().DeleteAllTransfers();
             } else if (m == "secretsmanager") {
                 Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {
                 Database::KMSDatabase::instance().DeleteAllKeys();
             } else if (m == "ssm") {
                 Database::SSMDatabase::instance().DeleteAllParameters();
+            } else if (m == "transfer") {
+                Database::S3Database::instance().DeleteObjects("transfer-server");
             }
         }
     }
