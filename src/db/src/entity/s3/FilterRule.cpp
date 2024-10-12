@@ -15,7 +15,7 @@ namespace AwsMock::Database::Entity::S3 {
         return filterRuleDoc.extract();
     }
 
-    void FilterRule::FromDocument(bsoncxx::document::element mResult) {
+    void FilterRule::FromDocument(bsoncxx::document::view mResult) {
 
         name = bsoncxx::string::to_string(mResult["name"].get_string().value);
         value = bsoncxx::string::to_string(mResult["value"].get_string().value);

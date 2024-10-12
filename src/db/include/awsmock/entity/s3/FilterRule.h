@@ -58,7 +58,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(bsoncxx::document::element mResult);
+        [[maybe_unused]] void FromDocument(bsoncxx::document::view mResult);
 
         /**
          * Converts the entity to a JSON object

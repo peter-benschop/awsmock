@@ -19,6 +19,10 @@
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+
 namespace AwsMock::Database::Entity::Lambda {
 
     /**
@@ -39,6 +43,13 @@ namespace AwsMock::Database::Entity::Lambda {
          * @param mResult database view.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+        /**
+         * @brief Converts the JSON object to and entity
+         *
+         * @param jsonObject JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * @brief Converts the entity to a JSON object

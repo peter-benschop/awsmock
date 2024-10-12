@@ -44,6 +44,8 @@
 #include <awsmock/dto/sqs/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
+#include <awsmock/dto/sqs/ListQueueTagsRequest.h>
+#include <awsmock/dto/sqs/ListQueueTagsResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
@@ -81,7 +83,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.
@@ -116,9 +118,20 @@ namespace AwsMock::Service {
          *
          * @param request list queue counters request
          * @return ListQueueCountersResponse
+         * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
         Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
+
+        /**
+         * @brief Returns a list of all available queues tags
+         *
+         * @param request list queue tagss request
+         * @return ListQueueTagsResponse
+         * @see ListQueueTagsRequest
+         * @see ListQueueTagsResponse
+         */
+        Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request);
 
         /**
          * @brief Purge a queue.

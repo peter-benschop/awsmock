@@ -36,6 +36,7 @@ namespace AwsMock::Dto::Common {
         GET_QUEUE_URL,
         TAG_QUEUE,
         LIST_QUEUES,
+        LIST_QUEUE_TAGS,
         LIST_QUEUE_ARNS,
         LIST_QUEUE_COUNTERS,
         DELETE_QUEUE,
@@ -50,6 +51,7 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<SqsCommandType, std::string> SqsCommandTypeNames{
+            // Queues
             {SqsCommandType::CREATE_QUEUE, "create-queue"},
             {SqsCommandType::PURGE_QUEUE, "purge-queue"},
             {SqsCommandType::GET_QUEUE_ATTRIBUTES, "get-queue-attributes"},
@@ -57,9 +59,11 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},
             {SqsCommandType::TAG_QUEUE, "tag-queue"},
             {SqsCommandType::LIST_QUEUES, "list-queues"},
+            {SqsCommandType::LIST_QUEUE_TAGS, "list-queue-tags"},
             {SqsCommandType::LIST_QUEUE_ARNS, "list-queue-arns"},
             {SqsCommandType::LIST_QUEUE_COUNTERS, "list-queue-counters"},
             {SqsCommandType::DELETE_QUEUE, "delete-queue"},
+            // Messages
             {SqsCommandType::SEND_MESSAGE, "send-message"},
             {SqsCommandType::SEND_MESSAGE_BATCH, "send-message-batch"},
             {SqsCommandType::RECEIVE_MESSAGE, "receive-message"},

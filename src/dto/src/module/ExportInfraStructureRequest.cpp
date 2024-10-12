@@ -16,7 +16,7 @@ namespace AwsMock::Dto::Module {
 
         try {
 
-            JsonUtils::GetJsonValueBool("onlyObjects", rootObject, includeObjects);
+            JsonUtils::GetJsonValueBool("includeObjects", rootObject, includeObjects);
             JsonUtils::GetJsonValueBool("prettyPrint", rootObject, prettyPrint);
 
             if (rootObject->has("modules")) {
@@ -39,7 +39,7 @@ namespace AwsMock::Dto::Module {
         try {
 
             Poco::JSON::Object rootJson;
-            JsonUtils::SetJsonValueBool(rootJson, "onlyObjects", includeObjects);
+            JsonUtils::SetJsonValueBool(rootJson, "includeObjects", includeObjects);
             JsonUtils::SetJsonValueBool(rootJson, "prettyPrint", prettyPrint);
 
             if (!modules.empty()) {

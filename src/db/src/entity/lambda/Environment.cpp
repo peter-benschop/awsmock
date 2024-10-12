@@ -6,6 +6,26 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
+
+    void Environment::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        try {
+
+            if (jsonObject->has("variables")) {
+                Poco::JSON::Object::Ptr variablesJsonObject = jsonObject->getObject("variables");
+                for (size_t i = 0; i < variablesJsonObject->getNames().size(); i++) {
+                    std::string key = jsonObject->getNames()[i];
+                    std::string value = jsonObject->get(key);
+                    variables[key] = value;
+                }
+            }
+
+        } catch (Poco::Exception &e) {
+            log_error << "JSON Exception" << e.message();
+            throw Core::JsonException(e.message());
+        }
+    }
+
     Poco::JSON::Object Environment::ToJsonObject() const {
 
         Poco::JSON::Object jsonObject;

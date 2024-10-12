@@ -48,13 +48,11 @@ namespace AwsMock::Database::Entity::S3 {
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                if (mResult.value().find("filterRules") != mResult.value().end()) {
-                    bsoncxx::document::view filterRulesView = mResult.value()["filterRules"].get_document().value;
-                    for (bsoncxx::document::element filterRuleElement: filterRulesView) {
-                        FilterRule filterRule;
-                        filterRule.FromDocument(filterRuleElement);
-                        filterRules.emplace_back(filterRule);
-                    }
+                bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value};
+                for (const bsoncxx::array::element &filterRuleElement: filterRulesView) {
+                    FilterRule filterRule;
+                    filterRule.FromDocument(filterRuleElement.get_document());
+                    filterRules.emplace_back(filterRule);
                 }
             }
 
@@ -70,15 +68,19 @@ namespace AwsMock::Database::Entity::S3 {
         Core::JsonUtils::GetJsonValueString("id", jsonObject, id);
         Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
 
+        // Events
         for (const auto &event: events) {
             events.emplace_back(event);
         }
 
-        Poco::JSON::Array::Ptr jsonFilterRules = jsonObject->getArray("filterRules");
-        for (int i = 0; i < jsonFilterRules->size(); i++) {
-            FilterRule filterRule;
-            filterRule.FromJsonObject(jsonFilterRules->getObject(i));
-            filterRules.emplace_back(filterRule);
+        // Filter rules
+        if (jsonObject->has("filterRules")) {
+            Poco::JSON::Array::Ptr jsonFilterRules = jsonObject->getArray("filterRules");
+            for (int i = 0; i < jsonFilterRules->size(); i++) {
+                FilterRule filterRule;
+                filterRule.FromJsonObject(jsonFilterRules->getObject(i));
+                filterRules.emplace_back(filterRule);
+            }
         }
     }
 
