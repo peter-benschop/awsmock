@@ -135,10 +135,51 @@ namespace AwsMock::Service {
                 counter.available = queue.attributes.approximateNumberOfMessages;
                 counter.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
                 counter.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
+                counter.visibilityTimeout = queue.attributes.visibilityTimeout;
+                counter.maxMessageSize = queue.attributes.maxMessageSize;
+                counter.retentionPeriod = queue.attributes.messageRetentionPeriod;
+                counter.created = queue.created;
+                counter.modified = queue.modified;
                 listQueueResponse.queueCounters.emplace_back(counter);
             }
             log_trace << "SQS create queue counters list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::GetQueueDetailsResponse SQSService::GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_details");
+        log_trace << "Get queue details request, queueArn: " << request.queueArn;
+
+        try {
+
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            long size = _sqsDatabase.CountMessageSize(request.queueArn);
+
+            Dto::SQS::GetQueueDetailsResponse sqsResponse;
+            sqsResponse.messageCount = _sqsDatabase.CountMessages(request.queueArn);
+            sqsResponse.queueName = queue.name;
+            sqsResponse.queueArn = queue.queueArn;
+            sqsResponse.queueUrl = queue.queueUrl;
+            sqsResponse.region = queue.region;
+            sqsResponse.retentionPeriod = queue.attributes.messageRetentionPeriod;
+            sqsResponse.maxMessageSize = queue.attributes.maxMessageSize;
+            sqsResponse.visibilityTimeout = queue.attributes.visibilityTimeout;
+            sqsResponse.delay = queue.attributes.delaySeconds;
+            sqsResponse.owner = queue.owner;
+            sqsResponse.size = size;
+            sqsResponse.available = queue.attributes.approximateNumberOfMessages;
+            sqsResponse.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
+            sqsResponse.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
+            sqsResponse.created = queue.created;
+            sqsResponse.modified = queue.modified;
+
+            log_trace << "SQS get queue details response: " << sqsResponse.ToJson();
+            return sqsResponse;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -483,6 +524,7 @@ namespace AwsMock::Service {
                                                       .body = request.body,
                                                       .status = Database::Entity::SQS::MessageStatus::INITIAL,
                                                       .reset = reset,
+                                                      .size = static_cast<long>(request.body.length()),
                                                       .messageId = messageId,
                                                       .receiptHandle = receiptHandle,
                                                       .md5Body = md5Body,

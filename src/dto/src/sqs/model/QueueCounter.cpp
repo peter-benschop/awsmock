@@ -29,6 +29,13 @@ namespace AwsMock::Dto::SQS {
             rootJson.set("available", available);
             rootJson.set("invisible", invisible);
             rootJson.set("delayed", delayed);
+            rootJson.set("visibilityTimeout", visibilityTimeout);
+            rootJson.set("delay", delay);
+            rootJson.set("retentionPeriod", retentionPeriod);
+            rootJson.set("maxMessageSize", maxMessageSize);
+
+            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
+            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
             return rootJson;
 

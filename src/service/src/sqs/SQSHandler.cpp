@@ -129,6 +129,18 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
+                case Dto::Common::SqsCommandType::GET_QUEUE_DETAILS: {
+
+                    Dto::SQS::GetQueueDetailsRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+
+                    Dto::SQS::GetQueueDetailsResponse sqsResponse = _sqsService.GetQueueDetails(sqsRequest);
+                    log_info << "Get queue url, queueArn: " << sqsRequest.queueArn;
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::LIST_QUEUE_ARNS: {
 
                     Dto::SQS::ListQueueArnsResponse sqsResponse = _sqsService.ListQueueArns();

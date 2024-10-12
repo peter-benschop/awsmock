@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_SQS_QUEUE_COUNTER_H
 
 // C++ standard includes
+#include <chrono>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -17,6 +18,8 @@
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
+
+    using std::chrono::system_clock;
 
     struct QueueCounter {
 
@@ -36,6 +39,16 @@ namespace AwsMock::Dto::SQS {
         std::string queueName;
 
         /**
+         * Created
+         */
+        system_clock::time_point created;
+
+        /**
+         * Modified
+         */
+        system_clock::time_point modified;
+
+        /**
          * Number of message available
          */
         long available;
@@ -49,6 +62,26 @@ namespace AwsMock::Dto::SQS {
          * Number of message delayed
          */
         long delayed;
+
+        /**
+         * Visibility timeout
+         */
+        int visibilityTimeout;
+
+        /**
+         * Message delay
+         */
+        int delay;
+
+        /**
+         * Retention period
+         */
+        long retentionPeriod;
+
+        /**
+         * Maximal message size
+         */
+        long maxMessageSize;
 
         /**
          * @brief Converts the DTO to a JSON string.
