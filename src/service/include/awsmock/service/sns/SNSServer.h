@@ -13,12 +13,14 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/sns/SNSMonitoring.h>
-#include <awsmock/service/sns/SNSWorker.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 #define SNS_DEFAULT_WORKER_PERIOD 300
 #define SNS_DEFAULT_MONITORING_PERIOD 300
+#define SNS_DEFAULT_MESSAGE_TIMEOUT 15
 
 namespace AwsMock::Service {
 
@@ -39,14 +41,24 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief SNS monitoring
+         * @brief Delete resources, which are over the retention period.
          */
-        SNSMonitoring _snsMonitoring;
+        void DeleteOldMessages();
 
         /**
-         * @brief SNS worker
+         * Update counters
          */
-        SNSWorker _snsWorker;
+        void UpdateCounter();
+
+        /**
+         * @brief Database connection
+         */
+        Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+
+        /**
+         * Metric service
+         */
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief SNS server period

@@ -21,15 +21,39 @@ namespace AwsMock::Service {
         log_info << "SNS server starting";
 
         // Start SNS monitoring update counters
-        scheduler.AddTask("monitoring-sns-counters", [this] { this->_snsMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-sns-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
-        scheduler.AddTask("sns-delete-messages", [this] { this->_snsWorker.DeleteOldMessages(); }, _workerPeriod);
+        scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _workerPeriod);
 
         // Set running
         SetRunning();
 
         log_debug << "SNS server initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+    }
+
+    void SNSServer::DeleteOldMessages() {
+        Core::Configuration &configuration = Core::Configuration::instance();
+        int messageTimeout = configuration.getInt("awsmock.service.sns.message.timeout", SNS_DEFAULT_MESSAGE_TIMEOUT);
+        _snsDatabase.DeleteOldMessages(messageTimeout);
+    }
+
+    void SNSServer::UpdateCounter() {
+        log_trace << "SNS Monitoring starting";
+
+        // Get total counts
+        long topics = _snsDatabase.CountTopics();
+        long messages = _snsDatabase.CountMessages();
+        _metricService.SetGauge(SNS_TOPIC_COUNT, topics);
+        _metricService.SetGauge(SNS_MESSAGE_COUNT, messages);
+
+        // Count resources per topic
+        for (const auto &topic: _snsDatabase.ListTopics()) {
+            std::string labelValue = Poco::replace(topic.topicName, "-", "_");
+            long messagesPerTopic = _snsDatabase.CountMessages(topic.region, topic.topicArn);
+            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, messagesPerTopic);
+        }
+        log_trace << "SNS monitoring finished";
     }
 
 }// namespace AwsMock::Service
