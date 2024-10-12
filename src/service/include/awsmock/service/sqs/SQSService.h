@@ -35,6 +35,8 @@
 #include <awsmock/dto/sqs/DeleteQueueResponse.h>
 #include <awsmock/dto/sqs/GetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
+#include <awsmock/dto/sqs/GetQueueDetailsRequest.h>
+#include <awsmock/dto/sqs/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
 #include <awsmock/dto/sqs/ListMessagesRequest.h>
@@ -149,6 +151,15 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
+
+        /**
+         * @brief Return the queue userAttributes
+         *
+         * @param request get queue sqs request
+         * @return GetQueueAttributesResponse
+         * @throws ServiceException
+         */
+        Dto::SQS::GetQueueDetailsResponse GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request);
 
         /**
          * @brief Return the queue userAttributes

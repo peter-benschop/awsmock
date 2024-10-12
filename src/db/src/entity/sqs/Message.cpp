@@ -47,6 +47,7 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("body", body),
                 kvp("status", MessageStatusToString(status)),
                 kvp("retries", retries),
+                kvp("size", size),
                 kvp("messageId", messageId),
                 kvp("receiptHandle", receiptHandle),
                 kvp("md5Body", md5Body),
@@ -76,6 +77,7 @@ namespace AwsMock::Database::Entity::SQS {
         if (mResult.value()["reset"].type() != bsoncxx::type::k_null) {
             reset = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
         }
+        size = mResult.value()["size"].get_int64().value;
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 

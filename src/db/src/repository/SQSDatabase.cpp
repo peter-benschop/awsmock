@@ -901,6 +901,36 @@ namespace AwsMock::Database {
         }
     }
 
+    long SQSDatabase::CountMessageSize(const std::string &queueArn) {
+
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+
+            mongocxx::pipeline p{};
+            if (!queueArn.empty()) {
+                p.match(make_document(kvp("queueArn", queueArn)));
+            }
+            p.group(make_document(kvp("_id", ""),
+                                  kvp("totalSize",
+                                      make_document(kvp("$sum", "$size")))));
+            p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
+            auto totalSizeCursor = messageCollection.aggregate(p);
+            auto t = *totalSizeCursor.begin();
+            if (!t.empty()) {
+                log_info << "Total size: " << t["totalSize"].get_int64().value;
+                return t["totalSize"].get_int64().value;
+            }
+
+            return 0;
+
+        } else {
+
+            return _memoryDb.CountMessages(queueArn);
+        }
+    }
+
     long SQSDatabase::CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status) {
 
         if (HasDatabase()) {

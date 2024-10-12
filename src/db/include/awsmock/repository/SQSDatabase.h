@@ -342,8 +342,17 @@ namespace AwsMock::Database {
          * @brief  Count the number of message by state
          *
          * @param queueArn ARN of the queue
+         * @return total number of messages
          */
         long CountMessages(const std::string &queueArn = {});
+
+        /**
+         * @brief  Count the number of message by state
+         *
+         * @param queueArn ARN of the queue
+         * @return total message size
+         */
+        long CountMessageSize(const std::string &queueArn = {});
 
         /**
          * @brief Count the number of message by state

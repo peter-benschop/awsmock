@@ -78,6 +78,16 @@ namespace AwsMock::Database::Entity::SQS {
         int retries = 0;
 
         /**
+         * Message size
+         */
+        long size = 0;
+
+        /**
+         * Visibility timeout
+         */
+        long visibilityTimeout = 30;
+
+        /**
          * Message ID
          */
         std::string messageId;
