@@ -9,9 +9,8 @@
 #include <Poco/Path.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/Task.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/repository/S3Database.h>
 

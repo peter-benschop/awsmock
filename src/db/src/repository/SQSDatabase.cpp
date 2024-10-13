@@ -597,7 +597,7 @@ namespace AwsMock::Database {
         return messageList;
     }
 
-    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, int pageSize, int pageIndex) {
+    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) {
 
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
@@ -611,6 +611,14 @@ namespace AwsMock::Database {
             }
             if (pageIndex * pageSize > 0) {
                 opts.skip(pageSize * pageIndex);
+            }
+            opts.sort(make_document(kvp("_id", 1)));
+            if (!sortColumns.empty()) {
+                bsoncxx::builder::basic::document sort;
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                }
+                opts.sort(sort.extract());
             }
 
             auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn)), opts);

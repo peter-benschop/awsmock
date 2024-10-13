@@ -10,9 +10,6 @@
 #include <iostream>
 #include <string>
 
-// TZ library includes
-#include <date/date.h>
-
 // Boost includes
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -23,7 +20,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/date/tz.h>
 
 namespace AwsMock::Core {
 
