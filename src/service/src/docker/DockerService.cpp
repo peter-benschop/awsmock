@@ -196,7 +196,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Docker::Container DockerService::GetContainerByName(const std::string &name, const std::string &tag) {
+    Dto::Docker::Container DockerService::GetFirstContainerByImageName(const std::string &name, const std::string &tag) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
@@ -213,10 +213,34 @@ namespace AwsMock::Service {
         }
 
         if (response.containerList.size() > 1) {
-            log_warning << "More than one docker container found, name: " << name << ":" << tag;
+            log_warning << "More than one docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
         }
 
         log_debug << "Docker container found, name: " << name << ":" << tag;
+        return response.containerList.front();
+    }
+
+    Dto::Docker::Container DockerService::GetContainerById(const std::string &containerId) {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + containerId + "\"]}");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+        if (domainSocketResponse.statusCode != http::status::ok) {
+            log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
+            return {};
+        }
+
+        Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+        if (response.containerList.empty()) {
+            log_warning << "Docker container not found, id: " << containerId;
+            return {};
+        }
+
+        if (response.containerList.size() > 1) {
+            log_warning << "More than one docker container found, id: " << containerId << " count: " << response.containerList.size();
+        }
+
+        log_debug << "Docker container found, id: " << containerId;
         return response.containerList.front();
     }
 

@@ -17,10 +17,9 @@
 #include <awsmock/dto/lambda/model/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/docker/DockerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
-#include <awsmock/service/lambda/LambdaMonitoring.h>
-#include <awsmock/service/lambda/LambdaWorker.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define LAMBDA_DEFAULT_MONITORING_PERIOD 300
@@ -42,29 +41,19 @@ namespace AwsMock::Service {
          */
         explicit LambdaServer(Core::PeriodicScheduler &scheduler);
 
-        /**
-         * Initialization
-         */
-        void Initialize();
-
-      protected:
-
-        /**
-         * Main method
-         */
-        void Run();
-
-        /**
-         * Shutdown
-         */
-        void Shutdown();
+        ~LambdaServer();
 
       private:
 
         /**
-         * Delete dangling, stopped containers
+         * @brief Delete dangling, stopped containers
          */
         void CleanupContainers();
+
+        /**
+         * @brief Delete instances from database, which are not running
+         */
+        void CleanupInstances();
 
         /**
          * Start all lambdas if they are not existing
@@ -82,6 +71,19 @@ namespace AwsMock::Service {
         Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
+         * @brief Remove expired lambda functions
+         *
+         * @par
+         * Loops over all lambda functions and removes the lambda container, when the lambdas are expired.
+         */
+        void RemoveExpiredLambdas();
+
+        /**
+         * Update counters
+         */
+        void UpdateCounter();
+
+        /**
          * lambda database
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -97,14 +99,9 @@ namespace AwsMock::Service {
         Service::DockerService _dockerService;
 
         /**
-         * Monitoring
+         * Metric service
          */
-        LambdaMonitoring _lambdaMonitoring;
-
-        /**
-         * Lambda worker
-         */
-        LambdaWorker _lambdaWorker;
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * Data dir

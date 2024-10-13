@@ -82,7 +82,6 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("containerId", containerId),
                 kvp("tags", tagsDoc),
                 kvp("arn", arn),
-                kvp("hostPort", hostPort),
                 kvp("timeout", timeout),
                 kvp("concurrency", concurrency),
                 kvp("codeSha256", codeSha256),
@@ -116,7 +115,6 @@ namespace AwsMock::Database::Entity::Lambda {
         containerId = bsoncxx::string::to_string(mResult.value()["containerId"].get_string().value);
         arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
         codeSha256 = bsoncxx::string::to_string(mResult.value()["codeSha256"].get_string().value);
-        hostPort = mResult.value()["hostPort"].get_int32().value;
         timeout = mResult.value()["timeout"].get_int32().value;
         concurrency = mResult.value()["concurrency"].get_int32().value;
         environment.FromDocument(mResult.value()["environment"].get_document().value);
@@ -182,7 +180,6 @@ namespace AwsMock::Database::Entity::Lambda {
             jsonObject.set("containerId", containerId);
             jsonObject.set("arn", arn);
             jsonObject.set("codeSha256", codeSha256);
-            jsonObject.set("hostPort", hostPort);
             jsonObject.set("timeout", timeout);
             jsonObject.set("concurrency", concurrency);
             jsonObject.set("environment", environment.ToJsonObject());
@@ -228,7 +225,6 @@ namespace AwsMock::Database::Entity::Lambda {
             Core::JsonUtils::GetJsonValueString("containerId", jsonObject, containerId);
             Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
             Core::JsonUtils::GetJsonValueString("codeSha256", jsonObject, codeSha256);
-            Core::JsonUtils::GetJsonValueInt("hostPort", jsonObject, hostPort);
             Core::JsonUtils::GetJsonValueInt("timeout", jsonObject, timeout);
             Core::JsonUtils::GetJsonValueInt("concurrency", jsonObject, concurrency);
             Core::JsonUtils::GetJsonValueString("stateReason", jsonObject, stateReason);

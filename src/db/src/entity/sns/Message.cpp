@@ -19,6 +19,7 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("targetArn", targetArn),
                 kvp("message", message),
                 kvp("messageId", messageId),
+                kvp("size", size),
                 kvp("status", MessageStatusToString(status)),
                 kvp("userAttributes", messageAttributesDoc),
                 kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
@@ -38,6 +39,7 @@ namespace AwsMock::Database::Entity::SNS {
             message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
             status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
             messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
+            size = mResult.value()["size"].get_int64().value;
             lastSend = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
             created = bsoncxx::types::b_date(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
             modified = bsoncxx::types::b_date(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));

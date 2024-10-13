@@ -130,7 +130,7 @@ namespace AwsMock::Service {
          *
          * @return random port between 32768 and 65536
          */
-        static int GetHostPort();
+        static int CreateRandomHostPort();
 
         /**
          * @brief Returns the docker tag.
@@ -155,7 +155,7 @@ namespace AwsMock::Service {
          * @param zipFile base64 encoded code from AWS CLI
          * @param lambda lambda entity
          * @param dockerTag docker tag to use
-         * @param dataDir data directoyr
+         * @param dataDir data directory
          * @return base64 string
          */
         static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir);

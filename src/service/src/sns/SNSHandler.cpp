@@ -143,6 +143,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
+
+                    Dto::SNS::DeleteMessageRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+
+                    _snsService.DeleteMessage(snsRequest);
+
+                    log_info << "Message deleted, messageId: " << snsRequest.messageId;
+                    return SendOkResponse(request);
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";

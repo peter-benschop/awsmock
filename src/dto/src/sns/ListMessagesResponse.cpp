@@ -11,12 +11,13 @@ namespace AwsMock::Dto::SNS {
             Poco::JSON::Object rootJson;
             rootJson.set("total", total);
 
-            Poco::JSON::Array jsonArray;
-            for (const auto &message: messageList) {
-                jsonArray.add(message.ToJsonObject());
+            if (!messageList.empty()) {
+                Poco::JSON::Array jsonArray;
+                for (const auto &message: messageList) {
+                    jsonArray.add(message.ToJsonObject());
+                }
+                rootJson.set("messages", jsonArray);
             }
-
-            rootJson.set("messages", jsonArray);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

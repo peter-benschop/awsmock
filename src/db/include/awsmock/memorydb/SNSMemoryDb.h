@@ -221,6 +221,14 @@ namespace AwsMock::Database {
         void DeleteMessage(const Entity::SNS::Message &message);
 
         /**
+         * @brief Deletes a message by message ID.
+         *
+         * @param messageId message ID to delete
+         * @throws Core::DatabaseException
+         */
+        void DeleteMessage(const std::string &messageId);
+
+        /**
          * @brief Bulk delete of resources.
          *
          * @param region AWS region

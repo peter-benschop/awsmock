@@ -185,7 +185,15 @@ namespace AwsMock::Service {
          * @param tag container tags
          * @return Container
          */
-        Dto::Docker::Container GetContainerByName(const std::string &name, const std::string &tag);
+        Dto::Docker::Container GetFirstContainerByImageName(const std::string &name, const std::string &tag);
+
+        /**
+         * @brief Returns a container by ID.
+         *
+         * @param containerId container ID
+         * @return Container
+         */
+        Dto::Docker::Container GetContainerById(const std::string &containerId);
 
         /**
          * @brief Start the container

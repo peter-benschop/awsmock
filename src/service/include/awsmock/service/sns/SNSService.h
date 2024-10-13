@@ -21,6 +21,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sns/CreateTopicRequest.h>
 #include <awsmock/dto/sns/CreateTopicResponse.h>
+#include <awsmock/dto/sns/DeleteMessageRequest.h>
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
 #include <awsmock/dto/sns/GetTopicAttributesRequest.h>
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
@@ -63,7 +64,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue
@@ -162,6 +163,18 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request);
+
+        /**
+         * @brief Deletes a message
+         *
+         * @par
+         * This is not an official AWS SDK service, but exists in AwsMock.
+         *
+         * @param request delete message request
+         * @see DeleteMessageRequest
+         * @throws ServiceException
+         */
+        void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request);
 
       private:
 

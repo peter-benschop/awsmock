@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService.GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+        Dto::Docker::Container container = _dockerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService.GetContainerByName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+        Dto::Docker::Container container = _dockerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
 
         // Stop docker container, in case it is running.
         if (container.state == "running") {

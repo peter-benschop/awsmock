@@ -22,7 +22,7 @@ namespace AwsMock::Core {
      *
      * @par Example:
      * @code{.cpp}
-     * 2024-05-10 14:38:53.933 WARN  [1255973] [Service::DockerService::GetContainerByName:146] Get docker container by name failed, state: 0
+     * 2024-05-10 14:38:53.933 WARN  [1255973] [Service::DockerService::GetFirstContainerByImageName:146] Get docker container by name failed, state: 0
      * 2024-05-10 14:38:53.933 DEBUG [1255973] [Core::CurlUtils::SendUnixSocketRequest:47] Request send to docker daemon, state: 301 socket: /var/run/docker.sock
      * 2024-05-10 14:38:53.933 DEBUG [1255973] [Service::DockerService::StartDockerContainer:248] Sending StartServer container request
      * 2024-05-10 14:38:53.933 WARN  [1255973] [Service::DockerService::StartDockerContainer:252] Start container failed, state: 0

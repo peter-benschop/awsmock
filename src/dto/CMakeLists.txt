@@ -21,7 +21,7 @@ set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp 
         src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp src/sns/TagResourceRequest.cpp src/sns/TagResourceResponse.cpp src/sns/GetTopicAttributesRequest.cpp
         src/sns/GetTopicAttributesResponse.cpp src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp src/sns/model/Subscription.cpp
         src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp src/sns/ListMessagesResponse.cpp src/sns/mapper/Mapper.cpp src/sns/GetTopicDetailsRequest.cpp
-        src/sns/GetTopicDetailsResponse.cpp)
+        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp src/s3/PutObjectRequest.cpp
         src/s3/GetObjectRequest.cpp src/s3/GetObjectResponse.cpp src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
         src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp

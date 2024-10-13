@@ -21,10 +21,13 @@ namespace AwsMock::Dto::S3 {
     }
 
     Poco::JSON::Object UserIdentity::ToJsonObject() const {
+
         try {
+
             Poco::JSON::Object rootJson;
             rootJson.set("principalId", principalId);
             return rootJson;
+
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());

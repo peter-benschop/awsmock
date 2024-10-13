@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         std::string containerName = lambdaEntity.function + "-" + instanceId;
         if (!DockerService::instance().ContainerExists(containerName, dockerTag)) {
             Database::Entity::Lambda::Instance instance;
-            instance.hostPort = GetHostPort();
+            instance.hostPort = CreateRandomHostPort();
             instance.id = instanceId;
             instance.status = Database::Entity::Lambda::InstanceIdle;
             CreateDockerContainer(lambdaEntity, instance, dockerTag);
@@ -49,17 +49,15 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = DockerService::instance().GetContainerByName(containerName, dockerTag);
+        Dto::Docker::Container container = DockerService::instance().GetFirstContainerByImageName(lambdaEntity.function, dockerTag);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
             DockerService::instance().StartDockerContainer(container.id);
             log_debug << "Lambda docker container started, containerId: " << container.id;
-        } else {
-            lambdaEntity.hostPort = container.GetLambdaPort();
-            log_debug << "Lambda docker container already started, containerId: " << container.id << " port: " << lambdaEntity.hostPort;
         }
     }
+
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
@@ -80,12 +78,10 @@ namespace AwsMock::Service {
         lambdaEntity.codeSize = image.size;
         lambdaEntity.imageId = image.id;
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
-        lambdaEntity.hostPort = GetHostPort();
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
         log_debug << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
-        log_debug << "Using port: " << lambdaEntity.hostPort;
     }
 
     void LambdaCreator::CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag) {
@@ -162,7 +158,7 @@ namespace AwsMock::Service {
         return environment;
     }
 
-    int LambdaCreator::GetHostPort() {
+    int LambdaCreator::CreateRandomHostPort() {
         return Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
     }
 

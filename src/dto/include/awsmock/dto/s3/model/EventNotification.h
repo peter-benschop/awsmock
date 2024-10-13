@@ -6,20 +6,21 @@
 #define AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H
 
 // C++ standard includes
+#include <chrono>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/lambda/model/UserIdentity.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
+
+    using std::chrono::system_clock;
 
     /**
      * {
@@ -233,15 +234,15 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
 
             try {
-                Poco::JSON::Object rootJson;
 
+                Poco::JSON::Object rootJson;
                 rootJson.set("key", key);
                 rootJson.set("size", size);
                 rootJson.set("etag", etag);
                 rootJson.set("versionId", versionId);
                 rootJson.set("sequencer", sequencer);
-
                 return rootJson;
+
             } catch (Poco::Exception &exc) {
                 throw Core::JsonException(exc.message());
             }
@@ -400,7 +401,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Event time
          */
-        std::string eventTime = Core::DateTimeUtils::AwsDatetimeNow();
+        system_clock::time_point eventTime = system_clock::now();
 
         /**
          * Event name
@@ -428,6 +429,16 @@ namespace AwsMock::Dto::S3 {
         S3 s3;
 
         /**
+         * @brief Converts the DTO to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const {
+
+            return Core::JsonUtils::ToJsonString(ToJsonObject());
+        }
+
+        /**
          * Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
@@ -440,7 +451,7 @@ namespace AwsMock::Dto::S3 {
                 rootJson.set("eventVersion", eventVersion);
                 rootJson.set("eventSource", eventSource);
                 rootJson.set("awsRegion", region);
-                rootJson.set("eventTime", eventTime);
+                rootJson.set("eventTime", Core::DateTimeUtils::ToISO8601(eventTime));
                 rootJson.set("eventName", eventName);
                 rootJson.set("userIdentity", userIdentity.ToJsonObject());
                 rootJson.set("s3", s3.ToJsonObject());
@@ -463,7 +474,7 @@ namespace AwsMock::Dto::S3 {
                 Core::JsonUtils::GetJsonValueString("eventVersion", object, eventVersion);
                 Core::JsonUtils::GetJsonValueString("eventSource", object, eventSource);
                 Core::JsonUtils::GetJsonValueString("awsRegion", object, region);
-                Core::JsonUtils::GetJsonValueString("eventTime", object, eventTime);
+                Core::JsonUtils::GetJsonValueDate("eventTime", object, eventTime);
                 Core::JsonUtils::GetJsonValueString("eventName", object, eventName);
                 s3.FromJson(object->getObject("s3"));
 
@@ -490,9 +501,7 @@ namespace AwsMock::Dto::S3 {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Record &r) {
-            os << "Record={eventVersion='" + r.eventVersion + "' eventSource='" + r.eventSource + "' region='" + r.region + "' eventTime='" + r.eventTime +
-                            "' eventName='" + r.eventName + "' userIdentity='" + r.userIdentity.ToString() + "' requestParameter='" + r.requestParameter.ToString() +
-                            "' responseElements='" + r.responseElements.ToString() + "' s3='" + r.s3.ToString() + "'}";
+            os << "Record=" << r.ToJson();
             return os;
         }
     };
@@ -513,11 +522,14 @@ namespace AwsMock::Dto::S3 {
 
             try {
                 Poco::JSON::Object rootJson;
-                Poco::JSON::Array recordsJsonArray;
-                for (const auto &record: records) {
-                    recordsJsonArray.add(record.ToJsonObject());
+
+                if (!records.empty()) {
+                    Poco::JSON::Array recordsJsonArray;
+                    for (const auto &record: records) {
+                        recordsJsonArray.add(record.ToJsonObject());
+                    }
+                    rootJson.set("Records", recordsJsonArray);
                 }
-                rootJson.set("Records", recordsJsonArray);
 
                 return Core::JsonUtils::ToJsonString(rootJson);
 
@@ -537,17 +549,19 @@ namespace AwsMock::Dto::S3 {
             try {
                 Poco::JSON::Parser parser;
                 Poco::Dynamic::Var result = parser.parse(jsonString);
-                Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-                Poco::JSON::Array::Ptr recordArray = rootObject->getArray("Records");
+                const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-                if (recordArray != nullptr) {
-                    for (const auto &it: *recordArray) {
-                        Record record;
-                        record.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-                        records.push_back(record);
+                // Record parsing
+                if (rootObject->has("Records")) {
+                    Poco::JSON::Array::Ptr recordArray = rootObject->getArray("Records");
+                    if (recordArray != nullptr) {
+                        for (const auto &it: *recordArray) {
+                            Record record;
+                            record.FromJson(it.extract<Poco::JSON::Object::Ptr>());
+                            records.push_back(record);
+                        }
                     }
                 }
-
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());

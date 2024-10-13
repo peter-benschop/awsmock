@@ -615,7 +615,7 @@ namespace AwsMock::Service {
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
-            // Check redrive policy
+            // Check re-drive policy
             std::string dlQueueArn{};
             int maxRetries = -1;
             int visibilityTimeout = queue.attributes.visibilityTimeout;
@@ -712,23 +712,7 @@ namespace AwsMock::Service {
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
 
             // Update queue counters
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
-            switch (message.status) {
-                case Database::Entity::SQS::MessageStatus::INITIAL:
-                    queue.attributes.approximateNumberOfMessages--;
-                    break;
-                case Database::Entity::SQS::MessageStatus::INVISIBLE:
-                    queue.attributes.approximateNumberOfMessagesNotVisible--;
-                    break;
-                case Database::Entity::SQS::MessageStatus::DELAYED:
-                    queue.attributes.approximateNumberOfMessagesDelayed--;
-                    break;
-                case Database::Entity::SQS::MessageStatus::UNKNOWN:
-                    break;
-            }
-
-            queue = _sqsDatabase.UpdateQueue(queue);
-            log_debug << "Queue counters updated, queue: " << queue.queueArn;
+            AdjustMessageCounters(message, message.queueArn);
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -755,20 +739,7 @@ namespace AwsMock::Service {
                 _sqsDatabase.DeleteMessage(message);
 
                 // Update queue counters
-                Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
-                switch (message.status) {
-                    case Database::Entity::SQS::MessageStatus::INITIAL:
-                        queue.attributes.approximateNumberOfMessages--;
-                        break;
-                    case Database::Entity::SQS::MessageStatus::INVISIBLE:
-                        queue.attributes.approximateNumberOfMessagesNotVisible--;
-                        break;
-                    case Database::Entity::SQS::MessageStatus::DELAYED:
-                        queue.attributes.approximateNumberOfMessagesDelayed--;
-                        break;
-                    case Database::Entity::SQS::MessageStatus::UNKNOWN:
-                        break;
-                }
+                AdjustMessageCounters(message, message.queueArn);
             }
             log_debug << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size();
 
@@ -801,20 +772,25 @@ namespace AwsMock::Service {
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 
-    void SQSService::AdjustMessageCounters(const Database::Entity::SQS::Message &message, Database::Entity::SQS::Queue &queue) {
+    void SQSService::AdjustMessageCounters(const Database::Entity::SQS::Message &message, const std::string &queueArn) {
+        Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
         switch (message.status) {
             case Database::Entity::SQS::MessageStatus::INITIAL:
                 queue.attributes.approximateNumberOfMessages--;
                 break;
             case Database::Entity::SQS::MessageStatus::INVISIBLE:
+                queue.attributes.approximateNumberOfMessages--;
                 queue.attributes.approximateNumberOfMessagesNotVisible--;
                 break;
             case Database::Entity::SQS::MessageStatus::DELAYED:
+                queue.attributes.approximateNumberOfMessages--;
                 queue.attributes.approximateNumberOfMessagesDelayed--;
                 break;
             case Database::Entity::SQS::MessageStatus::UNKNOWN:
                 break;
         }
         _sqsDatabase.UpdateQueue(queue);
+        log_debug << "Queue counters updated, queue: " << queue.queueArn;
     }
+
 }// namespace AwsMock::Service

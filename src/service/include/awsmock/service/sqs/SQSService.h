@@ -280,12 +280,12 @@ namespace AwsMock::Service {
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
         /**
-         * Adjust queue counters after update/delete of messages
+         * @brief Adjust queue counters after update/delete of messages
          *
-         * @param message
-         * @param queue
+         * @param message message object
+         * @param queueArn queue ARN
          */
-        void AdjustMessageCounters(const Database::Entity::SQS::Message &message, Database::Entity::SQS::Queue &queue);
+        void AdjustMessageCounters(const Database::Entity::SQS::Message &message, const std::string &queueArn);
 
         /**
          * SQS database connection

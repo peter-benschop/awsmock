@@ -177,11 +177,11 @@ namespace AwsMock::Database {
         /**
          * @brief Check existence of message
          *
-         * @param id message ID
+         * @param messageId message ID
          * @return true if message already exists
          * @throws DatabaseException
          */
-        bool MessageExists(const std::string &id);
+        bool MessageExists(const std::string &messageId);
 
         /**
          * @brief Creates a new message in the SQS message table
@@ -282,6 +282,14 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         void DeleteMessage(const Entity::SNS::Message &message);
+
+        /**
+         * @brief Deletes a message by message ID.
+         *
+         * @param messageId message ID to delete
+         * @throws Core::DatabaseException
+         */
+        void DeleteMessage(const std::string &messageId);
 
         /**
          * @brief Bulk delete of resources.

@@ -63,8 +63,8 @@ namespace AwsMock::Dto::S3 {
                 }
                 rootJson.set("lambdaConfigurations", jsonArray);
             }
-            rootJson.set("created", created);
-            rootJson.set("modified", modified);
+            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
+            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
             return rootJson;
 

@@ -281,14 +281,17 @@ namespace AwsMock::Database {
     }
 
     void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
+        DeleteMessage(message.messageId);
+    }
+
+    void SNSMemoryDb::DeleteMessage(const std::string &messageId) {
         Poco::ScopedLock loc(_snsMessageMutex);
 
-        std::string messageId = message.messageId;
         const auto count = std::erase_if(_messages, [messageId](const auto &item) {
             auto const &[key, value] = item;
             return value.messageId == messageId;
         });
-        log_debug << "Message deleted, messageId: " << message.messageId << " count: " << count;
+        log_debug << "Message deleted, messageId: " << messageId << " count: " << count;
     }
 
     void SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
