@@ -375,7 +375,7 @@ namespace AwsMock::Database {
         }
     }
 
-    bool SNSDatabase::MessageExists(const std::string &id) {
+    bool SNSDatabase::MessageExists(const std::string &messageId) {
 
         if (HasDatabase()) {
 
@@ -383,7 +383,7 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-                int64_t count = _messageCollection.count_documents(make_document(kvp("_id", id)));
+                int64_t count = _messageCollection.count_documents(make_document(kvp("messageId", messageId)));
                 log_trace << "Message exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -394,7 +394,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            return _memoryDb.MessageExists(id);
+            return _memoryDb.MessageExists(messageId);
         }
     }
 
@@ -665,6 +665,18 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
+            DeleteMessage(message.messageId);
+
+        } else {
+
+            _memoryDb.DeleteMessage(message.messageId);
+        }
+    }
+
+    void SNSDatabase::DeleteMessage(const std::string &messageId) {
+
+        if (HasDatabase()) {
+
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
@@ -672,9 +684,8 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _messageCollection.delete_one(make_document(kvp("messageId", message.messageId)));
-                log_debug << "Messages deleted, messageId: " << message.messageId << " count: "
-                          << result->deleted_count();
+                auto result = _messageCollection.delete_one(make_document(kvp("messageId", messageId)));
+                log_debug << "Messages deleted, messageId: " << messageId << " count: " << result->deleted_count();
                 session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
@@ -685,7 +696,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteMessage(message);
+            _memoryDb.DeleteMessage(messageId);
         }
     }
 

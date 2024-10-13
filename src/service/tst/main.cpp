@@ -37,7 +37,7 @@ class TestEnvironment : public ::testing::Environment {
         }
 
         // Get docker container
-        AwsMock::Dto::Docker::Container container = dockerService.GetContainerByName(TEST_CONTAINER_NAME, TEST_CONTAINER_VERSION);
+        AwsMock::Dto::Docker::Container container = dockerService.GetFirstContainerByImageName(TEST_CONTAINER_NAME, TEST_CONTAINER_VERSION);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {

@@ -59,6 +59,7 @@ namespace AwsMock::Database {
             mongocxx::database database = (*client)[_name];
 
             log_info << "Start creating indexes";
+
             // SQS
             database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
                                                  make_document(kvp("name", "sqs_message_idx1")));
@@ -98,8 +99,13 @@ namespace AwsMock::Database {
                                              make_document(kvp("name", "kms_idx2")));
             database["kms_key"].create_index(make_document(kvp("keyState", 1)),
                                              make_document(kvp("name", "kms_idx3")));
-            log_debug << "SQS indexes created";
+
+            // Monitoring
+            database["monitoring"].create_index(make_document(kvp("name", 1), kvp("created", 1)),
+                                                make_document(kvp("name", "monitoring_idx1")));
+            log_debug << "Database indexes created";
         }
     }
+
 
 }// namespace AwsMock::Database

@@ -219,11 +219,6 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string arn;
 
         /**
-         * Random host port
-         */
-        int hostPort;
-
-        /**
          * Timeout in seconds
          */
         int timeout;

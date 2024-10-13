@@ -111,6 +111,11 @@ namespace AwsMock::Database::Entity::SNS {
         MessageAttributeList attributes;
 
         /**
+         * Message size
+         */
+        long size;
+
+        /**
          * Last send datetime
          */
         system_clock::time_point lastSend;

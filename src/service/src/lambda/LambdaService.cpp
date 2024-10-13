@@ -127,7 +127,8 @@ namespace AwsMock::Service {
         if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
 
             // Synchronous execution
-            output = InvokeLambdaSynchronously("localhost", lambda.hostPort, payload);
+            // TODO: Fix host port, is now part of the instance
+            //output = InvokeLambdaSynchronously("localhost", lambda.hostPort, payload);
 
         } else {
 
@@ -276,7 +277,7 @@ namespace AwsMock::Service {
 
         // Delete the container, if existing
         if (dockerService.ContainerExists(request.functionName, request.qualifier)) {
-            Dto::Docker::Container container = dockerService.GetContainerByName(request.functionName, request.qualifier);
+            Dto::Docker::Container container = dockerService.GetFirstContainerByImageName(request.functionName, request.qualifier);
             dockerService.StopContainer(container.id);
             dockerService.DeleteContainer(container);
             log_debug << "Docker container deleted, function: " + request.functionName;
@@ -331,10 +332,12 @@ namespace AwsMock::Service {
 
     std::string LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) {
         if (lambda.instances.empty()) {
+            log_debug << "No idle instances found";
             return {};
         }
         for (const auto &instance: lambda.instances) {
             if (instance.status == Database::Entity::Lambda::InstanceIdle) {
+                log_debug << "Found idle instance, id: " << instance.id;
                 return instance.id;
             }
         }

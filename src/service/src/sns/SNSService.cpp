@@ -106,7 +106,8 @@ namespace AwsMock::Service {
                        .topicArn = request.topicArn,
                        .targetArn = request.targetArn,
                        .message = request.message,
-                       .messageId = messageId};
+                       .messageId = messageId,
+                       .size = static_cast<long>(request.message.length())};
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions
@@ -259,7 +260,8 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!_snsDatabase.TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
+                throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
             }
 
             long messageCount = _snsDatabase.CountMessages({}, request.topicArn);
@@ -309,7 +311,8 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!_snsDatabase.TopicExists(request.resourceArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                log_error << "SNS topic does not exists, topicArn: " << request.resourceArn;
+                throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.resourceArn);
             }
 
             // Get the topic
@@ -369,6 +372,26 @@ namespace AwsMock::Service {
             log_trace << "SNS list messages, response: " << listMessageResponse.ToJson();
 
             return listMessageResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "SNS list topics request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SNSService::DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_message");
+        log_trace << "Delete a message request, messageId: " << request.messageId;
+
+        if (!_snsDatabase.MessageExists(request.messageId)) {
+            log_error << "SNS message does not exists, messageId: " << request.messageId;
+            throw Core::ServiceException("SNS message does not exists, messageId: " + request.messageId);
+        }
+
+        try {
+
+            _snsDatabase.DeleteMessage(request.messageId);
+            log_trace << "SNS message deleted, messageId: " << request.messageId;
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.message();
