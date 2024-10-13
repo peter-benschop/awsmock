@@ -12,6 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 
@@ -38,6 +39,11 @@ namespace AwsMock::Dto::SQS {
          * Page index
          */
         int pageIndex;
+
+        /**
+         * Sort column
+         */
+        std::vector<Core::SortColumn> sortColumns;
 
         /**
          * @brief Convert from JSON representation

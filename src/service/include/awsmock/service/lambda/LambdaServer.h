@@ -24,6 +24,7 @@
 
 #define LAMBDA_DEFAULT_MONITORING_PERIOD 300
 #define LAMBDA_DEFAULT_WORKER_PERIOD 300
+#define LAMBDA_DEFAULT_LIFETIME 3600
 
 namespace AwsMock::Service {
 
@@ -112,16 +113,6 @@ namespace AwsMock::Service {
          * AWS region
          */
         std::string _region;
-
-        /**
-         * Lambda module host
-         */
-        std::string _lambdaServiceHost;
-
-        /**
-         * Lambda module port
-         */
-        int _lambdaServicePort;
 
         /**
          * Monitoring period

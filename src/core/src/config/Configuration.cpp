@@ -72,7 +72,6 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.sns.http.max.threads", "AWSMOCK_SERVICE_SNS_MAX_THREADS", 50);
         DefineIntProperty("awsmock.service.sns.http.timeout", "AWSMOCK_SERVICE_SNS_TIMEOUT", 900);
         DefineIntProperty("awsmock.service.sns.message.timeout", "AWSMOCK_SERVICE_SNS_MESSAGE_TIMEOUT", 14);
-        DefineStringProperty("awsmock.service.sns.hostname", "AWSMOCK_SERVICE_SNS_HOSTNAME", "localhost");
         DefineIntProperty("awsmock.monitoring.sns.worker.period", "AWSMOCK_SNS_WORKER_PERIOD", 300);
         DefineIntProperty("awsmock.monitoring.sns.monitoring.period", "AWSMOCK_SNS_MONITORING_PERIOD", 300);
 

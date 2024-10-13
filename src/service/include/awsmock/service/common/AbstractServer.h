@@ -17,7 +17,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Timer.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/repository/ModuleDatabase.h>

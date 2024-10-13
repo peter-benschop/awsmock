@@ -6,7 +6,6 @@
 #define AWSMOCK_SERVICE_MONITORING_WORKER_H
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/MonitoringDatabase.h>
 
 #define DEFAULT_RETENTION_PERIOD 3

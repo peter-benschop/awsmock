@@ -68,11 +68,11 @@ namespace AwsMock::Core {
     }
 
     long DateTimeUtils::UnixTimestampLocal(const system_clock::time_point &timePoint) {
-        return std::chrono::duration_cast<std::chrono::seconds>(date::make_zoned(date::current_zone(), timePoint).get_local_time().time_since_epoch()).count();
+        return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::zoned_time(std::chrono::current_zone(), timePoint).get_local_time().time_since_epoch()).count();
     }
 
     system_clock::time_point DateTimeUtils::LocalDateTimeNow() {
-        return system_clock::time_point(date::make_zoned(date::current_zone(), system_clock::now()).get_local_time().time_since_epoch());
+        return system_clock::time_point(std::chrono::zoned_time(std::chrono::current_zone(), system_clock::now()).get_local_time().time_since_epoch());
     }
 
     int DateTimeUtils::GetSecondsUntilMidnight() {

@@ -749,7 +749,9 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto result = messageCollection.delete_many(make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
-                log_debug << "Old resources deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
+                if (static_cast<long>(result->deleted_count()) > 0) {
+                    log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
+                }
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

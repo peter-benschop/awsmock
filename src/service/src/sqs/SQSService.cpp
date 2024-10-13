@@ -604,8 +604,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) {
-        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
-        log_debug << "Receive message request: " << request.ToString();
+        log_trace << "Receive message request: " << request.ToString();
 
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
@@ -628,6 +627,8 @@ namespace AwsMock::Service {
             auto begin = system_clock::now();
             Database::Entity::SQS::MessageList messageList;
             while (elapsed < request.waitTimeSeconds) {
+
+                Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
 
                 _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                 log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
@@ -671,7 +672,7 @@ namespace AwsMock::Service {
 
             long total = _sqsDatabase.CountMessages(request.queueArn);
 
-            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.pageSize, request.pageIndex);
+            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.pageSize, request.pageIndex, request.sortColumns);
 
             Dto::SQS::ListMessagesResponse listMessagesResponse;
             listMessagesResponse.total = total;

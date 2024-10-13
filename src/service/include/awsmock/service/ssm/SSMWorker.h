@@ -10,7 +10,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
 #include <awsmock/repository/SSMDatabase.h>
 
 namespace AwsMock::Service {

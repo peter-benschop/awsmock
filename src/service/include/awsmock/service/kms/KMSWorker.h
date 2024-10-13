@@ -10,7 +10,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Timer.h>
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/repository/KMSDatabase.h>
 

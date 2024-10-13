@@ -135,10 +135,10 @@ namespace AwsMock::Service {
         if (lambdaList.empty()) {
             return;
         }
-        log_info << "Lambda worker starting, count: " << lambdaList.size();
+        log_debug << "Lambda worker starting, count: " << lambdaList.size();
 
         // Get lifetime from configuration
-        int lifetime = Core::Configuration::instance().getInt("awsmock.service.lambda.lifetime", DEFAULT_LAMBDA_LIFETIME);
+        int lifetime = Core::Configuration::instance().getInt("awsmock.service.lambda.lifetime", LAMBDA_DEFAULT_LIFETIME);
         auto expired = std::chrono::system_clock::now() - std::chrono::minutes(lifetime);
 
         // Loop over lambdas and remove expired instances
@@ -163,7 +163,7 @@ namespace AwsMock::Service {
             log_debug << "Lambda updated, function" << lambda.function << " removed: " << toBeRemoved.size();
         }
         _dockerService.PruneContainers();
-        log_info << "Lambda worker finished, count: " << lambdaList.size();
+        log_debug << "Lambda worker finished, count: " << lambdaList.size();
     }
 
     void LambdaServer::UpdateCounter() {
