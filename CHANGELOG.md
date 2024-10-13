@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.15.22](https://github.com/jensvogt/awsmock/compare/v0.15.21...v0.15.22) (2024-10-13)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** add get SQS queue details ([0c1b42f](https://github.com/jensvogt/awsmock/commit/0c1b42f10689ccbf45707b2edc7eb08a55f40f13))
+* **653-move-manager-apis-to-gateway:** fix SQS queue counters ([a1c405a](https://github.com/jensvogt/awsmock/commit/a1c405a9f275332b79dd32f4e917f4256d60e31d))
+* **653-move-manager-apis-to-gateway:** fix SQS queue counters ([48efff7](https://github.com/jensvogt/awsmock/commit/48efff7d76ca78cdd87bd62b8dbf2b372e89901b))
+
 ## [0.15.21](https://github.com/jensvogt/awsmock/compare/v0.15.20...v0.15.21) (2024-10-12)
 
 
