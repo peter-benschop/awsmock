@@ -196,6 +196,15 @@ namespace AwsMock::Service {
         Dto::Docker::Container GetContainerById(const std::string &containerId);
 
         /**
+         * @brief List all containers of an given image.
+         *
+         * @param name image name
+         * @param tag image tag
+         * @return list of containers
+         */
+        std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag);
+
+        /**
          * @brief Start the container
          *
          * @param id container ID

@@ -3,7 +3,7 @@ set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
 set(COMMON_SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp src/common/AbstractDomainSocket.cpp)
-set(S3_SOURCES src/s3/S3Server.cpp src/s3/S3Handler.cpp src/s3/S3Service.cpp src/s3/S3Monitoring.cpp src/s3/S3HashCreator.cpp src/s3/S3Worker.cpp)
+set(S3_SOURCES src/s3/S3Server.cpp src/s3/S3Handler.cpp src/s3/S3Service.cpp src/s3/S3HashCreator.cpp)
 set(SQS_SOURCES src/sqs/SQSServer.cpp src/sqs/SQSHandler.cpp src/sqs/SQSService.cpp)
 set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSService.cpp)
 set(LAMBDA_SOURCES src/lambda/LambdaServer.cpp src/lambda/LambdaHandler.cpp src/lambda/LambdaService.cpp src/lambda/LambdaCreator.cpp src/lambda/LambdaExecutor.cpp)
@@ -15,7 +15,7 @@ set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandle
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp src/secretsmanager/SecretsManagerService.cpp
         src/secretsmanager/SecretsManagerMonitoring.cpp)
 set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSWorker.cpp src/kms/KMSService.cpp src/kms/KMSMonitoring.cpp src/kms/KMSCreator.cpp)
-set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMWorker.cpp src/ssm/SSMService.cpp src/ssm/SSMMonitoring.cpp)
+set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp)
 set(DOCKER_SOURCES src/docker/DockerService.cpp)

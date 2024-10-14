@@ -114,6 +114,11 @@ namespace AwsMock::Service {
         /**
          * @brief On clas callback
          */
+        void DoShutdown();
+
+        /**
+         * @brief On clas callback
+         */
         void DoClose();
 
         /**

@@ -371,6 +371,9 @@ namespace AwsMock::Service {
         // Get md5sum as ETag
         Dto::S3::UploadPartCopyResponse response;
         response.eTag = Core::Crypto::GetMd5FromFile(destFile);
+        response.checksumSHA1 = Core::Crypto::GetSha1FromFile(destFile);
+        response.checksumSHA256 = Core::Crypto::GetSha256FromFile(destFile);
+        response.lastModified = system_clock::now();
         log_info << "Upload part copy succeeded, part: " << request.partNumber << " filename: " << destFile << " length: " << length;
 
         return response;
@@ -379,64 +382,81 @@ namespace AwsMock::Service {
     Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) {
         log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
 
+        // Get database object
+        Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+
         std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", DEFAULT_DATA_DIR);
         std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Get all file parts
         std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
-        std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, request.uploadId);
+        if (Core::DirUtils::DirectoryExists(uploadDir)) {
 
-        // Output file
-        std::string filename = Core::AwsUtils::CreateS3FileName();
-        std::string outFile = dataS3Dir + Poco::Path::separator() + filename;
-        log_debug << "Output file, outFile: " << outFile;
+            std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, request.uploadId);
 
-        // Append all parts to the output file
-        long fileSize = 0;
-        try {
+            // Output file
+            std::string filename = Core::AwsUtils::CreateS3FileName();
+            std::string outFile = dataS3Dir + Poco::Path::separator() + filename;
+            log_debug << "Output file, outFile: " << outFile;
 
-            fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
-            log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
+            // Append all parts to the output file
+            long fileSize = 0;
+            try {
 
-        } catch (Poco::Exception &exc) {
-            log_error << "Append to binary file failed, error: " << exc.message();
+                fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
+                log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
+
+            } catch (Poco::Exception &exc) {
+                log_error << "Append to binary file failed, error: " << exc.message();
+            }
+
+            // Get file size, MD5 sum
+            std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
+            std::string sha1sum = Core::Crypto::GetSha1FromFile(outFile);
+            std::string sha256sum = Core::Crypto::GetSha256FromFile(outFile);
+            log_debug << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum;
+
+            // Update database object
+            object.size = fileSize;
+            object.md5sum = md5sum;
+            object.internalName = filename;
+            object = _database.UpdateObject(object);
+
+            // Calculate the hashes asynchronously
+            if (!request.checksumAlgorithm.empty()) {
+
+                S3HashCreator s3HashCreator;
+                std::vector<std::string> algorithms = {request.checksumAlgorithm};
+                boost::thread t(boost::ref(s3HashCreator), algorithms, object);
+                t.detach();
+                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+            }
+
+            // Cleanup
+            Core::DirUtils::DeleteDirectory(uploadDir);
+
+            // Check notifications
+            CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
+            log_info << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
+
+            return {
+                    .location = request.region,
+                    .bucket = request.bucket,
+                    .key = request.key,
+                    .etag = md5sum,
+                    .md5sum = md5sum,
+                    .checksumSha1 = sha1sum,
+                    .checksumSha256 = sha256sum};
         }
-
-        // Get file size, MD5 sum
-        std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
-        log_debug << "Metadata, bucket: " << request.bucket << " key: " << request.key << " md5: " << md5sum;
-
-        // Update database object
-        Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
-        object.size = fileSize;
-        object.md5sum = md5sum;
-        object.internalName = filename;
-        object = _database.UpdateObject(object);
-
-        // Calculate the hashes asynchronously
-        if (!request.checksumAlgorithm.empty()) {
-
-            S3HashCreator s3HashCreator;
-            std::vector<std::string> algorithms = {request.checksumAlgorithm};
-            boost::thread t(boost::ref(s3HashCreator), algorithms, object);
-            t.detach();
-            log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-        }
-
-        // Cleanup
-        Core::DirUtils::DeleteDirectory(uploadDir);
-
-        // Check notifications
-        CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-
-        log_info << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
         return {
                 .location = request.region,
                 .bucket = request.bucket,
                 .key = request.key,
-                .etag = md5sum,
-                .md5sum = md5sum};
+                .etag = object.md5sum,
+                .md5sum = object.md5sum,
+                .checksumSha1 = object.sha1sum,
+                .checksumSha256 = object.sha256sum};
     }
 
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream, bool chunkEncoding) {

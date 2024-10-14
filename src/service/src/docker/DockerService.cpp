@@ -244,6 +244,26 @@ namespace AwsMock::Service {
         return response.containerList.front();
     }
 
+    std::vector<Dto::Docker::Container> DockerService::ListContainerByImageName(const std::string &name, const std::string &tag) {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+        if (domainSocketResponse.statusCode != http::status::ok) {
+            log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
+            return {};
+        }
+
+        Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+        if (response.containerList.empty()) {
+            log_warning << "Docker container not found, name: " << name << ":" << tag;
+            return {};
+        }
+
+        log_debug << "Docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
+        return response.containerList;
+    }
+
     Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 

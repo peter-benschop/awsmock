@@ -193,7 +193,7 @@ namespace AwsMock::Service {
          * @param updateId upload ID
          * @return ETag
          */
-        static std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
+        std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
 
         /**
          * @brief Upload a partial file copy.

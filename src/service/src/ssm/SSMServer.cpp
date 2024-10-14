@@ -23,7 +23,7 @@ namespace AwsMock::Service {
 
         // Monitoring
         // Start SNS monitoring update counters
-        scheduler.AddTask("monitoring-ssm-counters", [this] { this->_ssmMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-ssm-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
         //scheduler.AddTask("s3-sync-directories", [this] { this->_ssmWorker.SyncObjects(); }, _workerPeriod);
@@ -32,6 +32,16 @@ namespace AwsMock::Service {
         SetRunning();
 
         log_debug << "SSM server started, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+    }
+
+    void SSMServer::UpdateCounter() {
+        log_trace << "SSM monitoring starting";
+
+        // Get total counts
+        long parameters = _ssmDatabase.CountParameters();
+        _metricService.SetGauge(SSM_PARAMETER_COUNT, parameters);
+
+        log_trace << "SSM monitoring finished";
     }
 
 }// namespace AwsMock::Service

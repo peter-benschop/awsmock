@@ -42,7 +42,10 @@ namespace AwsMock::Service {
          */
         explicit LambdaServer(Core::PeriodicScheduler &scheduler);
 
-        ~LambdaServer();
+        /**
+         * Shutdown server
+         */
+        void Shutdown() override;
 
       private:
 
@@ -55,21 +58,6 @@ namespace AwsMock::Service {
          * @brief Delete instances from database, which are not running
          */
         void CleanupInstances();
-
-        /**
-         * Start all lambdas if they are not existing
-         */
-        void StartLambdaFunctions();
-
-        /**
-         * Returns the code from a local file.
-         *
-         * <p>The code will provided as a Base64 encoded zip file.</p>
-         *
-         * @param lambda lambda to get the code from.
-         * @return Dto::lambda::Code
-         */
-        Dto::Lambda::Code GetCode(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Remove expired lambda functions
@@ -88,11 +76,6 @@ namespace AwsMock::Service {
          * lambda database
          */
         Database::LambdaDatabase &_lambdaDatabase;
-
-        /**
-         * lambda module
-         */
-        Service::LambdaService _lambdaService;
 
         /**
          * Docker module

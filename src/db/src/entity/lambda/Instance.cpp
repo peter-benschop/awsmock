@@ -9,6 +9,7 @@ namespace AwsMock::Database::Entity::Lambda {
     void Instance::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
         id = bsoncxx::string::to_string(mResult.value()["id"].get_string().value);
         containerId = bsoncxx::string::to_string(mResult.value()["containerId"].get_string().value);
+        containerName = bsoncxx::string::to_string(mResult.value()["containerName"].get_string().value);
         hostPort = mResult.value()["hostPort"].get_int32().value;
         status = LambdaInstanceStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
@@ -20,6 +21,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         instanceDoc.append(kvp("id", id));
         instanceDoc.append(kvp("containerId", containerId));
+        instanceDoc.append(kvp("containerName", containerName));
         instanceDoc.append(kvp("hostPort", hostPort));
         instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
         instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));

@@ -72,14 +72,19 @@ namespace AwsMock::Service {
         void CheckTransferServers();
 
         /**
+         * @brief Update counters
+         */
+        void UpdateCounter();
+
+        /**
          * Transfer database
          */
         Database::TransferDatabase &_transferDatabase;
 
         /**
-         * Transfer monitoring
+         * @brief Metric service
          */
-        TransferMonitoring _transferMonitoring;
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * AWS region

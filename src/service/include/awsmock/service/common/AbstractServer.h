@@ -49,6 +49,11 @@ namespace AwsMock::Service {
          */
         explicit AbstractServer(std::string name);
 
+        /**
+         * @brief Shutdown server
+         */
+        virtual void Shutdown();
+
       protected:
 
         /**

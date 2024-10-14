@@ -7,6 +7,7 @@
 
 // Boost includes
 #include <boost/asio/thread_pool.hpp>
+#include <boost/filesystem.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -14,14 +15,14 @@
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/s3/S3Monitoring.h>
 #include <awsmock/service/s3/S3Service.h>
-#include <awsmock/service/s3/S3Worker.h>
 
 #define S3_DEFAULT_MONITORING_PERIOD 300
 #define S3_DEFAULT_WORKER_PERIOD 3600
 
 namespace AwsMock::Service {
+
+    using namespace boost::filesystem;
 
     /**
      * @brief S3 module server
@@ -40,14 +41,24 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * S3 monitoring
+         * @brief Synchronize S3 object between filesystem and database.
          */
-        S3Monitoring _s3Monitoring;
+        [[maybe_unused]] void SyncObjects();
 
         /**
-         * S3 worker
+         * Update counters
          */
-        S3Worker _s3Worker;
+        void UpdateCounter();
+
+        /**
+         * Metric service
+         */
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * Database connection
+         */
+        Database::S3Database &_s3Database = Database::S3Database::instance();
 
         /**
          * Monitoring period

@@ -14,6 +14,10 @@ namespace AwsMock::Dto::S3 {
 
         // ETag
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32", checksumCRC32);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32C", checksumCRC32C);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA1", checksumSHA1);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA256", checksumSHA256);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
 
         return Core::XmlUtils::ToXmlString(pDoc);

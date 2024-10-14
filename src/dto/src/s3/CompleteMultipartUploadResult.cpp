@@ -36,6 +36,10 @@ namespace AwsMock::Dto::S3 {
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Bucket", bucket);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
         Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", etag);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32", checksumCrc32);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32C", checksumCrc32c);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA1", checksumSha1);
+        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA256", checksumSha256);
 
         return Core::XmlUtils::ToXmlString(pDoc);
     }

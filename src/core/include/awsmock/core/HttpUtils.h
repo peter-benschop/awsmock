@@ -382,6 +382,14 @@ namespace AwsMock::Core {
         static long GetContentLength(const http::request<http::dynamic_body> &request);
 
         /**
+         * @brief Returns the host
+         *
+         * @param request HTTP request
+         * @return request host
+         */
+        static std::string GetHost(const http::request<http::dynamic_body> &request);
+
+        /**
          * @brief Return a simple ok response (200)
          *
          * @param request HTTP request

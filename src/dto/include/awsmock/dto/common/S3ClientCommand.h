@@ -180,6 +180,11 @@ namespace AwsMock::Dto::Common {
         std::string uploadId;
 
         /**
+         * Requester host
+         */
+        std::string host;
+
+        /**
          * Convert to a JSON string
          *
          * @return JSON string
