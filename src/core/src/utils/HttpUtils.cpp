@@ -304,6 +304,10 @@ namespace AwsMock::Core {
         return 0;
     }
 
+    std::string HttpUtils::GetHost(const http::request<http::dynamic_body> &request) {
+        return request.base()[http::field::host];
+    }
+
     bool HttpUtils::IsUrlEncoded(const std::string &value) {
         return !StringUtils::Equals(StringUtils::UrlDecode(value), value);
     }

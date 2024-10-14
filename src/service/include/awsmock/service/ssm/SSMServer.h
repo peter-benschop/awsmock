@@ -13,10 +13,10 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
-#include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/ssm/SSMMonitoring.h>
-#include <awsmock/service/ssm/SSMWorker.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 #define SSM_DEFAULT_WORKER_PERIOD 3600
 #define SSM_DEFAULT_MONITORING_PERIOD 300
@@ -40,17 +40,22 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * SSM monitoring
+         * @brief Update counters
          */
-        SSMMonitoring _ssmMonitoring;
+        void UpdateCounter();
 
         /**
-         * SSM worker
+         * @brief Metric service
          */
-        SSMWorker _ssmWorker;
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
-         * SSM server period
+         * @brief Database connection
+         */
+        Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+
+        /**
+         * @brief SSM server period
          *
          * <p>
          * Used for the background threads (cleanup, reset, retention, etc.)
@@ -59,7 +64,7 @@ namespace AwsMock::Service {
         int _workerPeriod;
 
         /**
-         * SNS monitoring period
+         * @brief SNS monitoring period
          */
         int _monitoringPeriod;
     };

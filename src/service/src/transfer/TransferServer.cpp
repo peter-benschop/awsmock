@@ -21,7 +21,7 @@ namespace AwsMock::Service {
         log_info << "Transfer server starting";
 
         // Start SNS monitoring update counters
-        scheduler.AddTask("monitoring-transfer-counters", [this] { this->_transferMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-transfer-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Create transfer bucket
         CreateTransferBucket();
@@ -129,6 +129,15 @@ namespace AwsMock::Service {
                 log_info << "Transfer server stopped, serverId: " << transfer.first;
             }
         }
+    }
+
+    void TransferServer::UpdateCounter() {
+        log_trace << "Transfer monitoring starting";
+
+        long servers = _transferDatabase.CountServers();
+        _metricService.SetGauge(TRANSFER_SERVER_COUNT, static_cast<double>(servers));
+
+        log_trace << "Transfer monitoring finished";
     }
 
 }// namespace AwsMock::Service

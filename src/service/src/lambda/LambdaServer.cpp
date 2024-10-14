@@ -41,8 +41,8 @@ namespace AwsMock::Service {
         log_debug << "Lambda server initialized";
     }
 
-    LambdaServer::~LambdaServer() {
-        log_debug << "Lambda server destructor, region: " << _region;
+    void LambdaServer::Shutdown() {
+        log_debug << "Lambda server shutdown, region: " << _region;
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
         for (auto &lambda: lambdas) {
@@ -67,65 +67,21 @@ namespace AwsMock::Service {
 
     void LambdaServer::CleanupInstances() {
 
-        log_debug << "Starting lambdas";
+        log_debug << "Cleanup lambdas";
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
         for (auto &lambda: lambdas) {
+
+            log_debug << "Get containers";
+            std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest");
+            for (const auto &container: containers) {
+                Service::DockerService::instance().StopContainer(container.id);
+                Service::DockerService::instance().DeleteContainer(container.id);
+            }
             lambda.instances.clear();
             _lambdaDatabase.UpdateLambda(lambda);
         }
         log_debug << "Lambda instances cleaned up";
-    }
-
-    void LambdaServer::StartLambdaFunctions() {
-
-        log_debug << "Starting lambdas";
-        std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
-
-        Service::LambdaService lambdaService;
-
-        for (auto &lambda: lambdas) {
-
-            try {
-                // Create function request and send to service
-                Dto::Lambda::CreateFunctionRequest request = Dto::Lambda::Mapper::map(lambda);
-
-                // Add function code
-                request.code = GetCode(lambda);
-
-                lambdaService.CreateFunction(request);
-                log_debug << "Lambda started, name:" << lambda.function;
-
-            } catch (Core::ServiceException &e) {
-                log_error << e.message();
-            }
-        }
-    }
-
-    Dto::Lambda::Code LambdaServer::GetCode(const Database::Entity::Lambda::Lambda &lambda) {
-
-        Dto::Lambda::Code code;
-
-        // Check file
-        if (lambda.code.zipFile.empty()) {
-            throw Core::ServiceException("Lambda Zip file missing");
-        }
-
-        // Load file
-        std::string filename = _lambdaDir + Poco::Path::separator() + lambda.code.zipFile;
-        if (Core::FileUtils::FileExists(filename)) {
-
-            std::stringstream ss;
-            std::ifstream ifs(filename);
-            ss << ifs.rdbuf();
-            ifs.close();
-
-            log_debug << "Loaded lambda from file: " << filename << " size: " << Core::FileUtils::FileSize(filename);
-            return {.zipFile = ss.str()};
-
-        } else {
-            throw Core::ServiceException("Lambda Zip file does not exist");
-        }
     }
 
     void LambdaServer::RemoveExpiredLambdas() {
@@ -139,7 +95,7 @@ namespace AwsMock::Service {
 
         // Get lifetime from configuration
         int lifetime = Core::Configuration::instance().getInt("awsmock.service.lambda.lifetime", LAMBDA_DEFAULT_LIFETIME);
-        auto expired = std::chrono::system_clock::now() - std::chrono::minutes(lifetime);
+        auto expired = std::chrono::system_clock::now() - std::chrono::seconds(lifetime);
 
         // Loop over lambdas and remove expired instances
         for (auto &lambda: lambdaList) {

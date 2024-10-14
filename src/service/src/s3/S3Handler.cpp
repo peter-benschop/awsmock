@@ -698,6 +698,7 @@ namespace AwsMock::Service {
             return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
+            std::cerr << exc.what() << std::endl;
             return SendInternalServerError(request, exc.what());
         }
         log_error << "Unknown method";

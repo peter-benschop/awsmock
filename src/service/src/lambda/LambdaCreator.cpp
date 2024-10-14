@@ -43,6 +43,7 @@ namespace AwsMock::Service {
             Database::Entity::Lambda::Instance instance;
             instance.hostPort = CreateRandomHostPort();
             instance.id = instanceId;
+            instance.containerName = containerName;
             instance.status = Database::Entity::Lambda::InstanceIdle;
             CreateDockerContainer(lambdaEntity, instance, dockerTag);
             lambdaEntity.instances.emplace_back(instance);

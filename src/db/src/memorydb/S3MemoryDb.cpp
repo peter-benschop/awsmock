@@ -250,6 +250,7 @@ namespace AwsMock::Database {
     }
 
     long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
+        Poco::ScopedLock lock(_objectMutex);
 
         if (region.empty() && bucket.empty()) {
             return static_cast<long>(_objects.size());
@@ -275,6 +276,7 @@ namespace AwsMock::Database {
                 }
             }
         }
+        log_debug << "Count: " << count << " bucket: " << bucket << " region: " << region;
         return count;
     }
 
@@ -348,6 +350,7 @@ namespace AwsMock::Database {
     void S3MemoryDb::DeleteAllObjects() {
         Poco::ScopedLock lock(_objectMutex);
 
+        log_debug << "Deleting objects, size: " << _objects.size();
         _objects.clear();
     }
 }// namespace AwsMock::Database

@@ -85,6 +85,11 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string containerId;
 
         /**
+         * Container name
+         */
+        std::string containerName;
+
+        /**
          * Host port
          */
         int hostPort;

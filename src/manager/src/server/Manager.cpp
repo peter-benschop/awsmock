@@ -68,7 +68,7 @@ namespace AwsMock::Manager {
                 log_info << "Stopping module: " << module.name;
                 moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
                 if (moduleMap.HasModule(module.name)) {
-                    //moduleMap.GetModule(module.name)->Stop();
+                    moduleMap.GetModule(module.name)->Shutdown();
                     log_debug << "Module " << module.name << " stopped";
                 }
             }

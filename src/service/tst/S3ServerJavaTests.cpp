@@ -50,6 +50,10 @@ namespace AwsMock::Service {
 
             // Start HTTP manager
             _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _thread = boost::thread([&]() {
+                boost::asio::io_service::work work(_ios);
+                _ios.run();
+            });
         }
 
         void TearDown() override {
@@ -89,6 +93,7 @@ namespace AwsMock::Service {
             return response;
         }
 
+        boost::thread _thread;
         std::string _region, _baseUrl;
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
@@ -300,6 +305,34 @@ namespace AwsMock::Service {
 
         // act
         Core::HttpSocketResponse copyObjectResult = SendPostCommand(_baseUrl + "copyObject?sourceBucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&sourceKey=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&destinationBucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET_COPY) + "&destinationKey=" + Core::StringUtils::UrlEncode(TEST_KEY_COPY), {});
+        EXPECT_TRUE(copyObjectResult.statusCode == http::status::ok);
+        long objects1 = _s3Database.ObjectCount(REGION, TEST_BUCKET);
+        long objects2 = _s3Database.ObjectCount(REGION, TEST_BUCKET_COPY);
+
+        // assert
+        EXPECT_TRUE(copyObjectResult.statusCode == http::status::ok);
+        EXPECT_EQ(1, objects1);
+        EXPECT_EQ(1, objects2);
+    }
+
+    TEST_F(S3ServerJavaTest, S3CopyBigObjectTest) {
+
+        // arrange
+        Core::HttpSocketResponse createResult1 = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        EXPECT_TRUE(createResult1.statusCode == http::status::ok);
+        long buckets = _s3Database.BucketCount();
+        EXPECT_EQ(1, buckets);
+        Core::HttpSocketResponse createResult2 = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET_COPY), {});
+        EXPECT_TRUE(createResult2.statusCode == http::status::ok);
+        buckets = _s3Database.BucketCount();
+        EXPECT_EQ(2, buckets);
+        Core::HttpSocketResponse uploadObjectResult = SendGetCommand(_baseUrl + "uploadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=200", {});
+        EXPECT_TRUE(uploadObjectResult.statusCode == http::status::ok);
+        long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
+        EXPECT_EQ(1, objects);
+
+        // act
+        Core::HttpSocketResponse copyObjectResult = SendPostCommand(_baseUrl + "copyBigObject?sourceBucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&sourceKey=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&destinationBucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET_COPY) + "&destinationKey=" + Core::StringUtils::UrlEncode(TEST_KEY_COPY), {});
         EXPECT_TRUE(copyObjectResult.statusCode == http::status::ok);
         long objects1 = _s3Database.ObjectCount(REGION, TEST_BUCKET);
         long objects2 = _s3Database.ObjectCount(REGION, TEST_BUCKET_COPY);

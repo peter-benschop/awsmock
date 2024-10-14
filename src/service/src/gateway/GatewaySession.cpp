@@ -56,10 +56,10 @@ namespace AwsMock::Service {
 
         // This means they closed the connection
         if (ec == http::error::end_of_stream)
-            return DoClose();
+            return DoShutdown();
 
         if (ec) {
-            log_error << ec.message();
+            //log_error << ec.message();
             return;
         }
 
@@ -189,18 +189,19 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::OnWrite(bool keep_alive, boost::beast::error_code ec, std::size_t bytes_transferred) {
-        boost::ignore_unused(bytes_transferred);
 
+        boost::ignore_unused(bytes_transferred);
         if (ec) {
             log_error << ec.message();
-            return DoClose();
+            return DoShutdown();
         }
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
-            return DoClose();
+            return DoShutdown();
+        } else {
+            DoClose();
         }
-        return DoClose();
 
         // Resume the read if it has been paused
         if (response_queue_.size() == _queueLimit)
@@ -212,11 +213,23 @@ namespace AwsMock::Service {
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, response_queue_.size());
     }
 
-    void GatewaySession::DoClose() {
+    void GatewaySession::DoShutdown() {
 
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = stream_.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        if (ec) {
+            //log_error << "Could not shutdown socket, message: " << ec.message();
+        }
+
+        // At this point the connection is closed gracefully
+    }
+
+    void GatewaySession::DoClose() {
+
+        // Send a TCP shutdown
+        boost::beast::error_code ec;
+        ec = stream_.socket().close(ec);
         if (ec) {
             //log_error << "Could not shutdown socket, message: " << ec.message();
         }

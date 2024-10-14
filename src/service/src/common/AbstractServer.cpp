@@ -20,4 +20,7 @@ namespace AwsMock::Service {
         _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
     }
 
+    void AbstractServer::Shutdown() {
+    }
+
 }// namespace AwsMock::Service
