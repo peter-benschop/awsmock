@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.15.23](https://github.com/jensvogt/awsmock/compare/v0.15.22...v0.15.23) (2024-10-20)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([5d6507f](https://github.com/jensvogt/awsmock/commit/5d6507fb92324bbba1bc1f98c63149f1f4307787))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([ad90920](https://github.com/jensvogt/awsmock/commit/ad909206f5b825a9d190e617ce45be30c1da6ea9))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([c49ae83](https://github.com/jensvogt/awsmock/commit/c49ae83da0cc775f2f2974d171b063611d364725))
+* **653-move-manager-apis-to-gateway:** add SNS topic couters ([05eefaf](https://github.com/jensvogt/awsmock/commit/05eefafa17c413c3a3c56579df5e1edb8d3811eb))
+* **653-move-manager-apis-to-gateway:** add SNS topic couters ([3e67959](https://github.com/jensvogt/awsmock/commit/3e6795984b23d0101f67111c228728dc2610ed31))
+* **653-move-manager-apis-to-gateway:** fix SQS queue counters ([68b6008](https://github.com/jensvogt/awsmock/commit/68b6008efe9624a5c2bac4dbcad32b78e857d95c))
+
 ## [0.15.22](https://github.com/jensvogt/awsmock/compare/v0.15.21...v0.15.22) (2024-10-13)
 
 
