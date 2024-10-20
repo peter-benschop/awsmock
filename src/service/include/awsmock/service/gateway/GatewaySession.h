@@ -42,6 +42,9 @@ namespace AwsMock::Service {
     /**
      * @brief HTTP session manager
      *
+     * @par
+     * From: https://www.boost.org/doc/libs/1_86_0/libs/beast/example/advanced/server/advanced_server.cpp
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     class GatewaySession : public std::enable_shared_from_this<GatewaySession> {

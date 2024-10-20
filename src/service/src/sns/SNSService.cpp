@@ -58,6 +58,34 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_topic_counters");
+        log_trace << "List all topics counters request, request: " << request.ToString();
+
+        try {
+
+            Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, request.sortColumns, request.region);
+
+            Dto::SNS::ListTopicCountersResponse listTopicResponse;
+            listTopicResponse.total = _snsDatabase.CountTopics(request.region, request.prefix);
+            for (const auto &topic: topicList) {
+                Dto::SNS::TopicCounter counter;
+                counter.topicName = topic.topicName;
+                counter.topicArn = topic.topicArn;
+                counter.topicUrl = topic.topicUrl;
+                counter.created = topic.created;
+                counter.modified = topic.modified;
+                listTopicResponse.topicCounters.emplace_back(counter);
+            }
+            log_trace << "SNS list topic counters response: " << listTopicResponse.ToJson();
+            return listTopicResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
         log_trace << "Delete topic request, region: " << region << " topicArn: " << topicArn;
@@ -113,7 +141,7 @@ namespace AwsMock::Service {
             // Check subscriptions
             CheckSubscriptions(request);
 
-            return {.messageId = message.messageId};
+            return {.messageId = message.messageId, .requestId = Poco::UUIDGenerator::defaultGenerator().createRandom().toString()};
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS create message failed, message: " << ex.message();
@@ -332,9 +360,11 @@ namespace AwsMock::Service {
     }
 
     void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
+        log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Get queue by ARN
         Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByArn(subscription.endpoint);
+        log_debug << "Found queue, queueUrl: " << sqsQueue.name;
 
         // Create a SQS notification request
         AwsMock::Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
@@ -342,7 +372,7 @@ namespace AwsMock::Service {
                 .messageId = Core::AwsUtils::CreateMessageId(),
                 .topicArn = request.topicArn,
                 .message = request.message,
-                .timestamp = static_cast<long>(Poco::Timestamp().epochMicroseconds() / 1000)};
+                .timestamp = Core::DateTimeUtils::UnixTimestamp(std::chrono::system_clock::now())};
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest = {

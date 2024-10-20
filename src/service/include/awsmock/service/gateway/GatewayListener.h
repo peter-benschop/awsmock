@@ -64,12 +64,12 @@ namespace AwsMock::Service {
         /**
          * Boost IO context
          */
-        boost::asio::io_context &ioc_;
+        boost::asio::io_context &_ioc;
 
         /**
          * Boost acceptor
          */
-        boost::asio::ip::tcp::acceptor acceptor_;
+        boost::asio::ip::tcp::acceptor _acceptor;
     };
 
 }// namespace AwsMock::Service

@@ -209,7 +209,7 @@ namespace AwsMock::Database {
 
             bsoncxx::builder::basic::document query;
             if (!prefix.empty()) {
-                query.append(kvp("name", make_document(kvp("$regex", "/^" + prefix + "/"))));
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
             if (!region.empty()) {
                 query.append(kvp("region", region));
@@ -348,7 +348,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSDatabase::CountQueues(const std::string &region) {
+    long SQSDatabase::CountQueues(const std::string &prefix, const std::string &region) {
 
         long count;
         if (HasDatabase()) {
@@ -356,15 +356,20 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            if (region.empty()) {
-                count = _queueCollection.count_documents({});
-            } else {
-                count = _queueCollection.count_documents(make_document(kvp("region", region)));
+            bsoncxx::builder::basic::document query;
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
+
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+
+            count = _queueCollection.count_documents(query.extract());
 
         } else {
 
-            return _memoryDb.CountQueues(region);
+            return _memoryDb.CountQueues(prefix, region);
         }
         log_trace << "Count queues, result: " << count;
         return count;
@@ -460,11 +465,19 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            try {
 
-            int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
-            log_trace << "Message exists: " << std::boolalpha << count;
-            return count > 0;
+                int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
+                log_trace << "Message exists: " << std::boolalpha << count;
+                if (count == 0) {
+                    log_warning << "Message exists: " << std::boolalpha << count;
+                }
+                return count > 0;
 
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
         } else {
 
             return _memoryDb.MessageExists(receiptHandle);
@@ -647,8 +660,6 @@ namespace AwsMock::Database {
 
             try {
 
-                session.start_transaction();
-
                 mongocxx::options::find opts;
                 if (maxMessages > 0) {
                     opts.limit(maxMessages);
@@ -698,7 +709,9 @@ namespace AwsMock::Database {
                         result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
                         messageList.push_back(result);
 
+
                         // Update values
+                        session.start_transaction();
                         messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
                                                      make_document(kvp("$set",
                                                                        make_document(kvp("status",
@@ -707,14 +720,14 @@ namespace AwsMock::Database {
                                                                                      kvp("receiptHandle", result.receiptHandle),
                                                                                      kvp("retries", result.retries)))));
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
+
+                        // Commit
+                        session.commit_transaction();
                     }
                     if (messageList.size() >= maxMessages) {
                         break;
                     }
                 }
-
-                // Commit
-                session.commit_transaction();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -1056,18 +1069,14 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
-            auto queueCollection = (*client)[_databaseName][_collectionNameQueue];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
                 auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
-
-                // Adjust queue counters
-                //queueCollection.update_many({}, make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(-1))))));
-
                 session.commit_transaction();
+
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
                 return result->deleted_count();
 

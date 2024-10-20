@@ -249,6 +249,63 @@ namespace AwsMock::Database {
         return topicList;
     }
 
+    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) {
+
+        Entity::SNS::TopicList topicList;
+        if (HasDatabase()) {
+
+            try {
+
+                mongocxx::options::find opts;
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _queueCollection = (*client)[_databaseName][_topicCollectionName];
+
+                bsoncxx::builder::basic::document query;
+                if (!prefix.empty()) {
+                    query.append(kvp("topicName", make_document(kvp("$regex", "^" + prefix))));
+                }
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
+                }
+                if (pageIndex > 0) {
+                    opts.skip(pageIndex * pageSize);
+                }
+
+                opts.sort(make_document(kvp("_id", 1)));
+                if (!sortColumns.empty()) {
+                    bsoncxx::builder::basic::document sort;
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                auto queueCursor = _queueCollection.find(query.view(), opts);
+                for (auto queue: queueCursor) {
+                    Entity::SNS::Topic result;
+                    result.FromDocument(queue);
+                    topicList.push_back(result);
+                }
+
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "SNS Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+
+        } else {
+
+            topicList = _memoryDb.ListTopics(region);
+        }
+        log_trace << "Got topic list, size:" << topicList.size();
+        return topicList;
+    }
+
     Entity::SNS::Topic SNSDatabase::UpdateTopic(Entity::SNS::Topic &topic) {
 
         if (HasDatabase()) {
@@ -298,7 +355,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SNSDatabase::CountTopics(const std::string &region) {
+    long SNSDatabase::CountTopics(const std::string &region, const std::string &prefix) {
 
         if (HasDatabase()) {
 
@@ -306,7 +363,17 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                long count = _topicCollection.count_documents(make_document(kvp("region", region)));
+
+                bsoncxx::builder::basic::document query;
+
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("topicName", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                long count = _topicCollection.count_documents(query.extract());
                 log_trace << "Count topics, result: " << count;
                 return count;
 

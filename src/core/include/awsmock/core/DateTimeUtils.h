@@ -25,6 +25,15 @@ namespace AwsMock::Core {
 
     using std::chrono::system_clock;
 
+    template<class Clock, class Duration1, class Duration2>
+    constexpr auto ceilTimePoint(std::chrono::time_point<Clock, Duration1> t, Duration2 m) noexcept {
+        using R = std::chrono::time_point<Clock, Duration2>;
+        auto r = std::chrono::time_point_cast<Duration2>(R{} + (t - R{}) / m * m);
+        if (r < t)
+            r += m;
+        return r;
+    }
+
     /**
      * @brief Date time utilities.
      *
@@ -112,6 +121,13 @@ namespace AwsMock::Core {
          * @return time_point as Unix epoch timestamp
          */
         static long UnixTimestamp(const system_clock::time_point &timePoint);
+
+        /**
+         * @brief Returns the current Unix epoch timestamp (UTC)
+         *
+         * @return now as Unix epoch timestamp
+         */
+        static long UnixTimestampNow();
 
         /**
          * @brief Returns the time_point in Unix epoch timestamp (LocalTime)

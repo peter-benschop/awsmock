@@ -4,6 +4,7 @@
 //
 
 #include <awsmock/repository/MonitoringDatabase.h>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace AwsMock::Database {
 
@@ -22,20 +23,30 @@ namespace AwsMock::Database {
 
             try {
 
+                bsoncxx::builder::basic::document searchDocument;
+                searchDocument.append(kvp("name", name));
+
+                if (!labelName.empty()) {
+                    searchDocument.append(kvp("labelName", labelName));
+                }
+                if (!labelValue.empty()) {
+                    searchDocument.append(kvp("labelValue", labelValue));
+                }
+
+                auto mResult = _monitoringCollection.find_one(searchDocument.extract());
+                if (mResult) {
+                    value += mResult.value()["value"].get_double().value;
+                }
+
+                session.start_transaction();
+
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
-
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
                 if (!labelValue.empty()) {
                     document.append(kvp("labelValue", labelValue));
-                }
-
-                session.start_transaction();
-                auto mResult = _monitoringCollection.find_one(document.extract());
-                if (mResult) {
-                    value += mResult.value()["value"].get_double().value;
                 }
                 document.append(kvp("value", value));
                 document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
@@ -65,11 +76,12 @@ namespace AwsMock::Database {
             try {
 
                 system_clock::time_point now = Core::DateTimeUtils::LocalDateTimeNow();
+                system_clock::time_point end = Core::ceilTimePoint(now, std::chrono::seconds(300));
+                system_clock::time_point middle = end - std::chrono::seconds(150);
 
                 bsoncxx::builder::basic::document document;
                 document.append(kvp("name", name));
-                document.append(kvp("value", value));
-                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
+                document.append(kvp("created", bsoncxx::types::b_date(middle)));
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
@@ -77,8 +89,36 @@ namespace AwsMock::Database {
                     document.append(kvp("labelValue", labelValue));
                 }
 
+                if (name.empty()) {
+                    log_error << "Missing name";
+                }
                 session.start_transaction();
-                auto insert_one_result = _monitoringCollection.insert_one(document.extract());
+                auto mResult = _monitoringCollection.find_one(document.extract());
+                if (mResult) {
+
+                    double currentValue = mResult.value()["value"].get_double().value;
+                    int currentCount = mResult.value()["count"].get_int32().value;
+                    currentValue += value / static_cast<double>(++currentCount);
+                    _monitoringCollection.update_one(make_document(kvp("_id", mResult.value()["_id"].get_oid())),
+                                                     make_document(kvp("$set", make_document(kvp("value", currentValue), kvp("count", currentCount)))));
+
+                } else {
+                    if (name.empty()) {
+                        log_error << "Missing name";
+                    }
+                    bsoncxx::builder::basic::document newDocument;
+                    newDocument.append(kvp("value", value));
+                    newDocument.append(kvp("count", 1));
+                    newDocument.append(kvp("name", name));
+                    newDocument.append(kvp("created", bsoncxx::types::b_date(middle)));
+                    if (!labelName.empty()) {
+                        newDocument.append(kvp("labelName", labelName));
+                    }
+                    if (!labelValue.empty()) {
+                        newDocument.append(kvp("labelValue", labelValue));
+                    }
+                    _monitoringCollection.insert_one(newDocument.extract());
+                }
                 session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
@@ -117,14 +157,10 @@ namespace AwsMock::Database {
 
                 // Find and accumulate
                 auto cursor = _monitoringCollection.find(document.extract(), opts);
-                int i = 0;
-                Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
                 for (auto it: cursor) {
-                    acc(it["value"].get_double().value);
-                    if (!(++i % step)) {
-                        Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
-                        result.emplace_back(counter);
-                    }
+                    system_clock::time_point t = bsoncxx::types::b_date(it["created"].get_date().value);
+                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::minutes(120))};
+                    result.emplace_back(counter);
                 }
                 log_debug << "Counters, name: " << name << " count: " << result.size();
                 return result;

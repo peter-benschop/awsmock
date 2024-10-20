@@ -163,7 +163,6 @@ namespace AwsMock::Service {
             response.result(status);
             response.set(http::field::server, "awsmock");
             response.set(http::field::content_type, "application/octet-stream");
-            response.set(http::field::content_length, std::to_string(size));
             response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
             response.set(http::field::access_control_allow_origin, "http://localhost:4200");
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");

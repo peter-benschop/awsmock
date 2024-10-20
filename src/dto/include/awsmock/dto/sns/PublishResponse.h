@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_PUBLIS_RESPONSE_H
-#define AWSMOCK_DTO_SNS_PUBLIS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_PUBLISH_RESPONSE_H
+#define AWSMOCK_DTO_SNS_PUBLISH_RESPONSE_H
 
 // C++ standard includes
 #include <sstream>
@@ -11,18 +11,12 @@
 #include <utility>
 
 // Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
-#include <Poco/DateTime.h>
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
+
+// AwsMock includes
+#include <awsmock/core/RandomUtils.h>
+#include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -32,6 +26,11 @@ namespace AwsMock::Dto::SNS {
          * Message ID
          */
         std::string messageId;
+
+        /**
+         * Request ID
+         */
+        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
 
         /**
          * Convert to XML representation
@@ -57,4 +56,4 @@ namespace AwsMock::Dto::SNS {
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_PUBLIS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_PUBLISH_RESPONSE_H

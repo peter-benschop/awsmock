@@ -31,7 +31,7 @@ namespace AwsMock::Service {
     };
 
     void GatewaySession::Run() {
-        boost::asio::dispatch(stream_.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, this->shared_from_this()));
+        boost::asio::dispatch(stream_.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
     }
 
     void GatewaySession::DoRead() {
@@ -44,10 +44,10 @@ namespace AwsMock::Service {
         _parser->body_limit(boost::none);
 
         // Set the timeout.
-        stream_.expires_after(std::chrono::seconds(_timeout));
+        stream_.expires_after(std::chrono::seconds(30));
 
         // Read a request using the parser-oriented interface
-        http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, this->shared_from_this()));
+        http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
     void GatewaySession::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
@@ -55,11 +55,13 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream)
+        if (ec == http::error::end_of_stream) {
+            log_error << "End of stream";
             return DoShutdown();
+        }
 
         if (ec) {
-            //log_error << ec.message();
+            log_error << ec.message();
             return;
         }
 
@@ -69,6 +71,7 @@ namespace AwsMock::Service {
         // If we aren't at the queue limit, try to pipeline another request
         if (response_queue_.size() < _queueLimit)
             DoRead();
+        log_debug << "Request queue size: " << response_queue_.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
@@ -198,9 +201,11 @@ namespace AwsMock::Service {
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
+            log_debug << "Connection shutdown";
             return DoShutdown();
         } else {
-            DoClose();
+            //log_debug << "Connection closed";
+            //DoClose();
         }
 
         // Resume the read if it has been paused

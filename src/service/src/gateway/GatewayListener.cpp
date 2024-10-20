@@ -6,33 +6,33 @@
 
 namespace AwsMock::Service {
 
-    GatewayListener::GatewayListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint) : ioc_(ioc), acceptor_(boost::asio::make_strand(ioc)) {
+    GatewayListener::GatewayListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
 
         boost::beast::error_code ec;
 
         // Open the acceptor
-        ec = acceptor_.open(endpoint.protocol(), ec);
+        ec = _acceptor.open(endpoint.protocol(), ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
         // Allow address reuse
-        ec = acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
+        ec = _acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
         // Bind to the server address
-        ec = acceptor_.bind(endpoint, ec);
+        ec = _acceptor.bind(endpoint, ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
         // Start listening for connections
-        ec = acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
+        ec = _acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
         if (ec) {
             log_error << ec.message();
             return;
@@ -40,11 +40,11 @@ namespace AwsMock::Service {
     }
 
     void GatewayListener::Run() {
-        boost::asio::dispatch(acceptor_.get_executor(), boost::beast::bind_front_handler(&GatewayListener::DoAccept, this->shared_from_this()));
+        boost::asio::dispatch(_acceptor.get_executor(), boost::beast::bind_front_handler(&GatewayListener::DoAccept, shared_from_this()));
     }
 
     void GatewayListener::DoAccept() {
-        acceptor_.async_accept(boost::asio::make_strand(ioc_), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
+        _acceptor.async_accept(boost::asio::make_strand(_ioc), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
     }
 
     void GatewayListener::OnAccept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket) {
