@@ -44,7 +44,6 @@ namespace AwsMock::Monitoring {
                 log_trace << "Counter added, name: " << name;
                 return;
             }
-            log_error << "Gauge exists already, name: " << name;
         } catch (Poco::Exception &e) {
             log_error << e.message();
         }
@@ -58,7 +57,6 @@ namespace AwsMock::Monitoring {
                 log_trace << "Counter added, name: " << name;
                 return;
             }
-            log_error << "Counter exists already, name: " << name;
         } catch (Poco::Exception &e) {
             log_error << e.message();
         }
@@ -121,7 +119,6 @@ namespace AwsMock::Monitoring {
         auto counter = GetCounter(name);
         counter->inc(value);
         _database.IncCounter(name, value);
-
         log_trace << "Counter incremented, name: " << name;
     }
 
@@ -138,11 +135,9 @@ namespace AwsMock::Monitoring {
         boost::mutex::scoped_lock lock(_mutex);
         if (!GaugeExists(name)) {
             _gaugeMap[name] = new Poco::Prometheus::Gauge(name);
-            _gaugeMap[name]->clear();
             log_trace << "Gauge added, name: " << name;
             return;
         }
-        log_error << "Gauge exists already, name: " << name;
     }
 
     void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
@@ -152,7 +147,6 @@ namespace AwsMock::Monitoring {
             log_trace << "Gauge added, name: " << name;
             return;
         }
-        log_error << "Gauge exists already, name: " << name;
     }
 
     Poco::Prometheus::Gauge *MetricService::GetGauge(const std::string &name) {
@@ -174,21 +168,20 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::SetGauge(const std::string &name, double value) {
+        _database.SetGauge(name, value);
         if (!GaugeExists(name)) {
             AddGauge(name);
         }
         _gaugeMap[name]->set((double) value);
-        _database.SetGauge(name, value);
-
         log_trace << "Gauge value set, name: " << name;
     }
 
     void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) {
+        _database.SetGauge(name, value, labelName, labelValue);
         if (!GaugeExists(name, labelName, labelValue)) {
             AddGauge(name, labelName, labelValue);
         }
         _gaugeMap[name]->labels({labelValue}).set((double) value);
-        _database.SetGauge(name, value, labelName, labelValue);
         log_trace << "Gauge value set, name: " << name;
     }
 

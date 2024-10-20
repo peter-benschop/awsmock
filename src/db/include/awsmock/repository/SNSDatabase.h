@@ -17,10 +17,11 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
@@ -154,12 +155,26 @@ namespace AwsMock::Database {
         Entity::SNS::TopicList ListTopics(const std::string &region = {});
 
         /**
+         * @brief List all available topics
+         *
+         * @param region AWS region
+         * @param prefix queue name prefix
+         * @param pageSize maximal number of results
+         * @param pageIndex pge index
+         * @param sortColumns vector of sort columns
+         * @return list of SNS topics
+         * @throws DatabaseException
+         */
+        Entity::SNS::TopicList ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {});
+
+        /**
          * @brief Counts the number of topics
          *
          * @param region AWS region
+         * @param prefix name prefix
          * @return number of topics
          */
-        long CountTopics(const std::string &region = {});
+        long CountTopics(const std::string &region = {}, const std::string &prefix = {});
 
         /**
          * @brief Deletes a topic.
@@ -211,12 +226,12 @@ namespace AwsMock::Database {
         [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
 
         /**
-         * @brief Count the number of message by state
+         * @brief Count the number of message by ARN
          *
-         * @param region AWS region
-         * @param topicUrl URL of the topic
+         * @param topicArn URL of the topic
+         * @return number of available messages
          */
-        long CountMessages(const std::string &region = {}, const std::string &topicUrl = {});
+        long CountMessages(const std::string &topicArn = {});
 
         /**
          * @brief  Count the number of message by state

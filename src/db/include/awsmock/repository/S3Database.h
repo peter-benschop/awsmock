@@ -76,10 +76,12 @@ namespace AwsMock::Database {
         /**
          * @brief Returns the total number of buckets
          *
+         * @param region AWS region
+         * @param prefix bucket name prefix
          * @return total number of buckets
          * @throws DatabaseException
          */
-        long BucketCount();
+        long BucketCount(const std::string &region = {}, const std::string &prefix = {});
 
         /**
          * @brief Returns the bucket by userPoolId

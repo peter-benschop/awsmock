@@ -9,36 +9,22 @@ namespace AwsMock::Dto::SNS {
     std::string PublishResponse::ToXml() const {
 
         // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("PublishResponse");
-        pDoc->appendChild(pRoot);
+        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
+        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "PublishResponse");
 
         // SendMessageResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pSendMessageResult = pDoc->createElement("PublishResult");
-        pRoot->appendChild(pSendMessageResult);
+        Poco::XML::AutoPtr<Poco::XML::Element> pSendMessageResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "PublishResponse");
 
         // MessageID
-        Poco::XML::AutoPtr<Poco::XML::Element> pMessageId = pDoc->createElement("MessageId");
-        pSendMessageResult->appendChild(pMessageId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pMessageIdText = pDoc->createTextNode(messageId);
-        pMessageId->appendChild(pMessageIdText);
+        Core::XmlUtils::CreateTextNode(pDoc, pSendMessageResult, "MessageId", messageId);
 
         // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
+        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
+        // Request ID
+        Core::XmlUtils::CreateTextNode(pDoc, pMetaData, "RequestId", requestId);
 
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string PublishResponse::ToString() const {

@@ -75,7 +75,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long S3Database::BucketCount() {
+    long S3Database::BucketCount(const std::string &region, const std::string &prefix) {
 
         if (HasDatabase()) {
 
@@ -83,7 +83,16 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-                long count = _bucketCollection.count_documents(make_document());
+                bsoncxx::builder::basic::document query;
+
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                long count = _bucketCollection.count_documents(query.extract());
                 log_trace << "Bucket count: " << count;
                 return count;
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <iostream>
@@ -24,21 +24,44 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SNS {
 
-    struct ListTopicCountersResponse {
-
-        /**
-         * List of queues ARNs
-         */
-        std::vector<QueueCounter> queueCounters;
+    struct ListTopicCountersRequest {
 
         /**
-         * Total number of queues
+         * Region
          */
-        long total;
+        std::string region;
+
+        /**
+         * Prefix
+         */
+        std::string prefix;
+
+        /**
+         * Page size
+         */
+        int pageSize;
+
+        /**
+         * Page index
+         */
+        int pageIndex;
+
+        /**
+         * Sort column
+         */
+        std::vector<Core::SortColumn> sortColumns;
+
+        /**
+         * @brief Convert from JSON representation
+         *
+         * @param jsonString JSON string
+         */
+        void FromJson(const std::string &jsonString);
 
         /**
          * Convert to JSON representation
@@ -59,9 +82,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListTopicCountersRequest &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_REQUEST_H

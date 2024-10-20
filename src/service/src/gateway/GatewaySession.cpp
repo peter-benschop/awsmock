@@ -31,7 +31,7 @@ namespace AwsMock::Service {
     };
 
     void GatewaySession::Run() {
-        boost::asio::dispatch(stream_.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, this->shared_from_this()));
+        boost::asio::dispatch(stream_.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
     }
 
     void GatewaySession::DoRead() {
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         stream_.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
-        http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, this->shared_from_this()));
+        http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
     void GatewaySession::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
@@ -55,11 +55,13 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream)
+        if (ec == http::error::end_of_stream) {
+            log_error << "End of stream";
             return DoShutdown();
+        }
 
         if (ec) {
-            //log_error << ec.message();
+            log_error << ec.message();
             return;
         }
 
@@ -67,18 +69,19 @@ namespace AwsMock::Service {
         QueueWrite(HandleRequest(_parser->release()));
 
         // If we aren't at the queue limit, try to pipeline another request
-        if (response_queue_.size() < _queueLimit)
+        if (_response_queue.size() < _queueLimit)
             DoRead();
+        log_debug << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
 
         // Allocate and store the work
-        response_queue_.push(std::move(response));
+        _response_queue.push(std::move(response));
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, static_cast<double>(response_queue_.size()));
 
         // If there was no previous work, start the write loop
-        if (response_queue_.size() == 1)
+        if (_response_queue.size() == 1)
             DoWrite();
     }
 
@@ -182,9 +185,9 @@ namespace AwsMock::Service {
     // Called to start/continue the write-loop. Should not be called when
     // write_loop is already active.
     void GatewaySession::DoWrite() {
-        if (!response_queue_.empty()) {
-            bool keep_alive = response_queue_.front().keep_alive();
-            boost::beast::async_write(stream_, std::move(response_queue_.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
+        if (!_response_queue.empty()) {
+            bool keep_alive = _response_queue.front().keep_alive();
+            boost::beast::async_write(stream_, std::move(_response_queue.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
         }
     }
 
@@ -198,16 +201,17 @@ namespace AwsMock::Service {
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
+            log_debug << "Connection shutdown";
             return DoShutdown();
         } else {
-            DoClose();
+            //DoClose();
         }
 
         // Resume the read if it has been paused
-        if (response_queue_.size() == _queueLimit)
+        if (_response_queue.size() == _queueLimit)
             DoRead();
 
-        response_queue_.pop();
+        _response_queue.pop();
 
         DoWrite();
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, response_queue_.size());
@@ -296,6 +300,7 @@ namespace AwsMock::Service {
         response.set(http::field::vary, "Accept-Encoding, Origin");
         response.set(http::field::keep_alive, "timeout=10, max=100");
         response.set(http::field::connection, "Keep-Alive");
+        response.prepare_payload();
 
         // Send the response to the client
         return response;

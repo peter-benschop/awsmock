@@ -29,6 +29,7 @@
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
+#include <awsmock/dto/sqs/DeleteMessageBatchResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageResponse.h>
 #include <awsmock/dto/sqs/DeleteQueueRequest.h>
@@ -58,6 +59,8 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
+#include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
+#include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
 #include <awsmock/repository/LambdaDatabase.h>
@@ -123,7 +126,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
+        Dto::SQS::ListTopicCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
 
         /**
          * @brief Returns a list of all available queues tags
@@ -256,9 +259,10 @@ namespace AwsMock::Service {
          * @brief Deletes a message in a batch
          *
          * @param request delete message batch request DTO
+         * @return DeleteMessageBatchResponse
          * @throws ServiceException
          */
-        void DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
+        Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
 
       private:
 

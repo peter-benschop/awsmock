@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <iostream>
@@ -24,21 +24,21 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
-#include <awsmock/dto/sqs/model/QueueCounter.h>
+#include <awsmock/dto/sns/model/TopicCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SNS {
 
     struct ListTopicCountersResponse {
 
         /**
-         * List of queues ARNs
+         * List of topic counters
          */
-        std::vector<QueueCounter> queueCounters;
+        std::vector<TopicCounter> topicCounters;
 
         /**
          * Total number of queues
          */
-        long total;
+        long total = 0;
 
         /**
          * Convert to JSON representation
@@ -62,6 +62,6 @@ namespace AwsMock::Dto::SQS {
         friend std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H

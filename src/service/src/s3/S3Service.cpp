@@ -250,7 +250,7 @@ namespace AwsMock::Service {
             Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
-            listAllBucketResponse.total = _database.BucketCount();
+            listAllBucketResponse.total = _database.BucketCount(request.region, request.prefix);
 
             for (const auto &bucket: bucketList) {
                 Dto::S3::BucketCounter bucketCounter;

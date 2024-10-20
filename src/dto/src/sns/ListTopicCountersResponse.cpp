@@ -2,20 +2,20 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/ListQueueCountersResponse.h>
+#include <awsmock/dto/sns/ListTopicCountersResponse.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SNS {
 
     std::string ListTopicCountersResponse::ToJson() const {
 
         try {
             Poco::JSON::Array queueCounterArrayJson;
-            for (const auto &queueCounter: queueCounters) {
-                queueCounterArrayJson.add(queueCounter.ToJsonObject());
+            for (const auto &topicCounter: topicCounters) {
+                queueCounterArrayJson.add(topicCounter.ToJsonObject());
             }
 
             Poco::JSON::Object rootJson;
-            rootJson.set("QueueCounters", queueCounterArrayJson);
+            rootJson.set("TopicCounters", queueCounterArrayJson);
             rootJson.set("Total", total);
 
             return Core::JsonUtils::ToJsonString(rootJson);
@@ -33,8 +33,8 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r) {
-        os << "ListQueueCountersResponse=" << r.ToJson();
+        os << "ListTopicCountersResponse=" << r.ToJson();
         return os;
     }
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SNS

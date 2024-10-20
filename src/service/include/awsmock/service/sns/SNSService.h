@@ -31,6 +31,8 @@
 #include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicCountersRequest.h>
+#include <awsmock/dto/sns/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
@@ -67,22 +69,33 @@ namespace AwsMock::Service {
         explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
-         * @brief Creates a new queue
+         * @brief Creates a new topic
          *
          * <p>In case the topic exists already, return the existing topic.</p>
          *
-         * @param request create queue request
-         * @return CreateQueueResponse
+         * @param request create topic request
+         * @return CreateTopicResponse
          */
         Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
 
         /**
-         * @brief Returns a list of all available queues
+         * @brief Returns a list of all available topics
          *
          * @param region AWS region
-         * @return ListQueuesResponse
+         * @return ListTopicsResponse
+         * @see ListTopicsResponse
          */
         Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
+
+        /**
+         * @brief Returns a list of all topic counters
+         *
+         * @param request List topic counters request
+         * @return ListTopicCountersResponse
+         * @see ListTopicCountersResponse
+         * @see ListTopicCountersResponse
+         */
+        Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request);
 
         /**
          * @brief Publish a message to a SNS topic
@@ -145,11 +158,11 @@ namespace AwsMock::Service {
         Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
 
         /**
-         * @brief Delete a queue
+         * @brief Delete a topic
          *
          * @param region AWS region name
          * @param topicArn topic ARN
-         * @return DeleteQueueResponse
+         * @return DeleteTopicResponse
          * @throws ServiceException
          */
         Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
@@ -181,12 +194,12 @@ namespace AwsMock::Service {
         /**
          * @brief Checks the subscriptions.
          *
-         * <p>If a SQS queue subscription is found send the message to the SQS queue.</p>
+         * <p>If a SQS topic subscription is found send the message to the SQS topic.</p>
          */
         void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
 
         /**
-         * @brief Send a SNS message to an SQS queue
+         * @brief Send a SNS message to an SQS topic
          *
          * @param subscription SNS subscription
          * @param request SNS publish request
