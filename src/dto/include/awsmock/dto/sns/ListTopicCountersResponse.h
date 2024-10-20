@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * Total number of queues
          */
-        long total;
+        long total = 0;
 
         /**
          * Convert to JSON representation

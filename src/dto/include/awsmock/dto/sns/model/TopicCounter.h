@@ -51,17 +51,17 @@ namespace AwsMock::Dto::SNS {
         /**
          * Number of message available
          */
-        long available;
+        long available = 0;
 
         /**
          * Retention period
          */
-        long retentionPeriod;
+        long retentionPeriod = 0;
 
         /**
          * Maximal message size
          */
-        long maxMessageSize;
+        long maxMessageSize = 0;
 
         /**
          * @brief Converts the DTO to a JSON string.
