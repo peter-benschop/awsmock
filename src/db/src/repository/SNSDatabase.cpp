@@ -515,7 +515,7 @@ namespace AwsMock::Database {
         return GetMessageById(bsoncxx::oid(oid));
     }
 
-    long SNSDatabase::CountMessages(const std::string &region, const std::string &topicArn) {
+    long SNSDatabase::CountMessages(const std::string &topicArn) {
 
         if (HasDatabase()) {
 
@@ -524,14 +524,14 @@ namespace AwsMock::Database {
                 long count;
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-                if (!region.empty() && !topicArn.empty()) {
-                    count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn)));
-                } else if (!region.empty()) {
-                    count = _messageCollection.count_documents(make_document(kvp("region", region)));
-                } else {
-                    count = _messageCollection.count_documents({});
+
+                bsoncxx::builder::basic::document query;
+                if (!topicArn.empty()) {
+                    query.append(kvp("topicArn", topicArn));
                 }
-                log_trace << "Count resources, region: " << region << " arn: " << topicArn << " result: " << count;
+
+                count = _messageCollection.count_documents(query.extract());
+                log_trace << "Count messages, arn: " << topicArn << " result: " << count;
                 return count;
 
             } catch (const mongocxx::exception &exc) {
@@ -541,7 +541,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            return _memoryDb.CountMessages(region, topicArn);
+            return _memoryDb.CountMessages(topicArn);
         }
     }
 

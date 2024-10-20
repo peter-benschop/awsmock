@@ -49,11 +49,6 @@ namespace AwsMock::Dto::SNS {
         system_clock::time_point modified;
 
         /**
-         * Number of message available
-         */
-        long available = 0;
-
-        /**
          * Retention period
          */
         long retentionPeriod = 0;
@@ -62,6 +57,11 @@ namespace AwsMock::Dto::SNS {
          * Maximal message size
          */
         long maxMessageSize = 0;
+
+        /**
+         * Total number of available message
+         */
+        long availableMessages = 0;
 
         /**
          * @brief Converts the DTO to a JSON string.

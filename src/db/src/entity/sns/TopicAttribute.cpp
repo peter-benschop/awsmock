@@ -18,7 +18,8 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("kmsMasterKeyId", kmsMasterKeyId),
                 kvp("archivePolicy", archivePolicy),
                 kvp("beginningArchiveTime", bsoncxx::types::b_date(std::chrono::milliseconds(beginningArchiveTime.timestamp().epochMicroseconds() / 1000))),
-                kvp("contentBasedDeduplication", contentBasedDeduplication));
+                kvp("contentBasedDeduplication", contentBasedDeduplication),
+                kvp("availableMessages", availableMessages));
 
         return topicAttributeDoc;
     }
@@ -39,6 +40,7 @@ namespace AwsMock::Database::Entity::SNS {
         archivePolicy = bsoncxx::string::to_string(mResult.value()["archivePolicy"].get_string().value);
         beginningArchiveTime = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value) / 1000));
         contentBasedDeduplication = mResult.value()["contentBasedDeduplication"].get_bool().value;
+        availableMessages = mResult.value()["availableMessages"].get_int64().value;
     }
 
     Poco::JSON::Object TopicAttribute::ToJsonObject() const {
@@ -54,6 +56,7 @@ namespace AwsMock::Database::Entity::SNS {
             Core::JsonUtils::SetJsonValueString(jsonObject, "kmsMasterKeyId", kmsMasterKeyId);
             Core::JsonUtils::SetJsonValueBool(jsonObject, "fifoTopic", fifoTopic);
             Core::JsonUtils::SetJsonValueBool(jsonObject, "contentBasedDeduplication", contentBasedDeduplication);
+            Core::JsonUtils::SetJsonValueLong(jsonObject, "availableMessages", availableMessages);
             return jsonObject;
 
         } catch (Poco::Exception &e) {
@@ -74,6 +77,7 @@ namespace AwsMock::Database::Entity::SNS {
             Core::JsonUtils::GetJsonValueString("tracingConfig", jsonObject, tracingConfig);
             Core::JsonUtils::GetJsonValueString("kmsMasterKeyId", jsonObject, kmsMasterKeyId);
             Core::JsonUtils::GetJsonValueBool("contentBasedDeduplication", jsonObject, contentBasedDeduplication);
+            Core::JsonUtils::GetJsonValueLong("availableMessages", jsonObject, availableMessages);
 
         } catch (Poco::Exception &e) {
             log_error << e.message();

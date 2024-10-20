@@ -203,17 +203,15 @@ namespace AwsMock::Database {
         return {};
     }
 
-    long SNSMemoryDb::CountMessages(const std::string &region, const std::string &topicArn) {
+    long SNSMemoryDb::CountMessages(const std::string &topicArn) {
+
+        if (topicArn.empty()) {
+            return _messages.size();
+        }
 
         long count = 0;
         for (const auto &message: _messages) {
-            if (!region.empty() && message.second.region == region && !topicArn.empty() && message.second.topicArn == topicArn) {
-                count++;
-            } else if (!region.empty() && message.second.region == region) {
-                count++;
-            } else if (!topicArn.empty() && message.second.topicArn == topicArn) {
-                count++;
-            } else {
+            if (!topicArn.empty() && message.second.topicArn == topicArn) {
                 count++;
             }
         }

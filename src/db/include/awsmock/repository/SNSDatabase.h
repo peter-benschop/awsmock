@@ -226,12 +226,12 @@ namespace AwsMock::Database {
         [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
 
         /**
-         * @brief Count the number of message by state
+         * @brief Count the number of message by ARN
          *
-         * @param region AWS region
-         * @param topicUrl URL of the topic
+         * @param topicArn URL of the topic
+         * @return number of available messages
          */
-        long CountMessages(const std::string &region = {}, const std::string &topicUrl = {});
+        long CountMessages(const std::string &topicArn = {});
 
         /**
          * @brief  Count the number of message by state

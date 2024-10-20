@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    std::string ListQueueCountersResponse::ToJson() const {
+    std::string ListTopicCountersResponse::ToJson() const {
 
         try {
             Poco::JSON::Array queueCounterArrayJson;
@@ -26,13 +26,13 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListQueueCountersResponse::ToString() const {
+    std::string ListTopicCountersResponse::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListQueueCountersResponse &r) {
+    std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r) {
         os << "ListQueueCountersResponse=" << r.ToJson();
         return os;
     }

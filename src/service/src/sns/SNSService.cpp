@@ -73,6 +73,7 @@ namespace AwsMock::Service {
                 counter.topicName = topic.topicName;
                 counter.topicArn = topic.topicArn;
                 counter.topicUrl = topic.topicUrl;
+                counter.availableMessages = topic.topicAttribute.availableMessages;
                 counter.created = topic.created;
                 counter.modified = topic.modified;
                 listTopicResponse.topicCounters.emplace_back(counter);
@@ -292,7 +293,7 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
             }
 
-            long messageCount = _snsDatabase.CountMessages({}, request.topicArn);
+            long messageCount = _snsDatabase.CountMessages(request.topicArn);
             long messagesSize = _snsDatabase.CountMessagesSize(request.topicArn);
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
@@ -393,7 +394,7 @@ namespace AwsMock::Service {
 
         try {
 
-            long total = _snsDatabase.CountMessages(request.region, request.topicArn);
+            long total = _snsDatabase.CountMessages(request.topicArn);
 
             Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex);
 

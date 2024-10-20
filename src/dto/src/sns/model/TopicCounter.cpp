@@ -26,9 +26,9 @@ namespace AwsMock::Dto::SNS {
             rootJson.set("topicName", topicName);
             rootJson.set("topicArn", topicArn);
             rootJson.set("topicUrl", topicUrl);
-            rootJson.set("available", available);
             rootJson.set("retentionPeriod", retentionPeriod);
             rootJson.set("maxMessageSize", maxMessageSize);
+            rootJson.set("availableMessages", availableMessages);
 
             rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
             rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));

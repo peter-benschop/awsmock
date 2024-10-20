@@ -35,6 +35,7 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
+        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "http://localhost:4200");
@@ -42,7 +43,8 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
-        boost::beast::ostream(response.body()) << body;
+        boost::beast::ostream(response.body()) << body << std::endl
+                                               << std::endl;
         response.prepare_payload();
 
         // Copy headers
@@ -63,6 +65,7 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
+        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(contentLength));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
@@ -94,6 +97,7 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
+        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "http://localhost:4200");
@@ -123,6 +127,7 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
+        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "http://localhost:4200");
@@ -162,6 +167,7 @@ namespace AwsMock::Service {
             response.version(request.version());
             response.result(status);
             response.set(http::field::server, "awsmock");
+            response.set(http::field::keep_alive, "false");
             response.set(http::field::content_type, "application/octet-stream");
             response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
             response.set(http::field::access_control_allow_origin, "http://localhost:4200");

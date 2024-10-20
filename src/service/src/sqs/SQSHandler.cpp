@@ -154,8 +154,8 @@ namespace AwsMock::Service {
                     sqsRequest.FromJson(clientCommand.payload);
                     sqsRequest.region = clientCommand.region;
 
-                    Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
-                    log_info << "List queue counters";
+                    Dto::SQS::ListTopicCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
+                    log_info << "List queue counters, count: " << sqsResponse.queueCounters.size();
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }

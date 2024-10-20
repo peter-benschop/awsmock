@@ -46,7 +46,12 @@ namespace AwsMock::Service {
         void DeleteOldMessages();
 
         /**
-         * Update counters
+         * @brief Synchronizes the topic available messages counters.
+         */
+        void SychronizeCounters();
+
+        /**
+         * @brief Update counters
          */
         void UpdateCounter();
 

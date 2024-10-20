@@ -44,7 +44,7 @@ namespace AwsMock::Service {
         _parser->body_limit(boost::none);
 
         // Set the timeout.
-        stream_.expires_after(std::chrono::seconds(30));
+        stream_.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
         http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
@@ -69,19 +69,19 @@ namespace AwsMock::Service {
         QueueWrite(HandleRequest(_parser->release()));
 
         // If we aren't at the queue limit, try to pipeline another request
-        if (response_queue_.size() < _queueLimit)
+        if (_response_queue.size() < _queueLimit)
             DoRead();
-        log_debug << "Request queue size: " << response_queue_.size() << " limit: " << _queueLimit;
+        log_debug << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
 
         // Allocate and store the work
-        response_queue_.push(std::move(response));
+        _response_queue.push(std::move(response));
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, static_cast<double>(response_queue_.size()));
 
         // If there was no previous work, start the write loop
-        if (response_queue_.size() == 1)
+        if (_response_queue.size() == 1)
             DoWrite();
     }
 
@@ -185,9 +185,9 @@ namespace AwsMock::Service {
     // Called to start/continue the write-loop. Should not be called when
     // write_loop is already active.
     void GatewaySession::DoWrite() {
-        if (!response_queue_.empty()) {
-            bool keep_alive = response_queue_.front().keep_alive();
-            boost::beast::async_write(stream_, std::move(response_queue_.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
+        if (!_response_queue.empty()) {
+            bool keep_alive = _response_queue.front().keep_alive();
+            boost::beast::async_write(stream_, std::move(_response_queue.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
         }
     }
 
@@ -204,15 +204,14 @@ namespace AwsMock::Service {
             log_debug << "Connection shutdown";
             return DoShutdown();
         } else {
-            //log_debug << "Connection closed";
             //DoClose();
         }
 
         // Resume the read if it has been paused
-        if (response_queue_.size() == _queueLimit)
+        if (_response_queue.size() == _queueLimit)
             DoRead();
 
-        response_queue_.pop();
+        _response_queue.pop();
 
         DoWrite();
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, response_queue_.size());
@@ -301,6 +300,7 @@ namespace AwsMock::Service {
         response.set(http::field::vary, "Accept-Encoding, Origin");
         response.set(http::field::keep_alive, "timeout=10, max=100");
         response.set(http::field::connection, "Keep-Alive");
+        response.prepare_payload();
 
         // Send the response to the client
         return response;

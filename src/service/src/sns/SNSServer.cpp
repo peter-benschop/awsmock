@@ -25,6 +25,7 @@ namespace AwsMock::Service {
 
         // Start delete old message task
         scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _workerPeriod);
+        scheduler.AddTask("sns-synchronize-counters", [this] { SychronizeCounters(); }, _workerPeriod);
 
         // Set running
         SetRunning();
@@ -38,20 +39,26 @@ namespace AwsMock::Service {
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 
+    void SNSServer::SychronizeCounters() {
+        for (auto &topic: _snsDatabase.ListTopics()) {
+            topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
+            _snsDatabase.UpdateTopic(topic);
+        }
+    }
+
     void SNSServer::UpdateCounter() {
         log_trace << "SNS Monitoring starting";
 
         // Get total counts
         long topics = _snsDatabase.CountTopics();
         long messages = _snsDatabase.CountMessages();
-        _metricService.SetGauge(SNS_TOPIC_COUNT, topics);
-        _metricService.SetGauge(SNS_MESSAGE_COUNT, messages);
+        _metricService.SetGauge(SNS_TOPIC_COUNT, static_cast<double>(topics));
+        _metricService.SetGauge(SNS_MESSAGE_COUNT, static_cast<double>(messages));
 
         // Count resources per topic
         for (const auto &topic: _snsDatabase.ListTopics()) {
             std::string labelValue = Poco::replace(topic.topicName, "-", "_");
-            long messagesPerTopic = _snsDatabase.CountMessages(topic.region, topic.topicArn);
-            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, messagesPerTopic);
+            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(topic.topicAttribute.availableMessages));
         }
         log_trace << "SNS monitoring finished";
     }

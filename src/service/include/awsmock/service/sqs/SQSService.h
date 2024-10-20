@@ -126,7 +126,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
+        Dto::SQS::ListTopicCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
 
         /**
          * @brief Returns a list of all available queues tags

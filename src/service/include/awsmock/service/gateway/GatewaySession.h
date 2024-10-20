@@ -115,7 +115,7 @@ namespace AwsMock::Service {
         void OnWrite(bool keep_alive, boost::beast::error_code ec, std::size_t bytes_transferred);
 
         /**
-         * @brief On clas callback
+         * @brief On class callback
          */
         void DoShutdown();
 
@@ -175,7 +175,7 @@ namespace AwsMock::Service {
         /**
          * HTTP request queue
          */
-        std::queue<http::message_generator> response_queue_;
+        std::queue<http::message_generator> _response_queue;
 
         /**
          * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
