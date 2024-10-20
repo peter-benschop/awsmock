@@ -179,7 +179,7 @@ namespace AwsMock::Database {
         message = _snsDatabase.CreateMessage(message);
 
         // act
-        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+        long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
         EXPECT_EQ(1, result);
@@ -195,7 +195,7 @@ namespace AwsMock::Database {
 
         // act
         _snsDatabase.DeleteMessage(message);
-        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+        long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
         EXPECT_EQ(0, result);
@@ -216,7 +216,7 @@ namespace AwsMock::Database {
 
         // act
         _snsDatabase.DeleteMessages(_region, TOPIC_ARN, messageIds);
-        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+        long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
         EXPECT_EQ(0, result);
@@ -232,7 +232,7 @@ namespace AwsMock::Database {
 
         // act
         _snsDatabase.DeleteAllMessages();
-        long result = _snsDatabase.CountMessages(_region, topic.topicArn);
+        long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
         EXPECT_EQ(0, result);
