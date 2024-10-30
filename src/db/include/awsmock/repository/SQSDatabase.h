@@ -367,15 +367,6 @@ namespace AwsMock::Database {
         long CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status);
 
         /**
-         * @brief Converts a message object to a JSON string
-         *
-         * @param document message document
-         * @return message converted to JSON string
-         * @throws Core::DatabaseException
-         */
-        static std::string ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document);
-
-        /**
          * @brief Returns the average waiting time for messages in the given queue
          *
          * @par

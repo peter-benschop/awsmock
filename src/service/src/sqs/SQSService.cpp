@@ -713,7 +713,7 @@ namespace AwsMock::Service {
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
 
             // Update queue counters
-            AdjustMessageCounters(message, message.queueArn);
+            AdjustMessageCounters(message);
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -742,7 +742,7 @@ namespace AwsMock::Service {
                 _sqsDatabase.DeleteMessage(message);
 
                 // Update queue counters
-                AdjustMessageCounters(message, message.queueArn);
+                AdjustMessageCounters(message);
 
                 // Successful
                 Dto::SQS::DeleteMessageBatchResultEntry success = {.id = entry.id};
@@ -780,7 +780,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 
-    void SQSService::AdjustMessageCounters(const Database::Entity::SQS::Message &message, const std::string &queueArn) {
+    void SQSService::AdjustMessageCounters(const Database::Entity::SQS::Message &message) {
         Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
         switch (message.status) {
             case Database::Entity::SQS::MessageStatus::INITIAL:

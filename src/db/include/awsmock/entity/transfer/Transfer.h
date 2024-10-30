@@ -6,6 +6,7 @@
 #define AWSMOCK_DB_ENTITY_TRANSFER_H
 
 // C++ includes
+#include <chrono>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -38,7 +39,8 @@ namespace AwsMock::Database::Entity::Transfer {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
-
+    using std::chrono::system_clock;
+    
     enum ServerState {
         OFFLINE,
         ONLINE,
@@ -129,17 +131,17 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Last transfer manager StartServer
          */
-        Poco::DateTime lastStarted;
+        system_clock::time_point lastStarted;
 
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified;
 
         /**
          * Checks whether a user exists already.

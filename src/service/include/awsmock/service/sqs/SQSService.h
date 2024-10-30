@@ -287,9 +287,8 @@ namespace AwsMock::Service {
          * @brief Adjust queue counters after update/delete of messages
          *
          * @param message message object
-         * @param queueArn queue ARN
          */
-        void AdjustMessageCounters(const Database::Entity::SQS::Message &message, const std::string &queueArn);
+        void AdjustMessageCounters(const Database::Entity::SQS::Message &message);
 
         /**
          * SQS database connection

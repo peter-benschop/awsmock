@@ -41,9 +41,9 @@ namespace AwsMock::Database::Entity::Transfer {
                 kvp("concurrency", concurrency),
                 kvp("port", port),
                 kvp("listenAddress", listenAddress),
-                kvp("lastStarted", MongoUtils::ToBson(lastStarted)),
-                kvp("created", MongoUtils::ToBson(created)),
-                kvp("modified", MongoUtils::ToBson(modified)));
+                kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return transferDoc;
     }
@@ -58,9 +58,9 @@ namespace AwsMock::Database::Entity::Transfer {
         concurrency = mResult.value()["concurrency"].get_int32().value;
         port = mResult.value()["port"].get_int32().value;
         listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
-        lastStarted = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date()));
-        created = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-        modified = MongoUtils::FromBson(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+        lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date());
+        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
         // Protocols
         if (mResult.value().find("protocols") != mResult.value().end()) {
@@ -94,7 +94,7 @@ namespace AwsMock::Database::Entity::Transfer {
         jsonObject.set("concurrency", concurrency);
         jsonObject.set("port", port);
         jsonObject.set("listenAddress", listenAddress);
-        jsonObject.set("lastStarted", Poco::DateTimeFormatter::format(lastStarted, Poco::DateTimeFormat::ISO8601_FORMAT));
+        jsonObject.set("lastStarted", Core::DateTimeUtils::ToISO8601(lastStarted));
 
         if (!protocols.empty()) {
             Poco::JSON::Array jsonProtocolsArray;

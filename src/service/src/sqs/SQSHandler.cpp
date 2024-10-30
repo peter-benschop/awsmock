@@ -136,7 +136,7 @@ namespace AwsMock::Service {
                     sqsRequest.region = clientCommand.region;
 
                     Dto::SQS::GetQueueDetailsResponse sqsResponse = _sqsService.GetQueueDetails(sqsRequest);
-                    log_info << "Get queue url, queueArn: " << sqsRequest.queueArn;
+                    log_info << "Get queue details, queueArn: " << sqsRequest.queueArn;
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
@@ -403,7 +403,8 @@ namespace AwsMock::Service {
             }
 
         } catch (Poco::Exception &e) {
-            return Core::HttpUtils::InternalServerError(request, e.message());
+            log_error << e.message();
+            return SendInternalServerError(request, e.message());
         }
     }
 
