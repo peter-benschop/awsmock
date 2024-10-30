@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::Transfer {
     using bsoncxx::document::value;
     using bsoncxx::document::view;
     using std::chrono::system_clock;
-    
+
     enum ServerState {
         OFFLINE,
         ONLINE,

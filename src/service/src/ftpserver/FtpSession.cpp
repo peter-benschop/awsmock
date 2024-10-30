@@ -329,7 +329,7 @@ namespace AwsMock::FtpServer {
             asio::error_code ec;
             ec = data_acceptor_.bind(endpoint, ec);
             if (ec) {
-                log_error << "Error binding data acceptor: " << ec.message();
+                log_error << "Error binding data acceptor: " << ec.message() << " endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
