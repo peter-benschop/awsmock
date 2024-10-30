@@ -130,7 +130,7 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
+            auto mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
 
             if (!mResult) {
                 log_error << "Queue not found, queueArn: " << queueArn;
@@ -153,11 +153,11 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+            auto mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
             if (!mResult) {
 
-                log_error << "Queue not found, queueUrl: " << queueUrl;
-                throw Core::DatabaseException("Queue not found, queueUrl: " + queueUrl);
+                log_error << "Queue not found, region: " << region << " queueUrl: " << queueUrl;
+                throw Core::DatabaseException("Queue not found, region: " + region + " queueUrl: " + queueUrl);
 
             } else {
 
@@ -544,9 +544,9 @@ namespace AwsMock::Database {
                 auto mResult = messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
                 session.commit_transaction();
 
-                log_trace << "Message updated: " << ConvertMessageToJson(mResult.value());
                 if (mResult) {
                     message.FromDocument(mResult->view());
+                    log_trace << "Message updated: " << message.ToString();
                     return message;
                 }
 
@@ -1098,7 +1098,6 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
-            auto queueCollection = (*client)[_databaseName][_collectionNameQueue];
             auto session = client->start_session();
 
             try {
@@ -1155,10 +1154,6 @@ namespace AwsMock::Database {
 
             _memoryDb.DeleteAllMessages();
         }
-    }
-
-    std::string SQSDatabase::ConvertMessageToJson(mongocxx::stdx::optional<bsoncxx::document::value> document) {
-        return bsoncxx::to_json(document->view());
     }
 
 }// namespace AwsMock::Database

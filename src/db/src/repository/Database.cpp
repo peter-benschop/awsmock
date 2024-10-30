@@ -73,14 +73,18 @@ namespace AwsMock::Database {
                                                  make_document(kvp("name", "sqs_message_idx5")));
             database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
                                                make_document(kvp("name", "sqs_queue_idx1")));
-            database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("url", 1)),
+            database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("queueUrl", 1)),
                                                make_document(kvp("name", "sqs_queue_idx2")));
 
             // SNS
-            database["sns_topic"].create_index(make_document(kvp("region", 1), kvp("arn", 1)),
+            database["sns_topic"].create_index(make_document(kvp("topicArn", 1)),
                                                make_document(kvp("name", "sns_topic_idx1")));
+            database["sns_topic"].create_index(make_document(kvp("region", 1), kvp("topicName", 1)),
+                                               make_document(kvp("name", "sns_topic_idx2")));
             database["sns_message"].create_index(make_document(kvp("region", 1), kvp("topicArn", 1)),
                                                  make_document(kvp("name", "sns_message_idx2")));
+            database["sns_message"].create_index(make_document(kvp("topicArn", 1)),
+                                                 make_document(kvp("name", "sns_message_idx3")));
 
             // S3
             database["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)),

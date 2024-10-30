@@ -56,7 +56,7 @@ namespace AwsMock::Service {
 
         // This means they closed the connection
         if (ec == http::error::end_of_stream) {
-            log_error << "End of stream";
+            //       log_error << "End of stream";
             return DoShutdown();
         }
 
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         // If we aren't at the queue limit, try to pipeline another request
         if (_response_queue.size() < _queueLimit)
             DoRead();
-        log_debug << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
+        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
