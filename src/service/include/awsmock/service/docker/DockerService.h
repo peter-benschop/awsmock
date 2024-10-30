@@ -158,25 +158,25 @@ namespace AwsMock::Service {
         /**
          * @brief Creates a container
          *
-         * @param name image name
+         * @param imageName image name
          * @param instanceName name of the instance
          * @param tag image tags
          * @param environment runtime environment variables
          * @param hostPort external port of the lambda
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
 
         /**
          * @brief Creates a container for a predefined image.
          *
-         * @param name image name
+         * @param imageName image name
          * @param tag image tags
          * @param hostPort external port of the container
          * @param containerPort internal port of the container
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &name, const std::string &tag, int hostPort, int containerPort);
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, int hostPort, int containerPort);
 
         /**
          * @brief Returns a container by name/tags.
