@@ -264,16 +264,16 @@ namespace AwsMock::Service {
         return response.containerList;
     }
 
-    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
+    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         // Create the request
         std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         Dto::Docker::CreateContainerRequest request = {
                 .hostName = instanceName,
-                .domainName = instanceName + networkMode,
+                //                .domainName = instanceName + networkMode,
                 .user = "root",
-                .image = name + ":" + tag,
+                .image = imageName + ":" + tag,
                 .networkMode = networkMode,
                 .environment = environment,
                 .containerPort = _containerPort,
@@ -290,26 +290,26 @@ namespace AwsMock::Service {
         Dto::Docker::CreateContainerResponse response = {.hostPort = hostPort};
         response.FromJson(domainSocketResponse.body);
 
-        log_debug << "Docker container created, name: " << name << ":" << tag;
+        log_debug << "Docker container created, name: " << imageName << ":" << tag << " id: " << response.id;
         return response;
     }
 
-    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &name, const std::string &tag, int hostPort, int containerPort) {
+    Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &imageName, const std::string &tag, int hostPort, int containerPort) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         // Check container name
-        std::string containerName = name;
-        if (Core::StringUtils::Contains(name, "/")) {
+        std::string containerName = imageName;
+        if (Core::StringUtils::Contains(imageName, "/")) {
             containerName = Core::StringUtils::SubStringAfter(containerName, "/");
         }
 
         // Create the request
         std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         Dto::Docker::CreateContainerRequest request = {
-                .hostName = name,
-                .domainName = name + networkMode,
+                .hostName = imageName,
+                .domainName = imageName + networkMode,
                 .user = "root",
-                .image = name + ":" + tag,
+                .image = imageName + ":" + tag,
                 .networkMode = networkMode,
                 .containerPort = std::to_string(containerPort),
                 .hostPort = std::to_string(hostPort)};
@@ -324,7 +324,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateContainerResponse response = {.hostPort = hostPort};
         response.FromJson(domainSocketResponse.body);
 
-        log_debug << "Docker container created, name: " << name << ":" << tag;
+        log_debug << "Docker container created, name: " << imageName << ":" << tag;
         return response;
     }
 

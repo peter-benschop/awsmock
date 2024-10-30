@@ -112,13 +112,15 @@ namespace AwsMock::Service {
                     toBeRemoved.emplace_back(instance);
                 }
             }
-            for (const auto &instance: toBeRemoved) {
-                lambda.RemoveInstance(instance);
+            if (!toBeRemoved.empty()) {
+                for (const auto &instance: toBeRemoved) {
+                    lambda.RemoveInstance(instance);
+                }
+                lambda = _lambdaDatabase.UpdateLambda(lambda);
+                log_debug << "Lambda updated, function" << lambda.function << " removed: " << toBeRemoved.size();
+                _dockerService.PruneContainers();
             }
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_debug << "Lambda updated, function" << lambda.function << " removed: " << toBeRemoved.size();
         }
-        _dockerService.PruneContainers();
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
     }
 
