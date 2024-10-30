@@ -41,6 +41,7 @@
 #define HOST_PORT_MAX 65536
 #define CONTAINER_PORT "8080/tcp"
 #define NETWORK_DEFAULT_MODE "bridge"
+#define NETWORK_DEFAULT_NAME "local"
 
 namespace AwsMock::Service {
 
