@@ -268,7 +268,8 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         // Create the request
-        std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
+        // std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
+        std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.name", NETWORK_DEFAULT_NAME);
         Dto::Docker::CreateContainerRequest request = {
                 .hostName = instanceName,
                 //                .domainName = instanceName + networkMode,
