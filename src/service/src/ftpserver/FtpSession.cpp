@@ -309,7 +309,7 @@ namespace AwsMock::FtpServer {
         if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
             int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
             int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
-            int port = Core::RandomUtils::NextInt(minPort, minPort);
+            int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
