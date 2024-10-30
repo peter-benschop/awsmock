@@ -1036,9 +1036,6 @@ namespace AwsMock::FtpServer {
                 stream << "\r\n";
             }
 
-            std::string tmp = stream.str();
-            log_info << "Sending directory listing: " << tmp;
-
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
             const std::shared_ptr<std::vector<char>> dir_listing_rawdata = std::make_shared<std::vector<char>>();
@@ -1047,7 +1044,7 @@ namespace AwsMock::FtpServer {
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);// Nullpointer indicates end of transmission
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
         });
     }
 

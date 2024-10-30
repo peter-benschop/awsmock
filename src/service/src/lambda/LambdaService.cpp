@@ -136,7 +136,7 @@ namespace AwsMock::Service {
             boost::thread t(boost::ref(lambdaExecutor), lambda.function, instance.containerId, instance.containerName, instance.hostPort, payload);
             t.detach();
         }
-        log_debug << "Lambda executor notification send, name: " << lambda.function;
+        log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
 
         // Update database
         lambda.lastInvocation = std::chrono::system_clock::now();
