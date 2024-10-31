@@ -121,6 +121,7 @@ namespace AwsMock::Service {
         }
 
         Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
+        std::string hostName = GetHostname(instance);
 
         // Send invocation request
         std::string output;
@@ -343,4 +344,12 @@ namespace AwsMock::Service {
         }
         return {};
     }
+
+    std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            return instance.containerName;
+        }
+        return "localhost";
+    }
+    
 }// namespace AwsMock::Service
