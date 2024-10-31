@@ -438,7 +438,19 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+        asio::ip::tcp::endpoint endpoint;
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
+            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
+            int port = Core::RandomUtils::NextInt(minPort, maxPort);
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
+        } else {
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
+        }
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
+
+
+        //const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
 
         {
             asio::error_code ec;
