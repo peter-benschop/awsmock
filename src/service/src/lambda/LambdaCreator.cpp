@@ -106,12 +106,12 @@ namespace AwsMock::Service {
         std::string tempDir = dataDir + Poco::Path::separator() + "tmp";
 
         // Decode Base64 file
-        std::stringstream strstream;
+        std::stringstream stringStream;
         std::ifstream ifs(zipFile);
-        strstream << ifs.rdbuf();
+        stringStream << ifs.rdbuf();
         ifs.close();
 
-        std::string decoded = Core::Crypto::Base64Decode(strstream.str());
+        std::string decoded = Core::Crypto::Base64Decode(stringStream.str());
 
         try {
 
@@ -212,7 +212,7 @@ namespace AwsMock::Service {
                 // Encode returns the actual encoded_size
                 auto encoded_size = boost::beast::detail::base64::encode(encoded.data(), input.data(), input.size());
                 encoded.resize(encoded_size);
-                std::ofstream(base64Path + base64File) << encoded;
+                std::ofstream(base64FullFile) << encoded;
 
             } else {
 
