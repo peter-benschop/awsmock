@@ -8,6 +8,8 @@ namespace AwsMock::Core {
 
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
+        log_debug << "Sending JSON to host, endpoint: " << host << ":" << port << " path: " << path;
+
         boost::system::error_code ec;
         boost::asio::io_context ctx;
 
@@ -52,8 +54,8 @@ namespace AwsMock::Core {
             }
             return PrepareResult(response);
 
-        } catch (boost::system::system_error ec) {
-            log_error << "Error sending JSON message, error: " << ec.what();
+        } catch (const boost::system::system_error &exc) {
+            log_error << "Error sending JSON message, error: " << exc.what();
         }
         return {.statusCode = boost::beast::http::status::internal_server_error};
     }
