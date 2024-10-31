@@ -332,86 +332,110 @@ namespace AwsMock::Core {
 
     http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
 
-        http::response<http::dynamic_body> res{http::status::ok, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        return res;
+        http::response<http::dynamic_body> response{http::status::ok, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        return response;
     }
 
     http::response<http::string_body> HttpUtils::Ok(const http::request<http::string_body> &request) {
 
-        http::response<http::string_body> res{http::status::ok, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        return res;
+        http::response<http::string_body> response{http::status::ok, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        return response;
     }
 
     http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<http::dynamic_body> &request, const std::string &reason) {
 
-        http::response<http::dynamic_body> res{http::status::bad_request, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        boost::beast::ostream(res.body()) << reason;
-        res.prepare_payload();
-        return res;
+        http::response<http::dynamic_body> response{http::status::bad_request, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        boost::beast::ostream(response.body()) << reason;
+        response.prepare_payload();
+        return response;
     }
 
     http::response<http::string_body> HttpUtils::BadRequest(const http::request<http::string_body> &request, const std::string &reason) {
 
-        http::response<http::string_body> res{http::status::bad_request, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        res.body() = reason;
-        res.prepare_payload();
-        return res;
+        http::response<http::string_body> response{http::status::bad_request, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        response.body() = reason;
+        response.prepare_payload();
+        return response;
     }
 
     http::response<http::dynamic_body> HttpUtils::Unauthorized(const http::request<http::dynamic_body> &request, const std::string &reason) {
 
-        http::response<http::dynamic_body> res{http::status::unauthorized, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        boost::beast::ostream(res.body()) << reason;
-        res.prepare_payload();
-        return res;
+        http::response<http::dynamic_body> response{http::status::unauthorized, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        boost::beast::ostream(response.body()) << reason;
+        response.prepare_payload();
+        return response;
     }
 
     http::response<http::dynamic_body> HttpUtils::InternalServerError(const http::request<http::dynamic_body> &request, const std::string &reason) {
 
-        http::response<http::dynamic_body> res{http::status::internal_server_error, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        boost::beast::ostream(res.body()) << reason;
-        res.prepare_payload();
-        return res;
+        http::response<http::dynamic_body> response{http::status::internal_server_error, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        boost::beast::ostream(response.body()) << reason;
+        response.prepare_payload();
+        return response;
     }
 
     http::response<http::dynamic_body> HttpUtils::NotImplemented(const http::request<http::dynamic_body> &request, const std::string &reason) {
 
-        http::response<http::dynamic_body> res{http::status::not_implemented, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        boost::beast::ostream(res.body()) << reason;
-        res.prepare_payload();
-        return res;
+        http::response<http::dynamic_body> response{http::status::not_implemented, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        boost::beast::ostream(response.body()) << reason;
+        response.prepare_payload();
+        return response;
     }
 
     http::response<http::string_body> HttpUtils::NotImplemented(const http::request<http::string_body> &request, const std::string &reason) {
 
-        http::response<http::string_body> res{http::status::not_implemented, request.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(request.keep_alive());
-        res.body() = reason;
-        res.prepare_payload();
-        return res;
+        http::response<http::string_body> response{http::status::not_implemented, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.keep_alive(request.keep_alive());
+        response.body() = reason;
+        response.prepare_payload();
+        return response;
     }
 
 }// namespace AwsMock::Core
