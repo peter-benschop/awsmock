@@ -23,7 +23,7 @@ namespace AwsMock::Dto::Docker {
 
             // Exposed ports
             Poco::JSON::Object exposedPortsObject;
-            exposedPortsObject.set(containerPort, Poco::JSON::Object());
+            exposedPortsObject.set(hostPort, Poco::JSON::Object());
             rootJson.set("ExposedPorts", exposedPortsObject);
 
             // Host config
