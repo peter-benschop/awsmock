@@ -168,6 +168,9 @@ namespace AwsMock::Controller {
 
             std::string serverId = _commands[1];
             ShowFtpUsers(serverId);
+
+        } else if (std::find(_commands.begin(), _commands.end(), "ping") != _commands.end()) {
+            PingManager();
         }
     }
 
@@ -310,6 +313,20 @@ namespace AwsMock::Controller {
             return;
         }
         std::cout << "Log level set to " << level << std::endl;
+    }
+
+    void AwsMockCtl::PingManager() {
+        auto start = std::chrono::system_clock::now();
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "ping");
+        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "No response from manager, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            return;
+        }
+        long duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count();
+        std::cout << "Manager pinged (" << duration << "ms)" << std::endl;
     }
 
     void AwsMockCtl::GetConfig() {

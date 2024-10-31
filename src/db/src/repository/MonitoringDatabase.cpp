@@ -159,7 +159,7 @@ namespace AwsMock::Database {
                 auto cursor = _monitoringCollection.find(document.extract(), opts);
                 for (auto it: cursor) {
                     system_clock::time_point t = bsoncxx::types::b_date(it["created"].get_date().value);
-                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::minutes(120))};
+                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::minutes(60))};
                     result.emplace_back(counter);
                 }
                 log_debug << "Counters, name: " << name << " count: " << result.size();

@@ -154,6 +154,11 @@ namespace AwsMock::Controller {
          */
         void ShowFtpUsers(const std::string &serverId);
 
+        /**
+         * @brief Send a ping to the server and waits for the response
+         */
+        void PingManager();
+
       private:
 
         /**
