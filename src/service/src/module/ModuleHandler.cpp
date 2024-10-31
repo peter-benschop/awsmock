@@ -55,6 +55,10 @@ namespace AwsMock::Service {
                 Dto::Transfer::ListUsersResponse transferResponse = transferService.ListUsers(transferRequest);
                 return SendOkResponse(request, transferResponse.ToJson());
 
+            } else if (action == "ping") {
+
+                return SendOkResponse(request);
+
             } else {
 
                 return SendBadRequestError(request, "Unknown action");

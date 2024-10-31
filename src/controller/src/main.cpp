@@ -33,7 +33,7 @@
 
 // Allowed actions
 static std::list<std::string> allowedActions() {
-    return {"list", "logLevel", "logs", "start", "stop", "restart", "export", "import", "clean", "clean-objects", "show-ftp-users", "config"};
+    return {"list", "logLevel", "logs", "start", "stop", "restart", "export", "import", "clean", "clean-objects", "show-ftp-users", "config", "ping"};
 }
 
 /**
@@ -63,6 +63,7 @@ void ShowHelp(boost::program_options::options_description desc) {
               << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
               << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
               << std::left << std::setw(leftIndent) << "  show-ftp-users [serverId]" << ": shows the current ftp users of the given server." << std::endl
+              << std::left << std::setw(leftIndent) << "  ping" << ": ping the manager." << std::endl
               << "\nExport options:\n"
               << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
               << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
