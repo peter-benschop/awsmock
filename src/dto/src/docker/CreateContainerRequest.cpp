@@ -39,10 +39,11 @@ namespace AwsMock::Dto::Docker {
 
             // Host array
             Poco::JSON::Array dnsArray;
-            dnsArray.add("172.17.0.1");
+            //dnsArray.add("172.17.0.1");
             dnsArray.add("8.8.8.8");
-            dnsArray.add("8.8.4.4");
-            dnsArray.add("1.1.1.1");
+            //            dnsArray.add("8.8.4.4");
+            //            dnsArray.add("1.1.1.1");
+            hostConfigObject.set("Dns", dnsArray);
 
             Poco::JSON::Object portBindingsObject;
             portBindingsObject.set(containerPort, hostArray);
@@ -56,7 +57,6 @@ namespace AwsMock::Dto::Docker {
 
             hostConfigObject.set("ExtraHosts", extraHostsArray);
             hostConfigObject.set("NetworkMode", networkMode);
-            hostConfigObject.set("Dns", dnsArray);
             rootJson.set("HostConfig", hostConfigObject);
 
             return Core::JsonUtils::ToJsonString(rootJson);

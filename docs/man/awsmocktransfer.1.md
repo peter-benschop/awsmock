@@ -24,6 +24,10 @@ your cloud storage infrastructure.
 The SQS module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
 
+Currently only IPv4 is supported, so if you need to connect to the transfer server using a Linux/MacOS FTP client, make
+sure you set the host to ```127.0.0.1```, instead of ```localhost```, because sometimes on some Linux machines
+```localhost``` is resolved to the IPv6 address.
+
 ## COMMANDS
 
 ```awslocal transfer create-server --protocols <protocols>```  
@@ -125,4 +129,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```, ```awsmockkms(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```, ```awsmockkms(1)``````
