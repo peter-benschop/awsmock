@@ -351,5 +351,5 @@ namespace AwsMock::Service {
         }
         return "localhost";
     }
-    
+
 }// namespace AwsMock::Service

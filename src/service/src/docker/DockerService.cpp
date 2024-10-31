@@ -280,7 +280,7 @@ namespace AwsMock::Service {
 
         std::string jsonBody = request.ToJson();
         log_debug << "Docker container configuration, json: " << jsonBody;
-        
+
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + instanceName, jsonBody);
         if (domainSocketResponse.statusCode != http::status::created) {
             log_warning << "Create container failed, httpStatus: " << domainSocketResponse.statusCode << " body: " << domainSocketResponse.body;
