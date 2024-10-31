@@ -229,6 +229,19 @@ namespace AwsMock::Service {
         static std::string GetHostname(Database::Entity::Lambda::Instance &instance);
 
         /**
+         * @brief Returns the lambda port, to where we send lambda invocation notifications
+         *
+         * @par
+         * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
+         * host machine, the port to which we need to send the invocation notification differs. For a host manager we need
+         * to use the container exposed port, for a dockerized manager we need to use the container internal port, i.e. 8080.
+         *
+         * @param lambda lambda entity to check
+         * @return containerId of the idle instance
+         */
+        static int GetContainerPort(Database::Entity::Lambda::Instance &instance);
+
+        /**
          * lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
