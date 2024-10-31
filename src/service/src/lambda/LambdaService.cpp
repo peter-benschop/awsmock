@@ -121,6 +121,8 @@ namespace AwsMock::Service {
         }
 
         Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
+
+        // Get the hostname, the hostname is different from a manager running as Linux host and a manager running as docker container.
         std::string hostName = GetHostname(instance);
 
         // Send invocation request
@@ -134,7 +136,7 @@ namespace AwsMock::Service {
         } else {
 
             LambdaExecutor lambdaExecutor;
-            boost::thread t(boost::ref(lambdaExecutor), lambda.function, instance.containerId, instance.containerName, instance.hostPort, payload);
+            boost::thread t(boost::ref(lambdaExecutor), lambda.function, instance.containerId, hostName, instance.hostPort, payload);
             t.detach();
         }
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
@@ -346,10 +348,7 @@ namespace AwsMock::Service {
     }
 
     std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {
-        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
-            return instance.containerName;
-        }
-        return "localhost";
+        return Core::Configuration::instance().getBool("awsmock.dockerized") ? instance.containerName : "localhost";
     }
 
 }// namespace AwsMock::Service
