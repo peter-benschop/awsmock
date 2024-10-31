@@ -40,8 +40,7 @@
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
 #define CONTAINER_PORT "8080/tcp"
-#define NETWORK_DEFAULT_MODE "bridge"
-#define NETWORK_DEFAULT_NAME "local"
+#define NETWORK_DEFAULT_MODE "local"
 
 namespace AwsMock::Service {
 
@@ -159,6 +158,9 @@ namespace AwsMock::Service {
         /**
          * @brief Creates a container
          *
+         * @par
+         * Supported standard values for the network mode are: bridge, host, none, and container:<name|id>. Any other value is taken as a custom network's name to which this container should connect to.
+         *
          * @param imageName image name
          * @param instanceName name of the instance
          * @param tag image tags
@@ -170,6 +172,9 @@ namespace AwsMock::Service {
 
         /**
          * @brief Creates a container for a predefined image.
+         *
+         * @par
+         * Supported standard values for the network mode are: bridge, host, none, and container:<name|id>. Any other value is taken as a custom network's name to which this container should connect to.
          *
          * @param imageName image name
          * @param tag image tags
