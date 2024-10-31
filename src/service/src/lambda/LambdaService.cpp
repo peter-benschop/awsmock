@@ -353,7 +353,7 @@ namespace AwsMock::Service {
     }
 
     int LambdaService::GetContainerPort(Database::Entity::Lambda::Instance &instance) {
-        return Core::Configuration::instance().getBool("awsmock.dockerized") ? instance.hostPort : 8080;
+        return Core::Configuration::instance().getBool("awsmock.dockerized") ? 8080 : instance.hostPort;
     }
 
 }// namespace AwsMock::Service
