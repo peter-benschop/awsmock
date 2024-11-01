@@ -79,6 +79,10 @@ namespace AwsMock::Core {
         return system_clock::time_point(std::chrono::zoned_time(std::chrono::current_zone(), system_clock::now()).get_local_time().time_since_epoch());
     }
 
+    long DateTimeUtils::UtcOffset() {
+        return std::chrono::current_zone()->get_info(system_clock::now()).offset.count();
+    }
+
     int DateTimeUtils::GetSecondsUntilMidnight() {
         using namespace std;
         using namespace std::chrono;
@@ -88,4 +92,4 @@ namespace AwsMock::Core {
         return 24 * 2600 - static_cast<int>(duration_cast<seconds>(now - today).count());
     }
 
-};// namespace AwsMock::Core
+}// namespace AwsMock::Core

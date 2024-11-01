@@ -603,10 +603,9 @@ namespace AwsMock::Database {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult =
-                        _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
+                auto mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
 
-                if (mResult.operator bool()) {
+                if (mResult) {
                     Entity::S3::Object result;
                     result.FromDocument(mResult->view());
 

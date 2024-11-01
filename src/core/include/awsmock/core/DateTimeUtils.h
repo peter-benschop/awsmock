@@ -159,6 +159,13 @@ namespace AwsMock::Core {
          * @return number of seconds between now and the given time
          */
         static int GetSecondsUntilMidnight();
+
+        /**
+         * @brief Returns the offset to UTC in seconds.
+         *
+         * @return offset in seconds to UTC.
+         */
+        static long UtcOffset();
     };
 
 }// namespace AwsMock::Core
