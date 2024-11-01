@@ -78,7 +78,7 @@ namespace AwsMock::Core {
             int source = open(inFile.c_str(), O_RDONLY, 0);
 
             // struct required, rationale: function stat() exists also
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -155,7 +155,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
 #ifndef _WIN32
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);// Error check omitted
         struct passwd *pw = getpwuid(info.st_uid);
         if (pw) {
@@ -217,9 +217,8 @@ namespace AwsMock::Core {
         if (fileName.empty()) {
             return;
         }
-        Poco::File file(fileName);
-        if (file.exists()) {
-            file.remove();
+        if (!std::filesystem::exists(fileName)) {
+            std::filesystem::remove(fileName);
         }
     }
 

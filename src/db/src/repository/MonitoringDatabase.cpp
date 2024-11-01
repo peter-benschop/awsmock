@@ -134,6 +134,8 @@ namespace AwsMock::Database {
     std::vector<Database::Entity::Monitoring::Counter> MonitoringDatabase::GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName, const std::string &labelValue) {
         log_trace << "Get rolling mean, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
 
+        long offset = Core::DateTimeUtils::UtcOffset();
+
         std::vector<Database::Entity::Monitoring::Counter> result;
         if (HasDatabase()) {
 
@@ -159,7 +161,7 @@ namespace AwsMock::Database {
                 auto cursor = _monitoringCollection.find(document.extract(), opts);
                 for (auto it: cursor) {
                     system_clock::time_point t = bsoncxx::types::b_date(it["created"].get_date().value);
-                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::minutes(60))};
+                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::seconds(offset))};
                     result.emplace_back(counter);
                 }
                 log_debug << "Counters, name: " << name << " count: " << result.size();
