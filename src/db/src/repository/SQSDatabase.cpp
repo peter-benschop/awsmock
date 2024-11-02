@@ -306,9 +306,6 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            mongocxx::options::find_one_and_update opts{};
-            opts.return_document(mongocxx::options::return_document::k_after);
-
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
             auto session = client->start_session();
@@ -317,12 +314,14 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 queue.modified = system_clock::now();
-                auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument(), opts);
+                auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument());
                 session.commit_transaction();
                 log_trace << "Queue updated: " << queue.ToString();
 
-                queue.FromDocument(mResult->view());
-                return queue;
+                if (mResult) {
+                    queue.FromDocument(mResult->view());
+                    return queue;
+                }
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -334,6 +333,7 @@ namespace AwsMock::Database {
 
             return _memoryDb.UpdateQueue(queue);
         }
+        return {};
     }
 
     Entity::SQS::Queue SQSDatabase::CreateOrUpdateQueue(Entity::SQS::Queue &queue) {
