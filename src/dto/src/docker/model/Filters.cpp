@@ -2,7 +2,7 @@
 // Created by vogje01 on 1/20/24.
 //
 
-#include "awsmock/dto/docker/Filters.h"
+#include "awsmock/dto/docker/model/Filters.h"
 
 namespace AwsMock::Dto::Docker {
 

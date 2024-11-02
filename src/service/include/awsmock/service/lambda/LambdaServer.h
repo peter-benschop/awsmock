@@ -13,6 +13,7 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/dto/docker/CreateNetworkRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
@@ -58,6 +59,14 @@ namespace AwsMock::Service {
          * @brief Delete instances from database, which are not running
          */
         void CleanupInstances();
+
+        /**
+         * @brief Creates a local network.
+         *
+         * @par
+         * The lambda functions need to connect to a local bridged network, otherwise they cannot communicate with the awsmock manager.
+         */
+        void CreateLocalNetwork();
 
         /**
          * @brief Remove expired lambda functions

@@ -29,6 +29,9 @@ namespace AwsMock::Service {
         // Cleanup instances
         CleanupInstances();
 
+        // Create a local network, if it is not existing yet
+        CreateLocalNetwork();
+
         // Start lambda monitoring update counters
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
@@ -84,6 +87,22 @@ namespace AwsMock::Service {
         log_debug << "Lambda instances cleaned up";
     }
 
+    void LambdaServer::CreateLocalNetwork() {
+        log_debug << "Create networks, name: local";
+
+        if (!_dockerService.NetworkExists("local")) {
+
+            Dto::Docker::CreateNetworkRequest request;
+            request.name = "local";
+            request.driver = "bridge";
+
+            _dockerService.CreateNetwork(request);
+            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+        } else {
+            log_debug << "Docker network exists already, name: local";
+        }
+    }
+    
     void LambdaServer::RemoveExpiredLambdas() {
 
         // Get lambda list

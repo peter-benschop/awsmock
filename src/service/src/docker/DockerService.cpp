@@ -328,6 +328,45 @@ namespace AwsMock::Service {
         return response;
     }
 
+    bool DockerService::NetworkExists(const std::string &name) {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+        std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + name + "\"]}");
+
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/networks/?filters=" + filters);
+        if (domainSocketResponse.statusCode == http::status::ok) {
+
+            Dto::Docker::ListNetworkResponse response;
+            response.FromJson(domainSocketResponse.body);
+            if (response.networkList.empty()) {
+                log_debug << "Docker network not found, name: " << name;
+            } else {
+                log_debug << "Docker network found, name: " << name;
+            }
+            return !response.networkList.empty();
+
+        } else {
+
+            log_error << "Network exists request failed, httpStatus: " << domainSocketResponse.statusCode;
+        }
+        return false;
+    }
+
+    Dto::Docker::CreateNetworkResponse DockerService::CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/networks/create", request.ToJson());
+        if (domainSocketResponse.statusCode == http::status::ok) {
+            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+
+        } else {
+
+            log_error << "Docker network create failed, httpStatus: " << domainSocketResponse.statusCode;
+        }
+        Dto::Docker::CreateNetworkResponse response;
+        response.FromJson(domainSocketResponse.body);
+        return response;
+    }
+
     void DockerService::StartDockerContainer(const std::string &id) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 

@@ -2,7 +2,7 @@
 // Created by JVO on 22.04.2024.
 //
 
-#include "awsmock/dto/docker/Image.h"
+#include "awsmock/dto/docker/model/Image.h"
 
 namespace AwsMock::Dto::Docker {
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H
-#define AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H
+#ifndef AWSMOCK_DTO_DOCKER_CREATE_NETWORK_REQUEST_H
+#define AWSMOCK_DTO_DOCKER_CREATE_NETWORK_REQUEST_H
 
 // C++ includes
 #include <sstream>
@@ -14,38 +14,34 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/docker/model/Container.h>
 
 namespace AwsMock::Dto::Docker {
 
     /**
-     * @brief List container request
+     * @brief Create network request.
+     *
+     * @par
+     * Adds the DNS entries for S3 host-style requests. This needs a DNS server which is able to resolve the hostnames. Usually on Linux this can be done using 'dnsmasq'. You
+     * need to setup the hosts in dnsmasq. The host names must conform to the AWS S3 specification, i.e.: &lt;bucketname&gt;.s3.&lt;region&gt;.&lt;domainname&gt;.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListContainerResponse {
+    struct CreateNetworkRequest {
 
         /**
-         * Container list
+         * Network name
          */
-        std::vector<Container> containerList;
+        std::string name;
 
         /**
-         * @brief Constructor
+         * Driver name
          */
-        explicit ListContainerResponse(const std::string &body);
+        std::string driver = "bridge";
 
         /**
          * @brief Convert to a JSON string
          *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return object JSON string
+         * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
@@ -61,9 +57,9 @@ namespace AwsMock::Dto::Docker {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListContainerResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const CreateNetworkRequest &r);
     };
 
 }// namespace AwsMock::Dto::Docker
 
-#endif// AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H
+#endif// AWSMOCK_DTO_DOCKER_CREATE_CONTAINER_REQUEST_H

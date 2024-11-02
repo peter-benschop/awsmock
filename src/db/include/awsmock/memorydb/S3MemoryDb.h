@@ -109,7 +109,7 @@ namespace AwsMock::Database {
         bool HasObjects(const Entity::S3::Bucket &bucket);
 
         /**
-         * @brief List objects on a bucket.
+         * @brief List objects in a bucket.
          *
          * @param region AWS region
          * @param bucket bucket name
@@ -117,6 +117,24 @@ namespace AwsMock::Database {
          * @return list of S3 objects
          */
         std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
+
+        /**
+         * @brief Count objects in a bucket.
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @return number of S3 objects
+         */
+        long GetBucketObjectCount(const std::string &region, const std::string &bucket);
+
+        /**
+         * @brief Sum of all object sizes in bytes.
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @return size of S3 objects in bytes
+         */
+        long GetBucketSize(const std::string &region, const std::string &bucket);
 
         /**
          * @brief List all objects of a bucket
@@ -134,6 +152,16 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         long BucketCount();
+
+
+        /**
+         * @brief Purges a bucket
+         *
+         * @param bucket bucket entity
+         * @return number of deleted objects
+         * @throws DatabaseException
+         */
+        long PurgeBucket(const Entity::S3::Bucket &bucket);
 
         /**
          * @brief Updates a bucket

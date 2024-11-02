@@ -53,6 +53,9 @@ namespace AwsMock::Service {
                     objectsDeleted++;
                 }
             }
+            bucket.keys = _s3Database.GetBucketObjectCount(region, bucket.name);
+            bucket.size = _s3Database.GetBucketSize(region, bucket.name);
+            bucket = _s3Database.UpdateBucket(bucket);
         }
 
         boost::filesystem::path p(s3DataDir);

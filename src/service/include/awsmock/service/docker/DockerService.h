@@ -30,8 +30,11 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
+#include <awsmock/dto/docker/CreateNetworkRequest.h>
+#include <awsmock/dto/docker/CreateNetworkResponse.h>
 #include <awsmock/dto/docker/ListContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>
+#include <awsmock/dto/docker/ListNetworkResponse.h>
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
 
@@ -209,6 +212,22 @@ namespace AwsMock::Service {
          * @return list of containers
          */
         std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag);
+
+        /**
+         * @brief Checks whether a network exists.
+         *
+         * @param name network name
+         * @return true if network exists, otherwise false
+         */
+        bool NetworkExists(const std::string &name);
+
+        /**
+         * @brief Creates a network with the given name
+         *
+         * @param request create network request
+         * @return CreateNetworkResponse
+         */
+        Dto::Docker::CreateNetworkResponse CreateNetwork(const Dto::Docker::CreateNetworkRequest &request);
 
         /**
          * @brief Start the container

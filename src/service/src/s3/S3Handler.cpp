@@ -630,13 +630,11 @@ namespace AwsMock::Service {
                     // Get object versions
                     Dto::S3::ListObjectCounterResponse s3Response = _s3Service.ListObjectCounters(s3Request);
 
-                    log_info << "List object counters";
+                    log_info << "List object counters, count: " << s3Response.total;
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
                 case Dto::Common::S3CommandType::GET_BUCKET: {
-
-                    // Get object request
                     log_debug << "S3 get bucket request";
 
                     // Build request
@@ -649,9 +647,20 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
-                case Dto::Common::S3CommandType::UPDATE_BUCKET: {
+                case Dto::Common::S3CommandType::PURGE_BUCKET: {
+                    log_debug << "S3 purge bucket request";
 
-                    // Get object request
+                    // Build request
+                    Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+
+                    // Purge bucket
+                    _s3Service.PurgeBucket(s3Request);
+
+                    log_info << "Purge bucket, name: " << s3Request.bucketName;
+                    return SendOkResponse(request, {});
+                }
+
+                case Dto::Common::S3CommandType::UPDATE_BUCKET: {
                     log_debug << "S3 update bucket request";
 
                     // Build request

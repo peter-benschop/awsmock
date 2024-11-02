@@ -217,7 +217,7 @@ namespace AwsMock::Core {
         if (fileName.empty()) {
             return;
         }
-        if (!std::filesystem::exists(fileName)) {
+        if (std::filesystem::exists(fileName)) {
             std::filesystem::remove(fileName);
         }
     }

@@ -160,7 +160,7 @@ namespace AwsMock::Database {
         _servicedatabase.CreateObject(object2);
 
         // act
-        long totalSize = _servicedatabase.BucketSize(_region, BUCKET);
+        long totalSize = _servicedatabase.GetBucketSize(_region, BUCKET);
 
         // assert
         EXPECT_EQ(totalSize, 10);
