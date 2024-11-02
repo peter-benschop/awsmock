@@ -2,7 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include "awsmock/dto/docker/Port.h"
+#include "awsmock/dto/docker/model/Port.h"
 
 namespace AwsMock::Dto::Docker {
 

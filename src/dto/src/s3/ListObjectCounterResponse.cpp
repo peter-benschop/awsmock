@@ -15,7 +15,7 @@ namespace AwsMock::Dto::S3 {
                 Poco::JSON::Array jsonObjectArray;
                 for (auto &object: objectCounters) {
                     Poco::JSON::Object jsonObject;
-                    jsonObject.set("keys", object.key);
+                    jsonObject.set("key", object.key);
                     jsonObject.set("size", object.size);
                     jsonObjectArray.add(jsonObject);
                 }

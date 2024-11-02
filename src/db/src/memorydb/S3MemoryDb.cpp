@@ -97,6 +97,32 @@ namespace AwsMock::Database {
         return objectList;
     }
 
+    long S3MemoryDb::GetBucketObjectCount(const std::string &region, const std::string &bucket) {
+
+        long count = 0;
+        for (const auto &object: _objects) {
+            if (object.second.region == region && object.second.bucket == bucket) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count;
+    }
+
+    long S3MemoryDb::GetBucketSize(const std::string &region, const std::string &bucket) {
+
+        long size = 0;
+        for (const auto &object: _objects) {
+            if (object.second.region == region && object.second.bucket == bucket) {
+                size += object.second.size;
+            } else {
+                break;
+            }
+        }
+        return size;
+    }
+
     long S3MemoryDb::BucketCount() {
 
         return static_cast<long>(_buckets.size());
@@ -125,6 +151,16 @@ namespace AwsMock::Database {
 
         log_trace << "Got object list, size: " << objectList.size();
         return objectList;
+    }
+
+    long S3MemoryDb::PurgeBucket(const Entity::S3::Bucket &bucket) {
+        Poco::ScopedLock lock(_bucketMutex);
+
+        const auto count = std::erase_if(_objects, [bucket](const auto &item) {
+            auto const &[key, value] = item;
+            return value.region == bucket.region && value.bucket == bucket.name;
+        });
+        return static_cast<long>(count);
     }
 
     Entity::S3::Bucket S3MemoryDb::UpdateBucket(const Entity::S3::Bucket &bucket) {

@@ -1,41 +1,50 @@
 //
-// Created by vogje01 on 06/06/2023.
+// Created by vogje01 on 1/20/24.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H
-#define AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H
+#ifndef AWSMOCK_DTO_DOCKER_FILTERS_H
+#define AWSMOCK_DTO_DOCKER_FILTERS_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/docker/model/Image.h>
+#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/LogStream.h"
+#include "awsmock/core/exception/JsonException.h"
 
 namespace AwsMock::Dto::Docker {
 
     /**
-     * @brief List images response
+     * Docker filter
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListImageResponse {
+    struct Filter {
 
         /**
-         * Image list
+         * Docker image/container name
          */
-        std::vector<Image> imageList;
+        std::string name;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @param jsonString JSON string
+         * Docker image/container tag
          */
-        void FromJson(const std::string &jsonString);
+        std::string value;
+    };
+
+    /**
+     * Docker filter list
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct Filters {
+
+        /**
+         * Vector of filters
+         */
+        std::vector<Filter> filters;
 
         /**
          * @brief Convert to a JSON string
@@ -56,9 +65,9 @@ namespace AwsMock::Dto::Docker {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListImageResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const Filters &c);
     };
 
 }// namespace AwsMock::Dto::Docker
 
-#endif// AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H
+#endif//AWSMOCK_DTO_DOCKER_FILTERS_H

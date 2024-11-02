@@ -245,6 +245,56 @@ namespace AwsMock::Database {
         }
     }
 
+    long S3Database::GetBucketObjectCount(const std::string &region, const std::string &bucket) {
+
+        std::vector<Entity::S3::Object> objectList;
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+            long objectCount = _objectCollection.count_documents(make_document(kvp("region", region), kvp("bucket", bucket)));
+
+            log_trace << "Objects count, count: " << objectCount;
+            return objectCount;
+
+        } else {
+
+            return _memoryDb.GetBucketObjectCount(region, bucket);
+        }
+    }
+
+    long S3Database::PurgeBucket(Entity::S3::Bucket &bucket) {
+
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto mResult = _objectCollection.delete_many(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
+                log_trace << "Bucket purged: " << bucket.ToString();
+                session.commit_transaction();
+
+                if (mResult) {
+                    log_debug << "Bucket purged, name: " << bucket.name << " deleted: " << mResult->deleted_count();
+                    return mResult.value().deleted_count();
+                }
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what(), 500);
+            }
+
+        } else {
+
+            return _memoryDb.PurgeBucket(bucket);
+        }
+        return 0;
+    }
+
     Entity::S3::Bucket S3Database::UpdateBucket(Entity::S3::Bucket &bucket) {
 
         if (HasDatabase()) {
@@ -367,7 +417,7 @@ namespace AwsMock::Database {
         return objectList;
     }*/
 
-    long S3Database::BucketSize(const std::string &region, const std::string &bucket) {
+    long S3Database::GetBucketSize(const std::string &region, const std::string &bucket) {
 
         if (HasDatabase()) {
 
@@ -390,6 +440,10 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what(), 500);
             }
+
+        } else {
+
+            return _memoryDb.GetBucketSize(region, bucket);
         }
         return 0;
     }

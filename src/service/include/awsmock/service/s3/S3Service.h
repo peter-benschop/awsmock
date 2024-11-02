@@ -47,6 +47,7 @@
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/MoveObjectRequest.h>
 #include <awsmock/dto/s3/MoveObjectResponse.h>
+#include <awsmock/dto/s3/PurgeBucketRequest.h>
 #include <awsmock/dto/s3/PutBucketEncryptionRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
@@ -141,11 +142,21 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketResponse CreateBucket(Dto::S3::CreateBucketRequest &s3Request);
 
         /**
+         * @brief Purge a bucket
+         *
+         * @par
+         * This will delete all objects of the given bucket. The bucket itself is still existing, but empty.
+         *
+         * @param request S3 purge request
+         */
+        void PurgeBucket(const Dto::S3::PurgeBucketRequest &request);
+
+        /**
          * @brief Updates a bucket
          *
-         * @param s3Request S3 update request
+         * @param request S3 update request
          */
-        void UpdateBucket(const Dto::S3::UpdateBucketRequest &s3Request);
+        void UpdateBucket(const Dto::S3::UpdateBucketRequest &request);
 
         /**
          * @brief Lists all buckets
@@ -464,6 +475,14 @@ namespace AwsMock::Service {
          * @param lambdaConfigurations lambda notification configurations vector.
          */
         static void GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
+
+        /**
+         * @brief Adjusts the key counter in the bucket.
+         *
+         * @param region AWS region
+         * @param bucketName name of the bucket
+         */
+        void AdjustBucketCounters(const std::string &region, const std::string &bucketName);
 
         /**
          * Database connection
