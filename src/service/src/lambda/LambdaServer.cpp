@@ -102,7 +102,7 @@ namespace AwsMock::Service {
             log_debug << "Docker network exists already, name: local";
         }
     }
-    
+
     void LambdaServer::RemoveExpiredLambdas() {
 
         // Get lambda list
