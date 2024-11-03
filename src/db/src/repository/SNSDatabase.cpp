@@ -388,6 +388,33 @@ namespace AwsMock::Database {
         }
     }
 
+    void SNSDatabase::PurgeTopic(const Entity::SNS::Topic &topic) {
+
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _topicCollection = (*client)[_databaseName][_messageCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
+                log_debug << "Topic purge, count: " << result->deleted_count();
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "SNS database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+
+        } else {
+
+            _memoryDb.PurgeTopic(topic);
+        }
+    }
+
     void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) {
 
         if (HasDatabase()) {

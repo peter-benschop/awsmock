@@ -13,7 +13,7 @@ namespace AwsMock::Dto::SNS {
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "PublishResponse");
 
         // SendMessageResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pSendMessageResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "PublishResponse");
+        Poco::XML::AutoPtr<Poco::XML::Element> pSendMessageResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "PublishResult");
 
         // MessageID
         Core::XmlUtils::CreateTextNode(pDoc, pSendMessageResult, "MessageId", messageId);
@@ -27,6 +27,21 @@ namespace AwsMock::Dto::SNS {
         return Core::XmlUtils::ToXmlString(pDoc);
     }
 
+    std::string PublishResponse::ToJson() const {
+
+        try {
+
+            Poco::JSON::Object rootJson;
+            rootJson.set("messageId", messageId);
+
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
+    }
+
     std::string PublishResponse::ToString() const {
         std::stringstream ss;
         ss << (*this);
@@ -34,7 +49,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const PublishResponse &r) {
-        os << "PublishResponse={messageId='" + r.messageId + "'}";
+        os << "PublishResponse=" << r.ToJson();
         return os;
     }
 

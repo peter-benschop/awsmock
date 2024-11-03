@@ -34,6 +34,11 @@ namespace AwsMock::Dto::SNS {
         std::string message;
 
         /**
+         * Request ID
+         */
+        std::string requestId;
+
+        /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.

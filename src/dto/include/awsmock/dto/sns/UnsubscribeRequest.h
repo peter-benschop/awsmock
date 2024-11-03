@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_UNSUBSCRIBEREQUEST_H
-#define AWSMOCK_DTO_SNS_UNSUBSCRIBEREQUEST_H
+#ifndef AWSMOCK_DTO_SNS_UNSUBSCRIBE_REQUEST_H
+#define AWSMOCK_DTO_SNS_UNSUBSCRIBE_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -11,6 +11,11 @@
 
 namespace AwsMock::Dto::SNS {
 
+    /**
+     * @brief Unsubscribe a method from the topic
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct UnsubscribeRequest {
 
         /**
@@ -40,4 +45,4 @@ namespace AwsMock::Dto::SNS {
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_UNSUBSCRIBEREQUEST_H
+#endif// AWSMOCK_DTO_SNS_UNSUBSCRIBE_REQUEST_H

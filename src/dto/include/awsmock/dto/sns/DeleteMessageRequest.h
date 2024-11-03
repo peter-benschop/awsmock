@@ -26,6 +26,11 @@ namespace AwsMock::Dto::SNS {
         /**
          * Topic ARN
          */
+        std::string topicArn;
+
+        /**
+         * Message Id
+         */
         std::string messageId;
 
         /**

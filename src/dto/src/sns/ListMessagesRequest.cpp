@@ -32,7 +32,6 @@ namespace AwsMock::Dto::SNS {
         try {
 
             // Attributes
-            std::string tmpStr;
             Core::JsonUtils::GetJsonValueString("region", rootObject, region);
             Core::JsonUtils::GetJsonValueString("topicArn", rootObject, topicArn);
             Core::JsonUtils::GetJsonValueInt("pageSize", rootObject, pageSize);
