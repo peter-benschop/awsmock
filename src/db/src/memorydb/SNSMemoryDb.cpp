@@ -154,6 +154,16 @@ namespace AwsMock::Database {
         return count;
     }
 
+    void SNSMemoryDb::PurgeTopic(const Entity::SNS::Topic &topic) {
+        Poco::ScopedLock loc(_snsTopicMutex);
+
+        const auto count = std::erase_if(_messages, [topic](const auto &item) {
+            auto const &[key, value] = item;
+            return value.topicArn == topic.topicArn;
+        });
+        log_debug << "Topic purged, count: " << count;
+    }
+
     void SNSMemoryDb::DeleteTopic(const Entity::SNS::Topic &topic) {
         Poco::ScopedLock loc(_snsTopicMutex);
 

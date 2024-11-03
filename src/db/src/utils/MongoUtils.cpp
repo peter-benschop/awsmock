@@ -39,5 +39,4 @@ namespace AwsMock::Database {
         }
         return pDate;
     }
-
 }// namespace AwsMock::Database

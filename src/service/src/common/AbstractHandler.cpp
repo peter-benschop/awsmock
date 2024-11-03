@@ -43,8 +43,7 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
-        boost::beast::ostream(response.body()) << body << std::endl
-                                               << std::endl;
+        boost::beast::ostream(response.body()) << body << std::endl;
         response.prepare_payload();
 
         // Copy headers

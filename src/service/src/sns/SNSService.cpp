@@ -87,18 +87,44 @@ namespace AwsMock::Service {
         }
     }
 
+    void SNSService::PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "purge_topic");
+        log_trace << "Purge topic request, topicArn: " << request.topicArn;
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_warning << "Topic does not exist, topicArn: " << request.topicArn;
+            throw Core::NotFoundException("Topic does not exist, topicArn" + request.topicArn);
+        }
+
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            log_debug << "Got topic: " << topic.topicArn;
+
+            // Update database
+            _snsDatabase.PurgeTopic(topic);
+
+            // Adjust topic counters
+            AdjustTopicCounters(topic);
+
+        } catch (Poco::Exception &ex) {
+            log_error << "SNS purge topic failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
         log_trace << "Delete topic request, region: " << region << " topicArn: " << topicArn;
 
+        // Check existence
+        if (!_snsDatabase.TopicExists(topicArn)) {
+            log_warning << "Topic does not exist, arn: " << topicArn;
+            throw Core::NotFoundException("Topic does not exist");
+        }
+
         Dto::SNS::DeleteTopicResponse response;
         try {
-
-            // Check existence
-            if (!_snsDatabase.TopicExists(topicArn)) {
-                log_warning << "Topic does not exist, arn: " << topicArn;
-                throw Core::NotFoundException("Topic does not exist");
-            }
 
             // Update database
             _snsDatabase.DeleteTopic({.region = region, .topicArn = topicArn});
@@ -129,6 +155,8 @@ namespace AwsMock::Service {
         Database::Entity::SNS::Message message;
         try {
 
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
             // Update database
             std::string messageId = Core::AwsUtils::CreateMessageId();
             message = {.region = request.region,
@@ -142,7 +170,10 @@ namespace AwsMock::Service {
             // Check subscriptions
             CheckSubscriptions(request);
 
-            return {.messageId = message.messageId, .requestId = Poco::UUIDGenerator::defaultGenerator().createRandom().toString()};
+            // Adjust message counters
+            AdjustTopicCounters(topic);
+
+            return {.messageId = message.messageId, .requestId = request.requestId};
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS create message failed, message: " << ex.message();
@@ -424,10 +455,22 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteMessage(request.messageId);
             log_trace << "SNS message deleted, messageId: " << request.messageId;
 
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            // Adjust topic counters
+            AdjustTopicCounters(topic);
+            log_trace << "SNS topci counter adjusted, topicArn: " << request.topicArn;
+
         } catch (Poco::Exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
+    }
+
+    void SNSService::AdjustTopicCounters(Database::Entity::SNS::Topic &topic) {
+        topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
+        topic = _snsDatabase.UpdateTopic(topic);
+        log_debug << "Topic counters updated, queue: " << topic.topicArn;
     }
 
 }// namespace AwsMock::Service

@@ -36,6 +36,7 @@
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
+#include <awsmock/dto/sns/PurgeTopicRequest.h>
 #include <awsmock/dto/sns/SqsNotificationRequest.h>
 #include <awsmock/dto/sns/SubscribeRequest.h>
 #include <awsmock/dto/sns/SubscribeResponse.h>
@@ -158,6 +159,14 @@ namespace AwsMock::Service {
         Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
 
         /**
+         * @brief Purge a topic
+         *
+         * @param request purge topic request
+         * @throws ServiceException
+         */
+        void PurgeTopic(const Dto::SNS::PurgeTopicRequest &request);
+
+        /**
          * @brief Delete a topic
          *
          * @param region AWS region name
@@ -205,6 +214,13 @@ namespace AwsMock::Service {
          * @param request SNS publish request
          */
         void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
+
+        /**
+         * @brief Adjust topic counters
+         *
+         * @param topic SNS topic entity
+         */
+        void AdjustTopicCounters(Database::Entity::SNS::Topic &topic);
 
         /**
          * SNS database connection

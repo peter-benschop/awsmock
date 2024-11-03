@@ -13,20 +13,28 @@ namespace AwsMock::Database::Entity::SNS {
             messageAttributesDoc.append(attribute.ToDocument());
         }
 
-        view_or_value<view, value> messageDoc = make_document(
-                kvp("region", region),
-                kvp("topicArn", topicArn),
-                kvp("targetArn", targetArn),
-                kvp("message", message),
-                kvp("messageId", messageId),
-                kvp("size", size),
-                kvp("status", MessageStatusToString(status)),
-                kvp("userAttributes", messageAttributesDoc),
-                kvp("reset", bsoncxx::types::b_date(std::chrono::milliseconds(0))),
-                kvp("lastSend", bsoncxx::types::b_date(lastSend)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
-        return messageDoc;
+        // Mandatory fields
+        bsoncxx::builder::basic::document messageDoc;
+        messageDoc.append(kvp("region", region),
+                          kvp("topicArn", topicArn),
+                          kvp("targetArn", targetArn),
+                          kvp("message", message),
+                          kvp("messageId", messageId),
+                          kvp("size", size),
+                          kvp("status", MessageStatusToString(status)),
+                          kvp("userAttributes", messageAttributesDoc),
+                          kvp("reset", bsoncxx::types::b_null()));
+
+        if (lastSend.time_since_epoch().count() != 0) {
+            messageDoc.append(kvp("lastSend", bsoncxx::types::b_date(lastSend)));
+        }
+        if (created.time_since_epoch().count() != 0) {
+            messageDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+        }
+        if (modified.time_since_epoch().count() != 0) {
+            messageDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
+        }
+        return messageDoc.extract();
     }
 
     void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
@@ -40,9 +48,16 @@ namespace AwsMock::Database::Entity::SNS {
             status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
             messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
             size = mResult.value()["size"].get_int64().value;
-            lastSend = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
-            created = bsoncxx::types::b_date(bsoncxx::types::b_date(mResult.value()["created"].get_date()));
-            modified = bsoncxx::types::b_date(bsoncxx::types::b_date(mResult.value()["modified"].get_date()));
+
+            if (mResult.value().find("lastSend") != mResult.value().end()) {
+                lastSend = bsoncxx::types::b_date(mResult.value()["lastSend"].get_date());
+            }
+            if (mResult.value().find("created") != mResult.value().end()) {
+                created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+            }
+            if (mResult.value().find("modified") != mResult.value().end()) {
+                modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+            }
 
             if (mResult.value().find("userAttributes") != mResult.value().end()) {
                 bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
@@ -72,9 +87,15 @@ namespace AwsMock::Database::Entity::SNS {
             Core::JsonUtils::SetJsonValueString(jsonObject, "message", message);
             Core::JsonUtils::SetJsonValueString(jsonObject, "status", MessageStatusToString(status));
             Core::JsonUtils::SetJsonValueString(jsonObject, "messageId", messageId);
-            Core::JsonUtils::SetJsonValueDate(jsonObject, "lastSend", lastSend);
-            Core::JsonUtils::SetJsonValueDate(jsonObject, "created", created);
-            Core::JsonUtils::SetJsonValueDate(jsonObject, "modified", modified);
+            if (lastSend.time_since_epoch().count() > 0) {
+                Core::JsonUtils::SetJsonValueDate(jsonObject, "lastSend", lastSend);
+            }
+            if (created.time_since_epoch().count() > 0) {
+                Core::JsonUtils::SetJsonValueDate(jsonObject, "created", created);
+            }
+            if (modified.time_since_epoch().count() > 0) {
+                Core::JsonUtils::SetJsonValueDate(jsonObject, "modified", modified);
+            }
 
             // Attributes
             if (!attributes.empty()) {

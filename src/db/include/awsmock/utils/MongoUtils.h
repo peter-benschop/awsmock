@@ -23,6 +23,7 @@ namespace AwsMock::Database {
     using namespace boost::posix_time;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_document;
+    using std::chrono::system_clock;
 
     class MongoUtils {
 

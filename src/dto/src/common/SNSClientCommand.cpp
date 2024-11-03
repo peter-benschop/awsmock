@@ -19,7 +19,8 @@ namespace AwsMock::Dto::Common {
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->url = request.target();
-        this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
+        this->headers = Core::HttpUtils::GetHeaders(request);
+        this->requestId = Core::HttpUtils::GetHeaderValue(request, "amz-sdk-invocation-id", Core::AwsUtils::CreateRequestId());
 
         if (userAgent.clientCommand.empty()) {
 

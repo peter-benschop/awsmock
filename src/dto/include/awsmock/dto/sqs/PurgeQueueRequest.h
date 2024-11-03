@@ -9,25 +9,12 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/XML/XMLWriter.h>
-
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -51,7 +38,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
          * Converts the JSON string to a DTO

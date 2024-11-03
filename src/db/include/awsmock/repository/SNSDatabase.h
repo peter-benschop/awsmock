@@ -177,6 +177,14 @@ namespace AwsMock::Database {
         long CountTopics(const std::string &region = {}, const std::string &prefix = {});
 
         /**
+         * @brief Purge a topic.
+         *
+         * @param topicArn topic entity
+         * @throws DatabaseException
+         */
+        void PurgeTopic(const Entity::SNS::Topic &topic);
+
+        /**
          * @brief Deletes a topic.
          *
          * @param topic topic entity

@@ -72,7 +72,12 @@ namespace AwsMock::Service {
                     std::string targetArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TargetArn");
                     std::string message = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Message");
 
-                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message});
+                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .requestId = clientCommand.requestId});
+
+                    std::map<std::string, std::string> headers;
+                    headers["Content-Type"] = "application/xml";
+                    headers["Content-Length"] = std::to_string(snsResponse.ToXml().length());
+                    headers["amz-sdk-invocation-id"] = snsResponse.requestId;
 
                     log_info << "Message published, topic: " << topicArn;
                     return SendOkResponse(request, snsResponse.ToXml());
@@ -130,6 +135,18 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
+                case Dto::Common::SNSCommandType::PURGE_TOPIC: {
+
+                    Dto::SNS::PurgeTopicRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+                    log_debug << "Purge topic, topicArn: " << snsRequest.topicArn;
+
+                    _snsService.PurgeTopic(snsRequest);
+
+                    log_info << "Topic purged, topicArn: " << snsRequest.topicArn;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
 
                     std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TopicArn");
@@ -147,11 +164,12 @@ namespace AwsMock::Service {
                     snsRequest.FromJson(clientCommand.payload);
                     snsRequest.region = region;
 
-                    log_debug << "Topic ARN: " << snsRequest.topicArn;
+                    log_debug << "List messages, payload: " << clientCommand.payload;
+                    log_debug << "List messages, topicArn: " << snsRequest.topicArn;
 
                     Dto::SNS::ListMessagesResponse snsResponse = _snsService.ListMessages(snsRequest);
 
-                    log_info << "List messages, topicArn: " << snsRequest.topicArn;
+                    log_info << "List messages, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messageList.size();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
@@ -174,6 +192,7 @@ namespace AwsMock::Service {
             }
 
         } catch (Poco::Exception &e) {
+            log_error << e.message();
             return Core::HttpUtils::InternalServerError(request, e.message());
         }
     }
