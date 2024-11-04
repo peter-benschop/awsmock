@@ -10,10 +10,10 @@
 #include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/monitoring/MetricService.h"
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {

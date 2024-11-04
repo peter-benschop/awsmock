@@ -31,7 +31,6 @@ namespace AwsMock::Dto::Common {
     enum class SNSCommandType {
         CREATE_TOPIC,
         LIST_TOPICS,
-        LIST_TOPIC_COUNTERS,
         GET_TOPIC_ATTRIBUTES,
         GET_TOPIC_DETAILS,
         PURGE_TOPIC,
@@ -43,13 +42,15 @@ namespace AwsMock::Dto::Common {
         DELETE_TOPIC,
         LIST_MESSAGES,
         DELETE_MESSAGE,
+        // AwsMock
+        LIST_TOPIC_COUNTERS,
+        LIST_SUBSCRIPTION_COUNTERS,
         UNKNOWN
     };
 
     static std::map<SNSCommandType, std::string> SNSCommandTypeNames{
             {SNSCommandType::CREATE_TOPIC, "create-topic"},
             {SNSCommandType::LIST_TOPICS, "list-topics"},
-            {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
             {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
             {SNSCommandType::GET_TOPIC_DETAILS, "get-topic-details"},
             {SNSCommandType::PURGE_TOPIC, "purge-topic"},
@@ -61,6 +62,9 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::DELETE_TOPIC, "delete-topic"},
             {SNSCommandType::LIST_MESSAGES, "list-messages"},
             {SNSCommandType::DELETE_MESSAGE, "delete-message"},
+            // AwsMock
+            {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
+            {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {
