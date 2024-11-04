@@ -184,6 +184,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SNSCommandType::LIST_SUBSCRIPTION_COUNTERS: {
+
+                    Dto::SNS::ListSubscriptionCountersRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SNS::ListSubscriptionCountersResponse snsResponse = _snsService.ListSubscriptionCounters(snsRequest);
+
+                    log_info << "List subscriptions counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.subscriptionCounters.size();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";

@@ -257,7 +257,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -285,7 +285,34 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS get topic subscriptions failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SNS::ListSubscriptionCountersResponse SNSService::ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_subscription_counters");
+        log_trace << "List subscription counters request: " << request.ToString();
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
+        }
+
+        try {
+
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            Dto::SNS::ListSubscriptionCountersResponse response;
+            for (const auto &s: topic.subscriptions) {
+                Dto::SNS::Subscription subscription = {.topicArn = request.topicArn, .protocol = s.protocol, .subscriptionArn = s.subscriptionArn, .endpoint = s.endpoint};
+                response.subscriptionCounters.emplace_back(subscription);
+            }
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "SNS get subscription counters failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -297,7 +324,7 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!_snsDatabase.TopicExists(request.topicArn)) {
-                throw Core::ServiceException("SNS topic does not exists", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::ServiceException("SNS topic does not exists");
             }
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
@@ -308,7 +335,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS get topic attributes failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -341,7 +368,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS get topic attributes failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -387,7 +414,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "SNS tag resource failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(ex.message());
         }
     }
 

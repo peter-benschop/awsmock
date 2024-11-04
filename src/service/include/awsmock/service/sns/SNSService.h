@@ -29,6 +29,8 @@
 #include <awsmock/dto/sns/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/ListMessagesRequest.h>
 #include <awsmock/dto/sns/ListMessagesResponse.h>
+#include <awsmock/dto/sns/ListSubscriptionCountersRequest.h>
+#include <awsmock/dto/sns/ListSubscriptionCountersResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
 #include <awsmock/dto/sns/ListTopicCountersRequest.h>
@@ -151,12 +153,20 @@ namespace AwsMock::Service {
         Dto::SNS::GetTopicDetailsResponse GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request);
 
         /**
-         * Returns a list of subscriptions for a topic
+         * @brief Returns a list of subscriptions for a topic
          *
          * @param request list subscriptions request DTO
          * @return ListSubscriptionByTopicResponse DTO
          */
         Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
+
+        /**
+         * @brief Returns a list of subscription counters for a topic
+         *
+         * @param request list subscription counters request DTO
+         * @return ListSubscriptionCountersResponse DTO
+         */
+        Dto::SNS::ListSubscriptionCountersResponse ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request);
 
         /**
          * @brief Purge a topic
