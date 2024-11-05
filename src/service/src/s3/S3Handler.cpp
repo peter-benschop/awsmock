@@ -421,19 +421,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
-                    /*                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION: {
-
-                    log_debug << "Bucket notification request, bucket: " << clientCommand.bucket;
-
-                    // S3 notification setup
-                    std::string body = Core::HttpUtils::GetBodyAsString(request);
-                    Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, clientCommand.region, clientCommand.bucket);
-
-                    _s3Service.PutBucketNotification(s3Request);
-
-                    return SendNoContentResponse(request);
-                }*/
-
                 case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION: {
 
                     log_debug << "Put bucket notification configuration request, bucket: " << clientCommand.bucket;

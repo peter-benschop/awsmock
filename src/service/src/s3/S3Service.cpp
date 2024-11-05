@@ -854,6 +854,10 @@ namespace AwsMock::Service {
 
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
+        // Create S3 bucket and object
+        Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
+
         if (bucketEntity.HasQueueNotificationEvent(event)) {
 
             Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event);
@@ -861,9 +865,6 @@ namespace AwsMock::Service {
             if (notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
-
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
@@ -886,9 +887,6 @@ namespace AwsMock::Service {
             if (notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
-
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
@@ -911,9 +909,6 @@ namespace AwsMock::Service {
             if (notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
-
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
@@ -929,42 +924,6 @@ namespace AwsMock::Service {
             }
         }
     }
-
-    /*    Database::Entity::S3::Bucket S3Service::CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
-
-        if (bucket.HasQueueNotification(request.queueArn)) {
-            throw Core::NotFoundException("Bucket queue notification exists already");
-        }
-
-        Database::Entity::S3::BucketNotification bucketNotification = {.event = request.event, .notificationId = request.notificationId, .queueArn = request.queueArn};
-        return _database.CreateBucketNotification(bucket, bucketNotification);
-    }
-
-    Database::Entity::S3::Bucket S3Service::CreateTopicConfiguration(Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationConfigurationRequest &request) {
-
-        for (const auto &notificationConfiguration: request.topicConfigurations) {
-            if (bucket.HasTopicNotification(notificationConfiguration.topicArn)) {
-                throw Core::ServiceException("Bucket topic notification exists already");
-            }
-
-            for (const auto &event: notificationConfiguration.events) {
-
-                Database::Entity::S3::BucketNotification bucketNotification = {.event = event, .notificationId = notificationConfiguration.id, .topicArn = notificationConfiguration.topicArn};
-                bucket = _database.CreateBucketNotification(bucket, bucketNotification);
-            }
-        }
-        return bucket;
-    }
-
-    Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
-
-        if (bucket.HasLambdaNotification(request.lambdaArn)) {
-            throw Core::NotFoundException("Bucket lambda notification exists already");
-        }
-
-        Database::Entity::S3::BucketNotification bucketNotification = {.event = request.event, .notificationId = request.notificationId, .lambdaArn = request.lambdaArn};
-        return _database.CreateBucketNotification(bucket, bucketNotification);
-    }*/
 
     Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) {
 
@@ -1103,7 +1062,7 @@ namespace AwsMock::Service {
         std::string user = Core::Configuration::instance().getString("awsmock.user", DEFAULT_USER);
 
         std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
-        std::string functionName = parts[6];
+        const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
         _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), region, user);

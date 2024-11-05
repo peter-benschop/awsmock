@@ -51,7 +51,6 @@
 #include <awsmock/dto/s3/PutBucketEncryptionRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
-#include <awsmock/dto/s3/PutBucketNotificationRequest.h>
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
 #include <awsmock/dto/s3/PutObjectRequest.h>
 #include <awsmock/dto/s3/PutObjectResponse.h>
@@ -79,8 +78,6 @@
 #define DEFAULT_TRANSFER_BUCKET_NAME "transfer-server"
 
 namespace AwsMock::Service {
-
-    typedef std::map<std::string, std::ofstream> MultiPartUploads;
 
     /**
      * @brief S3 service.
@@ -284,13 +281,6 @@ namespace AwsMock::Service {
         Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
 
         /**
-         * @brief Adds a bucket notification
-         *
-         * @param request bucket notification request.
-         */
-        //void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request);
-
-        /**
          * @brief Adds a bucket notification configuration
          *
          * @param request bucket notification configuration request.
@@ -395,24 +385,6 @@ namespace AwsMock::Service {
         static std::string GetMultipartUploadDirectory(const std::string &uploadId);
 
         /**
-         * @brief Create a queue notification
-         *
-         * @param bucket bucket to modify
-         * @param request put bucket notification request.
-         * @return updated bucket.
-         */
-        //Database::Entity::S3::Bucket CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
-
-        /**
-         * @brief Create a lambda function notification
-         *
-         * @param bucket bucket to modify
-         * @param request put bucket notification request.
-         * @return updated bucket.
-         */
-        //Database::Entity::S3::Bucket CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
-
-        /**
          * @brief Deletes an object
          *
          * @param bucket S3 bucket
@@ -493,11 +465,6 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
-
-        /**
-         * Multipart uploads map
-         */
-        MultiPartUploads _uploads{};
     };
 
 }// namespace AwsMock::Service
