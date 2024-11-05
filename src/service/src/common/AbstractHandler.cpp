@@ -173,22 +173,15 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers) {
-        log_trace << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
-
-        if (!Core::MemoryMappedFile::instance().IsMapped()) {
-            if (!Core::MemoryMappedFile::instance().OpenFile(fileName)) {
-                log_error << "Could not open memory mapped file, filename: " << fileName;
-                throw Core::ServiceException("Could not open memory mapped file, filename: " + fileName);
-            }
-        }
+        log_debug << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         try {
 
             // Prepare the response message
             http::response<http::dynamic_body> response;
-            response.content_length(size);
             response.version(request.version());
-            response.result(status);
+            response.result(http::status::partial_content);
+            response.set(http::field::content_range, "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(totalSize));
             response.set(http::field::server, "awsmock");
             response.set(http::field::keep_alive, "false");
             response.set(http::field::content_type, "application/octet-stream");
@@ -199,9 +192,13 @@ namespace AwsMock::Service {
 
             // Body
             char *buffer = new char[size];
-            Core::MemoryMappedFile::instance().ReadChunk(min, size, (char *) buffer);
-            boost::beast::ostream(response.body()) << buffer;
+            std::ifstream file(fileName.c_str(), std::ios::binary);
+            file.seekg(min, std::ios::beg);
+            file.read(buffer, size);
+            int count = file.gcount();
+            boost::beast::ostream(response.body()).write(buffer, size);
             response.prepare_payload();
+            file.close();
             delete[] buffer;
 
             // Copy headers
@@ -211,14 +208,8 @@ namespace AwsMock::Service {
                 }
             }
 
-            // Close file
-            if (max == totalSize - 1) {
-                Core::MemoryMappedFile::instance().CloseFile();
-                log_debug << "Memory mapped file closed, filename: " << fileName;
-            }
-
             // Send the response to the client
-            log_debug << "Range response finished, filename: " << fileName << " size: " << size << " status: " << status;
+            log_debug << "Range response finished, filename: " << fileName << " size: " << count << " status: " << status;
             return response;
 
         } catch (Poco::Exception &exc) {

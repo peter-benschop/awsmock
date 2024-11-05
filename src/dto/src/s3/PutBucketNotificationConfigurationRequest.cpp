@@ -8,6 +8,8 @@ namespace AwsMock::Dto::S3 {
 
     void PutBucketNotificationConfigurationRequest::FromXml(const std::string &xmlString) {
 
+        log_debug << "FromXML: " << xmlString;
+
         Poco::XML::DOMParser parser;
         Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 

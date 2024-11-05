@@ -421,7 +421,7 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
-                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION: {
+                    /*                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION: {
 
                     log_debug << "Bucket notification request, bucket: " << clientCommand.bucket;
 
@@ -432,7 +432,7 @@ namespace AwsMock::Service {
                     _s3Service.PutBucketNotification(s3Request);
 
                     return SendNoContentResponse(request);
-                }
+                }*/
 
                 case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION: {
 

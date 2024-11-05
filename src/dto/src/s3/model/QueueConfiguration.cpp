@@ -30,10 +30,12 @@ namespace AwsMock::Dto::S3 {
     void QueueConfiguration::FromXmlNode(Poco::XML::Node *rootNode) {
 
         if (rootNode->hasChildNodes()) {
+
             Poco::XML::NodeList *childNodes = rootNode->childNodes();
             for (int i = 0; i < childNodes->length(); i++) {
 
                 Poco::XML::Node *child = childNodes->item(i);
+                log_trace << "NodeName: " << child->nodeName();
                 if (child->nodeName() == "Id") {
 
                     id = child->innerText();
@@ -46,6 +48,7 @@ namespace AwsMock::Dto::S3 {
 
                     // Filter
                     if (child->hasChildNodes()) {
+
                         Poco::XML::Node *filterNode = child->firstChild();
                         Poco::XML::Node *s3KeyNode = filterNode->firstChild();
 
@@ -60,6 +63,7 @@ namespace AwsMock::Dto::S3 {
 
                     // Events
                     if (child->hasChildNodes()) {
+
                         Poco::XML::NodeList *eventNodes = child->childNodes();
                         for (int j = 0; j < eventNodes->length(); j++) {
                             events.emplace_back(EventTypeFromString(eventNodes->item(j)->innerText()));
@@ -75,6 +79,27 @@ namespace AwsMock::Dto::S3 {
         try {
 
             Poco::JSON::Object rootJson;
+
+            Core::JsonUtils::SetJsonValueString(rootJson, "Id", id);
+            Core::JsonUtils::SetJsonValueString(rootJson, "Queue", queueArn);
+
+            // Filters
+            if (!filterRules.empty()) {
+                Poco::JSON::Array::Ptr jsonArray;
+                for (const auto &filter: filterRules) {
+                    jsonArray->add(filter.ToJsonObject());
+                }
+                rootJson.set("Filter", jsonArray);
+            }
+
+            // Event
+            if (!events.empty()) {
+                Poco::JSON::Array::Ptr jsonArray;
+                for (const auto &event: events) {
+                    jsonArray->add(event);
+                }
+                rootJson.set("Event", jsonArray);
+            }
             return rootJson;
 
         } catch (Poco::Exception &exc) {

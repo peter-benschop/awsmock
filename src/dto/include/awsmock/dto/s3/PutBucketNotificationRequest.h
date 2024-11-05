@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
-#define AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
+#ifndef AWSMOCK_DTO_S3_PUT_BUCKET_NOTIFICATION_REQUEST_H
+#define AWSMOCK_DTO_S3_PUT_BUCKET_NOTIFICATION_REQUEST_H
 
 // C++ standard includes
 #include <sstream>
@@ -47,61 +47,65 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    //[[deprecated("Use PutBucketNotificationConfiguration instead")]]
-    struct PutBucketNotificationRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
-         * AWS region
-         */
-        std::string bucket;
-
-        /**
-         * lambda ARN
-         */
-        std::string lambdaArn;
-
-        /**
-         * Queue ARN
-         */
-        std::string queueArn;
-
-        /**
-         * Id
-         */
-        std::string notificationId;
-
-        /**
-         * Event
-         */
-        std::string event;
-
-        /**
-         * Parse the notification XML.
-         *
-         * @param xmlString notification XML string
-         */
-        void FromXML(const std::string &xmlString);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r);
-    };
+    //    struct PutBucketNotificationRequest {
+    //
+    //        /**
+    //         * AWS region
+    //         */
+    //        std::string region;
+    //
+    //        /**
+    //         * AWS region
+    //         */
+    //        std::string bucket;
+    //
+    //        /**
+    //         * lambda ARN
+    //         */
+    //        std::string lambdaArn;
+    //
+    //        /**
+    //         * Queue ARN
+    //         */
+    //        std::string queueArn;
+    //
+    //        /**
+    //         * Topic ARN
+    //         */
+    //        std::string topicArn;
+    //
+    //        /**
+    //         * Id
+    //         */
+    //        std::string notificationId;
+    //
+    //        /**
+    //         * Event
+    //         */
+    //        std::string event;
+    //
+    //        /**
+    //         * Parse the notification XML.
+    //         *
+    //         * @param xmlString notification XML string
+    //         */
+    //        void FromXML(const std::string &xmlString);
+    //
+    //        /**
+    //         * Converts the DTO to a string representation.
+    //         *
+    //         * @return DTO as string for logging.
+    //         */
+    //        [[nodiscard]] std::string ToString() const;
+    //
+    //        /**
+    //         * Stream provider.
+    //         *
+    //         * @return output stream
+    //         */
+    //        friend std::ostream &operator<<(std::ostream &os, const PutBucketNotificationRequest &r);
+    //    };
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_PUTBUCKETNOTIFICATIONREQUEST_H
+#endif// AWSMOCK_DTO_S3_PUT_BUCKET_NOTIFICATION_REQUEST_H

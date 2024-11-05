@@ -288,7 +288,7 @@ namespace AwsMock::Service {
          *
          * @param request bucket notification request.
          */
-        void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request);
+        //void PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request);
 
         /**
          * @brief Adds a bucket notification configuration
@@ -401,7 +401,7 @@ namespace AwsMock::Service {
          * @param request put bucket notification request.
          * @return updated bucket.
          */
-        Database::Entity::S3::Bucket CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
+        //Database::Entity::S3::Bucket CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
 
         /**
          * @brief Create a lambda function notification
@@ -410,7 +410,7 @@ namespace AwsMock::Service {
          * @param request put bucket notification request.
          * @return updated bucket.
          */
-        Database::Entity::S3::Bucket CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
+        //Database::Entity::S3::Bucket CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request);
 
         /**
          * @brief Deletes an object
@@ -458,7 +458,7 @@ namespace AwsMock::Service {
          * @param bucket bucket entity.
          * @param queueConfigurations queue notification configurations vector.
          */
-        static void GetQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations);
+        static void PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations);
 
         /**
          * @brief Adds the topic notification configuration to the provided bucket.
@@ -466,7 +466,7 @@ namespace AwsMock::Service {
          * @param bucket bucket entity.
          * @param topicConfigurations topic notification configurations vector.
          */
-        static void GetTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations);
+        static void PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations);
 
         /**
          * @brief Adds the lambda notification configuration to the provided bucket.
@@ -474,7 +474,7 @@ namespace AwsMock::Service {
          * @param bucket bucket entity.
          * @param lambdaConfigurations lambda notification configurations vector.
          */
-        static void GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
+        static void PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
 
         /**
          * @brief Adjusts the key counter in the bucket.

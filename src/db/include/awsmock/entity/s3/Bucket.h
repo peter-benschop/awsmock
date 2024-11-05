@@ -188,33 +188,57 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Checks whether a SQS queue notification with the given event name exists.
          *
-         * @param eventName name of the event
+         * @param queueArn AWS queue ARN
          * @return true if notification with the given event name exists.
          */
-        bool HasQueueNotification(const std::string &eventName);
+        [[nodiscard]] bool HasQueueNotification(const std::string &queueArn) const;
 
         /**
          * @brief Checks whether a SNS topic notification with the given event name exists.
          *
-         * @param eventName name of the event
+         * @param topicArn AWS topic Arn
          * @return true if notification with the given event name exists.
          */
-        bool HasTopicNotification(const std::string &eventName);
+        [[nodiscard]] bool HasTopicNotification(const std::string &topicArn) const;
 
         /**
          * @brief Checks whether a lambda notification with the given event name exists.
          *
-         * @param eventName name of the event
+         * @param lambdaArn AWS Lambda ARN
          * @return true if notification with the given event name exists.
          */
-        bool HasLambdaNotification(const std::string &eventName);
+        [[nodiscard]] bool HasLambdaNotification(const std::string &lambdaArn) const;
+
+        /**
+         * @brief Checks whether a SQS queue notification with the given event name exists.
+         *
+         * @param queueArn AWS queue ARN
+         * @return true if notification with the given event name exists.
+         */
+        [[nodiscard]] bool HasQueueNotificationEvent(const std::string &event) const;
+
+        /**
+         * @brief Checks whether a SNS topic notification with the given event name exists.
+         *
+         * @param topicArn AWS topic Arn
+         * @return true if notification with the given event name exists.
+         */
+        [[nodiscard]] bool HasTopicNotificationEvent(const std::string &event) const;
+
+        /**
+         * @brief Checks whether a lambda notification with the given event name exists.
+         *
+         * @param lambdaArn AWS Lambda ARN
+         * @return true if notification with the given event name exists.
+         */
+        [[nodiscard]] bool HasLambdaNotificationEvent(const std::string &event) const;
 
         /**
          * @brief Checks whether a the bucket has encryption enabled.
          *
          * @return true if encryption is enabled for the bucket.
          */
-        bool HasEncryption() const;
+        [[nodiscard]] bool HasEncryption() const;
 
         /**
          * @brief Returns a given notification by name

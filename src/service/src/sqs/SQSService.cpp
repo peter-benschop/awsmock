@@ -10,15 +10,17 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
 
+        // Get queue ARN
+        std::string queueArn = Core::CreateSQSQueueArn(request.region, request.queueName);
+
         // Check existence. In case the queue exists already return the existing queue.
-        if (_sqsDatabase.QueueExists(request.region, request.queueName)) {
+        if (_sqsDatabase.QueueArnExists(queueArn)) {
             log_warning << "Queue exists already, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException("Queue exists already, region: " + request.region + " queueUrl: " + request.queueUrl);
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
+            return {.region = queue.region, .name = queue.name, .owner = queue.owner, .queueUrl = queue.queueUrl, .queueArn = queue.queueArn};
         }
 
         try {
-            // Get queue ARN
-            std::string queueArn = Core::CreateSQSQueueArn(request.queueName);
 
             // Get queue URL
             std::string queueUrl = Core::CreateSQSQueueUrl(request.queueName);
@@ -633,13 +635,11 @@ namespace AwsMock::Service {
                 _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                 log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
 
-                if (messageList.size() == request.maxMessages) {
+                if (!messageList.empty()) {
                     break;
                 }
-
-                elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
-
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
             }
 
 

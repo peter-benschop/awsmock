@@ -25,6 +25,7 @@ namespace AwsMock::Dto::S3 {
 
                     // Filter
                     if (child->hasChildNodes()) {
+
                         Poco::XML::Node *filterNode = child->firstChild();
                         Poco::XML::Node *s3KeyNode = filterNode->firstChild();
 
@@ -38,7 +39,7 @@ namespace AwsMock::Dto::S3 {
                             }
                         }
                     }
-                } else if (child->nodeName() == "Event") {
+                } else if (child->nodeName() == "Events") {
 
                     // Events
                     if (child->hasChildNodes()) {
@@ -57,6 +58,27 @@ namespace AwsMock::Dto::S3 {
         try {
 
             Poco::JSON::Object rootJson;
+
+            Core::JsonUtils::SetJsonValueString(rootJson, "Id", id);
+            Core::JsonUtils::SetJsonValueString(rootJson, "Topic", topicArn);
+
+            // Filters
+            if (!filterRules.empty()) {
+                Poco::JSON::Array::Ptr jsonArray;
+                for (const auto &filter: filterRules) {
+                    jsonArray->add(filter.ToJsonObject());
+                }
+                rootJson.set("Filter", jsonArray);
+            }
+
+            // Event
+            if (!events.empty()) {
+                Poco::JSON::Array::Ptr jsonArray;
+                for (const auto &event: events) {
+                    jsonArray->add(event);
+                }
+                rootJson.set("Event", jsonArray);
+            }
             return rootJson;
 
         } catch (Poco::Exception &exc) {
