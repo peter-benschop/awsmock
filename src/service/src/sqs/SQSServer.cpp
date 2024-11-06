@@ -72,25 +72,28 @@ namespace AwsMock::Service {
 
                 // Check retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
-                    long deleted = _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
-                    queue.attributes.approximateNumberOfMessages -= deleted;
+                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
                 }
 
                 // Check visibility timeout
                 if (queue.attributes.visibilityTimeout > 0) {
-                    long updated = _sqsDatabase.ResetMessages(queue.queueArn, queue.attributes.visibilityTimeout);
-                    queue.attributes.approximateNumberOfMessagesNotVisible -= updated;
+                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase.ResetMessages(queue.queueArn, queue.attributes.visibilityTimeout);
                 }
 
                 // Check delays
                 if (queue.attributes.delaySeconds > 0) {
-                    long updated = _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
-                    queue.attributes.approximateNumberOfMessagesDelayed -= updated;
+                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
                 }
-
-                _sqsDatabase.UpdateQueue(queue);
-                log_trace << "Queue updated, queueName" << queue.name;
             }
+
+            // Update counters
+            queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessages(queue.queueArn);
+            queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INVISIBLE);
+            queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::DELAYED);
+
+            // Save results
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_trace << "Queue updated, queueName" << queue.name;
         }
         log_trace << "SQS reset messages finished, count: " << queueList.size();
     }
