@@ -85,6 +85,8 @@ namespace AwsMock::Service {
             }
         }
 
+        Core::HttpUtils::DumpHeaders(response);
+
         // Send the response to the client
         return response;
     }
@@ -181,10 +183,12 @@ namespace AwsMock::Service {
             http::response<http::dynamic_body> response;
             response.version(request.version());
             response.result(http::status::partial_content);
-            response.set(http::field::content_range, "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(totalSize));
             response.set(http::field::server, "awsmock");
-            response.set(http::field::keep_alive, "false");
+            response.set(http::field::keep_alive, "true");
             response.set(http::field::content_type, "application/octet-stream");
+            response.set(http::field::accept_ranges, "bytes");
+            response.set(http::field::content_range, "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(totalSize));
+            response.set(http::field::content_length, std::to_string(size));
             response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
             response.set(http::field::access_control_allow_origin, "*");
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");

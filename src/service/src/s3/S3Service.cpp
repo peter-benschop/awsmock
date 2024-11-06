@@ -979,8 +979,11 @@ namespace AwsMock::Service {
 
             for (const auto &object: objectList) {
                 Dto::S3::ObjectCounter objectCounter;
+                objectCounter.oid = object.oid;
+                objectCounter.bucketName = object.bucket;
                 objectCounter.key = object.key;
                 objectCounter.size = object.size;
+                objectCounter.contentType = object.contentType;
                 listAllObjectResponse.objectCounters.emplace_back(objectCounter);
             }
             log_debug << "Count all objects, size: " << objectList.size();

@@ -22,6 +22,11 @@ namespace AwsMock::Dto::S3 {
     struct ObjectCounter {
 
         /**
+         * Database OID
+         */
+        std::string oid;
+
+        /**
          * Bucket name
          */
         std::string bucketName;
@@ -30,6 +35,11 @@ namespace AwsMock::Dto::S3 {
          * Object key
          */
         std::string key;
+
+        /**
+         * Content type (mime type)
+         */
+        std::string contentType;
 
         /**
          * Bucket size in bytes

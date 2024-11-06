@@ -10,9 +10,11 @@ namespace AwsMock::Dto::S3 {
 
         try {
             Poco::JSON::Object rootJson;
+            rootJson.set("oid", oid);
             rootJson.set("bucketName", bucketName);
             rootJson.set("key", key);
             rootJson.set("size", size);
+            rootJson.set("contentType", contentType);
             return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {

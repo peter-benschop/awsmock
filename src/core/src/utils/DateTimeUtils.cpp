@@ -51,7 +51,7 @@ namespace AwsMock::Core {
         char buf[256];
         time_t timeT = system_clock::to_time_t(system_clock::now());
         struct tm tm = *gmtime(&timeT);
-        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %z", &tm);
+        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
         return {buf};
     }
 
@@ -59,7 +59,7 @@ namespace AwsMock::Core {
         char buf[256];
         time_t timeT = system_clock::to_time_t(timePoint);
         struct tm tm = *gmtime(&timeT);
-        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %z", &tm);
+        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
         return {buf};
     }
 

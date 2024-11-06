@@ -11,7 +11,8 @@ namespace AwsMock::Service {
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.getInt("awsmock.service.s3.monitoring.period", S3_DEFAULT_MONITORING_PERIOD);
-        _workerPeriod = configuration.getInt("awsmock.service.s3.worker.period", S3_DEFAULT_WORKER_PERIOD);
+        _syncPeriod = configuration.getInt("awsmock.service.s3.sync.object.period", S3_DEFAULT_SYNC_PERIOD);
+        _sizePeriod = configuration.getInt("awsmock.service.s3.sync.bucket.period", S3_DEFAULT_SIZE_PERIOD);
 
         // Check module active
         if (!IsActive("s3")) {
@@ -19,11 +20,15 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Start SNS monitoring update counters
+        // Start S3 monitoring counters updates
         scheduler.AddTask("s3-monitoring-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
-        // Start delete old message task
-        scheduler.AddTask("s3-sync-directories", [this] { SyncObjects(); }, _workerPeriod);
+        // Start synchronization of objects
+        scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod);
+
+        // Start synchronization of buckets
+        scheduler.AddTask("s3-sync-buckets", [this] { SyncBuckets(); }, _syncPeriod);
+
         log_debug << "S3 server initialized";
     }
 
@@ -34,7 +39,7 @@ namespace AwsMock::Service {
         std::string s3DataDir = dataDir + "/s3/";
 
         Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
-        log_trace << "S3 worker starting, bucketCount: " << buckets.size();
+        log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {
             return;
@@ -53,9 +58,6 @@ namespace AwsMock::Service {
                     objectsDeleted++;
                 }
             }
-            bucket.keys = _s3Database.GetBucketObjectCount(region, bucket.name);
-            bucket.size = _s3Database.GetBucketSize(region, bucket.name);
-            bucket = _s3Database.UpdateBucket(bucket);
         }
 
         boost::filesystem::path p(s3DataDir);
@@ -68,7 +70,30 @@ namespace AwsMock::Service {
                 }
             }
         }
-        log_debug << "Bucket synchronized, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
+        log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
+    }
+
+    void S3Server::SyncBuckets() {
+
+        std::string region = Core::Configuration::instance().getString("awsmock.region");
+
+        Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        log_trace << "Bucket synchronization starting, bucketCount: " << buckets.size();
+
+        if (buckets.empty()) {
+            return;
+        }
+
+        // Loop over buckets and do some maintenance work
+        int filesDeleted = 0, objectsDeleted = 0;
+        for (auto &bucket: buckets) {
+
+            // Get objects and delete object, where the file is not existing anymore
+            bucket.keys = _s3Database.GetBucketObjectCount(region, bucket.name);
+            bucket.size = _s3Database.GetBucketSize(region, bucket.name);
+            bucket = _s3Database.UpdateBucket(bucket);
+        }
+        log_debug << "Bucket synchronized finished, bucketCount: " << buckets.size();
     }
 
     void S3Server::UpdateCounter() {
