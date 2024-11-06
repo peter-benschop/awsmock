@@ -9,10 +9,12 @@ namespace AwsMock::Dto::S3 {
     void LambdaConfiguration::FromXmlNode(Poco::XML::Node *rootNode) {
 
         if (rootNode->hasChildNodes()) {
+
             Poco::XML::NodeList *childNodes = rootNode->childNodes();
             for (int i = 0; i < childNodes->length(); i++) {
 
                 Poco::XML::Node *child = childNodes->item(i);
+                log_trace << "NodeName: " << child->nodeName();
                 if (child->nodeName() == "Id") {
 
                     id = child->innerText();
@@ -57,23 +59,25 @@ namespace AwsMock::Dto::S3 {
         try {
 
             Poco::JSON::Object rootJson;
-            rootJson.set("id", id);
-            rootJson.set("lambdaArn", lambdaArn);
+            rootJson.set("Id", id);
+            rootJson.set("CloudFunction", lambdaArn);
 
+            // Events
             if (!events.empty()) {
                 Poco::JSON::Array jsonArray;
                 for (const auto &event: events) {
                     jsonArray.add(Dto::S3::EventTypeToString(event));
                 }
-                rootJson.set("events", jsonArray);
+                rootJson.set("Event", jsonArray);
             }
 
+            // Filter
             if (!filterRules.empty()) {
                 Poco::JSON::Array jsonArray;
                 for (const auto &filterRule: filterRules) {
                     jsonArray.add(filterRule.ToJsonObject());
                 }
-                rootJson.set("filterRules", jsonArray);
+                rootJson.set("Filter", jsonArray);
             }
             return rootJson;
 

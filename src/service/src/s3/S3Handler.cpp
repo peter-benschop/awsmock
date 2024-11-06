@@ -103,11 +103,7 @@ namespace AwsMock::Service {
 
                     if (Core::HttpUtils::HasHeader(request, "Range")) {
 
-                        headerMap["Accept-Ranges"] = "bytes";
-                        headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
-                        headerMap["Content-Length"] = std::to_string(size);
                         log_info << "Multi-part download progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
-                        log_info << "Multi-part download request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
 
                     } else {
@@ -143,10 +139,8 @@ namespace AwsMock::Service {
                         headerMap["x-amz-meta-" + m.first] = m.second;
                     }
 
-                    headerMap["Accept-Ranges"] = "bytes";
-                    headerMap["Content-Range"] = "bytes " + std::to_string(s3Request.min) + "-" + std::to_string(s3Request.max) + "/" + std::to_string(s3Response.size);
+                    // Send range response
                     log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
-                    log_info << "Range download request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::ok, headerMap);
                 }
 
@@ -419,19 +413,6 @@ namespace AwsMock::Service {
                     log_info << "Finished S3 multipart upload part copy: " << partNumber;
 
                     return SendOkResponse(request, s3Response.ToXml());
-                }
-
-                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION: {
-
-                    log_debug << "Bucket notification request, bucket: " << clientCommand.bucket;
-
-                    // S3 notification setup
-                    std::string body = Core::HttpUtils::GetBodyAsString(request);
-                    Dto::S3::PutBucketNotificationRequest s3Request = Dto::S3::PutBucketNotificationRequest(body, clientCommand.region, clientCommand.bucket);
-
-                    _s3Service.PutBucketNotification(s3Request);
-
-                    return SendNoContentResponse(request);
                 }
 
                 case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION: {

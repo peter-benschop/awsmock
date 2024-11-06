@@ -742,7 +742,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void S3Service::PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request) {
+    /*    void S3Service::PutBucketNotification(const Dto::S3::PutBucketNotificationRequest &request) {
         log_trace << "Put bucket notification request, userPoolId: " << request.notificationId;
 
         // Check bucket existence
@@ -753,9 +753,6 @@ namespace AwsMock::Service {
 
         // Check notification existence
         Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-        if (bucket.HasNotification(request.event)) {
-            throw Core::NotFoundException("Bucket notification exists already");
-        }
 
         try {
             if (!request.lambdaArn.empty()) {
@@ -769,7 +766,7 @@ namespace AwsMock::Service {
             log_error << "S3 put bucket notification request failed, message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
-    }
+    }*/
 
     void S3Service::PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) {
         log_trace << "Put bucket encryption request, algorithm: " << request.sseAlgorithm;
@@ -857,16 +854,17 @@ namespace AwsMock::Service {
 
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
-        if (bucketEntity.HasQueueNotification(event)) {
+        // Create S3 bucket and object
+        Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
+
+        if (bucketEntity.HasQueueNotificationEvent(event)) {
 
             Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event);
 
             if (notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
-
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
@@ -882,16 +880,13 @@ namespace AwsMock::Service {
             }
         }
 
-        if (bucketEntity.HasTopicNotification(event)) {
+        if (bucketEntity.HasTopicNotificationEvent(event)) {
 
             Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event);
 
             if (notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
-
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
@@ -907,16 +902,13 @@ namespace AwsMock::Service {
             }
         }
 
-        if (bucketEntity.HasLambdaNotification(event)) {
+        if (bucketEntity.HasLambdaNotificationEvent(event)) {
 
             Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event);
 
             if (notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
-                Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
-
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
@@ -931,18 +923,6 @@ namespace AwsMock::Service {
                 log_debug << "lambda function invoked, lambdaArn:" << notification.lambdaArn;
             }
         }
-    }
-
-    Database::Entity::S3::Bucket S3Service::CreateQueueConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
-
-        Database::Entity::S3::BucketNotification bucketNotification = {.event = request.event, .notificationId = request.notificationId, .queueArn = request.queueArn};
-        return _database.CreateBucketNotification(bucket, bucketNotification);
-    }
-
-    Database::Entity::S3::Bucket S3Service::CreateLambdaConfiguration(const Database::Entity::S3::Bucket &bucket, const Dto::S3::PutBucketNotificationRequest &request) {
-
-        Database::Entity::S3::BucketNotification bucketNotification = {.event = request.event, .notificationId = request.notificationId, .lambdaArn = request.lambdaArn};
-        return _database.CreateBucketNotification(bucket, bucketNotification);
     }
 
     Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) {
@@ -961,20 +941,24 @@ namespace AwsMock::Service {
 
             // Add notification configurations
             if (!request.queueConfigurations.empty()) {
-                GetQueueNotificationConfigurations(bucket, request.queueConfigurations);
+                PutQueueNotificationConfigurations(bucket, request.queueConfigurations);
             }
             if (!request.topicConfigurations.empty()) {
-                GetTopicNotificationConfigurations(bucket, request.topicConfigurations);
+                PutTopicNotificationConfigurations(bucket, request.topicConfigurations);
             }
             if (!request.lambdaConfigurations.empty()) {
-                GetLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
+                PutLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
             }
 
             // Update database
             bucket = _database.UpdateBucket(bucket);
             log_debug << "Bucket updated, region:" << bucket.region << " bucket: " << bucket.name;
 
+            // Copy configurations
             response.queueConfigurations = request.queueConfigurations;
+            response.topicConfigurations = request.topicConfigurations;
+            response.lambdaConfigurations = request.lambdaConfigurations;
+
             return response;
 
         } catch (Poco::Exception &ex) {
@@ -995,8 +979,11 @@ namespace AwsMock::Service {
 
             for (const auto &object: objectList) {
                 Dto::S3::ObjectCounter objectCounter;
+                objectCounter.oid = object.oid;
+                objectCounter.bucketName = object.bucket;
                 objectCounter.key = object.key;
                 objectCounter.size = object.size;
+                objectCounter.contentType = object.contentType;
                 listAllObjectResponse.objectCounters.emplace_back(objectCounter);
             }
             log_debug << "Count all objects, size: " << objectList.size();
@@ -1078,7 +1065,7 @@ namespace AwsMock::Service {
         std::string user = Core::Configuration::instance().getString("awsmock.user", DEFAULT_USER);
 
         std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
-        std::string functionName = parts[6];
+        const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
         _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), region, user);
@@ -1263,12 +1250,13 @@ namespace AwsMock::Service {
                 .versionId = object.versionId};
     }
 
-    void S3Service::GetQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
+    void S3Service::PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
 
         for (auto &queueConfiguration: queueConfigurations) {
 
             // Check existence
             if (!queueConfiguration.id.empty() && bucket.HasQueueNotificationId(queueConfiguration.id)) {
+                log_info << "Queue notification configuration exists already, id: " << queueConfiguration.id;
                 break;
             }
 
@@ -1294,12 +1282,13 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::GetTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
+    void S3Service::PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
 
         for (auto &topicConfiguration: topicConfigurations) {
 
             // Check existence
             if (!topicConfiguration.id.empty() && bucket.HasTopicNotificationId(topicConfiguration.id)) {
+                log_info << "Topic notification configuration exists already, id: " << topicConfiguration.id;
                 break;
             }
 
@@ -1325,13 +1314,13 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::GetLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
-
+    void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
 
         for (auto &lambdaConfiguration: lambdaConfigurations) {
 
             // Check existence
             if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
+                log_info << "Lambda notification configuration exists already, id: " << lambdaConfiguration.id;
                 break;
             }
 

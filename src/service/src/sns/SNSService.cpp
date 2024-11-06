@@ -44,10 +44,8 @@ namespace AwsMock::Service {
 
         try {
 
-            long total = _snsDatabase.CountTopics(region);
             Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
             auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
-            listTopicsResponse.nextToken = "" + std::to_string(total);
             log_trace << "SNS list topics response: " << listTopicsResponse.ToXml();
 
             return listTopicsResponse;

@@ -16,8 +16,16 @@ namespace AwsMock::Dto::S3 {
 
             Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "QueueNotification");
             Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", queueConfiguration.id);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Queue", queueConfiguration.queueArn);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Event", EventTypeToString(queueConfiguration.events.front()));
+            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "QueueArn", queueConfiguration.queueArn);
+
+            // Events
+            if (!queueConfiguration.events.empty()) {
+                std::vector<std::string> stringArray;
+                for (const auto &event: queueConfiguration.events) {
+                    stringArray.emplace_back(EventTypeToString(event));
+                }
+                Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
+            }
         }
 
         // Topic notification configurations
@@ -26,7 +34,15 @@ namespace AwsMock::Dto::S3 {
             Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "TopicNotification");
             Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", topicConfiguration.id);
             Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Topic", topicConfiguration.topicArn);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Event", EventTypeToString(topicConfiguration.events.front()));
+
+            // Events
+            if (!topicConfiguration.events.empty()) {
+                std::vector<std::string> stringArray;
+                for (const auto &event: topicConfiguration.events) {
+                    stringArray.emplace_back(EventTypeToString(event));
+                }
+                Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
+            }
         }
 
         // Lambda notification configurations
@@ -35,7 +51,15 @@ namespace AwsMock::Dto::S3 {
             Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "CloudFunctionNotification");
             Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", lambdaConfiguration.id);
             Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "CloudFunction", lambdaConfiguration.lambdaArn);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Event", EventTypeToString(lambdaConfiguration.events.front()));
+
+            // Events
+            if (!lambdaConfiguration.events.empty()) {
+                std::vector<std::string> stringArray;
+                for (const auto &event: lambdaConfiguration.events) {
+                    stringArray.emplace_back(EventTypeToString(event));
+                }
+                Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
+            }
         }
 
         return Core::XmlUtils::ToXmlString(pDoc);

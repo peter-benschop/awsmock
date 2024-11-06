@@ -663,7 +663,9 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (maxMessages > 0) {
                     opts.limit(maxMessages);
-                }
+                }// Update values
+
+                session.start_transaction();
 
                 // Get the cursor
                 auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn),
@@ -709,9 +711,6 @@ namespace AwsMock::Database {
                         result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
                         messageList.push_back(result);
 
-
-                        // Update values
-                        session.start_transaction();
                         messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
                                                      make_document(kvp("$set",
                                                                        make_document(kvp("status",
@@ -720,14 +719,11 @@ namespace AwsMock::Database {
                                                                                      kvp("receiptHandle", result.receiptHandle),
                                                                                      kvp("retries", result.retries)))));
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
-
-                        // Commit
-                        session.commit_transaction();
-                    }
-                    if (messageList.size() >= maxMessages) {
-                        break;
                     }
                 }
+
+                // Commit
+                session.commit_transaction();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();

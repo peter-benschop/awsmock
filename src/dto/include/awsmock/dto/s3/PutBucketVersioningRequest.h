@@ -2,10 +2,11 @@
 // Created by vogje01 on 13/10/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_PUTBUCKETVERSIONINGREQUEST_H
-#define AWSMOCK_CORE_DTO_PUTBUCKETVERSIONINGREQUEST_H
+#ifndef AWSMOCK_CORE_DTO_PUT_BUCKET_VERSIONING_REQUEST_H
+#define AWSMOCK_CORE_DTO_PUT_BUCKET_VERSIONING_REQUEST_H
 
 // C++ standard includes
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -64,4 +65,4 @@ namespace AwsMock::Dto::S3 {
 
 }// namespace AwsMock::Dto::S3
 
-#endif//AWSMOCK_CORE_DTO_PUTBUCKETVERSIONINGREQUEST_H
+#endif// AWSMOCK_CORE_DTO_PUT_BUCKET_VERSIONING_REQUEST_H

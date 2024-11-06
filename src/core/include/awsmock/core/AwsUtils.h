@@ -602,6 +602,19 @@ namespace AwsMock::Core {
     }
 
     /**
+     * @brief Create SQS queue ARN
+     *
+     * @param region AWS region
+     * @param queueName name of the queue
+     * @return SQS queue ARN
+     */
+    inline std::string CreateSQSQueueArn(const std::string &region, const std::string &queueName) {
+        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+        log_trace << "Region: " << region << " accountId: " << accountId;
+        return CreateArn("sqs", region, accountId, queueName);
+    }
+
+    /**
      * @brief Get the name from a queue URL
      *
      * @param queueUrl URL of the queue

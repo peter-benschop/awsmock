@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
-#include <iostream>
 
 namespace AwsMock::Dto::S3 {
 

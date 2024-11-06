@@ -18,7 +18,8 @@
 #include <awsmock/service/s3/S3Service.h>
 
 #define S3_DEFAULT_MONITORING_PERIOD 300
-#define S3_DEFAULT_WORKER_PERIOD 3600
+#define S3_DEFAULT_SYNC_PERIOD 3600
+#define S3_DEFAULT_SIZE_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -46,6 +47,11 @@ namespace AwsMock::Service {
         [[maybe_unused]] void SyncObjects();
 
         /**
+         * @brief Synchronize S3 bucket size and object counts
+         */
+        [[maybe_unused]] void SyncBuckets();
+
+        /**
          * Update counters
          */
         void UpdateCounter();
@@ -66,9 +72,14 @@ namespace AwsMock::Service {
         int _monitoringPeriod;
 
         /**
-         * Worker period
+         * Worker directory object synchronization period
          */
-        int _workerPeriod;
+        int _syncPeriod;
+
+        /**
+         * Worker bucket size period
+         */
+        int _sizePeriod;
     };
 
 }// namespace AwsMock::Service

@@ -19,7 +19,8 @@ namespace AwsMock::Service {
 
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
-            throw Core::BadRequestException("DynamoDb table exists already");
+            return {};
+            //throw Core::BadRequestException("DynamoDb table exists already");
         }
 
         Dto::DynamoDb::CreateTableResponse createTableResponse;

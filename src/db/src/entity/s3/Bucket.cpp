@@ -34,21 +34,39 @@ namespace AwsMock::Database::Entity::S3 {
                }) != lambdaNotifications.end();
     }
 
-    bool Bucket::HasQueueNotification(const std::string &eventName) {
-        return find_if(queueNotifications.begin(), queueNotifications.end(), [eventName](const QueueNotification &notification) {
-                   return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();
+    bool Bucket::HasQueueNotification(const std::string &queueArn) const {
+        return find_if(queueNotifications.begin(), queueNotifications.end(), [queueArn](const QueueNotification &notification) {
+                   return notification.queueArn == queueArn;
                }) != queueNotifications.end();
     }
 
-    bool Bucket::HasTopicNotification(const std::string &eventName) {
-        return find_if(topicNotifications.begin(), topicNotifications.end(), [eventName](const TopicNotification &notification) {
-                   return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();
+    bool Bucket::HasTopicNotification(const std::string &topicArn) const {
+        return find_if(topicNotifications.begin(), topicNotifications.end(), [topicArn](const TopicNotification &notification) {
+                   return notification.topicArn == topicArn;
                }) != topicNotifications.end();
     }
 
-    bool Bucket::HasLambdaNotification(const std::string &eventName) {
-        return find_if(lambdaNotifications.begin(), lambdaNotifications.end(), [eventName](const LambdaNotification &notification) {
-                   return std::find(notification.events.begin(), notification.events.end(), eventName) != notification.events.end();
+    bool Bucket::HasLambdaNotificationEvent(const std::string &event) const {
+        return find_if(lambdaNotifications.begin(), lambdaNotifications.end(), [event](const LambdaNotification &notification) {
+                   return std::find(notification.events.begin(), notification.events.end(), event) != notification.events.end();
+               }) != lambdaNotifications.end();
+    }
+
+    bool Bucket::HasQueueNotificationEvent(const std::string &event) const {
+        return find_if(queueNotifications.begin(), queueNotifications.end(), [event](const QueueNotification &notification) {
+                   return std::find(notification.events.begin(), notification.events.end(), event) != notification.events.end();
+               }) != queueNotifications.end();
+    }
+
+    bool Bucket::HasTopicNotificationEvent(const std::string &event) const {
+        return find_if(topicNotifications.begin(), topicNotifications.end(), [event](const TopicNotification &notification) {
+                   return std::find(notification.events.begin(), notification.events.end(), event) != notification.events.end();
+               }) != topicNotifications.end();
+    }
+
+    bool Bucket::HasLambdaNotification(const std::string &lambdaArn) const {
+        return find_if(lambdaNotifications.begin(), lambdaNotifications.end(), [lambdaArn](const LambdaNotification &notification) {
+                   return notification.lambdaArn == lambdaArn;
                }) != lambdaNotifications.end();
     }
 

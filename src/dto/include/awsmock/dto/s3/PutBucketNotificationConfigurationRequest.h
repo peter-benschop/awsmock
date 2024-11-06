@@ -22,62 +22,62 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 Notification configuration
+     * @brief S3 Notification configuration
      *
      * Example:
      * @code{.xml}
-       <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-         <TopicConfiguration>
-           <Event>string</Event>
-             ...
-           <Filter>
-             <S3Key>
-                <FilterRule>
-                  <Name>string</Name>
-                  <Value>string</Value>
-               </FilterRule>
-               ...
-             </S3Key>
-           </Filter>
-           <Id>string</Id>
-           <Topic>string</Topic>
-         </TopicConfiguration>
-         ...
-         <QueueConfiguration>
-           <Event>string</Event>
-           ...
-           <Filter>
-             <S3Key>
-               <FilterRule>
-                 <Name>string</Name>
-                 <Value>string</Value>
-               </FilterRule>
-               ...
-            </S3Key>
-           </Filter>
-           <Id>string</Id>
-           <Queue>string</Queue>
-         </QueueConfiguration>
-         ...
-         <CloudFunctionConfiguration>
-          <Event>string</Event>
-          ...
-          <Filter>
-            <S3Key>
-              <FilterRule>
-                <Name>string</Name>
-                <Value>string</Value>
-             </FilterRule>
-             ...
-            </S3Key>
-          </Filter>
-          <Id>string</Id>
-          <CloudFunction>string</CloudFunction>
-         </CloudFunctionConfiguration>
-         ...
-         <EventBridgeConfiguration>
-         </EventBridgeConfiguration>
-       </NotificationConfiguration>
+     *  <NotificationConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+     *    <TopicConfiguration>
+     *      <Event>string</Event>
+     *        ...
+     *      <Filter>
+     *        <S3Key>
+     *           <FilterRule>
+     *             <Name>string</Name>
+     *             <Value>string</Value>
+     *          </FilterRule>
+     *          ...
+     *        </S3Key>
+     *      </Filter>
+     *      <Id>string</Id>
+     *      <Topic>string</Topic>
+     *    </TopicConfiguration>
+     *    ...
+     *    <QueueConfiguration>
+     *      <Event>string</Event>
+     *      ...
+     *      <Filter>
+     *        <S3Key>
+     *          <FilterRule>
+     *            <Name>string</Name>
+     *            <Value>string</Value>
+     *          </FilterRule>
+     *          ...
+     *       </S3Key>
+     *      </Filter>
+     *      <Id>string</Id>
+     *      <Queue>string</Queue>
+     *    </QueueConfiguration>
+     *    ...
+     *    <CloudFunctionConfiguration>
+     *     <Event>string</Event>
+     *     ...
+     *     <Filter>
+     *       <S3Key>
+     *         <FilterRule>
+     *           <Name>string</Name>
+     *           <Value>string</Value>
+     *        </FilterRule>
+     *        ...
+     *       </S3Key>
+     *     </Filter>
+     *     <Id>string</Id>
+     *     <CloudFunction>string</CloudFunction>
+     *    </CloudFunctionConfiguration>
+     *    ...
+     *    <EventBridgeConfiguration>
+     *    </EventBridgeConfiguration>
+     * </NotificationConfiguration>
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -85,53 +85,53 @@ namespace AwsMock::Dto::S3 {
     struct PutBucketNotificationConfigurationRequest {
 
         /**
-         * AWS region
+         * @brief AWS region
          */
         std::string region;
 
         /**
-         * Bucket
+         * @brief Bucket
          */
         std::string bucket;
 
         /**
-         * Topic configurations
+         * @brief SNS topic configurations
          */
         std::vector<TopicConfiguration> topicConfigurations;
 
         /**
-         * SQS queue configurations
+         * @brief SQS queue configurations
          */
         std::vector<QueueConfiguration> queueConfigurations;
 
         /**
-         * Lambda function configurations
+         * @brief Lambda function configurations
          */
         std::vector<LambdaConfiguration> lambdaConfigurations;
 
         /**
-          * Convert from XML representation
+          * @brief Convert from XML representation
           *
           * @param xmlString XML string
           */
         void FromXml(const std::string &xmlString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
