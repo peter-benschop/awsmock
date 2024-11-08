@@ -247,7 +247,8 @@ namespace AwsMock::Service {
                     sqsRequest.region = clientCommand.region;
                     sqsRequest.messageId = Core::AwsUtils::CreateRequestId();
                     sqsRequest.senderId = clientCommand.user;
-
+                    sqsRequest.contentType = clientCommand.contentType;
+                    
                     if (clientCommand.contentType == "json") {
 
                         sqsRequest.FromJson(clientCommand.payload);
