@@ -39,4 +39,20 @@ namespace AwsMock::Database {
         }
         return pDate;
     }
+
+    void MongoUtils::SetDatetime(bsoncxx::builder::basic::document &document, const std::string &attribute, system_clock::time_point datetime) {
+        if (datetime.time_since_epoch().count() > 0) {
+            document.append(kvp(attribute, bsoncxx::types::b_date(datetime)));
+        } else {
+            document.append(kvp(attribute, bsoncxx::types::b_null()));
+        }
+    }
+
+    system_clock::time_point MongoUtils::GetDatetime(const mongocxx::stdx::optional<bsoncxx::document::view> &document, const std::string &attribute) {
+        if (document.value()[attribute].type() != bsoncxx::type::k_null) {
+            return bsoncxx::types::b_date(document.value()[attribute].get_date());
+        }
+        return {};
+    }
+
 }// namespace AwsMock::Database

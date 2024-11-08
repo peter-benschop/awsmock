@@ -58,15 +58,9 @@ namespace AwsMock::Database::Entity::SQS {
         messageDoc.append(kvp("contentType", contentType));
         messageDoc.append(kvp("attributes", attributesDoc));
         messageDoc.append(kvp("messageAttributes", messageAttributesDoc));
-        if (reset.time_since_epoch().count() > 0) {
-            messageDoc.append(kvp("reset", bsoncxx::types::b_date(reset)));
-        }
-        if (created.time_since_epoch().count() > 0) {
-            messageDoc.append(kvp("created", bsoncxx::types::b_date(created)));
-        }
-        if (modified.time_since_epoch().count() > 0) {
-            messageDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
-        }
+        MongoUtils::SetDatetime(messageDoc, "reset", reset);
+        MongoUtils::SetDatetime(messageDoc, "created", created);
+        MongoUtils::SetDatetime(messageDoc, "modified", modified);
 
         return messageDoc.extract();
     }
@@ -85,12 +79,10 @@ namespace AwsMock::Database::Entity::SQS {
         md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
         md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
         contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
-        if (mResult.value()["reset"].type() != bsoncxx::type::k_null) {
-            reset = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
-        }
         size = mResult.value()["size"].get_int64().value;
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+        reset = MongoUtils::GetDatetime(mResult, "reset");
+        created = MongoUtils::GetDatetime(mResult, "created");
+        modified = MongoUtils::GetDatetime(mResult, "modified");
 
         // Attributes
         if (mResult.value().find("messageAttributes") != mResult.value().end()) {
