@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.15.25](https://github.com/jensvogt/awsmock/compare/v0.15.24...v0.15.25) (2024-11-08)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** Accelerate SQS message processing ([e9e58e8](https://github.com/jensvogt/awsmock/commit/e9e58e8d1505fe1c91e046ccd57366e9862c3468))
+* **653-move-manager-apis-to-gateway:** Accelerate SQS message processing ([c3fd1dd](https://github.com/jensvogt/awsmock/commit/c3fd1dd1e012891eca57b38598ce01b3e767cc28))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([5eaa21f](https://github.com/jensvogt/awsmock/commit/5eaa21f86beb59891791c186bcfce2b1e59942e6))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([8797630](https://github.com/jensvogt/awsmock/commit/879763063b08442f306161ca599bdc121314cdcb))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([732c8dd](https://github.com/jensvogt/awsmock/commit/732c8dd8ae3819f60740e5925f5a02fff6773253))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([50d3681](https://github.com/jensvogt/awsmock/commit/50d3681068428c24d1120f2f99976ececf537c03))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([8535311](https://github.com/jensvogt/awsmock/commit/8535311b0acd240e8cc6dcc343ed40bd02731b36))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([5b1d915](https://github.com/jensvogt/awsmock/commit/5b1d915a23f09cffae66bfcc630b7b3ce4b70a43))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([bc09d6b](https://github.com/jensvogt/awsmock/commit/bc09d6bf82c6ca7fcf4dc3410d869e70a47505bc))
+
 ## [0.15.24](https://github.com/jensvogt/awsmock/compare/v0.15.23...v0.15.24) (2024-11-04)
 
 
