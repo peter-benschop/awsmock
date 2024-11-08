@@ -52,7 +52,7 @@ namespace AwsMock::Database {
         if (document.value()[attribute].type() != bsoncxx::type::k_null) {
             return bsoncxx::types::b_date(document.value()[attribute].get_date());
         }
-        return {};
+        return system_clock::time_point::min();
     }
 
 }// namespace AwsMock::Database
