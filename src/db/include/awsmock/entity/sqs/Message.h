@@ -136,6 +136,11 @@ namespace AwsMock::Database::Entity::SQS {
         MessageAttributeList messageAttributes;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = std::chrono::system_clock::now();
@@ -143,7 +148,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Last modification date
          */
-        system_clock::time_point modified = std::chrono::system_clock::now();
+        system_clock::time_point modified;
 
         /**
          * @brief Checks for the existence of a attribute with the given key.

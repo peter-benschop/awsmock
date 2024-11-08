@@ -59,6 +59,7 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
+#include <awsmock/dto/sqs/mapper/Mapper.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>

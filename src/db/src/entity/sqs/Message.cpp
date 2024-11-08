@@ -53,6 +53,7 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("md5Body", md5Body),
                 kvp("md5UserAttr", md5UserAttr),
                 kvp("md5SystemAttr", md5SystemAttr),
+                kvp("contentType", contentType),
                 kvp("attributes", attributesDoc),
                 kvp("messageAttributes", messageAttributesDoc),
                 kvp("reset", bsoncxx::types::b_date(reset)),
@@ -74,6 +75,7 @@ namespace AwsMock::Database::Entity::SQS {
         md5Body = bsoncxx::string::to_string(mResult.value()["md5Body"].get_string().value);
         md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
         md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
+        contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
         if (mResult.value()["reset"].type() != bsoncxx::type::k_null) {
             reset = bsoncxx::types::b_date(mResult.value()["reset"].get_date());
         }
@@ -120,6 +122,7 @@ namespace AwsMock::Database::Entity::SQS {
             JsonUtils::SetJsonValueString(jsonObject, "md5Body", md5Body);
             JsonUtils::SetJsonValueString(jsonObject, "md5UserAttr", md5UserAttr);
             JsonUtils::SetJsonValueString(jsonObject, "md5SystemAttr", md5SystemAttr);
+            JsonUtils::SetJsonValueString(jsonObject, "contentType", contentType);
             JsonUtils::SetJsonValueDate(jsonObject, "reset", reset);
             JsonUtils::SetJsonValueDate(jsonObject, "created", created);
             JsonUtils::SetJsonValueDate(jsonObject, "modified", modified);
@@ -164,6 +167,7 @@ namespace AwsMock::Database::Entity::SQS {
             Core::JsonUtils::GetJsonValueString("md5Body", jsonObject, md5Body);
             Core::JsonUtils::GetJsonValueString("md5UserAttr", jsonObject, md5UserAttr);
             Core::JsonUtils::GetJsonValueString("md5SystemAttr", jsonObject, md5SystemAttr);
+            Core::JsonUtils::GetJsonValueString("contentType", jsonObject, contentType);
             Core::JsonUtils::GetJsonValueDate("reset", jsonObject, reset);
             std::string statusStr;
             Core::JsonUtils::GetJsonValueString("status", jsonObject, statusStr);

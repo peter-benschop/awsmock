@@ -138,6 +138,11 @@ namespace AwsMock::Dto::SQS {
         std::string md5sum;
 
         /**
+         * Content type (can only be XML, JSON, TXT)
+         */
+        std::string contentType;
+
+        /**
          * Request ID
          */
         std::string requestId;

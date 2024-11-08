@@ -11,7 +11,8 @@ namespace AwsMock::Service {
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.getInt("awsmock.service.sqs.monitoring.period", SQS_DEFAULT_MONITORING_PERIOD);
-        _workerPeriod = configuration.getInt("awsmock.service.sqs.worker.period", SQS_DEFAULT_WORKER_PERIOD);
+        _resetPeriod = configuration.getInt("awsmock.service.sqs.reset.period", SQS_DEFAULT_WORKER_PERIOD);
+        _counterPeriod = configuration.getInt("awsmock.service.sqs.counter.period", SQS_DEFAULT_WORKER_PERIOD);
 
         // Check module active
         if (!IsActive("sqs")) {
@@ -20,15 +21,13 @@ namespace AwsMock::Service {
         }
         log_info << "SQS server starting";
 
-        // Adjust counters
-        AdjustCounters();
-
         // Start SQS monitoring update counters
         scheduler.AddTask("monitoring-sqs-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         scheduler.AddTask("monitoring-sqs-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod);
 
         // Start reset messages task
-        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _workerPeriod);
+        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod);
+        scheduler.AddTask("sqs-count-messages", [this] { this->AdjustCounters(); }, _resetPeriod);
 
         // Set running
         SetRunning();
@@ -39,20 +38,17 @@ namespace AwsMock::Service {
     void SQSServer::AdjustCounters() {
 
         Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
-        log_trace << "SQS reset messages starting, count: " << queueList.size();
+        log_trace << "SQS adjust counter starting, count: " << queueList.size();
 
         // Loop over queues and synchronize queue counters
         for (auto &queue: queueList) {
 
-            long messageCount = _sqsDatabase.CountMessages(queue.queueArn);
-            if (messageCount > 0) {
-
-                queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INITIAL);
-                queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INVISIBLE);
-                queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::DELAYED);
-                queue = _sqsDatabase.UpdateQueue(queue);
-            }
+            queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INITIAL);
+            queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INVISIBLE);
+            queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::DELAYED);
+            queue = _sqsDatabase.UpdateQueue(queue);
         }
+        log_trace << "SQS adjust counter finished, count: " << queueList.size();
     }
 
     void SQSServer::ResetMessages() {
@@ -84,16 +80,11 @@ namespace AwsMock::Service {
                 if (queue.attributes.delaySeconds > 0) {
                     queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
                 }
+
+                // Save results
+                queue = _sqsDatabase.UpdateQueue(queue);
+                log_trace << "Queue updated, queueName" << queue.name;
             }
-
-            // Update counters
-            queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessages(queue.queueArn);
-            queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::INVISIBLE);
-            queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Database::Entity::SQS::MessageStatus::DELAYED);
-
-            // Save results
-            queue = _sqsDatabase.UpdateQueue(queue);
-            log_trace << "Queue updated, queueName" << queue.name;
         }
         log_trace << "SQS reset messages finished, count: " << queueList.size();
     }

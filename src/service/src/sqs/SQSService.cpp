@@ -487,55 +487,44 @@ namespace AwsMock::Service {
             // Get queue by URL
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
+            // Entity
+            Database::Entity::SQS::Message message = Dto::SQS::Mapper::map(request);
+
             // System attributes
-            std::map<std::string, std::string> attributes = request.attributes;
-            attributes["SentTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampNow());
-            attributes["ApproximateFirstReceivedTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampNow());
-            attributes["ApproximateReceivedCount"] = std::to_string(0);
-            attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
-            attributes["SenderId"] = request.senderId;
+            message.attributes["SentTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampNow());
+            message.attributes["ApproximateFirstReceivedTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampNow());
+            message.attributes["ApproximateReceivedCount"] = std::to_string(0);
+            message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
+            message.attributes["SenderId"] = request.senderId;
 
             // Set userAttributes
-            Database::Entity::SQS::MessageAttributeList messageAttributes;
             for (const auto &attribute: request.messageAttributes) {
-                messageAttributes.push_back({.attributeName = attribute.first,
-                                             .attributeValue = attribute.second.stringValue,
-                                             .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.second.type))});
+                message.messageAttributes.push_back({.attributeName = attribute.first,
+                                                     .attributeValue = attribute.second.stringValue,
+                                                     .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.second.type))});
             }
 
             // Set delay
             system_clock::time_point reset = system_clock::now();
             if (queue.attributes.delaySeconds > 0) {
-                reset += std::chrono::seconds(queue.attributes.delaySeconds);
+                message.reset += std::chrono::seconds(queue.attributes.delaySeconds);
                 queue.attributes.approximateNumberOfMessagesDelayed++;
             } else {
-                reset += std::chrono::seconds(queue.attributes.visibilityTimeout);
+                message.reset += std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
 
             // Set parameters
-            std::string messageId = Core::AwsUtils::CreateMessageId();
-            std::string receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-            std::string md5Body = Core::Crypto::GetMd5FromString(request.body);
-            std::string md5UserAttr = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(request.messageAttributes);
-            std::string md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes);
+            message.messageId = Core::AwsUtils::CreateMessageId();
+            message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+            message.md5Body = Core::Crypto::GetMd5FromString(request.body);
+            message.md5UserAttr = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(request.messageAttributes);
+            message.md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes);
 
             // Update database
             queue.attributes.approximateNumberOfMessages++;
             queue = _sqsDatabase.UpdateQueue(queue);
-            Database::Entity::SQS::Message message = {.queueArn = queue.queueArn,
-                                                      .body = request.body,
-                                                      .status = Database::Entity::SQS::MessageStatus::INITIAL,
-                                                      .reset = reset,
-                                                      .size = static_cast<long>(request.body.length()),
-                                                      .messageId = messageId,
-                                                      .receiptHandle = receiptHandle,
-                                                      .md5Body = md5Body,
-                                                      .md5UserAttr = md5UserAttr,
-                                                      .md5SystemAttr = md5SystemAttr,
-                                                      .attributes = attributes,
-                                                      .messageAttributes = messageAttributes};
             message = _sqsDatabase.CreateMessage(message);
-            log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId << " md5Body: " << md5Body;
+            log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
 
             // Find Lambdas with this as event source
             std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
@@ -548,14 +537,7 @@ namespace AwsMock::Service {
                 }
             }
 
-            return {
-                    .queueUrl = queue.queueUrl,
-                    .messageId = message.messageId,
-                    .receiptHandle = message.receiptHandle,
-                    .md5Body = md5Body,
-                    .md5UserAttr = md5UserAttr,
-                    .md5SystemAttr = md5SystemAttr,
-                    .requestId = request.requestId};
+            return Dto::SQS::Mapper::map(request, message);
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
