@@ -6,6 +6,11 @@
 
 namespace AwsMock::Manager {
 
+    void CreateIndexes() {
+        Database::ModuleDatabase::instance().CreateIndexes();
+        log_debug << "Database indexes created";
+    }
+
     void Manager::Initialize() {
 
         InitializeDatabase();
@@ -41,9 +46,9 @@ namespace AwsMock::Manager {
             pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri)));
             log_info << "MongoDB database initialized, version: " << mongocxx::v_noabi::options::server_api::version_to_string(api.get_version());
 
-            // Create database indexes
-            Database::ModuleDatabase::instance().CreateIndexes();
-            log_debug << "Database indexes created";
+            // Create database indexes in a background thread
+            boost::thread t{CreateIndexes};
+            t.detach();
 
         } else {
 
