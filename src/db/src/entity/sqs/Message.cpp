@@ -42,31 +42,40 @@ namespace AwsMock::Database::Entity::SQS {
             attributesDoc.append(kvp(attribute.first, attribute.second));
         }
 
-        view_or_value<view, value> messageDoc = make_document(
-                kvp("queueArn", queueArn),
-                kvp("body", body),
-                kvp("status", MessageStatusToString(status)),
-                kvp("retries", retries),
-                kvp("size", size),
-                kvp("messageId", messageId),
-                kvp("receiptHandle", receiptHandle),
-                kvp("md5Body", md5Body),
-                kvp("md5UserAttr", md5UserAttr),
-                kvp("md5SystemAttr", md5SystemAttr),
-                kvp("contentType", contentType),
-                kvp("attributes", attributesDoc),
-                kvp("messageAttributes", messageAttributesDoc),
-                kvp("reset", bsoncxx::types::b_date(reset)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+        auto messageDoc = bsoncxx::builder::basic::document{};
 
-        return messageDoc;
+        messageDoc.append(kvp("queueArn", queueArn));
+        messageDoc.append(kvp("queueName", queueName));
+        messageDoc.append(kvp("body", body));
+        messageDoc.append(kvp("status", MessageStatusToString(status)));
+        messageDoc.append(kvp("retries", retries));
+        messageDoc.append(kvp("size", size));
+        messageDoc.append(kvp("messageId", messageId));
+        messageDoc.append(kvp("receiptHandle", receiptHandle));
+        messageDoc.append(kvp("md5Body", md5Body));
+        messageDoc.append(kvp("md5UserAttr", md5UserAttr));
+        messageDoc.append(kvp("md5SystemAttr", md5SystemAttr));
+        messageDoc.append(kvp("contentType", contentType));
+        messageDoc.append(kvp("attributes", attributesDoc));
+        messageDoc.append(kvp("messageAttributes", messageAttributesDoc));
+        if (reset.time_since_epoch().count() > 0) {
+            messageDoc.append(kvp("reset", bsoncxx::types::b_date(reset)));
+        }
+        if (created.time_since_epoch().count() > 0) {
+            messageDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+        }
+        if (modified.time_since_epoch().count() > 0) {
+            messageDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
+        }
+
+        return messageDoc.extract();
     }
 
     void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         oid = mResult.value()["_id"].get_oid().value.to_string();
         queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
+        queueName = bsoncxx::string::to_string(mResult.value()["queueName"].get_string().value);
         body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
         status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
         retries = mResult.value()["retries"].get_int32().value;
@@ -115,6 +124,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             Poco::JSON::Object jsonObject;
             JsonUtils::SetJsonValueString(jsonObject, "queueArn", queueArn);
+            JsonUtils::SetJsonValueString(jsonObject, "queueName", queueName);
             JsonUtils::SetJsonValueString(jsonObject, "body", body);
             JsonUtils::SetJsonValueString(jsonObject, "status", MessageStatusToString(status));
             JsonUtils::SetJsonValueString(jsonObject, "messageId", messageId);
@@ -161,6 +171,7 @@ namespace AwsMock::Database::Entity::SQS {
 
         try {
             Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
+            Core::JsonUtils::GetJsonValueString("queueName", jsonObject, queueName);
             Core::JsonUtils::GetJsonValueString("body", jsonObject, body);
             Core::JsonUtils::GetJsonValueString("messageId", jsonObject, messageId);
             Core::JsonUtils::GetJsonValueString("receiptHandle", jsonObject, receiptHandle);
