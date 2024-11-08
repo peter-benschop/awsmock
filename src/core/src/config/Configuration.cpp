@@ -208,6 +208,8 @@ namespace AwsMock::Core {
 
         // Reapply environment settings
         ApplyEnvSettings();
+
+        log_debug << ToString();
     }
 
     void Configuration::SetValue(const std::string &key, const std::string &value) {
@@ -270,7 +272,7 @@ namespace AwsMock::Core {
     std::ostream &operator<<(std::ostream &os, const Configuration &s) {
         os << "Configuration={";
         for (const auto &it: s) {
-            os << it.first << "={" << it.second + "}, ";
+            os << it.first << " = " << it.second + ", ";
         }
         return os;
     }
