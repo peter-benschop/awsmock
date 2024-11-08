@@ -17,6 +17,7 @@
 #include <bsoncxx/builder/basic/kvp.hpp>
 #include <bsoncxx/types.hpp>
 #include <mongocxx/pipeline.hpp>
+#include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database {
 
@@ -44,6 +45,24 @@ namespace AwsMock::Database {
          * @return Poco::DateTime value
          */
         static Poco::DateTime FromBson(bsoncxx::types::b_date date);
+
+        /**
+         * @brief Sets a time point or null.
+         *
+         * @param document MongoDB document
+         * @param attribute attribute name
+         * @param datetime date time value
+         */
+        static void SetDatetime(bsoncxx::builder::basic::document &document, const std::string &attribute, system_clock::time_point datetime);
+
+        /**
+         * @brief Return a chrono time_point
+         *
+         * @param result MongoDB result
+         * @param attribute attribute name
+         * @return time_point
+         */
+        static system_clock::time_point GetDatetime(const mongocxx::stdx::optional<bsoncxx::document::view> &result, const std::string &attribute);
     };
 
 }// namespace AwsMock::Database

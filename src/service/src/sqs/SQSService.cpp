@@ -507,10 +507,10 @@ namespace AwsMock::Service {
             // Set delay
             system_clock::time_point reset = system_clock::now();
             if (queue.attributes.delaySeconds > 0) {
-                message.reset += std::chrono::seconds(queue.attributes.delaySeconds);
+                message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.delaySeconds);
                 queue.attributes.approximateNumberOfMessagesDelayed++;
             } else {
-                message.reset += std::chrono::seconds(queue.attributes.visibilityTimeout);
+                message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
 
             // Set parameters
