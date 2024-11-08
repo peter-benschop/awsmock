@@ -28,8 +28,8 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
-#define DEFAULT_MONGO_DBUSER "admin"
-#define DEFAULT_MONGO_DBPWD "admin"
+#define DEFAULT_MONGO_DBUSER "root"
+#define DEFAULT_MONGO_DBPWD "password"
 #define DEFAULT_MONGO_DBHOST "localhost"
 #define DEFAULT_MONGO_DBPORT 27017
 #define DEFAULT_MONGO_POOL_SIZE 256
