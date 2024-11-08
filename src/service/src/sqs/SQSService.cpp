@@ -514,6 +514,7 @@ namespace AwsMock::Service {
             }
 
             // Set parameters
+            message.queueArn = queue.queueArn;
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
