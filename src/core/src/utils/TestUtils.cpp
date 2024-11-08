@@ -40,8 +40,8 @@ namespace AwsMock::Core {
         ofs << "awsmock.mongodb.name=test" << std::endl;
         ofs << "awsmock.mongodb.http.host=" << hostName << std::endl;
         ofs << "awsmock.mongodb.http.port=27017" << std::endl;
-        ofs << "awsmock.mongodb.user=admin" << std::endl;
-        ofs << "awsmock.mongodb.password=admin" << std::endl;
+        ofs << "awsmock.mongodb.user=root" << std::endl;
+        ofs << "awsmock.mongodb.password=password" << std::endl;
         // S3 configuration
         ofs << "awsmock.service.s3.http.port=19500" << std::endl;
         ofs << "awsmock.service.s3.http.host=localhost" << std::endl;
