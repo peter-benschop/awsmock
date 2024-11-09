@@ -70,7 +70,27 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "Lambda list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::Lambda::ListFunctionCountersResponse LambdaService::ListFunctionCounters(const Dto::Lambda::ListFunctionCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_function_counters");
+        log_debug << "List function counters request, region: " << request.region;
+
+        try {
+            std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
+            long count = _lambdaDatabase.LambdaCount(request.region);
+
+            Dto::Lambda::ListFunctionCountersResponse response = Dto::Lambda::Mapper::map(request, lambdas);
+            response.total = count;
+
+            log_trace << "Lambda list function counters, result: " << response.ToString();
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Lambda list function counters request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -137,7 +157,7 @@ namespace AwsMock::Service {
         } else {
 
             LambdaExecutor lambdaExecutor;
-            boost::thread t(boost::ref(lambdaExecutor), lambda.function, instance.containerId, hostName, port, payload);
+            boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload);
             t.detach();
         }
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;

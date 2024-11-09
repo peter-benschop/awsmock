@@ -14,6 +14,7 @@ namespace AwsMock::Service {
             switch (clientCommand.command) {
 
                 case Dto::Common::LambdaCommandType::LIST_LAMBDAS: {
+
                     Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                     log_trace << "Lambda function list";
                     return SendOkResponse(request, lambdaResponse.ToJson());
@@ -174,6 +175,14 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
                 log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
+
+            } else if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
+
+                Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
+
+                Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
+                log_trace << "Lambda function counters list,, count: " << lambdaResponse.functionCounters.size();
+                return SendOkResponse(request, lambdaResponse.ToJson());
 
             } else {
                 log_error << "Unknown method";

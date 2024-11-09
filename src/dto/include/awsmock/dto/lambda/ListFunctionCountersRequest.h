@@ -1,0 +1,79 @@
+//
+// Created by vogje01 on 31/05/2023.
+//
+
+#ifndef AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_COUNTERS_REQUEST_H
+
+// C++ Standard includes
+#include <sstream>
+#include <string>
+
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+
+namespace AwsMock::Dto::Lambda {
+
+    struct ListFunctionCountersRequest {
+
+        /**
+         * Region
+         */
+        std::string region;
+
+        /**
+         * Prefix
+         */
+        std::string prefix;
+
+        /**
+         * MaxResults
+         */
+        int maxResults;
+
+        /**
+         * Skip
+         */
+        int skip;
+
+        /**
+         * List of sort columns names
+         */
+        std::vector<Core::SortColumn> sortColumns;
+
+        /**
+         * Parse values from a JSON stream
+         *
+         * @param body json input stream
+         */
+        static ListFunctionCountersRequest FromJson(const std::string &body);
+
+        /**
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * @brief Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const ListFunctionCountersRequest &r);
+    };
+
+}// namespace AwsMock::Dto::Lambda
+
+#endif//AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_COUNTERS_REQUEST_H
