@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <map>
@@ -23,7 +23,7 @@
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * @brief Get function response
+     * @brief Get function counters response
      *
      * Example:
      * @code{.json}
@@ -136,7 +136,7 @@ namespace AwsMock::Dto::Lambda {
      *}
      * @endcode
      */
-    struct GetFunctionResponse {
+    struct GetFunctionCountersResponse {
 
         /**
          * Region
@@ -189,18 +189,21 @@ namespace AwsMock::Dto::Lambda {
         std::string stateReasonCode;
 
         /**
+         * Invocation
+         */
+        long invocations;
+
+        /**
+         * Invocation
+         */
+        long averageRuntime;
+
+        /**
          * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Creates a XML string from the object.
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -214,9 +217,9 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const GetFunctionResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const GetFunctionCountersResponse &r);
     };
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
