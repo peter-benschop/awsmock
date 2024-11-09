@@ -10,19 +10,21 @@ namespace AwsMock::Dto::Lambda {
 
         try {
             Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("User", user);
-            rootJson.set("Configuration", configuration.ToJsonObject());
-            rootJson.set("Code", code.ToJson());
-            rootJson.set("Timeout", timeout);
 
-            if (!tags.empty()) {
-                Poco::JSON::Object jsonTags;
-                for (const auto &tag: tags) {
-                    jsonTags.set(tag.first, tag.second);
-                }
-                rootJson.set("Tags", jsonTags);
-            }
+            rootJson.set("region", region);
+            rootJson.set("functionName", functionName);
+            rootJson.set("user", user);
+            rootJson.set("handler", handler);
+            rootJson.set("user", user);
+            rootJson.set("role", role);
+            rootJson.set("size", size);
+            rootJson.set("concurrency", concurrency);
+            rootJson.set("runtime", runtime);
+            rootJson.set("invocations", invocations);
+            rootJson.set("averageRuntime", averageRuntime);
+            rootJson.set("lastInvocation", Core::DateTimeUtils::ToISO8601(lastInvocation));
+            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
+            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

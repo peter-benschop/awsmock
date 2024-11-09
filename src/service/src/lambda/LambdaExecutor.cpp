@@ -14,7 +14,8 @@ namespace AwsMock::Service {
 
         // Set status
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceRunning);
-        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+        Database::LambdaDatabase::instance().SetLastInvocation(oid, system_clock::now());
+        system_clock::time_point start = system_clock::now();
 
         // Send request to lambda docker container
         Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload, {});
@@ -25,7 +26,7 @@ namespace AwsMock::Service {
 
         // Reset status
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
-        Database::LambdaDatabase::instance().SetAverageRuntime(oid, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count());
+        Database::LambdaDatabase::instance().SetAverageRuntime(oid, std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count());
         log_debug << "Lambda invocation finished, function: " << oid << " httpStatus: " << response.statusCode;
         log_info << "Lambda output: " << response.body;
     }

@@ -31,6 +31,8 @@
 #include <awsmock/dto/lambda/CreateTagRequest.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/dto/lambda/DeleteTagsRequest.h>
+#include <awsmock/dto/lambda/GetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
@@ -151,6 +153,17 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::Lambda::GetFunctionResponse
          */
         Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Gets a single lambda function counters
+         *
+         * @param request get function counters request
+         * @return GetFunctionCountersResponse
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::GetFunctionCountersRequest
+         * @see AwsMock::Dto::Lambda::GetFunctionCountersResponse
+         */
+        Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request);
 
         /**
          * @brief Returns the account settings

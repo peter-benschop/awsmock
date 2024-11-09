@@ -144,49 +144,39 @@ namespace AwsMock::Dto::Lambda {
         std::string region;
 
         /**
+         * Function name
+         */
+        std::string functionName;
+
+        /**
          * User
          */
         std::string user;
 
         /**
-         * Configuration
+         * Role
          */
-        Configuration configuration;
+        std::string role;
 
         /**
-         * Temporary disk space in MB
+         * Handler
          */
-        EphemeralStorage ephemeralStorage;
+        std::string handler;
 
         /**
-         * Code
+         * Runtime
          */
-        Code code;
+        std::string runtime;
 
         /**
-         * Tags
+         * Size
          */
-        std::map<std::string, std::string> tags;
+        long size;
 
         /**
-         * Timeout
+         * Concurrency
          */
-        int timeout = 3;
-
-        /**
-         * State
-         */
-        std::string state;
-
-        /**
-         * State reason
-         */
-        std::string stateReason;
-
-        /**
-         * State reason code
-         */
-        std::string stateReasonCode;
+        long concurrency;
 
         /**
          * Invocation
@@ -197,6 +187,21 @@ namespace AwsMock::Dto::Lambda {
          * Invocation
          */
         long averageRuntime;
+
+        /**
+         * Last invocation
+         */
+        system_clock::time_point lastInvocation;
+
+        /**
+         * Creation date
+         */
+        system_clock::time_point created = system_clock::now();
+
+        /**
+         * Last modification date
+         */
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * @brief Creates a JSON string from the object.
