@@ -274,21 +274,48 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            auto session = client->start_session();
+
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
                                              make_document(kvp("$set",
                                                                make_document(kvp("instances.$.status", Entity::Lambda::LambdaInstanceStatusToString(status))))));
+                session.commit_transaction();
 
             } catch (mongocxx::exception::system_error &e) {
+                session.abort_transaction();
                 log_error << "Get lambda by ARN failed, error: " << e.what();
             }
 
         } else {
 
             _memoryDb.SetInstanceStatus(containerId, status);
+        }
+    }
+
+    void LambdaDatabase::SetLastInvocation(const std::string &oid, const system_clock::time_point &lastInvocation) {
+
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(oid))),
+                                             make_document(kvp("$set",
+                                                               make_document(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation))))));
+                session.commit_transaction();
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Set last invocation failed, error: " << e.what();
+            }
         }
     }
 

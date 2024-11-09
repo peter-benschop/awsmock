@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <map>
@@ -23,7 +23,7 @@
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * @brief Get function response
+     * @brief Get function counters response
      *
      * Example:
      * @code{.json}
@@ -136,7 +136,7 @@ namespace AwsMock::Dto::Lambda {
      *}
      * @endcode
      */
-    struct GetFunctionResponse {
+    struct GetFunctionCountersResponse {
 
         /**
          * Region
@@ -144,49 +144,64 @@ namespace AwsMock::Dto::Lambda {
         std::string region;
 
         /**
+         * Function name
+         */
+        std::string functionName;
+
+        /**
          * User
          */
         std::string user;
 
         /**
-         * Configuration
+         * Role
          */
-        Configuration configuration;
+        std::string role;
 
         /**
-         * Temporary disk space in MB
+         * Handler
          */
-        EphemeralStorage ephemeralStorage;
+        std::string handler;
 
         /**
-         * Code
+         * Runtime
          */
-        Code code;
+        std::string runtime;
 
         /**
-         * Tags
+         * Size
          */
-        std::map<std::string, std::string> tags;
+        long size;
 
         /**
-         * Timeout
+         * Concurrency
          */
-        int timeout = 3;
+        long concurrency;
 
         /**
-         * State
+         * Invocation
          */
-        std::string state;
+        long invocations;
 
         /**
-         * State reason
+         * Invocation
          */
-        std::string stateReason;
+        long averageRuntime;
 
         /**
-         * State reason code
+         * Last invocation
          */
-        std::string stateReasonCode;
+        system_clock::time_point lastInvocation;
+
+        /**
+         * Creation date
+         */
+        system_clock::time_point created = system_clock::now();
+
+        /**
+         * Last modification date
+         */
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * @brief Creates a JSON string from the object.
@@ -194,13 +209,6 @@ namespace AwsMock::Dto::Lambda {
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Creates a XML string from the object.
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -214,9 +222,9 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const GetFunctionResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const GetFunctionCountersResponse &r);
     };
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H

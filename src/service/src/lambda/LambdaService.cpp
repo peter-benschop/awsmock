@@ -102,8 +102,41 @@ namespace AwsMock::Service {
 
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
 
+
             Dto::Lambda::Configuration configuration = {.functionName = lambda.function, .handler = lambda.handler, .runtime = lambda.runtime, .state = LambdaStateToString(lambda.state), .stateReason = lambda.stateReason, .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
             Dto::Lambda::GetFunctionResponse response = {.region = lambda.region, .configuration = configuration, .tags = lambda.tags};
+
+            log_info << "Lambda function: " + response.ToJson();
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Lambda list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::Lambda::GetFunctionCountersResponse LambdaService::GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_function");
+        log_debug << "Get function request, region: " << request.region << " name: " << request.functionName;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+
+            Dto::Lambda::GetFunctionCountersResponse response;
+            response.region = lambda.region;
+            response.functionName = lambda.function;
+            response.handler = lambda.handler;
+            response.runtime = lambda.runtime;
+            response.user = lambda.user;
+            response.role = lambda.role;
+            response.size = lambda.codeSize;
+            response.concurrency = lambda.concurrency;
+            response.invocations = lambda.invocations;
+            response.averageRuntime = lambda.averageRuntime;
+            response.lastInvocation = lambda.lastInvocation;
+            response.created = lambda.created;
+            response.modified = lambda.modified;
 
             log_info << "Lambda function: " + response.ToJson();
             return response;

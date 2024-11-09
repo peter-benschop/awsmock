@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
 // C++ include
+#include <chrono>
 #include <utility>
 
 // AwsMock includes
@@ -20,6 +21,7 @@
 namespace AwsMock::Service {
 
     namespace http = boost::beast::http;
+    using std::chrono::system_clock;
 
     /**
      * @brief Lambda executor.

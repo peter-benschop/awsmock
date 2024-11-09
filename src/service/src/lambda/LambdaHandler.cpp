@@ -184,6 +184,15 @@ namespace AwsMock::Service {
                 log_trace << "Lambda function counters list,, count: " << lambdaResponse.functionCounters.size();
                 return SendOkResponse(request, lambdaResponse.ToJson());
 
+            } else if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
+
+                Dto::Lambda::GetFunctionCountersRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                Dto::Lambda::GetFunctionCountersResponse lambdaResponse = _lambdaService.GetFunctionCounters(lambdaRequest);
+                log_trace << "Lambda function counters list";
+                return SendOkResponse(request, lambdaResponse.ToJson());
+
             } else {
                 log_error << "Unknown method";
                 return SendBadRequestError(request, "Unknown method");
