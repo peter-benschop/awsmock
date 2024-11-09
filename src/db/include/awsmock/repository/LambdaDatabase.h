@@ -161,12 +161,33 @@ namespace AwsMock::Database {
         void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
 
         /**
+         * @brief Sets the average runtime of a lambda instance
+         *
+         * @param oid lambda ID
+         * @param millis lambda invocation runtime
+         * @throws DatabaseException
+         */
+        void SetAverageRuntime(const std::string &oid, long millis);
+
+        /**
          * @brief Returns a list of lambda functions.
          *
          * @param region AWS region name
          * @return list of lambda functions
          */
         std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
+
+        /**
+         * @brief Returns a list of lambda functions.
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @param maxResult maximal number of results
+         * @param skip number of records to skip
+         * @param sortColumns sorting columns
+         * @return list of lambda function counters
+         */
+        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {});
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.

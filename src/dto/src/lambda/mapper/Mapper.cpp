@@ -96,4 +96,18 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
+    Dto::Lambda::ListFunctionCountersResponse Mapper::map(const Dto::Lambda::ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
+        Dto::Lambda::ListFunctionCountersResponse response;
+        for (auto &lambdaEntity: lambdaEntities) {
+            Dto::Lambda::FunctionCounter counter;
+            counter.functionName = lambdaEntity.function;
+            counter.invocations = lambdaEntity.invocations;
+            counter.runtime = lambdaEntity.runtime;
+            counter.handler = lambdaEntity.handler;
+            counter.averageRuntime = lambdaEntity.averageRuntime;
+            response.functionCounters.emplace_back(counter);
+        }
+        return response;
+    }
+
 }// namespace AwsMock::Dto::Lambda

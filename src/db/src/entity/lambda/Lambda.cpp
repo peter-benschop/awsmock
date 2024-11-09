@@ -68,7 +68,8 @@ namespace AwsMock::Database::Entity::Lambda {
 
         view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
 
-        view_or_value<view, value> lambdaDoc = make_document(
+        bsoncxx::builder::basic::document lambdaDoc;
+        lambdaDoc.append(
                 kvp("region", region),
                 kvp("user", user),
                 kvp("function", function),
@@ -91,12 +92,14 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("stateReason", stateReason),
                 kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
                 kvp("instances", instancesDoc),
+                kvp("invocations", invocations),
+                kvp("averageRuntime", averageRuntime),
                 kvp("eventSources", eventSourcesDoc),
                 kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
                 kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
-        return lambdaDoc;
+        return lambdaDoc.extract();
     }
 
     void Lambda::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
@@ -123,6 +126,8 @@ namespace AwsMock::Database::Entity::Lambda {
         stateReasonCode = LambdaStateReasonCodeFromString(bsoncxx::string::to_string(mResult.value()["stateReasonCode"].get_string().value));
         lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value);
         lastInvocation = bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value);
+        invocations = mResult.value()["invocations"].get_int64().value;
+        averageRuntime = mResult.value()["averageRuntime"].get_int64().value;
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 

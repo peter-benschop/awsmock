@@ -292,6 +292,36 @@ namespace AwsMock::Database {
         }
     }
 
+    void LambdaDatabase::SetAverageRuntime(const std::string &oid, long millis) {
+
+        if (HasDatabase()) {
+
+            auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                Database::Entity::Lambda::Lambda lambda = GetLambdaById(oid);
+                lambda.invocations++;
+                lambda.averageRuntime = static_cast<long>(std::round((lambda.averageRuntime + millis) / lambda.invocations));
+
+                _lambdaCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid(oid))), lambda.ToDocument());
+                session.commit_transaction();
+                log_debug << "Lambda counters updated, oid: " << oid;
+
+            } catch (mongocxx::exception::system_error &e) {
+                session.abort_transaction();
+                log_error << "Get lambda by ARN failed, error: " << e.what();
+            }
+
+        } else {
+
+            //  _memoryDb.SetInstanceStatus(containerId, status);
+        }
+    }
+
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
@@ -329,6 +359,56 @@ namespace AwsMock::Database {
         }
 
         log_trace << "Got lambda list, size:" << lambdas.size();
+        return lambdas;
+    }
+
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<Core::SortColumn> &sortColumns) {
+
+        std::vector<Entity::Lambda::Lambda> lambdas;
+        if (HasDatabase()) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    bsoncxx::builder::basic::document sort = {};
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+                if (skip > 0) {
+                    opts.skip(skip);
+                }
+                if (maxResults > 0) {
+                    opts.limit(maxResults);
+                }
+
+                bsoncxx::builder::basic::document query = {};
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("functionName", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                auto lambdaCursor = _lambdaCollection.find(query.extract(), opts);
+                for (auto lambda: lambdaCursor) {
+                    Entity::Lambda::Lambda result;
+                    result.FromDocument(lambda);
+                    lambdas.push_back(result);
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+
+        log_trace << "Got lambda counter list, size:" << lambdas.size();
         return lambdas;
     }
 

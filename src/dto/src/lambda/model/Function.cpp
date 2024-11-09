@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("LastUpdateStatus", lastUpdateStatusReason);
             rootJson.set("LastUpdateStatusCode", lastUpdateStatusReasonCode);
             rootJson.set("State", state);
-            rootJson.set("StateResaon", stateReason);
+            rootJson.set("StateReason", stateReason);
             rootJson.set("StateReasonCode", stateReasonCode);
             rootJson.set("Timeout", timeout);
             rootJson.set("Environment", environment.ToJsonObject());

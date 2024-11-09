@@ -313,8 +313,11 @@ namespace AwsMock::Core {
     }
 
     void HttpUtils::GetVersionAction(const std::string &uri, std::string &version, std::string &action) {
-        version = GetPathParameters(uri)[0];
-        action = GetPathParameters(uri)[1];
+        std::vector<std::string> parameters = GetPathParameters(uri);
+        if (!parameters.empty()) {
+            version = GetPathParameters(uri)[0];
+            action = GetPathParameters(uri)[1];
+        }
     }
 
     std::string HttpUtils::GetBodyAsString(const http::request<http::dynamic_body> &request) {

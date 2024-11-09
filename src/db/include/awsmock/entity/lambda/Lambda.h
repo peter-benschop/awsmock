@@ -279,6 +279,16 @@ namespace AwsMock::Database::Entity::Lambda {
         std::vector<EventSourceMapping> eventSources;
 
         /**
+         * Number of invocations
+         */
+        long invocations = 0;
+
+        /**
+         * Average runtime in milliseconds
+         */
+        long averageRuntime = 0;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();

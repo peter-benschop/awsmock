@@ -34,6 +34,8 @@
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
+#include <awsmock/dto/lambda/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
@@ -99,6 +101,15 @@ namespace AwsMock::Service {
          * @return CreateFunctionResponse
          */
         Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region);
+
+        /**
+         * @brief List lambda function counters
+         *
+         * @param request list lambda function counters request
+         * @return ListFunctionCountersResponse
+         * @see ListFunctionCountersResponse
+         */
+        Dto::Lambda::ListFunctionCountersResponse ListFunctionCounters(const Dto::Lambda::ListFunctionCountersRequest &request);
 
         /**
          * @brief Invoke SQS function.
