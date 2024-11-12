@@ -194,7 +194,7 @@ namespace AwsMock::Database::Entity::Lambda {
         EphemeralStorage ephemeralStorage;
 
         /**
-         * Size of the code in bytes
+         * Size of the code in bytes, usually the size of the ZIP or JAR file.
          */
         long codeSize;
 
@@ -204,9 +204,23 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string imageId;
 
         /**
+         * @brief Image size, as reported by the docker daemon
+         */
+        long imageSize;
+
+        /**
          * Container ID
          */
         std::string containerId;
+
+        /**
+         * @brief Container size in bytes, as reported by the docker daemon.
+         *
+         * @par
+         * Usually this id the size of the root file system of the container, as reported by the docker daemon. The docker container
+         * reports this size as 'SizeRootFs' in container JSON.
+         */
+        long containerSize;
 
         /**
          * Tags

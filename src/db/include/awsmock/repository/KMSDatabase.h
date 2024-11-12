@@ -16,11 +16,11 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/KMSMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -33,7 +33,7 @@ namespace AwsMock::Database {
     using bsoncxx::builder::stream::document;
 
     /**
-     * KMS MongoDB database.
+     * @brief KMS MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -42,12 +42,12 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit KMSDatabase() : _memoryDb(KMSMemoryDb::instance()), _databaseName(GetDatabaseName()), _keyCollectionName("kms_key") {}
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static KMSDatabase &instance() {
             static KMSDatabase kmsDatabase;
@@ -55,7 +55,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Check existence of key by keyId
+         * @brief Check existence of key by keyId
          *
          * @param keyId key ID
          * @return true if key already exists
@@ -64,7 +64,7 @@ namespace AwsMock::Database {
         bool KeyExists(const std::string &keyId);
 
         /**
-         * Returns a KMS key by primary key
+         * @brief Returns a KMS key by primary key
          *
          * @param oid key primary key
          * @return key entity
@@ -73,7 +73,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyById(const std::string &oid);
 
         /**
-         * Returns a KMS key by primary key
+         * @brief Returns a KMS key by primary key
          *
          * @param oid key primary key
          * @return key entity
@@ -82,7 +82,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyById(bsoncxx::oid oid);
 
         /**
-         * Returns a KMS key by key ID
+         * @brief Returns a KMS key by key ID
          *
          * @param keyId key ID
          * @return key entity
@@ -91,7 +91,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
 
         /**
-         * List all keys
+         * @brief List all keys
          *
          * @param region AWS region
          * @return KeyList
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
         Entity::KMS::KeyList ListKeys(const std::string &region = {});
 
         /**
-         * Returns the total number of keys
+         * @brief Returns the total number of keys
          *
          * @return total number of keys
          * @throws DatabaseException
@@ -107,16 +107,25 @@ namespace AwsMock::Database {
         long CountKeys();
 
         /**
-         * Create a new topic in the KMS topic table
+         * @brief Create a new key in the KMS key table
          *
-         * @param topic topic entity
-         * @return created KMS topic entity
+         * @param key key entity
+         * @return created KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key CreateKey(const Entity::KMS::Key &topic);
+        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key);
 
         /**
-         * Updates a key
+         * @brief Create or update a key in the KMS key table
+         *
+         * @param key key entity
+         * @return created or updated KMS key entity
+         * @throws DatabaseException
+         */
+        Entity::KMS::Key UpsertKey(const Entity::KMS::Key &key);
+
+        /**
+         * @brief Updates a key
          *
          * @param key key entity
          * @return created key entity
@@ -125,7 +134,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
 
         /**
-         * Delete a key
+         * @brief Delete a key
          *
          * @param key key entity
          * @throws DatabaseException
@@ -133,18 +142,13 @@ namespace AwsMock::Database {
         void DeleteKey(const Entity::KMS::Key &key);
 
         /**
-         * Delete a all keys
+         * @brief Delete a all keys
          *
          * @throws DatabaseException
          */
         void DeleteAllKeys();
 
       private:
-
-        /**
-         * Use MongoDB
-         */
-        //bool _useDatabase;
 
         /**
          * Database name

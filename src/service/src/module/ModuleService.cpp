@@ -106,7 +106,7 @@ namespace AwsMock::Service {
                 infrastructure.cognitoUserGroups = _cognitoDatabase.ListGroups();
                 infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
 
-            } else if (module == "dynanmodb") {
+            } else if (module == "dynamodb") {
 
                 Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
                 infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
@@ -128,6 +128,11 @@ namespace AwsMock::Service {
 
                 Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
                 infrastructure.kmsKeys = _kmsDatabase.ListKeys();
+
+            } else if (module == "ssm") {
+
+                Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+                infrastructure.ssmParameters = _ssmDatabase.ListParameters();
             }
         }
         Dto::Module::ExportInfrastructureResponse response{.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
@@ -239,12 +244,28 @@ namespace AwsMock::Service {
         // SecretsManager
         if (!infrastructure.secrets.empty()) {
             Database::SecretsManagerDatabase &_secretsDatabase = Database::SecretsManagerDatabase::instance();
-            if (!infrastructure.secrets.empty()) {
-                for (auto &secret: infrastructure.secrets) {
-                    _secretsDatabase.CreateOrUpdateSecret(secret);
-                }
-                log_info << "Secrets imported, count: " << infrastructure.secrets.size();
+            for (auto &secret: infrastructure.secrets) {
+                _secretsDatabase.CreateOrUpdateSecret(secret);
             }
+            log_info << "Secrets imported, count: " << infrastructure.secrets.size();
+        }
+
+        // KMS
+        if (!infrastructure.kmsKeys.empty()) {
+            Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+            for (auto &key: infrastructure.kmsKeys) {
+                _kmsDatabase.UpsertKey(key);
+            }
+            log_info << "Secrets imported, count: " << infrastructure.secrets.size();
+        }
+
+        // SSM
+        if (!infrastructure.ssmParameters.empty()) {
+            Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+            for (auto &parameter: infrastructure.ssmParameters) {
+                _ssmDatabase.UpsertParameter(parameter);
+            }
+            log_info << "Secrets imported, count: " << infrastructure.secrets.size();
         }
     }
 

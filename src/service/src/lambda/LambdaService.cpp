@@ -147,6 +147,24 @@ namespace AwsMock::Service {
         }
     }
 
+    void LambdaService::ResetFunctionCounters(const Dto::Lambda::ResetFunctionCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "reset_function_counters");
+        log_debug << "Reset function counters request, region: " << request.region << " name: " << request.functionName;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+            lambda.averageRuntime = 0;
+            lambda.invocations = 0;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_info << "Reset lambda function counters";
+
+        } catch (Poco::Exception &ex) {
+            log_error << "Reset function counters request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType) {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
         Poco::ScopedLock lock(_mutex);
@@ -196,8 +214,6 @@ namespace AwsMock::Service {
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
 
         // Update database
-        lambda.lastInvocation = std::chrono::system_clock::now();
-        lambda.state = Database::Entity::Lambda::Active;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
         log_debug << "Lambda entity invoked, name: " << lambda.function;
         return output;
@@ -332,12 +348,18 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
-        // Delete the container, if existing
-        if (dockerService.ContainerExists(request.functionName, request.qualifier)) {
-            Dto::Docker::Container container = dockerService.GetFirstContainerByImageName(request.functionName, request.qualifier);
-            dockerService.StopContainer(container.id);
-            dockerService.DeleteContainer(container);
-            log_debug << "Docker container deleted, function: " + request.functionName;
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+
+        // Delete the containers, if existing
+        for (const auto &instance: lambda.instances) {
+
+            if (dockerService.ContainerExists(instance.id)) {
+
+                Dto::Docker::Container container = dockerService.GetContainerById(instance.id);
+                dockerService.StopContainer(container.id);
+                dockerService.DeleteContainer(container);
+                log_debug << "Docker container deleted, function: " + request.functionName;
+            }
         }
 
         // Delete the image, if existing

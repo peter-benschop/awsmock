@@ -60,10 +60,9 @@ namespace AwsMock::Dto::S3 {
          *
          * Some values will be pulled over from the request.
          *
-         * @param request get bucket request
-         * @param bucket bucket entity
-         * @return GetBucketResponse
-         * @see GetBucketResponse
+         * @param bucketDto bucket DTO
+         * @return Bucket
+         * @see Bucket
          */
         static Database::Entity::S3::Bucket map(const Dto::S3::Bucket &bucketDto);
 
@@ -108,7 +107,7 @@ namespace AwsMock::Dto::S3 {
          * @brief Maps a S3 queue configuration DTO list to a queue configuration entity
          *
          * @param lambdaConfigurations list of lambda configuration
-         * @return LambdaConfiguration
+         * @return list of LambdaConfiguration
          * @see LambdaConfiguration
          */
         static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfiguration);

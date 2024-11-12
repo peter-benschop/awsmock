@@ -8,6 +8,11 @@
 // C++ includes
 #include <string>
 
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+
 namespace AwsMock::Core {
 
     struct SortColumn {
@@ -21,6 +26,13 @@ namespace AwsMock::Core {
          * Direction, MongoDB style, 1: ascending, -1 descending
          */
         int sortDirection;
+
+        /**
+         * @brief Convert to JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
     };
 
 }// namespace AwsMock::Core

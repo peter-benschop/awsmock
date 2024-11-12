@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    [[nodiscard]] std::string CreateFunctionResponse::ToJson() const {
+    std::string CreateFunctionResponse::ToJson() const {
 
         try {
 

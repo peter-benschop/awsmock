@@ -19,7 +19,6 @@
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/transfer/TransferMonitoring.h>
 
 #define TRANSFER_DEFAULT_MONITORING_PERIOD 300
 #define DEFAULT_BASE_DIR "transfer"

@@ -57,6 +57,9 @@ namespace AwsMock::Service {
             DockerService::instance().StartDockerContainer(container.id);
             log_debug << "Lambda docker container started, containerId: " << container.id;
         }
+
+        // Save size in entity
+        lambdaEntity.containerSize = container.sizeRootFs;
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
@@ -76,8 +79,9 @@ namespace AwsMock::Service {
 
         // Get the image struct
         Dto::Docker::Image image = DockerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
-        lambdaEntity.codeSize = image.size;
+        lambdaEntity.codeSize = static_cast<long>(zipFile.size());
         lambdaEntity.imageId = image.id;
+        lambdaEntity.imageSize = image.size;
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
         // Cleanup

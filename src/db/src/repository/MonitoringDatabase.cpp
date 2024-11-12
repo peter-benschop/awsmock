@@ -190,7 +190,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto retention = system_clock::now() - std::chrono::hours(retentionPeriod * 24);
                 auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
-                log_debug << "Counters deleted, name: " << mResult.value().deleted_count();
+                log_debug << "Counters deleted, count: " << mResult.value().deleted_count();
                 session.commit_transaction();
                 return mResult.value().deleted_count();
 

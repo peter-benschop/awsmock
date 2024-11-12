@@ -54,6 +54,9 @@ namespace AwsMock::Service {
                 case Dto::Common::LambdaCommandType::INVOKE_LAMBDA:
                 case Dto::Common::LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING:
                 case Dto::Common::LambdaCommandType::TAG_LAMBDA:
+                case Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS:
+                case Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS:
+                case Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS:
                 case Dto::Common::LambdaCommandType::UNKNOWN:
                     break;
             }
@@ -147,6 +150,7 @@ namespace AwsMock::Service {
 
                     Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
                     log_info << "Lambda function created, name: " << lambdaResponse.functionName;
+
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
@@ -160,8 +164,9 @@ namespace AwsMock::Service {
                 lambdaRequest.FromJson(body);
 
                 _lambdaService.CreateTag(lambdaRequest);
-                return SendNoContentResponse(request);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
+
+                return SendNoContentResponse(request);
 
             } else if (action == "event-source-mappings") {
 
@@ -172,9 +177,9 @@ namespace AwsMock::Service {
                 lambdaRequest.user = user;
 
                 Dto::Lambda::CreateEventSourceMappingsResponse lambdaResponse = _lambdaService.CreateEventSourceMappings(lambdaRequest);
+                log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
-                log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
 
             } else if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
 
@@ -182,6 +187,7 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list,, count: " << lambdaResponse.functionCounters.size();
+
                 return SendOkResponse(request, lambdaResponse.ToJson());
 
             } else if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
@@ -191,7 +197,18 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::GetFunctionCountersResponse lambdaResponse = _lambdaService.GetFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list";
+
                 return SendOkResponse(request, lambdaResponse.ToJson());
+
+            } else if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
+
+                Dto::Lambda::ResetFunctionCountersRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.ResetFunctionCounters(lambdaRequest);
+                log_trace << "Reset function counters list";
+
+                return SendOkResponse(request);
 
             } else {
                 log_error << "Unknown method";
@@ -202,8 +219,6 @@ namespace AwsMock::Service {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
         }
-        log_error << "Unknown method";
-        return SendBadRequestError(request, "Unknown method");
     }
 
     http::response<http::dynamic_body> LambdaHandler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -223,7 +238,7 @@ namespace AwsMock::Service {
                 std::string qualifier = Core::HttpUtils::GetPathParameter(request.target(), 3);
                 log_debug << "Found lambda name, name: " << functionName << " qualifier: " << qualifier;
 
-                Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.functionName = functionName, .qualifier = qualifier};
+                Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.region = region, .functionName = functionName, .qualifier = qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
                 return SendOkResponse(request);
 

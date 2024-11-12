@@ -226,10 +226,7 @@ namespace AwsMock::FtpServer {
 
         void receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
 
-        void writeDataToFile(
-                const std::shared_ptr<std::vector<char>> &data,
-                const std::shared_ptr<IoFile> &file,
-                const std::function<void(void)> &fetch_more = []() { return; });
+        void writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void(void)> &fetch_more = []() { return; });
 
         void endDataReceiving(const std::shared_ptr<IoFile> &file);
 
@@ -244,22 +241,26 @@ namespace AwsMock::FtpServer {
 
         static std::string createQuotedFtpPath(const std::string &unquoted_ftp_path);
 
-        /** @brief Checks if a path is renamable
-        *
-        * Checks if the current user can rename the given path. A path is renameable
-        * if it exists, a user is logged in and the user has sufficient permissions
-        * (file / dir / both) to rename it.
-        *
-        * @param ftp_path: The source path
-        *
-        * @return (COMMAND_OK, "") if the path can be renamed or any other meaningfull error message if not.
-        */
+        /**
+         * @brief Checks if a path is renamable
+         *
+         * Checks if the current user can rename the given path. A path is renameable
+         * if it exists, a user is logged in and the user has sufficient permissions
+         * (file / dir / both) to rename it.
+         *
+         * @param ftp_path: The source path
+         *
+         * @return (COMMAND_OK, "") if the path can be renamed or any other meaningfull error message if not.
+         */
         FtpMessage checkIfPathIsRenamable(const std::string &ftp_path) const;
 
         FtpMessage executeCWD(const std::string &param);
 
         /**
-         * Send file to AWS s3
+         * @brief Send file to AWS S3
+         *
+         * @par
+         * The S3 request will have 2 metadata fields: user-agent=serverName and user-agent-id=FTP-user\@serverName.
          *
          * @param user user name
          * @param fileName filename
@@ -267,7 +268,7 @@ namespace AwsMock::FtpServer {
         void SendCreateObjectRequest(const std::string &user, const std::string &fileName);
 
         /**
-         * Delete file in AWS s3
+         * @brief Delete file in AWS S3
          *
          * @param user user name
          * @param fileName filename
@@ -275,7 +276,7 @@ namespace AwsMock::FtpServer {
         void SendDeleteObjectRequest(const std::string &user, const std::string &fileName);
 
         /**
-         * Extract the S3 key from the file path.
+         * @brief Extract the S3 key from the file path.
          *
          * @param path file system path
          * @return S3 key
@@ -324,7 +325,9 @@ namespace AwsMock::FtpServer {
         std::string _renameFromPath;
         std::string _usernameForLogin;
 
-        // Data Socket (=> passive mode)
+        /**
+         * @brief Data Socket (=> passive mode)
+         */
         bool data_type_binary_;
         asio::ip::tcp::acceptor data_acceptor_;
         std::weak_ptr<asio::ip::tcp::socket> data_socket_weakptr_;

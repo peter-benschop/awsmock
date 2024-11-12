@@ -29,7 +29,7 @@ namespace AwsMock::Dto::SQS {
             rootJson.set("body", body);
             rootJson.set("md5OfBody", md5Sum);
             rootJson.set("eventSource", eventSource);
-            rootJson.set("eventSourceArn", eventSourceArn);
+            rootJson.set("eventSourceARN", eventSourceArn);
 
             if (!messagesAttributes.empty()) {
                 Poco::JSON::Array jsonMessageAttributeArray;
@@ -42,13 +42,11 @@ namespace AwsMock::Dto::SQS {
             }
 
             if (!attributes.empty()) {
-                Poco::JSON::Array jsonAttributeArray;
+                Poco::JSON::Object jsonAttributeObject;
                 for (const auto &attribute: attributes) {
-                    Poco::JSON::Object jsonAttribute;
-                    jsonAttribute.set(attribute.first, attribute.second);
-                    jsonAttributeArray.add(jsonAttribute);
+                    jsonAttributeObject.set(attribute.first, attribute.second);
                 }
-                rootJson.set("attributes", jsonAttributeArray);
+                rootJson.set("attributes", jsonAttributeObject);
             }
             return rootJson;
 

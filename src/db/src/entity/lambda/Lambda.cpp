@@ -80,7 +80,9 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("ephemeralStorage", ephemeralStorageDoc),
                 kvp("codeSize", static_cast<bsoncxx::types::b_int64>(codeSize)),
                 kvp("imageId", imageId),
+                kvp("imageSize", imageSize),
                 kvp("containerId", containerId),
+                kvp("containerSize", containerSize),
                 kvp("tags", tagsDoc),
                 kvp("arn", arn),
                 kvp("timeout", timeout),
@@ -115,7 +117,9 @@ namespace AwsMock::Database::Entity::Lambda {
         ephemeralStorage.FromDocument(mResult.value()["ephemeralStorage"].get_document().value);
         codeSize = mResult.value()["codeSize"].get_int64().value;
         imageId = bsoncxx::string::to_string(mResult.value()["imageId"].get_string().value);
+        imageSize = mResult.value()["imageSize"].get_int64().value;
         containerId = bsoncxx::string::to_string(mResult.value()["containerId"].get_string().value);
+        containerSize = mResult.value()["containerSize"].get_int64().value;
         arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
         codeSha256 = bsoncxx::string::to_string(mResult.value()["codeSha256"].get_string().value);
         timeout = mResult.value()["timeout"].get_int32().value;

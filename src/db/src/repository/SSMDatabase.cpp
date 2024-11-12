@@ -218,6 +218,18 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::SSM::Parameter SSMDatabase::UpsertParameter(Entity::SSM::Parameter &parameter) {
+
+        if (ParameterExists(parameter.parameterName)) {
+
+            return UpdateParameter(parameter);
+
+        } else {
+
+            return CreateParameter(parameter);
+        }
+    }
+
     void SSMDatabase::DeleteParameter(const Entity::SSM::Parameter &parameter) {
 
         if (HasDatabase()) {

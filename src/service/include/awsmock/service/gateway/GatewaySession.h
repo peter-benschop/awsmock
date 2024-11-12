@@ -145,12 +145,12 @@ namespace AwsMock::Service {
         /**
          * TCP stream
          */
-        boost::beast::tcp_stream stream_;
+        boost::beast::tcp_stream _stream;
 
         /**
          * Read buffer
          */
-        boost::beast::flat_buffer buffer_;
+        boost::beast::flat_buffer _buffer;
 
         /**
          * Queue limit

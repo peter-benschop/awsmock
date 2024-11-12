@@ -37,6 +37,9 @@ namespace AwsMock::Database::Entity::Lambda {
     struct Code {
 
         /**
+         * @brief Name of the ZIP file.
+         *
+         * @par
          * Filename of the code. This is the filename of the base64 encoded ZIP file, which is saved in the
          * lambda directory, usually /home/awsmock/data/lambda. This file is loaded by the server during
          * startup. All lambdas, which are saved in the database and found in the lambda directory get
@@ -48,17 +51,17 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string zipFile;
 
         /**
-         * S3 bucket
+         * @brief S3 bucket for the lambda code
          */
         std::string s3Bucket;
 
         /**
-         * S3 key
+         * @brief S3 key for the lambda code
          */
         std::string s3Key;
 
         /**
-         * S3 version
+         * @brief S3 version of the lambda code
          */
         std::string s3ObjectVersion;
 

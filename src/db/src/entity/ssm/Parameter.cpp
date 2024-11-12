@@ -57,6 +57,24 @@ namespace AwsMock::Database::Entity::SSM {
         }
     }
 
+
+    Poco::JSON::Object Parameter::ToJsonObject() const {
+
+        Poco::JSON::Object jsonObject;
+        jsonObject.set("region", region);
+        jsonObject.set("arn", arn);
+        jsonObject.set("name", parameterName);
+        jsonObject.set("value", parameterValue);
+        jsonObject.set("type", type);
+        jsonObject.set("description", description);
+        jsonObject.set("tier", tier);
+        jsonObject.set("version", version);
+        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
+        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+
+        return jsonObject;
+    }
+
     std::string Parameter::ToString() const {
         std::stringstream ss;
         ss << (*this);
