@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.15.26](https://github.com/jensvogt/awsmock/compare/v0.15.25...v0.15.26) (2024-11-14)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** Add lambda details page ([af55529](https://github.com/jensvogt/awsmock/commit/af55529ae1567b3beaf7597f330eed43a820aed7))
+* **653-move-manager-apis-to-gateway:** Add lambda details page ([493d897](https://github.com/jensvogt/awsmock/commit/493d897033d02189b33e928613be4a3030c6e49d))
+* **653-move-manager-apis-to-gateway:** Add lambda list page ([8f75f38](https://github.com/jensvogt/awsmock/commit/8f75f38493b4b1743b737eaf8859d193f0dcaa27))
+* **653-move-manager-apis-to-gateway:** Change default password ([42884cf](https://github.com/jensvogt/awsmock/commit/42884cfbfcf81ece46c2c1ba8406efb94617fdac))
+* **653-move-manager-apis-to-gateway:** Change default password ([5c04c5e](https://github.com/jensvogt/awsmock/commit/5c04c5e1407e1f80dd8c71ddbed12a1796c525dc))
+* **653-move-manager-apis-to-gateway:** Cognito modules in UI ([bae5866](https://github.com/jensvogt/awsmock/commit/bae586694494c32bdddb3972b9c6545687f803ac))
+* **653-move-manager-apis-to-gateway:** Cognito user module in UI ([eb239ac](https://github.com/jensvogt/awsmock/commit/eb239ac1e947f141b436669d57779d5325d20740))
+* **653-move-manager-apis-to-gateway:** Cognito user module in UI ([4f455a0](https://github.com/jensvogt/awsmock/commit/4f455a03da121ece8a013fb43e09dd6746f7862c))
+
 ## [0.15.25](https://github.com/jensvogt/awsmock/compare/v0.15.24...v0.15.25) (2024-11-08)
 
 
