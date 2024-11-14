@@ -2,11 +2,11 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/ListUserPoolCountersRequest.h>
+#include <awsmock/dto/cognito/ListUserCountersRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    void ListUserPoolCountersRequest::FromJson(const std::string &payload) {
+    void ListUserCountersRequest::FromJson(const std::string &payload) {
 
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(payload);
@@ -15,6 +15,7 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             Core::JsonUtils::GetJsonValueString("region", rootObject, region);
+            Core::JsonUtils::GetJsonValueString("userPoolId", rootObject, userPoolId);
             Core::JsonUtils::GetJsonValueString("prefix", rootObject, prefix);
             Core::JsonUtils::GetJsonValueInt("pageSize", rootObject, pageSize);
             Core::JsonUtils::GetJsonValueInt("pageIndex", rootObject, pageIndex);
@@ -34,12 +35,13 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToJson() const {
+    std::string ListUserCountersRequest::ToJson() const {
 
         try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
+            rootJson.set("userPoolId", userPoolId);
             rootJson.set("prefix", prefix);
             rootJson.set("pageSize", pageSize);
             rootJson.set("pageIndex", pageIndex);
@@ -60,14 +62,14 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToString() const {
+    std::string ListUserCountersRequest::ToString() const {
         std::stringstream ss;
         ss << (*this);
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListUserPoolCountersRequest &r) {
-        os << "ListUserPoolRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListUserCountersRequest &r) {
+        os << "ListUserCountersRequest=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Cognito

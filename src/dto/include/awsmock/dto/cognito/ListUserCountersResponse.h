@@ -2,63 +2,61 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_LIST_USERPOOL_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_COGNITO_LIST_USER_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_COGNITO_LIST_USER_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/UserPool.h>
+#include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief List user pool counters response
+     * @brief List users response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolCountersResponse : public Dto::Common::BaseRequest {
+    struct ListUserCountersResponse : public Dto::Common::BaseRequest {
 
         /**
-         * User pool entities
+         * User entities
          */
-        std::vector<UserPool> userPools;
+        Database::Entity::Cognito::UserList users;
 
         /**
-         * Total number of user pools
+         * User entities
          */
         long total;
 
         /**
-         * Convert to a JSON string.
+         * @brief Convert to a JSON string.
          *
          * @return user pools json string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListUserPoolCountersResponse &i);
+        friend std::ostream &operator<<(std::ostream &os, const ListUserCountersResponse &i);
     };
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_LIST_USERPOOL_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_COGNITO_LIST_USER_COUNTERS_RESPONSE_H

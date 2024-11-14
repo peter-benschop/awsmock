@@ -117,13 +117,6 @@ namespace AwsMock::Dto::Common {
          *
          * @param request HTTP server request
          */
-        void FromRequest(Poco::Net::HTTPServerRequest &request);
-
-        /**
-         * Gets the value from the user-agent string
-         *
-         * @param request HTTP server request
-         */
         void FromRequest(const http::request<http::dynamic_body> &request);
 
         /**

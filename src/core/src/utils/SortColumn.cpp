@@ -3,6 +3,12 @@
 
 namespace AwsMock::Core {
 
+    void SortColumn::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+
+        Core::JsonUtils::GetJsonValueString("column", jsonObject, column);
+        Core::JsonUtils::GetJsonValueInt("sortDirection", jsonObject, sortDirection);
+    }
+
     Poco::JSON::Object SortColumn::ToJsonObject() const {
 
         try {

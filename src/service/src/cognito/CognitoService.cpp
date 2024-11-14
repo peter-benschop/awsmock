@@ -91,6 +91,26 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::ListUserPoolCountersResponse CognitoService::ListUserPoolCounters(const Dto::Cognito::ListUserPoolCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
+        log_debug << "List user pools counters request, pageSize: " << request.pageSize;
+
+        try {
+
+            long total = _database.CountUserPools(request.region);
+            std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
+            log_trace << "Got user pool list counters, count: " << userPools.size();
+            Dto::Cognito::ListUserPoolCountersResponse response;
+            response.userPools = Dto::Cognito::Mapper::map(userPools);
+            response.total = total;
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "User pool counters list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::Cognito::DescribeUserPoolResponse CognitoService::DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request) {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool");
         log_debug << "Describe user pool request, userPoolId: " << request.userPoolId;
@@ -532,6 +552,26 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "User list request failed, message: " << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::Cognito::ListUserCountersResponse CognitoService::ListUserCounters(const Dto::Cognito::ListUserCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
+        log_debug << "List user counters request, pageSize: " << request.pageSize;
+
+        try {
+
+            long total = _database.CountUserPools(request.region);
+            std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId);
+            log_trace << "Got user list counters, count: " << users.size();
+            Dto::Cognito::ListUserCountersResponse response;
+            response.users = users;
+            response.total = total;
+            return response;
+
+        } catch (Poco::Exception &ex) {
+            log_error << "User counters list request failed, message: " << ex.message();
             throw Core::ServiceException(ex.message());
         }
     }

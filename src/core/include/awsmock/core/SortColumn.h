@@ -28,6 +28,13 @@ namespace AwsMock::Core {
         int sortDirection;
 
         /**
+         * @brief Convert from JSON object
+         *
+         * @param JSON object
+         */
+        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
          * @brief Convert to JSON object
          *
          * @return JSON object

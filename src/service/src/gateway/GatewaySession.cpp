@@ -259,7 +259,6 @@ namespace AwsMock::Service {
                 authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
                 authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
                 authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
-                //authKeys.isoDateTime = request.has("x-amz-date") ? request.get("x-amz-date") : GetISODateString();
                 return authKeys;
 
             } catch (Poco::Exception &e) {
