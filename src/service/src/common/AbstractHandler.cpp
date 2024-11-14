@@ -43,8 +43,10 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
-        boost::beast::ostream(response.body()) << body << std::endl;
-        response.prepare_payload();
+        if (!body.empty()) {
+            boost::beast::ostream(response.body()).write(body.c_str(), body.size());
+            response.prepare_payload();
+        }
 
         // Copy headers
         if (!headers.empty()) {
@@ -131,8 +133,10 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
-        boost::beast::ostream(response.body()) << body;
-        response.prepare_payload();
+        if (!body.empty()) {
+            boost::beast::ostream(response.body()).write(body.c_str(), body.size());
+            response.prepare_payload();
+        }
 
         // Copy headers
         if (!headers.empty()) {
@@ -160,8 +164,10 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Body
-        boost::beast::ostream(response.body()) << body;
-        response.prepare_payload();
+        if (!body.empty()) {
+            boost::beast::ostream(response.body()).write(body.c_str(), body.size());
+            response.prepare_payload();
+        }
 
         // Copy headers
         if (!headers.empty()) {
@@ -194,7 +200,7 @@ namespace AwsMock::Service {
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
             response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
-            // Body
+            // Body is part of file from min -> max
             char *buffer = new char[size];
             std::ifstream file(fileName.c_str(), std::ios::binary);
             file.seekg(min, std::ios::beg);

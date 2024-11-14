@@ -91,6 +91,23 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDto;
     }
 
+    std::vector<Dto::Cognito::UserPool> Mapper::map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities) {
+        std::vector<Dto::Cognito::UserPool> userPoolDtos;
+        for (const auto &userPoolEntity: userPoolEntities) {
+            UserPool userPoolDto = {
+                    .id = userPoolEntity.userPoolId,
+                    .region = userPoolEntity.region,
+                    .name = userPoolEntity.name,
+                    .userPoolId = userPoolEntity.userPoolId,
+                    .arn = userPoolEntity.arn,
+                    .domain = userPoolEntity.domain.domain,
+                    .created = userPoolEntity.created,
+                    .modified = userPoolEntity.modified};
+            userPoolDtos.emplace_back(userPoolDto);
+        }
+        return userPoolDtos;
+    }
+
     Dto::Cognito::User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
         User userDto = {
                 .region = userEntity.region,
@@ -106,6 +123,26 @@ namespace AwsMock::Dto::Cognito {
         }
 
         return userDto;
+    }
+
+    std::vector<Dto::Cognito::User> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
+        std::vector<Dto::Cognito::User> userDtos;
+        for (const auto &userEntity: userEntities) {
+            User userDto = {
+                    .region = userEntity.region,
+                    .userPoolId = userEntity.userPoolId,
+                    .userName = userEntity.userName,
+                    .enabled = userEntity.enabled,
+                    .created = userEntity.created,
+                    .modified = userEntity.modified,
+            };
+
+            for (const auto &group: userEntity.groups) {
+                userDto.groups.emplace_back(Mapper::map(group));
+            }
+            userDtos.emplace_back(userDto);
+        }
+        return userDtos;
     }
 
     Dto::Cognito::Group Mapper::map(const Database::Entity::Cognito::Group &groupEntity) {

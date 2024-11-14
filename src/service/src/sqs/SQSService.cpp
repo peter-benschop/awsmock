@@ -760,7 +760,7 @@ namespace AwsMock::Service {
 
         Dto::SQS::EventNotification eventNotification;
         eventNotification.records.emplace_back(record);
-        log_debug << "Invocation request function name: " << lambda.function;
+        log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
         _lambdaService.InvokeLambdaFunction(lambda.function, eventNotification.ToJson(), region, user);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;

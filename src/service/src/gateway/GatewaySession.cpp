@@ -22,7 +22,7 @@ namespace AwsMock::Service {
             {"monitoring", std::make_shared<MonitoringHandler>()},
             {"module", std::make_shared<ModuleHandler>()}};
 
-    GatewaySession::GatewaySession(ip::tcp::socket &&socket) : stream_(std::move(socket)) {
+    GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
         Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.getInt("awsmock.service.gateway.http.max.queue", DEFAULT_MAX_QUEUE_SIZE);
         _bodyLimit = configuration.getInt("awsmock.service.gateway.http.max.body", DEFAULT_MAX_BODY_SIZE);
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
     };
 
     void GatewaySession::Run() {
-        boost::asio::dispatch(stream_.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
+        boost::asio::dispatch(_stream.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
     }
 
     void GatewaySession::DoRead() {
@@ -44,10 +44,10 @@ namespace AwsMock::Service {
         _parser->body_limit(boost::none);
 
         // Set the timeout.
-        stream_.expires_after(std::chrono::seconds(_timeout));
+        _stream.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
-        http::async_read(stream_, buffer_, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
+        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
     void GatewaySession::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
@@ -147,31 +147,26 @@ namespace AwsMock::Service {
 
                 switch (request.method()) {
                     case http::verb::get: {
-                        log_debug << "Handle GET request";
                         Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
                         return handler->HandleGetRequest(request, region, "none");
                     }
                     case http::verb::put: {
-                        log_debug << "Handle PUT request";
                         Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
                         return handler->HandlePutRequest(request, region, "none");
                     }
                     case http::verb::post: {
-                        log_debug << "Handle POST request";
                         Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
                         return handler->HandlePostRequest(request, region, "none");
                     }
                     case http::verb::delete_: {
-                        log_debug << "Handle DELETE request";
                         Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
                         return handler->HandleDeleteRequest(request, region, "none");
                     }
                     case http::verb::head: {
-                        log_debug << "Handle HEAD request";
                         Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
                         Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
                         return handler->HandleHeadRequest(request, region, "none");
@@ -187,7 +182,7 @@ namespace AwsMock::Service {
     void GatewaySession::DoWrite() {
         if (!_response_queue.empty()) {
             bool keep_alive = _response_queue.front().keep_alive();
-            boost::beast::async_write(stream_, std::move(_response_queue.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
+            boost::beast::async_write(_stream, std::move(_response_queue.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
         }
     }
 
@@ -203,8 +198,6 @@ namespace AwsMock::Service {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
             log_debug << "Connection shutdown";
             return DoShutdown();
-        } else {
-            //DoClose();
         }
 
         // Resume the read if it has been paused
@@ -221,7 +214,7 @@ namespace AwsMock::Service {
 
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = stream_.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
         if (ec) {
             //log_error << "Could not shutdown socket, message: " << ec.message();
         }
@@ -233,7 +226,7 @@ namespace AwsMock::Service {
 
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = stream_.socket().close(ec);
+        ec = _stream.socket().close(ec);
         if (ec) {
             //log_error << "Could not shutdown socket, message: " << ec.message();
         }
@@ -266,7 +259,6 @@ namespace AwsMock::Service {
                 authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
                 authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
                 authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
-                //authKeys.isoDateTime = request.has("x-amz-date") ? request.get("x-amz-date") : GetISODateString();
                 return authKeys;
 
             } catch (Poco::Exception &e) {

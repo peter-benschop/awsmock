@@ -9,33 +9,27 @@
 #include <string>
 #include <utility>
 
-// Poco includes
-#include <Poco/JSON/Array.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/core/exception/ServiceException.h"
-#include "awsmock/entity/cognito/Group.h"
-#include "awsmock/entity/cognito/User.h"
-#include "awsmock/entity/cognito/UserPool.h"
-#include "awsmock/entity/dynamodb/Item.h"
-#include "awsmock/entity/dynamodb/Table.h"
-#include "awsmock/entity/kms/Key.h"
-#include "awsmock/entity/lambda/Lambda.h"
-#include "awsmock/entity/s3/Bucket.h"
-#include "awsmock/entity/s3/Object.h"
-#include "awsmock/entity/secretsmanager/Secret.h"
-#include "awsmock/entity/sns/Message.h"
-#include "awsmock/entity/sns/Topic.h"
-#include "awsmock/entity/sqs/Message.h"
-#include "awsmock/entity/sqs/Queue.h"
-#include "awsmock/entity/transfer/Transfer.h"
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/entity/cognito/Group.h>
+#include <awsmock/entity/cognito/User.h>
+#include <awsmock/entity/cognito/UserPool.h>
+#include <awsmock/entity/dynamodb/Item.h>
+#include <awsmock/entity/dynamodb/Table.h>
+#include <awsmock/entity/kms/Key.h>
+#include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/entity/s3/Bucket.h>
+#include <awsmock/entity/s3/Object.h>
+#include <awsmock/entity/secretsmanager/Secret.h>
+#include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/Topic.h>
+#include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/Queue.h>
+#include <awsmock/entity/ssm/Parameter.h>
+#include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -47,52 +41,52 @@ namespace AwsMock::Dto::Module {
     struct Infrastructure {
 
         /**
-         * S3 buckets
+         * @brief S3 buckets
          */
         Database::Entity::S3::BucketList s3Buckets;
 
         /**
-         * S3 objects
+         * @brief S3 objects
          */
         Database::Entity::S3::ObjectList s3Objects;
 
         /**
-         * SQS queues
+         * @brief SQS queues
          */
         Database::Entity::SQS::QueueList sqsQueues;
 
         /**
-         * SQS resources
+         * @brief SQS resources
          */
         Database::Entity::SQS::MessageList sqsMessages;
 
         /**
-         * SNS topics
+         * @brief SNS topics
          */
         Database::Entity::SNS::TopicList snsTopics;
 
         /**
-         * SQS resources
+         * @brief SQS resources
          */
         Database::Entity::SNS::MessageList snsMessages;
 
         /**
-         * Lambda functions
+         * @brief Lambda functions
          */
         Database::Entity::Lambda::LambdaList lambdas;
 
         /**
-         * Transfer servers
+         * @brief Transfer servers
          */
         Database::Entity::Transfer::TransferList transferServers;
 
         /**
-         * Cognito user pools
+         * @brief Cognito user pools
          */
         Database::Entity::Cognito::UserPoolList cognitoUserPools;
 
         /**
-         * Cognito users
+         * @brief Cognito users
          */
         Database::Entity::Cognito::UserList cognitoUsers;
 
@@ -107,19 +101,24 @@ namespace AwsMock::Dto::Module {
         Database::Entity::DynamoDb::TableList dynamoDbTables;
 
         /**
-         * DynamoDb items
+         * @brief DynamoDb items
          */
         Database::Entity::DynamoDb::ItemList dynamoDbItems;
 
         /**
-         * Secrets manager secrets
+         * @brief Secrets manager secrets
          */
         Database::Entity::SecretsManager::SecretList secrets;
 
         /**
-         * Secrets manager secrets
+         * @brief Key management keys
          */
         Database::Entity::KMS::KeyList kmsKeys;
+
+        /**
+         * @brief System manager parameters
+         */
+        Database::Entity::SSM::ParameterList ssmParameters;
 
         /**
          * @brief JSON representation

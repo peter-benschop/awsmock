@@ -178,6 +178,24 @@ namespace AwsMock::Service {
         log_debug << "Image deleted, id: " << id;
     }
 
+    bool DockerService::ContainerExists(const std::string &id) {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+        if (domainSocketResponse.statusCode == http::status::ok) {
+
+            Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+            log_debug << "Docker container found, id: " << id;
+            return !response.containerList.empty();
+
+        } else {
+
+            log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+            return false;
+        }
+    }
+
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
@@ -200,7 +218,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&size=true&filters=" + filters);
         if (domainSocketResponse.statusCode != http::status::ok) {
             log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
             return {};
@@ -378,6 +396,10 @@ namespace AwsMock::Service {
         log_debug << "Docker container started, id: " << id;
     }
 
+    void DockerService::RestartContainer(const Dto::Docker::Container &container) {
+        RestartDockerContainer(container.id);
+    }
+
     void DockerService::RestartDockerContainer(const std::string &id) {
 
         Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/restart");
@@ -386,10 +408,6 @@ namespace AwsMock::Service {
             return;
         }
         log_debug << "Docker container restarted, id: " << id;
-    }
-
-    void DockerService::RestartContainer(const Dto::Docker::Container &container) {
-        RestartDockerContainer(container.id);
     }
 
     void DockerService::StopContainer(const Dto::Docker::Container &container) {

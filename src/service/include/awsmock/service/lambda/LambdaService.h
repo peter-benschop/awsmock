@@ -40,6 +40,7 @@
 #include <awsmock/dto/lambda/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <awsmock/dto/lambda/ResetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
@@ -164,6 +165,15 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::Lambda::GetFunctionCountersResponse
          */
         Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request);
+
+        /**
+         * @brief Reset function counters
+         *
+         * @param request reset function counters request
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::ResetFunctionCountersRequest
+         */
+        void ResetFunctionCounters(const Dto::Lambda::ResetFunctionCountersRequest &request);
 
         /**
          * @brief Returns the account settings

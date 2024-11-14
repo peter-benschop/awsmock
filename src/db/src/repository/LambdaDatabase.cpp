@@ -340,7 +340,7 @@ namespace AwsMock::Database {
 
             } catch (mongocxx::exception::system_error &e) {
                 session.abort_transaction();
-                log_error << "Get lambda by ARN failed, error: " << e.what();
+                log_error << "Set average function runtime failed, error: " << e.what();
             }
 
         } else {

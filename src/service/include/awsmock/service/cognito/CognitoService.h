@@ -49,8 +49,12 @@
 #include <awsmock/dto/cognito/InitiateAuthResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
+#include <awsmock/dto/cognito/ListUserCountersRequest.h>
+#include <awsmock/dto/cognito/ListUserCountersResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolClientsRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolClientsResponse.h>
+#include <awsmock/dto/cognito/ListUserPoolCountersRequest.h>
+#include <awsmock/dto/cognito/ListUserPoolCountersResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
@@ -112,6 +116,15 @@ namespace AwsMock::Service {
          * @return ListUserPoolResponse DTO
          */
         Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request);
+
+        /**
+         * @brief List cognito user pool counters
+         *
+         * @param request list user pool counters request
+         * @return ListUserPoolCountersResponse DTO
+         * @see ListUserPoolCountersResponse
+         */
+        Dto::Cognito::ListUserPoolCountersResponse ListUserPoolCounters(const Dto::Cognito::ListUserPoolCountersRequest &request);
 
         /**
          * @brief Describes a user pool
@@ -200,6 +213,15 @@ namespace AwsMock::Service {
          * @return ListUsersResponse DTO
          */
         Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request);
+
+        /**
+         * @brief List cognito user counters
+         *
+         * @param request list user counters request
+         * @return ListUserCountersResponse DTO
+         * @see ListUserCountersResponse
+         */
+        Dto::Cognito::ListUserCountersResponse ListUserCounters(const Dto::Cognito::ListUserCountersRequest &request);
 
         /**
          * @brief Create a new cognito user pool

@@ -125,6 +125,15 @@ namespace AwsMock::Database {
         Entity::SSM::Parameter UpdateParameter(Entity::SSM::Parameter &parameter);
 
         /**
+         * @brief Inserts or updates a parameter
+         *
+         * @param parameter parameter entity
+         * @return inserted or updated parameter entity
+         * @throws DatabaseException
+         */
+        Entity::SSM::Parameter UpsertParameter(Entity::SSM::Parameter &parameter);
+
+        /**
          * @brief Deletes a parameter
          *
          * @param parameter parameter entity

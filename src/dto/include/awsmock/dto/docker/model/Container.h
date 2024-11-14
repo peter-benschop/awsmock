@@ -53,57 +53,67 @@ namespace AwsMock::Dto::Docker {
         std::string command;
 
         /**
-         * State
+         * The state of this container (e.g. Exited)
          */
         std::string state;
 
         /**
-         * Status
+         * Additional human-readable status of this container (e.g. Exit 0)
          */
         std::string status;
 
         /**
-         * Ports
+         * The ports exposed by this container
          */
         std::vector<Port> ports;
 
         /**
-         * Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
+         * The size of files that have been created or changed by this container
+         */
+        long sizeRw = 0;
+
+        /**
+         * The total size of all the files in this container
+         */
+        long sizeRootFs = 0;
+
+        /**
+         * @brief Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
          *
          * @return lambda public port, or -1 if port does not exist.
          */
         int GetLambdaPort();
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @param jsonObject JSON object
          */
         void FromJson(Poco::JSON::Object::Ptr jsonObject);
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

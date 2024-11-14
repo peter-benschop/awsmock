@@ -6,6 +6,7 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> CognitoHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Cognito POST request, URI: " << request.target() << " region: " << region << " user: " << user;
+
         Dto::Common::CognitoClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
@@ -84,6 +85,21 @@ namespace AwsMock::Service {
 
                 Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
                 log_info << "User pools listed, count: " << serviceResponse.userPools.size();
+
+                return SendOkResponse(request, serviceResponse.ToJson());
+
+            } else if (action == "ListUserPoolCounters") {
+
+                Dto::Cognito::ListUserPoolCountersRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+
+                log_debug << "Got list user pool counters request, json: " << cognitoRequest.ToString();
+
+                Dto::Cognito::ListUserPoolCountersResponse serviceResponse = _cognitoService.ListUserPoolCounters(cognitoRequest);
+                log_info << "User pools counters listed, count: " << serviceResponse.userPools.size();
 
                 return SendOkResponse(request, serviceResponse.ToJson());
 
@@ -202,6 +218,20 @@ namespace AwsMock::Service {
 
                 Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
                 log_info << "Users listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
+
+                return SendOkResponse(request, cognitoResponse.ToJson());
+
+            } else if (action == "ListUserCounters") {
+
+                Dto::Cognito::ListUserCountersRequest cognitoRequest{};
+                cognitoRequest.FromJson(clientCommand.payload);
+                cognitoRequest.region = clientCommand.region;
+                cognitoRequest.requestId = clientCommand.requestId;
+                cognitoRequest.user = clientCommand.user;
+                log_debug << "Got list user counters request: " << cognitoRequest.ToString();
+
+                Dto::Cognito::ListUserCountersResponse cognitoResponse = _cognitoService.ListUserCounters(cognitoRequest);
+                log_info << "User counters listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
 
                 return SendOkResponse(request, cognitoResponse.ToJson());
 
@@ -449,6 +479,10 @@ namespace AwsMock::Service {
     }
 
     std::string CognitoHandler::GetActionFromHeader(const http::request<http::dynamic_body> &request) {
+
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-action")) {
+            return Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+        }
 
         if (!Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
             log_error << "Could not extract action";

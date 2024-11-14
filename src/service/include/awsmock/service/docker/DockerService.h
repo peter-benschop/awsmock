@@ -151,6 +151,14 @@ namespace AwsMock::Service {
         bool ContainerExists(const std::string &name, const std::string &tag);
 
         /**
+         * @brief Checks whether a container exists by ID.
+         *
+         * @param id container ID
+         * @return true if container exists, otherwise false
+         */
+        bool ContainerExists(const std::string &id);
+
+        /**
          * @brief List all docker images, with the given name and different tags.
          *
          * @param name name of the image

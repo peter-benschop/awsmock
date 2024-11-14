@@ -2,7 +2,7 @@
 // Created by vogje01 on 22/09/2023.
 //
 
-#include "awsmock/dto/docker/model/Container.h"
+#include <awsmock/dto/docker/model/Container.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -40,6 +40,8 @@ namespace AwsMock::Dto::Docker {
             Core::JsonUtils::GetJsonValueString("Command", object, command);
             Core::JsonUtils::GetJsonValueString("State", object, state);
             Core::JsonUtils::GetJsonValueString("Status", object, status);
+            Core::JsonUtils::GetJsonValueLong("SizeRw", object, sizeRw);
+            Core::JsonUtils::GetJsonValueLong("SizeRootFs", object, sizeRootFs);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

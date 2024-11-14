@@ -18,7 +18,9 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SSM {
@@ -111,6 +113,13 @@ namespace AwsMock::Database::Entity::SSM {
          * @param mResult MongoDB document view.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+
+        /**
+         * @brief JSON representation
+         *
+         * @return parameter as JSON string
+         */
+        Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Converts the DTO to a string representation.

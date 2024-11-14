@@ -8,8 +8,16 @@ namespace AwsMock::Dto::Common {
 
     void CognitoClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
-        Dto::Common::UserAgent userAgent;
-        userAgent.FromRequest(request);
+        // From AwsMock UI
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "cognito-idp") {
+
+            this->command = CognitoCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
+
+        } else {
+
+            Dto::Common::UserAgent userAgent;
+            userAgent.FromRequest(request);
+        }
 
         // Basic values
         this->region = awsRegion;

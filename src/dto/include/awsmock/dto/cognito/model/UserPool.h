@@ -53,6 +53,11 @@ namespace AwsMock::Dto::Cognito {
         std::string domain;
 
         /**
+         * Number of users
+         */
+        long userCount;
+
+        /**
          * Created
          */
         system_clock::time_point created;

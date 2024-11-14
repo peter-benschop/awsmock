@@ -209,6 +209,18 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::KMS::Key KMSDatabase::UpsertKey(const Entity::KMS::Key &key) {
+
+        if (KeyExists(key.keyId)) {
+
+            return UpdateKey(key);
+
+        } else {
+
+            return CreateKey(key);
+        }
+    }
+
     void KMSDatabase::DeleteKey(const Entity::KMS::Key &key) {
 
         if (HasDatabase()) {

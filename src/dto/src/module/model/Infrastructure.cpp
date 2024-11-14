@@ -46,7 +46,7 @@ namespace AwsMock::Dto::Module {
                 for (const auto &message: sqsMessages) {
                     jsonSqsMessageArray.add(message.ToJsonObject());
                 }
-                rootJson.set("sqs-resources", jsonSqsMessageArray);
+                rootJson.set("sqs-messages", jsonSqsMessageArray);
             }
 
             // SNS topic array
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Module {
                 for (const auto &message: snsMessages) {
                     jsonSnsMessageArray.add(message.ToJsonObject());
                 }
-                rootJson.set("sns-resources", jsonSnsMessageArray);
+                rootJson.set("sns-messages", jsonSnsMessageArray);
             }
 
             // Lambda functions
@@ -128,6 +128,24 @@ namespace AwsMock::Dto::Module {
                     jsonSecretsArray.add(secret.ToJsonObject());
                 }
                 rootJson.set("secretsmanager-secrets", jsonSecretsArray);
+            }
+
+            // KMS keys secrets
+            if (!kmsKeys.empty()) {
+                Poco::JSON::Array jsonSecretsArray;
+                for (const auto &key: kmsKeys) {
+                    jsonSecretsArray.add(key.ToJsonObject());
+                }
+                rootJson.set("kms-keys", jsonSecretsArray);
+            }
+
+            // SSM parameters
+            if (!ssmParameters.empty()) {
+                Poco::JSON::Array jsonSecretsArray;
+                for (const auto &parameter: ssmParameters) {
+                    jsonSecretsArray.add(parameter.ToJsonObject());
+                }
+                rootJson.set("ssm-parameters", jsonSecretsArray);
             }
 
             return rootJson;
