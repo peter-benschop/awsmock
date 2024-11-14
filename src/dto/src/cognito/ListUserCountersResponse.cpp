@@ -20,6 +20,8 @@ namespace AwsMock::Dto::Cognito {
                     userJson.set("userPoolId", user.userPoolId);
                     userJson.set("userName", user.userName);
                     userJson.set("region", user.region);
+                    userJson.set("status", UserStatusToString(user.userStatus));
+                    userJson.set("enabled", user.enabled);
                     userJson.set("created", Core::DateTimeUtils::ToISO8601(user.created));
                     userJson.set("modified", Core::DateTimeUtils::ToISO8601(user.modified));
                     userArray.add(userJson);
