@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.15.25](https://github.com/jensvogt/awsmock/compare/v0.15.24...v0.15.25) (2024-11-08)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** Accelerate SQS message processing ([e9e58e8](https://github.com/jensvogt/awsmock/commit/e9e58e8d1505fe1c91e046ccd57366e9862c3468))
+* **653-move-manager-apis-to-gateway:** Accelerate SQS message processing ([c3fd1dd](https://github.com/jensvogt/awsmock/commit/c3fd1dd1e012891eca57b38598ce01b3e767cc28))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([5eaa21f](https://github.com/jensvogt/awsmock/commit/5eaa21f86beb59891791c186bcfce2b1e59942e6))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([8797630](https://github.com/jensvogt/awsmock/commit/879763063b08442f306161ca599bdc121314cdcb))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([732c8dd](https://github.com/jensvogt/awsmock/commit/732c8dd8ae3819f60740e5925f5a02fff6773253))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([50d3681](https://github.com/jensvogt/awsmock/commit/50d3681068428c24d1120f2f99976ececf537c03))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([8535311](https://github.com/jensvogt/awsmock/commit/8535311b0acd240e8cc6dcc343ed40bd02731b36))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([5b1d915](https://github.com/jensvogt/awsmock/commit/5b1d915a23f09cffae66bfcc630b7b3ce4b70a43))
+* **653-move-manager-apis-to-gateway:** Add SQS file load ([bc09d6b](https://github.com/jensvogt/awsmock/commit/bc09d6bf82c6ca7fcf4dc3410d869e70a47505bc))
+
+## [0.15.24](https://github.com/jensvogt/awsmock/compare/v0.15.23...v0.15.24) (2024-11-04)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** add ping to awsmockctl ([35c0ca3](https://github.com/jensvogt/awsmock/commit/35c0ca38b72ce8b5ec0550aa04dc23ed9e5c084a))
+* **653-move-manager-apis-to-gateway:** add s3 redux pattern ([8b693bd](https://github.com/jensvogt/awsmock/commit/8b693bd34887acfc569588f50e10aefa46fae837))
+* **653-move-manager-apis-to-gateway:** add s3 redux pattern ([a0738bf](https://github.com/jensvogt/awsmock/commit/a0738bf8ac472d1cc9e7a8852c742be26643d5d7))
+* **653-move-manager-apis-to-gateway:** add s3 redux pattern ([3c4d4da](https://github.com/jensvogt/awsmock/commit/3c4d4dafabc3febec7caae8fc6a44c26c94a714c))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([2e83d84](https://github.com/jensvogt/awsmock/commit/2e83d842b72c313472a14bf8d5423d4738e6e3ee))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([3740f0b](https://github.com/jensvogt/awsmock/commit/3740f0b497a6fd12846b00984a49880b86dc6852))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([2a644be](https://github.com/jensvogt/awsmock/commit/2a644be0d26b85844ba325992451927884b8b211))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([9852762](https://github.com/jensvogt/awsmock/commit/985276250b8b4657a642035bcc725591a684b117))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([f6f4147](https://github.com/jensvogt/awsmock/commit/f6f414777183c0f669c31104cd7da58508a47aa4))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([119b2d8](https://github.com/jensvogt/awsmock/commit/119b2d80577a9f2ea21fad53303f4ee9896fc0f3))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([5c76535](https://github.com/jensvogt/awsmock/commit/5c76535292c0a9b9e488b1d60c626c9ed3b2ec4d))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([10b906a](https://github.com/jensvogt/awsmock/commit/10b906a4fd8d22b85bfcc22e56d88a9315b3bf0e))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([8abb51d](https://github.com/jensvogt/awsmock/commit/8abb51d0378cf0eec13bb7efaf5d2637f3db7ed4))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([0d564a2](https://github.com/jensvogt/awsmock/commit/0d564a268a92557927c7e4592be9a75c3e1f69d6))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([4bc7ab7](https://github.com/jensvogt/awsmock/commit/4bc7ab70c006c9830f8681adb5a4533ba4b0347e))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([c7aa905](https://github.com/jensvogt/awsmock/commit/c7aa90520f1cdda2cec67ba1857f5fb0f11aa199))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([19ac488](https://github.com/jensvogt/awsmock/commit/19ac48815309eacd576d5cc6344a098117847deb))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([0025f5a](https://github.com/jensvogt/awsmock/commit/0025f5acfe1ef5a146f79fa455f352e62ff29e8f))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([47d95bb](https://github.com/jensvogt/awsmock/commit/47d95bb2497c5a073f955a594424beb80a7f83cc))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([a1fdac5](https://github.com/jensvogt/awsmock/commit/a1fdac5d0a417d4ef60646370e54cd0d0f6a47a4))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([9aced7c](https://github.com/jensvogt/awsmock/commit/9aced7ca2bb5d1cca1a0f05d62ad0a73001734d0))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([280f80b](https://github.com/jensvogt/awsmock/commit/280f80b66fc411f1a5cf21a96dbb6a06199d52da))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([de0c883](https://github.com/jensvogt/awsmock/commit/de0c883eed85fa446b6eb4053d5e0e8afbb6de2b))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([e68ebee](https://github.com/jensvogt/awsmock/commit/e68ebee66e5a3007487c241726db89da677be6cf))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([77c92bc](https://github.com/jensvogt/awsmock/commit/77c92bc3a3bcac10dc0c5319ad57ccfabf201fa7))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([dde3f80](https://github.com/jensvogt/awsmock/commit/dde3f805226f2a1500cc9b5b32eb9d54dc8c72b8))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([dfeff8b](https://github.com/jensvogt/awsmock/commit/dfeff8b070baed38a4a0f49ed28d06c46f94c676))
+* **653-move-manager-apis-to-gateway:** add SNS topic counters ([e202a7f](https://github.com/jensvogt/awsmock/commit/e202a7f869aba5fd310e5d6b352a6340c090c044))
+* **653-move-manager-apis-to-gateway:** SNS message list redux pattern ([5f9a03a](https://github.com/jensvogt/awsmock/commit/5f9a03afd4492f1e092fd0ff2f14f5b1696b9292))
+* **653-move-manager-apis-to-gateway:** SNS message list redux pattern ([5669e1f](https://github.com/jensvogt/awsmock/commit/5669e1fbfe28756663d873bf0c91b6359d61c43c))
+
 ## [0.15.23](https://github.com/jensvogt/awsmock/compare/v0.15.22...v0.15.23) (2024-10-20)
 
 
