@@ -48,18 +48,14 @@ namespace AwsMock::Core {
     }
 
     std::string DateTimeUtils::HttpFormat() {
-        char buf[256];
-        time_t timeT = system_clock::to_time_t(system_clock::now());
-        struct tm tm = *gmtime(&timeT);
-        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
-        return {buf};
+        return HttpFormat(system_clock::now());
     }
 
     std::string DateTimeUtils::HttpFormat(const system_clock::time_point &timePoint) {
         char buf[256];
         time_t timeT = system_clock::to_time_t(timePoint);
         struct tm tm = *gmtime(&timeT);
-        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
+        strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S GMT", &tm);
         return {buf};
     }
 

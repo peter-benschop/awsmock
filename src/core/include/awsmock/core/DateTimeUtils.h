@@ -12,6 +12,7 @@
 
 // Boost includes
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/locale/date_time.hpp>
 
 // Poco includes
 #include <Poco/DateTime.h>
