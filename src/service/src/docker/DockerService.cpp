@@ -30,29 +30,53 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         _networkName = _configuration.getString("awsmock.docker.network.name", NETWORK_NAME);
         _containerPort = _configuration.getString("awsmock.docker.container.port", CONTAINER_PORT);
-        _dockerSocketPath = _configuration.getString("awsmock.docker.socket", DOCKER_SOCKET);
-        _domainSocket = std::make_shared<Core::DomainSocket>(_dockerSocketPath);
+        _isDocker = _configuration.getBool("awsmock.docker.active");
+        if (_isDocker) {
+            _containerSocketPath = _configuration.getString("awsmock.docker.socket");
+        } else {
+            _containerSocketPath = _configuration.getString("awsmock.podman.socket");
+        }
+        _domainSocket = std::make_shared<Core::DomainSocket>(_containerSocketPath);
     }
 
     bool DockerService::ImageExists(const std::string &name, const std::string &tag) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
-        std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
-        if (domainSocketResponse.statusCode == http::status::ok) {
+        if (_isDocker) {
+            std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
+            if (domainSocketResponse.statusCode == http::status::ok) {
 
-            Dto::Docker::ListImageResponse response;
-            response.FromJson(domainSocketResponse.body);
-            if (response.imageList.empty()) {
-                log_debug << "Docker image not found, name: " << name << ":" << tag;
+                Dto::Docker::ListImageResponse response;
+                response.FromJson(domainSocketResponse.body);
+                if (response.imageList.empty()) {
+                    log_debug << "Docker image not found, name: " << name << ":" << tag;
+                } else {
+                    log_debug << "Docker image found, name: " << name << ":" << tag;
+                }
+                return !response.imageList.empty();
+
             } else {
-                log_debug << "Docker image found, name: " << name << ":" << tag;
+
+                log_error << "Image exists request failed, httpStatus: " << domainSocketResponse.statusCode;
             }
-            return !response.imageList.empty();
 
         } else {
 
-            log_error << "Image exists request failed, httpStatus: " << domainSocketResponse.statusCode;
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/images/" + name + "/exists");
+            if (domainSocketResponse.statusCode == http::status::no_content) {
+
+                log_debug << "Podman image found, name: " << name << ":" << tag;
+                return true;
+
+            } else if (domainSocketResponse.statusCode == http::status::not_found) {
+
+                log_info << "Podman image not found";
+
+            } else {
+
+                log_error << "Podman image exists request failed, httpStatus: " << domainSocketResponse.statusCode;
+            }
         }
         return false;
     }
@@ -181,37 +205,76 @@ namespace AwsMock::Service {
     bool DockerService::ContainerExists(const std::string &id) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
-        if (domainSocketResponse.statusCode == http::status::ok) {
+        if (_isDocker) {
 
-            Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
-            log_debug << "Docker container found, id: " << id;
-            return !response.containerList.empty();
+            std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (domainSocketResponse.statusCode == http::status::ok) {
+
+                Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+                log_debug << "Docker container found, id: " << id;
+                return !response.containerList.empty();
+
+            } else {
+
+                log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+                return false;
+            }
 
         } else {
 
-            log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
-            return false;
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/containers/" + id + "/exists");
+            if (domainSocketResponse.statusCode == http::status::ok) {
+
+                Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+                log_debug << "Docker container found, id: " << id;
+                return !response.containerList.empty();
+
+            } else {
+
+                log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+                return false;
+            }
         }
     }
 
     bool DockerService::ContainerExists(const std::string &name, const std::string &tag) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
-        if (domainSocketResponse.statusCode == http::status::ok) {
+        if (_isDocker) {
 
-            Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
-            log_debug << "Docker image found, name: " << name << ":" << tag;
-            return !response.containerList.empty();
+            std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (domainSocketResponse.statusCode == http::status::ok) {
+
+                Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+                log_debug << "Docker container found, name: " << name << ":" << tag;
+                return !response.containerList.empty();
+
+            } else {
+
+                log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+                return false;
+            }
 
         } else {
 
-            log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
-            return false;
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/images/" + name + "/exists");
+            if (domainSocketResponse.statusCode == http::status::no_content) {
+
+                log_debug << "Podman container found, name: " << name << ":" << tag;
+                return true;
+
+            } else if (domainSocketResponse.statusCode == http::status::not_found) {
+
+                log_info << "Podman container not found";
+
+            } else {
+
+                log_error << "Podman container exists request failed, httpStatus: " << domainSocketResponse.statusCode;
+            }
         }
+        return false;
     }
 
     Dto::Docker::Container DockerService::GetFirstContainerByImageName(const std::string &name, const std::string &tag) {
@@ -262,36 +325,78 @@ namespace AwsMock::Service {
         return response.containerList.front();
     }
 
-    std::vector<Dto::Docker::Container> DockerService::ListContainerByImageName(const std::string &name, const std::string &tag) {
+    Dto::Docker::Container DockerService::GetContainerByName(const std::string &name) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+        std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + name + "\"]}");
+        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&size=true&filters=" + filters);
         if (domainSocketResponse.statusCode != http::status::ok) {
-            log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
+            log_warning << "Get container by name failed, state: " << domainSocketResponse.statusCode;
             return {};
         }
 
         Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
         if (response.containerList.empty()) {
-            log_warning << "Docker container not found, name: " << name << ":" << tag;
+            log_warning << "Container not found, name: " << name;
             return {};
         }
 
-        log_debug << "Docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
-        return response.containerList;
+        if (response.containerList.size() > 1) {
+            log_warning << "More than one container found, name: " << name << " count: " << response.containerList.size();
+        }
+
+        log_debug << "Container found, name: " << name;
+        return response.containerList.front();
+    }
+
+    std::vector<Dto::Docker::Container> DockerService::ListContainerByImageName(const std::string &name, const std::string &tag) {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        if (_isDocker) {
+
+            std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (domainSocketResponse.statusCode != http::status::ok) {
+                log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
+                return {};
+            }
+
+            Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+            if (response.containerList.empty()) {
+                log_warning << "Docker container not found, name: " << name << ":" << tag;
+                return {};
+            }
+            log_debug << "Docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
+            return response.containerList;
+
+        } else {
+
+            std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (domainSocketResponse.statusCode != http::status::ok) {
+                log_warning << "Get docker container by name failed, state: " << domainSocketResponse.statusCode;
+                return {};
+            }
+
+            Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+            if (response.containerList.empty()) {
+                log_warning << "Docker container not found, name: " << name << ":" << tag;
+                return {};
+            }
+            log_debug << "Docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
+            return response.containerList;
+        }
     }
 
     Dto::Docker::CreateContainerResponse DockerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         // Create the request
-        std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         Dto::Docker::CreateContainerRequest request = {
                 .hostName = instanceName,
                 .user = "root",
                 .image = imageName + ":" + tag,
-                .networkMode = networkMode,
+                .networkMode = GetNetworkName(),
                 .environment = environment,
                 .containerPort = _containerPort,
                 .hostPort = std::to_string(hostPort)};
@@ -322,13 +427,11 @@ namespace AwsMock::Service {
         }
 
         // Create the request
-        std::string networkMode = Core::Configuration::instance().getString("awsmock.docker.network.mode", NETWORK_DEFAULT_MODE);
         Dto::Docker::CreateContainerRequest request = {
                 .hostName = imageName,
-                .domainName = imageName + networkMode,
                 .user = "root",
                 .image = imageName + ":" + tag,
-                .networkMode = networkMode,
+                .networkMode = GetNetworkName(),
                 .containerPort = std::to_string(containerPort),
                 .hostPort = std::to_string(hostPort)};
         std::string jsonBody = request.ToJson();
@@ -372,16 +475,32 @@ namespace AwsMock::Service {
     Dto::Docker::CreateNetworkResponse DockerService::CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/networks/create", request.ToJson());
-        if (domainSocketResponse.statusCode == http::status::ok) {
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+        Dto::Docker::CreateNetworkResponse response;
+        if (_isDocker) {
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/networks/create", request.ToJson());
+            if (domainSocketResponse.statusCode == http::status::ok) {
+
+                log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+
+            } else {
+
+                log_error << "Docker network create failed, httpStatus: " << domainSocketResponse.statusCode;
+            }
+            response.FromJson(domainSocketResponse.body);
 
         } else {
 
-            log_error << "Docker network create failed, httpStatus: " << domainSocketResponse.statusCode;
+            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::post, "http://localhost/networks/create", request.ToJson());
+            if (domainSocketResponse.statusCode == http::status::ok) {
+
+                log_debug << "Podman network created, name: " << request.name << " driver: " << request.driver;
+
+            } else {
+
+                log_error << "Podman network create failed, httpStatus: " << domainSocketResponse.statusCode;
+            }
+            response.FromJson(domainSocketResponse.body);
         }
-        Dto::Docker::CreateNetworkResponse response;
-        response.FromJson(domainSocketResponse.body);
         return response;
     }
 
@@ -539,6 +658,14 @@ namespace AwsMock::Service {
         log_debug << "Zipped TAR file written: " << tarFileName;
 
         return tarFileName;
+    }
+
+    std::string DockerService::GetNetworkName() {
+        if (Core::Configuration::instance().getBool("awsmock.docker.active")) {
+            return Core::Configuration::instance().getString("awsmock.docker.network.mode");
+        } else {
+            return Core::Configuration::instance().getString("awsmock.podman.network.mode");
+        }
     }
 
 }// namespace AwsMock::Service

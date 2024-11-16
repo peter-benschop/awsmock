@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = DockerService::instance().GetFirstContainerByImageName(lambdaEntity.function, dockerTag);
+        Dto::Docker::Container container = DockerService::instance().GetContainerByName(containerName);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
@@ -196,36 +196,47 @@ namespace AwsMock::Service {
         std::string base64File = lambdaEntity.function + "-" + dockerTag + ".zip";
         std::string base64FullFile = base64Path + base64File;
 
-        // Write Base64 ZIP file
+        std::string base64EncodedCodeString = zipFile;
+
+        // Write base64 string, either from S3 bucket/key or from supplied string
+        if (zipFile.empty()) {
+
+            // Get internal name of S3 object
+            Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambdaEntity.region, lambdaEntity.code.s3Bucket, lambdaEntity.code.s3Key);
+            std::string s3CodeFile = s3DataDir + Poco::Path::separator() + s3Object.internalName;
+
+            // Load file
+            std::vector<char> input;
+            load_file(s3CodeFile, back_inserter(input));
+
+            // Allocate "enough" space, using an upperbound prediction:
+            std::string encoded(boost::beast::detail::base64::encoded_size(input.size()), '\0');
+
+            // Encode returns the actual encoded_size
+            auto encoded_size = boost::beast::detail::base64::encode(encoded.data(), input.data(), input.size());
+            encoded.resize(encoded_size);
+
+            base64EncodedCodeString = encoded;
+        }
+
+        // If we do not have a local file already or the MD5 sum changed, write the Base64 encoded file to lambda dir
         if (!Core::FileUtils::FileExists(base64FullFile)) {
 
-            // Write base64 zip file, either from S3 bucket/key or from supplied string
-            if (zipFile.empty()) {
+            std::ofstream ofs(base64FullFile);
+            ofs << base64EncodedCodeString;
+            ofs.close();
 
-                // Get internal name of S3 object
-                Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambdaEntity.region, lambdaEntity.code.s3Bucket, lambdaEntity.code.s3Key);
-                std::string s3CodeFile = s3DataDir + Poco::Path::separator() + s3Object.internalName;
+        } else {
 
-                // Load file
-                std::vector<char> input;
-                load_file(s3CodeFile, back_inserter(input));
-
-                // Allocate "enough" space, using an upperbound prediction:
-                std::string encoded(boost::beast::detail::base64::encoded_size(input.size()), '\0');
-
-                // Encode returns the actual encoded_size
-                auto encoded_size = boost::beast::detail::base64::encode(encoded.data(), input.data(), input.size());
-                encoded.resize(encoded_size);
-                std::ofstream(base64FullFile) << encoded;
-
-            } else {
-
-                // If we do not have a local file already, write the Base64 encoded file to lambda dir
+            std::string md5sumFile = Core::Crypto::GetMd5FromFile(base64FullFile);
+            std::string md5sumString = Core::Crypto::GetMd5FromString(base64EncodedCodeString);
+            if (md5sumFile != md5sumString) {
                 std::ofstream ofs(base64FullFile);
-                ofs << zipFile;
+                ofs << base64EncodedCodeString;
                 ofs.close();
             }
         }
+
         lambdaEntity.code.zipFile = base64File;
         return base64FullFile;
     }
