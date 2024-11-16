@@ -30,7 +30,9 @@ namespace AwsMock::Service {
         CleanupInstances();
 
         // Create a local network, if it is not existing yet
-        CreateLocalNetwork();
+        if (Core::Configuration::instance().getBool("awsmock.docker.active")) {
+            CreateLocalNetwork();
+        }
 
         // Start lambda monitoring update counters
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);

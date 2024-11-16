@@ -240,7 +240,7 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.region = region, .functionName = functionName, .qualifier = qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
-                return SendOkResponse(request);
+                return SendNoContentResponse(request);
 
             } else if (action == "tags") {
 

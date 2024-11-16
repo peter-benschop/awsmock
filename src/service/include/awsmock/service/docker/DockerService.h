@@ -38,7 +38,6 @@
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
 
-#define DOCKER_SOCKET "/var/run/docker.sock"
 #define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
@@ -213,6 +212,14 @@ namespace AwsMock::Service {
         Dto::Docker::Container GetContainerById(const std::string &containerId);
 
         /**
+         * @brief Returns a container by name.
+         *
+         * @param name container name
+         * @return Container
+         */
+        Dto::Docker::Container GetContainerByName(const std::string &name);
+
+        /**
          * @brief List all containers of an given image.
          *
          * @param name image name
@@ -314,6 +321,17 @@ namespace AwsMock::Service {
         static std::string BuildImageFile(const std::string &codeDir, const std::string &name);
 
         /**
+         * @brief Returns the network name
+         *
+         * @par
+         * Depending on the container engine, the network name must be different. For Podman use the detault name'podman', for docker
+         * we use a own network, 'local'.
+         *
+         * @return network name
+         */
+        static std::string GetNetworkName();
+
+        /**
          * Docker version
          */
         std::string _dockerVersion;
@@ -329,9 +347,14 @@ namespace AwsMock::Service {
         std::string _containerPort;
 
         /**
+         * Using docker: true, else: false: use podman
+         */
+        bool _isDocker = false;
+
+        /**
          * Docker listening socket
          */
-        std::string _dockerSocketPath;
+        std::string _containerSocketPath;
 
         /**
          * Docker listening socket

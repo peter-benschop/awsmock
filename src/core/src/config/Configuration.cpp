@@ -136,12 +136,20 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.service.kms.worker.period", "AWSMOCK_WORKER_KMS_PERIOD", 300);
 
         // Docker
-        DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "bridge");
-        DefineStringProperty("awsmock.docker.network.name", "AWSMOCK_DOCKER_NETWORK_NAME", ".dockerhost.net");
+        DefineBoolProperty("awsmock.docker.active", "AWSMOCK_DOCKER_ACTIVE", false);
+        DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "local");
         DefineIntProperty("awsmock.docker.default.memory.size", "AWSMOCK_DOCKER_DEFAULT_MEMORY_SIZE", 512);
         DefineIntProperty("awsmock.docker.default.temp.size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.docker.socket", "AWSMOCK_DOCKER_SOCKET", "/var/run/docker.sock");
+
+        // Podman
+        DefineBoolProperty("awsmock.podman.active", "AWSMOCK_PODMAN_ACTIVE", true);
+        DefineStringProperty("awsmock.podman.network.mode", "AWSMOCK_PODMAN_NETWORK_MODE", "local");
+        DefineIntProperty("awsmock.podman.default.memory.size", "AWSMOCK_PODMAN_DEFAULT_MEMORY_SIZE", 512);
+        DefineIntProperty("awsmock.podman.default.temp.size", "AWSMOCK_PODMAN_DEFAULT_TEMP_SIZE", 10240);
+        DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);
+        DefineStringProperty("awsmock.podman.socket", "AWSMOCK_PODMAN_SOCKET", "/run/podman/podman.sock");
 
         // Monitoring
         DefineIntProperty("awsmock.service.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9091);

@@ -29,7 +29,7 @@ namespace AwsMock::Dto::SQS {
      * Example (from Java v2 client):
      * @code{.json}
      * {
-     *   "QueueUrl":"http://vogje01-nuc:4566/000000000000/artikel-input",
+     *   "QueueUrl":"http://localhost:4566/000000000000/artikel-input",
      *   "MessageBody":"{
      *     "id":"94169598-3b07-4913-aa09-7bab3babd18d",
      *     "ursprungsDatei":"SourceFile",
