@@ -21,13 +21,14 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer transferEntity;
         std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", "000000000000");
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, accountId, serverId);
+        std::string listenAddress = Core::Configuration::instance().getString("awsmock.service.ftp.address", "::");
 
         // Create entity
         int ftpPort = Core::Configuration::instance().getInt("awsmock.module.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
-        transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .protocols = request.protocols, .port = ftpPort};
+        transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .protocols = request.protocols, .port = ftpPort, .listenAddress = listenAddress};
 
         // Add anonymous user
-        Database::Entity::Transfer::User anonymousUser = {.userName = "anonymous", .password = "123", .homeDirectory = "/"};
+        Database::Entity::Transfer::User anonymousUser = {.userName = "anonymous", .password = "secret", .homeDirectory = "/"};
         transferEntity.users.emplace_back(anonymousUser);
 
         transferEntity = _transferDatabase.CreateTransfer(transferEntity);

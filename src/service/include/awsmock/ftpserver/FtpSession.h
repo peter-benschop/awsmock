@@ -149,6 +149,10 @@ namespace AwsMock::FtpServer {
 
         void handleFtpCommandMODE(const std::string &param);
 
+        void handleFtpCommandLPRT(const std::string &param);
+
+        void handleFtpCommandLPSV(const std::string &param);
+
         // Ftp module commands
         void handleFtpCommandRETR(const std::string &param);
 

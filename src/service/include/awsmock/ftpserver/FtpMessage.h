@@ -33,6 +33,7 @@ namespace AwsMock::FtpServer {
         CLOSING_DATA_CONNECTION = 226,
         TRANSFER_ABORTED = 426,
         ENTERING_PASSIVE_MODE = 227,
+        ENTERING_LONG_PASSIVE_MODE = 228,
 
         USER_LOGGED_IN = 230,
         NOT_LOGGED_IN = 530,
@@ -54,6 +55,7 @@ namespace AwsMock::FtpServer {
 
     class FtpMessage {
       public:
+
         FtpMessage(FtpReplyCode code, const std::string &message)
             : code_(code), message_(message) {}
 
@@ -70,6 +72,7 @@ namespace AwsMock::FtpServer {
         }
 
       private:
+
         FtpReplyCode code_;
         std::string message_;
     };
