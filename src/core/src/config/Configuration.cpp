@@ -151,6 +151,15 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.podman.socket", "AWSMOCK_PODMAN_SOCKET", "/run/podman/podman.sock");
 
+        // FTP server
+        DefineIntProperty("awsmock.service.ftp.port", "AWSMOCK_SERVICE_FTP_ACTIVE", 21);
+        DefineStringProperty("awsmock.service.ftp.host", "AWSMOCK_SERVICE_FTP_HOST", "localhost");
+        DefineIntProperty("awsmock.service.ftp.max.thread", "AWSMOCK_SERVICE_FTP_MAX_THREADS", 4);
+        DefineStringProperty("awsmock.service.ftp.base.dir", "AWSMOCK_SERVICE_FTP_BASE_DIR", "/home/awsmock/data/transfer");
+        DefineIntProperty("awsmock.service.ftp.pasv.min", "AWSMOCK_SERVICE_FTP_PASV_MIN", 6000);
+        DefineIntProperty("awsmock.service.ftp.pasv.max", "AWSMOCK_SERVICE_FTP_PASV_MAX", 6010);
+        DefineStringProperty("awsmock.service.ftp.address", "AWSMOCK_SERVICE_FTP_ADDRESS", "::");
+
         // Monitoring
         DefineIntProperty("awsmock.service.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9091);
         DefineIntProperty("awsmock.service.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);

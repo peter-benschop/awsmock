@@ -156,6 +156,8 @@ namespace AwsMock::FtpServer {
                 {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
                 {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
                 {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
+                {"LPRT", std::bind(&FtpSession::handleFtpCommandLPRT, this, std::placeholders::_1)},
+                {"LPSV", std::bind(&FtpSession::handleFtpCommandLPSV, this, std::placeholders::_1)},
 
                 // Ftp module commands
                 {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
@@ -349,7 +351,7 @@ namespace AwsMock::FtpServer {
         if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
         } else {
-            ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+            ip_bytes = command_socket_.local_endpoint().address().to_v6().to_v4().to_bytes();
         }
         auto port = data_acceptor_.local_endpoint().port();
         log_info << "Server suggested port: " << port;
@@ -424,6 +426,65 @@ namespace AwsMock::FtpServer {
         sendFtpMessage(FtpReplyCode::ENTERING_PASSIVE_MODE, "Entering passive mode " + stream.str());
     }
 
+    void FtpSession::handleFtpCommandLPRT(const std::string & /*param*/) {
+        if (!_logged_in_user) {
+            sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
+            return;
+        }
+
+        if (data_acceptor_.is_open()) {
+            asio::error_code ec;
+            data_acceptor_.close(ec);
+            if (ec) {
+                log_error << "Error closing data acceptor: " << ec.message();
+            }
+        }
+
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+
+        {
+            asio::error_code ec;
+            data_acceptor_.open(endpoint.protocol(), ec);
+            if (ec) {
+                log_error << "Error opening data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            data_acceptor_.bind(endpoint, ec);
+            if (ec) {
+                log_error << "Error binding data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            if (ec) {
+                log_error << "Error listening on data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+
+        // Split address and port into bytes and get the port the OS chose for us
+        auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        auto port = data_acceptor_.local_endpoint().port();
+
+        // Form reply string
+        std::stringstream stream;
+        stream << "(";
+        for (size_t i = 0; i < 8; i++) {
+            stream << static_cast<int>(ip_bytes[i]) << ",";
+        }
+        stream << ((port >> 8) & 0xff) << "," << (port & 0xff) << ")";
+
+        sendFtpMessage(FtpReplyCode::ENTERING_LONG_PASSIVE_MODE, "Entering passive mode " + stream.str());
+    }
+
     void FtpSession::handleFtpCommandEPSV(const std::string & /*param*/) {
         if (!_logged_in_user) {
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
@@ -478,7 +539,7 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
         auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
@@ -490,6 +551,74 @@ namespace AwsMock::FtpServer {
         stream << ((port >> 8) & 0xff) << "," << (port & 0xff) << ")";
 
         sendFtpMessage(FtpReplyCode::ENTERING_PASSIVE_MODE, "Entering passive mode " + stream.str());
+    }
+
+    void FtpSession::handleFtpCommandLPSV(const std::string & /*param*/) {
+        if (!_logged_in_user) {
+            sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
+            return;
+        }
+
+        if (data_acceptor_.is_open()) {
+            asio::error_code ec;
+            data_acceptor_.close(ec);
+            if (ec) {
+                log_error << "Error closing data acceptor: " << ec.message();
+            }
+        }
+
+        asio::ip::tcp::endpoint endpoint;
+        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
+            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
+            int port = Core::RandomUtils::NextInt(minPort, maxPort);
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
+        } else {
+            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
+        }
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
+
+        {
+            asio::error_code ec;
+            data_acceptor_.open(endpoint.protocol(), ec);
+            if (ec) {
+                log_error << "Error opening data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            data_acceptor_.bind(endpoint, ec);
+            if (ec) {
+                log_error << "Error binding data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+        {
+            asio::error_code ec;
+            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            if (ec) {
+                log_error << "Error listening on data acceptor: " << ec.message();
+                sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
+                return;
+            }
+        }
+
+        // Split address and port into bytes and get the port the OS chose for us
+        auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+        auto port = data_acceptor_.local_endpoint().port();
+
+        // Form reply string
+        std::stringstream stream;
+        stream << "(";
+        for (size_t i = 0; i < 8; i++) {
+            stream << static_cast<int>(ip_bytes[i]) << ",";
+        }
+        stream << ((port >> 8) & 0xff) << "," << (port & 0xff) << ")";
+
+        sendFtpMessage(FtpReplyCode::ENTERING_LONG_PASSIVE_MODE, "Entering passive mode " + stream.str());
     }
 
     void FtpSession::handleFtpCommandTYPE(const std::string &param) {
