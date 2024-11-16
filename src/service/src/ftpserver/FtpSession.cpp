@@ -449,9 +449,6 @@ namespace AwsMock::FtpServer {
         }
         log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
 
-
-        //const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
-
         {
             asio::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
@@ -481,7 +478,7 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+        auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
         auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
