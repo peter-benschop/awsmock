@@ -34,7 +34,7 @@ namespace AwsMock::Service {
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SNS create topic failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message(), 400);
+            throw Core::ServiceException(exc.message());
         }
     }
 

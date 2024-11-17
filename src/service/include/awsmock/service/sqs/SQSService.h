@@ -40,6 +40,8 @@
 #include <awsmock/dto/sqs/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/ListMessageCountersRequest.h>
+#include <awsmock/dto/sqs/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/ListMessagesRequest.h>
 #include <awsmock/dto/sqs/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/ListQueueArnsResponse.h>
@@ -247,6 +249,16 @@ namespace AwsMock::Service {
          * @see ListMessagesResponse
          */
         Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request);
+
+        /**
+         * @brief Returns a list SQS messages
+         *
+         * @param request list messages request
+         * @return ListMessagesResponse
+         * @throws ServiceException
+         * @see ListMessageCountersResponse
+         */
+        Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request);
 
         /**
          * @brief Deletes a message

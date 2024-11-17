@@ -287,13 +287,14 @@ namespace AwsMock::Database {
          * @brief Paged list of messages
          *
          * @param queueArn queue ARN
+         * @param prefix message ID prefix
          * @param pageSize page size
          * @param pageIndex page index
          * @param sortColumns sorting columns array
          * @return list of SQS messages
          * @throws DatabaseException
          */
-        Entity::SQS::MessageList ListMessages(const std::string &queueArn, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns);
+        Entity::SQS::MessageList ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns);
 
         /**
          * @brief Receive messages from an queue.
@@ -346,9 +347,10 @@ namespace AwsMock::Database {
          * @brief  Count the number of message by state
          *
          * @param queueArn ARN of the queue
+         * @param prefix message ID prefix
          * @return total number of messages
          */
-        long CountMessages(const std::string &queueArn = {});
+        long CountMessages(const std::string &queueArn = {}, const std::string &prefix = {});
 
         /**
          * @brief  Count the number of message by state

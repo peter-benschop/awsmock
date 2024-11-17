@@ -658,13 +658,45 @@ namespace AwsMock::Service {
 
             long total = _sqsDatabase.CountMessages(request.queueArn);
 
-            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.pageSize, request.pageIndex, request.sortColumns);
+            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, {}, request.pageSize, request.pageIndex, request.sortColumns);
 
             Dto::SQS::ListMessagesResponse listMessagesResponse;
             listMessagesResponse.total = total;
             for (const auto &message: messages) {
                 Dto::SQS::MessageEntry messageEntry;
                 messageEntry.region = request.region;
+                messageEntry.messageId = message.messageId;
+                messageEntry.id = message.oid;
+                messageEntry.body = message.body;
+                messageEntry.receiptHandle = message.receiptHandle;
+                messageEntry.md5Sum = message.md5Body;
+                messageEntry.created = message.created;
+                messageEntry.modified = message.modified;
+                listMessagesResponse.messages.emplace_back(messageEntry);
+            }
+            log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
+            return listMessagesResponse;
+
+        } catch (Poco::Exception &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::ListMessageCountersResponse SQSService::ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_messages");
+        log_trace << "List message counters request";
+
+        try {
+
+            long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
+
+            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
+
+            Dto::SQS::ListMessageCountersResponse listMessagesResponse;
+            listMessagesResponse.total = total;
+            for (const auto &message: messages) {
+                Dto::SQS::MessageEntry messageEntry;
                 messageEntry.messageId = message.messageId;
                 messageEntry.id = message.oid;
                 messageEntry.body = message.body;
