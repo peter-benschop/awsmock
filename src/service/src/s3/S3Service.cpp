@@ -972,10 +972,10 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::S3::ObjectList objectList = _database.ListObjects(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
+            Database::Entity::S3::ObjectList objectList = _database.ListObjects(request.region, request.prefix, request.bucket, request.pageSize, request.pageIndex, request.sortColumns);
 
             Dto::S3::ListObjectCounterResponse listAllObjectResponse;
-            listAllObjectResponse.total = _database.ObjectCount();
+            listAllObjectResponse.total = _database.ObjectCount(request.region, request.prefix, request.bucket);
 
             for (const auto &object: objectList) {
                 Dto::S3::ObjectCounter objectCounter;
@@ -1105,7 +1105,6 @@ namespace AwsMock::Service {
 
         long size = Core::FileUtils::FileSize(filePath);
         log_debug << "File received, fileName: " << filePath << " size: " << size;
-
 
         // Create entity
         Database::Entity::S3::Object object = {

@@ -19,16 +19,16 @@ namespace AwsMock::Dto::S3 {
                 request.region = rootObject->get("region").convert<std::string>();
             }
             if (!rootObject->get("bucket").isEmpty()) {
-                request.region = rootObject->get("bucket").convert<std::string>();
+                request.bucket = rootObject->get("bucket").convert<std::string>();
             }
             if (!rootObject->get("prefix").isEmpty()) {
                 request.prefix = rootObject->get("prefix").convert<std::string>();
             }
-            if (!rootObject->get("skip").isEmpty()) {
-                request.skip = rootObject->get("skip").convert<int>();
+            if (!rootObject->get("pageSize").isEmpty()) {
+                request.pageSize = rootObject->get("pageSize").convert<int>();
             }
-            if (!rootObject->get("maxResults").isEmpty()) {
-                request.maxResults = rootObject->get("maxResults").convert<int>();
+            if (!rootObject->get("pageIndex").isEmpty()) {
+                request.pageIndex = rootObject->get("pageIndex").convert<int>();
             }
             if (!rootObject->get("sortColumns").isEmpty()) {
 
@@ -55,8 +55,10 @@ namespace AwsMock::Dto::S3 {
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("region", region);
-            rootJson.set("maxResults", maxResults);
-            rootJson.set("skip", skip);
+            rootJson.set("prefix", prefix);
+            rootJson.set("bucket", bucket);
+            rootJson.set("pageSize", pageSize);
+            rootJson.set("pageIndex", pageIndex);
 
             if (!sortColumns.empty()) {
                 Poco::JSON::Array jsonArray;

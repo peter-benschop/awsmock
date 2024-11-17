@@ -326,22 +326,24 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param prefix S3 key prefix
-         * @param maxResults maximal number of results
-         * @param skip first rows
+         * @param bucket S3 bucket name
+         * @param pageSize maximal number of results
+         * @param pageIndex page index
          * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {});
+        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {});
 
         /**
          * @brief Counts the number of keys in a bucket
          *
          * @param region AWS region
+         * @param prefix key prefix
          * @param bucket bucket name
          * @return number of object in bucket
          * @throws DatabaseException
          */
-        long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
+        long ObjectCount(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {});
 
         /**
          * @brief Creates a bucket notification-
