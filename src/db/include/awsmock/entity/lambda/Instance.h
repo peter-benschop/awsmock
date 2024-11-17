@@ -21,6 +21,9 @@
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
+// AwsMOck includes
+#include <awsmock/core/BsonUtils.h>
+
 namespace AwsMock::Database::Entity::Lambda {
 
     using bsoncxx::view_or_value;

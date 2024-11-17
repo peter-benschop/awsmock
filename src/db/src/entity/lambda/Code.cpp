@@ -12,9 +12,9 @@ namespace AwsMock::Database::Entity::Lambda {
             zipFile = bsoncxx::string::to_string(mResult.value()["zipFile"].get_string().value);
         }
         if (mResult.value().find("s3Bucket") != mResult.value().end()) {
-            s3Bucket = bsoncxx::string::to_string(mResult.value()["s3Bucket"].get_string().value);
-            s3Key = bsoncxx::string::to_string(mResult.value()["s3Key"].get_string().value);
-            s3ObjectVersion = bsoncxx::string::to_string(mResult.value()["s3ObjectVersion"].get_string().value);
+            s3Bucket = Core::Bson::BsonUtils::GetStringValue(mResult, "s3Bucket");
+            s3Key = Core::Bson::BsonUtils::GetStringValue(mResult, "s3Key");
+            s3ObjectVersion = Core::Bson::BsonUtils::GetStringValue(mResult, "s3ObjectVersion");
         }
     }
 

@@ -28,6 +28,8 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/utils/MongoUtils.h>
 

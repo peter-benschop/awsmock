@@ -6,279 +6,91 @@
 
 namespace AwsMock::Dto::Module {
 
-    Poco::JSON::Object Infrastructure::ToJsonObject() {
+    document Infrastructure::ToDocument() const {
+        document document;
 
-        try {
+        // S3
+        Core::Bson::ToBsonArray(document, "s3-buckets", s3Buckets);
+        Core::Bson::ToBsonArray(document, "s3-objects", s3Objects);
 
-            Poco::JSON::Object rootJson;
-            Poco::JSON::Object infrastructureJson;
+        // SQS
+        Core::Bson::ToBsonArray(document, "sqs-queues", sqsQueues);
+        Core::Bson::ToBsonArray(document, "sqs-messages", sqsMessages);
 
-            // S3 Bucket array
-            if (!s3Buckets.empty()) {
-                Poco::JSON::Array jsonBucketArray;
-                for (const auto &bucket: s3Buckets) {
-                    jsonBucketArray.add(bucket.ToJsonObject());
-                }
-                rootJson.set("s3-buckets", jsonBucketArray);
-            }
+        // SNS
+        Core::Bson::ToBsonArray(document, "sns-topics", snsTopics);
+        Core::Bson::ToBsonArray(document, "sns-messages", snsMessages);
 
-            // S3 object array
-            if (!s3Objects.empty()) {
-                Poco::JSON::Array jsonObjectArray;
-                for (const auto &object: s3Objects) {
-                    jsonObjectArray.add(object.ToJsonObject());
-                }
-                rootJson.set("s3-objects", jsonObjectArray);
-            }
+        // Lambdas
+        Core::Bson::ToBsonArray(document, "lambda-functions", lambdas);
 
-            // SQS queue array
-            if (!sqsQueues.empty()) {
-                Poco::JSON::Array jsonQueueArray;
-                for (const auto &queue: sqsQueues) {
-                    jsonQueueArray.add(queue.ToJsonObject());
-                }
-                rootJson.set("sqs-queues", jsonQueueArray);
-            }
+        // Transfer servers
+        Core::Bson::ToBsonArray(document, "transfer-servers", transferServers);
 
-            // SQS message array
-            if (!sqsMessages.empty()) {
-                Poco::JSON::Array jsonSqsMessageArray;
-                for (const auto &message: sqsMessages) {
-                    jsonSqsMessageArray.add(message.ToJsonObject());
-                }
-                rootJson.set("sqs-messages", jsonSqsMessageArray);
-            }
+        // Cognito
+        Core::Bson::ToBsonArray(document, "cognito-user-pools", cognitoUserPools);
+        Core::Bson::ToBsonArray(document, "cognito-users", cognitoUsers);
 
-            // SNS topic array
-            if (!snsTopics.empty()) {
-                Poco::JSON::Array jsonTopicArray;
-                for (const auto &topic: snsTopics) {
-                    jsonTopicArray.add(topic.ToJsonObject());
-                }
-                rootJson.set("sns-topics", jsonTopicArray);
-            }
+        // DynamoDb
+        Core::Bson::ToBsonArray(document, "dynamodb-tables", dynamoDbTables);
+        Core::Bson::ToBsonArray(document, "dynamodb-items", dynamoDbItems);
 
-            // SNS message array
-            if (!snsMessages.empty()) {
-                Poco::JSON::Array jsonSnsMessageArray;
-                for (const auto &message: snsMessages) {
-                    jsonSnsMessageArray.add(message.ToJsonObject());
-                }
-                rootJson.set("sns-messages", jsonSnsMessageArray);
-            }
+        // Secrets manager
+        Core::Bson::ToBsonArray(document, "secretsmanager-secrets", secrets);
 
-            // Lambda functions
-            if (!lambdas.empty()) {
-                Poco::JSON::Array jsonLambdaArray;
-                for (const auto &lambda: lambdas) {
-                    jsonLambdaArray.add(lambda.ToJsonObject());
-                }
-                rootJson.set("lambda-functions", jsonLambdaArray);
-            }
+        // KMS
+        Core::Bson::ToBsonArray(document, "kms-keys", kmsKeys);
 
-            // Transfer server
-            if (!transferServers.empty()) {
-                Poco::JSON::Array jsonTransferArray;
-                for (const auto &transfer: transferServers) {
-                    jsonTransferArray.add(transfer.ToJsonObject());
-                }
-                rootJson.set("transfer-servers", jsonTransferArray);
-            }
-
-            // Cognito user pools
-            if (!cognitoUserPools.empty()) {
-                Poco::JSON::Array jsonCognitoUserPoolArray;
-                for (const auto &userPool: cognitoUserPools) {
-                    jsonCognitoUserPoolArray.add(userPool.ToJsonObject());
-                }
-                rootJson.set("cognito-user-pools", jsonCognitoUserPoolArray);
-            }
-
-            // Cognito users
-            if (!cognitoUsers.empty()) {
-                Poco::JSON::Array jsonCognitoUserArray;
-                for (const auto &user: cognitoUsers) {
-                    jsonCognitoUserArray.add(user.ToJsonObject());
-                }
-                rootJson.set("cognito-users", jsonCognitoUserArray);
-            }
-
-            // DynamoDb tables
-            if (!dynamoDbTables.empty()) {
-                Poco::JSON::Array jsonDynamoDbTableArray;
-                for (const auto &table: dynamoDbTables) {
-                    jsonDynamoDbTableArray.add(table.ToJsonObject());
-                }
-                rootJson.set("dynamodb-tables", jsonDynamoDbTableArray);
-            }
-
-            // DynamoDb items
-            if (!dynamoDbItems.empty()) {
-                Poco::JSON::Array jsonDynamoDbItemArray;
-                for (const auto &item: dynamoDbItems) {
-                    jsonDynamoDbItemArray.add(item.ToJsonObject());
-                }
-                rootJson.set("dynamodb-items", jsonDynamoDbItemArray);
-            }
-
-            // SecretsManager secrets
-            if (!secrets.empty()) {
-                Poco::JSON::Array jsonSecretsArray;
-                for (const auto &secret: secrets) {
-                    jsonSecretsArray.add(secret.ToJsonObject());
-                }
-                rootJson.set("secretsmanager-secrets", jsonSecretsArray);
-            }
-
-            // KMS keys secrets
-            if (!kmsKeys.empty()) {
-                Poco::JSON::Array jsonSecretsArray;
-                for (const auto &key: kmsKeys) {
-                    jsonSecretsArray.add(key.ToJsonObject());
-                }
-                rootJson.set("kms-keys", jsonSecretsArray);
-            }
-
-            // SSM parameters
-            if (!ssmParameters.empty()) {
-                Poco::JSON::Array jsonSecretsArray;
-                for (const auto &parameter: ssmParameters) {
-                    jsonSecretsArray.add(parameter.ToJsonObject());
-                }
-                rootJson.set("ssm-parameters", jsonSecretsArray);
-            }
-
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
+        // SSM
+        Core::Bson::ToBsonArray(document, "ssm-parameters", ssmParameters);
+        return document;
     }
 
     void Infrastructure::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-        const auto &infrastructureObject = rootObject->getObject("infrastructure");
+        bsoncxx::document::value documentValue = bsoncxx::from_json(jsonString);
 
-        try {
-
-            if (infrastructureObject->has("s3-buckets")) {
-                Poco::JSON::Array::Ptr s3BucketArray = infrastructureObject->getArray("s3-buckets");
-                for (int i = 0; i < s3BucketArray->size(); i++) {
-                    Database::Entity::S3::Bucket bucket;
-                    bucket.FromJsonObject(s3BucketArray->getObject(i));
-                    s3Buckets.emplace_back(bucket);
-                }
-            }
-
-            if (infrastructureObject->has("s3-objects")) {
-                Poco::JSON::Array::Ptr s3ObjectArray = infrastructureObject->getArray("s3-objects");
-                for (int i = 0; i < s3ObjectArray->size(); i++) {
-                    Database::Entity::S3::Object s3Object;
-                    s3Object.FromJsonObject(s3ObjectArray->getObject(i));
-                    s3Objects.emplace_back(s3Object);
-                }
-            }
-
-            if (infrastructureObject->has("sqs-queues")) {
-                Poco::JSON::Array::Ptr sqsQueueArray = infrastructureObject->getArray("sqs-queues");
-                for (int i = 0; i < sqsQueueArray->size(); i++) {
-                    Database::Entity::SQS::Queue sqsQueueObject;
-                    sqsQueueObject.FromJsonObject(sqsQueueArray->getObject(i));
-                    sqsQueues.emplace_back(sqsQueueObject);
-                }
-            }
-
-            if (infrastructureObject->has("sqs-resources")) {
-                Poco::JSON::Array::Ptr sqsMessageArray = infrastructureObject->getArray("sqs-resources");
-                for (int i = 0; i < sqsMessageArray->size(); i++) {
-                    Database::Entity::SQS::Message sqsMessage;
-                    sqsMessage.FromJsonObject(sqsMessageArray->getObject(i));
-                    sqsMessages.emplace_back(sqsMessage);
-                }
-            }
-
-            if (infrastructureObject->has("sns-topics")) {
-                Poco::JSON::Array::Ptr snsTopicArray = infrastructureObject->getArray("sns-topics");
-                for (int i = 0; i < snsTopicArray->size(); i++) {
-                    Database::Entity::SNS::Topic snsTopic;
-                    snsTopic.FromJsonObject(snsTopicArray->getObject(i));
-                    snsTopics.emplace_back(snsTopic);
-                }
-            }
-
-            if (infrastructureObject->has("sns-resources")) {
-                Poco::JSON::Array::Ptr snsMessageArray = infrastructureObject->getArray("sns-resources");
-                for (int i = 0; i < snsMessageArray->size(); i++) {
-                    Database::Entity::SNS::Message snsMessage;
-                    snsMessage.FromJsonObject(snsMessageArray->getObject(i));
-                    snsMessages.emplace_back(snsMessage);
-                }
-            }
-
-            if (infrastructureObject->has("cognito-user-pools")) {
-                Poco::JSON::Array::Ptr cognitoUserPoolArray = infrastructureObject->getArray("cognito-user-pools");
-                for (int i = 0; i < cognitoUserPoolArray->size(); i++) {
-                    Database::Entity::Cognito::UserPool cognitoUserPoolObject;
-                    cognitoUserPoolObject.FromJsonObject(cognitoUserPoolArray->getObject(i));
-                    cognitoUserPools.emplace_back(cognitoUserPoolObject);
-                }
-            }
-
-            if (infrastructureObject->has("cognito-users")) {
-                Poco::JSON::Array::Ptr cognitoUserArray = infrastructureObject->getArray("cognito-users");
-                for (int i = 0; i < cognitoUserArray->size(); i++) {
-                    Database::Entity::Cognito::User cognitoUserObject;
-                    cognitoUserObject.FromJsonObject(cognitoUserArray->getObject(i));
-                    cognitoUsers.emplace_back(cognitoUserObject);
-                }
-            }
-
-            if (infrastructureObject->has("dynamodb-tables")) {
-                Poco::JSON::Array::Ptr dynamoDbTableArray = infrastructureObject->getArray("dynamodb-tables");
-                for (int i = 0; i < dynamoDbTableArray->size(); i++) {
-                    Database::Entity::DynamoDb::Table dynamoDbTableObject;
-                    dynamoDbTableObject.FromJsonObject(dynamoDbTableArray->getObject(i));
-                    dynamoDbTables.emplace_back(dynamoDbTableObject);
-                }
-            }
-
-            // Secrets manager
-            if (infrastructureObject->has("secretsmanager-secrets")) {
-                Poco::JSON::Array::Ptr secretsArray = infrastructureObject->getArray("secretsmanager-secrets");
-                for (int i = 0; i < secretsArray->size(); i++) {
-                    Database::Entity::SecretsManager::Secret secretsObject;
-                    secretsObject.FromJsonObject(secretsArray->getObject(i));
-                    secrets.emplace_back(secretsObject);
-                }
-            }
-
-            // Transfer servers
-            if (infrastructureObject->has("transfer-servers")) {
-                Poco::JSON::Array::Ptr transferServerArray = infrastructureObject->getArray("transfer-servers");
-                for (int i = 0; i < transferServerArray->size(); i++) {
-                    Database::Entity::Transfer::Transfer transferObject;
-                    transferObject.FromJsonObject(transferServerArray->getObject(i));
-                    transferServers.emplace_back(transferObject);
-                }
-            }
-
-            // Lambdas
-            if (infrastructureObject->has("lambdas")) {
-                Poco::JSON::Array::Ptr lambdasArray = infrastructureObject->getArray("lambdas");
-                for (int i = 0; i < lambdasArray->size(); i++) {
-                    Database::Entity::Lambda::Lambda lambdaObject;
-                    lambdaObject.FromJsonObject(lambdasArray->getObject(i));
-                    lambdas.emplace_back(lambdaObject);
-                }
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        if (documentValue.find("infrastructure") != documentValue.end()) {
+            FromDocument(documentValue["infrastructure"].get_document().view());
         }
     }
+
+    void Infrastructure::FromDocument(const bsoncxx::document::view &document) {
+
+        // S3
+        Core::Bson::FromBsonArray(document, "s3-buckets", &s3Buckets);
+        Core::Bson::FromBsonArray(document, "s3-objects", &s3Objects);
+
+        // SQS
+        Core::Bson::FromBsonArray(document, "sqs-queues", &sqsQueues);
+        Core::Bson::FromBsonArray(document, "sqs-messages", &sqsMessages);
+
+        // SNS
+        Core::Bson::FromBsonArray(document, "sns-topics", &snsTopics);
+        Core::Bson::FromBsonArray(document, "sns-messages", &snsMessages);
+
+        // Cognito
+        Core::Bson::FromBsonArray(document, "cognito-user-pools", &cognitoUserPools);
+        Core::Bson::FromBsonArray(document, "cognito-users", &cognitoUsers);
+
+        // DynamoDB
+        Core::Bson::FromBsonArray(document, "dynamodb-tables", &dynamoDbTables);
+        Core::Bson::FromBsonArray(document, "dynamodb-items", &dynamoDbItems);
+
+        // Secrets manager
+        Core::Bson::FromBsonArray(document, "secretsmanager-secrets", &secrets);
+
+        // Lambdas
+        Core::Bson::FromBsonArray(document, "lambda-functions", &lambdas);
+
+        // Transfer servers
+        Core::Bson::FromBsonArray(document, "transfer-servers", &transferServers);
+
+        // KMS
+        Core::Bson::FromBsonArray(document, "kms-keys", &kmsKeys);
+
+        // SSM
+        Core::Bson::FromBsonArray(document, "ssm-parameters", &ssmParameters);
+    }
+
 }// namespace AwsMock::Dto::Module

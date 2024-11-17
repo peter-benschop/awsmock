@@ -6,37 +6,20 @@
 
 namespace AwsMock::Dto::Module {
 
-    Poco::JSON::Object ExportInfrastructureResponse::ToJsonObject() {
-
-        try {
-
-            Poco::JSON::Object rootJson;
-            rootJson.set("onlyObjects", includeObjects);
-            rootJson.set("prettyPrint", prettyPrint);
-            rootJson.set("infrastructure", infrastructure.ToJsonObject());
-
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
-    }
-
     std::string ExportInfrastructureResponse::ToJson() {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("onlyObjects", includeObjects);
-            rootJson.set("prettyPrint", prettyPrint);
-            rootJson.set("infrastructure", infrastructure.ToJsonObject());
+            document document;
+            document.append(kvp("onlyObjects", includeObjects));
+            document.append(kvp("prettyPrint", prettyPrint));
+            document.append(kvp("infrastructure", infrastructure.ToDocument()));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return bsoncxx::to_json(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

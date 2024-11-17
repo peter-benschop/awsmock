@@ -26,21 +26,25 @@ namespace AwsMock::Database::Entity::SNS {
 
     void TopicAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        if (mResult->empty()) {
-            return;
-        }
+        try {
 
-        deliveryPolicy = bsoncxx::string::to_string(mResult.value()["deliveryPolicy"].get_string().value);
-        displayName = bsoncxx::string::to_string(mResult.value()["displayName"].get_string().value);
-        fifoTopic = mResult.value()["fifoTopic"].get_bool().value;
-        policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
-        signatureVersion = bsoncxx::string::to_string(mResult.value()["signatureVersion"].get_string().value);
-        tracingConfig = bsoncxx::string::to_string(mResult.value()["tracingConfig"].get_string().value);
-        kmsMasterKeyId = bsoncxx::string::to_string(mResult.value()["kmsMasterKeyId"].get_string().value);
-        archivePolicy = bsoncxx::string::to_string(mResult.value()["archivePolicy"].get_string().value);
-        beginningArchiveTime = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value) / 1000));
-        contentBasedDeduplication = mResult.value()["contentBasedDeduplication"].get_bool().value;
-        availableMessages = mResult.value()["availableMessages"].get_int64().value;
+            deliveryPolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "deliveryPolicy");
+            displayName = Core::Bson::BsonUtils::GetStringValue(mResult, "displayName");
+            fifoTopic = mResult.value()["fifoTopic"].get_bool().value;
+            policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");
+            signatureVersion = Core::Bson::BsonUtils::GetStringValue(mResult, "signatureVersion");
+            tracingConfig = Core::Bson::BsonUtils::GetStringValue(mResult, "tracingConfig");
+            kmsMasterKeyId = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsMasterKeyId");
+            archivePolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "archivePolicy");
+            beginningArchiveTime = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value) / 1000));
+            contentBasedDeduplication = mResult.value()["contentBasedDeduplication"].get_bool().value;
+            availableMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "availableMessages");
+
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::DatabaseException(exc.what());
+        }
     }
 
     Poco::JSON::Object TopicAttribute::ToJsonObject() const {

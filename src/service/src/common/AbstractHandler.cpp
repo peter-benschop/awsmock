@@ -35,7 +35,6 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "*");
@@ -45,8 +44,8 @@ namespace AwsMock::Service {
         // Body
         if (!body.empty()) {
             boost::beast::ostream(response.body()).write(body.c_str(), body.size());
-            response.prepare_payload();
         }
+        response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
@@ -66,7 +65,6 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(contentLength));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
@@ -100,7 +98,6 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "*");
@@ -125,7 +122,6 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::internal_server_error);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "*");
@@ -135,8 +131,8 @@ namespace AwsMock::Service {
         // Body
         if (!body.empty()) {
             boost::beast::ostream(response.body()).write(body.c_str(), body.size());
-            response.prepare_payload();
         }
+        response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
@@ -156,7 +152,6 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::keep_alive, "false");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "*");
@@ -166,8 +161,8 @@ namespace AwsMock::Service {
         // Body
         if (!body.empty()) {
             boost::beast::ostream(response.body()).write(body.c_str(), body.size());
-            response.prepare_payload();
         }
+        response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
@@ -190,7 +185,6 @@ namespace AwsMock::Service {
             response.version(request.version());
             response.result(http::status::partial_content);
             response.set(http::field::server, "awsmock");
-            response.set(http::field::keep_alive, "true");
             response.set(http::field::content_type, "application/octet-stream");
             response.set(http::field::accept_ranges, "bytes");
             response.set(http::field::content_range, "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(totalSize));

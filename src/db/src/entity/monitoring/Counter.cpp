@@ -1,7 +1,6 @@
 //
 // Created by vogje01 on 10/2/24.
 //
-#include "awsmock/core/DateTimeUtils.h"
 #include <awsmock/entity/monitoring/Counter.h>
 
 namespace AwsMock::Database::Entity::Monitoring {
@@ -19,11 +18,11 @@ namespace AwsMock::Database::Entity::Monitoring {
 
     void Counter::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-        labelName = bsoncxx::string::to_string(mResult.value()["labelName"].get_string().value);
-        labelValue = bsoncxx::string::to_string(mResult.value()["labelValue"].get_string().value);
-        performanceValue = mResult.value()["value"].get_double().value;
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        labelName = Core::Bson::BsonUtils::GetStringValue(mResult, "labelName");
+        labelValue = Core::Bson::BsonUtils::GetStringValue(mResult, "labelValue");
+        performanceValue = Core::Bson::BsonUtils::GetDoubleValue(mResult, "value");
         timestamp = bsoncxx::types::b_date(mResult.value()["timestamp"].get_date().value);
     }
 

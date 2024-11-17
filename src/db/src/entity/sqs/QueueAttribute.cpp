@@ -27,17 +27,24 @@ namespace AwsMock::Database::Entity::SQS {
 
     void QueueAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        delaySeconds = mResult.value()["delaySeconds"].get_int32().value;
-        maxMessageSize = mResult.value()["maxMessageSize"].get_int32().value;
-        messageRetentionPeriod = mResult.value()["messageRetentionPeriod"].get_int32().value;
-        policy = bsoncxx::string::to_string(mResult.value()["policy"].get_string().value);
-        receiveMessageWaitTime = mResult.value()["receiveMessageWaitTime"].get_int32().value;
-        visibilityTimeout = mResult.value()["visibilityTimeout"].get_int32().value;
-        redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
-        redriveAllowPolicy = bsoncxx::string::to_string(mResult.value()["redriveAllowPolicy"].get_string().value);
-        approximateNumberOfMessages = static_cast<long>(mResult.value()["approximateNumberOfMessages"].get_int64().value);
-        approximateNumberOfMessagesDelayed = static_cast<long>(mResult.value()["approximateNumberOfMessagesDelayed"].get_int64().value);
-        approximateNumberOfMessagesNotVisible = static_cast<long>(mResult.value()["approximateNumberOfMessagesNotVisible"].get_int64().value);
+        try {
+
+            delaySeconds = Core::Bson::BsonUtils::GetIntValue(mResult, "delaySeconds");
+            maxMessageSize = Core::Bson::BsonUtils::GetIntValue(mResult, "maxMessageSize");
+            messageRetentionPeriod = Core::Bson::BsonUtils::GetIntValue(mResult, "messageRetentionPeriod");
+            policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");
+            receiveMessageWaitTime = Core::Bson::BsonUtils::GetIntValue(mResult, "receiveMessageWaitTime");
+            visibilityTimeout = Core::Bson::BsonUtils::GetIntValue(mResult, "visibilityTimeout");
+            redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
+            redriveAllowPolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "redriveAllowPolicy");
+            approximateNumberOfMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessages");
+            approximateNumberOfMessagesDelayed = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesDelayed");
+            approximateNumberOfMessagesNotVisible = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesNotVisible");
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::DatabaseException(exc.what());
+        }
     }
 
     Poco::JSON::Object QueueAttribute::ToJsonObject() const {

@@ -26,13 +26,13 @@ namespace AwsMock::Database::Entity::Cognito {
 
         try {
 
-            userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
-            clientId = bsoncxx::string::to_string(mResult.value()["clientId"].get_string().value);
-            clientName = bsoncxx::string::to_string(mResult.value()["clientName"].get_string().value);
-            clientSecret = bsoncxx::string::to_string(mResult.value()["clientSecret"].get_string().value);
-            accessTokenValidity = mResult.value()["accessTokenValidity"].get_int64().value;
-            idTokenValidity = mResult.value()["idTokenValidity"].get_int64().value;
-            refreshTokenValidity = mResult.value()["refreshTokenValidity"].get_int64().value;
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(mResult, "userPoolId");
+            clientId = Core::Bson::BsonUtils::GetStringValue(mResult, "clientId");
+            clientName = Core::Bson::BsonUtils::GetStringValue(mResult, "clientName");
+            clientSecret = Core::Bson::BsonUtils::GetStringValue(mResult, "clientSecret");
+            accessTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "accessTokenValidity");
+            idTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "idTokenValidity");
+            refreshTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "refreshTokenValidity");
             generateSecret = mResult.value()["generateSecret"].get_bool().value;
             created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
             modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);

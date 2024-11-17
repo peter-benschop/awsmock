@@ -8,11 +8,11 @@ namespace AwsMock::Database::Entity::Lambda {
 
     void EventSourceMapping::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        eventSourceArn = bsoncxx::string::to_string(mResult.value()["eventSourceArn"].get_string().value);
-        batchSize = mResult.value()["batchSize"].get_int32().value;
-        maximumBatchingWindowInSeconds = mResult.value()["maximumBatchingWindowInSeconds"].get_int32().value;
-        enabled = mResult.value()["enabled"].get_bool().value;
-        uuid = bsoncxx::string::to_string(mResult.value()["uuid"].get_string().value);
+        eventSourceArn = Core::Bson::BsonUtils::GetStringValue(mResult, "eventSourceArn");
+        batchSize = Core::Bson::BsonUtils::GetIntValue(mResult, "batchSize");
+        maximumBatchingWindowInSeconds = Core::Bson::BsonUtils::GetIntValue(mResult, "maximumBatchingWindowInSeconds");
+        enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
+        uuid = Core::Bson::BsonUtils::GetStringValue(mResult, "uuid");
     }
 
     view_or_value<view, value> EventSourceMapping::ToDocument() const {

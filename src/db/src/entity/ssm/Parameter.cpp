@@ -32,15 +32,15 @@ namespace AwsMock::Database::Entity::SSM {
 
     void Parameter::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        parameterName = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-        parameterValue = bsoncxx::string::to_string(mResult.value()["value"].get_string().value);
-        type = bsoncxx::string::to_string(mResult.value()["type"].get_string().value);
-        description = bsoncxx::string::to_string(mResult.value()["description"].get_string().value);
-        tier = bsoncxx::string::to_string(mResult.value()["tier"].get_string().value);
-        version = mResult.value()["version"].get_int32().value;
-        arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        parameterName = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        parameterValue = Core::Bson::BsonUtils::GetStringValue(mResult, "value");
+        type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
+        description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
+        tier = Core::Bson::BsonUtils::GetStringValue(mResult, "tier");
+        version = Core::Bson::BsonUtils::GetIntValue(mResult, "version");
+        arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 

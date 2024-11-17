@@ -22,10 +22,12 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include <awsmock/core//DateTimeUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>

@@ -2,6 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
+#include "awsmock/core/BsonUtils.h"
 #include <awsmock/entity/s3/Bucket.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -151,14 +152,14 @@ namespace AwsMock::Database::Entity::S3 {
 
     void Bucket::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-        owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-        arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-        size = mResult.value()["size"].get_int64().value;
-        keys = mResult.value()["keys"].get_int64().value;
-        versionStatus = BucketVersionStatusFromString(bsoncxx::string::to_string(mResult.value()["versionStatus"].get_string().value));
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
+        arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
+        size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
+        keys = Core::Bson::BsonUtils::GetLongValue(mResult.value()["keys"]);
+        versionStatus = BucketVersionStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "arn"));
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
@@ -188,11 +189,6 @@ namespace AwsMock::Database::Entity::S3 {
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
-
-        // Bucket encryption
-        /*if (mResult.value().find("encryptionConfiguration") != mResult.value().end()) {
-            bucketEncryption.FromDocument(mResult.value()["encryptionConfiguration"].get_document().view());
-        }*/
     }
 
     Poco::JSON::Object Bucket::ToJsonObject() const {

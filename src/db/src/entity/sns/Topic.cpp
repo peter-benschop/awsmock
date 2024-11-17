@@ -43,36 +43,45 @@ namespace AwsMock::Database::Entity::SNS {
 
     void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        topicName = bsoncxx::string::to_string(mResult.value()["topicName"].get_string().value);
-        owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-        topicUrl = bsoncxx::string::to_string(mResult.value()["topicUrl"].get_string().value);
-        topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
-        topicAttribute.FromDocument(mResult.value()["attributes"].get_document().view());
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+        try {
 
-        // Subscriptions
-        if (mResult.value().find("subscriptions") != mResult.value().end()) {
-            bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
-            for (const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
-                Subscription subscription{
-                        .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-                        .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-                        .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
-                subscriptions.push_back(subscription);
-            }
-        }
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            topicName = Core::Bson::BsonUtils::GetStringValue(mResult, "topicName");
+            owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
+            topicUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "topicUrl");
+            topicArn = Core::Bson::BsonUtils::GetStringValue(mResult, "topicArn");
+            created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
+            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 
-        // Get tags
-        if (mResult.value().find("tags") != mResult.value().end()) {
-            bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-            for (const bsoncxx::document::element &tagElement: tagsView) {
-                std::string key = bsoncxx::string::to_string(tagElement.key());
-                std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-                tags.emplace(key, value);
+            // Attributes
+            topicAttribute.FromDocument(mResult.value()["attributes"].get_document().view());
+
+            // Subscriptions
+            if (mResult.value().find("subscriptions") != mResult.value().end()) {
+                bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value};
+                for (const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
+                    Subscription subscription{
+                            .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                            .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
+                            .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
+                    subscriptions.push_back(subscription);
+                }
             }
+
+            // Get tags
+            if (mResult.value().find("tags") != mResult.value().end()) {
+                bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
+                for (const bsoncxx::document::element &tagElement: tagsView) {
+                    std::string key = bsoncxx::string::to_string(tagElement.key());
+                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                    tags.emplace(key, value);
+                }
+            }
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
     }
 
