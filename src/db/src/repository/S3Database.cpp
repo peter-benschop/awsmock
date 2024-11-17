@@ -772,7 +772,7 @@ namespace AwsMock::Database {
         return objectList;
     }
 
-    long S3Database::ObjectCount(const std::string &region, const std::string &bucket) {
+    long S3Database::ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) {
 
         if (HasDatabase()) {
 
@@ -782,24 +782,22 @@ namespace AwsMock::Database {
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
                 long count = 0;
-                if (region.empty() && bucket.empty()) {
+                mongocxx::options::find opts;
 
-                    count = static_cast<long>(_objectCollection.count_documents({}));
-
-                } else if (!region.empty() && bucket.empty()) {
-
-                    count = static_cast<long>(_objectCollection.count_documents(make_document(kvp("region", region))));
-
-                } else if (region.empty() && !bucket.empty()) {
-
-                    count = static_cast<long>(_objectCollection.count_documents(make_document(kvp("bucket", bucket))));
-
-                } else {
-
-                    count = static_cast<long>(_objectCollection.count_documents(make_document(kvp("region", region), kvp("bucket", bucket))));
+                bsoncxx::builder::basic::document query = {};
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!bucket.empty()) {
+                    query.append(kvp("bucket", bucket));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
                 }
 
+                count = static_cast<long>(_objectCollection.count_documents(query.extract()));
                 log_trace << "Object count: " << count;
+
                 return count;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -813,7 +811,7 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::S3::ObjectList S3Database::ListObjects(const std::string &bucket, const std::string &prefix, long maxResults, long skip, const std::vector<Core::SortColumn> &sortColumns) {
+    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) {
 
         Entity::S3::ObjectList objectList;
         if (HasDatabase()) {
@@ -829,14 +827,17 @@ namespace AwsMock::Database {
                 }
                 opts.sort(sort.extract());
             }
-            if (skip > 0) {
-                opts.skip(skip);
-            }
-            if (maxResults > 0) {
-                opts.limit(maxResults);
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+                if (pageIndex > 0) {
+                    opts.skip(pageIndex * pageSize);
+                }
             }
 
             bsoncxx::builder::basic::document query = {};
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
             if (!bucket.empty()) {
                 query.append(kvp("bucket", bucket));
             }

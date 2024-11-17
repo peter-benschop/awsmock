@@ -36,14 +36,14 @@ namespace AwsMock::Dto::S3 {
         std::string prefix;
 
         /**
-         * MaxResults
+         * Page size, default: 10
          */
-        int maxResults;
+        int pageSize = 10;
 
         /**
-         * Skip
+         * Page index
          */
-        int skip;
+        int pageIndex;
 
         /**
          * List of sort columns names

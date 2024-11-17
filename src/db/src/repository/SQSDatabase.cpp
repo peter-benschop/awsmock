@@ -504,14 +504,17 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
-            Entity::SQS::Message result;
-            result.FromDocument(mResult->view());
-            return result;
+            if (mResult) {
+                Entity::SQS::Message result;
+                result.FromDocument(mResult->view());
+                return result;
+            }
 
         } else {
 
             return _memoryDb.GetMessageByReceiptHandle(receiptHandle);
         }
+        return {};
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageById(const std::string &oid) {
