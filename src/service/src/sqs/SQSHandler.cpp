@@ -340,6 +340,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
+                case Dto::Common::SqsCommandType::LIST_MESSAGE_COUNTERS: {
+
+                    Dto::SQS::ListMessageCountersRequest sqsRequest{};
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SQS::ListMessageCountersResponse sqsResponse = _sqsService.ListMessageCounters(sqsRequest);
+                    log_info << "List queue message counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.total;
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
 
                     Dto::SQS::DeleteMessageRequest sqsRequest;
@@ -361,7 +372,7 @@ namespace AwsMock::Service {
                     _sqsService.DeleteMessage(sqsRequest);
                     log_info << "Delete message, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request);
+                    return SendOkResponse(request, "{}");
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE_BATCH: {

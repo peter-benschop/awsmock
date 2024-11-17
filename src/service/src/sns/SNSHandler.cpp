@@ -181,7 +181,7 @@ namespace AwsMock::Service {
                     _snsService.DeleteMessage(snsRequest);
 
                     log_info << "Message deleted, messageId: " << snsRequest.messageId;
-                    return SendOkResponse(request);
+                    return SendOkResponse(request, "{}");
                 }
 
                 case Dto::Common::SNSCommandType::LIST_SUBSCRIPTION_COUNTERS: {

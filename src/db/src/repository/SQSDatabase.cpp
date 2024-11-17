@@ -469,9 +469,6 @@ namespace AwsMock::Database {
 
                 int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
                 log_trace << "Message exists: " << std::boolalpha << count;
-                if (count == 0) {
-                    log_warning << "Message exists: " << std::boolalpha << count;
-                }
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -613,7 +610,7 @@ namespace AwsMock::Database {
         return messageList;
     }
 
-    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) {
+    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) {
 
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
@@ -624,9 +621,9 @@ namespace AwsMock::Database {
             mongocxx::options::find opts;
             if (pageSize > 0) {
                 opts.limit(pageSize);
-            }
-            if (pageIndex * pageSize > 0) {
-                opts.skip(pageSize * pageIndex);
+                if (pageIndex > 0) {
+                    opts.skip(pageSize * pageIndex);
+                }
             }
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
@@ -637,7 +634,16 @@ namespace AwsMock::Database {
                 opts.sort(sort.extract());
             }
 
-            auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn)), opts);
+            bsoncxx::builder::basic::document query;
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+            }
+
+            if (!queueArn.empty()) {
+                query.append(kvp("queueArn", queueArn));
+            }
+
+            auto messageCursor = messageCollection.find(query.extract(), opts);
             for (auto message: messageCursor) {
                 Entity::SQS::Message result;
                 result.FromDocument(message);
@@ -898,7 +904,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSDatabase::CountMessages(const std::string &queueArn) {
+    long SQSDatabase::CountMessages(const std::string &queueArn, const std::string &prefix) {
 
         if (HasDatabase()) {
 
@@ -906,13 +912,17 @@ namespace AwsMock::Database {
             auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
+            bsoncxx::builder::basic::document query = {};
             if (!queueArn.empty()) {
-                count = static_cast<long>(messageCollection.count_documents(make_document(kvp("queueArn", queueArn))));
-                log_trace << "Count resources, queueArn: " << queueArn << " result: " << count;
-            } else {
-                count = static_cast<long>(messageCollection.count_documents({}));
-                log_trace << "Count resources, result: " << count;
+                query.append(kvp("queueArn", queueArn));
             }
+            if (!prefix.empty()) {
+                query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
+            }
+
+            count = static_cast<long>(messageCollection.count_documents(query.extract()));
+            log_trace << "Count messages, queueArn: " << queueArn << " result: " << count;
+
             return count;
 
         } else {

@@ -46,6 +46,7 @@ namespace AwsMock::Dto::Common {
         RECEIVE_MESSAGE,
         CHANGE_MESSAGE_VISIBILITY,
         LIST_MESSAGES,
+        LIST_MESSAGE_COUNTERS,
         DELETE_MESSAGE,
         DELETE_MESSAGE_BATCH,
         UNKNOWN
@@ -71,6 +72,7 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::RECEIVE_MESSAGE, "receive-message"},
             {SqsCommandType::CHANGE_MESSAGE_VISIBILITY, "change-message-visibility"},
             {SqsCommandType::LIST_MESSAGES, "list-messages"},
+            {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
             {SqsCommandType::DELETE_MESSAGE, "delete-message"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
     };
