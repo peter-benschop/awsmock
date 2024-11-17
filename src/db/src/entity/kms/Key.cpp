@@ -55,21 +55,21 @@ namespace AwsMock::Database::Entity::KMS {
     void Key::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         try {
-            oid = mResult.value()["_id"].get_oid().value.to_string();
-            region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-            arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-            keyId = bsoncxx::string::to_string(mResult.value()["keyId"].get_string().value);
-            keyUsage = bsoncxx::string::to_string(mResult.value()["keyUsage"].get_string().value);
-            keySpec = bsoncxx::string::to_string(mResult.value()["keySpec"].get_string().value);
-            keyState = bsoncxx::string::to_string(mResult.value()["keyState"].get_string().value);
-            aes256Key = bsoncxx::string::to_string(mResult.value()["aes256Key"].get_string().value);
-            aes256Iv = bsoncxx::string::to_string(mResult.value()["aes256Iv"].get_string().value);
-            hmac224Key = bsoncxx::string::to_string(mResult.value()["hmac224Key"].get_string().value);
-            hmac256Key = bsoncxx::string::to_string(mResult.value()["hmac256Key"].get_string().value);
-            hmac384Key = bsoncxx::string::to_string(mResult.value()["hmac384Key"].get_string().value);
-            hmac512Key = bsoncxx::string::to_string(mResult.value()["hmac512Key"].get_string().value);
-            rsaPrivateKey = bsoncxx::string::to_string(mResult.value()["rsaPrivateKey"].get_string().value);
-            rsaPublicKey = bsoncxx::string::to_string(mResult.value()["rsaPublicKey"].get_string().value);
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
+            keyId = Core::Bson::BsonUtils::GetStringValue(mResult, "keyId");
+            keyUsage = Core::Bson::BsonUtils::GetStringValue(mResult, "keyUsage");
+            keySpec = Core::Bson::BsonUtils::GetStringValue(mResult, "keySpec");
+            keyState = Core::Bson::BsonUtils::GetStringValue(mResult, "keyState");
+            aes256Key = Core::Bson::BsonUtils::GetStringValue(mResult, "aes256Key");
+            aes256Iv = Core::Bson::BsonUtils::GetStringValue(mResult, "aes256Iv");
+            hmac224Key = Core::Bson::BsonUtils::GetStringValue(mResult, "hmac224Key");
+            hmac256Key = Core::Bson::BsonUtils::GetStringValue(mResult, "hmac256Key");
+            hmac384Key = Core::Bson::BsonUtils::GetStringValue(mResult, "hmac384Key");
+            hmac512Key = Core::Bson::BsonUtils::GetStringValue(mResult, "hmac512Key");
+            rsaPrivateKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPrivateKey");
+            rsaPublicKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPublicKey");
             pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
             if (mResult.value()["scheduledDeletion"].type() != bsoncxx::type::k_null) {
                 scheduledDeletion = mResult.value()["scheduledDeletion"].get_date();

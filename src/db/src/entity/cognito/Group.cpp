@@ -23,15 +23,13 @@ namespace AwsMock::Database::Entity::Cognito {
     void Group::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         // Could be null, in case the group is part of a user
-        if (mResult.value().find("_id") != mResult.value().end()) {
-            oid = mResult.value()["_id"].get_oid().value.to_string();
-        }
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        groupName = bsoncxx::string::to_string(mResult.value()["groupName"].get_string().value);
-        userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
-        description = bsoncxx::string::to_string(mResult.value()["description"].get_string().value);
-        roleArn = bsoncxx::string::to_string(mResult.value()["roleArn"].get_string().value);
-        precedence = mResult.value()["precedence"].get_int32().value;
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        groupName = Core::Bson::BsonUtils::GetStringValue(mResult, "groupName");
+        userPoolId = Core::Bson::BsonUtils::GetStringValue(mResult, "userPoolId");
+        description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
+        roleArn = Core::Bson::BsonUtils::GetStringValue(mResult, "roleArn");
+        precedence = Core::Bson::BsonUtils::GetIntValue(mResult, "precedence");
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
     }

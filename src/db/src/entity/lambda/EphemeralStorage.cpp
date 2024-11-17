@@ -7,7 +7,7 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     void EphemeralStorage::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-        size = static_cast<long>(mResult.value()["size"].get_int64());
+        size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
     }
 
     view_or_value<view, value> EphemeralStorage::ToDocument() const {

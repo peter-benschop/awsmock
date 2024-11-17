@@ -10,6 +10,7 @@
 #include <utility>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -32,6 +33,10 @@
 #include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Dto::Module {
+
+    using bsoncxx::builder::basic::array;
+    using bsoncxx::builder::basic::document;
+    using bsoncxx::builder::basic::kvp;
 
     /**
      * @brief Infrastructure
@@ -121,12 +126,18 @@ namespace AwsMock::Dto::Module {
         Database::Entity::SSM::ParameterList ssmParameters;
 
         /**
-         * @brief JSON representation
+         * @brief Convert to BSON object
          *
-         * @param prettyPrint pretty print, if true JSON indent=4
-         * @return Infrastructure as JSON string
+         * @return bson document
          */
-        Poco::JSON::Object ToJsonObject();
+        document ToDocument() const;
+
+        /**
+         * @brief Convert from BSON document
+         *
+         * @param bson document
+         */
+        void FromDocument(const bsoncxx::document::view &document);
 
         /**
          * @brief From JSON representation

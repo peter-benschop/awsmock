@@ -24,7 +24,9 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/sns/Subscription.h>
 #include <awsmock/entity/sns/TopicAttribute.h>
 #include <awsmock/utils/MongoUtils.h>

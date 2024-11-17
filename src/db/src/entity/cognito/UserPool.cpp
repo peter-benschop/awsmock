@@ -54,12 +54,12 @@ namespace AwsMock::Database::Entity::Cognito {
 
         try {
 
-            oid = mResult.value()["_id"].get_oid().value.to_string();
-            userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
-            region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-            name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-            kmsKey = bsoncxx::string::to_string(mResult.value()["kmsKey"].get_string().value);
-            arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(mResult, "userPoolId");
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+            kmsKey = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsKey");
+            arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
             created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
             modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 

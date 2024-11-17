@@ -43,13 +43,13 @@ namespace AwsMock::Database::Entity::Cognito {
 
     void User::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        userName = bsoncxx::string::to_string(mResult.value()["userName"].get_string().value);
-        userPoolId = bsoncxx::string::to_string(mResult.value()["userPoolId"].get_string().value);
-        enabled = mResult.value()["enabled"].get_bool().value;
-        userStatus = Entity::Cognito::UserStatusFromString(bsoncxx::string::to_string(mResult.value()["userStatus"].get_string().value));
-        confirmationCode = bsoncxx::string::to_string(mResult.value()["confirmationCode"].get_string().value);
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        userName = Core::Bson::BsonUtils::GetStringValue(mResult, "userName");
+        userPoolId = Core::Bson::BsonUtils::GetStringValue(mResult, "userPoolId");
+        enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
+        userStatus = Entity::Cognito::UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "userStatus"));
+        confirmationCode = Core::Bson::BsonUtils::GetStringValue(mResult, "confirmationCode");
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 

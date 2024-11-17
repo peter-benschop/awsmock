@@ -2,7 +2,6 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#include "awsmock/core/JsonUtils.h"
 #include <awsmock/entity/transfer/Transfer.h>
 
 namespace AwsMock::Database::Entity::Transfer {
@@ -50,12 +49,12 @@ namespace AwsMock::Database::Entity::Transfer {
 
     void Transfer::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        serverId = bsoncxx::string::to_string(mResult.value()["serverId"].get_string().value);
-        arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-        state = Entity::Transfer::ServerStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
-        concurrency = mResult.value()["concurrency"].get_int32().value;
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        serverId = Core::Bson::BsonUtils::GetStringValue(mResult, "serverId");
+        arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
+        state = Entity::Transfer::ServerStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
+        concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
         port = mResult.value()["port"].get_int32().value;
         listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
         lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date());

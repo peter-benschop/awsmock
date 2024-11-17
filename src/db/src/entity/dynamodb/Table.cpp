@@ -54,10 +54,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     void Table::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-        status = bsoncxx::string::to_string(mResult.value()["status"].get_string().value);
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 

@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::SQS {
     Entity::SQS::Queue Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         try {
-            oid = mResult.value()["_id"].get_oid().value.to_string();
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
             region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
             name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
             owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
@@ -41,14 +41,6 @@ namespace AwsMock::Database::Entity::SQS {
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
             created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
             modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
-
-            // Paging
-            if (mResult.value().find("paginationToken") != mResult.value().end()) {
-                paginationToken = bsoncxx::string::to_string(mResult.value()["paginationToken"].get_string().value);
-            }
-            if (mResult.value().find("score") != mResult.value().end()) {
-                score = mResult.value()["score"].get_double().value;
-            }
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {

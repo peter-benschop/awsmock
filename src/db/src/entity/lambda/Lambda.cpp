@@ -106,34 +106,36 @@ namespace AwsMock::Database::Entity::Lambda {
 
     void Lambda::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        user = bsoncxx::string::to_string(mResult.value()["user"].get_string().value);
-        function = bsoncxx::string::to_string(mResult.value()["function"].get_string().value);
-        runtime = bsoncxx::string::to_string(mResult.value()["runtime"].get_string().value);
-        role = bsoncxx::string::to_string(mResult.value()["role"].get_string().value);
-        handler = bsoncxx::string::to_string(mResult.value()["handler"].get_string().value);
-        memorySize = mResult.value()["memorySize"].get_int64().value;
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        user = Core::Bson::BsonUtils::GetStringValue(mResult, "user");
+        function = Core::Bson::BsonUtils::GetStringValue(mResult, "function");
+        runtime = Core::Bson::BsonUtils::GetStringValue(mResult, "runtime");
+        role = Core::Bson::BsonUtils::GetStringValue(mResult, "role");
+        handler = Core::Bson::BsonUtils::GetStringValue(mResult, "handler");
+        memorySize = Core::Bson::BsonUtils::GetLongValue(mResult, "memorySize");
         ephemeralStorage.FromDocument(mResult.value()["ephemeralStorage"].get_document().value);
-        codeSize = mResult.value()["codeSize"].get_int64().value;
-        imageId = bsoncxx::string::to_string(mResult.value()["imageId"].get_string().value);
-        imageSize = mResult.value()["imageSize"].get_int64().value;
-        containerId = bsoncxx::string::to_string(mResult.value()["containerId"].get_string().value);
-        containerSize = mResult.value()["containerSize"].get_int64().value;
-        arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-        codeSha256 = bsoncxx::string::to_string(mResult.value()["codeSha256"].get_string().value);
-        timeout = mResult.value()["timeout"].get_int32().value;
-        concurrency = mResult.value()["concurrency"].get_int32().value;
-        environment.FromDocument(mResult.value()["environment"].get_document().value);
-        state = LambdaStateFromString(bsoncxx::string::to_string(mResult.value()["state"].get_string().value));
-        stateReason = bsoncxx::string::to_string(mResult.value()["stateReason"].get_string().value);
-        stateReasonCode = LambdaStateReasonCodeFromString(bsoncxx::string::to_string(mResult.value()["stateReasonCode"].get_string().value));
+        codeSize = Core::Bson::BsonUtils::GetLongValue(mResult, "codeSize");
+        imageId = Core::Bson::BsonUtils::GetStringValue(mResult, "imageId");
+        imageSize = Core::Bson::BsonUtils::GetLongValue(mResult, "imageSize");
+        containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
+        containerSize = Core::Bson::BsonUtils::GetLongValue(mResult, "containerSize");
+        arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
+        codeSha256 = Core::Bson::BsonUtils::GetStringValue(mResult, "codeSha256");
+        timeout = Core::Bson::BsonUtils::GetIntValue(mResult, "timeout");
+        concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
+        state = LambdaStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
+        stateReason = Core::Bson::BsonUtils::GetStringValue(mResult, "stateReason");
+        stateReasonCode = LambdaStateReasonCodeFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "stateReasonCode"));
         lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value);
         lastInvocation = bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value);
-        invocations = mResult.value()["invocations"].get_int64().value;
-        averageRuntime = mResult.value()["averageRuntime"].get_int64().value;
+        invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
+        averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
         created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
         modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+
+        // Environment
+        environment.FromDocument(mResult.value()["environment"].get_document().value);
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {

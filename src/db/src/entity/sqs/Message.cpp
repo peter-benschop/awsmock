@@ -67,44 +67,51 @@ namespace AwsMock::Database::Entity::SQS {
 
     void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
-        queueName = bsoncxx::string::to_string(mResult.value()["queueName"].get_string().value);
-        body = bsoncxx::string::to_string(mResult.value()["body"].get_string().value);
-        status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
-        retries = mResult.value()["retries"].get_int32().value;
-        messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-        receiptHandle = bsoncxx::string::to_string(mResult.value()["receiptHandle"].get_string().value);
-        md5Body = bsoncxx::string::to_string(mResult.value()["md5Body"].get_string().value);
-        md5UserAttr = bsoncxx::string::to_string(mResult.value()["md5UserAttr"].get_string().value);
-        md5SystemAttr = bsoncxx::string::to_string(mResult.value()["md5SystemAttr"].get_string().value);
-        contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
-        size = mResult.value()["size"].get_int64().value;
-        reset = MongoUtils::GetDatetime(mResult, "reset");
-        created = MongoUtils::GetDatetime(mResult, "created");
-        modified = MongoUtils::GetDatetime(mResult, "modified");
+        try {
 
-        // Attributes
-        if (mResult.value().find("messageAttributes") != mResult.value().end()) {
-            bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value};
-            for (const bsoncxx::array::element &attributeElement: attributesView) {
-                MessageAttribute attribute{
-                        .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                        .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
-                        .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
-                };
-                messageAttributes.push_back(attribute);
-            }
-        }
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
+            queueName = Core::Bson::BsonUtils::GetStringValue(mResult, "queueName");
+            body = Core::Bson::BsonUtils::GetStringValue(mResult, "body");
+            status = MessageStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+            retries = Core::Bson::BsonUtils::GetIntValue(mResult, "retries");
+            messageId = Core::Bson::BsonUtils::GetStringValue(mResult, "messageId");
+            receiptHandle = Core::Bson::BsonUtils::GetStringValue(mResult, "receiptHandle");
+            md5Body = Core::Bson::BsonUtils::GetStringValue(mResult, "md5Body");
+            md5UserAttr = Core::Bson::BsonUtils::GetStringValue(mResult, "md5UserAttr");
+            md5SystemAttr = Core::Bson::BsonUtils::GetStringValue(mResult, "md5SystemAttr");
+            contentType = Core::Bson::BsonUtils::GetStringValue(mResult, "contentType");
+            size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+            reset = MongoUtils::GetDatetime(mResult, "reset");
+            created = MongoUtils::GetDatetime(mResult, "created");
+            modified = MongoUtils::GetDatetime(mResult, "modified");
 
-        // Get attributes
-        if (mResult.value().find("attributes") != mResult.value().end()) {
-            bsoncxx::document::view attributesView = mResult.value()["attributes"].get_document().value;
-            for (const bsoncxx::document::element &attributeElement: attributesView) {
-                std::string key = bsoncxx::string::to_string(attributeElement.key());
-                std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);
-                attributes.emplace(key, value);
+            // Attributes
+            if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+                bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value};
+                for (const bsoncxx::array::element &attributeElement: attributesView) {
+                    MessageAttribute attribute{
+                            .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
+                            .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
+                            .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
+                    };
+                    messageAttributes.push_back(attribute);
+                }
             }
+
+            // Get attributes
+            if (mResult.value().find("attributes") != mResult.value().end()) {
+                bsoncxx::document::view attributesView = mResult.value()["attributes"].get_document().value;
+                for (const bsoncxx::document::element &attributeElement: attributesView) {
+                    std::string key = bsoncxx::string::to_string(attributeElement.key());
+                    std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);
+                    attributes.emplace(key, value);
+                }
+            }
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::DatabaseException(exc.what());
         }
     }
 
