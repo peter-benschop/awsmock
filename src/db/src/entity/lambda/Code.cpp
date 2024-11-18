@@ -9,7 +9,7 @@ namespace AwsMock::Database::Entity::Lambda {
     void Code::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         if (mResult.value().find("zipFile") != mResult.value().end()) {
-            zipFile = bsoncxx::string::to_string(mResult.value()["zipFile"].get_string().value);
+            zipFile = Core::Bson::BsonUtils::GetStringValue(mResult, "zipFile");
         }
         if (mResult.value().find("s3Bucket") != mResult.value().end()) {
             s3Bucket = Core::Bson::BsonUtils::GetStringValue(mResult, "s3Bucket");

@@ -18,7 +18,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/cognito/UserPoolClient.h>
@@ -119,24 +118,6 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * Basically only used for the infrastructure export.
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * Basically only used for the infrastructure import.
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * @brief Converts the entity to a string representation.
