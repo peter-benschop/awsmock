@@ -50,8 +50,8 @@ namespace AwsMock::Database::Entity::Cognito {
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
         userStatus = Entity::Cognito::UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "userStatus"));
         confirmationCode = Core::Bson::BsonUtils::GetStringValue(mResult, "confirmationCode");
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Attributes
         if (mResult.value().find("userAttributes") != mResult.value().end()) {

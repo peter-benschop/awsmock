@@ -34,8 +34,8 @@ namespace AwsMock::Database::Entity::Cognito {
             idTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "idTokenValidity");
             refreshTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "refreshTokenValidity");
             generateSecret = mResult.value()["generateSecret"].get_bool().value;
-            created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         } catch (std::exception &exc) {
             log_error << exc.what();

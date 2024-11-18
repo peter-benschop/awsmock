@@ -30,8 +30,8 @@ namespace AwsMock::Database::Entity::Cognito {
         description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
         roleArn = Core::Bson::BsonUtils::GetStringValue(mResult, "roleArn");
         precedence = Core::Bson::BsonUtils::GetIntValue(mResult, "precedence");
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
     Poco::JSON::Object Group::ToJsonObject() const {

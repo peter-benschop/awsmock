@@ -71,11 +71,9 @@ namespace AwsMock::Database::Entity::KMS {
             rsaPrivateKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPrivateKey");
             rsaPublicKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPublicKey");
             pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
-            if (mResult.value()["scheduledDeletion"].type() != bsoncxx::type::k_null) {
-                scheduledDeletion = mResult.value()["scheduledDeletion"].get_date();
-            }
-            created = mResult.value()["created"].get_date();
-            modified = mResult.value()["modified"].get_date();
+            scheduledDeletion = Core::Bson::BsonUtils::GetDateValue(mResult, "scheduledDeletion");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
