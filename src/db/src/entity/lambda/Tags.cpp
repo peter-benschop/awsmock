@@ -27,7 +27,7 @@ namespace AwsMock::Database::Entity::Lambda {
         });
 
         for (auto &it: keys) {
-            tags.emplace_back(it, bsoncxx::string::to_string(mResult.value()[it].get_string().value));
+            tags.emplace_back(it, Core::Bson::BsonUtils::GetStringValue(mResult, it));
         }
     }
 

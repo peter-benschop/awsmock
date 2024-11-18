@@ -18,6 +18,7 @@
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/utils/MongoUtils.h>
 

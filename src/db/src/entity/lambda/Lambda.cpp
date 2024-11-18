@@ -131,8 +131,8 @@ namespace AwsMock::Database::Entity::Lambda {
         lastInvocation = bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value);
         invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Environment
         environment.FromDocument(mResult.value()["environment"].get_document().value);

@@ -22,10 +22,11 @@
 #include <iostream>
 
 // Boost includes
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 // AwsMock includes
 #include <awsmock/controller/Controller.h>
 

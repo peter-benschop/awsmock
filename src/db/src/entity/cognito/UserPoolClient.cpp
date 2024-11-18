@@ -33,7 +33,7 @@ namespace AwsMock::Database::Entity::Cognito {
             accessTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "accessTokenValidity");
             idTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "idTokenValidity");
             refreshTokenValidity = Core::Bson::BsonUtils::GetLongValue(mResult, "refreshTokenValidity");
-            generateSecret = mResult.value()["generateSecret"].get_bool().value;
+            generateSecret = Core::Bson::BsonUtils::GetBoolValue(mResult, "generateSecret");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
@@ -41,37 +41,6 @@ namespace AwsMock::Database::Entity::Cognito {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-    }
-
-    Poco::JSON::Object UserPoolClient::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("userPoolId", userPoolId);
-        jsonObject.set("clientId", clientId);
-        jsonObject.set("clientName", clientName);
-        jsonObject.set("clientSecret", clientSecret);
-        jsonObject.set("idTokenValidity", idTokenValidity);
-        jsonObject.set("accessTokenValidity", accessTokenValidity);
-        jsonObject.set("refreshTokenValidity", refreshTokenValidity);
-        jsonObject.set("generateSecret", generateSecret);
-        jsonObject.set("created", created);
-        jsonObject.set("modified", modified);
-
-        return jsonObject;
-    }
-
-    void UserPoolClient::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("userPoolId", jsonObject, userPoolId);
-        Core::JsonUtils::GetJsonValueString("clientId", jsonObject, clientId);
-        Core::JsonUtils::GetJsonValueString("clientName", jsonObject, clientName);
-        Core::JsonUtils::GetJsonValueString("clientSecret", jsonObject, clientSecret);
-        Core::JsonUtils::GetJsonValueLong("accessTokenValidity", jsonObject, accessTokenValidity);
-        Core::JsonUtils::GetJsonValueLong("idTokenValidity", jsonObject, idTokenValidity);
-        Core::JsonUtils::GetJsonValueLong("refreshTokenValidity", jsonObject, refreshTokenValidity);
-        Core::JsonUtils::GetJsonValueBool("generateSecret", jsonObject, generateSecret);
-        Core::JsonUtils::GetJsonValueDate("created", jsonObject, created);
-        Core::JsonUtils::GetJsonValueDate("modified", jsonObject, modified);
     }
 
     std::string UserPoolClient::ToString() const {

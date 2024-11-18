@@ -13,7 +13,7 @@ namespace AwsMock::Database::Entity::Lambda {
         containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
         hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
         status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
     }
 
     view_or_value<view, value> Instance::ToDocument() const {

@@ -34,29 +34,6 @@ namespace AwsMock::Database::Entity::Cognito {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
-    Poco::JSON::Object Group::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("groupName", groupName);
-        jsonObject.set("userPoolId", userPoolId);
-        jsonObject.set("description", description);
-        jsonObject.set("roleArn", roleArn);
-        jsonObject.set("precedence", precedence);
-
-        return jsonObject;
-    }
-
-    void Group::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("userName", jsonObject, groupName);
-        Core::JsonUtils::GetJsonValueString("userPoolId", jsonObject, userPoolId);
-        Core::JsonUtils::GetJsonValueString("description", jsonObject, description);
-        Core::JsonUtils::GetJsonValueString("roleArn", jsonObject, roleArn);
-        Core::JsonUtils::GetJsonValueInt("precedence", jsonObject, precedence);
-    }
-
     std::string Group::ToString() const {
         std::stringstream ss;
         ss << (*this);

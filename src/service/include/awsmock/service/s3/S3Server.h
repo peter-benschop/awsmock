@@ -6,8 +6,10 @@
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
 // Boost includes
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/asio/thread_pool.hpp>
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>

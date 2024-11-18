@@ -64,10 +64,7 @@ namespace AwsMock::Database::Entity::Cognito {
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get domain
-            if (mResult.value().find("domain") != mResult.value().end()) {
-                bsoncxx::document::view domainView = mResult.value()["domain"].get_document().value;
-                domain.domain = bsoncxx::string::to_string(domainView["domain"].get_string().value);
-            }
+            domain.domain = Core::Bson::BsonUtils::GetStringValue(mResult, "domain");
 
             // Get clients
             if (mResult.value().find("userPoolClients") != mResult.value().end()) {
@@ -93,31 +90,6 @@ namespace AwsMock::Database::Entity::Cognito {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-    }
-
-    Poco::JSON::Object UserPool::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("userPoolId", userPoolId);
-        jsonObject.set("name", name);
-        jsonObject.set("kmsKey", kmsKey);
-        jsonObject.set("arn", arn);
-        jsonObject.set("domain", domain.domain);
-        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
-
-        return jsonObject;
-    }
-
-    void UserPool::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("userPoolId", jsonObject, userPoolId);
-        Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
-        Core::JsonUtils::GetJsonValueString("kmsKey", jsonObject, kmsKey);
-        Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
-        Core::JsonUtils::GetJsonValueString("domain", jsonObject, domain.domain);
     }
 
     std::string UserPool::ToString() const {
