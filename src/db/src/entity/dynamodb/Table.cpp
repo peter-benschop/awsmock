@@ -58,8 +58,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {

@@ -60,8 +60,8 @@ namespace AwsMock::Database::Entity::Cognito {
             name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
             kmsKey = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsKey");
             arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
-            created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get domain
             if (mResult.value().find("domain") != mResult.value().end()) {
