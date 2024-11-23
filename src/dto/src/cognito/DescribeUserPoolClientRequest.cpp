@@ -43,7 +43,7 @@ namespace AwsMock::Dto::Cognito {
 
     std::string DescribeUserPoolClientRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

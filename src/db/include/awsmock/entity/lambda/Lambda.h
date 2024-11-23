@@ -7,9 +7,7 @@
 
 // C++ includes
 #include <chrono>
-#include <iostream>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -17,24 +15,17 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // Poco includes
 #include <Poco/JSON/Object.h>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 #include <awsmock/entity/lambda/EventSourceMapping.h>
 #include <awsmock/entity/lambda/Instance.h>
-#include <awsmock/entity/lambda/Tags.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database::Entity::Lambda {
@@ -61,10 +52,10 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     static std::map<LambdaState, std::string> LambdaStateNames{
-            {LambdaState::Pending, "Pending"},
-            {LambdaState::Active, "Active"},
-            {LambdaState::Inactive, "Inactive"},
-            {LambdaState::Failed, "Failed"},
+            {Pending, "Pending"},
+            {Active, "Active"},
+            {Inactive, "Inactive"},
+            {Failed, "Failed"},
     };
 
     [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
@@ -72,9 +63,9 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
-        for (auto &it: LambdaStateNames) {
-            if (it.second == lambdaState) {
-                return it.first;
+        for (auto &[fst, snd]: LambdaStateNames) {
+            if (snd == lambdaState) {
+                return fst;
             }
         }
         return LambdaState::Inactive;
@@ -108,30 +99,30 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     static std::map<LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
-            {LambdaStateReasonCode::Idle, "Idle"},
-            {LambdaStateReasonCode::Creating, "Creating"},
-            {LambdaStateReasonCode::Restoring, "Restoring"},
-            {LambdaStateReasonCode::EniLimitExceeded, "EniLimitExceeded"},
-            {LambdaStateReasonCode::InsufficientRolePermissions, "InsufficientRolePermissions"},
-            {LambdaStateReasonCode::InvalidConfiguration, "InvalidConfiguration"},
-            {LambdaStateReasonCode::InternalError, "InternalError"},
-            {LambdaStateReasonCode::SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
-            {LambdaStateReasonCode::InvalidSubnet, "InvalidSubnet"},
-            {LambdaStateReasonCode::InvalidSecurityGroup, "InvalidSecurityGroup"},
-            {LambdaStateReasonCode::ImageDeleted, "ImageDeleted"},
-            {LambdaStateReasonCode::ImageAccessDenied, "ImageAccessDenied"},
-            {LambdaStateReasonCode::InvalidImage, "InvalidImage"},
-            {LambdaStateReasonCode::KMSKeyAccessDenied, "KMSKeyAccessDenied"},
-            {LambdaStateReasonCode::KMSKeyNotFound, "KMSKeyNotFound"},
-            {LambdaStateReasonCode::InvalidStateKMSKey, "InvalidStateKMSKey"},
-            {LambdaStateReasonCode::DisabledKMSKey, "DisabledKMSKey"},
-            {LambdaStateReasonCode::EFSIOError, "EFSIOError"},
-            {LambdaStateReasonCode::EFSMountConnectivityError, "EFSMountConnectivityError"},
-            {LambdaStateReasonCode::EFSMountFailure, "EFSMountFailure"},
-            {LambdaStateReasonCode::EFSMountTimeout, "EFSMountTimeout"},
-            {LambdaStateReasonCode::InvalidRuntime, "InvalidRuntime"},
-            {LambdaStateReasonCode::InvalidZipFileException, "InvalidZipFileException"},
-            {LambdaStateReasonCode::FunctionError, "FunctionError"},
+            {Idle, "Idle"},
+            {Creating, "Creating"},
+            {Restoring, "Restoring"},
+            {EniLimitExceeded, "EniLimitExceeded"},
+            {InsufficientRolePermissions, "InsufficientRolePermissions"},
+            {InvalidConfiguration, "InvalidConfiguration"},
+            {InternalError, "InternalError"},
+            {SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
+            {InvalidSubnet, "InvalidSubnet"},
+            {InvalidSecurityGroup, "InvalidSecurityGroup"},
+            {ImageDeleted, "ImageDeleted"},
+            {ImageAccessDenied, "ImageAccessDenied"},
+            {InvalidImage, "InvalidImage"},
+            {KMSKeyAccessDenied, "KMSKeyAccessDenied"},
+            {KMSKeyNotFound, "KMSKeyNotFound"},
+            {InvalidStateKMSKey, "InvalidStateKMSKey"},
+            {DisabledKMSKey, "DisabledKMSKey"},
+            {EFSIOError, "EFSIOError"},
+            {EFSMountConnectivityError, "EFSMountConnectivityError"},
+            {EFSMountFailure, "EFSMountFailure"},
+            {EFSMountTimeout, "EFSMountTimeout"},
+            {InvalidRuntime, "InvalidRuntime"},
+            {InvalidZipFileException, "InvalidZipFileException"},
+            {FunctionError, "FunctionError"},
     };
 
     [[maybe_unused]] static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
@@ -139,12 +130,12 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
-        for (auto &it: LambdaStateReasonCodeNames) {
-            if (it.second == lambdaStateReasonCode) {
-                return it.first;
+        for (auto &[fst, snd]: LambdaStateReasonCodeNames) {
+            if (snd == lambdaStateReasonCode) {
+                return fst;
             }
         }
-        return LambdaStateReasonCode::Idle;
+        return Idle;
     }
 
     struct Lambda {
@@ -261,7 +252,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * State reason code
          */
-        LambdaStateReasonCode stateReasonCode = LambdaStateReasonCode::Creating;
+        LambdaStateReasonCode stateReasonCode = Creating;
 
         /**
          * Code SHA256
@@ -370,20 +361,6 @@ namespace AwsMock::Database::Entity::Lambda {
         void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
 
         /**
-         * @brief Converts the JSON object to an entity
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
          * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
@@ -401,5 +378,7 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     typedef std::vector<Lambda> LambdaList;
+
 }// namespace AwsMock::Database::Entity::Lambda
+
 #endif//AWSMOCK_DB_ENTITY_LAMBDA_H

@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Cognito {
 
     std::string ListUserCountersRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

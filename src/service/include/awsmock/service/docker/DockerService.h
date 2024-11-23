@@ -98,7 +98,7 @@ namespace AwsMock::Service {
          * @param tag image tags
          * @return true if image exists, otherwise false
          */
-        bool ImageExists(const std::string &name, const std::string &tag);
+        bool ImageExists(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Returns a image by name/tags.

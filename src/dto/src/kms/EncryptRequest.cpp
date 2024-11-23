@@ -66,7 +66,7 @@ namespace AwsMock::Dto::KMS {
 
     std::string EncryptRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

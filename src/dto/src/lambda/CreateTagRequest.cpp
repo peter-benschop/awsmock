@@ -47,7 +47,7 @@ namespace AwsMock::Dto::Lambda {
 
     std::string CreateTagRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

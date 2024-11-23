@@ -6,33 +6,31 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
+    bsoncxx::document::view ProvisionedThroughput::ToDocument() const {
+        bsoncxx::builder::basic::document document;
+        Core::Bson::BsonUtils::SetIntValue(document, "ReadCapacityUnits", readCapacityUnits);
+        Core::Bson::BsonUtils::SetIntValue(document, "WriteCapacityUnits", writeCapacityUnits);
+        Core::Bson::BsonUtils::SetDateValue(document, "LastDecreaseDateTime", lastDecreaseDateTime);
+        Core::Bson::BsonUtils::SetDateValue(document, "LastIncreaseDateTime", lastIncreaseDateTime);
+        Core::Bson::BsonUtils::SetLongValue(document, "NumberOfDecreasesToday", numberOfDecreasesToday);
+        return document;
+    }
 
-    Poco::JSON::Object ProvisionedThroughput::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("ReadCapacityUnits", readCapacityUnits);
-        jsonObject.set("WriteCapacityUnits", writeCapacityUnits);
-        jsonObject.set("LastDecreaseDateTime", lastDecreaseDateTime);
-        jsonObject.set("LastIncreaseDateTime", lastIncreaseDateTime);
-        jsonObject.set("NumberOfDecreasesToday", numberOfDecreasesToday);
-        return jsonObject;
+    void ProvisionedThroughput::FromDocument(bsoncxx::document::view document) {
+        readCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "ReadCapacityUnits");
+        writeCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "WriteCapacityUnits");
+        lastDecreaseDateTime = Core::Bson::BsonUtils::GetDateValue(document, "LastDecreaseDateTime");
+        lastIncreaseDateTime = Core::Bson::BsonUtils::GetDateValue(document, "LastIncreaseDateTime");
+        numberOfDecreasesToday = Core::Bson::BsonUtils::GetLongValue(document, "NumberOfDecreasesToday");
     }
 
     std::string ProvisionedThroughput::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
-    }
-
-    void ProvisionedThroughput::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-        Core::JsonUtils::GetJsonValueInt("ReadCapacityUnits", jsonObject, readCapacityUnits);
-        Core::JsonUtils::GetJsonValueInt("WriteCapacityUnits", jsonObject, writeCapacityUnits);
-        Core::JsonUtils::GetJsonValueDate("LastDecreaseDateTime", jsonObject, lastDecreaseDateTime);
-        Core::JsonUtils::GetJsonValueDate("LastIncreaseDateTime", jsonObject, lastIncreaseDateTime);
-        Core::JsonUtils::GetJsonValueLong("NumberOfDecreasesToday", jsonObject, numberOfDecreasesToday);
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string ProvisionedThroughput::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

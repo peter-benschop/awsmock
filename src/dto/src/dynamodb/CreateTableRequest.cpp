@@ -3,54 +3,62 @@
 //
 
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/config/util.hpp>
+#include <bsoncxx/stdx/make_unique.hpp>
+#include <bsoncxx/types/bson_value/view.hpp>
 
 namespace AwsMock::Dto::DynamoDb {
 
     std::string CreateTableRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
+
+            bsoncxx::builder::basic::document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableClass", tableClass);
 
             // Attributes
-            Poco::JSON::Array jsonAttributeArray;
-            for (const auto &tag: attributes) {
-                Poco::JSON::Object object;
-                object.set("AttributeName", tag.first);
-                object.set("AttributeType", tag.second);
-                jsonAttributeArray.add(object);
+            if (!attributes.empty()) {
+                bsoncxx::builder::basic::array attributeArray;
+                for (const auto &[fst, snd]: attributes) {
+                    bsoncxx::builder::basic::document attributeDocument;
+                    Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeName", fst);
+                    Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeType", snd);
+                    attributeArray.append(attributeDocument);
+                }
+                document.append(kvp("AttributeDefinitions", attributeArray));
             }
-            rootJson.set("AttributeDefinitions", jsonAttributeArray);
 
             // Key schema
-            Poco::JSON::Array jsonKeySchemasArray;
-            for (const auto &keySchema: keySchemas) {
-                Poco::JSON::Object object;
-                object.set("AttributeName", keySchema.first);
-                object.set("KeyType", keySchema.second);
-                jsonKeySchemasArray.add(object);
+            if (!keySchemas.empty()) {
+                bsoncxx::builder::basic::array keySchemasArray;
+                for (const auto &[fst, snd]: keySchemas) {
+                    bsoncxx::builder::basic::document keySchemaDocument;
+                    Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "AttributeName", fst);
+                    Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "KeyType", snd);
+                    keySchemasArray.append(keySchemaDocument);
+                }
+                document.append(kvp("KeySchema", keySchemasArray));
             }
-            rootJson.set("KeySchema", jsonKeySchemasArray);
 
             // Provisioned throughput
-            rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
-
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
-            if (!tableClass.empty()) {
-                rootJson.set("TableClass", tableClass);
-            }
+            document.append(kvp("ProvisionedThroughput", provisionedThroughput.ToDocument()));
 
             // Tags
-            Poco::JSON::Array jsonTagsArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object object;
-                object.set("Key", tag.first);
-                object.set("Value", tag.second);
-                jsonTagsArray.add(object);
+            if (!tags.empty()) {
+                bsoncxx::builder::basic::array tagsArray;
+                for (const auto &[fst, snd]: tags) {
+                    bsoncxx::builder::basic::document tagDocument;
+                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Key", fst);
+                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Value", snd);
+                    tagsArray.append(tagDocument);
+                }
+                document.append(kvp("Tags", tagsArray));
             }
-            rootJson.set("Tags", jsonTagsArray);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -60,68 +68,63 @@ namespace AwsMock::Dto::DynamoDb {
 
     void CreateTableRequest::FromJson(const std::string &jsonBody) {
 
+        if (jsonBody.empty()) {
+            return;
+        }
+
         // Save original body
         body = jsonBody;
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonBody);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("TableClass", rootObject, tableClass);
-            Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
+
+            bsoncxx::builder::basic::document document;
+            const value documentValue = bsoncxx::from_json(body);
+
+            region = Core::Bson::BsonUtils::GetStringValue(documentValue, "Region");
+            tableClass = Core::Bson::BsonUtils::GetStringValue(documentValue, "TableClass");
+            tableName = Core::Bson::BsonUtils::GetStringValue(documentValue, "TableName");
 
             // Tags
-            Poco::JSON::Array::Ptr jsonTagsArray = rootObject->getArray("Tags");
-            if (!jsonTagsArray.isNull()) {
-                for (size_t i = 0; i < jsonTagsArray->size(); i++) {
-                    std::string key, value;
-                    Poco::JSON::Object::Ptr jsonTagsObject = jsonTagsArray->getObject(i);
-                    Core::JsonUtils::GetJsonValueString("Key", jsonTagsObject, key);
-                    Core::JsonUtils::GetJsonValueString("Value", jsonTagsObject, value);
-                    tags[key] = value;
+            if (documentValue.find("Tags") != documentValue.end()) {
+                for (const view tagsView = documentValue["Tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                    std::string key = bsoncxx::string::to_string(tagElement.key());
+                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                    tags.emplace(key, value);
                 }
             }
 
             // Attributes
-            Poco::JSON::Array::Ptr jsonAttributeArray = rootObject->getArray("AttributeDefinitions");
-            if (!jsonAttributeArray.isNull()) {
-                for (size_t i = 0; i < jsonAttributeArray->size(); i++) {
-                    std::string name, type;
-                    Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-                    Core::JsonUtils::GetJsonValueString("AttributeName", jsonAttributeObject, name);
-                    Core::JsonUtils::GetJsonValueString("AttributeType", jsonAttributeObject, type);
+            if (documentValue.find("AttributeDefinitions") != documentValue.end()) {
+                for (const view attributesView = documentValue["AttributeDefinitions"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
+                    const std::string name = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeName"]);
+                    const std::string type = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeType"]);
                     attributes[name] = type;
                 }
             }
 
             // Key schemas
-            Poco::JSON::Array::Ptr jsonKeySchemasArray = rootObject->getArray("KeySchema");
-            if (!jsonKeySchemasArray.isNull()) {
-                for (size_t i = 0; i < jsonKeySchemasArray->size(); i++) {
-                    std::string attributeName, keyType;
-                    Poco::JSON::Object::Ptr jsonKeySchemaObject = jsonKeySchemasArray->getObject(i);
-                    Core::JsonUtils::GetJsonValueString("AttributeName", jsonKeySchemaObject, attributeName);
-                    Core::JsonUtils::GetJsonValueString("KeyType", jsonKeySchemaObject, keyType);
-                    keySchemas[attributeName] = keyType;
+            if (documentValue.find("KeySchema") != documentValue.end()) {
+                for (const view attributesView = documentValue["KeySchema"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
+                    const std::string name = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeName"]);
+                    const std::string type = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeType"]);
+                    keySchemas[name] = type;
                 }
             }
 
             // Provisioned throughput
-            if (rootObject->has("ProvisionedThroughput")) {
-                provisionedThroughput.FromJsonObject(rootObject->getObject("ProvisionedThroughput"));
+            if (documentValue.find("ProvisionedThroughput") != documentValue.end()) {
+                provisionedThroughput.FromDocument(documentValue["ProvisionedThroughput"].get_document().view());
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string CreateTableRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

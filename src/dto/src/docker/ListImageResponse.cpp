@@ -47,7 +47,7 @@ namespace AwsMock::Dto::Docker {
 
     std::string ListImageResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

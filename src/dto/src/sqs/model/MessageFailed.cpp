@@ -53,7 +53,7 @@ namespace AwsMock::Dto::SQS {
 
     [[nodiscard]] std::string MessageFailed::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

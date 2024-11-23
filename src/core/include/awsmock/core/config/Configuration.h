@@ -6,24 +6,17 @@
 #define AWSMOCK_CORE_CONFIGURATION_H
 
 // Standard C++ includes
-#include <fstream>
-#include <sstream>
 #include <string>
-#include <utility>
 
 // Poco includes
-#include <Poco/String.h>
-#include <Poco/Util/LayeredConfiguration.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
 namespace AwsMock::Core {
@@ -50,7 +43,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class Configuration : public Poco::Util::PropertyFileConfiguration {
+    class Configuration final : public Poco::Util::PropertyFileConfiguration {
 
       public:
 
@@ -167,7 +160,7 @@ namespace AwsMock::Core {
          *
          * @param filename name of the configuration file
          */
-        void WriteFile(const std::string &filename);
+        void WriteFile(const std::string &filename) const;
 
         /**
          * @brief Converts the DTO to a string representation.

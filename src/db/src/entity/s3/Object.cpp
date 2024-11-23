@@ -6,15 +6,11 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     view_or_value<view, value> Object::ToDocument() const {
 
         auto metadataDoc = bsoncxx::builder::basic::document{};
-        for (const auto &m: metadata) {
-            metadataDoc.append(kvp(m.first, m.second));
+        for (const auto &[fst, snd]: metadata) {
+            metadataDoc.append(kvp(fst, snd));
         }
 
         view_or_value<view, value> objectDoc = make_document(
@@ -37,25 +33,24 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     void Object::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
-        oid = mResult.value()["_id"].get_oid().value.to_string();
-        region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-        bucket = bsoncxx::string::to_string(mResult.value()["bucket"].get_string().value);
-        key = bsoncxx::string::to_string(mResult.value()["key"].get_string().value);
-        owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-        size = static_cast<long>(mResult.value()["size"].get_int64().value);
-        md5sum = bsoncxx::string::to_string(mResult.value()["md5sum"].get_string().value);
-        sha1sum = bsoncxx::string::to_string(mResult.value()["sha1sum"].get_string().value);
-        sha256sum = bsoncxx::string::to_string(mResult.value()["sha256sum"].get_string().value);
-        contentType = bsoncxx::string::to_string(mResult.value()["contentType"].get_string().value);
-        internalName = bsoncxx::string::to_string(mResult.value()["internalName"].get_string().value);
-        versionId = bsoncxx::string::to_string(mResult.value()["versionId"].get_string().value);
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult.value()["_id"]);
+        region = Core::Bson::BsonUtils::GetStringValue(mResult.value()["region"]);
+        bucket = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucket"]);
+        key = Core::Bson::BsonUtils::GetStringValue(mResult.value()["key"]);
+        owner = Core::Bson::BsonUtils::GetStringValue(mResult.value()["owner"]);
+        size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
+        md5sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["md5sum"]);
+        sha1sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sha1sum"]);
+        sha256sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sha256sum"]);
+        contentType = Core::Bson::BsonUtils::GetStringValue(mResult.value()["contentType"]);
+        internalName = Core::Bson::BsonUtils::GetStringValue(mResult.value()["internalName"]);
+        versionId = Core::Bson::BsonUtils::GetStringValue(mResult.value()["versionId"]);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
 
         // Get metadata
         if (mResult.value().find("metadata") != mResult.value().end()) {
-            bsoncxx::document::view metadataView = mResult.value()["metadata"].get_document().value;
-            for (const bsoncxx::document::element &metadataElement: metadataView) {
+            for (const view metadataView = mResult.value()["metadata"].get_document().value; const bsoncxx::document::element &metadataElement: metadataView) {
                 std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
                 std::string metadataValue = bsoncxx::string::to_string(metadataView[metadataKey].get_string().value);
                 metadata.emplace(metadataKey, metadataValue);
@@ -63,69 +58,14 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    Poco::JSON::Object Object::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("bucket", bucket);
-        jsonObject.set("key", key);
-        jsonObject.set("owner", owner);
-        jsonObject.set("size", size);
-        jsonObject.set("md5sum", md5sum);
-        jsonObject.set("sha1sum", sha1sum);
-        jsonObject.set("sha256sum", sha256sum);
-        jsonObject.set("contentType", contentType);
-        jsonObject.set("internalName", internalName);
-        jsonObject.set("versionId", versionId);
-        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
-
-        if (!metadata.empty()) {
-            Poco::JSON::Array jsonMetadataArray;
-            for (const auto &meta: metadata) {
-                Poco::JSON::Object jsonMetadata;
-                jsonMetadata.set("name", meta.first);
-                jsonMetadata.set("value", meta.second);
-                jsonMetadataArray.add(jsonMetadata);
-            }
-            jsonObject.set("metadata", jsonMetadataArray);
-        }
-
-        return jsonObject;
-    }
-
-    void Object::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("bucket", jsonObject, bucket);
-        Core::JsonUtils::GetJsonValueString("key", jsonObject, key);
-        Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-        Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
-        Core::JsonUtils::GetJsonValueString("md5sum", jsonObject, md5sum);
-        Core::JsonUtils::GetJsonValueString("sha1sum", jsonObject, sha1sum);
-        Core::JsonUtils::GetJsonValueString("sha256sum", jsonObject, sha256sum);
-        Core::JsonUtils::GetJsonValueString("contentType", jsonObject, contentType);
-        Core::JsonUtils::GetJsonValueString("internalName", jsonObject, internalName);
-        Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
-
-        if (jsonObject->has("metadata")) {
-            Poco::JSON::Array::Ptr jsonMetadataArray = jsonObject->getArray("metadata");
-            for (int i = 0; i < jsonMetadataArray->size(); i++) {
-                Poco::JSON::Object::Ptr jsonMetadataObject = jsonMetadataArray->getObject(i);
-                std::string keyString = jsonMetadataObject->get("name");
-                std::string valueString = jsonMetadataObject->get("value");
-                metadata[keyString] = valueString;
-            }
-        }
-    }
-
     std::string Object::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const Object &o) {
-        os << "Object=" << bsoncxx::to_json(o.ToDocument());
+        os << "Object=" << to_json(o.ToDocument());
         return os;
     }
 

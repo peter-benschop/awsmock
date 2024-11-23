@@ -7,19 +7,12 @@
 
 // C++ includes
 #include <chrono>
-#include <map>
 #include <string>
-
-// Poco includes
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include

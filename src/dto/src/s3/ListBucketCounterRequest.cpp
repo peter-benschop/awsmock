@@ -72,7 +72,7 @@ namespace AwsMock::Dto::S3 {
 
     std::string ListBucketCounterRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

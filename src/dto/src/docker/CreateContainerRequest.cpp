@@ -66,7 +66,7 @@ namespace AwsMock::Dto::Docker {
 
     std::string CreateContainerRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

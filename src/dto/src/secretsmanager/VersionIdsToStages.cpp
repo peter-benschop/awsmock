@@ -59,7 +59,7 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string VersionIdsToStages::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

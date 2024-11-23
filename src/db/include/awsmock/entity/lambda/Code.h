@@ -6,12 +6,7 @@
 #define AWSMOCK_DB_ENTITY_LAMBDA_CODE_H
 
 // C++ includes
-#include <sstream>
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <awsmock/core/BsonUtils.h>
@@ -79,13 +74,6 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * @brief Converts the DTO to a string representation.

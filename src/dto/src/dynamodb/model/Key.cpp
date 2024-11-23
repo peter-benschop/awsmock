@@ -47,7 +47,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string Key::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

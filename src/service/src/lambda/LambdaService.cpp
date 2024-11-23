@@ -134,9 +134,12 @@ namespace AwsMock::Service {
             response.concurrency = lambda.concurrency;
             response.invocations = lambda.invocations;
             response.averageRuntime = lambda.averageRuntime;
+            response.lastStarted = lambda.lastStarted;
             response.lastInvocation = lambda.lastInvocation;
             response.created = lambda.created;
             response.modified = lambda.modified;
+            response.tags = lambda.tags;
+            response.environment = lambda.environment.variables;
 
             log_info << "Lambda function: " + response.ToJson();
             return response;

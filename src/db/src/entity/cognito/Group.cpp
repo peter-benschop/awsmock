@@ -36,7 +36,7 @@ namespace AwsMock::Database::Entity::Cognito {
 
     std::string Group::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

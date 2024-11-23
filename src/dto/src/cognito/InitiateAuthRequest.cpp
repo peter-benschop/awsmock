@@ -95,7 +95,7 @@ namespace AwsMock::Dto::Cognito {
 
     std::string InitiateAuthRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

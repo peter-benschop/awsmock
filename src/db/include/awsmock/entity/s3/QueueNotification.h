@@ -6,22 +6,17 @@
 #define AWSMOCK_DB_ENTITY_S3_QUEUE_NOTIFICATION_H
 
 // C++ includes
-#include <chrono>
-#include <sstream>
 #include <string>
-
-// Poco includes
-#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/FilterRule.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -34,7 +29,7 @@ namespace AwsMock::Database::Entity::S3 {
     using bsoncxx::document::view;
 
     /**
-     * S3 bucket queue notification entity
+     * @brief S3 bucket queue notification entity
      *
      * <p>
      * This is a child object of the bucket entity.
@@ -66,7 +61,7 @@ namespace AwsMock::Database::Entity::S3 {
         std::vector<FilterRule> filterRules;
 
         /**
-         * Check filter
+         * @brief Check filter
          *
          * @param key object key
          * @return true in case filter exists and key matches
@@ -74,42 +69,28 @@ namespace AwsMock::Database::Entity::S3 {
         bool CheckFilter(const std::string &key);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        QueueNotification FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        QueueNotification FromDocument(const mongocxx::stdx::optional<view> &mResult);
 
         /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
-
-        /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

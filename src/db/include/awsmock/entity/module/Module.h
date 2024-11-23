@@ -6,15 +6,11 @@
 #define AWSMOCK_DB_ENTITY_MODULE_MODULE_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
@@ -85,7 +81,7 @@ namespace AwsMock::Database::Entity::Module {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<view> mResult);
 
         /**
          * Convert to JSON representation

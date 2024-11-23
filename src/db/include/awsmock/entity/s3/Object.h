@@ -7,29 +7,17 @@
 
 // C++ includes
 #include <chrono>
-#include <iostream>
 #include <map>
-#include <sstream>
 #include <string>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -136,21 +124,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
+        void FromDocument(mongocxx::stdx::optional<view> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -173,6 +147,5 @@ namespace AwsMock::Database::Entity::S3 {
     typedef std::vector<Object> ObjectList;
 
 }// namespace AwsMock::Database::Entity::S3
-// namespace AwsMock::Database::S3::Entity
 
 #endif//AWSMOCK_DB_ENTITY_S3_OBJECT_H

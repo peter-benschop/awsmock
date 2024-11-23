@@ -4,6 +4,8 @@
 
 #include "awsmock/core/config/Configuration.h"
 
+#include <awsmock/core/Version.h>
+
 namespace AwsMock::Core {
 
     boost::mutex Configuration::_configurationMutex;
@@ -263,11 +265,11 @@ namespace AwsMock::Core {
 
     std::string Configuration::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
-    void Configuration::WriteFile(const std::string &filename) {
+    void Configuration::WriteFile(const std::string &filename) const {
         std::vector<std::string> pKeys;
         this->keys(pKeys);
         std::ofstream ofs(filename, std::ofstream::trunc);

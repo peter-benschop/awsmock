@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Transfer {
 
     std::string IdentityProviderDetails::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

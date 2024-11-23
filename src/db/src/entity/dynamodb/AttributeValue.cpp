@@ -107,12 +107,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     std::string AttributeValue::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const AttributeValue &a) {
-        os << "AttributeValue=" << bsoncxx::to_json(a.ToDocument());
+        os << "AttributeValue=" << to_json(a.ToDocument());
         return os;
     }
 

@@ -23,24 +23,24 @@ namespace AwsMock::Database::Entity::Module {
         return objectDoc;
     }
 
-    void Module::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Module::FromDocument(mongocxx::stdx::optional<view> mResult) {
 
-        oid = Core::Bson::BsonUtils::GetOidValue(mResult,"_id");
-        name = Core::Bson::BsonUtils::GetStringValue(mResult,"name");
-        port = Core::Bson::BsonUtils::GetIntValue(mResult,"port");
-        state = ModuleStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult,"state"));
-        status = ModuleStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult,"status"));
-        created = Core::Bson::BsonUtils::GetDateValue(mResult,"created");
-        modified = Core::Bson::BsonUtils::GetDateValue(mResult,"modified");
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        port = Core::Bson::BsonUtils::GetIntValue(mResult, "port");
+        state = ModuleStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
+        status = ModuleStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
     std::string Module::ToJson() const {
-        return bsoncxx::to_json(ToDocument());
+        return to_json(ToDocument());
     }
 
     std::string Module::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -8,7 +8,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string QueueAttribute::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

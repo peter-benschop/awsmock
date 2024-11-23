@@ -30,6 +30,7 @@ namespace AwsMock::Database::Entity::S3 {
         }
         lambdaNotificationDoc.append(kvp("events", eventsDoc));
 
+        // Filter rules
         auto filterRulesDoc = bsoncxx::builder::basic::array{};
         for (const auto &filterRule: filterRules) {
             filterRulesDoc.append(filterRule.ToDocument());
@@ -43,21 +44,19 @@ namespace AwsMock::Database::Entity::S3 {
 
         try {
 
-            id = bsoncxx::string::to_string(mResult.value()["id"].get_string().value);
-            lambdaArn = bsoncxx::string::to_string(mResult.value()["lambdaArn"].get_string().value);
+            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
+            lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["lambdaArn"]);
 
             // Extract events
             if (mResult.value().find("events") != mResult.value().end()) {
-                bsoncxx::document::view eventsView = mResult.value()["events"].get_array().value;
-                for (bsoncxx::document::element event: eventsView) {
+                for (const view eventsView = mResult.value()["events"].get_array().value; bsoncxx::document::element event: eventsView) {
                     events.emplace_back(event.get_string().value);
                 }
             }
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                bsoncxx::document::view filterRulesView = mResult.value()["filterRules"].get_array().value;
-                for (const bsoncxx::document::element &filterRuleElement: filterRulesView) {
+                for (const view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document().view());
                     filterRules.emplace_back(filterRule);
@@ -71,35 +70,14 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
-    Poco::JSON::Object LambdaNotification::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("id", id);
-        jsonObject.set("lambdaArn", lambdaArn);
-
-        if (!events.empty()) {
-            jsonObject.set("events", Core::JsonUtils::GetJsonStringArray(events));
-        }
-
-        if (!filterRules.empty()) {
-            Poco::JSON::Array filterRulesArray;
-            for (const auto &filterRule: filterRules) {
-                filterRulesArray.add(filterRule.ToJsonObject());
-            }
-            jsonObject.set("filterRules", filterRulesArray);
-        }
-
-        return jsonObject;
-    }
-
     std::string LambdaNotification::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const LambdaNotification &n) {
-        os << "LambdaNotification=" << bsoncxx::to_json(n.ToDocument());
+        os << "LambdaNotification=" << to_json(n.ToDocument());
         return os;
     }
 

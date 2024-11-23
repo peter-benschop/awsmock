@@ -58,7 +58,7 @@ namespace AwsMock::Dto::Module {
 
     std::string CleanInfrastructureRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

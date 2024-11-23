@@ -6,8 +6,6 @@
 #define AWSMOCK_DB_ENTITY_S3_BUCKET_ENCRYPTION_H
 
 // C++ includes
-#include <chrono>
-#include <sstream>
 #include <string>
 
 // Poco includes
@@ -17,17 +15,20 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
+    using bsoncxx::to_json;
     using bsoncxx::view_or_value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
 
@@ -62,7 +63,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(const mongocxx::stdx::optional<view> &mResult);
 
         /**
          * Converts the entity to a JSON object

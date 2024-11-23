@@ -224,7 +224,7 @@ namespace AwsMock::Dto::Common {
 
     std::string S3ClientCommand::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

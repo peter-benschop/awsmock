@@ -50,7 +50,7 @@ namespace AwsMock::Database {
          * @return true if DynamoDb table already exists
          * @throws DatabaseException
          */
-        bool TableExists(const std::string &region, const std::string &tableName);
+        bool TableExists(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Create a new DynamoDb table
@@ -110,7 +110,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of DynamoDB tables
          */
-        Entity::DynamoDb::TableList ListTables(const std::string &region = {});
+        Entity::DynamoDb::TableList ListTables(const std::string &region = {}) const;
 
         /**
          * @brief Returns the number of DynamoDB tables
@@ -220,7 +220,7 @@ namespace AwsMock::Database {
         void DeleteItems(const std::string &region, const std::string &tableName);
 
         /**
-         * Deletes all items
+         * @brief Deletes all items
          *
          * @throws DatabaseException
          */
@@ -229,22 +229,22 @@ namespace AwsMock::Database {
       private:
 
         /**
-         * Database name
+         * @brief Database name
          */
         std::string _databaseName;
 
         /**
-         * Table collection name
+         * @brief Table collection name
          */
         std::string _tableCollectionName;
 
         /**
-         * Item collection name
+         * @brief Item collection name
          */
         std::string _itemCollectionName;
 
         /**
-         * DynamoDB in-memory database
+         * @brief DynamoDB in-memory database
          */
         DynamoDbMemoryDb &_memoryDb;
     };

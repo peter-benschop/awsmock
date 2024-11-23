@@ -70,7 +70,7 @@ namespace AwsMock::Dto::Docker {
 
     std::string Image::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

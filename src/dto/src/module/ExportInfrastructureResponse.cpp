@@ -25,7 +25,7 @@ namespace AwsMock::Dto::Module {
 
     std::string ExportInfrastructureResponse::ToString() {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

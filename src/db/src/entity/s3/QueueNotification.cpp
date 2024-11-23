@@ -39,25 +39,23 @@ namespace AwsMock::Database::Entity::S3 {
         return queueNotificationDoc.extract();
     }
 
-    QueueNotification QueueNotification::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    QueueNotification QueueNotification::FromDocument(const mongocxx::stdx::optional<view> &mResult) {
 
         try {
 
-            id = bsoncxx::string::to_string(mResult.value()["id"].get_string().value);
-            queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
+            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
+            queueArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["queueArn"]);
 
             // Extract events
             if (mResult.value().find("events") != mResult.value().end()) {
-                bsoncxx::document::view eventsView = mResult.value()["events"].get_array().value;
-                for (const bsoncxx::document::element &eventElement: eventsView) {
+                for (view eventsView = mResult.value()["events"].get_array().value; const bsoncxx::document::element &eventElement: eventsView) {
                     events.emplace_back(eventElement.get_string().value);
                 }
             }
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                bsoncxx::document::view filterRulesView = mResult.value()["filterRules"].get_array().value;
-                for (const bsoncxx::document::element &filterRuleElement: filterRulesView) {
+                for (view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document().view());
                     filterRules.emplace_back(filterRule);
@@ -71,52 +69,14 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
-    Poco::JSON::Object QueueNotification::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("id", id);
-        jsonObject.set("queueArn", queueArn);
-
-        if (!events.empty()) {
-            jsonObject.set("events", Core::JsonUtils::GetJsonStringArray(events));
-        }
-
-        if (!filterRules.empty()) {
-            Poco::JSON::Array filterRulesArray;
-            for (const auto &filterRule: filterRules) {
-                filterRulesArray.add(filterRule.ToJsonObject());
-            }
-            jsonObject.set("filterRules", filterRulesArray);
-        }
-
-        return jsonObject;
-    }
-
-    void QueueNotification::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("id", jsonObject, id);
-        Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
-
-        for (const auto &event: events) {
-            events.emplace_back(event);
-        }
-
-        Poco::JSON::Array::Ptr jsonFilterRules = jsonObject->getArray("filterRules");
-        for (int i = 0; i < jsonFilterRules->size(); i++) {
-            FilterRule filterRule;
-            filterRule.FromJsonObject(jsonFilterRules->getObject(i));
-            filterRules.emplace_back(filterRule);
-        }
-    }
-
     std::string QueueNotification::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const QueueNotification &n) {
-        os << "QueueNotification=" << bsoncxx::to_json(n.ToDocument());
+        os << "QueueNotification=" << to_json(n.ToDocument());
         return os;
     }
 

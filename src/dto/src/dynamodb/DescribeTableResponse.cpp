@@ -15,7 +15,7 @@ namespace AwsMock::Dto::DynamoDb {
             rootJson.set("TableId", tableId);
             rootJson.set("TableArn", tableArn);
             rootJson.set("TableStatus", TableStatusTypeToString(tableStatus));
-            rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
+            rootJson.set("ProvisionedThroughput", provisionedThroughput.ToDocument());
 
             if (!keySchemas.empty()) {
                 Poco::JSON::Array jsonKeySchemasArray;
@@ -63,7 +63,7 @@ namespace AwsMock::Dto::DynamoDb {
             Core::JsonUtils::GetJsonValueString("TableName", tableObject, tableName);
             Core::JsonUtils::GetJsonValueString("TableId", tableObject, tableId);
             Core::JsonUtils::GetJsonValueString("TableArn", tableObject, tableArn);
-            provisionedThroughput.FromJsonObject(tableObject->getObject("ProvisionedThroughput"));
+            //provisionedThroughput.FromJsonObject(tableObject->getObject("ProvisionedThroughput"));
             std::string tableStatusStr;
             Core::JsonUtils::GetJsonValueString("TableStatus", tableObject, tableStatusStr);
             tableStatus = TableStatusTypeFromString(tableStatusStr);
@@ -111,7 +111,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DescribeTableResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

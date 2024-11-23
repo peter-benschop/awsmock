@@ -32,23 +32,9 @@ namespace AwsMock::Database::Entity::Lambda {
         return codeDoc.extract();
     }
 
-    Poco::JSON::Object Code::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        if (!zipFile.empty()) {
-            jsonObject.set("zipFile", zipFile);
-        }
-        if (!s3Bucket.empty()) {
-            jsonObject.set("s3Bucket", s3Bucket);
-            jsonObject.set("s3Key", s3Key);
-            jsonObject.set("s3ObjectVersion", s3ObjectVersion);
-        }
-        return jsonObject;
-    }
-
     [[nodiscard]] std::string Code::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

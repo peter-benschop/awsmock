@@ -14,22 +14,22 @@ namespace AwsMock::Dto::DynamoDb {
             rootJson.set("TableName", tableName);
             rootJson.set("TableId", tableId);
             rootJson.set("TableArn", tableArn);
-            rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
+            //rootJson.set("ProvisionedThroughput", provisionedThroughput.ToJsonObject());
 
             Poco::JSON::Array jsonKeySchemasArray;
-            for (const auto &keySchema: keySchemas) {
+            for (const auto &[fst, snd]: keySchemas) {
                 Poco::JSON::Object object;
-                object.set("attributeName", keySchema.first);
-                object.set("KeyType", keySchema.second);
+                object.set("attributeName", fst);
+                object.set("KeyType", snd);
                 jsonKeySchemasArray.add(object);
             }
             rootJson.set("KeySchema", jsonKeySchemasArray);
 
             Poco::JSON::Array jsonAttributesArray;
-            for (const auto &attribute: attributes) {
+            for (const auto &[fst, snd]: attributes) {
                 Poco::JSON::Object object;
-                object.set("attributeName", attribute.first);
-                object.set("AttributeType", attribute.second);
+                object.set("attributeName", fst);
+                object.set("AttributeType", snd);
                 jsonAttributesArray.add(object);
             }
             rootJson.set("AttributeDefinitions", jsonAttributesArray);
@@ -42,10 +42,10 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    void DeleteTableResponse::FromJson(const std::string &jsonString, const std::map<std::string, std::string> &headerMap) {
+    void DeleteTableResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        body = jsonString;
-        headers = headerMap;
+        this->body = body;
+        this->headers = headers;
 
         /*Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -91,7 +91,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DeleteTableResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

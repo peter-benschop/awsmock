@@ -43,7 +43,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string ChangeMessageVisibilityRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

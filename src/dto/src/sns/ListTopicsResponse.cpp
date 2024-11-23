@@ -54,7 +54,7 @@ namespace AwsMock::Dto::SNS {
 
     std::string ListTopicsResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

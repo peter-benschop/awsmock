@@ -48,7 +48,7 @@ namespace AwsMock::Dto::Cognito {
 
     std::string CreateGroupRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -105,7 +105,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string CreateTableResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

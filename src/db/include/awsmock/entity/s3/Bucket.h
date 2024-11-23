@@ -8,25 +8,16 @@
 // C++ includes
 #include <chrono>
 #include <map>
-#include <sstream>
 #include <string>
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock include
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/s3/BucketEncryption.h>
 #include <awsmock/entity/s3/BucketNotification.h>
@@ -52,9 +43,9 @@ namespace AwsMock::Database::Entity::S3 {
     };
 
     static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
-            {BucketVersionStatus::ENABLED, "enabled"},
-            {BucketVersionStatus::SUSPENDED, "suspended"},
-            {BucketVersionStatus::DISABLED, "disabled"},
+            {ENABLED, "enabled"},
+            {SUSPENDED, "suspended"},
+            {DISABLED, "disabled"},
     };
 
     [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
@@ -62,12 +53,12 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     [[maybe_unused]] static BucketVersionStatus BucketVersionStatusFromString(const std::string &bucketVersionStatus) {
-        for (auto &it: BucketVersionStatusNames) {
-            if (it.second == bucketVersionStatus) {
-                return it.first;
+        for (auto &[fst, snd]: BucketVersionStatusNames) {
+            if (snd == bucketVersionStatus) {
+                return fst;
             }
         }
-        return BucketVersionStatus::DISABLED;
+        return DISABLED;
     }
 
     /**

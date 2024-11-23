@@ -41,7 +41,7 @@ namespace AwsMock::Dto::SSM {
 
     std::string PutParameterResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

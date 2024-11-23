@@ -34,7 +34,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
     std::string RotationRules::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

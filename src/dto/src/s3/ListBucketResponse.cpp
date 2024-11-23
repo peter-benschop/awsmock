@@ -207,7 +207,7 @@ namespace AwsMock::Dto::S3 {
 
     [[nodiscard]] std::string ListBucketResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

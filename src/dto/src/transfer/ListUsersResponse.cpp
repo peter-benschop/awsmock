@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListUsersResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

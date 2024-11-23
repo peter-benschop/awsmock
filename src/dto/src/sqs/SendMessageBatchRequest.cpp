@@ -63,7 +63,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string SendMessageBatchRequest::ToString() {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

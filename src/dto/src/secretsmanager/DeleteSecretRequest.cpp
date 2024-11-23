@@ -24,7 +24,7 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string DeleteSecretRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

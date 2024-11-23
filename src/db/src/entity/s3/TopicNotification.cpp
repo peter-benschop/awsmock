@@ -43,13 +43,12 @@ namespace AwsMock::Database::Entity::S3 {
 
         try {
 
-            id = bsoncxx::string::to_string(mResult.value()["id"].get_string().value);
-            topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
+            id = mResult.value()["id"].get_string().value;
+            topicArn = mResult.value()["topicArn"].get_string().value;
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value};
-                for (const bsoncxx::array::element &filterRuleElement: filterRulesView) {
+                for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document());
                     filterRules.emplace_back(filterRule);
@@ -63,56 +62,14 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
-    void TopicNotification::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("id", jsonObject, id);
-        Core::JsonUtils::GetJsonValueString("topicArn", jsonObject, topicArn);
-
-        // Events
-        for (const auto &event: events) {
-            events.emplace_back(event);
-        }
-
-        // Filter rules
-        if (jsonObject->has("filterRules")) {
-            Poco::JSON::Array::Ptr jsonFilterRules = jsonObject->getArray("filterRules");
-            for (int i = 0; i < jsonFilterRules->size(); i++) {
-                FilterRule filterRule;
-                filterRule.FromJsonObject(jsonFilterRules->getObject(i));
-                filterRules.emplace_back(filterRule);
-            }
-        }
-    }
-
-    Poco::JSON::Object TopicNotification::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("id", id);
-        jsonObject.set("topicArn", topicArn);
-
-        if (!events.empty()) {
-            jsonObject.set("events", Core::JsonUtils::GetJsonStringArray(events));
-        }
-
-        if (!filterRules.empty()) {
-            Poco::JSON::Array filterRulesArray;
-            for (const auto &filterRule: filterRules) {
-                filterRulesArray.add(filterRule.ToJsonObject());
-            }
-            jsonObject.set("filterRules", filterRulesArray);
-        }
-
-        return jsonObject;
-    }
-
     std::string TopicNotification::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const TopicNotification &n) {
-        os << "TopicNotification=" << bsoncxx::to_json(n.ToDocument());
+        os << "TopicNotification=" << to_json(n.ToDocument());
         return os;
     }
 

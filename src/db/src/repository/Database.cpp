@@ -6,8 +6,32 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_document;
+    const std::map<std::string, IndexDefinition> DatabaseBase::indexDefinitions = {
+            // SQS messages
+            {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}}},
+            {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}}},
+            {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}}},
+            {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}}}},
+            {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}}},
+            // SQS queues
+            {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}}},
+            {"sqs_queue_idx2", {"sqs_queue", {{"region", 1}, {"queueUrl", 1}}}},
+            // SNS messages
+            {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}}},
+            // SNS topics
+            {"sns_topic_idx1", {"sns_topic", {{"region", 1}, {"topicName", 1}}}},
+            // S3 buckets
+            {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}}},
+            // S3 objects
+            {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}}},
+            // Modules
+            {"module_idx1", {"module", {{"name", 1}, {"state", 1}}}},
+            // KMS
+            {"kms_idx1", {"kms", {{"region", 1}, {"keyId", 1}}}},
+            // Monitoring
+            {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}}},
+            {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}}},
+    };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {
 
@@ -15,7 +39,7 @@ namespace AwsMock::Database {
         _name = Core::Configuration::instance().getString("awsmock.mongodb.name", "awsmock");
     }
 
-    mongocxx::database DatabaseBase::GetConnection() {
+    mongocxx::database DatabaseBase::GetConnection() const {
         mongocxx::pool::entry _client = _pool->acquire();
         return (*_client)[_name];
     }
@@ -55,61 +79,31 @@ namespace AwsMock::Database {
 
         if (_useDatabase) {
 
-            auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::database database = (*client)[_name];
+            const auto client = ConnectionPool::instance().GetConnection();
+            const mongocxx::database database = (*client)[_name];
 
             log_info << "Start creating indexes";
 
-            // SQS
-            database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("reset", 1)),
-                                                 make_document(kvp("name", "sqs_message_idx1")));
-            database["sqs_message"].create_index(make_document(kvp("queueUrl", 1), kvp("status", 1), kvp("retries", 1)),
-                                                 make_document(kvp("name", "sqs_message_idx2")));
-            database["sqs_message"].create_index(make_document(kvp("receiptHandle", 1)),
-                                                 make_document(kvp("name", "sqs_message_idx3")));
-            database["sqs_message"].create_index(make_document(kvp("queueArn", 1), kvp("status", 1)),
-                                                 make_document(kvp("name", "sqs_message_idx4")));
-            database["sqs_message"].create_index(make_document(kvp("queueArn", 1), kvp("created", 1)),
-                                                 make_document(kvp("name", "sqs_message_idx5")));
-            database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
-                                               make_document(kvp("name", "sqs_queue_idx1")));
-            database["sqs_queue"].create_index(make_document(kvp("region", 1), kvp("queueUrl", 1)),
-                                               make_document(kvp("name", "sqs_queue_idx2")));
-
-            // SNS
-            database["sns_topic"].create_index(make_document(kvp("topicArn", 1)),
-                                               make_document(kvp("name", "sns_topic_idx1")));
-            database["sns_topic"].create_index(make_document(kvp("region", 1), kvp("topicName", 1)),
-                                               make_document(kvp("name", "sns_topic_idx2")));
-            database["sns_message"].create_index(make_document(kvp("region", 1), kvp("topicArn", 1)),
-                                                 make_document(kvp("name", "sns_message_idx2")));
-            database["sns_message"].create_index(make_document(kvp("topicArn", 1)),
-                                                 make_document(kvp("name", "sns_message_idx3")));
-
-            // S3
-            database["s3_bucket"].create_index(make_document(kvp("region", 1), kvp("name", 1)),
-                                               make_document(kvp("name", "s3_idx1")));
-            database["s3_object"].create_index(make_document(kvp("region", 1), kvp("bucket", 1), kvp("key", 1)),
-                                               make_document(kvp("name", "s3_idx2")));
-
-            // Module
-            database["module"].create_index(make_document(kvp("name", 1), kvp("state", 1)),
-                                            make_document(kvp("name", "module_idx1")));
-
-            // KMS
-            database["kms_key"].create_index(make_document(kvp("region", 1)),
-                                             make_document(kvp("name", "kms_idx1")));
-            database["kms_key"].create_index(make_document(kvp("keyId", 1)),
-                                             make_document(kvp("name", "kms_idx2")));
-            database["kms_key"].create_index(make_document(kvp("keyState", 1)),
-                                             make_document(kvp("name", "kms_idx3")));
-
-            // Monitoring
-            database["monitoring"].create_index(make_document(kvp("name", 1), kvp("created", 1)),
-                                                make_document(kvp("name", "monitoring_idx1")));
-            log_debug << "Database indexes created";
+            for (const auto &index: indexDefinitions) {
+                const auto m_thread = std::make_shared<boost::thread>([database, capture0 = index.first] { CreateIndex(database, capture0); });
+                m_thread->detach();
+            }
         }
     }
 
+    void DatabaseBase::CreateIndex(const mongocxx::database &database, const std::string &indexName) {
+
+        log_trace << "Start creating index, name: " << indexName;
+        auto [collectionName, indexColumns] = indexDefinitions.at(indexName);
+        bsoncxx::builder::basic::document queryDoc;
+        for (const auto &[columns, direction]: indexColumns) {
+            queryDoc.append(kvp(columns, direction));
+        }
+        bsoncxx::builder::basic::document nameDoc;
+        nameDoc.append(kvp("name", indexName));
+
+        database[collectionName].create_index(queryDoc.extract(), nameDoc.extract());
+        log_trace << "Database index created, name: " << indexName;
+    }
 
 }// namespace AwsMock::Database

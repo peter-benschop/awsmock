@@ -98,7 +98,7 @@ namespace AwsMock::Dto::Common {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 

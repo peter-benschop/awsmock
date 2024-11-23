@@ -6,26 +6,21 @@
 #define AWSMOCK_DB_ENTITY_S3_LAMBDA_NOTIFICATION_H
 
 // C++ includes
-#include <chrono>
-#include <sstream>
 #include <string>
-
-// Poco includes
-#include <Poco/JSON/Object.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/FilterRule.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
+    using bsoncxx::to_json;
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
@@ -86,13 +81,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         LambdaNotification FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Converts the DTO to a string representation.

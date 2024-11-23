@@ -20,15 +20,14 @@ namespace AwsMock::Service {
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
             return {};
-            //throw Core::BadRequestException("DynamoDb table exists already");
         }
 
         Dto::DynamoDb::CreateTableResponse createTableResponse;
         try {
 
             // Send request to DynamoDB docker container
-            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
-            createTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
+            auto [body, headers, status] = SendDynamoDbRequest(request.body, request.headers);
+            createTableResponse = {.body = body, .headers = headers, .status = status};
 
             // Update database
             Database::Entity::DynamoDb::Table table = {

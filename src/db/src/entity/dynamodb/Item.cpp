@@ -11,8 +11,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
         try {
 
             auto attributesDoc = bsoncxx::builder::basic::document{};
-            for (const auto &attribute: attributes) {
-                attributesDoc.append(kvp(attribute.first, attribute.second.ToDocument()));
+            for (const auto &[fst, snd]: attributes) {
+                attributesDoc.append(kvp(fst, snd.ToDocument()));
             }
 
             auto itemDoc = bsoncxx::builder::basic::document{};
@@ -25,13 +25,13 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             return itemDoc.extract();
 
-        } catch (const mongocxx::exception &exc) {
+        } catch (const std::exception &exc) {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
     }
 
-    Entity::DynamoDb::Item Item::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    Item Item::FromDocument(optional<view> mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -41,28 +41,18 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return *this;
     }
 
-    Poco::JSON::Object Item::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("tableName", tableName);
-
-
-        return jsonObject;
-    }
-
     std::string Item::ToJson() const {
-        return bsoncxx::to_json(ToDocument());
+        return to_json(ToDocument());
     }
 
     std::string Item::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const Item &i) {
-        os << "Item=" << bsoncxx::to_json(i.ToDocument());
+    std::ostream &operator<<(std::ostream &os, const Item &d) {
+        os << "Item=" << to_json(d.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::DynamoDb

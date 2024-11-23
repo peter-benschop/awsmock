@@ -76,7 +76,7 @@ namespace AwsMock::Dto::Common {
 
     std::string DynamoDbClientCommand::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -6,31 +6,40 @@
 #define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
+#include <map>
 #include <string>
-#include <utility>
 #include <vector>
 
 // Boost include<
 #include <boost/beast.hpp>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     namespace http = boost::beast::http;
+
+    using bsoncxx::view_or_value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
+    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB list table response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableResponse : public Dto::Common::BaseRequest {
+    struct ListTableResponse : Common::BaseRequest {
 
         /**
          * Region
