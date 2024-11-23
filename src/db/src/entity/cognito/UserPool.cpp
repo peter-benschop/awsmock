@@ -94,7 +94,7 @@ namespace AwsMock::Database::Entity::Cognito {
 
     std::string UserPool::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

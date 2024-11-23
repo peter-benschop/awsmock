@@ -48,7 +48,7 @@ namespace AwsMock::Dto::Common {
 
     std::string MonitoringClientCommand::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

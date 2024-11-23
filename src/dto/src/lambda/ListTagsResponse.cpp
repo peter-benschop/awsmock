@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Lambda {
 
     std::string ListTagsResponse::ToString() {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -2,18 +2,15 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SNSDATABASETEST_H
-#define AWMOCK_CORE_SNSDATABASETEST_H
+#ifndef AWMOCK_CORE_SNS_DATABASE_TEST_H
+#define AWMOCK_CORE_SNS_DATABASE_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
 
-// Poco includes
-#include <Poco/Path.h>
-
 // Local includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/SNSDatabase.h>
 
 #define REGION "eu-central-1"
@@ -240,4 +237,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_SNSDATABASETEST_H
+#endif// AWMOCK_CORE_SNS_DATABASE_TEST_H

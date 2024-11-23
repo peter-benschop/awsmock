@@ -43,7 +43,7 @@ namespace AwsMock::Dto::KMS {
 
     std::string ScheduleKeyDeletionRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -6,10 +6,6 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     view_or_value<view, value> BucketNotification::ToDocument() const {
 
         view_or_value<view, value> notificationDoc = make_document(
@@ -21,31 +17,14 @@ namespace AwsMock::Database::Entity::S3 {
         return notificationDoc;
     }
 
-    Poco::JSON::Object BucketNotification::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("notificationId", notificationId);
-        jsonObject.set("event", event);
-        jsonObject.set("queueArn", queueArn);
-        jsonObject.set("lambdaArn", lambdaArn);
-        return jsonObject;
-    }
-
-    void BucketNotification::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("notificationId", jsonObject, notificationId);
-        Core::JsonUtils::GetJsonValueString("event", jsonObject, event);
-        Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
-        Core::JsonUtils::GetJsonValueString("lambdaArn", jsonObject, lambdaArn);
-    }
-
     std::string BucketNotification::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const BucketNotification &n) {
-        os << "BucketNotification=" << bsoncxx::to_json(n.ToDocument());
+    std::ostream &operator<<(std::ostream &os, const BucketNotification &q) {
+        os << "BucketNotification=" << bsoncxx::to_json(q.ToDocument());
         return os;
     }
 

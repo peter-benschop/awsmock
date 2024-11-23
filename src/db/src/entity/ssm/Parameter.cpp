@@ -77,7 +77,7 @@ namespace AwsMock::Database::Entity::SSM {
 
     std::string Parameter::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

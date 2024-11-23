@@ -7,12 +7,16 @@
 
 // C++ standard includes
 #include <chrono>
-#include <sstream>
 #include <string>
 
+// BSON includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -59,18 +63,15 @@ namespace AwsMock::Dto::DynamoDb {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the entity to a JSON object
-         *
-         * @return JSON object
+         * @brief Convert to a BSON document
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        bsoncxx::document::view ToDocument() const;
 
         /**
-         * Parse a JSON object
-         *
-         * @param jsonObject JSON object
+         * @brief Convert from a BSON document
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(bsoncxx::document::view document);
+        std::string ToJson();
 
         /**
          * Converts the DTO to a string representation.

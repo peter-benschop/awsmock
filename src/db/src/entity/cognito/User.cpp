@@ -76,7 +76,7 @@ namespace AwsMock::Database::Entity::Cognito {
 
     std::string User::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

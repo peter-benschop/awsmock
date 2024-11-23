@@ -2,19 +2,13 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#ifndef AWSMOCK_ENTITY_LAMBDA_EPHEMERALSTORAGE_H
-#define AWSMOCK_ENTITY_LAMBDA_EPHEMERALSTORAGE_H
+#ifndef AWSMOCK_ENTITY_LAMBDA_EPHEMERAL_STORAGE_H
+#define AWSMOCK_ENTITY_LAMBDA_EPHEMERAL_STORAGE_H
 
 // C++ includes
-#include <sstream>
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/JSON/Object.h>
 
 // MongoDB includes
-#include <bsoncxx/array/view.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
@@ -22,8 +16,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
@@ -62,20 +54,6 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the JSON object to and entity
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
          * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
@@ -92,4 +70,4 @@ namespace AwsMock::Database::Entity::Lambda {
 
 }// namespace AwsMock::Database::Entity::Lambda
 
-#endif// AWSMOCK_ENTITY_LAMBDA_EPHEMERALSTORAGE_H
+#endif// AWSMOCK_ENTITY_LAMBDA_EPHEMERAL_STORAGE_H

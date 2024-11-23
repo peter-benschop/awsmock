@@ -17,6 +17,9 @@
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 
+// Boost includes
+#include <boost/thread.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>

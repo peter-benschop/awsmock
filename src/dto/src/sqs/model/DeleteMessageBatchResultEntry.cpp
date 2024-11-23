@@ -34,7 +34,7 @@ namespace AwsMock::Dto::SQS {
 
     [[nodiscard]] std::string DeleteMessageBatchResultEntry::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

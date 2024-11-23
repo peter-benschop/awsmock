@@ -34,7 +34,7 @@ namespace AwsMock::Dto::Cognito {
 
     std::string RespondToAuthChallengeResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

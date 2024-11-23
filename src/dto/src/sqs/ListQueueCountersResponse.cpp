@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string ListTopicCountersResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -12,7 +12,7 @@
 namespace AwsMock::Database::Entity::Module {
 
     /**
-     * AwsMock module state
+     * @brief AwsMock module state
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -37,9 +37,9 @@ namespace AwsMock::Database::Entity::Module {
     }
 
     [[maybe_unused]] static ModuleState ModuleStateFromString(const std::string &serviceStatus) {
-        for (auto &it: ModuleStateNames) {
-            if (it.second == serviceStatus) {
-                return it.first;
+        for (auto &[fst, snd]: ModuleStateNames) {
+            if (snd == serviceStatus) {
+                return fst;
             }
         }
         return ModuleState::UNKNOWN;
@@ -61,9 +61,9 @@ namespace AwsMock::Database::Entity::Module {
     }
 
     [[maybe_unused]] static ModuleStatus ModuleStatusFromString(const std::string &modulesStatus) {
-        for (auto &it: ModuleStatusNames) {
-            if (it.second == modulesStatus) {
-                return it.first;
+        for (auto &[fst, snd]: ModuleStatusNames) {
+            if (snd == modulesStatus) {
+                return fst;
             }
         }
         return ModuleStatus::UNKNOWN;

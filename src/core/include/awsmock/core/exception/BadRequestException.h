@@ -5,8 +5,16 @@
 #ifndef AWSMOCK_CORE_BAD_REQUEST_EXCEPTION_H
 #define AWSMOCK_CORE_BAD_REQUEST_EXCEPTION_H
 
-#include <Poco/Exception.h>
-#include <Poco/Net/HTTPResponse.h>
+// C*+ includes
+#include <sstream>
+#include <string>
+
+// C++ includes
+#include <exception>
+
+// Boost includes
+#include <boost/beast/http/status.hpp>
+#include <utility>
 
 namespace AwsMock::Core {
 
@@ -15,7 +23,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class BadRequestException : public Poco::Exception {
+    class BadRequestException final : public std::exception {
 
       public:
 
@@ -24,7 +32,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit BadRequestException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+        explicit BadRequestException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {}
 
         /**
          * Constructor.
@@ -32,7 +40,7 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit BadRequestException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_BAD_REQUEST);
+        explicit BadRequestException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {}
 
         /**
          * Copy constructor.
@@ -55,6 +63,16 @@ namespace AwsMock::Core {
          * Rethrows the exception.
          */
         void rethrow() const;
+
+        /**
+         * HTTP status code
+         */
+        boost::beast::http::status _code;
+
+        /**
+         * Exception message
+         */
+        std::string _message;
     };
 
 }// namespace AwsMock::Core

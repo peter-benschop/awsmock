@@ -54,7 +54,7 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string GetSecretValueResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

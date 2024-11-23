@@ -46,7 +46,7 @@ namespace AwsMock::Database::Entity::KMS {
             }
             return keyDoc.extract();
 
-        } catch (mongocxx::exception &e) {
+        } catch (std::exception &e) {
             log_error << e.what();
             throw Core::DatabaseException(e.what());
         }
@@ -85,55 +85,15 @@ namespace AwsMock::Database::Entity::KMS {
                 }
             }
 
-        } catch (mongocxx::exception &e) {
+        } catch (std::exception &e) {
             log_error << e.what();
             throw Core::DatabaseException(e.what());
         }
     }
 
-    Poco::JSON::Object Key::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("arn", arn);
-        jsonObject.set("keyId", keyId);
-        jsonObject.set("keyUsage", keyUsage);
-        jsonObject.set("keySpec", keySpec);
-        jsonObject.set("keyState", keyState);
-        jsonObject.set("aes256Key", aes256Key);
-        jsonObject.set("aes256Iv", aes256Iv);
-        jsonObject.set("hmac224Key", hmac224Key);
-        jsonObject.set("hmac256Key", hmac256Key);
-        jsonObject.set("hmac384Key", hmac384Key);
-        jsonObject.set("hmac512Key", hmac512Key);
-        jsonObject.set("rsaPrivateKey", rsaPrivateKey);
-        jsonObject.set("rsaPublicKey", rsaPublicKey);
-        jsonObject.set("pendingWindowInDays", pendingWindowInDays);
-        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
-
-        // Scheduled deletion
-        if (scheduledDeletion.time_since_epoch().count() > 0) {
-            jsonObject.set("scheduledDeletion", Core::DateTimeUtils::ToISO8601(scheduledDeletion));
-        }
-
-        // Tags array
-        if (!tags.empty()) {
-            Poco::JSON::Array jsonTagArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object jsonTagObject;
-                jsonTagObject.set(tag.first, tag.second);
-                jsonTagArray.add(jsonTagObject);
-            }
-            jsonObject.set("tags", jsonTagArray);
-        }
-
-        return jsonObject;
-    }
-
     std::string Key::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

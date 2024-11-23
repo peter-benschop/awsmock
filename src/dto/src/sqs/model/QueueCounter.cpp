@@ -47,7 +47,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string QueueCounter::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

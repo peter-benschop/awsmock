@@ -8,7 +8,7 @@ namespace AwsMock::Dto::SNS {
 
     std::string ListSubscriptionsByTopicRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

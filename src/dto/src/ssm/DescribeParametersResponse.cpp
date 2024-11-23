@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SSM {
 
     std::string DescribeParametersResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

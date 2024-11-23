@@ -93,7 +93,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string RestErrorResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

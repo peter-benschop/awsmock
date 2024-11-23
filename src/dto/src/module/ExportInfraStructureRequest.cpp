@@ -60,7 +60,7 @@ namespace AwsMock::Dto::Module {
 
     std::string ExportInfrastructureRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

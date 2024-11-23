@@ -43,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DeleteItemResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

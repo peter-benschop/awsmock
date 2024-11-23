@@ -83,7 +83,7 @@ namespace AwsMock::Dto::Common {
 
     std::string LambdaClientCommand::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

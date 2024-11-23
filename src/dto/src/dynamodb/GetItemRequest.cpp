@@ -58,7 +58,7 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string GetItemRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

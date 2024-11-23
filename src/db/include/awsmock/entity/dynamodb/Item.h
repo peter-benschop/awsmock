@@ -7,8 +7,6 @@
 
 // C++ includes
 #include <chrono>
-#include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -16,15 +14,11 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/dynamodb/AttributeValue.h>
-#include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -35,6 +29,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
     using bsoncxx::builder::basic::make_document;
     using bsoncxx::document::value;
     using bsoncxx::document::view;
+    using mongocxx::stdx::optional;
     using std::chrono::system_clock;
 
     /**
@@ -62,12 +57,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Attributes
          */
-        std::map<std::string, Entity::DynamoDb::AttributeValue> attributes;
+        std::map<std::string, AttributeValue> attributes;
 
         /**
          * Keys
          */
-        std::map<std::string, Entity::DynamoDb::AttributeValue> keys;
+        std::map<std::string, AttributeValue> keys;
 
         /**
          * Creation date
@@ -91,7 +86,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        Entity::DynamoDb::Item FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        Item FromDocument(optional<view> mResult);
 
         /**
          * @brief Converts the entity to a JSON object

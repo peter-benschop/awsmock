@@ -81,7 +81,7 @@ namespace AwsMock::Database::Entity::Module {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<view> mResult);
 
         /**
          * Convert to JSON representation

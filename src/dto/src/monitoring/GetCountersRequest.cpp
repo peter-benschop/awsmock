@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Monitoring {
 
     std::string GetCountersRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

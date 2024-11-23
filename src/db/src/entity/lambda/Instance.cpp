@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Instance::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Instance::FromDocument(mongocxx::stdx::optional<view> mResult) {
 
         id = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
         containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
     [[nodiscard]] std::string Instance::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

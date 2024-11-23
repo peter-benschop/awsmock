@@ -45,7 +45,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string EventNotification::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

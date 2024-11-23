@@ -26,25 +26,14 @@ namespace AwsMock::Database::Entity::Lambda {
         return eventSourceMappingDoc.extract();
     }
 
-    Poco::JSON::Object EventSourceMapping::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("eventSourceArn", eventSourceArn);
-        jsonObject.set("batchSize", batchSize);
-        jsonObject.set("maximumBatchingWindowInSeconds", maximumBatchingWindowInSeconds);
-        jsonObject.set("enabled", enabled);
-
-        return jsonObject;
-    }
-
     [[nodiscard]] std::string EventSourceMapping::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const EventSourceMapping &t) {
-        os << "EventSourceMapping=" << bsoncxx::to_json(t.ToDocument());
+        os << "EventSourceMapping=" << to_json(t.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Lambda

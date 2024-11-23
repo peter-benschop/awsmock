@@ -53,7 +53,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string SetQueueAttributesResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

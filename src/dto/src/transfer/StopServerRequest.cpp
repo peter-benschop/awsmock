@@ -42,7 +42,7 @@ namespace AwsMock::Dto::Transfer {
 
     std::string StopServerRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

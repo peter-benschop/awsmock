@@ -6,10 +6,6 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     view_or_value<view, value> BucketEncryption::ToDocument() const {
 
         try {
@@ -25,12 +21,12 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    void BucketEncryption::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void BucketEncryption::FromDocument(const mongocxx::stdx::optional<view> &mResult) {
 
         try {
 
-            sseAlgorithm = bsoncxx::string::to_string(mResult.value()["sseAlgorithm"].get_string().value);
-            kmsKeyId = bsoncxx::string::to_string(mResult.value()["kmsKeyId"].get_string().value);
+            sseAlgorithm = mResult.value()["sseAlgorithm"].get_string().value;
+            kmsKeyId = mResult.value()["kmsKeyId"].get_string();
 
         } catch (std::exception &exc) {
             log_error << exc.what();
@@ -53,12 +49,12 @@ namespace AwsMock::Database::Entity::S3 {
 
     std::string BucketEncryption::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const BucketEncryption &n) {
-        os << "BucketEncryption=" << bsoncxx::to_json(n.ToDocument());
+        os << "BucketEncryption=" << to_json(n.ToDocument());
         return os;
     }
 

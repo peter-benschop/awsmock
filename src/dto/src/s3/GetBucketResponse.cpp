@@ -55,7 +55,7 @@ namespace AwsMock::Dto::S3 {
 
     std::string GetBucketResponse::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

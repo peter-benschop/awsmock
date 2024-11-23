@@ -33,7 +33,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string TagQueueRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

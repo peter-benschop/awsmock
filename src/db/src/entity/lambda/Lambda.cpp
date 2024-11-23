@@ -7,36 +7,35 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     bool Lambda::HasEventSource(const std::string &eventSourceArn) const {
-        return find_if(eventSources.begin(), eventSources.end(), [eventSourceArn](const EventSourceMapping &e) {
+        return std::ranges::find_if(eventSources, [eventSourceArn](const EventSourceMapping &e) {
                    return e.eventSourceArn == eventSourceArn;
                }) != eventSources.end();
     }
 
     bool Lambda::HasTag(const std::string &key) const {
-        return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+        return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
                    return t.first == key;
                }) != tags.end();
     }
 
     std::string Lambda::GetTagValue(const std::string &key) const {
-        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+        const auto it = std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
             return t.first == key;
         });
         return it->second;
     }
 
     Instance Lambda::GetInstance(const std::string &instanceId) {
-        auto it = std::ranges::find(instances, instanceId, &Instance::id);
-        if (it != instances.end()) {
+        if (const auto it = std::ranges::find(instances, instanceId, &Instance::id); it != instances.end()) {
             return *it;
         }
         log_error << "Lambda instance not found, id: " << instanceId;
         return {};
     }
 
-    void Lambda::RemoveInstance(const AwsMock::Database::Entity::Lambda::Instance &instance) {
+    void Lambda::RemoveInstance(const Instance &instance) {
         std::string id = instance.id;
-        instances.erase(std::remove_if(instances.begin(), instances.end(), [&id](const Instance &instance) { return id == instance.id; }), instances.end());
+        instances.erase(std::ranges::remove_if(instances, [&id](const Instance &instance) { return id == instance.id; }).begin(), instances.end());
     }
 
     view_or_value<view, value> Lambda::ToDocument() const {
@@ -49,15 +48,15 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Convert environment to document
         auto variablesDoc = bsoncxx::builder::basic::array{};
-        for (const auto &variables: environment.variables) {
-            variablesDoc.append(make_document(kvp(variables.first, variables.second)));
+        for (const auto &[fst, snd]: environment.variables) {
+            variablesDoc.append(make_document(kvp(fst, snd)));
         }
         view_or_value<view, value> varDoc = make_document(kvp("variables", variablesDoc));
 
         // Convert tags to document
         auto tagsDoc = bsoncxx::builder::basic::document{};
-        for (const auto &t: tags) {
-            tagsDoc.append(kvp(t.first, t.second));
+        for (const auto &[fst, snd]: tags) {
+            tagsDoc.append(kvp(fst, snd));
         }
 
         // Convert event source mappings
@@ -127,8 +126,8 @@ namespace AwsMock::Database::Entity::Lambda {
         state = LambdaStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
         stateReason = Core::Bson::BsonUtils::GetStringValue(mResult, "stateReason");
         stateReasonCode = LambdaStateReasonCodeFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "stateReasonCode"));
-        lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date().value);
-        lastInvocation = bsoncxx::types::b_date(mResult.value()["lastInvocation"].get_date().value);
+        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStarted"]);
+        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
         invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
@@ -139,8 +138,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
-            bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-            for (const bsoncxx::document::element &tagElement: tagsView) {
+            for (view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
@@ -154,8 +152,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get instances
         if (mResult.value().find("instances") != mResult.value().end()) {
-            bsoncxx::document::view instancesView = mResult.value()["instances"].get_array().value;
-            for (const bsoncxx::document::element &instanceElement: instancesView) {
+            for (view instancesView = mResult.value()["instances"].get_array().value; const bsoncxx::document::element &instanceElement: instancesView) {
                 Instance instance;
                 instance.FromDocument(instanceElement.get_document().view());
                 instances.emplace_back(instance);
@@ -164,8 +161,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get event sources
         if (mResult.value().find("eventSources") != mResult.value().end()) {
-            bsoncxx::document::view eventSourcesView = mResult.value()["eventSources"].get_array().value;
-            for (const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
+            for (view eventSourcesView = mResult.value()["eventSources"].get_array().value; const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
                 EventSourceMapping eventSourceMapping;
                 eventSourceMapping.FromDocument(eventSourceElement.get_document().view());
                 eventSources.emplace_back(eventSourceMapping);
@@ -173,99 +169,9 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
-    Poco::JSON::Object Lambda::ToJsonObject() const {
-
-        try {
-
-            Poco::JSON::Object jsonObject;
-            jsonObject.set("region", region);
-            jsonObject.set("user", user);
-            jsonObject.set("function", function);
-            jsonObject.set("runtime", runtime);
-            jsonObject.set("role", role);
-            jsonObject.set("handler", handler);
-            jsonObject.set("memorySize", memorySize);
-            jsonObject.set("ephemeralStorage", ephemeralStorage.ToJsonObject());
-            jsonObject.set("codeSize", codeSize);
-            jsonObject.set("imageId", imageId);
-            jsonObject.set("containerId", containerId);
-            jsonObject.set("arn", arn);
-            jsonObject.set("codeSha256", codeSha256);
-            jsonObject.set("timeout", timeout);
-            jsonObject.set("concurrency", concurrency);
-            jsonObject.set("environment", environment.ToJsonObject());
-            jsonObject.set("code", code.ToJsonObject());
-            jsonObject.set("state", LambdaStateToString(state));
-            jsonObject.set("stateReason", stateReason);
-            jsonObject.set("lastStarted", Core::DateTimeUtils::ToISO8601(lastStarted));
-            jsonObject.set("lastInvocation", Core::DateTimeUtils::ToISO8601(lastInvocation));
-
-            // Tags
-            if (!tags.empty()) {
-                Poco::JSON::Array jsonTagArray;
-                for (const auto &tag: tags) {
-                    Poco::JSON::Object jsonTagObject;
-                    jsonTagObject.set(tag.first, tag.second);
-                    jsonTagArray.add(jsonTagObject);
-                }
-                jsonObject.set("tags", jsonTagArray);
-            }
-
-            return jsonObject;
-
-
-        } catch (Poco::Exception &e) {
-            log_error << "JSON Exception" << e.message();
-            throw Core::JsonException(e.message());
-        }
-    }
-
-    void Lambda::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        try {
-
-            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-            Core::JsonUtils::GetJsonValueString("user", jsonObject, user);
-            Core::JsonUtils::GetJsonValueString("function", jsonObject, function);
-            Core::JsonUtils::GetJsonValueString("runtime", jsonObject, runtime);
-            Core::JsonUtils::GetJsonValueString("role", jsonObject, role);
-            Core::JsonUtils::GetJsonValueString("handler", jsonObject, handler);
-            Core::JsonUtils::GetJsonValueLong("memorySize", jsonObject, memorySize);
-            Core::JsonUtils::GetJsonValueLong("codeSize", jsonObject, codeSize);
-            Core::JsonUtils::GetJsonValueString("imageId", jsonObject, imageId);
-            Core::JsonUtils::GetJsonValueString("containerId", jsonObject, containerId);
-            Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
-            Core::JsonUtils::GetJsonValueString("codeSha256", jsonObject, codeSha256);
-            Core::JsonUtils::GetJsonValueInt("timeout", jsonObject, timeout);
-            Core::JsonUtils::GetJsonValueInt("concurrency", jsonObject, concurrency);
-            Core::JsonUtils::GetJsonValueString("stateReason", jsonObject, stateReason);
-            Core::JsonUtils::GetJsonValueDate("lastStarted", jsonObject, lastStarted);
-            Core::JsonUtils::GetJsonValueDate("lastInvocation", jsonObject, lastInvocation);
-            std::string tmp;
-            Core::JsonUtils::GetJsonValueString("arn", jsonObject, tmp);
-            if (!tmp.empty()) {
-                state = LambdaStateFromString(tmp);
-            }
-
-            // Ephemeral storage
-            if (jsonObject->has("ephemeralStorage")) {
-                ephemeralStorage.FromJsonObject(jsonObject->getObject("ephemeralStorage"));
-            }
-
-            // Environment
-            if (jsonObject->has("environment")) {
-                environment.FromJsonObject(jsonObject->getObject("environment"));
-            }
-
-        } catch (Poco::Exception &e) {
-            log_error << "JSON Exception" << e.message();
-            throw Core::JsonException(e.message());
-        }
-    }
-
     std::string Lambda::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

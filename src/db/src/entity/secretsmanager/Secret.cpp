@@ -136,7 +136,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
     std::string Secret::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

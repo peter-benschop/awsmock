@@ -80,7 +80,7 @@ namespace AwsMock::Dto::SQS {
 
     std::string ReceiveMessageRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

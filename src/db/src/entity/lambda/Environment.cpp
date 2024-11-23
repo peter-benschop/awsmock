@@ -14,8 +14,8 @@ namespace AwsMock::Database::Entity::Lambda {
             if (jsonObject->has("variables")) {
                 Poco::JSON::Object::Ptr variablesJsonObject = jsonObject->getObject("variables");
                 for (size_t i = 0; i < variablesJsonObject->getNames().size(); i++) {
-                    std::string key = jsonObject->getNames()[i];
-                    std::string value = jsonObject->get(key);
+                    const std::string key = jsonObject->getNames()[i];
+                    const std::string value = jsonObject->get(key);
                     variables[key] = value;
                 }
             }
@@ -31,10 +31,10 @@ namespace AwsMock::Database::Entity::Lambda {
         Poco::JSON::Object jsonObject;
         if (!variables.empty()) {
             Poco::JSON::Array jsonArray;
-            for (const auto &variable: variables) {
+            for (const auto &[fst, snd]: variables) {
                 Poco::JSON::Object object;
-                object.set("name", variable.first);
-                object.set("value", variable.second);
+                object.set("name", fst);
+                object.set("value", snd);
                 jsonArray.add(object);
             }
             jsonObject.set("variables", jsonArray);
@@ -45,8 +45,8 @@ namespace AwsMock::Database::Entity::Lambda {
     void Environment::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
 
         if (mResult.value().find("variables") != mResult.value().end()) {
-            auto varDoc = mResult.value()["variables"].get_array();
-            for (auto &v: varDoc.value) {
+            auto [value] = mResult.value()["variables"].get_array();
+            for (auto &v: value) {
                 for (auto &it: v.get_document().value) {
                     variables[std::string{it.key()}] = bsoncxx::string::to_string(it.get_string().value);
                 }

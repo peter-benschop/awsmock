@@ -88,7 +88,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 
@@ -122,7 +122,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 
@@ -184,7 +184,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 
@@ -274,7 +274,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 
@@ -365,7 +365,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 
@@ -491,7 +491,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 
@@ -575,7 +575,7 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
-            ss << (*this);
+            ss << *this;
             return ss.str();
         }
 

@@ -1,6 +1,8 @@
 //
 // Created by vogje01 on 10/2/24.
 //
+
+
 #include <awsmock/entity/monitoring/Counter.h>
 
 namespace AwsMock::Database::Entity::Monitoring {
@@ -26,25 +28,14 @@ namespace AwsMock::Database::Entity::Monitoring {
         timestamp = bsoncxx::types::b_date(mResult.value()["timestamp"].get_date().value);
     }
 
-    Poco::JSON::Object Counter::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("name", name);
-        jsonObject.set("labelName", labelName);
-        jsonObject.set("labelValue", labelValue);
-        jsonObject.set("value", performanceValue);
-        jsonObject.set("timestamp", Core::DateTimeUtils::ToISO8601(timestamp));
-        return jsonObject;
-    }
-
     std::string Counter::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
     std::ostream &operator<<(std::ostream &os, const Counter &counter) {
-        os << "Counter=" << bsoncxx::to_json(counter.ToDocument());
+        os << "Counter=" << to_json(counter.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Monitoring

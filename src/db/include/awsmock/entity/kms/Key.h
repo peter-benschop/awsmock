@@ -10,24 +10,15 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/exception/exception.hpp>
 #include <mongocxx/stdx.hpp>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::KMS {
@@ -164,14 +155,7 @@ namespace AwsMock::Database::Entity::KMS {
          *
          * @param mResult MongoDB document view.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        void FromDocument(mongocxx::stdx::optional<view> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.

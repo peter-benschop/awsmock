@@ -39,7 +39,7 @@ namespace AwsMock::Dto::Lambda {
 
     std::string ListFunctionResponse::ToString() {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

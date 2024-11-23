@@ -68,7 +68,7 @@ namespace AwsMock::Dto::Common {
 
     std::string UserAgent::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

@@ -76,7 +76,7 @@ namespace AwsMock::Dto::SQS {
 
     [[nodiscard]] std::string Record::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

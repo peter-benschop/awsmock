@@ -68,7 +68,7 @@ namespace AwsMock::Dto::SNS {
 
     std::string ListSubscriptionCountersRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 

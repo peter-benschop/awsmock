@@ -99,9 +99,16 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static long GetLongValue(mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static long GetLongValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetLongValue(view.value()[name]);
+            }
+            return {};
+        }
+
+        static long GetLongValue(const value &value, const std::string &name) {
+            if (value.find(name) != value.end()) {
+                return GetLongValue(value[name]);
             }
             return {};
         }
@@ -112,7 +119,7 @@ namespace AwsMock::Core::Bson {
                 case bsoncxx::type::k_int32:
                     return element.get_int32().value;
                 case bsoncxx::type::k_int64:
-                    return static_cast<long>(element.get_int64().value);
+                    return element.get_int64().value;
                 case bsoncxx::type::k_null:
                     return 0;
                 default:
@@ -121,9 +128,16 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static int GetIntValue(mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static int GetIntValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetIntValue(view.value()[name]);
+            }
+            return {};
+        }
+
+        static int GetIntValue(const value &value, const std::string &name) {
+            if (value.find(name) != value.end()) {
+                return GetIntValue(value[name]);
             }
             return {};
         }
@@ -132,7 +146,7 @@ namespace AwsMock::Core::Bson {
 
             switch (element.type()) {
                 case bsoncxx::type::k_int32:
-                    return static_cast<int>(element.get_int32().value);
+                    return element.get_int32().value;
                 case bsoncxx::type::k_int64:
                     return static_cast<int>(element.get_int64().value);
                 case bsoncxx::type::k_null:
@@ -156,16 +170,23 @@ namespace AwsMock::Core::Bson {
                 case bsoncxx::type::k_null:
                     return 0.0;
                 case bsoncxx::type::k_double:
-                    return static_cast<double>(element.get_double().value);
+                    return element.get_double().value;
                 default:
                     break;
             }
             return 0;
         }
 
-        static std::string GetStringValue(mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static std::string GetStringValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetStringValue(view.value()[name]);
+            }
+            return {};
+        }
+
+        static std::string GetStringValue(const value &value, const std::string &name) {
+            if (value.find(name) != value.end()) {
+                return GetStringValue(value[name]);
             }
             return {};
         }
@@ -182,7 +203,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static bool GetBoolValue(mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static bool GetBoolValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetBoolValue(view.value()[name]);
             }

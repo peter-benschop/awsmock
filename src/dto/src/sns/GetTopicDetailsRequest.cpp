@@ -40,7 +40,7 @@ namespace AwsMock::Dto::SNS {
 
     [[nodiscard]] std::string GetTopicDetailsRequest::ToString() const {
         std::stringstream ss;
-        ss << (*this);
+        ss << *this;
         return ss.str();
     }
 
