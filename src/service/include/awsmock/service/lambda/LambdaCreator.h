@@ -8,9 +8,12 @@
 // C++ standard includes
 #include <sstream>
 #include <string>
+#include <utility>
 
 // Poco includes
 #include <Poco/Base64Decoder.h>
+#include <Poco/Zip/Compress.h>
+#include <Poco/Zip/Decompress.h>
 
 // Boost includes
 #include <boost/beast/core/detail/base64.hpp>
@@ -37,13 +40,13 @@ namespace AwsMock::Service {
      * to the lambda directory. This is needed, as the lambda server runs through all lambda entity in the database and starts the lambdas from the lambda directory.
      *
      * @par
-     * Once the lambdas re written to the lambda directory, the creator decodes the lambda and check for a existing image in the docker registry. If it find a image, it will
-     * create a docker container and starts it. Otherwise a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
-     * Dockerfile for that runtime. Then a container is creates and started.
+     * Once the lambdas are written to the lambda directory, the creator decodes the lambda and check for a existing image in the docker registry. If it find a image, it will
+     * create a docker container and starts it. Otherwise, a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
+     * Dockerfile for that runtime. Then a container is created and started.
      *
      * @par
      * To see the running container simply issue a 'docker ps'. The container has a name of 'lambda-function-name:version. The docker tag is taken from the lambda function
-     * tags. If a 'version' or 'dockerTag' exists in the lambda function, this is taken as the docker tag. Otherwise 'latest' is used. If it is a function, which is loaded
+     * tags. If a 'version' or 'dockerTag' exists in the lambda function, this is taken as the docker tag. Otherwise, 'latest' is used. If it is a function, which is loaded
      * from a versioned S3 bucket/key, the version tag of the S3 object is taken.
      *
      * @par
@@ -52,7 +55,7 @@ namespace AwsMock::Service {
      * request.
      *
      * @par
-     * The docker creator runs asynchronously. Therefore the lambda function is in 'pending' state as long as the asynchronous thread runs. Afterwards state status will be
+     * The docker creator runs asynchronously. Therefore, the lambda function is in 'pending' state as long as the asynchronous thread runs. Afterwards state status will be
      * set to 'active'. This means you need to wait until the state is 'active' before you can invoke the lambda function.
      *
      * @author jens.vogt\@opitz-consulting.com

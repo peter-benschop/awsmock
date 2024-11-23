@@ -6,6 +6,7 @@
 #define AWSMOCK_CORE_CONFIGURATION_H
 
 // Standard C++ includes
+#include <fstream>
 #include <string>
 
 // Poco includes
@@ -17,6 +18,7 @@
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
 namespace AwsMock::Core {

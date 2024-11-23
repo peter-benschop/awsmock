@@ -140,17 +140,16 @@ namespace AwsMock::Database {
         return _queues[it->first];
     }
 
-    long SQSMemoryDb::CountQueues(const std::string &prefix, const std::string &region) {
+    long SQSMemoryDb::CountQueues(const std::string &prefix, const std::string &region) const {
 
         long count = 0;
 
         if (region.empty() && prefix.empty()) {
-            count = (long) _queues.size();
+            count = static_cast<long>(_queues.size());
         } else {
 
-            std::map<std::string, Entity::SQS::Queue>::iterator it;
-            for (it = _queues.begin(); it != _queues.end(); it++) {
-                if ((!region.empty() && it->second.region == region) && (!prefix.empty() && Core::StringUtils::StartsWith(it->second.name, prefix))) {
+            for (auto &queue: _queues) {
+                if (!region.empty() && queue.second.region == region || (!prefix.empty() && Core::StringUtils::StartsWith(queue.second.name, prefix))) {
                     count++;
                 }
             }
@@ -421,7 +420,7 @@ namespace AwsMock::Database {
                                if (kv.second.queueArn == queue.queueArn) {
                                    return kv.second;
                                }
-                               return (Entity::SQS::Message){};
+                               return (Entity::SQS::Message) {};
                            });
 
             if (!filtered.empty()) {

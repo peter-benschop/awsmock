@@ -24,11 +24,11 @@ namespace AwsMock::Core {
       protected:
 
         void SetUp() override {
-            tempDir = Core::DirUtils::CreateTempDir();
+            tempDir = DirUtils::CreateTempDir();
         }
 
         void TearDown() override {
-            Core::DirUtils::DeleteDirectory(tempDir);
+            DirUtils::DeleteDirectory(tempDir);
         }
         std::string tempDir;
     };
@@ -36,10 +36,10 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, BasenameTest) {
 
         // arrange
-        std::string fileName = tempDir + Poco::Path::separator() + "example.gif";
+        const std::string fileName = tempDir + "/" + "example.gif";
 
         // act
-        std::string result = FileUtils::GetBasename(fileName);
+        const std::string result = FileUtils::GetBasename(fileName);
 
         // assert
         EXPECT_EQ(result.length(), 7);
@@ -48,10 +48,10 @@ namespace AwsMock::Core {
 
     TEST_F(FileUtilsTest, ExtensionTest) {
         // arrange
-        std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
+        const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
-        std::string result = FileUtils::GetExtension(fileName);
+        const std::string result = FileUtils::GetExtension(fileName);
 
         // assert
         EXPECT_EQ(result.length(), 3);
@@ -60,10 +60,10 @@ namespace AwsMock::Core {
 
     TEST_F(FileUtilsTest, FileSizeTest) {
         // arrange
-        std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
+        const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
-        long result = FileUtils::FileSize(fileName);
+        const long result = FileUtils::FileSize(fileName);
 
         // assert
         EXPECT_EQ(result, 100);
@@ -72,12 +72,12 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, FileMoveToTest) {
 
         // arrange
-        std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
-        std::string targetFilename = tempDir + Poco::Path::separator() + "test1/test2/test3/test4.gif";
+        const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
+        const std::string targetFilename = tempDir + Poco::Path::separator() + "test1/test2/test3/test4.gif";
 
         // act
         FileUtils::MoveTo(fileName, targetFilename);
-        bool result = FileUtils::FileExists(targetFilename);
+        const bool result = FileUtils::FileExists(targetFilename);
 
         // assert
         EXPECT_TRUE(result);
@@ -86,7 +86,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, DeleteFileTest) {
 
         // arrange
-        std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
+        const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
         EXPECT_NO_THROW({ FileUtils::DeleteFile(fileName); });
@@ -98,7 +98,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, StripBasenameTest) {
 
         // arrange
-        std::string fileName = tempDir + Poco::Path::separator() + "testFile.txt";
+        const std::string fileName = tempDir + "/" + "testFile.txt";
 
         // act
         std::string basename;
@@ -112,10 +112,10 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetParentPathTest) {
 
         // arrange
-        std::string fileName = tempDir + Poco::Path::separator() + "testFile.txt";
+        const std::string fileName = tempDir + Poco::Path::separator() + "testFile.txt";
 
         // act
-        std::string tempPath = FileUtils::GetParentPath(fileName);
+        const std::string tempPath = FileUtils::GetParentPath(fileName);
 
         // assert
         EXPECT_FALSE(tempPath.empty());
@@ -126,7 +126,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        std::string tempFile = FileUtils::CreateTempFile(tempDir, "json", FILE_SIZE);
+        const std::string tempFile = FileUtils::CreateTempFile(tempDir, "json", FILE_SIZE);
 
         // assert
         EXPECT_FALSE(tempFile.empty());
@@ -134,46 +134,10 @@ namespace AwsMock::Core {
         EXPECT_EQ(FILE_SIZE, FileUtils::FileSize(tempFile));
     }
 
-    TEST_F(FileUtilsTest, CompressTest) {
-
-        // arrange
-        std::string zipName = FileUtils::GetTempFile("zip");
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-        for (int i = 0; i < 3; i++) {
-            FileUtils::CreateTempFile(dirName, "json", 100);
-        }
-
-        // act
-        EXPECT_NO_THROW({ FileUtils::ZipFiles(zipName, dirName); });
-
-        // assert
-        EXPECT_TRUE(FileUtils::FileExists(zipName));
-        EXPECT_TRUE(FileUtils::FileSize(zipName) > 0);
-    }
-
-    TEST_F(FileUtilsTest, UncompressTest) {
-
-        // arrange
-        std::string zipName = FileUtils::GetTempFile("zip");
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
-        std::string outputDirName = DirUtils::CreateTempDir(tempDir);
-        for (int i = 0; i < 3; i++) {
-            FileUtils::CreateTempFile(dirName, "json", 100);
-        }
-
-        // act
-        EXPECT_NO_THROW({ FileUtils::ZipFiles(zipName, dirName); });
-        EXPECT_NO_THROW({ FileUtils::UnzipFiles(zipName, outputDirName); });
-
-        // assert
-        EXPECT_TRUE(DirUtils::DirectoryExists(outputDirName));
-        EXPECT_FALSE(DirUtils::DirectoryEmpty(outputDirName));
-    }
-
     TEST_F(FileUtilsTest, StripChunkSignatureTest) {
 
         // arrange
-        std::string tempFile = FileUtils::CreateTempFile("txt", "b;chunk-signature=654753fda\ntest\nb;chunk-signature=654753fda\n");
+        const std::string tempFile = FileUtils::CreateTempFile("txt", "b;chunk-signature=654753fda\ntest\nb;chunk-signature=654753fda\n");
 
         // act
         FileUtils::StripChunkSignature(tempFile);

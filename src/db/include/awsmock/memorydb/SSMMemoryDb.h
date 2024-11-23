@@ -92,7 +92,7 @@ namespace AwsMock::Database {
          * @return total number of parameters
          * @throws DatabaseException
          */
-        long CountParameters();
+        long CountParameters() const;
 
         /**
          * @brief Create a new parameter in the ssm parameter table

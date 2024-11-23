@@ -612,7 +612,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::UpdateObject(Entity::S3::Object &object) {
+    Entity::S3::Object S3Database::UpdateObject(Entity::S3::Object &object) const {
 
         if (HasDatabase()) {
 
@@ -649,7 +649,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
+    Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) const {
 
         if (HasDatabase()) {
 
@@ -679,7 +679,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
+    Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const {
 
         if (HasDatabase()) {
 
@@ -711,7 +711,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::S3::Object S3Database::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &versionId) {
+    Entity::S3::Object S3Database::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &versionId) const {
 
         try {
 
@@ -736,7 +736,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::S3::ObjectList S3Database::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) {
+    Entity::S3::ObjectList S3Database::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
 
         Entity::S3::ObjectList objectList;
         if (HasDatabase()) {
@@ -772,13 +772,13 @@ namespace AwsMock::Database {
         return objectList;
     }
 
-    long S3Database::ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) {
+    long S3Database::ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
                 long count = 0;
@@ -795,7 +795,7 @@ namespace AwsMock::Database {
                     query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                count = static_cast<long>(_objectCollection.count_documents(query.extract()));
+                count = _objectCollection.count_documents(query.extract());
                 log_trace << "Object count: " << count;
 
                 return count;
@@ -811,7 +811,7 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) {
+    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
 
         Entity::S3::ObjectList objectList;
         if (HasDatabase()) {
@@ -860,7 +860,7 @@ namespace AwsMock::Database {
         return objectList;
     }
 
-    void S3Database::DeleteObject(const Entity::S3::Object &object) {
+    void S3Database::DeleteObject(const Entity::S3::Object &object) const {
 
         if (HasDatabase()) {
 
@@ -884,7 +884,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+    void S3Database::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) const {
 
         if (HasDatabase()) {
 
@@ -923,7 +923,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void S3Database::DeleteAllObjects() {
+    void S3Database::DeleteAllObjects() const {
 
         if (HasDatabase()) {
 

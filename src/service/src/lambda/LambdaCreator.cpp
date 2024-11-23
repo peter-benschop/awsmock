@@ -4,8 +4,6 @@
 
 #include <awsmock/service/lambda/LambdaCreator.h>
 
-#include <utility>
-
 namespace AwsMock::Service {
 
     void LambdaCreator::operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) {

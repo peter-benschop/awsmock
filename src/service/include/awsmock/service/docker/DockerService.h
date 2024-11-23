@@ -131,14 +131,14 @@ namespace AwsMock::Service {
          * @param dockerFile docker file
          * @return file size in bytes
          */
-        std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile);
+        std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
 
         /**
          * @brief Delete an image by name/tags.
          *
          * @param id image ID
          */
-        void DeleteImage(const std::string &id);
+        void DeleteImage(const std::string &id) const;
 
         /**
          * @brief Checks whether a container exists.
@@ -155,7 +155,7 @@ namespace AwsMock::Service {
          * @param id container ID
          * @return true if container exists, otherwise false
          */
-        bool ContainerExists(const std::string &id);
+        bool ContainerExists(const std::string &id) const;
 
         /**
          * @brief List all docker images, with the given name and different tags.
@@ -163,7 +163,7 @@ namespace AwsMock::Service {
          * @param name name of the image
          * @return ListImageResponse
          */
-        Dto::Docker::ListImageResponse ListImages(const std::string &name);
+        Dto::Docker::ListImageResponse ListImages(const std::string &name) const;
 
         /**
          * @brief Creates a container

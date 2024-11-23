@@ -118,7 +118,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return number of DynamoDB tables
          */
-        long CountTables(const std::string &region = {});
+        long CountTables(const std::string &region = {}) const;
 
         /**
          * @brief Deletes an existing DynamoDB table
@@ -127,14 +127,14 @@ namespace AwsMock::Database {
          * @param tableName name of the table
          * @throws DatabaseException
          */
-        void DeleteTable(const std::string &region, const std::string &tableName);
+        void DeleteTable(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Deletes all existing DynamoDB tables
          *
          * @throws DatabaseException
          */
-        void DeleteAllTables();
+        void DeleteAllTables() const;
 
         /**
          * @brief Checks the existence of an item.

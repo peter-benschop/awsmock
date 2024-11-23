@@ -6,43 +6,23 @@
 #define AWS_MOCK_CORE_FILE_UTILS_H
 
 // Standard C includes
-#include <fcntl.h>
-#include <grp.h>
-#include <pwd.h>
 #include <sys/sendfile.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <utime.h>
 
 // Standard C++ includes
-#include <cstdio>
-#include <cstdlib>
-#include <execution>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include <streambuf>
+#include <pwd.h>
 #include <string>
 
-// Poco includes
-#include <Poco/BinaryReader.h>
-#include <Poco/BinaryWriter.h>
-#include <Poco/DirectoryIterator.h>
-#include <Poco/File.h>
-#include <Poco/Format.h>
-#include <Poco/Path.h>
-#include <Poco/RegularExpression.h>
-#include <Poco/StreamCopier.h>
-#include <Poco/String.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/Zip/Compress.h>
-#include <Poco/Zip/Decompress.h>
+// Boost includes
+#include <boost/asio/streambuf.hpp>
+#include <boost/beast/core/file.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/iostreams/copy.hpp>
 
 // AwsMock includes
-#include <awsmock/core/DirUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 

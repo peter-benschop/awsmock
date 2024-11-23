@@ -54,7 +54,7 @@ namespace AwsMock::Database {
                 queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.CreateQueue(queue);
+        const Entity::SQS::Queue result = _sqsDatabase.CreateQueue(queue);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -69,7 +69,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        bool result = _sqsDatabase.QueueUrlExists(_region, _queueUrl);
+        const bool result = _sqsDatabase.QueueUrlExists(_region, _queueUrl);
 
         // assert
         EXPECT_TRUE(result);
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.GetQueueByArn(queue.queueArn);
+        const Entity::SQS::Queue result = _sqsDatabase.GetQueueByArn(queue.queueArn);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -120,10 +120,10 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
-        queue = _sqsDatabase.CreateQueue(queue);
+        _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_region, _queueUrl);
+        const Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_region, _queueUrl);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -137,7 +137,7 @@ namespace AwsMock::Database {
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(queue.region);
+        const Entity::SQS::QueueList result = _sqsDatabase.ListQueues(queue.region);
 
         // assert
         EXPECT_EQ(result.size(), 1);
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.PurgeQueue(queue.queueArn);
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(0, result);
@@ -167,7 +167,7 @@ namespace AwsMock::Database {
 
         // act
         queue.owner = "root";
-        Entity::SQS::Queue result = _sqsDatabase.UpdateQueue(queue);
+        const Entity::SQS::Queue result = _sqsDatabase.UpdateQueue(queue);
 
         // assert
         EXPECT_TRUE(result.oid == queue.oid);
@@ -181,7 +181,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        long result = _sqsDatabase.CountQueues(_region);
+        const long result = _sqsDatabase.CountQueues({}, _region);
 
         // assert
         EXPECT_EQ(1, result);
@@ -194,7 +194,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        long result = _sqsDatabase.CountQueues();
+        const long result = _sqsDatabase.CountQueues();
 
         // assert
         EXPECT_EQ(1, result);
@@ -208,7 +208,7 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.DeleteQueue(queue);
-        bool result = _sqsDatabase.QueueExists(queue.region, queue.queueUrl);
+        const bool result = _sqsDatabase.QueueExists(queue.region, queue.queueUrl);
 
         // assert
         EXPECT_FALSE(result);
@@ -222,7 +222,7 @@ namespace AwsMock::Database {
         Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
 
         // act
-        Entity::SQS::Message result = _sqsDatabase.CreateMessage(message);
+        const Entity::SQS::Message result = _sqsDatabase.CreateMessage(message);
 
         // assert
         EXPECT_FALSE(result.oid.empty());
@@ -238,7 +238,7 @@ namespace AwsMock::Database {
         message = _sqsDatabase.CreateMessage(message);
 
         // act
-        bool result = _sqsDatabase.MessageExists(message.receiptHandle);
+        const bool result = _sqsDatabase.MessageExists(message.receiptHandle);
 
         // assert
         EXPECT_TRUE(result);
@@ -253,7 +253,7 @@ namespace AwsMock::Database {
         message = _sqsDatabase.CreateMessage(message);
 
         // act
-        Entity::SQS::Message result = _sqsDatabase.GetMessageById(message.oid);
+        const Entity::SQS::Message result = _sqsDatabase.GetMessageById(message.oid);
 
         // assert
         EXPECT_TRUE(message.oid == result.oid);
@@ -284,7 +284,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateMessage(message);
 
         // act
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(1, result);
@@ -299,7 +299,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateMessage(message);
 
         // act
-        long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+        const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -319,7 +319,7 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.ResetMessages(_queueUrl, 1);
-        long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+        const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -345,7 +345,7 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.ResetDelayedMessages(queue.queueArn, queueAttribute.delaySeconds);
-        long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+        const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -379,7 +379,7 @@ namespace AwsMock::Database {
 
         // act
         message.status = Entity::SQS::MessageStatus::DELAYED;
-        Entity::SQS::Message result = _sqsDatabase.UpdateMessage(message);
+        const Entity::SQS::Message result = _sqsDatabase.UpdateMessage(message);
 
         // assert
         EXPECT_TRUE(result.oid == message.oid);
@@ -397,9 +397,9 @@ namespace AwsMock::Database {
         _sqsDatabase.ReceiveMessages(queue.queueArn, 30, 3, "", -1, messageList);
 
         // act
-        Entity::SQS::Message resultMessage = messageList[0];
+        const Entity::SQS::Message resultMessage = messageList[0];
         _sqsDatabase.DeleteMessage(resultMessage);
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(0, result);
@@ -420,7 +420,7 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.DeleteMessages(_queueArn);
-        long result = _sqsDatabase.CountMessages(_queueArn);
+        const long result = _sqsDatabase.CountMessages(_queueArn);
 
         // assert
         EXPECT_EQ(0, result);
