@@ -9,17 +9,15 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/dto/dynamodb/DescribeTableResponse.h>
+#include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
-#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/docker/DockerService.h>
-#include <awsmock/service/dynamodb/DynamoDbMonitoring.h>
-#include <awsmock/service/dynamodb/DynamoDbWorker.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 #define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
 #define DYNAMODB_DEFAULT_WORKER_PERIOD 300
@@ -40,7 +38,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbServer : public AbstractServer {
+    class DynamoDbServer final : public AbstractServer {
 
       public:
 
@@ -49,29 +47,12 @@ namespace AwsMock::Service {
          */
         explicit DynamoDbServer(Core::PeriodicScheduler &scheduler);
 
-        /**
-         * @brief Initialization
-         */
-        void Initialize();
-
-      protected:
-
-        /**
-         * @brief Main method
-         */
-        void Run();
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown();
-
       private:
 
         /**
          * @brief Delete dangling, stopped containers
          */
-        void CleanupContainers();
+        void CleanupContainers() const;
 
         /**
          * @brief Start the local DynamoDB container.
@@ -81,7 +62,7 @@ namespace AwsMock::Service {
          * image will be started as container.
          * </p>
          */
-        void StartLocalDynamoDb();
+        void StartLocalDynamoDb() const;
 
         /**
          * @brief Stop the local DynamoDB container.
@@ -90,22 +71,34 @@ namespace AwsMock::Service {
          * The AWS DynamoDb docker container will be stopped.
          * </p>
          */
-        void StopLocalDynamoDb();
+        void StopLocalDynamoDb() const;
+
+        /**
+         * Update counters
+         */
+        void UpdateCounter() const;
+
+        /**
+         * @brief Synchronize tables.
+         *
+         * Loops over all DynamoDB tables an updates the MongoDB backend.
+         */
+        void SynchronizeTables() const;
 
         /**
          * Docker module
          */
-        Service::DockerService &_dockerService;
+        Service::DockerService &_containerService;
 
         /**
-         * Monitoring
+         * Database connection
          */
-        DynamoDbMonitoring _dynamoDbMonitoring;
+        Database::DynamoDbDatabase &_dynamoDbDatabase;
 
         /**
-         * Monitoring
+         * Metric service
          */
-        DynamoDbWorker _dynamoDbWorker;
+        Monitoring::MetricService &_metricService;
 
         /**
          * Monitoring period
@@ -120,12 +113,12 @@ namespace AwsMock::Service {
         /**
          * Dynamo DB docker host
          */
-        std::string _dockerHost;
+        std::string _containerHost;
 
         /**
          * Dynamo DB docker host
          */
-        int _dockerPort;
+        int _containerPort;
     };
 
 }// namespace AwsMock::Service

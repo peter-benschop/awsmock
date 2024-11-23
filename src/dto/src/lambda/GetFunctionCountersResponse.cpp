@@ -9,24 +9,44 @@ namespace AwsMock::Dto::Lambda {
     std::string GetFunctionCountersResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
 
-            rootJson.set("region", region);
-            rootJson.set("functionName", functionName);
-            rootJson.set("user", user);
-            rootJson.set("handler", handler);
-            rootJson.set("user", user);
-            rootJson.set("role", role);
-            rootJson.set("size", size);
-            rootJson.set("concurrency", concurrency);
-            rootJson.set("runtime", runtime);
-            rootJson.set("invocations", invocations);
-            rootJson.set("averageRuntime", averageRuntime);
-            rootJson.set("lastInvocation", Core::DateTimeUtils::ToISO8601(lastInvocation));
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            bsoncxx::builder::basic::document document;
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "functionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "handler", handler);
+            Core::Bson::BsonUtils::SetStringValue(document, "runtime", runtime);
+            Core::Bson::BsonUtils::SetStringValue(document, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "role", role);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetLongValue(document, "concurrency", concurrency);
+            Core::Bson::BsonUtils::SetLongValue(document, "invocations", invocations);
+            Core::Bson::BsonUtils::SetLongValue(document, "averageRuntime", averageRuntime);
+            Core::Bson::BsonUtils::SetDateValue(document, "lastInvocation", lastInvocation);
+            Core::Bson::BsonUtils::SetDateValue(document, "lastStarted", lastStarted);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+
+            // Environment
+            if (!environment.empty()) {
+                bsoncxx::builder::basic::document envDoc;
+                for (const auto &env: environment) {
+                    envDoc.append(bsoncxx::builder::basic::kvp(env.first, env.second));
+                }
+                document.append(bsoncxx::builder::basic::kvp("environment", envDoc));
+            }
+
+            // Tags
+            if (!tags.empty()) {
+                bsoncxx::builder::basic::document tagDoc;
+                for (const auto &tag: tags) {
+                    tagDoc.append(bsoncxx::builder::basic::kvp(tag.first, tag.second));
+                }
+                document.append(bsoncxx::builder::basic::kvp("tags", tagDoc));
+            }
+            log_info << bsoncxx::to_json(document);
+
+            return bsoncxx::to_json(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

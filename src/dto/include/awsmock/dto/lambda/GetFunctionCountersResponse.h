@@ -11,6 +11,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
@@ -189,9 +190,24 @@ namespace AwsMock::Dto::Lambda {
         long averageRuntime;
 
         /**
+         * Environment
+         */
+        std::map<std::string, std::string> environment;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
          * Last invocation
          */
         system_clock::time_point lastInvocation;
+
+        /**
+         * Last started
+         */
+        system_clock::time_point lastStarted;
 
         /**
          * Creation date

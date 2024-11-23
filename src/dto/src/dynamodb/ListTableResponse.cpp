@@ -2,7 +2,9 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include "awsmock/core/exception/ServiceException.h"
+#include "awsmock/core/BsonUtils.h"
+
+
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -10,42 +12,45 @@ namespace AwsMock::Dto::DynamoDb {
     std::string ListTableResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("LastEvaluatedTableName", lastEvaluatedTableName);
 
-            Poco::JSON::Array jsonTableArray;
-            for (const auto &tableName: tableNames) {
-                jsonTableArray.add(tableName);
+            bsoncxx::builder::basic::document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastEvaluatedTableName", lastEvaluatedTableName);
+
+            if (!tableNames.empty()) {
+                bsoncxx::builder::basic::array array;
+                for (const auto &tableName: tableNames) {
+                    array.append(tableName);
+                }
+                document.append(kvp("Tables", array));
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void ListTableResponse::FromJson(const std::string &jsonString, const std::map<std::string, std::string> &headerMap) {
+    void ListTableResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        body = jsonString;
-        headers = headerMap;
+        this->body = body;
+        this->headers = headers;
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        if (body.empty()) {
+            log_info << "Empty response from DynamoDB";
+            return;
+        }
 
         try {
-            Poco::JSON::Array::Ptr jsonTableArray = rootObject->getArray("TableNames");
-            if (!jsonTableArray.isNull()) {
-                for (const auto &tableName: *jsonTableArray) {
-                    tableNames.emplace_back(tableName);
-                }
+
+            if (const value documentValue = bsoncxx::from_json(body); documentValue.find("TableNames") != documentValue.end()) {
+                Core::Bson::FromBsonArray(documentValue, "TableNames", &tableNames);
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -614,31 +614,39 @@ namespace AwsMock::Service {
             long elapsed = 0;
             auto begin = system_clock::now();
             Database::Entity::SQS::MessageList messageList;
-            while (elapsed < request.waitTimeSeconds) {
+            if (request.waitTimeSeconds == 0) {
 
-                Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
-
+                // Short polling period
                 _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                 log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
 
-                if (!messageList.empty()) {
-                    break;
-                }
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
-            }
+            } else {
 
+                // Long polling period
+                while (elapsed < request.waitTimeSeconds) {
+
+                    Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
+
+                    _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
+                    log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
+
+                    if (!messageList.empty()) {
+                        break;
+                    }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                    elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
+                }
+            }
 
             // Prepare response
             Dto::SQS::ReceiveMessageResponse response;
+            response.requestId = request.requestId;
             if (!messageList.empty()) {
 
                 // Update queue
                 queue.attributes.approximateNumberOfMessagesNotVisible += static_cast<long>(messageList.size());
                 queue = _sqsDatabase.UpdateQueue(queue);
-
                 response.messageList = messageList;
-                response.requestId = request.requestId;
             }
             log_info << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
 

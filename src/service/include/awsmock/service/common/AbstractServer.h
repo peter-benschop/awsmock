@@ -34,6 +34,8 @@ namespace AwsMock::Service {
 
       public:
 
+        virtual ~AbstractServer() = default;
+
         /**
          * @brief Constructor
          *

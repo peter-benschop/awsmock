@@ -16,14 +16,14 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto result = _tableCollection.insert_one(table.ToDocument());
+                const auto result = _tableCollection.insert_one(table.ToDocument());
                 session.commit_transaction();
                 log_trace << "DynamoDb table created, oid: " << result->inserted_id().get_oid().value.to_string();
                 return GetTableById(result->inserted_id().get_oid().value);
@@ -106,14 +106,14 @@ namespace AwsMock::Database {
         }
     }
 
-    bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) {
+    bool DynamoDbDatabase::TableExists(const std::string &region, const std::string &tableName) const {
 
         if (HasDatabase()) {
 
             try {
 
                 int64_t count;
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
                 if (!region.empty()) {
@@ -135,32 +135,24 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) {
+    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) const {
 
         Entity::DynamoDb::TableList tables;
         if (HasDatabase()) {
 
             try {
-
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                if (region.empty()) {
 
-                    auto tableCursor = _tableCollection.find({});
-                    for (auto table: tableCursor) {
-                        Entity::DynamoDb::Table result;
-                        result.FromDocument(table);
-                        tables.push_back(result);
-                    }
+                bsoncxx::builder::basic::document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
 
-                } else {
-
-                    auto tableCursor = _tableCollection.find(make_document(kvp("region", region)));
-                    for (auto table: tableCursor) {
-                        Entity::DynamoDb::Table result;
-                        result.FromDocument(table);
-                        tables.push_back(result);
-                    }
+                for (auto tableCursor = _tableCollection.find(query.extract()); auto table: tableCursor) {
+                    Entity::DynamoDb::Table result;
+                    result.FromDocument(table);
+                    tables.push_back(result);
                 }
 
             } catch (const mongocxx::exception &exc) {

@@ -672,7 +672,7 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (maxMessages > 0) {
                     opts.limit(maxMessages);
-                }// Update values
+                }
 
                 session.start_transaction();
 

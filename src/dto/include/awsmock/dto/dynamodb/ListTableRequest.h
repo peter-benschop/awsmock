@@ -25,7 +25,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableRequest : public Dto::Common::BaseRequest {
+    struct ListTableRequest : Common::BaseRequest {
 
         /**
          * AWS region

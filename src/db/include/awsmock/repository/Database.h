@@ -17,9 +17,6 @@
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 
-// Poco includes
-#include <Poco/Util/AbstractConfiguration.h>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
@@ -27,8 +24,40 @@
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_document;
+
+    struct IndexColumnDefinition {
+
+        /**
+         * Column name
+         */
+        std::string columns;
+
+        /**
+         * Index direction
+         */
+        int direction;
+    };
+
+    struct IndexDefinition {
+
+        /**
+         * Collection name
+         */
+        std::string collectionName;
+
+        /**
+         * Columns definitions
+         */
+        std::vector<IndexColumnDefinition> indexColumns;
+    };
+
     /**
      * @brief MongoDB database base class.
+     *
+     * @par
+     * Indexes are created during startup using detached background threads. Indexes which are already existing are ignored.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -46,7 +75,7 @@ namespace AwsMock::Database {
          *
          * @return MongoDB database client
          */
-        mongocxx::database GetConnection();
+        [[nodiscard]] mongocxx::database GetConnection() const;
 
         /**
          * @brief Check all indexes.
@@ -80,6 +109,14 @@ namespace AwsMock::Database {
       private:
 
         /**
+         * @brief Create index as background thread
+         *
+         * @param database database connection
+         * @param indexName name of the collection
+         */
+        static void CreateIndex(const mongocxx::database &database, const std::string &indexName);
+
+        /**
          * Database name
          */
         std::string _name;
@@ -93,6 +130,11 @@ namespace AwsMock::Database {
          * Database flag
          */
         bool _useDatabase;
+
+        /**
+         * @brief Index definitions
+         */
+        const static std::map<std::string, IndexDefinition> indexDefinitions;
     };
 
 }// namespace AwsMock::Database

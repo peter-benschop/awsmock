@@ -6,18 +6,18 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb", 10), _dockerService(DockerService::instance()) {
+    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb", 10), _containerService(DockerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
 
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _workerPeriod = configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
         _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
-        _dockerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
-        _dockerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
-        log_debug << "DynamoDB docker endpoint: " << _dockerHost << ":" << _dockerPort;
+        _containerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
+        _containerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
+        log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
         // Docker module
-        _dockerService = DockerService::instance();
+        _containerService = DockerService::instance();
         log_debug << "DynamoDbServer initialized";
 
         // Check module active
@@ -27,84 +27,113 @@ namespace AwsMock::Service {
         }
         log_info << "DynamoDb server started";
 
-        // Start DynamoDB monitoring update counters
-        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->_dynamoDbMonitoring.UpdateCounter(); }, _monitoringPeriod);
-
-        // Start synchronizing tables
-        //scheduler.AddTask("dynamodb-sync-tables", [this] { this->_dynamoDbWorker.SynchronizeTables(); }, _workerPeriod);
-
         // Start DynamoDb docker image
         StartLocalDynamoDb();
 
-        // Cleanup
-        CleanupContainers();
+        // Start DynamoDB monitoring update counters
+        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+
+        // Start synchronizing tables
+        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
 
         // Set running
         SetRunning();
     }
 
-    void DynamoDbServer::Initialize() {
-    }
-
-    void DynamoDbServer::Run() {
-    }
-
-    void DynamoDbServer::Shutdown() {
-    }
-
-    void DynamoDbServer::CleanupContainers() {
-        _dockerService.PruneContainers();
+    void DynamoDbServer::CleanupContainers() const {
+        _containerService.PruneContainers();
         log_debug << "Docker containers cleaned up";
     }
 
-    void DynamoDbServer::StartLocalDynamoDb() {
+    void DynamoDbServer::StartLocalDynamoDb() const {
         log_debug << "Starting DynamoDB docker image";
 
         // Check docker image
-        if (!_dockerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            _dockerService.BuildImage(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_DOCKER_FILE);
+        if (!_containerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+            _containerService.BuildImage(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, DYNAMODB_DOCKER_FILE);
         }
 
         // Check container image
-        if (!_dockerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            _dockerService.CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, _dockerPort, _dockerPort);
+        if (!_containerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+            _containerService.CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, _containerPort, _containerPort);
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+        const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
-            _dockerService.StartDockerContainer(container.id);
+            _containerService.StartDockerContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
             log_info << "Docker containers for DynamoDB already running";
         }
     }
 
-    void DynamoDbServer::StopLocalDynamoDb() {
+    void DynamoDbServer::StopLocalDynamoDb() const {
         log_debug << "Starting DynamoDB docker image";
 
         // Check docker image
-        if (!_dockerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+        if (!_containerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
             throw Core::ServiceException("Image does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Check container image
-        if (!_dockerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
+        if (!_containerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
             throw Core::ServiceException("Container does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Get docker container
-        Dto::Docker::Container container = _dockerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
+        Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG);
 
         // Stop docker container, in case it is running.
         if (container.state == "running") {
-            _dockerService.StopContainer(container);
+            _containerService.StopContainer(container);
             log_info << "Docker containers for DynamoDB stopped";
         } else {
             log_info << "Docker containers for DynamoDB not running";
         }
+    }
+
+    void DynamoDbServer::SynchronizeTables() const {
+
+        // Get the list of tables from DynamoDB
+        auto [status, output] = Core::SystemUtils::Exec("aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+        Dto::DynamoDb::ListTableResponse listTableResponse;
+        listTableResponse.FromJson(output, {});
+
+        if (!listTableResponse.tableNames.empty()) {
+            for (const auto &tableName: listTableResponse.tableNames) {
+                auto [status, output] = Core::SystemUtils::Exec(
+                        "aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+                Dto::DynamoDb::DescribeTableResponse describeTableResponse;
+                describeTableResponse.FromJson(output, {});
+
+                Database::Entity::DynamoDb::Table table = {
+                        .region = describeTableResponse.region,
+                        .name = describeTableResponse.tableName,
+                        .status = Dto::DynamoDb::TableStatusTypeToString(describeTableResponse.tableStatus),
+                        .attributes = describeTableResponse.attributes,
+                        .keySchemas = describeTableResponse.keySchemas};
+                _dynamoDbDatabase.CreateOrUpdateTable(table);
+            }
+
+        } else {
+
+            _dynamoDbDatabase.DeleteAllTables();
+        }
+        log_debug << "DynamoDB synchronized";
+    }
+
+    void DynamoDbServer::UpdateCounter() const {
+        log_trace << "Dynamodb monitoring starting";
+
+        const long tables = _dynamoDbDatabase.CountTables();
+        const long items = _dynamoDbDatabase.CountItems();
+        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, tables);
+        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, items);
+
+        log_trace << "DynamoDb monitoring finished";
     }
 
 }// namespace AwsMock::Service
