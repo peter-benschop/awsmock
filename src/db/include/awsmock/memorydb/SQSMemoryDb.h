@@ -154,7 +154,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return number of queues in the given region.
          */
-        long CountQueues(const std::string &prefix = {}, const std::string &region = {});
+        long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
 
         /**
          * @brief Deletes a queue.

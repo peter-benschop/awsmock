@@ -1,81 +1,73 @@
 #include <awsmock/core/FileUtils.h>
-#include <boost/asio/streambuf.hpp>
 
 namespace AwsMock::Core {
 
     std::string FileUtils::GetBasename(const std::string &fileName) {
-        Poco::Path path(fileName);
-        return path.getBaseName();
+        const std::filesystem::path path(fileName);
+        return path.filename().replace_extension().string();
     }
 
     std::string FileUtils::GetExtension(const std::string &fileName) {
-        Poco::Path path(fileName);
-        return path.getExtension();
+        const std::filesystem::path path(fileName);
+        return path.extension().string().substr(1);
     }
 
     bool FileUtils::FileNameContainsString(const std::string &fileName, const std::string &pattern) {
-        Poco::Path path(fileName);
-        return path.getBaseName().find(pattern) != std::string::npos;
+        const std::filesystem::path path(fileName);
+        return GetBasename(fileName).find(pattern) != std::string::npos;
     }
 
     std::string FileUtils::GetTempFile(const std::string &extension) {
-        return Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
+        const boost::filesystem::path temp = boost::filesystem::temp_directory_path().append(boost::filesystem::unique_path());
+        return temp.native() + "." + extension;
     }
 
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
-        return dir + Poco::Path::separator() + Poco::replace(Poco::toLower(Poco::Path::temp() + Poco::UUIDGenerator().createRandom().toString() + "." + extension), "-", "");
+        const boost::filesystem::path temp = boost::filesystem::unique_path();
+        return dir + "/" + GetBasename(temp.native()) + "." + extension;
     }
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
-#ifndef _WIN32
-        std::filesystem::path path(fileName);
+        const std::filesystem::path path(fileName);
         return path.parent_path();
-#else
-        return fileName.substr(0, fileName.find_last_of("/\\"));
-#endif
     }
 
     long FileUtils::FileSize(const std::string &fileName) {
         if (FileExists(fileName)) {
-            return (long) std::filesystem::file_size({fileName.c_str()});
+            return static_cast<long>(std::filesystem::file_size({fileName.c_str()}));
         }
         return -1;
     }
 
-    void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {
+    void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, const bool createDir) {
         try {
-            Poco::File sourceFile(sourceFileName);
-            Poco::File targetFile(targetFileName);
-            std::string parentPath = GetParentPath(targetFileName);
-            if (createDir && !Core::DirUtils::DirectoryExists(parentPath)) {
-                Poco::File parentFile(parentPath);
-                parentFile.createDirectories();
+            if (createDir) {
+                create_directories(boost::filesystem::path(GetParentPath(targetFileName)));
             }
-            sourceFile.renameTo(targetFileName);
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
+            boost::filesystem::rename(boost::filesystem::path(sourceFileName), boost::filesystem::path(targetFileName));
+        } catch (std::exception &e) {
+            log_error << e.what();
         }
     }
 
-    void FileUtils::CopyTo(const std::string &sourceFileName, const std::string &targetFileName, bool createDir) {
-        Poco::File sourceFile(sourceFileName);
-        Poco::File targetFile(targetFileName);
-        std::string parentPath = GetParentPath(targetFileName);
+    void FileUtils::CopyTo(const std::string &sourceFileName, const std::string &targetFileName, const bool createDir) {
         if (createDir) {
-            DirUtils::EnsureDirectory(parentPath);
+            create_directories(boost::filesystem::path(GetParentPath(targetFileName)));
         }
-        sourceFile.copyTo(targetFileName);
+        copy_file(boost::filesystem::path(sourceFileName), boost::filesystem::path(targetFileName), boost::filesystem::copy_options::none);
     }
 
     long FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
 
-        int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
 
         size_t copied = 0;
         for (auto &it: files) {
 
-            std::string inFile = inDir + "/" + it;
-            int source = open(inFile.c_str(), O_RDONLY, 0);
+            std::string inFile = inDir;
+            inFile.append("/");
+            inFile.append(it);
+            const int source = open(inFile.c_str(), O_RDONLY, 0);
 
             // struct required, rationale: function stat() exists also
             struct stat stat_source{};
@@ -95,9 +87,10 @@ namespace AwsMock::Core {
         std::ofstream ofs(outFile, std::ios::out | std::ios::trunc);
         for (auto &it: files) {
             std::string inFile = inDir;
-            inFile.append(Poco::Path::separator() + it);
+            inFile.append("/");
+            inFile.append(it);
             std::ifstream ifs(inFile, std::ios::in);
-            copied += Poco::StreamCopier::copyStream(ifs, ofs);
+            copied = boost::iostreams::copy(ifs, ofs);
             ofs.flush();
             ifs.close();
         }
@@ -124,15 +117,12 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::CreateTempFile(const std::string &dirName, const std::string &extension, int numBytes) {
-        std::string tmpFileName = Poco::replace(Poco::UUIDGenerator().createRandom().toString(), "-", "") + "." + extension;
-        std::ostringstream stringStream;
-        stringStream << dirName << Poco::Path::separator() << tmpFileName;
-        std::string tempFilename = stringStream.str();
+        std::string tmpFileName = GetTempFile(dirName, extension);
         std::ofstream tempFile;
-        tempFile.open(tempFilename);
+        tempFile.open(tmpFileName);
         tempFile << StringUtils::GenerateRandomString(numBytes);
         tempFile.close();
-        return tempFilename;
+        return tmpFileName;
     }
 
     std::string FileUtils::CreateTempFile(const std::string &extension, const std::string &content) {
@@ -145,71 +135,19 @@ namespace AwsMock::Core {
     }
 
     bool FileUtils::FileExists(const std::string &fileName) {
-        Poco::File file(fileName);
-        return file.exists();
+        return std::filesystem::exists(fileName);
     }
 
     std::string FileUtils::StripBasePath(const std::string &fileName) {
-        return Poco::format("%s.%s", GetBasename(fileName), GetExtension(fileName));
+        return GetBasename(fileName) + "." + GetExtension(fileName);
     }
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
-#ifndef _WIN32
         struct stat info{};
         stat(fileName.c_str(), &info);// Error check omitted
-        struct passwd *pw = getpwuid(info.st_uid);
-        if (pw) {
+        if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
         }
-#else
-        PSID pSidOwner = NULL;
-        PSECURITY_DESCRIPTOR pSD = NULL;
-        LPTSTR AcctName = NULL;
-        LPTSTR DomainName = NULL;
-        DWORD dwAcctName = 1, dwDomainName = 1;
-        SID_NAME_USE eUse = SidTypeUnknown;
-        BOOL bRtnBool = TRUE;
-        HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-        DWORD dwRtnCode = GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &pSidOwner, NULL, NULL, NULL, &pSD);
-        bRtnBool = LookupAccountSid(NULL, pSidOwner, AcctName, (LPDWORD) &dwAcctName, DomainName, (LPDWORD) &dwDomainName, &eUse);
-        // Reallocate memory for the buffers.
-        AcctName = (LPTSTR) GlobalAlloc(GMEM_FIXED, dwAcctName);
-
-        // Check GetLastError for GlobalAlloc error condition.
-        if (AcctName == NULL) {
-            DWORD dwErrorCode = 0;
-            dwErrorCode = GetLastError();
-            log_error << "GlobalAlloc error:" << dwErrorCode;
-        }
-
-        DomainName = (LPTSTR) GlobalAlloc(GMEM_FIXED, dwDomainName);
-
-        // Check GetLastError for GlobalAlloc error condition.
-        if (DomainName == NULL) {
-            DWORD dwErrorCode = 0;
-            dwErrorCode = GetLastError();
-            log_error << "GlobalAlloc error:" << dwErrorCode;
-        }
-
-        // Second call to LookupAccountSid to get the account name.
-        bRtnBool = LookupAccountSid(NULL, pSidOwner, AcctName, (LPDWORD) &dwAcctName, DomainName, (LPDWORD) &dwDomainName, &eUse);
-
-        // Check GetLastError for LookupAccountSid error condition.
-        if (bRtnBool == FALSE) {
-            DWORD dwErrorCode = 0;
-            dwErrorCode = GetLastError();
-            if (dwErrorCode == ERROR_NONE_MAPPED) {
-                log_error << "Account owner not found for specified SID";
-            } else {
-                log_error << "Error in LookupAccountSid.";
-            }
-        } else if (bRtnBool == TRUE) {
-
-            // Print the account name.
-            log_debug << "Account owner: " << AcctName;
-            return AcctName;
-        }
-#endif
         return {};
     }
 
@@ -222,42 +160,17 @@ namespace AwsMock::Core {
         }
     }
 
-    void FileUtils::UnzipFiles(const std::string &zipFile, const std::string &dirName) {
-        Poco::File tempDir = Poco::File(dirName);
-        tempDir.createDirectories();
-
-        std::ifstream inp(zipFile, std::ios::binary);
-        poco_assert(inp);
-
-        // Decompress to a temp dir
-        Poco::Zip::Decompress dec(inp, dirName);
-
-        // Decompress to directory
-        dec.decompressAllFiles();
-    }
-
-    void FileUtils::ZipFiles(const std::string &zipFile, const std::string &dirName) {
-
-        std::ofstream out(zipFile, std::ios::binary);
-        Poco::Zip::Compress com(out, true);
-        com.addRecursive(Poco::Path(dirName));
-        com.close();
-    }
-
     bool FileUtils::Touch(const std::string &fileName) {
-#ifndef _WIN32
-        int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
+        const int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
         if (fd < 0) {
             log_error << "Could not open file: " << fileName;
             return false;
         }
-        int rc = utimensat(AT_FDCWD, fileName.c_str(), nullptr, 0);
-        if (rc) {
-            log_error << "Could not utimensat file: " << fileName;
+        if (int rc = utimensat(AT_FDCWD, fileName.c_str(), nullptr, 0)) {
+            log_error << "Could not touch file: " << fileName;
             return false;
         }
         close(fd);
-#endif
         return true;
     }
 
@@ -282,6 +195,7 @@ namespace AwsMock::Core {
         fin.close();
 
         // Required conversion for remove and rename functions
+        DeleteFile(path);
         CopyTo(tempFile, path);
         DeleteFile(tempFile);
     }

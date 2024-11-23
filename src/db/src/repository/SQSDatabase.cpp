@@ -348,12 +348,12 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSDatabase::CountQueues(const std::string &prefix, const std::string &region) {
+    long SQSDatabase::CountQueues(const std::string &prefix, const std::string &region) const {
 
         long count;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
             bsoncxx::builder::basic::document query;
@@ -375,7 +375,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) {
+    void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) const {
 
         if (HasDatabase()) {
 

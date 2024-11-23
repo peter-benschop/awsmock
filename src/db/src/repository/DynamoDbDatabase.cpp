@@ -169,22 +169,20 @@ namespace AwsMock::Database {
         return tables;
     }
 
-    long DynamoDbDatabase::CountTables(const std::string &region) {
+    long DynamoDbDatabase::CountTables(const std::string &region) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                if (region.empty()) {
 
-                    return _tableCollection.count_documents({});
-
-                } else {
-
-                    return _tableCollection.count_documents(make_document(kvp("region", region)));
+                bsoncxx::builder::basic::document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
                 }
+                return _tableCollection.count_documents(query.extract());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -237,11 +235,11 @@ namespace AwsMock::Database {
         }
     }
 
-    void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) {
+    void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
@@ -264,18 +262,18 @@ namespace AwsMock::Database {
         }
     }
 
-    void DynamoDbDatabase::DeleteAllTables() {
+    void DynamoDbDatabase::DeleteAllTables() const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto result = _tableCollection.delete_many({});
+                const auto result = _tableCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All DynamoDb tables deleted, count: " << result->deleted_count();
 

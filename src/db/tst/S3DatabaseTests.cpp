@@ -283,7 +283,7 @@ namespace AwsMock::Database {
 
         // act
         EXPECT_NO_THROW({ _servicedatabase.DeleteObject(object); });
-        bool result = _servicedatabase.ObjectExists({.region = object.region, .bucket = object.bucket, .key = object.key});
+        const bool result = _servicedatabase.ObjectExists({.region = object.region, .bucket = object.bucket, .key = object.key});
 
         // assert
         EXPECT_FALSE(result);
@@ -298,11 +298,11 @@ namespace AwsMock::Database {
         // Create objects
         for (int i = 0; i < 10; i++) {
             Entity::S3::Object object = {.region = _region, .bucket = bucket.name, .key = std::string(OBJECT) + std::to_string(i), .owner = OWNER};
-            object = _servicedatabase.CreateObject(object);
+            _servicedatabase.CreateObject(object);
         }
 
         // act
-        long result = _servicedatabase.ObjectCount(bucket.region, bucket.name);
+        const long result = _servicedatabase.ObjectCount(bucket.region, {}, bucket.name);
 
         // assert
         EXPECT_EQ(10, result);
@@ -321,7 +321,7 @@ namespace AwsMock::Database {
         }
 
         // act
-        Entity::S3::ObjectList result = _servicedatabase.ListObjects();
+        const Entity::S3::ObjectList result = _servicedatabase.ListObjects();
 
         // assert
         EXPECT_EQ(10, result.size());

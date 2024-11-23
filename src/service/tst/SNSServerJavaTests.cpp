@@ -43,7 +43,7 @@ namespace AwsMock::Service {
             _sqsBaseUrl = "/api/sqs/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
         }
 
         void TearDown() override {
@@ -90,8 +90,8 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::HttpSocketResponse result = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
-        std::string topicArn = result.body;
+        const Core::HttpSocketResponse result = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        const std::string topicArn = result.body;
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);

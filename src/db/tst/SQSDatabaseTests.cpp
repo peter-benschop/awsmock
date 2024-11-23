@@ -163,18 +163,18 @@ namespace AwsMock::Database {
 
         // arrange
         for (int i = 0; i < 10; i++) {
-            std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
+            const std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
             Entity::SQS::Queue queue = {.region = _region, .name = name, .owner = OWNER, .queueUrl = _queueUrl};
             _sqsDatabase.CreateQueue(queue);
         }
 
         // act
-        Entity::SQS::QueueList result = _sqsDatabase.ListQueues({}, 5, 0, {}, _region);
-        Entity::SQS::QueueList result2 = _sqsDatabase.ListQueues({}, 5, 1, {}, _region);
+        const Entity::SQS::QueueList result = _sqsDatabase.ListQueues({}, 5, 0, {}, _region);
+        const Entity::SQS::QueueList result2 = _sqsDatabase.ListQueues({}, 5, 1, {}, _region);
 
         // assert
         EXPECT_EQ(result2.size(), 5);
-        EXPECT_TRUE(result2.front().name == std::string(QUEUE_NAME) + "_" + std::to_string(0));
+        EXPECT_TRUE(result2.front().name == std::string(QUEUE_NAME) + "_" + std::to_string(5));
     }
 
     TEST_F(SQSDatabaseTest, QueuePurgeTest) {
@@ -215,7 +215,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        long result = _sqsDatabase.CountQueues(_region);
+        const long result = _sqsDatabase.CountQueues({}, _region);
 
         // assert
         EXPECT_EQ(1, result);

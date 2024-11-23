@@ -68,15 +68,15 @@ namespace AwsMock::Database {
         return parameterList;
     }
 
-    long SSMMemoryDb::CountParameters() {
+    long SSMMemoryDb::CountParameters() const {
 
-        return (long) _parameters.size();
+        return static_cast<long>(_parameters.size());
     }
 
     Entity::SSM::Parameter SSMMemoryDb::CreateParameter(const Entity::SSM::Parameter &topic) {
         Poco::ScopedLock loc(_parameterMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _parameters[oid] = topic;
         log_trace << "Parameter created, oid: " << oid;
         return GetParameterById(oid);
@@ -86,11 +86,10 @@ namespace AwsMock::Database {
         Poco::ScopedLock lock(_parameterMutex);
 
         std::string oid = parameter.oid;
-        auto it = find_if(_parameters.begin(),
-                          _parameters.end(),
-                          [oid](const std::pair<std::string, Entity::SSM::Parameter> &parameter) {
-                              return parameter.second.oid == oid;
-                          });
+        const auto it = std::ranges::find_if(_parameters,
+                                             [oid](const std::pair<std::string, Entity::SSM::Parameter> &parameter) {
+                                                 return parameter.second.oid == oid;
+                                             });
         if (it != _parameters.end()) {
             _parameters[it->first] = parameter;
             return _parameters[it->first];

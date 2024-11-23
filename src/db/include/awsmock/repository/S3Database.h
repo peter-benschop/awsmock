@@ -220,7 +220,7 @@ namespace AwsMock::Database {
          * @return updated object entity
          * @throws DatabaseException
          */
-        Entity::S3::Object UpdateObject(Entity::S3::Object &object);
+        Entity::S3::Object UpdateObject(Entity::S3::Object &object) const;
 
         /**
          * @brief Check the existence of an object
@@ -249,7 +249,7 @@ namespace AwsMock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key);
+        Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key) const;
 
         /**
          * @brief Gets an object from a bucket using the bucket, key and MD5 sum as query parameter
@@ -261,7 +261,7 @@ namespace AwsMock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum);
+        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const;
 
         /**
          * @brief Gets an object from a bucket using the bucket, key and MD5 sum as query parameter
@@ -273,7 +273,7 @@ namespace AwsMock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version);
+        Entity::S3::Object GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version) const;
 
         /**
          * @brief Gets a list of versioned objects
@@ -284,7 +284,7 @@ namespace AwsMock::Database {
          * @return list of S3 object
          * @throws DatabaseException
          */
-        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix);
+        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
 
         /**
          * @brief Gets an object from an bucket
@@ -332,7 +332,7 @@ namespace AwsMock::Database {
          * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {});
+        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Counts the number of keys in a bucket
@@ -343,7 +343,7 @@ namespace AwsMock::Database {
          * @return number of object in bucket
          * @throws DatabaseException
          */
-        long ObjectCount(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {});
+        long ObjectCount(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}) const;
 
         /**
          * @brief Creates a bucket notification-
@@ -384,7 +384,7 @@ namespace AwsMock::Database {
          * @param object object entity
          * @throws DatabaseException
          */
-        void DeleteObject(const Entity::S3::Object &object);
+        void DeleteObject(const Entity::S3::Object &object) const;
 
         /**
          * @brief Updates an existing object in the S3 object table
@@ -393,12 +393,12 @@ namespace AwsMock::Database {
          * @param keys vector of object keys
          * @throws DatabaseException
          */
-        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys = {});
+        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys = {}) const;
 
         /**
          * @brief Deletes all objects
          */
-        void DeleteAllObjects();
+        void DeleteAllObjects() const;
 
       private:
 

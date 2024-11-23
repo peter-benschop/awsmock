@@ -197,7 +197,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return number of queues in the given region.
          */
-        long CountQueues(const std::string &prefix = {}, const std::string &region = {});
+        long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
 
         /**
          * @brief Deletes a queue.
@@ -205,7 +205,7 @@ namespace AwsMock::Database {
          * @param queue queue entity
          * @throws DatabaseException
          */
-        void DeleteQueue(const Entity::SQS::Queue &queue);
+        void DeleteQueue(const Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Deletes all queues

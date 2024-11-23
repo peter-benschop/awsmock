@@ -2,15 +2,15 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_CONFIGURATION_TEST_H
-#define AWSMOCK_CORE_CONFIGURATION_TEST_H
+#ifndef AWS_MOCK_CORE_CONFIGURATION_TEST_H
+#define AWS_MOCK_CORE_CONFIGURATION_TEST_H
 
 // GTest includes
 #include <gtest/gtest.h>
 
 // Local includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
 
@@ -34,10 +34,9 @@ namespace AwsMock::Core {
         // act
         EXPECT_THROW({
             try {
-                Configuration configuration = Configuration("");
+                auto configuration = Configuration("");
             } catch (const CoreException &e) {
                 EXPECT_STREQ("Empty filename", e.message().c_str());
-                EXPECT_STREQ("CoreException: ", e.name());
                 throw;
             } }, CoreException);
 
@@ -47,7 +46,7 @@ namespace AwsMock::Core {
     TEST_F(ConfigurationTest, ConstructorTest) {
 
         // arrange
-        Configuration *configuration = nullptr;
+        const Configuration *configuration = nullptr;
 
         // act
         EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
@@ -75,21 +74,21 @@ namespace AwsMock::Core {
     TEST_F(ConfigurationTest, EnvironmentTest) {
 
         // arrange
-#ifdef WIN32
-        _putenv_s("AWSMOCK_LOG_LEVEL", "error");
-#else
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
-#endif
-        Configuration *configuration = nullptr;
+        const Configuration *configuration = nullptr;
 
         // act
         EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
-        std::string tmp = configuration->getString("awsmock.service.logging.level");
-        EXPECT_STREQ(configuration->getString("awsmock.service.logging.level").c_str(), "error");
+        if (configuration != nullptr) {
+            std::string tmp = configuration->getString("awsmock.service.logging.level");
+            EXPECT_STREQ(configuration->getString("awsmock.service.logging.level").c_str(), "error");
+        } else {
+            FAIL();
+        }
     }
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_CONFIGURATION_TEST_H
+#endif// AWS_MOCK_CORE_CONFIGURATION_TEST_H

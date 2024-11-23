@@ -2,6 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
+#include <awsmock/core/DirUtils.h>
 #include <awsmock/service/docker/DockerService.h>
 
 namespace AwsMock::Service {
@@ -128,7 +129,7 @@ namespace AwsMock::Service {
         return imageFile;
     }
 
-    std::string DockerService::BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) {
+    std::string DockerService::BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
         log_debug << "Build image request, name: " << name << " tags: " << tag;
 
@@ -147,15 +148,14 @@ namespace AwsMock::Service {
         return dockerFile;
     }
 
-    Dto::Docker::ListImageResponse DockerService::ListImages(const std::string &name) {
+    Dto::Docker::ListImageResponse DockerService::ListImages(const std::string &name) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         Dto::Docker::ListImageResponse response{};
-        std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
-        if (domainSocketResponse.statusCode == http::status::ok) {
+        const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
 
-            response.FromJson(domainSocketResponse.body);
+            response.FromJson(body);
             if (response.imageList.empty()) {
                 log_warning << "Docker image not found, name: " << name;
                 return response;
@@ -170,52 +170,51 @@ namespace AwsMock::Service {
 
         } else {
 
-            log_error << "Get image by name failed, httpStatus: " << domainSocketResponse.statusCode;
+            log_error << "Get image by name failed, httpStatus: " << statusCode;
         }
         return response;
     }
 
-    void DockerService::DeleteImage(const std::string &id) {
+    void DockerService::DeleteImage(const std::string &id) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::delete_, "http://localhost/images/" + id + "?force=true");
-        if (domainSocketResponse.statusCode != http::status::ok) {
-            log_error << "Delete image failed, httpStatus: " << domainSocketResponse.statusCode;
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "http://localhost/images/" + id + "?force=true"); statusCode != http::status::ok) {
+            log_error << "Delete image failed, httpStatus: " << statusCode;
         }
         log_debug << "Image deleted, id: " << id;
     }
 
-    bool DockerService::ContainerExists(const std::string &id) {
+    bool DockerService::ContainerExists(const std::string &id) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         if (_isDocker) {
 
-            std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
-            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
-            if (domainSocketResponse.statusCode == http::status::ok) {
+            const std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
+            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (statusCode == http::status::ok) {
 
-                Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+                Dto::Docker::ListContainerResponse response(body);
                 log_debug << "Docker container found, id: " << id;
                 return !response.containerList.empty();
 
             } else {
 
-                log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+                log_warning << "Docker container exists failed, httpStatus: " << statusCode;
                 return false;
             }
 
         } else {
 
-            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/containers/" + id + "/exists");
-            if (domainSocketResponse.statusCode == http::status::ok) {
+            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/containers/" + id + "/exists");
+            if (statusCode == http::status::ok) {
 
-                Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+                Dto::Docker::ListContainerResponse response(body);
                 log_debug << "Docker container found, id: " << id;
                 return !response.containerList.empty();
 
             } else {
 
-                log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+                log_warning << "Docker container exists failed, httpStatus: " << statusCode;
                 return false;
             }
         }
@@ -226,17 +225,17 @@ namespace AwsMock::Service {
 
         if (_isDocker) {
 
-            std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
-            Core::DomainSocketResult domainSocketResponse = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
-            if (domainSocketResponse.statusCode == http::status::ok) {
+            const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
+            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (statusCode == http::status::ok) {
 
-                Dto::Docker::ListContainerResponse response(domainSocketResponse.body);
+                Dto::Docker::ListContainerResponse response(body);
                 log_debug << "Docker container found, name: " << name << ":" << tag;
                 return !response.containerList.empty();
 
             } else {
 
-                log_warning << "Docker container exists failed, httpStatus: " << domainSocketResponse.statusCode;
+                log_warning << "Docker container exists failed, httpStatus: " << statusCode;
                 return false;
             }
 

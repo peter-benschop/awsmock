@@ -100,15 +100,12 @@ namespace AwsMock::Service {
             _baseUrl = "/api/sqs/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
-            //_gatewayServer->Initialize();
-            //            _gatewayServer->Start();
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
         }
 
         void TearDown() override {
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            //          _gatewayServer->Shutdown();
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
@@ -140,7 +137,7 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerJavaTest, SQSCreateQueueTest) {
@@ -148,8 +145,8 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        std::string queueUrl = result.body;
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const std::string queueUrl = result.body;
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -160,12 +157,12 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSGetQueueUrlTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
 
         // act
-        Core::HttpSocketResponse getUrlResult = SendGetCommand(_baseUrl + "getQueueUrl?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
-        std::string queueUrl = result.body;
+        const Core::HttpSocketResponse getUrlResult = SendGetCommand(_baseUrl + "getQueueUrl?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
+        const std::string queueUrl = result.body;
 
         // assert
         EXPECT_TRUE(getUrlResult.statusCode == http::status::ok);

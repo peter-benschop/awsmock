@@ -8,9 +8,9 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/Exception.h>
-#include <Poco/Net/HTTPResponse.h>
+// Boost includes
+#include <boost/beast/http.hpp>
+#include <utility>
 
 namespace AwsMock::Core {
 
@@ -19,7 +19,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CoreException : public Poco::Exception {
+    class CoreException final : public std::exception {
       public:
 
         /**
@@ -27,7 +27,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit CoreException(int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        explicit CoreException(const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code) {}
 
         /**
          * Constructor.
@@ -35,25 +35,7 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit CoreException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-
-        /**
-         * Constructor.
-         *
-         * @param msg exception message
-         * @param arg exception argument, will be appended to the message, separated with a ':'.
-         * @param code exception code, default: 0
-         */
-        CoreException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-
-        /**
-         * Constructor.
-         *
-         * @param msg exception message
-         * @param exc parent exception.
-         * @param code exception code, default: 0
-         */
-        CoreException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+        explicit CoreException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code), _message(std::move(msg)) {}
 
         /**
          * Copy constructor.
@@ -73,25 +55,25 @@ namespace AwsMock::Core {
         CoreException &operator=(const CoreException &exc);
 
         /**
-         * Returns the exception name.
+         * Return message
          */
-        [[nodiscard]] const char *name() const noexcept override;
-
-#ifndef _WIN32
-        /**
-         * Returns the exception class name.
-         */
-        [[nodiscard]] const char *className() const noexcept override;
-#endif
-        /**
-         * Returns a clone of the exception
-         */
-        [[nodiscard]] Core::CoreException *clone() const override;
+        std::string message() const { return _message; }
 
         /**
-         * Rethrows the exception.
+         * Return code
          */
-        void rethrow() const override;
+        [[nodiscard]] boost::beast::http::status code() const { return _code; }
+
+        /**
+         * Http status code
+         */
+        boost::beast::http::status _code;
+
+        /**
+       * Http status code
+       */
+        std::string _message;
+        ;
     };
 
 }// namespace AwsMock::Core
