@@ -239,9 +239,8 @@ namespace AwsMock::Database {
          *
          * @param queueArn ARN of the queue
          * @param redrivePolicy redrive policy
-         * @param configuration AwsMock configuration
          */
-        void RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy, const Core::Configuration &configuration);
+        void RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy);
 
         /**
          * @brief Any message, which has a message state is DELAYED is reset when the delay period is over.
@@ -271,10 +270,9 @@ namespace AwsMock::Database {
         Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
 
         /**
-         * @brief Count the number of message by state
+         * @brief Count the number of message by queue
          *
-         * @param region AWS region
-         * @param queueUrl URL of the queue
+         * @param queueArn AWS queue ARN
          */
         long CountMessages(const std::string &queueArn = {});
 

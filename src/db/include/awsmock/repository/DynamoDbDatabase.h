@@ -66,7 +66,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return updated DynamoDb table.
          */
-        Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
+        Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table) const;
 
         /**
          * @brief Create a new DynamoDb table or update an existing one
@@ -83,7 +83,7 @@ namespace AwsMock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Table GetTableById(bsoncxx::oid oid);
+        Entity::DynamoDb::Table GetTableById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a table entity by primary key
@@ -92,7 +92,7 @@ namespace AwsMock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Table GetTableById(const std::string &oid);
+        Entity::DynamoDb::Table GetTableById(const std::string &oid) const;
 
         /**
          * @brief Returns a table entity by primary key
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
+        Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Returns a list of DynamoDB tables
@@ -143,7 +143,7 @@ namespace AwsMock::Database {
          * @return true if database exists, otherwise false
          * @throws DatabaseException
          */
-        bool ItemExists(const Entity::DynamoDb::Item &item);
+        bool ItemExists(const Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Returns a list of DynamoDB items
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
          * @return list of DynamoDB tables
          * @throws DatabaseException
          */
-        Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
+        Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
 
 
         /**
@@ -163,7 +163,7 @@ namespace AwsMock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item GetItemById(bsoncxx::oid oid);
+        Entity::DynamoDb::Item GetItemById(bsoncxx::oid oid) const;
 
         /**
          * @brief Creates a new item
@@ -172,7 +172,7 @@ namespace AwsMock::Database {
          * @return created item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item);
+        Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Updates an existing item
@@ -181,7 +181,7 @@ namespace AwsMock::Database {
          * @return updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item);
+        Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Create or update item
@@ -190,7 +190,7 @@ namespace AwsMock::Database {
          * @return created or updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateOrUpdateItem(const Entity::DynamoDb::Item &item);
+        Entity::DynamoDb::Item CreateOrUpdateItem(const Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Returns the number of DynamoDB items.
@@ -198,7 +198,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return number of DynamoDB items
          */
-        long CountItems(const std::string &region = {});
+        long CountItems(const std::string &region = {}) const;
 
         /**
          * @brief Deletes an item by primary key
@@ -208,7 +208,7 @@ namespace AwsMock::Database {
          * @param key primary key of the item
          * @throws DatabaseException
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key);
+        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) const;
 
         /**
          * @brief Deletes all item of a table

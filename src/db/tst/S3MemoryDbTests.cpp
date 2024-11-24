@@ -36,7 +36,7 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {
@@ -45,7 +45,7 @@ namespace AwsMock::Database {
         }
 
         std::string _region;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         S3Database _servicedatabase = S3Database();
     };
 

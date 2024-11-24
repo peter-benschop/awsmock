@@ -28,7 +28,7 @@ namespace AwsMock::Service {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {
@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         }
 
         std::string _region;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::CognitoDatabase &_database = Database::CognitoDatabase::instance();
         CognitoService _service;
     };

@@ -6,14 +6,14 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb", 10), _containerService(DockerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
+    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb"), _containerService(DockerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
 
         // Get HTTP configuration values
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
-        _containerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
-        _containerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _workerPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.worker.period");
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.monitoring.period");
+        _containerHost = configuration.GetValueString("awsmock.modules.dynamodb.container.host");
+        _containerPort = configuration.GetValueInt("awsmock.modules.dynamodb.container.port");
         log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
         // Check module active
@@ -27,10 +27,10 @@ namespace AwsMock::Service {
         StartLocalDynamoDb();
 
         // Start DynamoDB monitoring update counters
-        //scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod, 10);
+        //scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing tables
-        //scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 60);
+        //scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
 
         // Set running
         SetRunning();

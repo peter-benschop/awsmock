@@ -460,7 +460,8 @@ namespace AwsMock::Service {
         try {
 
             // Delete all resources in queue
-            _sqsDatabase.DeleteMessages(request.queueUrl);
+            const long deleted = _sqsDatabase.DeleteMessages(request.queueUrl);
+            log_debug << "Queue deleted: " << deleted;
 
             // Update database
             _sqsDatabase.DeleteQueue({.region = request.region, .queueUrl = request.queueUrl});
@@ -723,7 +724,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) {
+    void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message");
         log_trace << "Delete message request, url: " << request.receiptHandle;
 
@@ -732,14 +733,14 @@ namespace AwsMock::Service {
                 log_error << "Message does not exist, receiptHandle: " << request.receiptHandle;
                 throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
             }
-            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
+            const Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
 
             // Delete from database
-            _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
-            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle;
+            const long deleted = _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
+            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << "deleted: " << deleted;
 
             // Update queue counters
-            AdjustMessageCounters(message);
+            AdjustMessageCounters(message.queueArn);
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -747,16 +748,17 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::DeleteMessageBatchResponse SQSService::DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) {
+    Dto::SQS::DeleteMessageBatchResponse SQSService::DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message_batch");
         log_trace << "Delete message batch request, size: " << request.deleteMessageBatchEntries.size();
 
+        const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
         try {
+            long deleted = 0;
             Dto::SQS::DeleteMessageBatchResponse deleteMessageBatchResponse;
             for (const auto &[id, receiptHandle]: request.deleteMessageBatchEntries) {
 
                 if (!_sqsDatabase.MessageExists(receiptHandle)) {
-                    //throw Core::ServiceException("Message does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
                     log_warning << "Message does not exist, receiptHandle: " << receiptHandle.substr(0, 40);
                     Dto::SQS::BatchResultErrorEntry failure = {.id = id};
                     deleteMessageBatchResponse.failed.emplace_back(failure);
@@ -765,16 +767,17 @@ namespace AwsMock::Service {
 
                 // Delete from database
                 Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(receiptHandle);
-                _sqsDatabase.DeleteMessage(message);
-
-                // Update queue counters
-                AdjustMessageCounters(message);
+                deleted += _sqsDatabase.DeleteMessage(message);
 
                 // Successful
                 Dto::SQS::DeleteMessageBatchResultEntry success = {.id = id};
                 deleteMessageBatchResponse.successFull.emplace_back(success);
             }
-            log_debug << "Message batch deleted, count: " << request.deleteMessageBatchEntries.size();
+
+            // Update queue counters
+            AdjustMessageCounters(queueArn);
+
+            log_debug << "Message batch deleted, count: " << deleted;
             return deleteMessageBatchResponse;
 
         } catch (Poco::Exception &ex) {
@@ -806,9 +809,10 @@ namespace AwsMock::Service {
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 
-    void SQSService::AdjustMessageCounters(const Database::Entity::SQS::Message &message) const {
-        Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(message.queueArn);
-        switch (message.status) {
+    void SQSService::AdjustMessageCounters(const std::string &queueArn) const {
+        Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
+
+        /*switch (message.status) {
             case Database::Entity::SQS::MessageStatus::INITIAL:
                 queue.attributes.approximateNumberOfMessages--;
                 break;
@@ -822,7 +826,7 @@ namespace AwsMock::Service {
                 break;
             case Database::Entity::SQS::MessageStatus::UNKNOWN:
                 break;
-        }
+        }*/
         _sqsDatabase.UpdateQueue(queue);
         log_debug << "Queue counters updated, queue: " << queue.queueArn;
     }

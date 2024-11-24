@@ -112,9 +112,14 @@ namespace AwsMock::Service {
         int _monitoringPeriod;
 
         /**
-         * Worker period
+         * Counter period
          */
-        int _workerPeriod;
+        int _counterPeriod;
+
+        /**
+         * Remove period
+         */
+        int _removePeriod;
     };
 
 }// namespace AwsMock::Service

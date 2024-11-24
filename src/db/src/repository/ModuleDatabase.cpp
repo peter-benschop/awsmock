@@ -266,6 +266,20 @@ namespace AwsMock::Database {
         }
     }
 
+    Entity::Module::ModuleState ModuleDatabase::GetState(const std::string &name) {
+
+        if (HasDatabase()) {
+
+            const Entity::Module::Module module = GetModuleByName(name);
+            log_trace << "Module state, name: " << name;
+            return module.state;
+
+        } else {
+
+            return _memoryDb.GetModuleByName(name).state;
+        }
+    }
+
     void ModuleDatabase::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
 
         if (HasDatabase()) {

@@ -315,7 +315,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    void SQSMemoryDb::RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy, const Core::Configuration &configuration) {
+    void SQSMemoryDb::RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) {
         Poco::ScopedLock lock(_sqsMessageMutex);
 
         long count = 0;

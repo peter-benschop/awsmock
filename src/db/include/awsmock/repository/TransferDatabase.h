@@ -6,16 +6,16 @@
 #define AWSMOCK_REPOSITORY_TRANSFER_DATABASE_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/config/YamlConfiguration.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/memorydb/TransferMemoryDb.h>
 #include <awsmock/repository/Database.h>

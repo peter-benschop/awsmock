@@ -68,15 +68,15 @@ namespace AwsMock::Database {
         return keyList;
     }
 
-    long KMSMemoryDb::CountKeys() {
+    long KMSMemoryDb::CountKeys() const {
 
-        return (long) _keys.size();
+        return static_cast<long>(_keys.size());
     }
 
     Entity::KMS::Key KMSMemoryDb::CreateKey(const Entity::KMS::Key &topic) {
         Poco::ScopedLock loc(_keyMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _keys[oid] = topic;
         log_trace << "Key created, oid: " << oid;
         return GetKeyById(oid);
@@ -86,11 +86,10 @@ namespace AwsMock::Database {
         Poco::ScopedLock lock(_keyMutex);
 
         std::string keyId = key.keyId;
-        auto it = find_if(_keys.begin(),
-                          _keys.end(),
-                          [keyId](const std::pair<std::string, Entity::KMS::Key> &key) {
-                              return key.second.keyId == keyId;
-                          });
+        const auto it = std::ranges::find_if(_keys,
+                                             [keyId](const std::pair<std::string, Entity::KMS::Key> &key) {
+                                                 return key.second.keyId == keyId;
+                                             });
         if (it != _keys.end()) {
             _keys[it->first] = key;
             return _keys[it->first];

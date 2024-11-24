@@ -9,16 +9,17 @@ namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
-        _workerPeriod = configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.lambda.monitoring.period");
+        _counterPeriod = configuration.GetValueInt("awsmock.modules.lambda.counter.period");
+        _removePeriod = configuration.GetValueInt("awsmock.modules.lambda.remove.period");
 
         // Directories
-        _lambdaDir = configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
+        _lambdaDir = configuration.GetValueString("awsmock.modules.lambda.data-dir");
         log_debug << "Lambda directory: " << _lambdaDir;
 
         // Create environment
-        _region = configuration.getString("awsmock.region");
+        _region = configuration.GetValueString("awsmock.region");
 
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
@@ -36,7 +37,7 @@ namespace AwsMock::Service {
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
-        scheduler.AddTask("lambda-remove-lambdas", [this] { RemoveExpiredLambdas(); }, _workerPeriod);
+        scheduler.AddTask("lambda-remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
 
         // Set running
         SetRunning();

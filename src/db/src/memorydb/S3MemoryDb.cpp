@@ -56,7 +56,7 @@ namespace AwsMock::Database {
     Entity::S3::Bucket S3MemoryDb::CreateBucket(const Entity::S3::Bucket &bucket) {
         Poco::ScopedLock lock(_bucketMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _buckets[oid] = bucket;
         log_trace << "Bucket created, oid: " << oid;
         return GetBucketById(oid);
@@ -65,15 +65,15 @@ namespace AwsMock::Database {
     Entity::S3::BucketList S3MemoryDb::ListBuckets() {
 
         Entity::S3::BucketList bucketList;
-        for (const auto &bucket: _buckets) {
-            bucketList.emplace_back(bucket.second);
+        for (const auto &bucket: std::views::keys(_buckets)) {
+            bucketList.emplace_back(bucket);
         }
 
         log_trace << "Got bucket list, size: " << bucketList.size();
         return bucketList;
     }
 
-    bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) {
+    bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) const {
 
         long count = 0;
         for (const auto &object: _objects) {
@@ -211,17 +211,16 @@ namespace AwsMock::Database {
 
     bool S3MemoryDb::ObjectExists(const std::string &filename) {
 
-        return find_if(_objects.begin(),
-                       _objects.end(),
-                       [filename](const std::pair<std::string, Entity::S3::Object> &object) {
-                           return object.second.internalName == filename;
-                       }) != _objects.end();
+        return std::ranges::find_if(_objects,
+                                    [filename](const std::pair<std::string, Entity::S3::Object> &object) {
+                                        return object.second.internalName == filename;
+                                    }) != _objects.end();
     }
 
     Entity::S3::Object S3MemoryDb::CreateObject(const Entity::S3::Object &object) {
         Poco::ScopedLock lock(_objectMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _objects[oid] = object;
         log_trace << "Object created, oid: " << oid;
         return GetObjectById(oid);
@@ -232,21 +231,19 @@ namespace AwsMock::Database {
 
         std::string bucket = object.bucket;
         std::string key = object.key;
-        auto it = find_if(_objects.begin(),
-                          _objects.end(),
-                          [bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
-                              return object.second.bucket == bucket && object.second.key == key;
-                          });
+        const auto it = std::ranges::find_if(_objects,
+                                             [bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                                                 return object.second.bucket == bucket && object.second.key == key;
+                                             });
         _objects[it->first] = object;
         return _objects[it->first];
     }
 
     Entity::S3::Object S3MemoryDb::GetObjectById(const std::string &oid) {
 
-        auto
-                it = find_if(_objects.begin(), _objects.end(), [oid](const std::pair<std::string, Entity::S3::Object> &object) {
-                    return object.first == oid;
-                });
+        const auto it = std::ranges::find_if(_objects, [oid](const std::pair<std::string, Entity::S3::Object> &object) {
+            return object.first == oid;
+        });
 
         if (it != _objects.end()) {
             it->second.oid = oid;
@@ -257,11 +254,10 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3MemoryDb::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
 
-        auto it = find_if(_objects.begin(),
-                          _objects.end(),
-                          [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
-                              return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
-                          });
+        const auto it = std::ranges::find_if(_objects,
+                                             [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
+                                                 return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
+                                             });
 
         if (it != _objects.end()) {
             it->second.oid = it->first;
@@ -272,11 +268,10 @@ namespace AwsMock::Database {
 
     Entity::S3::Object S3MemoryDb::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
 
-        auto it = find_if(_objects.begin(),
-                          _objects.end(),
-                          [region, bucket, key, md5sum](const std::pair<std::string, Entity::S3::Object> &object) {
-                              return object.second.region == region && object.second.bucket == bucket && object.second.key == key && object.second.md5sum == md5sum;
-                          });
+        const auto it = std::ranges::find_if(_objects,
+                                             [region, bucket, key, md5sum](const std::pair<std::string, Entity::S3::Object> &object) {
+                                                 return object.second.region == region && object.second.bucket == bucket && object.second.key == key && object.second.md5sum == md5sum;
+                                             });
 
         if (it != _objects.end()) {
             it->second.oid = it->first;
@@ -285,7 +280,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
+    long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) const {
         Poco::ScopedLock lock(_objectMutex);
 
         if (region.empty() && bucket.empty()) {
@@ -294,20 +289,20 @@ namespace AwsMock::Database {
 
         long count = 0;
         if (!region.empty() && bucket.empty()) {
-            for (const auto &object: _objects) {
-                if (object.second.region == region) {
+            for (const auto &val: _objects | std::views::values) {
+                if (val.region == region) {
                     count++;
                 }
             }
         } else if (region.empty() && !bucket.empty()) {
-            for (const auto &object: _objects) {
-                if (object.second.bucket == bucket) {
+            for (const auto &val: _objects | std::views::values) {
+                if (val.bucket == bucket) {
                     count++;
                 }
             }
         } else if (!region.empty() && !bucket.empty()) {
-            for (const auto &object: _objects) {
-                if (object.second.bucket == bucket && object.second.region == region) {
+            for (const auto &val: _objects | std::views::values) {
+                if (val.bucket == bucket && val.region == region) {
                     count++;
                 }
             }
@@ -316,17 +311,17 @@ namespace AwsMock::Database {
         return count;
     }
 
-    Entity::S3::ObjectList S3MemoryDb::ListObjects(const std::string &prefix) {
+    Entity::S3::ObjectList S3MemoryDb::ListObjects(const std::string &prefix) const {
 
         Entity::S3::ObjectList objectList;
         if (prefix.empty()) {
-            for (const auto &object: _objects) {
-                objectList.emplace_back(object.second);
+            for (const auto &val: _objects | std::views::values) {
+                objectList.emplace_back(val);
             }
         } else {
-            for (const auto &object: _objects) {
-                if (!prefix.empty() && Core::StringUtils::StartsWith(object.second.key, prefix)) {
-                    objectList.emplace_back(object.second);
+            for (const auto &val: _objects | std::views::values) {
+                if (!prefix.empty() && Core::StringUtils::StartsWith(val.key, prefix)) {
+                    objectList.emplace_back(val);
                 }
             }
         }
@@ -335,20 +330,20 @@ namespace AwsMock::Database {
         return objectList;
     }
 
-    Entity::S3::ObjectList S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) {
+    Entity::S3::ObjectList S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
 
         Entity::S3::ObjectList objectList;
         if (prefix.empty()) {
-            for (const auto &object: _objects) {
-                if (object.second.region == region && object.second.bucket == bucket) {
-                    objectList.emplace_back(object.second);
+            for (const auto &val: _objects | std::views::values) {
+                if (val.region == region && val.bucket == bucket) {
+                    objectList.emplace_back(val);
                 }
             }
         } else {
-            for (const auto &object: _objects) {
-                if (object.second.region == region && object.second.bucket == bucket) {
-                    if (!prefix.empty() && Core::StringUtils::StartsWith(object.second.key, prefix)) {
-                        objectList.emplace_back(object.second);
+            for (const auto &val: _objects | std::views::values) {
+                if (val.region == region && val.bucket == bucket) {
+                    if (!prefix.empty() && Core::StringUtils::StartsWith(val.key, prefix)) {
+                        objectList.emplace_back(val);
                     }
                 }
             }

@@ -32,8 +32,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.setString("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/cognito/";
@@ -74,7 +74,7 @@ namespace AwsMock::Service {
 
         std::string _endpoint, _baseUrl;
         boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
         Database::CognitoDatabase _database = Database::CognitoDatabase();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };

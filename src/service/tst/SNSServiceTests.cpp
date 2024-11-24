@@ -27,7 +27,7 @@
 
 namespace AwsMock::Service {
 
-    class SNSServiceTest : public ::testing::Test {
+    class SNSServiceTest : public testing::Test {
 
       protected:
 
@@ -41,7 +41,7 @@ namespace AwsMock::Service {
             _sqsDatabase.DeleteAllQueues();
         }
 
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         SNSService _snsService;
@@ -51,10 +51,10 @@ namespace AwsMock::Service {
     TEST_F(SNSServiceTest, TopicCreateTest) {
 
         // arrange
-        Dto::SNS::CreateTopicRequest request = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
+        const Dto::SNS::CreateTopicRequest request = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
 
         // act
-        Dto::SNS::CreateTopicResponse response = _snsService.CreateTopic(request);
+        const Dto::SNS::CreateTopicResponse response = _snsService.CreateTopic(request);
 
         // assert
         EXPECT_TRUE(response.region == REGION);
@@ -64,8 +64,8 @@ namespace AwsMock::Service {
     TEST_F(SNSServiceTest, TopicDeleteTest) {
 
         // arrange
-        Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
-        Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
+        const Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
+        const Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
 
         // act
         EXPECT_NO_THROW({ _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn); });

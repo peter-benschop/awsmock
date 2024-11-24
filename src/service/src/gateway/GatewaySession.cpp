@@ -23,11 +23,11 @@ namespace AwsMock::Service {
             {"module", std::make_shared<ModuleHandler>()}};
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _queueLimit = configuration.getInt("awsmock.service.gateway.http.max.queue", DEFAULT_MAX_QUEUE_SIZE);
-        _bodyLimit = configuration.getInt("awsmock.service.gateway.http.max.body", DEFAULT_MAX_BODY_SIZE);
-        _timeout = configuration.getInt("awsmock.service.gateway.http.timeout", DEFAULT_TIMEOUT);
-        _verifySignature = configuration.getBool("awsmock.verifysignature", false);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _queueLimit = configuration.GetValueInt("awsmock.gateway.http.max-queue");
+        _bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
+        _timeout = configuration.GetValueInt("awsmock.gateway.http.timeout");
+        _verifySignature = configuration.GetValueBool("awsmock.aws.signature.verify");
     };
 
     void GatewaySession::Run() {
@@ -237,17 +237,15 @@ namespace AwsMock::Service {
     Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {
 
         // Get signing version
-        Core::AuthorizationHeaderKeys authKeys;
-        std::string authorizationHeader = request["Authorization"];
+        Core::AuthorizationHeaderKeys authKeys = {};
 
-        if (!authorizationHeader.empty()) {
+        if (const std::string authorizationHeader = request["Authorization"]; !authorizationHeader.empty()) {
 
             authKeys.signingVersion = Core::StringUtils::Split(authorizationHeader, ' ')[0];
 
             try {
                 Poco::RegularExpression::MatchVec posVec;
-                Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
-                if (!pattern.match(authorizationHeader, 0, posVec)) {
+                if (const Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)"); !pattern.match(authorizationHeader, 0, posVec)) {
                     log_error << "Could not extract authorization, authorization: " << authorizationHeader;
                     throw Core::UnauthorizedException("Could not extract authorization, authorization: " + authorizationHeader);
                 }

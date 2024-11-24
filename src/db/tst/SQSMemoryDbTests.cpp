@@ -34,7 +34,7 @@ namespace AwsMock::Database {
             _queueUrl = Core::CreateSQSQueueUrl(QUEUE_NAME);
             _dlqueueUrl = Core::CreateSQSQueueUrl(DLQ_NAME);
             _dlqueueArn = Core::CreateSQSQueueArn(DLQ_NAME);
-            _region = _configuration.getString("awsmock.region");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {
@@ -43,7 +43,7 @@ namespace AwsMock::Database {
         }
 
         std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         SQSDatabase &_sqsDatabase = SQSDatabase::instance();
     };
 

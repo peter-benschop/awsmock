@@ -46,17 +46,17 @@ namespace AwsMock::Service {
         /**
          * @brief Synchronize S3 object between filesystem and database.
          */
-        [[maybe_unused]] void SyncObjects();
+        [[maybe_unused]] void SyncObjects() const;
 
         /**
          * @brief Synchronize S3 bucket size and object counts
          */
-        [[maybe_unused]] void SyncBuckets();
+        [[maybe_unused]] void SyncBuckets() const;
 
         /**
          * Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * Metric service

@@ -43,12 +43,12 @@ namespace AwsMock::Service {
         /**
          * @brief Delete resources, which are over the retention period.
          */
-        void DeleteOldMessages();
+        void DeleteOldMessages() const;
 
         /**
          * @brief Synchronizes the topic available messages counters.
          */
-        void SychronizeCounters();
+        void SychronizeCounters() const;
 
         /**
          * @brief Update counters
@@ -72,7 +72,16 @@ namespace AwsMock::Service {
          * Used for the background threads (cleanup, reset, retention, etc.)
          * </p>
          */
-        int _workerPeriod;
+        int _deletePeriod;
+
+        /**
+         * @brief SNS server period
+         *
+         * <p>
+         * Used for the background threads (cleanup, reset, retention, etc.)
+         * </p>
+         */
+        int _counterPeriod;
 
         /**
          * @brief SNS monitoring period

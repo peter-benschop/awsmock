@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_DATABASE_H
 
 // C++ standard includes
+#include <ranges>
 #include <string>
 
 // MongoDB includes

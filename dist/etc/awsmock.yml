@@ -1,0 +1,96 @@
+#
+# Configuration file for the AWS cloud simulation
+#
+awsmock:
+  region: eu-central-1
+  user: none
+  access:
+    key-id: none
+    secret-access-key: none
+    account-id: 000000000000
+    client-id: 00000000
+  data:
+    temp: /home/awsmock/data/tmp
+  dockerized: false
+  json:
+    pretty: true
+  aws:
+    signature:
+      verify: false
+  mongodb:
+    active: true
+    name: awsmock
+    user: root
+    password: password
+    port: 27017
+    host: localhost
+    pool-size: 256
+  gateway:
+    active: true
+    http:
+      host: localhost
+      address: 0.0.0.0
+      port: 4566
+      max-queue: 10
+      max-threads: 50
+      max-body: 104857600
+      timeout: 900
+  modules:
+    s3:
+      active: true
+      data-dir: /home/awsmock/data/s3
+      monitoring:
+        period: 300
+      sync:
+        object:
+          period: 3600
+        bucket:
+          period: 300
+    sqs:
+      active: true
+      monitoring:
+        period: 300
+      reset:
+        period: 60
+      counter:
+        period: 30
+    sns:
+      active: true
+      timeout: 14
+      monitoring:
+        period: 300
+      delete:
+        period: 3600
+      counter:
+        period: 30
+    lambda:
+      active: true
+      data-dir: /home/awsmock/data/lambda
+      monitoring:
+        period: 300
+      remove:
+        period: 3600
+      counter:
+        period: 30
+    kms:
+      active: true
+      monitoring:
+        period: 300
+      remove:
+        period: 3600
+    dynamodb:
+      active: true
+      monitoring:
+        period: 300
+      worker:
+        period: 400
+      container:
+        host: localhost
+        port: 8000
+    cognito:
+      active: true
+      monitoring:
+        period: 300
+  logging:
+    level: debug
+    filename:

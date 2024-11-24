@@ -10,12 +10,11 @@
 
 // Poco includes
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/YamlConfiguration.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/Database.h>
 
@@ -85,7 +84,7 @@ namespace AwsMock::Database {
          * @return total number of keys
          * @throws DatabaseException
          */
-        long CountKeys();
+        long CountKeys() const;
 
         /**
          * Create a new key in the KMS key table

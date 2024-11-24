@@ -6,18 +6,23 @@
 
 namespace AwsMock::Service {
 
-    AbstractServer::AbstractServer(std::string name, int timeout) : _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)) {
+    AbstractServer::AbstractServer(std::string name) : _name(std::move(name)), _moduleDatabase(Database::ModuleDatabase::instance()) {
     }
 
-    AbstractServer::AbstractServer(std::string name) : _moduleDatabase(Database::ModuleDatabase::instance()), _name(std::move(name)) {
-    }
-
-    bool AbstractServer::IsActive(const std::string &name) {
+    bool AbstractServer::IsActive(const std::string &name) const {
         return _moduleDatabase.IsActive(name);
     }
 
-    void AbstractServer::SetRunning() {
+    void AbstractServer::SetRunning() const {
         _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::RUNNING);
+    }
+
+    void AbstractServer::SetStopped() const {
+        _moduleDatabase.SetState(_name, Database::Entity::Module::ModuleState::STOPPED);
+    }
+
+    bool AbstractServer::IsRunning() const {
+        return _moduleDatabase.GetState(_name) == Database::Entity::Module::ModuleState::RUNNING;
     }
 
     void AbstractServer::Shutdown() {

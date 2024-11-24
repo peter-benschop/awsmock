@@ -6,10 +6,6 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _databaseName(GetDatabaseName()), _collectionName("lambda") {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {

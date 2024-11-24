@@ -71,8 +71,8 @@ namespace AwsMock::Service {
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
-        Service::LambdaService _lambdaService;
-        Service::S3Service _s3Service;
+        LambdaService _lambdaService;
+        S3Service _s3Service;
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 

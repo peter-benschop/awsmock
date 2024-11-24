@@ -142,6 +142,17 @@ namespace AwsMock::Database {
         Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
         /**
+         * @brief Sets the state of module.
+         *
+         * <p>State can be one of STARTING, RUNNING, STOPPED, UNKNOWN.</p>
+         *
+         * @param name module name
+         * @return module state
+         * @see AwsMock::Database::Entity::Module::ModuleState()
+         */
+        Entity::Module::ModuleState GetState(const std::string &name);
+
+        /**
          * @brief Sets the status of module.
          *
          * <p>Status can be one of UNKNOWN, ACTIVE, INACTIVE.</p>

@@ -6,7 +6,6 @@
 #define AWSMOCK_REPOSITORY_KMS_DATABASE_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -16,10 +15,9 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/config/YamlConfiguration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/KMSMemoryDb.h>
@@ -44,7 +42,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit KMSDatabase() : _memoryDb(KMSMemoryDb::instance()), _databaseName(GetDatabaseName()), _keyCollectionName("kms_key") {}
+        explicit KMSDatabase() : _databaseName(GetDatabaseName()), _keyCollectionName("kms_key"), _memoryDb(KMSMemoryDb::instance()) {}
 
         /**
          * @brief Singleton instance

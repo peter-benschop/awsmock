@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms", 10) {
+    SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms") {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();

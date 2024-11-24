@@ -9,11 +9,13 @@ namespace AwsMock::Core {
     }
 
     void PeriodicScheduler::AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval, int delay) {
-        _tasks.push_back(std::make_unique<PeriodicTask>(std::ref(_io_service), name, interval, task, delay));
+        if (!_tasks.contains(name)) {
+            _tasks[name] = std::make_unique<PeriodicTask>(std::ref(_io_service), name, interval, task, delay);
+        }
     }
 
     void PeriodicScheduler::Shutdown() const {
         _io_service.stop();
-    };
+    }
 
 }// namespace AwsMock::Core

@@ -812,7 +812,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.RedriveMessages(queueArn, redrivePolicy, Core::Configuration::instance());
+            _memoryDb.RedriveMessages(queueArn, redrivePolicy);
         }
     }
 
@@ -831,13 +831,13 @@ namespace AwsMock::Database {
                 const auto result = messageCollection.update_many(
                         make_document(
                                 kvp("queueArn", queueArn),
-                                kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+                                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
                                 kvp("reset", make_document(
                                                      kvp("$lt", bsoncxx::types::b_date(now))))),
                         make_document(
                                 kvp("$set",
                                     make_document(
-                                            kvp("status", Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                                            kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                 session.commit_transaction();
 
                 log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
@@ -856,9 +856,9 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSDatabase::MessageRetention(const std::string &queueUrl, long retentionPeriod) const {
+    long SQSDatabase::MessageRetention(const std::string &queueUrl, const long retentionPeriod) const {
 
-        const auto reset = std::chrono::system_clock::now() - std::chrono::seconds{retentionPeriod};
+        const auto reset = system_clock::now() - std::chrono::seconds{retentionPeriod};
 
         if (HasDatabase()) {
 
@@ -1093,7 +1093,6 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
-
                 session.commit_transaction();
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(receiptHandle, 0, 40) << "... count: " << result->deleted_count();
 

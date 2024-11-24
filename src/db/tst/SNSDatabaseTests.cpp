@@ -28,7 +28,7 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {
@@ -37,7 +37,7 @@ namespace AwsMock::Database {
         }
 
         std::string _region;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration();
         SNSDatabase &_snsDatabase = SNSDatabase::instance();
     };
 
@@ -47,7 +47,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
+        const Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
 
         // assert
         EXPECT_TRUE(result.topicName == TOPIC);

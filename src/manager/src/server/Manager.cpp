@@ -14,23 +14,23 @@ namespace AwsMock::Manager {
     void Manager::Initialize() {
 
         InitializeDatabase();
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
-                 << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
-        log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
-        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().getBool("awsmock.dockerized");
+        log_info << "Starting " << Core::YamlConfiguration::GetAppName() << " " << Core::YamlConfiguration::GetVersion() << " pid: " << getpid()
+                 << " loglevel: " << Core::YamlConfiguration::instance().GetValueString("awsmock.logging.level");
+        log_info << "Configuration file: " << Core::YamlConfiguration::instance().GetFilename();
+        log_info << "Dockerized: " << std::boolalpha << Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized");
     }
 
     void Manager::InitializeDatabase() {
 
         // Get database variables
-        if (const Core::Configuration &configuration = Core::Configuration::instance(); configuration.getBool("awsmock.mongodb.active")) {
+        if (const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance(); configuration.GetValueBool("awsmock.mongodb.active")) {
 
-            const std::string name = configuration.getString("awsmock.mongodb.name", DEFAULT_MONGO_DBNAME);
-            const std::string host = configuration.getString("awsmock.mongodb.host", DEFAULT_MONGO_DBHOST);
-            const std::string user = configuration.getString("awsmock.mongodb.user", DEFAULT_MONGO_DBUSER);
-            const std::string password = configuration.getString("awsmock.mongodb.password", DEFAULT_MONGO_DBPWD);
-            const int _port = configuration.getInt("awsmock.mongodb.port", DEFAULT_MONGO_DBPORT);
-            const int poolSize = configuration.getInt("awsmock.mongodb.pool.size", DEFAULT_MONGO_POOL_SIZE);
+            const std::string name = configuration.GetValueString("awsmock.mongodb.name");
+            const std::string host = configuration.GetValueString("awsmock.mongodb.host");
+            const std::string user = configuration.GetValueString("awsmock.mongodb.user");
+            const std::string password = configuration.GetValueString("awsmock.mongodb.password");
+            const int _port = configuration.GetValueInt("awsmock.mongodb.port");
+            const int poolSize = configuration.GetValueInt("awsmock.mongodb.pool-size");
 
             // MongoDB URL
             const std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);

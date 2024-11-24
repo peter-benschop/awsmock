@@ -9,10 +9,10 @@ namespace AwsMock::Service {
     GatewayServer::GatewayServer(boost::asio::io_service &ios) : AbstractServer("gateway"), _ios(ios) {
 
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
-        _host = configuration.getString("awsmock.service.gateway.http.host", GATEWAY_DEFAULT_HOST);
-        _address = configuration.getString("awsmock.service.gateway.http.address", GATEWAY_DEFAULT_ADDRESS);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _port = configuration.GetValueInt("awsmock.gateway.http.port");
+        _host = configuration.GetValueString("awsmock.gateway.http.host");
+        _address = configuration.GetValueString("awsmock.gateway.http.address");
         log_debug << "Gateway server initialized";
 
         // Check module active

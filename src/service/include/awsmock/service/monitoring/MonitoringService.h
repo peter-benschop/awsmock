@@ -47,7 +47,7 @@ namespace AwsMock::Service {
          * @return GetCountersResponse
          * @see GetCountersResponse
          */
-        Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request);
+        Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
       private:
 

@@ -76,7 +76,7 @@ namespace AwsMock::Database {
     Entity::Transfer::Transfer TransferMemoryDb::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
         Poco::ScopedLock lock(_transferMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _transfers[oid] = transfer;
         log_trace << "Transfer created, oid: " << oid;
         return GetTransferById(oid);
@@ -87,11 +87,10 @@ namespace AwsMock::Database {
 
         std::string region = transfer.region;
         std::string serverId = transfer.serverId;
-        auto it = find_if(_transfers.begin(),
-                          _transfers.end(),
-                          [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                              return transfer.second.region == region && transfer.second.serverId == serverId;
-                          });
+        const auto it = std::ranges::find_if(_transfers,
+                                             [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                                 return transfer.second.region == region && transfer.second.serverId == serverId;
+                                             });
 
         if (it == _transfers.end()) {
             log_error << "Update transfer failed, serverId: " << serverId;
@@ -104,11 +103,10 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferMemoryDb::GetTransferById(const std::string &oid) {
 
-        auto it = find_if(_transfers.begin(),
-                          _transfers.end(),
-                          [oid](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                              return transfer.first == oid;
-                          });
+        const auto it = std::ranges::find_if(_transfers,
+                                             [oid](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                                 return transfer.first == oid;
+                                             });
 
         if (it == _transfers.end()) {
             log_error << "Get transfer by ID failed, oid: " << oid;
@@ -121,11 +119,10 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferMemoryDb::GetTransferByServerId(const std::string &serverId) {
 
-        auto it = find_if(_transfers.begin(),
-                          _transfers.end(),
-                          [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                              return transfer.second.serverId == serverId;
-                          });
+        const auto it = std::ranges::find_if(_transfers,
+                                             [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                                 return transfer.second.serverId == serverId;
+                                             });
 
         if (it == _transfers.end()) {
             log_error << "Get transfer by serverId failed, serverId: " << serverId;
@@ -138,11 +135,10 @@ namespace AwsMock::Database {
 
     Entity::Transfer::Transfer TransferMemoryDb::GetTransferByArn(const std::string &arn) {
 
-        auto it = find_if(_transfers.begin(),
-                          _transfers.end(),
-                          [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                              return transfer.second.arn == arn;
-                          });
+        const auto it = std::ranges::find_if(_transfers,
+                                             [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                                 return transfer.second.arn == arn;
+                                             });
 
         if (it == _transfers.end()) {
             log_error << "Get transfer by arn failed, arn: " << arn;
@@ -159,14 +155,14 @@ namespace AwsMock::Database {
 
         if (region.empty()) {
 
-            count = (long) _transfers.size();
+            count = static_cast<long>(_transfers.size());
 
         } else {
 
-            return std::count_if(std::begin(_transfers), std::end(_transfers),
-                                 [region](std::pair<std::string, Entity::Transfer::Transfer> const &p) {
-                                     return p.second.region == region;
-                                 });
+            return std::ranges::count_if(_transfers,
+                                         [region](std::pair<std::string, Entity::Transfer::Transfer> const &p) {
+                                             return p.second.region == region;
+                                         });
         }
         log_trace << "Count servers, result: " << count;
         return count;

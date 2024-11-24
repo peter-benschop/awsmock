@@ -6,15 +6,9 @@
 #define AWSMOCK_SERVICE_LAMBDA_SERVICE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Boost includes
-#include <boost/thread.hpp>
-
 // AwsMock includes
-#include "awsmock/service/docker/DockerService.h"
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -22,6 +16,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
+#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
@@ -47,8 +42,10 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
+#include <awsmock/service/docker/DockerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 // Maximal output length for a synchronous invocation call
 #define MAX_OUTPUT_LENGTH (4 * 1024)

@@ -27,8 +27,8 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region");
-            _accountId = _configuration.getString("awsmock.account.id");
+            _region = _configuration.GetValueString("awsmock.region");
+            _accountId = _configuration.GetValueString("awsmock.account.id");
         }
 
         void TearDown() override {
@@ -37,7 +37,7 @@ namespace AwsMock::Database {
 
         std::string _region;
         std::string _accountId;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(true);
+        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(true);
         LambdaDatabase &_lambdaDatabase = LambdaDatabase::instance();
     };
 

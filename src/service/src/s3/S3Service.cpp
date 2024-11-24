@@ -6,11 +6,11 @@
 
 namespace AwsMock::Service {
 
-    bool S3Service::BucketExists(const std::string &region, const std::string &bucket) {
+    bool S3Service::BucketExists(const std::string &region, const std::string &bucket) const {
         return _database.BucketExists({.region = region, .name = bucket});
     }
 
-    Dto::S3::CreateBucketResponse S3Service::CreateBucket(Dto::S3::CreateBucketRequest &s3Request) {
+    Dto::S3::CreateBucketResponse S3Service::CreateBucket(Dto::S3::CreateBucketRequest &s3Request) const {
         log_trace << "Create bucket request, s3Request: " << s3Request.ToString();
 
         // Get region

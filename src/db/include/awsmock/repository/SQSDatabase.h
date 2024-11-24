@@ -6,9 +6,6 @@
 #define AWSMOCK_REPOSITORY_SQS_DATABASE_H
 
 // C++ standard includes
-#include <chrono>
-#include <iostream>
-#include <iterator>
 #include <string>
 
 // MongoDB includes
@@ -20,11 +17,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -387,7 +381,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessages(const std::string &queueArn) const;
+        [[nodiscard]] long DeleteMessages(const std::string &queueArn) const;
 
         /**
          * @brief Deletes a message.
@@ -396,7 +390,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const Entity::SQS::Message &message) const;
+        [[nodiscard]] long DeleteMessage(const Entity::SQS::Message &message) const;
 
         /**
          * @brief Deletes a message by receipt handle.
@@ -405,7 +399,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const std::string &receiptHandle) const;
+        [[nodiscard]] long DeleteMessage(const std::string &receiptHandle) const;
 
         /**
          * @brief Deletes a resources.
@@ -413,6 +407,13 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         void DeleteAllMessages() const;
+
+        /**
+         * @brief Adjust counters
+         *
+         * @param queueArn AWS queue ARN
+         */
+        void AdjustMessageCounters(const std::string &queueArn) const;
 
       private:
 

@@ -40,7 +40,7 @@ namespace AwsMock::Database {
     }
 
     mongocxx::database DatabaseBase::GetConnection() const {
-        mongocxx::pool::entry _client = _pool->acquire();
+        const mongocxx::pool::entry _client = _pool->acquire();
         return (*_client)[_name];
     }
 
@@ -58,7 +58,7 @@ namespace AwsMock::Database {
         Core::Configuration::instance().SetValue("awsmock.mongodb.active", true);
 
         // Update module database
-        mongocxx::pool::entry _client = _pool->acquire();
+        const mongocxx::pool::entry _client = _pool->acquire();
         (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
         log_info << "Database module started";
     }
@@ -84,9 +84,8 @@ namespace AwsMock::Database {
 
             log_info << "Start creating indexes";
 
-            for (const auto &index: indexDefinitions) {
-                const auto m_thread = std::make_shared<boost::thread>([database, capture0 = index.first] { CreateIndex(database, capture0); });
-                m_thread->join();
+            for (const auto &indexName: std::views::keys(indexDefinitions)) {
+                CreateIndex(database, indexName);
             }
         }
     }

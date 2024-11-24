@@ -100,7 +100,7 @@ namespace AwsMock::Service {
          * @param bucket bucket name
          * @return true if bucket exists
          */
-        bool BucketExists(const std::string &region, const std::string &bucket);
+        bool BucketExists(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief Returns the meta data of an S3 bucket
@@ -136,7 +136,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 create request
          * @return CreateBucketResponse
          */
-        Dto::S3::CreateBucketResponse CreateBucket(Dto::S3::CreateBucketRequest &s3Request);
+        Dto::S3::CreateBucketResponse CreateBucket(Dto::S3::CreateBucketRequest &s3Request) const;
 
         /**
          * @brief Purge a bucket

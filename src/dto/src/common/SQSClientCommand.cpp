@@ -35,7 +35,7 @@ namespace AwsMock::Dto::Common {
     std::string SQSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) const {
 
         std::string cmd;
-        std::string cType = request["Content-Type"];
+        const std::string cType = request["Content-Type"];
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             // awsmock command from UI
@@ -49,7 +49,7 @@ namespace AwsMock::Dto::Common {
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
             // AWS Java SDK
-            std::string headerValue = request["X-Amz-Target"];
+            const std::string headerValue = request["X-Amz-Target"];
             cmd = Core::StringUtils::Split(headerValue, '.')[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);

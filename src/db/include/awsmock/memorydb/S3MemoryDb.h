@@ -6,19 +6,18 @@
 #define AWSMOCK_REPOSITORY_S3_MEMORYDB_H
 
 // C++ includes
+#include <ranges>
 #include <string>
 
 // Poco includes
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/YamlConfiguration.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
-#include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
@@ -106,7 +105,7 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool HasObjects(const Entity::S3::Bucket &bucket);
+        bool HasObjects(const Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief List objects in a bucket.
@@ -178,7 +177,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
+        Entity::S3::ObjectList ListObjects(const std::string &prefix = {}) const;
 
         /**
          * @brief Gets a list of versioned objects
@@ -189,7 +188,7 @@ namespace AwsMock::Database {
          * @return list of S3 object
          * @throws DatabaseException
          */
-        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix);
+        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
 
         /**
          * @brief Delete a bucket.
@@ -280,7 +279,7 @@ namespace AwsMock::Database {
          * @return number of object in bucket
          * @throws DatabaseException
          */
-        long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
+        long ObjectCount(const std::string &region = {}, const std::string &bucket = {}) const;
 
         /**
          * @brief Delete an object.

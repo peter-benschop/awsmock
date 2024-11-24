@@ -6,12 +6,13 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns", 10) {
+    SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
 
         // HTTP manager configuration
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.sns.worker.period", SNS_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.sns.monitoring.period", SNS_DEFAULT_MONITORING_PERIOD);
+        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _deletePeriod = configuration.GetValueInt("awsmock.modules.sns.delete.period");
+        _counterPeriod = configuration.GetValueInt("awsmock.modules.sns.counter.period");
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.sns.monitoring.period");
 
         // Check module active
         if (!IsActive("sns")) {
@@ -24,22 +25,22 @@ namespace AwsMock::Service {
         scheduler.AddTask("monitoring-sns-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
-        scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _workerPeriod);
-        scheduler.AddTask("sns-synchronize-counters", [this] { SychronizeCounters(); }, _workerPeriod);
+        scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
+        scheduler.AddTask("sns-synchronize-counters", [this] { SychronizeCounters(); }, _counterPeriod);
 
         // Set running
         SetRunning();
 
-        log_debug << "SNS server initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+        log_debug << "SNS server initialized, workerPeriod: " << _deletePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
 
-    void SNSServer::DeleteOldMessages() {
+    void SNSServer::DeleteOldMessages() const {
         Core::Configuration &configuration = Core::Configuration::instance();
         int messageTimeout = configuration.getInt("awsmock.service.sns.message.timeout", SNS_DEFAULT_MESSAGE_TIMEOUT);
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 
-    void SNSServer::SychronizeCounters() {
+    void SNSServer::SychronizeCounters() const {
         for (auto &topic: _snsDatabase.ListTopics()) {
             topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
             _snsDatabase.UpdateTopic(topic);

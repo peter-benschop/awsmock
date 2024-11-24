@@ -5,22 +5,18 @@
 #ifndef AWSMOCK_SERVICE_COGNITO_SERVER_H
 #define AWSMOCK_SERVICE_COGNITO_SERVER_H
 
-// Boost includes
-#include <boost/asio/post.hpp>
-#include <boost/asio/thread_pool.hpp>
+// C++ includes
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/config/YamlConfiguration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/CognitoDatabase.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/cognito/CognitoMonitoring.h>
 #include <awsmock/service/common/AbstractServer.h>
-
-#define COGNITO_DEFAULT_TIMEOUT 900
-#define COGNITO_DEFAULT_MONITORING_PERIOD 300
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -29,7 +25,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoServer : public AbstractServer {
+    class CognitoServer final : public AbstractServer {
 
       public:
 
@@ -38,27 +34,22 @@ namespace AwsMock::Service {
          */
         explicit CognitoServer(Core::PeriodicScheduler &scheduler);
 
-        /**
-         * Initialization
-         */
-        void Initialize();
-
-        /**
-         * Main method
-         */
-        void Run();
-
-        /**
-         * Shutdown
-         */
-        void Shutdown();
-
       private:
 
         /**
-         * Cognito monitoring
+         * @brief Update counters
          */
-        CognitoMonitoring _cognitoMonitoring;
+        void UpdateCounter() const;
+
+        /**
+         * @brief Metric service
+         */
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * @brief Database connection
+         */
+        Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
 
         /**
          * Cognito module name

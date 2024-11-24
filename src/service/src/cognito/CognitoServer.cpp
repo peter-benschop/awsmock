@@ -6,11 +6,11 @@
 
 namespace AwsMock::Service {
 
-    CognitoServer::CognitoServer(Core::PeriodicScheduler &scheduler) : AbstractServer("cognito", 10) {
+    CognitoServer::CognitoServer(Core::PeriodicScheduler &scheduler) : AbstractServer("cognito"), _module("cognito") {
 
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.getInt("awsmock.service.cognito.monitoring.period", COGNITO_DEFAULT_MONITORING_PERIOD);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.cognito.monitoring.period");
 
         // Check module active
         if (!IsActive("cognito")) {
@@ -20,18 +20,28 @@ namespace AwsMock::Service {
         log_info << "Cognito module starting";
 
         // Start DynamoDB monitoring update counters
-        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->_cognitoMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Set running
         SetRunning();
 
         log_debug << "Cognito server started";
     }
-    void CognitoServer::Initialize() {
-    }
-    void CognitoServer::Run() {
-    }
-    void CognitoServer::Shutdown() {
-    }
 
+    void CognitoServer::UpdateCounter() const {
+        log_trace << "Cognito monitoring starting";
+
+        const long users = _cognitoDatabase.CountUsers();
+        const long userPools = _cognitoDatabase.CountUserPools();
+        _metricService.SetGauge(COGNITO_USER_COUNT, users);
+        _metricService.SetGauge(COGNITO_USERPOOL_COUNT, userPools);
+
+        // Count users per user pool
+        for (const auto &userPool: _cognitoDatabase.ListUserPools()) {
+            std::string labelValue = Poco::replace(userPool.name, "-", "_");
+            const long usersPerUserPool = _cognitoDatabase.CountUsers(userPool.region, userPool.userPoolId);
+            _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", labelValue, usersPerUserPool);
+        }
+        log_trace << "Cognito monitoring finished";
+    }
 }// namespace AwsMock::Service

@@ -6,19 +6,9 @@
 #define AWSMOCK_SERVICE_ABSTRACT_SERVER_H
 
 // C++ standard includes
-#include <iostream>
-#include <map>
 #include <string>
-#include <utility>
-
-// Poco includes
-#include <Poco/Net/HTTPServer.h>
-#include <Poco/Net/HTTPServerResponse.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
 namespace AwsMock::Service {
@@ -26,6 +16,7 @@ namespace AwsMock::Service {
     /**
      * @brief Abstract HTTP request server
      *
+     * @par
      * Base class for all server processes.
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -34,22 +25,17 @@ namespace AwsMock::Service {
 
       public:
 
-        virtual ~AbstractServer() = default;
-
-        /**
-         * @brief Constructor
-         *
-         * @param name manager name
-         * @param timeout run timeout in seconds
-         */
-        explicit AbstractServer(std::string name, int timeout);
-
         /**
          * @brief Constructor
          *
          * @param name manager name
          */
         explicit AbstractServer(std::string name);
+
+        /**
+         * Destructor
+         */
+        virtual ~AbstractServer() = default;
 
         /**
          * @brief Shutdown server
@@ -62,13 +48,26 @@ namespace AwsMock::Service {
          * @brief Checks whether the module is active
          *
          * @param name module name
+         * @return true if active
          */
-        bool IsActive(const std::string &name);
+        [[nodiscard]] bool IsActive(const std::string &name) const;
 
         /**
          * @brief Sets the running status in the module database
          */
-        void SetRunning();
+        void SetRunning() const;
+
+        /**
+         * @brief Checks whether the module is running
+         *
+         * @return true if running
+         */
+        [[nodiscard]] bool IsRunning() const;
+
+        /**
+         * @brief Sets the running status in the module database
+         */
+        void SetStopped() const;
 
       private:
 
