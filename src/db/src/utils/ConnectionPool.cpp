@@ -11,11 +11,11 @@ namespace AwsMock::Database {
         _pool = std::move(pool);
     }
 
-    mongocxx::pool::entry ConnectionPool::GetConnection() {
+    mongocxx::pool::entry ConnectionPool::GetConnection() const {
         return _pool->acquire();
     }
 
-    bsoncxx::stdx::optional<mongocxx::pool::entry> ConnectionPool::TryGetConnection() {
+    bsoncxx::stdx::optional<mongocxx::pool::entry> ConnectionPool::TryGetConnection() const {
         return _pool->try_acquire();
     }
 

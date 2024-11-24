@@ -60,11 +60,6 @@ namespace AwsMock::Monitoring {
         }
 
         /**
-         * @brief Destructor
-         */
-        virtual ~MetricService() = default;
-
-        /**
          * @brief Initialization
          */
         void Initialize();
@@ -77,7 +72,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Gracefully shutdown
          */
-        void Shutdown();
+        void Shutdown() const;
 
         /**
          * @brief Increments a counter.
@@ -155,7 +150,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the counter.
          * @return true if counter exists.
          */
-        bool CounterExists(const std::string &name);
+        bool CounterExists(const std::string &name) const;
 
         /**
          * @brief Check whether a counter exists
@@ -207,7 +202,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the gauge.
          * @return true if gauge exists.
          */
-        bool GaugeExists(const std::string &name);
+        bool GaugeExists(const std::string &name) const;
 
         /**
          * @brief Check whether a gauge exists

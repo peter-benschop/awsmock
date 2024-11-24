@@ -6,31 +6,28 @@
 
 namespace AwsMock::Core {
 
-    ExecResult SystemUtils::Exec(const std::string &cmd) {
+    ExecResult SystemUtils::Exec(const std::string &command) {
         // set up file redirection
         std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
-        std::string command = cmd + " > " + redirection.string() + " 2>&1";
+        std::string cmd = command + " > " + redirection.string() + " 2>&1";
 
         // execute command
-        auto status = std::system(command.c_str());
+        auto status = std::system(cmd.c_str());
+        log_trace << "Exec status: " << status;
 
         // read redirection file and remove the file
         std::ifstream output_file(redirection);
-        std::string output((std::istreambuf_iterator<char>(output_file)), std::istreambuf_iterator<char>());
+        std::string output((std::istreambuf_iterator(output_file)), std::istreambuf_iterator<char>());
         std::filesystem::remove(redirection);
 
         return ExecResult{status, output};
     }
 
     std::string SystemUtils::GetCurrentWorkingDir() {
-#ifndef _WIN32
         char result[PATH_MAX];
-        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-        std::string path = {std::string(result, (count > 0) ? count : 0)};
+        const ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+        const std::string path = {std::string(result, (count > 0) ? count : 0)};
         return path.substr(0, path.find_last_of('/'));
-#else
-        return {};
-#endif
     }
 
     std::string SystemUtils::GetHomeDir() {

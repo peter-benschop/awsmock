@@ -12,7 +12,7 @@ namespace AwsMock::Core {
         _tasks.push_back(std::make_unique<PeriodicTask>(std::ref(_io_service), name, interval, task, delay));
     }
 
-    void PeriodicScheduler::Shutdown() {
+    void PeriodicScheduler::Shutdown() const {
         _io_service.stop();
     };
 

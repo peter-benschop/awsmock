@@ -144,7 +144,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
-                bsoncxx::builder::basic::document query;
+                bsoncxx::builder::basic::document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
@@ -178,7 +178,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
-                bsoncxx::builder::basic::document query;
+                bsoncxx::builder::basic::document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
                 }

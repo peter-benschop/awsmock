@@ -5,27 +5,11 @@
 #ifndef AWSMOCK_MANAGER_H
 #define AWSMOCK_MANAGER_H
 
-// C++ includes
-#include <string>
-
-// MongoDB includes
-#include <mongocxx/instance.hpp>
-
-// Boost includes
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/signal_set.hpp>
-#include <boost/beast/core.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/gateway/GatewayServer.h>
-#include <awsmock/service/lambda/LambdaServer.h>
 #include <awsmock/service/module/ModuleMap.h>
 #include <awsmock/service/monitoring/MonitoringServer.h>
-#include <awsmock/service/s3/S3Server.h>
-#include <awsmock/service/sns/SNSServer.h>
-#include <awsmock/service/sqs/SQSServer.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
 #define DEFAULT_MONGO_DBUSER "root"
@@ -80,24 +64,9 @@ namespace AwsMock::Manager {
         static void InitializeDatabase();
 
         /**
-         * @brief Initialize monitoring
-         */
-        void InitializeMonitoring();
-
-        /**
          * Thread group
          */
         boost::thread_group _threadGroup;
-
-        /**
-         * Metric server
-         */
-        //Monitoring::MetricService _metricService;
-
-        /**
-         * Metric server
-         */
-        //Service::MonitoringServer _monitoringServer;
     };
 
 }// namespace AwsMock::Manager

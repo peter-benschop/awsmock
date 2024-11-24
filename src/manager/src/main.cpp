@@ -51,11 +51,11 @@ int main(int argc, char *argv[]) {
     desc.add_options()("help", "produce help message")("version", "application version")("config", boost::program_options::value<std::string>(), "set configuration file")("loglevel", boost::program_options::value<std::string>(), "set log level")("logfile", boost::program_options::value<std::string>(), "set log file");
 
     boost::program_options::variables_map vm;
-    boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
-    boost::program_options::notify(vm);
+    store(parse_command_line(argc, argv, desc), vm);
+    notify(vm);
 
     // Show usage
-    if (vm.count("help")) {
+    if (vm.contains("help")) {
         std::cout << std::endl
                   << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Show version
-    if (vm.count("version")) {
+    if (vm.contains("version")) {
         std::cout << std::endl
                   << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
@@ -76,15 +76,15 @@ int main(int argc, char *argv[]) {
 
     // Read configuration
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.count("config")) {
+    if (vm.contains("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
     // Set log level
-    if (vm.count("loglevel")) {
-        std::string value = vm["loglevel"].as<std::string>();
+    if (vm.contains("loglevel")) {
+        auto value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
@@ -93,8 +93,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Set log file
-    if (vm.count("logfile")) {
-        std::string value = vm["logfile"].as<std::string>();
+    if (vm.contains("logfile")) {
+        auto value = vm["logfile"].as<std::string>();
         AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.file", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }

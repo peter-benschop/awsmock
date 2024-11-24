@@ -14,7 +14,6 @@ namespace AwsMock::Manager {
     void Manager::Initialize() {
 
         InitializeDatabase();
-        InitializeMonitoring();
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
                  << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
@@ -24,25 +23,24 @@ namespace AwsMock::Manager {
     void Manager::InitializeDatabase() {
 
         // Get database variables
-        Core::Configuration &configuration = Core::Configuration::instance();
-        if (configuration.getBool("awsmock.mongodb.active")) {
+        if (const Core::Configuration &configuration = Core::Configuration::instance(); configuration.getBool("awsmock.mongodb.active")) {
 
-            std::string name = configuration.getString("awsmock.mongodb.name", DEFAULT_MONGO_DBNAME);
-            std::string host = configuration.getString("awsmock.mongodb.host", DEFAULT_MONGO_DBHOST);
-            std::string user = configuration.getString("awsmock.mongodb.user", DEFAULT_MONGO_DBUSER);
-            std::string password = configuration.getString("awsmock.mongodb.password", DEFAULT_MONGO_DBPWD);
-            int _port = configuration.getInt("awsmock.mongodb.port", DEFAULT_MONGO_DBPORT);
-            int poolSize = configuration.getInt("awsmock.mongodb.pool.size", DEFAULT_MONGO_POOL_SIZE);
+            const std::string name = configuration.getString("awsmock.mongodb.name", DEFAULT_MONGO_DBNAME);
+            const std::string host = configuration.getString("awsmock.mongodb.host", DEFAULT_MONGO_DBHOST);
+            const std::string user = configuration.getString("awsmock.mongodb.user", DEFAULT_MONGO_DBUSER);
+            const std::string password = configuration.getString("awsmock.mongodb.password", DEFAULT_MONGO_DBPWD);
+            const int _port = configuration.getInt("awsmock.mongodb.port", DEFAULT_MONGO_DBPORT);
+            const int poolSize = configuration.getInt("awsmock.mongodb.pool.size", DEFAULT_MONGO_POOL_SIZE);
 
             // MongoDB URL
-            std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
+            const std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
             mongocxx::uri _uri(url.c_str());
 
             auto instance = bsoncxx::stdx::make_unique<mongocxx::instance>();
             Database::ConnectionPool &pool = Database::ConnectionPool::instance();
 
             // Options
-            auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
+            const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
             pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri)));
             log_info << "MongoDB database initialized, version: " << mongocxx::v_noabi::options::server_api::version_to_string(api.get_version());
 
@@ -56,19 +54,13 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::InitializeMonitoring() {
-        //        _monitoringServer.Initialize();
-        log_info << "Monitoring initialized";
-    }
-
     void Manager::StopModules() {
 
         log_info << "Stopping services";
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
-        for (const auto &module: modules) {
+        for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                 log_info << "Stopping module: " << module.name;
                 moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
@@ -82,10 +74,9 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting();
-        for (const auto &module: existingModules) {
+        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &module: existingModules) {
             if (!moduleDatabase.ModuleExists(module.first)) {
                 Database::Entity::Module::Module m = {.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE};
                 moduleDatabase.CreateModule(m);
@@ -97,14 +88,14 @@ namespace AwsMock::Manager {
         Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
 
         // Define thread pool size
-        int numberOfCores = Core::SystemUtils::GetNumberOfCores();
+        const int numberOfCores = Core::SystemUtils::GetNumberOfCores();
         boost::asio::thread_pool pool(numberOfCores);
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_service ios;
 
         Core::PeriodicScheduler scheduler(ios);
-        std::shared_ptr<Service::MonitoringServer> monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
 
         boost::asio::signal_set signals(ios, SIGINT, SIGTERM);
         signals.async_wait(

@@ -83,7 +83,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-                bsoncxx::builder::basic::document query;
+                bsoncxx::builder::basic::document query = {};
 
                 if (!region.empty()) {
                     query.append(kvp("region", region));

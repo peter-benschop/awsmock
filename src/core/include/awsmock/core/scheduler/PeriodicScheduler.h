@@ -49,7 +49,7 @@ namespace AwsMock::Core {
         /**
          * @brief Shutdown the scheduler
          */
-        void Shutdown();
+        void Shutdown() const;
 
       private:
 

@@ -26,7 +26,7 @@ namespace AwsMock::Monitoring {
 
     void MetricService::Run() {}
 
-    void MetricService::Shutdown() {
+    void MetricService::Shutdown() const {
         log_info << "Starting metric server shutdown";
         if (_server != nullptr) {
             _server->stop();
@@ -42,7 +42,6 @@ namespace AwsMock::Monitoring {
                 _counterMap[name] = new Poco::Prometheus::Counter(name);
                 _counterMap[name]->clear();
                 log_trace << "Counter added, name: " << name;
-                return;
             }
         } catch (Poco::Exception &e) {
             log_error << e.message();
@@ -62,19 +61,18 @@ namespace AwsMock::Monitoring {
         }
     }
 
-    bool MetricService::CounterExists(const std::string &name) {
-        return _counterMap.find(name) != _counterMap.end();
+    bool MetricService::CounterExists(const std::string &name) const {
+        return _counterMap.contains(name);
     }
 
     bool MetricService::CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        return std::find_if(_counterMap.begin(), _counterMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Counter *> obj) {
-                   return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
+        return std::ranges::find_if(_counterMap, [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Counter *> obj) {
+                   return obj.first == name && std::ranges::find(obj.second->labelNames(), labelName) != obj.second->labelNames().end();
                }) != _counterMap.end();
     }
 
     Poco::Prometheus::Counter *MetricService::GetCounter(const std::string &name) {
-        auto it = _counterMap.find(name);
-        if (it != _counterMap.end()) {
+        if (auto it = _counterMap.find(name); it != _counterMap.end()) {
             return it->second;
         }
         return nullptr;
@@ -150,16 +148,15 @@ namespace AwsMock::Monitoring {
     }
 
     Poco::Prometheus::Gauge *MetricService::GetGauge(const std::string &name) {
-        auto it = _gaugeMap.find(name);
-        if (it != _gaugeMap.end()) {
+        if (const auto it = _gaugeMap.find(name); it != _gaugeMap.end()) {
             return it->second;
         }
         return nullptr;
     }
 
     Poco::Prometheus::Gauge *MetricService::GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        auto it = std::find_if(_gaugeMap.begin(), _gaugeMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> obj) {
-            return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
+        const auto it = std::ranges::find_if(_gaugeMap, [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> obj) {
+            return obj.first == name && std::ranges::find(obj.second->labelNames(), labelName) != obj.second->labelNames().end();
         });
         if (it != _gaugeMap.end()) {
             return it->second;
@@ -172,26 +169,26 @@ namespace AwsMock::Monitoring {
         if (!GaugeExists(name)) {
             AddGauge(name);
         }
-        _gaugeMap[name]->set((double) value);
+        _gaugeMap[name]->set(value);
         log_trace << "Gauge value set, name: " << name;
     }
 
-    void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) {
+    void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
         _database.SetGauge(name, value, labelName, labelValue);
         if (!GaugeExists(name, labelName, labelValue)) {
             AddGauge(name, labelName, labelValue);
         }
-        _gaugeMap[name]->labels({labelValue}).set((double) value);
+        _gaugeMap[name]->labels({labelValue}).set(value);
         log_trace << "Gauge value set, name: " << name;
     }
 
-    bool MetricService::GaugeExists(const std::string &name) {
-        return _gaugeMap.find(name) != _gaugeMap.end();
+    bool MetricService::GaugeExists(const std::string &name) const {
+        return _gaugeMap.contains(name);
     }
 
     bool MetricService::GaugeExists(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        return std::find_if(_gaugeMap.begin(), _gaugeMap.end(), [&name, &labelName, &labelValue](const std::pair<std::string, Poco::Prometheus::Gauge *> &obj) {
-                   return obj.first == name && std::find(obj.second->labelNames().begin(), obj.second->labelNames().end(), labelName) != obj.second->labelNames().end();
+        return std::ranges::find_if(_gaugeMap, [&name, &labelName](const std::pair<std::string, Poco::Prometheus::Gauge *> &obj) {
+                   return obj.first == name && std::ranges::find(obj.second->labelNames(), labelName) != obj.second->labelNames().end();
                }) != _gaugeMap.end();
     }
 
