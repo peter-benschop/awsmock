@@ -10,17 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
-
-#define SNS_DEFAULT_WORKER_PERIOD 300
-#define SNS_DEFAULT_MONITORING_PERIOD 300
-#define SNS_DEFAULT_MESSAGE_TIMEOUT 15
 
 namespace AwsMock::Service {
 
@@ -53,7 +48,7 @@ namespace AwsMock::Service {
         /**
          * @brief Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * @brief Database connection

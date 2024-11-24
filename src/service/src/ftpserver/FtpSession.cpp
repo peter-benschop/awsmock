@@ -13,16 +13,11 @@ namespace AwsMock::FtpServer {
           command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service), data_buffer_strand_(io_service), file_rw_strand_(io_service),
           _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
 
-        // S3 module connection
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _s3ServiceHost = configuration.getString("awsmock.service.s3.host", "localhost");
-        _s3ServicePort = configuration.getInt("awsmock.service.s3.port", 9500);
-        _baseUrl = "http://" + _s3ServiceHost + ":" + std::to_string(_s3ServicePort);
-
         // Environment
-        _region = configuration.getString("awsmock.region", DEFAULT_TRANSFER_REGION);
-        _bucket = configuration.getString("awsmock.service.transfer.bucket", DEFAULT_TRANSFER_BUCKET_NAME);
-        _transferDir = configuration.getString("awsmock.service.ftp.base.dir", DEFAULT_TRANSFER_DATA_DIR);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _region = configuration.GetValueString("awsmock.region");
+        _bucket = configuration.GetValueString("awsmock.modules.transfer.bucket");
+        _transferDir = configuration.GetValueString("awsmock.modules.transfer.data-dir");
 
         // S3 service
         _s3Service = std::make_shared<Service::S3Service>();
@@ -308,9 +303,9 @@ namespace AwsMock::FtpServer {
 
         // In case of a dockerized FTP server we need to use some special ports
         asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
-            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
-            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
+        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
+            int minPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
+            int maxPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
             int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
         } else {
@@ -348,7 +343,7 @@ namespace AwsMock::FtpServer {
 
         // Split address and port into bytes and get the port the OS chose for us
         boost::asio::ip::address_v4::bytes_type ip_bytes;
-        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
+        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
         } else {
             ip_bytes = command_socket_.local_endpoint().address().to_v6().to_v4().to_bytes();
@@ -500,10 +495,10 @@ namespace AwsMock::FtpServer {
         }
 
         asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
-            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
-            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
-            int port = Core::RandomUtils::NextInt(minPort, maxPort);
+        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
+            const int minPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.min");
+            const int maxPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.max");
+            const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
@@ -568,10 +563,10 @@ namespace AwsMock::FtpServer {
         }
 
         asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().getBool("awsmock.dockerized")) {
-            int minPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.min");
-            int maxPort = Core::Configuration::instance().getInt("awsmock.service.ftp.pasv.max");
-            int port = Core::RandomUtils::NextInt(minPort, maxPort);
+        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
+            const int minPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
+            const int maxPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+            const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);

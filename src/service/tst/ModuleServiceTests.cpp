@@ -9,12 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/module/ModuleService.h"
 #include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/service/module/ModuleService.h>
 
-// Test includes
-#include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"

@@ -3,7 +3,6 @@
 // C++ includes
 #include <memory>
 #include <string>
-#include <utility>
 
 #define FTP_DEFAULT_PORT 21
 #define FTP_DEFAULT_HOST "localhost"
@@ -12,7 +11,6 @@
 #define FTP_BUCKET "transfer-manager"
 
 // C++ includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/ftpserver/Permissions.h>
 
 namespace AwsMock::FtpServer {
@@ -50,7 +48,7 @@ namespace AwsMock::FtpServer {
          * use that port, make sure that your application runs as root.
          *
          * Instead of using a predefined port, the operating system can choose a
-         * free port port. Use port=0, if that behaviour is desired. The chosen port
+         * free port. Use port=0, if that behaviour is desired. The chosen port
          * can be determined by with getPort().
          *
          * This constructor will create an FTP Server binding to IPv4 0.0.0.0 and

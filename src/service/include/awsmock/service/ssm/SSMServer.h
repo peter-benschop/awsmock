@@ -10,16 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
-
-#define SSM_DEFAULT_WORKER_PERIOD 3600
-#define SSM_DEFAULT_MONITORING_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -28,7 +24,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SSMServer : public AbstractServer {
+    class SSMServer final : public AbstractServer {
 
       public:
 

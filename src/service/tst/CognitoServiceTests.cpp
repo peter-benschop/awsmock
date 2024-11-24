@@ -9,9 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/cognito/CognitoService.h"
 #include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/service/cognito/CognitoService.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>

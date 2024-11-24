@@ -10,7 +10,6 @@
 
 // Local includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/SNSDatabase.h>
 
 #define REGION "eu-central-1"

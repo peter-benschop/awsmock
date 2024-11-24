@@ -9,9 +9,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/UUIDGenerator.h>
-
 // Boost includes
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
@@ -21,7 +18,6 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>

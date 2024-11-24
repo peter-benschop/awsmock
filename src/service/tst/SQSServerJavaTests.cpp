@@ -90,11 +90,11 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.setString("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/sqs/";
@@ -134,7 +134,7 @@ namespace AwsMock::Service {
 
         std::string _region, _baseUrl;
         boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         std::shared_ptr<GatewayServer> _gatewayServer;

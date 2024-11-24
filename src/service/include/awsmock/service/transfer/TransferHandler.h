@@ -7,10 +7,8 @@
 
 // Boost includes
 #include <boost/beast.hpp>
-#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/transfer/TransferService.h>
@@ -27,7 +25,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferHandler : public AbstractHandler {
+    class TransferHandler final : public AbstractHandler {
 
       public:
 

@@ -6,12 +6,12 @@
 
 namespace AwsMock::Service {
 
-    void S3HashCreator::operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) {
+    void S3HashCreator::operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const {
 
-        Core::Configuration &configuration = Core::Configuration::instance();
-        std::string dataDir = configuration.getString("awsmock.data.dir", DEFAULT_DATA_DIR);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const std::string dataDir = configuration.GetValueString("awsmock.modules.s3.data-dir");
 
-        std::string filename = dataDir + Poco::Path::separator() + object.internalName;
+        const std::string filename = dataDir + "/" + object.internalName;
         for (const auto &algorithm: algorithms) {
             if (algorithm == "SHA1") {
                 object.sha1sum = Core::Crypto::GetSha1FromFile(filename);

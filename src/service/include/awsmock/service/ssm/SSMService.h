@@ -59,7 +59,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::PutParameterRequest
          * @see Dto::KMS::PutParameterResponse
          */
-        Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request);
+        Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
 
         /**
          * @brief Returns a new parameter
@@ -69,7 +69,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::GetParameterRequest
          * @see Dto::KMS::GetParameterResponse
          */
-        Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request);
+        Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
 
         /**
          * @brief Describe the parameters
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DescribeParametersRequest
          * @see Dto::KMS::DescribeParametersResponse
          */
-        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request);
+        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
 
         /**
          * @brief Deletes a parameter
@@ -87,7 +87,7 @@ namespace AwsMock::Service {
          * @param request delete parameter request
          * @see Dto::KMS::DeleteParameterRequest
          */
-        void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request);
+        void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const;
 
       private:
 

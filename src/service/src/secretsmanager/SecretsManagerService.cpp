@@ -9,13 +9,13 @@ namespace AwsMock::Service {
     SecretsManagerService::SecretsManagerService() : _database(Database::SecretsManagerDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_ACCOUNT_ID);
+        _accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.account.id");
 
         // Simulation of KMS key
         _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";
     }
 
-    Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) {
+    Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const {
         log_trace << "Create secret request, request: " << request.ToString();
 
         // Get region
@@ -47,9 +47,9 @@ namespace AwsMock::Service {
             // Either string or binary data
             if (!request.secretString.empty()) {
                 auto *plaintext = (unsigned char *) request.secretString.c_str();
-                int len = (int) strlen(reinterpret_cast<const char *>(plaintext));
+                int len = static_cast<int>(strlen(reinterpret_cast<const char *>(plaintext)));
                 unsigned char *encrypted = Core::Crypto::Aes256EncryptString(plaintext, &len, (unsigned char *) _kmsKey.c_str());
-                secret.secretString = Core::Crypto::Base64Encode({(char *) encrypted, static_cast<size_t>(len)});
+                secret.secretString = Core::Crypto::Base64Encode({reinterpret_cast<char *>(encrypted), static_cast<size_t>(len)});
             } else {
                 secret.secretBinary = request.secretBinary;
             }
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
         return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
     }
 
-    Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) {
+    Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const {
         log_trace << "Describe secret request: " << request.ToString();
 
         // Check bucket existence
@@ -70,11 +70,11 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Secret does not exist, secretId: " + request.secretId);
         }
 
-        Dto::SecretsManager::DescribeSecretResponse response;
         try {
+            Dto::SecretsManager::DescribeSecretResponse response;
 
             // Get object from database
-            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+            const Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
 
             // Convert to DTO
             response.region = secret.region;
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         return {};
     }
 
-    Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) {
+    Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const {
         log_trace << "Get secret value request: " << request.ToString();
 
         // Check bucket existence
@@ -100,8 +100,8 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
         }
 
-        Dto::SecretsManager::GetSecretValueResponse response;
         try {
+            Dto::SecretsManager::GetSecretValueResponse response;
 
             // Get object from database
             Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
@@ -111,9 +111,8 @@ namespace AwsMock::Service {
             response.arn = secret.arn;
             response.versionId = secret.versionId;
             if (!secret.secretString.empty()) {
-                unsigned char *base64Decoded;
                 int len;
-                base64Decoded = (unsigned char *) Core::Crypto::Base64Decode(secret.secretString).c_str();
+                const auto base64Decoded = (unsigned char *) Core::Crypto::Base64Decode(secret.secretString).c_str();
                 response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString(base64Decoded, &len, (unsigned char *) _kmsKey.c_str())));
                 response.secretString[len] = '\0';
             } /*else if (!secret.secretString.empty()) {
@@ -139,17 +138,16 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) {
+    Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const {
         log_trace << "List secrets request: " << request.ToString();
 
-        Dto::SecretsManager::ListSecretsResponse response;
         try {
+            Dto::SecretsManager::ListSecretsResponse response;
 
             // Get object from database
-            Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets();
 
             // Convert to DTO
-            for (const auto &s: secrets) {
+            for (Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets(); const auto &s: secrets) {
                 Dto::SecretsManager::Secret secret;
                 secret.primaryRegion = s.primaryRegion;
                 secret.arn = s.arn;
@@ -184,7 +182,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) {
+    Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const {
         log_trace << "Update secret request: " << request.ToString();
 
         // Check bucket existence
@@ -217,7 +215,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) {
+    Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const {
         log_trace << "Rotate secret request: " << request.ToString();
 
         // Check bucket existence

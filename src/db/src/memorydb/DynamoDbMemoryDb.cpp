@@ -57,7 +57,7 @@ namespace AwsMock::Database {
     Entity::DynamoDb::Table DynamoDbMemoryDb::CreateTable(const Entity::DynamoDb::Table &table) {
         Poco::ScopedLock lock(_tableMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _tables[oid] = table;
         log_trace << "Lambda created, oid: " << oid;
         return GetTableById(oid);
@@ -219,7 +219,7 @@ namespace AwsMock::Database {
     Entity::DynamoDb::Item DynamoDbMemoryDb::CreateItem(const Entity::DynamoDb::Item &item) {
         Poco::ScopedLock lock(_itemMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _items[oid] = item;
         log_trace << "Item created, oid: " << oid;
         return GetItemById(oid);
@@ -230,21 +230,20 @@ namespace AwsMock::Database {
 
         std::string region = item.region;
         std::string tableName = item.tableName;
-        auto it = find_if(_items.begin(),
-                          _items.end(),
-                          [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                              return item.second.region == region && item.second.tableName == tableName;
-                          });
+        const auto it = std::ranges::find_if(_items,
+                                             [region, tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                                                 return item.second.region == region && item.second.tableName == tableName;
+                                             });
         _items[it->first] = item;
         return _items[it->first];
     }
 
-    long DynamoDbMemoryDb::CountItems(const std::string &region) {
+    long DynamoDbMemoryDb::CountItems(const std::string &region) const {
 
         if (!region.empty()) {
             long count = 0;
-            for (const auto &table: _items) {
-                if (table.second.region == region) {
+            for (const auto &val: _items | std::views::values) {
+                if (val.region == region) {
                     count++;
                 }
             }

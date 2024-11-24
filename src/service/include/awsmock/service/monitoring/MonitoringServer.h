@@ -7,12 +7,9 @@
 
 // Boost includes
 #include <boost/asio/post.hpp>
-#include <boost/asio/thread_pool.hpp>
-#include <boost/bind/bind.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
@@ -32,7 +29,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MonitoringServer : public AbstractServer {
+    class MonitoringServer final : public AbstractServer {
 
       public:
 

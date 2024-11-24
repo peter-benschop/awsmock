@@ -6,7 +6,6 @@
 #define AWSMOCK_DB_TEST_UTILS_H
 
 // C++ includes
-#include <fstream>
 #include <string>
 #include <vector>
 
@@ -20,6 +19,7 @@ namespace AwsMock::Database {
     class TestUtils {
 
       public:
+
         /**
          * Creates all services in the module database
          */

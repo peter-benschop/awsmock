@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>

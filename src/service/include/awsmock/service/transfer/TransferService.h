@@ -64,7 +64,7 @@ namespace AwsMock::Service {
          * @return CreateServerResponse
          * @see Dto::Transfer::CreateServerResponse
          */
-        Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request);
+        Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request) const;
 
         /**
          * @brief Create a user for the transfer manager.
@@ -91,21 +91,21 @@ namespace AwsMock::Service {
          * @return ListServerResponse
          * @see Dto::Transfer::ListServerResponse
          */
-        Dto::Transfer::ListUsersResponse ListUsers(const Dto::Transfer::ListUsersRequest &request);
+        Dto::Transfer::ListUsersResponse ListUsers(const Dto::Transfer::ListUsersRequest &request) const;
 
         /**
          * @brief Starts an manager.
          *
          * @param request StartServer manager request
          */
-        void StartServer(const Dto::Transfer::StartServerRequest &request);
+        void StartServer(const Dto::Transfer::StartServerRequest &request) const;
 
         /**
          * @brief Stops an manager.
          *
          * @param request stop manager request
          */
-        void StopServer(const Dto::Transfer::StopServerRequest &request);
+        void StopServer(const Dto::Transfer::StopServerRequest &request) const;
 
         /**
          * @brief Deleted an manager.

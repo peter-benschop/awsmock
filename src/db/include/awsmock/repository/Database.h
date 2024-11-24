@@ -6,7 +6,6 @@
 #define AWSMOCK_REPOSITORY_DATABASE_H
 
 // C++ standard includes
-#include <ranges>
 #include <string>
 
 // MongoDB includes
@@ -18,12 +17,9 @@
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 
-// Boost includes
-#include <boost/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/config/YamlConfiguration.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
@@ -128,7 +124,7 @@ namespace AwsMock::Database {
         /**
          * Database client
          */
-        std::unique_ptr<mongocxx::pool> _pool;
+        std::unique_ptr<mongocxx::pool> _pool{};
 
         /**
          * Database flag

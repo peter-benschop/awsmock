@@ -15,7 +15,6 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>

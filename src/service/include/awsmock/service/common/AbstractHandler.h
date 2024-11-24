@@ -40,6 +40,8 @@ namespace AwsMock::Service {
 
       public:
 
+        virtual ~AbstractHandler() = default;
+
         /**
          * @brief Default User-defined Constructor
          */

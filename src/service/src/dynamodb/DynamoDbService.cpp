@@ -9,8 +9,8 @@ namespace AwsMock::Service {
     DynamoDbService::DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
         // DynamoDB docker host, port
-        _dockerHost = Core::Configuration::instance().getString("awsmock.dynamodb.host", "localhost");
-        _dockerPort = Core::Configuration::instance().getInt("awsmock.dynamodb.port", 8000);
+        _dockerHost = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.dynamodb.container.host");
+        _dockerPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.dynamodb.container.port");
     }
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {

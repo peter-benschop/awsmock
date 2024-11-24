@@ -9,9 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/dto/transfer/model/Tag.h"
 #include <awsmock/dto/transfer/CreateServerResponse.h>
+#include <awsmock/dto/transfer/model/Tag.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -26,13 +25,13 @@ namespace AwsMock::Dto::Transfer {
 
         void SetUp() override {
             // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         std::string _region;
         std::vector<std::string> _protocols = {"ftp", "sftp"};
         std::vector<Dto::Transfer::Tag> _tags = {{.key = "version", .value = "1.0"}};
-        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(CreateServerResponseTest, ToStringTest) {

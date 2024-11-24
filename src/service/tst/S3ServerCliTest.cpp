@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/s3/S3Server.h>

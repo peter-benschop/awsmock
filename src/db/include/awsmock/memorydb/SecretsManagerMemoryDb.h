@@ -2,26 +2,19 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SECRETSMANAGER_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_SECRETSMANAGER_MEMORYDB_H
+#ifndef AWSMOCK_REPOSITORY_SECRETS_MANAGER_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_SECRETS_MANAGER_MEMORYDB_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
 // Poco includes
 #include <Poco/Mutex.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/repository/Database.h>
 
@@ -127,7 +120,7 @@ namespace AwsMock::Database {
          * @return list of available secrets
          * @throws DatabaseException
          */
-        Entity::SecretsManager::SecretList ListSecrets();
+        Entity::SecretsManager::SecretList ListSecrets() const;
 
         /**
          * Returns the total number of secrets
@@ -136,7 +129,7 @@ namespace AwsMock::Database {
          * @return total number of secrets
          * @throws DatabaseException
          */
-        long CountSecrets(const std::string &region = {});
+        long CountSecrets(const std::string &region = {}) const;
 
         /**
          * Delete a secret.
@@ -168,4 +161,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_SECRETSMANAGER_MEMORYDB_H
+#endif// AWSMOCK_REPOSITORY_SECRETS_MANAGER_MEMORYDB_H

@@ -6,11 +6,10 @@
 #define AWSMOCK_SERVICE_SSM_HANDLER_H
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/common/SSMClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/ssm/SSMService.h>
 
 namespace AwsMock::Service {
@@ -23,7 +22,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SSMHandler : public AbstractHandler {
+    class SSMHandler final : public AbstractHandler {
 
       public:
 

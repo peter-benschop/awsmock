@@ -6,12 +6,11 @@
 #define AWSMOCK_SERVICE_KMS_HANDLER_H
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/KMSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/kms/KMSService.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 

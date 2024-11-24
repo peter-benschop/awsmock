@@ -10,8 +10,8 @@ namespace AwsMock::Service {
     TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
 
         // REST manager configuration
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.getInt("awsmock.service.transfer.monitoring.period", TRANSFER_DEFAULT_MONITORING_PERIOD);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.transfer.monitoring.period");
 
         // Check module active
         if (!IsActive("transfer")) {
@@ -41,8 +41,8 @@ namespace AwsMock::Service {
 
         Dto::S3::CreateBucketRequest request;
         request.name = "transfer-server";
-        request.owner = Core::Configuration::instance().getString("awsmock.user");
-        request.region = Core::Configuration::instance().getString("awsmock.region");
+        request.owner = Core::YamlConfiguration::instance().GetValueString("awsmock.user");
+        request.region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
         if (!s3Service.BucketExists(request.region, request.name)) {
             s3Service.CreateBucket(request);
         }
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         _transferServerList[server.serverId] = _ftpServer;
 
         // Get base dir
-        std::string baseDir = Core::Configuration::instance().getString("awsmock.service.transfer.base.dir", DEFAULT_BASE_DIR);
+        std::string baseDir = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.transfer.data-dir");
 
         // Add users
         for (const auto &user: server.users) {
@@ -108,30 +108,28 @@ namespace AwsMock::Service {
 
         for (auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
-                auto it = _transferServerList.find(transfer.serverId);
-                if (it == _transferServerList.end()) {
+                if (auto it = _transferServerList.find(transfer.serverId); it == _transferServerList.end()) {
                     StartTransferServer(transfer);
                     log_info << "Transfer server started, serverId: " << transfer.serverId;
                 }
             } else if (transfer.state == Database::Entity::Transfer::ServerState::OFFLINE) {
-                auto it = _transferServerList.find(transfer.serverId);
-                if (it != _transferServerList.end()) {
+                if (auto it = _transferServerList.find(transfer.serverId); it != _transferServerList.end()) {
                     StopTransferServer(transfer);
                     log_info << "Transfer server stopped, serverId: " << transfer.serverId;
                 }
             }
         }
 
-        for (auto &transfer: _transferServerList) {
-            if (!_transferDatabase.TransferExists(transfer.first)) {
-                Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(transfer.first);
+        for (const auto &key: _transferServerList | std::views::keys) {
+            if (!_transferDatabase.TransferExists(key)) {
+                Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(key);
                 StopTransferServer(server);
-                log_info << "Transfer server stopped, serverId: " << transfer.first;
+                log_info << "Transfer server stopped, serverId: " << key;
             }
         }
     }
 
-    void TransferServer::UpdateCounter() {
+    void TransferServer::UpdateCounter() const {
         log_trace << "Transfer monitoring starting";
 
         long servers = _transferDatabase.CountServers();

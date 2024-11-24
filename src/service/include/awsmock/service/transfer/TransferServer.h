@@ -12,16 +12,12 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-
-#define TRANSFER_DEFAULT_MONITORING_PERIOD 300
-#define DEFAULT_BASE_DIR "transfer"
 
 namespace AwsMock::Service {
 
@@ -30,7 +26,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferServer : public AbstractServer {
+    class TransferServer final : public AbstractServer {
 
       public:
 
@@ -73,7 +69,7 @@ namespace AwsMock::Service {
         /**
          * @brief Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * Transfer database

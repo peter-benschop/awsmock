@@ -108,7 +108,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        Dto::S3::GetMetadataResponse GetBucketMetadata(Dto::S3::GetMetadataRequest &request);
+        Dto::S3::GetMetadataResponse GetBucketMetadata(Dto::S3::GetMetadataRequest &request) const;
 
         /**
          * @brief Returns the S3 bucket.
@@ -136,7 +136,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 create request
          * @return CreateBucketResponse
          */
-        Dto::S3::CreateBucketResponse CreateBucket(Dto::S3::CreateBucketRequest &s3Request) const;
+        Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) const;
 
         /**
          * @brief Purge a bucket
@@ -153,7 +153,7 @@ namespace AwsMock::Service {
          *
          * @param request S3 update request
          */
-        void UpdateBucket(const Dto::S3::UpdateBucketRequest &request);
+        void UpdateBucket(const Dto::S3::UpdateBucketRequest &request) const;
 
         /**
          * @brief Lists all buckets
@@ -229,7 +229,7 @@ namespace AwsMock::Service {
          * @param request put object request
          * @return GetObjectResponse
          */
-        Dto::S3::GetObjectResponse GetObject(Dto::S3::GetObjectRequest &request);
+        Dto::S3::GetObjectResponse GetObject(const Dto::S3::GetObjectRequest &request) const;
 
         /**
          * @brief Put object
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
          * @param request copy object request
          * @return PutObjectResponse
          */
-        Dto::S3::CopyObjectResponse CopyObject(Dto::S3::CopyObjectRequest &request);
+        Dto::S3::CopyObjectResponse CopyObject(const Dto::S3::CopyObjectRequest &request);
 
         /**
          * @brief Move object
@@ -255,7 +255,7 @@ namespace AwsMock::Service {
          * @param request move object request
          * @return PutObjectResponse
          */
-        Dto::S3::MoveObjectResponse MoveObject(Dto::S3::MoveObjectRequest &request);
+        Dto::S3::MoveObjectResponse MoveObject(const Dto::S3::MoveObjectRequest &request);
 
         /**
          * @brief Lists object counters
@@ -454,7 +454,7 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param bucketName name of the bucket
          */
-        void AdjustBucketCounters(const std::string &region, const std::string &bucketName);
+        void AdjustBucketCounters(const std::string &region, const std::string &bucketName) const;
 
         /**
          * Database connection

@@ -35,8 +35,8 @@ namespace AwsMock::Service {
     }
 
     void SNSServer::DeleteOldMessages() const {
-        Core::Configuration &configuration = Core::Configuration::instance();
-        int messageTimeout = configuration.getInt("awsmock.service.sns.message.timeout", SNS_DEFAULT_MESSAGE_TIMEOUT);
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const int messageTimeout = configuration.GetValueInt("awsmock.modules.sns.timeout");
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 
@@ -47,12 +47,12 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSServer::UpdateCounter() {
+    void SNSServer::UpdateCounter() const {
         log_trace << "SNS Monitoring starting";
 
         // Get total counts
-        long topics = _snsDatabase.CountTopics();
-        long messages = _snsDatabase.CountMessages();
+        const long topics = _snsDatabase.CountTopics();
+        const long messages = _snsDatabase.CountMessages();
         _metricService.SetGauge(SNS_TOPIC_COUNT, static_cast<double>(topics));
         _metricService.SetGauge(SNS_MESSAGE_COUNT, static_cast<double>(messages));
 

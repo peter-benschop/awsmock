@@ -23,15 +23,15 @@ namespace AwsMock::Core {
       public:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region");
-            _accountId = _configuration.getString("awsmock.account.id");
-            _endpoint = SystemUtils::GetHostName() + ":" + _configuration.getString("awsmock.service.gateway.http.port");
+            _region = _configuration.GetValueString("awsmock.region");
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
+            _endpoint = SystemUtils::GetHostName() + ":" + _configuration.GetValueString("awsmock.gateway.http.port");
         }
 
       protected:
 
         std::string _region, _accountId, _endpoint;
-        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(AwsUtilsTest, CreateS3ArnTest) {

@@ -6,12 +6,10 @@
 #define AWSMOCK_CORE_TEST_UTILS_H
 
 // C++ includes
-#include <fstream>
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/config/YamlConfiguration.h>
 
 #define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"

@@ -8,17 +8,17 @@ namespace AwsMock::Service {
 
     template<typename K>
     void CallAsyncCreateKey(K &&k) {
-        Service::KMSCreator creator;
+        KMSCreator creator;
         std::thread(&KMSCreator::CreateKmsKey, k).detach();
     }
 
     KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_KMS_ACCOUNT_ID);
+        _accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account.id");
     }
 
-    Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) {
+    Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "list_keys");
         log_trace << "List keys request: " << request.ToString();
 
@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) {
+    Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "create_key");
         log_trace << "Create key request: " << request.ToString();
 
@@ -82,7 +82,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void KMSService::WaitForRsaKey(const std::string &keyId, int maxSeconds) {
+    void KMSService::WaitForRsaKey(const std::string &keyId, int maxSeconds) const {
 
         int i = 0;
         while (true) {
@@ -95,7 +95,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void KMSService::WaitForAesKey(const std::string &keyId, int maxSeconds) {
+    void KMSService::WaitForAesKey(const std::string &keyId, int maxSeconds) const {
 
         int i = 0;
         while (true) {
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::KMS::ScheduledKeyDeletionResponse KMSService::ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) {
+    Dto::KMS::ScheduledKeyDeletionResponse KMSService::ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "schedule_key_deletion");
         log_trace << "Schedule key deletion request: " << request.ToString();
 
@@ -143,7 +143,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::KMS::DescribeKeyResponse KMSService::DescribeKey(const Dto::KMS::DescribeKeyRequest &request) {
+    Dto::KMS::DescribeKeyResponse KMSService::DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "describe_key");
         log_trace << "Create key request: " << request.ToString();
 
@@ -176,7 +176,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::KMS::EncryptResponse KMSService::Encrypt(const Dto::KMS::EncryptRequest &request) {
+    Dto::KMS::EncryptResponse KMSService::Encrypt(const Dto::KMS::EncryptRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "encrypt");
         log_trace << "Encrypt plaintext request: " << request.ToString();
 
@@ -201,7 +201,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) {
+    Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "decrypt");
         log_trace << "Decrypt plaintext request: " << request.ToString();
 
@@ -234,14 +234,13 @@ namespace AwsMock::Service {
 
                 // Preparation
                 unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
-                unsigned char *rawCiphertext;
-                std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
+                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
                 int plaintextLen = static_cast<int>(rawPlaintext.length());
 
                 // Encryption
-                rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, rawKey);
+                unsigned char *rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, rawKey);
                 log_debug << "Encrypted plaintext, length: " << rawPlaintext;
-                return Core::Crypto::Base64Encode({(char *) rawCiphertext, static_cast<size_t>(plaintextLen)});
+                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawCiphertext), static_cast<size_t>(plaintextLen)});
             }
 
             case Dto::KMS::KeySpec::RSA_2048:
@@ -249,11 +248,11 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::RSA_4096: {
 
                 // Preparation
-                std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
+                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
                 EVP_PKEY *publicKey = Core::Crypto::ReadRsaPublicKey(key.rsaPublicKey);
 
                 // Encryption
-                std::string cipherText = Core::Crypto::RsaEncrypt(publicKey, rawPlaintext);
+                const std::string cipherText = Core::Crypto::RsaEncrypt(publicKey, rawPlaintext);
                 log_debug << "Encrypted plaintext, length: " << rawPlaintext.length();
                 return Core::Crypto::Base64Encode(cipherText);
             }
@@ -266,12 +265,11 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::HMAC_224: {
 
                 // Preparation
-                std::string ciphertext;
-                std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-                int plaintextLen = static_cast<int>(rawPlaintext.length());
+                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
+                const int plaintextLen = static_cast<int>(rawPlaintext.length());
 
                 // Encryption
-                ciphertext = Core::Crypto::GetHmacSha224FromString(key.hmac224Key, rawPlaintext);
+                std::string ciphertext = Core::Crypto::GetHmacSha224FromString(key.hmac224Key, rawPlaintext);
                 log_debug << "Encrypted plaintext, length: " << rawPlaintext;
                 return Core::Crypto::Base64Encode({ciphertext, static_cast<size_t>(plaintextLen)});
             }
@@ -279,12 +277,11 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::HMAC_256: {
 
                 // Preparation
-                std::string ciphertext;
-                std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-                int plaintextLen = static_cast<int>(rawPlaintext.length());
+                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
+                const int plaintextLen = static_cast<int>(rawPlaintext.length());
 
                 // Encryption
-                ciphertext = Core::Crypto::GetHmacSha256FromString(key.hmac256Key, rawPlaintext);
+                std::string ciphertext = Core::Crypto::GetHmacSha256FromString(key.hmac256Key, rawPlaintext);
                 log_debug << "Encrypted plaintext, length: " << rawPlaintext;
                 return Core::Crypto::Base64Encode({ciphertext, static_cast<size_t>(plaintextLen)});
             }
@@ -293,7 +290,7 @@ namespace AwsMock::Service {
 
                 // Preparation
                 std::string ciphertext;
-                std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
+                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
                 unsigned int hashLen = 0;
 
                 // Encryption
@@ -305,12 +302,11 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::HMAC_512: {
 
                 // Preparation
-                std::string ciphertext;
-                std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
+                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
                 unsigned int hashLen = 0;
 
                 // Encryption
-                ciphertext = Core::Crypto::GetHmacSha512FromString(key.hmac512Key, rawPlaintext, &hashLen);
+                const std::string ciphertext = Core::Crypto::GetHmacSha512FromString(key.hmac512Key, rawPlaintext, &hashLen);
                 log_debug << "HMAC hashed plaintext, length: " << hashLen;
                 std::string tmp = ciphertext.substr(0, hashLen * 2);
                 return Core::Crypto::Base64Encode(ciphertext.substr(0, hashLen * 2));
@@ -326,15 +322,14 @@ namespace AwsMock::Service {
 
                 // Preparation
                 unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
-                std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
+                const std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
                 int ciphertextLenLen = static_cast<int>(rawCiphertext.length());
-                unsigned char *rawPlaintext;
 
                 // Description
-                rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLenLen, rawKey);
+                unsigned char *rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLenLen, rawKey);
                 log_debug << "Decrypted plaintext, length: " << ciphertextLenLen;
 
-                return Core::Crypto::Base64Encode({(char *) rawPlaintext});
+                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext)});
             }
 
             case Dto::KMS::KeySpec::RSA_2048:
@@ -342,11 +337,11 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::RSA_4096: {
 
                 // Preparation
-                std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
+                const std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
                 EVP_PKEY *privateKey = Core::Crypto::ReadRsaPrivateKey(key.rsaPrivateKey);
 
                 // Description
-                std::string plainText = Core::Crypto::RsaDecrypt(privateKey, rawCiphertext);
+                const std::string plainText = Core::Crypto::RsaDecrypt(privateKey, rawCiphertext);
                 log_debug << "Decrypted plaintext, length: " << plainText.length();
                 return Core::Crypto::Base64Encode(plainText);
             }

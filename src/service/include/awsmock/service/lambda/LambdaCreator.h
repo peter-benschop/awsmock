@@ -6,28 +6,20 @@
 #define AWSMOCK_SERVICE_LAMBDA_CREATOR_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
 
 // Poco includes
-#include <Poco/Base64Decoder.h>
 #include <Poco/Zip/Compress.h>
 #include <Poco/Zip/Decompress.h>
-
-// Boost includes
-#include <boost/beast/core/detail/base64.hpp>
+#include <Poco/Zip/Zip.h>
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/docker/DockerService.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -76,7 +68,7 @@ namespace AwsMock::Service {
          * @param functionId lambda function OID
          * @param instanceId instanceId
          */
-        void operator()(std::string &functionCode, std::string &functionId, std::string &instanceId);
+        void operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) const;
 
       private:
 

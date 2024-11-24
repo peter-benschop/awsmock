@@ -122,7 +122,7 @@ namespace AwsMock::Service {
         } else {
 
             std::shared_ptr<AbstractHandler> handler;
-            std::string region = Core::Configuration::instance().getString("awsmock.region");
+            std::string region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
             if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
                 std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
@@ -266,7 +266,7 @@ namespace AwsMock::Service {
 
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
-                authKeys.region = Core::Configuration::instance().getString("awsmock.region");
+                authKeys.region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
             }
 
             return authKeys;

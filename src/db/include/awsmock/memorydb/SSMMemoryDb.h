@@ -6,7 +6,6 @@
 #define AWSMOCK_REPOSITORY_SSM_MEMORYDB_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -17,7 +16,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/repository/Database.h>
@@ -84,7 +82,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return ParameterList
          */
-        Entity::SSM::ParameterList ListParameters(const std::string &region = {});
+        Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
 
         /**
          * @brief Returns the total number of parameters
@@ -137,7 +135,7 @@ namespace AwsMock::Database {
         /**
          * Parameter mutex
          */
-        static Poco::Mutex _parameterMutex;
+        static boost::mutex _parameterMutex;
     };
 
 }// namespace AwsMock::Database

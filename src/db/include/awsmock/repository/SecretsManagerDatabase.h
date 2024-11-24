@@ -6,15 +6,10 @@
 #define AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>

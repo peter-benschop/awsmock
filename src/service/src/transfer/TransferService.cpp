@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Dto::Transfer::CreateServerResponse TransferService::CreateTransferServer(Dto::Transfer::CreateServerRequest &request) {
+    Dto::Transfer::CreateServerResponse TransferService::CreateTransferServer(Dto::Transfer::CreateServerRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_transfer_server");
         log_debug << "Create transfer manager";
 
@@ -19,12 +19,12 @@ namespace AwsMock::Service {
         std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
 
         Database::Entity::Transfer::Transfer transferEntity;
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", "000000000000");
+        std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, accountId, serverId);
-        std::string listenAddress = Core::Configuration::instance().getString("awsmock.service.ftp.address", "::");
+        std::string listenAddress = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.transfer.ftp.address");
 
         // Create entity
-        int ftpPort = Core::Configuration::instance().getInt("awsmock.module.transfer.ftp.port", TRANSFER_DEFAULT_FTP_PORT);
+        int ftpPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
         transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .protocols = request.protocols, .port = ftpPort, .listenAddress = listenAddress};
 
         // Add anonymous user
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
             }
 
             // Add user
-            std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
+            std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account.id");
             std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
             Database::Entity::Transfer::User user = {
                     .userName = request.userName,
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
             std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region);
 
             auto response = Dto::Transfer::ListServerResponse();
-            response.nextToken = Poco::UUIDGenerator().createRandom().toString();
+            response.nextToken = Core::StringUtils::CreateRandomUuid();
             for (const auto &s: servers) {
                 Dto::Transfer::Server server = {
                         .arn = s.arn,
@@ -111,7 +111,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Transfer::ListUsersResponse TransferService::ListUsers(const Dto::Transfer::ListUsersRequest &request) {
+    Dto::Transfer::ListUsersResponse TransferService::ListUsers(const Dto::Transfer::ListUsersRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
 
         try {
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
 
 
             Dto::Transfer::ListUsersResponse response = Dto::Transfer::Mapper::map(request, users);
-            response.nextToken = Poco::UUIDGenerator().createRandom().toString();
+            response.nextToken = Core::StringUtils::CreateRandomUuid();
 
             log_trace << "Handler list outcome: " + response.ToJson();
             return response;
@@ -130,7 +130,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void TransferService::StartServer(const Dto::Transfer::StartServerRequest &request) {
+    void TransferService::StartServer(const Dto::Transfer::StartServerRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "start_server");
 
         Database::Entity::Transfer::Transfer server;
@@ -159,7 +159,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void TransferService::StopServer(const Dto::Transfer::StopServerRequest &request) {
+    void TransferService::StopServer(const Dto::Transfer::StopServerRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "stop_server");
 
         Database::Entity::Transfer::Transfer server;

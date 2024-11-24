@@ -5,10 +5,8 @@
 #ifndef AWSMOCK_MONITORING_METRIC_SERVICE_H
 #define AWSMOCK_MONITORING_METRIC_SERVICE_H
 
-// C includes
 // C++ Standard includes
 #include <chrono>
-#include <sstream>
 #include <string>
 
 // Poco includes
@@ -21,9 +19,8 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/repository/MonitoringDatabase.h"
+#include <awsmock/core/LogStream.h>
+#include <awsmock/repository/MonitoringDatabase.h>
 
 namespace AwsMock::Monitoring {
 

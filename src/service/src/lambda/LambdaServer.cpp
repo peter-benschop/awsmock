@@ -114,8 +114,8 @@ namespace AwsMock::Service {
         log_debug << "Lambda worker starting, count: " << lambdaList.size();
 
         // Get lifetime from configuration
-        int lifetime = Core::Configuration::instance().getInt("awsmock.service.lambda.lifetime", LAMBDA_DEFAULT_LIFETIME);
-        auto expired = std::chrono::system_clock::now() - std::chrono::seconds(lifetime);
+        const int lifetime = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.lambda.lifetime");
+        const auto expired = std::chrono::system_clock::now() - std::chrono::seconds(lifetime);
 
         // Loop over lambdas and remove expired instances
         for (auto &lambda: lambdaList) {

@@ -12,7 +12,6 @@
 #include <Poco/Path.h>
 
 // Local includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/Database.h>
 
@@ -30,7 +29,7 @@ namespace AwsMock::Database {
         void TearDown() override {
         }
 
-        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
         DatabaseBase _database = DatabaseBase();
     };
 

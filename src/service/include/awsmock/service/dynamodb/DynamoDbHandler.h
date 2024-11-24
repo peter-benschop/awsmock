@@ -9,14 +9,13 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -30,7 +29,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbHandler : public AbstractHandler {
+    class DynamoDbHandler final : public AbstractHandler {
 
       public:
 

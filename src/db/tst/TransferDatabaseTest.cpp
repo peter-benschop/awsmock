@@ -13,7 +13,6 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/TransferDatabase.h>
 

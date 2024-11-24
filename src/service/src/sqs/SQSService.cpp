@@ -532,7 +532,7 @@ namespace AwsMock::Service {
             log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
 
             // Find Lambdas with this as event source
-            const std::string accountId = Core::Configuration::instance().getString("awsmock.account.id");
+            const std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
             const std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, accountId, queue.name);
             std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn);
             if (!lambdas.empty()) {
@@ -795,8 +795,8 @@ namespace AwsMock::Service {
     void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, Database::Entity::SQS::Message &message, const std::string &eventSourceArn) {
         log_debug << "Invoke lambda function request, size: " << lambda.function;
 
-        const std::string region = Core::Configuration::instance().getString("awsmock.region", DEFAULT_REGION);
-        const std::string user = Core::Configuration::instance().getString("awsmock.user", DEFAULT_USER);
+        const std::string region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
+        const std::string user = Core::YamlConfiguration::instance().GetValueString("awsmock.user");
 
         // Create the event record
         Dto::SQS::Record record = {.region = lambda.region, .messageId = message.messageId, .receiptHandle = message.receiptHandle, .body = message.body, .attributes = message.attributes, .md5Sum = message.md5Body, .eventSource = "aws:sqs", .eventSourceArn = eventSourceArn};

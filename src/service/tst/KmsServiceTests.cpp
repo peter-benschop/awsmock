@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSService.h>
 

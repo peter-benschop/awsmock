@@ -6,7 +6,6 @@
 #define AWSMOCK_REPOSITORY_SSM_DATABASE_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -16,10 +15,7 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/memorydb/SSMMemoryDb.h>

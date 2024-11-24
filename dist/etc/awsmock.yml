@@ -9,14 +9,32 @@ awsmock:
     secret-access-key: none
     account-id: 000000000000
     client-id: 00000000
-  data:
-    temp: /home/awsmock/data/tmp
+  temp-dir: /home/awsmock/data/tmp
+  data-dir: /home/awsmock/data
   dockerized: false
   json:
     pretty: true
   aws:
     signature:
       verify: false
+  docker:
+    active: false
+    network-mode: local
+    defaults:
+      memory-size: 512
+      temp-size: 10240
+    container:
+      port: 8080
+    socket: /var/run/docker.sock
+  podman:
+    active: true
+    network-mode: local
+    defaults:
+      memory-size: 512
+      temp-size: 10240
+    container:
+      port: 8080
+    socket: /var/run/podman/podman.sock
   mongodb:
     active: true
     name: awsmock
@@ -65,6 +83,7 @@ awsmock:
         period: 30
     lambda:
       active: true
+      lifetime: 3600
       data-dir: /home/awsmock/data/lambda
       monitoring:
         period: 300
@@ -91,6 +110,35 @@ awsmock:
       active: true
       monitoring:
         period: 300
+    ssm:
+      active: true
+      monitoring:
+        period: 300
+      worker:
+        period: 3600
+    secretsmanager:
+      active: true
+      monitoring:
+        period: 300
+      worker:
+        period: 3600
+    transfer:
+      active: true
+      bucket: transfer-server
+      data-dir: /home/awsmock/data/transfer
+      monitoring:
+        period: 300
+      worker:
+        period: 3600
+      ftp:
+        pasv-min: 6000
+        pasv-max: 6100
+  monitoring:
+    port: 9091
+    period: 60
+    prometheus: true
+    intern: true
+    retention: 3
   logging:
     level: debug
     filename:

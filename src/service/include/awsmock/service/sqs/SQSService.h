@@ -70,11 +70,6 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
-#define DEFAULT_USER "none"
-#define DEFAULT_REGION "eu-central-1"
-#define SQS_DEFAULT_ACCOUNT_ID "000000000000"
-#define SQS_DEFAULT_VISIBILITY_TIMEOUT 300
-
 namespace AwsMock::Service {
 
     using std::chrono::system_clock;
@@ -91,7 +86,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.

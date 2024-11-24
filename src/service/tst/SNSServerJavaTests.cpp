@@ -35,8 +35,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.setString("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
 
             // Set base URLs
             _snsBaseUrl = "/api/sns/";
@@ -79,10 +79,10 @@ namespace AwsMock::Service {
 
         std::string _snsBaseUrl, _sqsBaseUrl, _region;
         boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SNSServerJavaTest, TopicCreateTest) {

@@ -6,14 +6,10 @@
 #define AWSMOCK_SERVICE_DOCKER_SERVICE_H
 
 // C++ standard includes
-#include <fstream>
-#include <iostream>
 #include <string>
 
 // Boost includes
-#include <boost/filesystem/path.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -26,7 +22,6 @@
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>

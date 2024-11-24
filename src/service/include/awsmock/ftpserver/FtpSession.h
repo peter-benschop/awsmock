@@ -5,7 +5,6 @@
 #include <fstream>
 #include <functional>
 #include <iomanip>
-#include <iostream>
 #include <map>
 #include <sstream>
 #include <utility>
@@ -13,18 +12,7 @@
 // Asio includes
 #include <asio.hpp>
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <direct.h>
-#endif
-
-// Poco includes
-#include <Poco/Net/HTTPClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/monitoring/MetricDefinition.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -32,6 +20,7 @@
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/s3/S3Service.h>
 
 #define DEFAULT_TRANSFER_BASE_DIR "/home/awsmock/data/transfer"

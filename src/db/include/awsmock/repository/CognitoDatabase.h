@@ -6,17 +6,14 @@
 #define AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
 
@@ -36,7 +33,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _memoryDb(CognitoMemoryDb::instance()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group") {};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {};
 
         /**
          * @brief Singleton instance

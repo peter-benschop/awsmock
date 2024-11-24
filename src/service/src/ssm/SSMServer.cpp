@@ -9,9 +9,9 @@ namespace AwsMock::Service {
     SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms") {
 
         // HTTP manager configuration
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.ssm.worker.period", SSM_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.ssm.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
+        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        _workerPeriod = configuration.GetValueInt("awsmock.modules.ssm.worker.period");
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.ssm.monitoring.period");
         log_debug << "SSM server initialized";
 
         // Check module active

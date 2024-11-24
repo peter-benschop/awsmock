@@ -10,18 +10,16 @@
 
 // Boost includes
 #include <boost/beast.hpp>
-#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricDefinition.h"
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/NumberUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    void LambdaCreator::operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) {
+    void LambdaCreator::operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) const {
 
         log_debug << "Start creating lambda function, oid: " << functionId;
 
@@ -63,20 +63,20 @@ namespace AwsMock::Service {
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
-        std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
+        const std::string dataDir = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.lambda.data-dir");
 
         // Write base64 encoded zip file
-        std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag, dataDir);
+        const std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag, dataDir);
 
         // Unzip provided zip-file into a temporary directory
         codeDir = UnpackZipFile(codeDir, encodedFile, lambdaEntity.runtime);
         log_debug << "Lambda file unzipped, codeDir: " << codeDir;
 
         // Build the docker image using the docker module
-        std::string imageFile = DockerService::instance().BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
+        const std::string imageFile = DockerService::instance().BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
 
         // Get the image struct
-        Dto::Docker::Image image = DockerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
+        const Dto::Docker::Image image = DockerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
         lambdaEntity.codeSize = static_cast<long>(zipFile.size());
         lambdaEntity.imageId = image.id;
         lambdaEntity.imageSize = image.size;
@@ -91,9 +91,9 @@ namespace AwsMock::Service {
 
         try {
 
-            std::string containerName = lambdaEntity.function + "-" + instance.id;
-            std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
-            Dto::Docker::CreateContainerResponse containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, instance.hostPort);
+            const std::string containerName = lambdaEntity.function + "-" + instance.id;
+            const std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
+            const Dto::Docker::CreateContainerResponse containerCreateResponse = DockerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, instance.hostPort);
             instance.containerId = containerCreateResponse.id;
             log_debug << "Lambda container created, hostPort: " << instance.hostPort << " containerId: " << instance.containerId;
 
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime) {
 
-        std::string dataDir = Core::Configuration::instance().getString("awsmock.data.dir", "/tmp/awsmock/data");
+        std::string dataDir = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.lambda.data-dir");
         std::string tempDir = dataDir + Poco::Path::separator() + "tmp";
 
         // Decode Base64 file

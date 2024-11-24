@@ -8,20 +8,16 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMock includes
-#include "awsmock/dto/module/model/Infrastructure.h"
-#include "awsmock/dto/module/model/Module.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/module/CleanInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
+#include <awsmock/dto/module/model/Infrastructure.h>
+#include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>

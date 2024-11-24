@@ -74,14 +74,14 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        const Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &module: existingModules) {
             if (!moduleDatabase.ModuleExists(module.first)) {
                 Database::Entity::Module::Module m = {.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE};
                 moduleDatabase.CreateModule(m);
             }
-            if (configuration.has("awsmock.service." + module.first + ".active") && configuration.getBool("awsmock.service." + module.first + ".active")) {
+            if (configuration.GetValueBool("awsmock.modules." + module.first + ".active")) {
                 moduleDatabase.SetStatus(module.first, Database::Entity::Module::ModuleStatus::ACTIVE);
             }
         }
