@@ -84,9 +84,6 @@ namespace AwsMock::Service {
                 response.set(header.first, header.second);
             }
         }
-
-        Core::HttpUtils::DumpHeaders(response);
-
         // Send the response to the client
         return response;
     }

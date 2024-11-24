@@ -70,7 +70,7 @@ namespace AwsMock::Core {
             const int source = open(inFile.c_str(), O_RDONLY, 0);
 
             // struct required, rationale: function stat() exists also
-            struct stat stat_source{};
+            struct stat stat_source {};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -143,7 +143,7 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
-        struct stat info{};
+        struct stat info {};
         stat(fileName.c_str(), &info);// Error check omitted
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;

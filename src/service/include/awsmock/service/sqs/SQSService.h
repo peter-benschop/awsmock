@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Creates a new queue.
@@ -111,7 +111,7 @@ namespace AwsMock::Service {
          * @see ListQueuesRequest
          * @see ListQueuesResponse
          */
-        Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request);
+        Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues ARNs
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
          * @return ListQueueArnsResponse
          * @see ListQueueArnsResponse
          */
-        Dto::SQS::ListQueueArnsResponse ListQueueArns();
+        Dto::SQS::ListQueueArnsResponse ListQueueArns() const;
 
         /**
          * @brief Returns a list of all available queues counters
@@ -129,7 +129,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        Dto::SQS::ListTopicCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request);
+        Dto::SQS::ListTopicCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags
@@ -139,7 +139,7 @@ namespace AwsMock::Service {
          * @see ListQueueTagsRequest
          * @see ListQueueTagsResponse
          */
-        Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request);
+        Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
 
         /**
          * @brief Purge a queue.
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
          * @param request purge queue request
          * @throws ServiceException
          */
-        void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request);
+        void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes
@@ -156,7 +156,7 @@ namespace AwsMock::Service {
          * @return GetQueueAttributesResponse
          * @throws ServiceException
          */
-        Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request);
+        Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
          * @return GetQueueAttributesResponse
          * @throws ServiceException
          */
-        Dto::SQS::GetQueueDetailsResponse GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request);
+        Dto::SQS::GetQueueDetailsResponse GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes
@@ -174,7 +174,7 @@ namespace AwsMock::Service {
          * @return GetQueueAttributesResponse
          * @throws ServiceException
          */
-        Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request);
+        Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
 
         /**
          * @brief Set queue userAttributes
@@ -183,7 +183,7 @@ namespace AwsMock::Service {
          * @return SetQueueAttributesResponse
          * @throws ServiceException
          */
-        Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request);
+        Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
 
         /**
          * @brief Sets the message visibility timeout timeout.
@@ -191,7 +191,7 @@ namespace AwsMock::Service {
          * @param request set visibility timeout request
          * @throws ServiceException
          */
-        void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request);
+        void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) const;
 
         /**
          * @brief Sets tags for a queue.
@@ -202,7 +202,7 @@ namespace AwsMock::Service {
          *
          * @param request tag resource request DTO
          */
-        void TagQueue(const Dto::SQS::TagQueueRequest &request);
+        void TagQueue(const Dto::SQS::TagQueueRequest &request) const;
 
         /**
          * @brief Delete a queue
@@ -211,7 +211,7 @@ namespace AwsMock::Service {
          * @return SQSQueueResponse
          * @throws ServiceException
          */
-        Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request);
+        Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) const;
 
         /**
          * @brief Send a message to the queue
@@ -238,7 +238,7 @@ namespace AwsMock::Service {
          * @return ReceiveMessageResponse
          * @throws ServiceException
          */
-        Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request);
+        Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const;
 
         /**
          * @brief Returns a list SQS messages
@@ -248,7 +248,7 @@ namespace AwsMock::Service {
          * @throws ServiceException
          * @see ListMessagesResponse
          */
-        Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request);
+        Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request) const;
 
         /**
          * @brief Returns a list SQS messages
@@ -258,7 +258,7 @@ namespace AwsMock::Service {
          * @throws ServiceException
          * @see ListMessageCountersResponse
          */
-        Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request);
+        Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
 
         /**
          * @brief Deletes a message
@@ -301,7 +301,7 @@ namespace AwsMock::Service {
          *
          * @param message message object
          */
-        void AdjustMessageCounters(const Database::Entity::SQS::Message &message);
+        void AdjustMessageCounters(const Database::Entity::SQS::Message &message) const;
 
         /**
          * SQS database connection

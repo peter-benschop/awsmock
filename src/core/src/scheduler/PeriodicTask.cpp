@@ -3,8 +3,8 @@
 
 namespace AwsMock::Core {
 
-    PeriodicTask::PeriodicTask(boost::asio::io_service &ioService, std::string const &name, int interval, handler_fn task, int delay)
-        : ioService(ioService), interval(interval), task(std::move(task)), name(name), timer(ioService), _delay(delay) {
+    PeriodicTask::PeriodicTask(boost::asio::io_service &ioService, std::string const &name, const int interval, handler_fn task, const int delay)
+        : ioService(ioService), timer(ioService), task(std::move(task)), name(name), interval(interval), _delay(delay) {
         log_debug << "Create PeriodicTask '" << name << "'";
 
         // Schedule start to be run by the _io_service
@@ -29,7 +29,7 @@ namespace AwsMock::Core {
 
         // Wait for first execution time
         if (_delay > 0) {
-            //                std::this_thread::sleep_for(std::chrono::seconds(_delay));
+            std::this_thread::sleep_for(std::chrono::seconds(_delay));
         }
 
         // Uncomment if you want to call the handler on startup (i.e. at time 0)

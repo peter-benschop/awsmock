@@ -60,14 +60,14 @@ namespace AwsMock::Database {
          *
          * @return connection from the pool
          */
-        mongocxx::pool::entry GetConnection();
+        mongocxx::pool::entry GetConnection() const;
 
         /**
          * @brief Try to get a connection
          *
          * @return optional connection from the pool
          */
-        bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection();
+        bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection() const;
 
         /**
          * @brief Shutdown the connection pool

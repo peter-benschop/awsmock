@@ -67,7 +67,7 @@ namespace AwsMock::Database {
 
         // Update module database
         Core::Configuration::instance().SetValue("awsmock.mongodb.active", false);
-        mongocxx::pool::entry _client = _pool->acquire();
+        const mongocxx::pool::entry _client = _pool->acquire();
         (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
                                                make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
 
@@ -86,7 +86,7 @@ namespace AwsMock::Database {
 
             for (const auto &index: indexDefinitions) {
                 const auto m_thread = std::make_shared<boost::thread>([database, capture0 = index.first] { CreateIndex(database, capture0); });
-                m_thread->detach();
+                m_thread->join();
             }
         }
     }
