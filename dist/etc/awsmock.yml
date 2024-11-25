@@ -2,16 +2,17 @@
 # Configuration file for the AWS cloud simulation
 #
 awsmock:
-  region: eu-central-1
-  user: none
+  region: eu-central-1                        # AWS region
+  user: none                                  # AWS user
+  # AWS access definition
   access:
-    key-id: none
-    secret-access-key: none
-    account-id: 000000000000
-    client-id: 00000000
-  temp-dir: /home/awsmock/data/tmp
-  data-dir: /home/awsmock/data
-  dockerized: false
+    key-id: none                              # AWS access key ID
+    secret-access-key: none                   # AWS access secret
+    account-id: 000000000000                  # AWS account ID
+    client-id: 00000000                       # AWS client ID
+  temp-dir: /home/awsmock/data/tmp            # General temp directory
+  data-dir: /home/awsmock/data                # General data directory
+  dockerized: false                           # dockerized flag
   json:
     pretty: true
   aws:
