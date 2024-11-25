@@ -5,9 +5,7 @@
 #include "awsmock/service/sns/SNSServer.h"
 
 namespace AwsMock::Service {
-
     SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
-
         // HTTP manager configuration
         Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
         _deletePeriod = configuration.GetValueInt("awsmock.modules.sns.delete.period");
@@ -31,17 +29,17 @@ namespace AwsMock::Service {
         // Set running
         SetRunning();
 
-        log_debug << "SNS server initialized, workerPeriod: " << _deletePeriod << " monitoringPeriod: " << _monitoringPeriod;
+        log_debug << "SNS server initialized, workerPeriod: " << _deletePeriod << " monitoringPeriod: " <<
+ _monitoringPeriod;
     }
 
     void SNSServer::DeleteOldMessages() const {
-        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
-        const int messageTimeout = configuration.GetValueInt("awsmock.modules.sns.timeout");
+        const int messageTimeout = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.sns.timeout");
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 
     void SNSServer::SychronizeCounters() const {
-        for (auto &topic: _snsDatabase.ListTopics()) {
+        for (auto &topic : _snsDatabase.ListTopics()) {
             topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
             _snsDatabase.UpdateTopic(topic);
         }
@@ -57,11 +55,13 @@ namespace AwsMock::Service {
         _metricService.SetGauge(SNS_MESSAGE_COUNT, static_cast<double>(messages));
 
         // Count resources per topic
-        for (const auto &topic: _snsDatabase.ListTopics()) {
+        for (const auto &topic : _snsDatabase.ListTopics()) {
             std::string labelValue = Poco::replace(topic.topicName, "-", "_");
-            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(topic.topicAttribute.availableMessages));
+            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT,
+                                    "topic",
+                                    labelValue,
+                                    static_cast<double>(topic.topicAttribute.availableMessages));
         }
         log_trace << "SNS monitoring finished";
     }
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

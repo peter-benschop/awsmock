@@ -2,15 +2,14 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/s3/S3Service.h"
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
-
-    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
-
+    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"),
+                                                                         _transferDatabase(
+                                                                             Database::TransferDatabase::instance()) {
         // REST manager configuration
-        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.transfer.monitoring.period");
 
         // Check module active
@@ -36,30 +35,26 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::CreateTransferBucket() {
-
-        Service::S3Service s3Service;
-
         Dto::S3::CreateBucketRequest request;
         request.name = "transfer-server";
         request.owner = Core::YamlConfiguration::instance().GetValueString("awsmock.user");
         request.region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
-        if (!s3Service.BucketExists(request.region, request.name)) {
+        if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
             s3Service.CreateBucket(request);
         }
     }
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
-
         // Create transfer manager thread
         _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, server.port, server.listenAddress);
         _transferServerList[server.serverId] = _ftpServer;
 
         // Get base dir
-        std::string baseDir = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string baseDir = Core::YamlConfiguration::instance().GetValueString(
+            "awsmock.modules.transfer.data-dir");
 
         // Add users
-        for (const auto &user: server.users) {
-
+        for (const auto &user : server.users) {
             std::string homeDir = baseDir + Poco::Path::separator() + user.homeDirectory;
 
             // Ensure the home directory exists
@@ -78,7 +73,6 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
-
         // Create transfer manager thread
         std::shared_ptr<FtpServer::FtpServer> ftpserver = _transferServerList[server.serverId];
         ftpserver->stop();
@@ -90,11 +84,10 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::StartTransferServers() {
-
         log_debug << "Starting transfer servers";
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
-        for (auto &transfer: transfers) {
+        for (auto &transfer : transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 StartTransferServer(transfer);
             }
@@ -102,11 +95,10 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::CheckTransferServers() {
-
         log_trace << "Checking transfer servers";
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
-        for (auto &transfer: transfers) {
+        for (auto &transfer : transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 if (auto it = _transferServerList.find(transfer.serverId); it == _transferServerList.end()) {
                     StartTransferServer(transfer);
@@ -120,7 +112,7 @@ namespace AwsMock::Service {
             }
         }
 
-        for (const auto &key: _transferServerList | std::views::keys) {
+        for (const auto &key : _transferServerList | std::views::keys) {
             if (!_transferDatabase.TransferExists(key)) {
                 Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(key);
                 StopTransferServer(server);
@@ -132,10 +124,9 @@ namespace AwsMock::Service {
     void TransferServer::UpdateCounter() const {
         log_trace << "Transfer monitoring starting";
 
-        long servers = _transferDatabase.CountServers();
+        const long servers = _transferDatabase.CountServers();
         _metricService.SetGauge(TRANSFER_SERVER_COUNT, static_cast<double>(servers));
 
         log_trace << "Transfer monitoring finished";
     }
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

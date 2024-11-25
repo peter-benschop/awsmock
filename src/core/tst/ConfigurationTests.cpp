@@ -13,38 +13,34 @@
 #include <awsmock/core/config/YamlConfiguration.h>
 
 namespace AwsMock::Core {
-
     class ConfigurationTest : public ::testing::Test {
+        protected:
+            void SetUp() override {
+            }
 
-      protected:
+            void TearDown() override {
+            }
 
-        void SetUp() override {
-        }
-
-        void TearDown() override {
-        }
-
-        YamlConfiguration _configuration = YamlConfiguration(TMP_PROPERTIES_FILE);
+            //YamlConfiguration _configuration = YamlConfiguration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(ConfigurationTest, EmptyFilenameTest) {
-
         // arrange
 
         // act
         EXPECT_THROW({
-            try {
-                auto configuration = YamlConfiguration("");
-            } catch (const CoreException &e) {
-                EXPECT_STREQ("Empty filename", e.message().c_str());
-                throw;
-            } }, CoreException);
+                     try {
+                     auto configuration = YamlConfiguration("");
+                     } catch (const CoreException &e) {
+                     EXPECT_STREQ("Empty filename", e.message().c_str());
+                     throw;
+                     } },
+                     CoreException);
 
         // assert
     }
 
     TEST_F(ConfigurationTest, ConstructorTest) {
-
         // arrange
         const YamlConfiguration *configuration = nullptr;
 
@@ -57,7 +53,6 @@ namespace AwsMock::Core {
     }
 
     TEST_F(ConfigurationTest, SetValueTest) {
-
         // arrange
         YamlConfiguration *configuration = nullptr;
         EXPECT_NO_THROW({ configuration = new YamlConfiguration(TMP_PROPERTIES_FILE); });
@@ -72,7 +67,6 @@ namespace AwsMock::Core {
     }
 
     TEST_F(ConfigurationTest, EnvironmentTest) {
-
         // arrange
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
         const YamlConfiguration *configuration = nullptr;
@@ -89,6 +83,26 @@ namespace AwsMock::Core {
         }
     }
 
-}// namespace AwsMock::Core
+    TEST_F(ConfigurationTest, YamlConfiggurationTest) {
+        // arrange
+        const std::string yamlString = "awsmock:\n\t"
+                "region: eu-central-1\n\t"
+                "user: none\n\t"
+                "access: \n\t\t"
+                "key-id: none\n\t\t"
+                "secret-access-key: none\n\t\t"
+                "account-id: 000000000000\n\t\t";
+        const std::string yamlFile = FileUtils::CreateTempFile("yaml", yamlString);
+        const auto configuration = YamlConfiguration(yamlFile);
+
+        // act
+        const std::string region = configuration.GetValueString("awsmock.region");
+        const std::string keyId = configuration.GetValueString("awsmock.access.key-id");
+
+        // assert
+        EXPECT_TRUE(region == "eu-central-1");
+        EXPECT_TRUE(keyId == "none");
+    }
+} // namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_CONFIGURATION_TEST_H

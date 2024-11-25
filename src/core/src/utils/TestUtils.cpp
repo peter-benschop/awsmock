@@ -5,9 +5,7 @@
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
-
     void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
-
         // Logging
         if (getenv("AWSMOCK_TEST_LOG") != nullptr) {
             LogStream::Initialize();
@@ -22,7 +20,7 @@ namespace AwsMock::Core {
         const std::string hostName = SystemUtils::GetNodeName();
 
         const YamlConfiguration config;
-        config.SetValue("awsmock.region", "eu-central-1");
+        /*config.SetValue("awsmock.region", "eu-central-1");
         config.SetValue("awsmock.access.account-id", "000000000000");
         config.SetValue("awsmock.access.client-id", "00000000");
         config.SetValue("awsmock.user", "none");
@@ -33,7 +31,7 @@ namespace AwsMock::Core {
         config.SetValue("awsmock.gateway.address", "0.0.0.0");
         config.SetValue("awsmock.gateway.max-queue", 10);
         config.SetValue("awsmock.gateway.max-threads", 10);
-        config.SetValue("awsmock.gateway.timeout", 10);
+        config.SetValue("awsmock.gateway.timeout", 10);*/
         /*
         // Mongo DB
         ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
@@ -92,7 +90,7 @@ namespace AwsMock::Core {
         ofs << "awsmock.service.logging.file=/tmp/awsmock-test.log" << std::endl;
         ofs.close();*/
         //config.SetFilename(TMP_PROPERTIES_FILE);
-        config.WriteFile(TMP_PROPERTIES_FILE);
+        // config.WriteFile(TMP_PROPERTIES_FILE);
     }
 
     std::string TestUtils::GetTestConfigurationFilename() {
@@ -109,5 +107,4 @@ namespace AwsMock::Core {
     ExecResult TestUtils::SendCliCommand(const std::string &command) {
         return SystemUtils::Exec(command);
     }
-
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

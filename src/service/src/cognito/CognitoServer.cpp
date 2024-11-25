@@ -5,12 +5,10 @@
 #include <awsmock/service/cognito/CognitoServer.h>
 
 namespace AwsMock::Service {
-
     CognitoServer::CognitoServer(Core::PeriodicScheduler &scheduler) : AbstractServer("cognito"), _module("cognito") {
-
         // Get HTTP configuration values
-        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.cognito.monitoring.period");
+        _monitoringPeriod = Core::YamlConfiguration::instance().
+                GetValueInt("awsmock.modules.cognito.monitoring.period");
 
         // Check module active
         if (!IsActive("cognito")) {
@@ -37,11 +35,11 @@ namespace AwsMock::Service {
         _metricService.SetGauge(COGNITO_USERPOOL_COUNT, userPools);
 
         // Count users per user pool
-        for (const auto &userPool: _cognitoDatabase.ListUserPools()) {
+        for (const auto &userPool : _cognitoDatabase.ListUserPools()) {
             std::string labelValue = Poco::replace(userPool.name, "-", "_");
             const long usersPerUserPool = _cognitoDatabase.CountUsers(userPool.region, userPool.userPoolId);
             _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", labelValue, usersPerUserPool);
         }
         log_trace << "Cognito monitoring finished";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

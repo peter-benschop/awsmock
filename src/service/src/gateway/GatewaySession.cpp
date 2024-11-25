@@ -5,25 +5,25 @@
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
-
     GatewaySession::RoutingTable GatewaySession::_routingTable = {
-            {"s3", std::make_shared<S3Handler>()},
-            {"s3api", std::make_shared<S3Handler>()},
-            {"sqs", std::make_shared<SQSHandler>()},
-            {"sns", std::make_shared<SNSHandler>()},
-            {"lambda", std::make_shared<LambdaHandler>()},
-            {"transfer", std::make_shared<TransferHandler>()},
-            {"cognito-idp", std::make_shared<CognitoHandler>()},
-            {"cognito-identity", std::make_shared<CognitoHandler>()},
-            {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
-            {"kms", std::make_shared<KMSHandler>()},
-            {"ssm", std::make_shared<SSMHandler>()},
-            {"dynamodb", std::make_shared<DynamoDbHandler>()},
-            {"monitoring", std::make_shared<MonitoringHandler>()},
-            {"module", std::make_shared<ModuleHandler>()}};
+        {"s3", std::make_shared<S3Handler>()},
+        {"s3api", std::make_shared<S3Handler>()},
+        {"sqs", std::make_shared<SQSHandler>()},
+        {"sns", std::make_shared<SNSHandler>()},
+        {"lambda", std::make_shared<LambdaHandler>()},
+        {"transfer", std::make_shared<TransferHandler>()},
+        {"cognito-idp", std::make_shared<CognitoHandler>()},
+        {"cognito-identity", std::make_shared<CognitoHandler>()},
+        {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
+        {"kms", std::make_shared<KMSHandler>()},
+        {"ssm", std::make_shared<SSMHandler>()},
+        {"dynamodb", std::make_shared<DynamoDbHandler>()},
+        {"monitoring", std::make_shared<MonitoringHandler>()},
+        {"module", std::make_shared<ModuleHandler>()}
+    };
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
-        const Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
         _queueLimit = configuration.GetValueInt("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
         _timeout = configuration.GetValueInt("awsmock.gateway.http.timeout");
@@ -31,11 +31,10 @@ namespace AwsMock::Service {
     };
 
     void GatewaySession::Run() {
-        boost::asio::dispatch(_stream.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
+        dispatch(_stream.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
     }
 
     void GatewaySession::DoRead() {
-
         // Construct a new parser for each message
         _parser.emplace();
 
@@ -47,11 +46,13 @@ namespace AwsMock::Service {
         _stream.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
-        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
+        http::async_read(_stream,
+                         _buffer,
+                         *_parser,
+                         boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
     void GatewaySession::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
-
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
@@ -75,7 +76,6 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
-
         // Allocate and store the work
         _response_queue.push(std::move(response));
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, static_cast<double>(response_queue_.size()));
@@ -89,9 +89,8 @@ namespace AwsMock::Service {
     //
     // The concrete type of the response message (which depends on the
     // request), is type-erased in message_generator.
-    template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
-
+    template<class Body, class Allocator> http::message_generator GatewaySession::HandleRequest(
+        http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -109,27 +108,22 @@ namespace AwsMock::Service {
         }
 
         // Request path must be absolute and not contain "..".
-        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") !=
+            boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
             return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
         // Process OPTIONS requests
         if (request.method() == http::verb::options) {
-
             return HandleOptionsRequest(request);
-
         } else {
-
             std::shared_ptr<AbstractHandler> handler;
             std::string region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
             if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
-
                 std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
                 handler = _routingTable[target];
-
             } else {
-
                 // Verify AWS signature
                 if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
                     log_warning << "AWS signature could not be verified";
@@ -144,33 +138,32 @@ namespace AwsMock::Service {
             }
 
             if (handler) {
-
                 switch (request.method()) {
-                    case http::verb::get: {
-                        Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
-                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                        return handler->HandleGetRequest(request, region, "none");
-                    }
-                    case http::verb::put: {
-                        Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
-                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                        return handler->HandlePutRequest(request, region, "none");
-                    }
-                    case http::verb::post: {
-                        Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
-                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                        return handler->HandlePostRequest(request, region, "none");
-                    }
-                    case http::verb::delete_: {
-                        Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
-                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                        return handler->HandleDeleteRequest(request, region, "none");
-                    }
-                    case http::verb::head: {
-                        Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
-                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                        return handler->HandleHeadRequest(request, region, "none");
-                    }
+                case http::verb::get: {
+                    Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
+                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
+                    return handler->HandleGetRequest(request, region, "none");
+                }
+                case http::verb::put: {
+                    Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
+                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
+                    return handler->HandlePutRequest(request, region, "none");
+                }
+                case http::verb::post: {
+                    Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
+                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
+                    return handler->HandlePostRequest(request, region, "none");
+                }
+                case http::verb::delete_: {
+                    Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
+                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
+                    return handler->HandleDeleteRequest(request, region, "none");
+                }
+                case http::verb::head: {
+                    Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
+                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
+                    return handler->HandleHeadRequest(request, region, "none");
+                }
                 }
             }
         }
@@ -182,12 +175,15 @@ namespace AwsMock::Service {
     void GatewaySession::DoWrite() {
         if (!_response_queue.empty()) {
             bool keep_alive = _response_queue.front().keep_alive();
-            boost::beast::async_write(_stream, std::move(_response_queue.front()), boost::beast::bind_front_handler(&GatewaySession::OnWrite, shared_from_this(), keep_alive));
+            boost::beast::async_write(_stream,
+                                      std::move(_response_queue.front()),
+                                      boost::beast::bind_front_handler(&GatewaySession::OnWrite,
+                                                                       shared_from_this(),
+                                                                       keep_alive));
         }
     }
 
     void GatewaySession::OnWrite(bool keep_alive, boost::beast::error_code ec, std::size_t bytes_transferred) {
-
         boost::ignore_unused(bytes_transferred);
         if (ec) {
             log_error << ec.message();
@@ -211,7 +207,6 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoShutdown() {
-
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
@@ -223,7 +218,6 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoClose() {
-
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = _stream.socket().close(ec);
@@ -234,20 +228,22 @@ namespace AwsMock::Service {
         // At this point the connection is closed gracefully
     }
 
-    Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {
-
+    Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request,
+                                                                       const std::string &secretAccessKey) {
         // Get signing version
         Core::AuthorizationHeaderKeys authKeys = {};
 
         if (const std::string authorizationHeader = request["Authorization"]; !authorizationHeader.empty()) {
-
             authKeys.signingVersion = Core::StringUtils::Split(authorizationHeader, ' ')[0];
 
             try {
                 Poco::RegularExpression::MatchVec posVec;
-                if (const Poco::RegularExpression pattern(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)"); !pattern.match(authorizationHeader, 0, posVec)) {
+                if (const Poco::RegularExpression pattern(
+                        R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)")
+                    ; !pattern.match(authorizationHeader, 0, posVec)) {
                     log_error << "Could not extract authorization, authorization: " << authorizationHeader;
-                    throw Core::UnauthorizedException("Could not extract authorization, authorization: " + authorizationHeader);
+                    throw Core::UnauthorizedException(
+                        "Could not extract authorization, authorization: " + authorizationHeader);
                 }
                 authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
                 authKeys.dateTime = authorizationHeader.substr(posVec[2].offset, posVec[2].length);
@@ -256,14 +252,13 @@ namespace AwsMock::Service {
                 authKeys.requestVersion = authorizationHeader.substr(posVec[5].offset, posVec[5].length);
                 authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
                 authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
-                authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
+                authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.
+                        requestVersion;
                 return authKeys;
-
             } catch (Poco::Exception &e) {
                 log_error << e.message();
             }
         } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
-
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
                 authKeys.region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
@@ -274,8 +269,8 @@ namespace AwsMock::Service {
         return {};
     }
 
-    http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
-
+    http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(
+        const http::request<http::dynamic_body> &request) {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
@@ -295,5 +290,4 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
