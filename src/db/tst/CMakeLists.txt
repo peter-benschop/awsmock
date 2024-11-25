@@ -20,7 +20,7 @@ link_directories(../ ../../core)
 add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoUtil PocoFoundation PocoNet
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoUtil PocoFoundation PocoNet PocoXML PocoJSON
         boost_thread boost_filesystem yaml-cpp gtest pthread ssl crypto z archive tbb curl)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

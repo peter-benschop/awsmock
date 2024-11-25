@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/config/YamlConfiguration.h>
-#include <picojson/picojson.h>
 
 namespace AwsMock::Core {
 
@@ -181,17 +180,17 @@ namespace AwsMock::Core {
         if (getenv(envProperty.c_str()) != nullptr) {
             _yamlConfig[key] = envProperty.c_str();
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
+        } else /*if (!HasProperty(key))*/ {
             _yamlConfig[key] = defaultValue;
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
-    void YamlConfiguration::DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue) {
+    void YamlConfiguration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
             _yamlConfig[key] = envProperty.c_str();
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
+        } else /*if (!HasProperty(key))*/ {
             _yamlConfig[key] = defaultValue;
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -201,7 +200,7 @@ namespace AwsMock::Core {
         if (getenv(envProperty.c_str()) != nullptr) {
             _yamlConfig[key] = envProperty.c_str();
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
+        } else /*if (!HasProperty(key))*/ {
             _yamlConfig[key] = defaultValue;
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -242,6 +241,20 @@ namespace AwsMock::Core {
         const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
         node.as<std::string>() = value;
         log_trace << "Value set, key: " << key;
+    }
+
+    void YamlConfiguration::SetValueByPath(const std::string &path, const std::string &value) const {
+        std::vector<std::string> paths = StringUtils::Split(path, '.');
+        if (paths.size() == 1) {
+            _yamlConfig[path[0]].as<std::string>() = value;
+        }
+        if (paths.size() == 2) {
+            _yamlConfig[path[0]][path[1]].as<std::string>() = value;
+        }
+        if (paths.size() == 3) {
+            _yamlConfig[path[0]][path[1]][path[2]].as<std::string>() = value;
+        }
+        log_trace << "Value set, key: " << path;
     }
 
     void YamlConfiguration::SetValue(const std::string &key, const bool value) const {
@@ -335,9 +348,15 @@ namespace AwsMock::Core {
     }
 
     bool YamlConfiguration::HasProperty(const std::string &key) const {
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        if (YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end())) {
-            return true;
+        const std::vector<std::string> paths = StringUtils::Split(key, '.');
+        if (paths.size() == 1) {
+            return _yamlConfig[paths[0]].IsDefined();
+        }
+        if (paths.size() == 2) {
+            return _yamlConfig[paths[0]].IsDefined() && _yamlConfig[paths[0]][paths[1]].IsDefined()
+        }
+        if (paths.size() == 3) {
+            return _yamlConfig[paths[0]].IsDefined() && _yamlConfig[paths[0]][paths[1]].IsDefined() && _yamlConfig[paths[0]][paths[1]][paths[2]].IsDefined();
         }
         return false;
     }

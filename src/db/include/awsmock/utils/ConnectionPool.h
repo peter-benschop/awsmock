@@ -7,8 +7,8 @@
 
 // C++ includes
 #include <memory>
-#include <string>
 #include <ranges>
+#include <string>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/document.hpp>
@@ -94,4 +94,3 @@ namespace AwsMock::Database {
 }// namespace AwsMock::Database
 
 #endif//AWSMOCK_CORE_CONNECTION_POOL_H
-

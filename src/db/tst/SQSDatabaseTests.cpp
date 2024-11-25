@@ -11,6 +11,9 @@
 // GTest includes
 #include <gtest/gtest.h>
 
+// Boost includes
+#include <boost/thread.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
@@ -348,7 +351,7 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(queue.queueArn, 1, 1, "", -1, messageList);
-        Poco::Thread::sleep(2000);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
 
         // act
         _sqsDatabase.ResetMessages(queue.queueArn, 1);
@@ -374,14 +377,15 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(queue.queueArn, 1, 1, "", 3, messageList);
         EXPECT_EQ(0, messageList.size());
-        Poco::Thread::sleep(2000);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
 
         // act
-        _sqsDatabase.ResetDelayedMessages(queue.queueArn, queueAttribute.delaySeconds);
-        long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+        const long delayed = _sqsDatabase.ResetDelayedMessages(queue.queueArn, queueAttribute.delaySeconds);
+        const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
+        EXPECT_TRUE(delayed > 0);
     }
 
     TEST_F(SQSDatabaseTest, MessageGetByReceiptHandleTest) {
@@ -412,7 +416,7 @@ namespace AwsMock::Database {
 
         // act
         message.status = Entity::SQS::MessageStatus::DELAYED;
-        Entity::SQS::Message result = _sqsDatabase.UpdateMessage(message);
+        const Entity::SQS::Message result = _sqsDatabase.UpdateMessage(message);
 
         // assert
         EXPECT_TRUE(result.oid == message.oid);
@@ -430,12 +434,13 @@ namespace AwsMock::Database {
         _sqsDatabase.ReceiveMessages(queue.queueArn, 30, 3, "", -1, messageList);
 
         // act
-        Entity::SQS::Message resultMessage = messageList[0];
-        _sqsDatabase.DeleteMessage(resultMessage);
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const Entity::SQS::Message resultMessage = messageList[0];
+        const long deleted = _sqsDatabase.DeleteMessage(resultMessage);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(0, result);
+        EXPECT_TRUE(deleted > 0);
     }
 
     TEST_F(SQSDatabaseTest, MessageDeleteQueueTest) {
@@ -447,11 +452,12 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateMessage(message);
 
         // act
-        _sqsDatabase.DeleteMessages(queue.queueArn);
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const long deleted = _sqsDatabase.DeleteMessages(queue.queueArn);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(0, result);
+        EXPECT_TRUE(deleted > 0);
     }
 
 }// namespace AwsMock::Database

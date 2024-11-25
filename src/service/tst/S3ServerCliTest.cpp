@@ -32,15 +32,15 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", GATEWAY_DEFAULT_HOST);
+            std::string _port = _configuration.GetValueString("awsmock.modules.sqs.http.port");
+            std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
 
             // Set test config
             std::string p = std::to_string(Core::RandomUtils::NextInt(32678, 65480));
-            _configuration.setString("awsmock.service.gateway.http.host", p);
+            _configuration.SetValue("awsmock.service.gateway.http.host", p);
             _endpoint = "http://localhost:" + p;
             std::cout << "port: " << p << std::endl;
 
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
         boost::thread _thread;
         boost::asio::io_service _ios{10};
         std::string _endpoint, _accountId, _output, _region;
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };

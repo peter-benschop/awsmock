@@ -22,7 +22,7 @@
 namespace AwsMock::Core {
 
     template<typename Iter>
-    YAML::Node lookup(YAML::Node node, Iter start, Iter end) {
+    YAML::Node lookup(const YAML::Node &node, Iter start, Iter end) {
         if (start == end) {
             return node;
         }
@@ -132,6 +132,14 @@ namespace AwsMock::Core {
          * @param value configuration value
          */
         void SetValue(const std::string &key, const std::string &value) const;
+
+        /**
+         * @brief Sets a string configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValueByPath(const std::string &key, const std::string &value) const;
 
         /**
          * @brief Returns a string configuration value

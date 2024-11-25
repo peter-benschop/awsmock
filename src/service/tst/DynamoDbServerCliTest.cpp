@@ -32,23 +32,20 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.dynamodb.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.dynamodb.http.host", GATEWAY_DEFAULT_HOST);
+            std::string _port = _configuration.GetValueString("awsmock.service.dynamodb.http.port");
+            std::string _host = _configuration.GetValueString("awsmock.service.dynamodb.http.host");
 
             // Setup gateway
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
+            _configuration.SetValue("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
             _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
-            //            _gatewayServer->Initialize();
-            //            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint http://localhost:8000");
-            //            _gatewayServer->Shutdown();
         }
 
         static std::string WriteItemFile() {
@@ -62,7 +59,7 @@ namespace AwsMock::Service {
 
         std::string _endpoint;
         boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };

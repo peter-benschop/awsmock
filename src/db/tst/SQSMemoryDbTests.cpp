@@ -11,6 +11,9 @@
 // GTest includes
 #include <gtest/gtest.h>
 
+// Boost include
+#include <boost/thread.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
@@ -314,11 +317,11 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(_queueArn, 1, 3, "", -1, messageList);
-        Poco::Thread().sleep(2000);
-        _sqsDatabase.ResetMessages(_queueUrl, 1);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        long reset = _sqsDatabase.ResetMessages(_queueUrl, 1);
 
         // act
-        _sqsDatabase.ResetMessages(_queueUrl, 1);
+        reset = _sqsDatabase.ResetMessages(_queueUrl, 1);
         const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
@@ -341,10 +344,10 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(queue.queueArn, 1, 3, "", 3, messageList);
         EXPECT_EQ(0, messageList.size());
-        Poco::Thread::sleep(2000);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
 
         // act
-        _sqsDatabase.ResetDelayedMessages(queue.queueArn, queueAttribute.delaySeconds);
+        long resets = _sqsDatabase.ResetDelayedMessages(queue.queueArn, queueAttribute.delaySeconds);
         const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
