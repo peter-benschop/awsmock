@@ -53,14 +53,14 @@ namespace AwsMock::Database {
         /**
          * @brief Check existence of a parameter by name
          *
-         * @param keyId key ID
+         * @param name parameter name
          * @return true if key already exists
          * @throws DatabaseException
          */
         bool ParameterExists(const std::string &name);
 
         /**
-         * @brief Returns a SMS parameter by primary key
+         * @brief Returns an SSM parameter by primary key
          *
          * @param oid key primary key
          * @return key entity

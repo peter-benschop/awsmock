@@ -18,7 +18,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/service/docker/DockerService.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {

@@ -45,9 +45,29 @@ namespace AwsMock::Service {
     using namespace std::chrono_literals;
 
     /**
-     * @brief Controls the connection to the docker daemon using a UNIX Domain socket.
+     * @brief Controls the connection to the container daemon using a UNIX Domain socket.
      *
-     * All docker related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc.
+     * @par
+     * All docker related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc. Supported
+     * are docker container and podman container. Set the appropriate active flag in the configuration file.
+     *
+     * In order to run docker container use:
+     * @code{.yaml}
+     * awsmock:
+     * ...
+     *   docker:
+     *     active: true
+     * ...
+     * @endcode
+     *
+     * To run it with podman
+     * @code{.yaml}
+     * awsmock:
+     * ...
+     *   podman:
+     *     active: true
+     * ...
+     * @endcode
      *
      * @par Linux
      * On Linux the service is using the docker REST API available at the UNIX domain socket. Depending on your Linux distribution the docker socket is located under
@@ -60,20 +80,20 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DockerService {
+    class ContainerService {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit DockerService();
+        explicit ContainerService();
 
         /**
          * @brief Singleton instance
          */
-        static DockerService &instance() {
-            static DockerService dockerService;
+        static ContainerService &instance() {
+            static ContainerService dockerService;
             return dockerService;
         }
 

@@ -7,9 +7,9 @@
 namespace AwsMock::Service {
     TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"),
                                                                          _transferDatabase(
-                                                                             Database::TransferDatabase::instance()) {
+                                                                                 Database::TransferDatabase::instance()) {
         // REST manager configuration
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.transfer.monitoring.period");
 
         // Check module active
@@ -37,8 +37,8 @@ namespace AwsMock::Service {
     void TransferServer::CreateTransferBucket() {
         Dto::S3::CreateBucketRequest request;
         request.name = "transfer-server";
-        request.owner = Core::YamlConfiguration::instance().GetValueString("awsmock.user");
-        request.region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
+        request.owner = Core::Configuration::instance().GetValueString("awsmock.user");
+        request.region = Core::Configuration::instance().GetValueString("awsmock.region");
         if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
             s3Service.CreateBucket(request);
         }
@@ -50,11 +50,10 @@ namespace AwsMock::Service {
         _transferServerList[server.serverId] = _ftpServer;
 
         // Get base dir
-        const std::string baseDir = Core::YamlConfiguration::instance().GetValueString(
-            "awsmock.modules.transfer.data-dir");
+        const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
 
         // Add users
-        for (const auto &user : server.users) {
+        for (const auto &user: server.users) {
             std::string homeDir = baseDir + Poco::Path::separator() + user.homeDirectory;
 
             // Ensure the home directory exists
@@ -87,7 +86,7 @@ namespace AwsMock::Service {
         log_debug << "Starting transfer servers";
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
-        for (auto &transfer : transfers) {
+        for (auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 StartTransferServer(transfer);
             }
@@ -98,7 +97,7 @@ namespace AwsMock::Service {
         log_trace << "Checking transfer servers";
         std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
-        for (auto &transfer : transfers) {
+        for (auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 if (auto it = _transferServerList.find(transfer.serverId); it == _transferServerList.end()) {
                     StartTransferServer(transfer);
@@ -112,7 +111,7 @@ namespace AwsMock::Service {
             }
         }
 
-        for (const auto &key : _transferServerList | std::views::keys) {
+        for (const auto &key: _transferServerList | std::views::keys) {
             if (!_transferDatabase.TransferExists(key)) {
                 Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(key);
                 StopTransferServer(server);
@@ -129,4 +128,4 @@ namespace AwsMock::Service {
 
         log_trace << "Transfer monitoring finished";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

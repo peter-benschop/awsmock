@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         }
 
         std::string _region;
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
         KMSService _kmsService;
     };

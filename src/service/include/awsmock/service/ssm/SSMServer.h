@@ -38,7 +38,7 @@ namespace AwsMock::Service {
         /**
          * @brief Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * @brief Metric service

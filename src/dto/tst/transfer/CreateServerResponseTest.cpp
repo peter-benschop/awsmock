@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Transfer {
         std::string _region;
         std::vector<std::string> _protocols = {"ftp", "sftp"};
         std::vector<Dto::Transfer::Tag> _tags = {{.key = "version", .value = "1.0"}};
-        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(CreateServerResponseTest, ToStringTest) {

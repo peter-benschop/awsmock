@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
     S3Server::S3Server(Core::PeriodicScheduler &scheduler) : AbstractServer("s3") {
         // Get HTTP configuration values
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.s3.monitoring.period");
         _syncPeriod = configuration.GetValueInt("awsmock.modules.s3.sync.object.period");
         _sizePeriod = configuration.GetValueInt("awsmock.modules.s3.sync.bucket.period");
@@ -31,8 +31,8 @@ namespace AwsMock::Service {
     }
 
     void S3Server::SyncObjects() const {
-        const std::string region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
-        const std::string s3DataDir = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
 
         Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
@@ -43,10 +43,10 @@ namespace AwsMock::Service {
 
         // Loop over buckets and do some maintenance work
         int filesDeleted = 0, objectsDeleted = 0;
-        for (auto &bucket : buckets) {
+        for (auto &bucket: buckets) {
             // Get objects and delete object, where the file is not existing anymore
-            for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object :
-                 objects) {
+            for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object:
+                                                                                                   objects) {
                 if (!Core::FileUtils::FileExists(s3DataDir + object.internalName)) {
                     _s3Database.DeleteObject(object);
                     log_debug << "Object deleted, internalName: " << object.internalName;
@@ -56,7 +56,7 @@ namespace AwsMock::Service {
         }
 
         if (const path p(s3DataDir); is_directory(p)) {
-            for (auto &entry : boost::make_iterator_range(directory_iterator(p), {})) {
+            for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
                 if (!_s3Database.ObjectExists(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::DeleteFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
@@ -65,11 +65,11 @@ namespace AwsMock::Service {
             }
         }
         log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted
- << " objectsDeleted: " << objectsDeleted;
+                  << " objectsDeleted: " << objectsDeleted;
     }
 
     void S3Server::SyncBuckets() const {
-        const std::string region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
+        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
 
         Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Bucket synchronization starting, bucketCount: " << buckets.size();
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
         }
 
         // Loop over buckets and do some maintenance work
-        for (auto &bucket : buckets) {
+        for (auto &bucket: buckets) {
             // Get objects and delete object, where the file is not existing anymore
             bucket.keys = _s3Database.GetBucketObjectCount(region, bucket.name);
             bucket.size = _s3Database.GetBucketSize(region, bucket.name);
@@ -97,14 +97,11 @@ namespace AwsMock::Service {
         _metricService.SetGauge(S3_OBJECT_COUNT, static_cast<double>(objects));
 
         // Count resources per topic
-        for (const auto &bucket : _s3Database.ListBuckets()) {
+        for (const auto &bucket: _s3Database.ListBuckets()) {
             std::string labelValue = Poco::replace(bucket.name, "-", "_");
             const long messagesPerTopic = _s3Database.ObjectCount(bucket.region, bucket.name);
-            _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT,
-                                    "bucket",
-                                    labelValue,
-                                    static_cast<double>(messagesPerTopic));
+            _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(messagesPerTopic));
         }
         log_trace << "S3 monitoring finished";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

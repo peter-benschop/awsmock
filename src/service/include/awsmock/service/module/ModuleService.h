@@ -47,10 +47,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param serverMap module map
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()){};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
          * @brief Return all list of all modules
@@ -78,9 +76,7 @@ namespace AwsMock::Service {
         /**
          * @brief Exports the current infrastructure
          *
-         * @param modules modules name list
-         * @param prettyPrint JSON pretty print, if true JSON indent = 4
-         * @param includeObjects include objects in the export
+         * @param request export infrstructure request
          * @return JSON string
          */
         Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request);
@@ -106,7 +102,7 @@ namespace AwsMock::Service {
          *
          * <p>Cleans all objects from the infrastructure. This means all SQS resources, SNS resources, S3 object keys, etc. will be deleted.</p>
          *
-         * @param modules modules list
+         * @param request clean infrastructure request
          */
         static void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request);
 

@@ -30,7 +30,7 @@ namespace AwsMock::Core {
         /**
          * @brief Convert from JSON object
          *
-         * @param JSON object
+         * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 

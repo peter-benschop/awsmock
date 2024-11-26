@@ -9,8 +9,8 @@ namespace AwsMock::Service {
     DynamoDbService::DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
         // DynamoDB docker host, port
-        _dockerHost = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.dynamodb.container.host");
-        _dockerPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.dynamodb.container.port");
+        _dockerHost = Core::Configuration::instance().GetValueString("awsmock.modules.dynamodb.container.host");
+        _dockerPort = Core::Configuration::instance().GetValueInt("awsmock.modules.dynamodb.container.port");
     }
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) {
@@ -55,8 +55,8 @@ namespace AwsMock::Service {
         try {
 
             // Send request to docker container
-            Dto::DynamoDb::DynamoDbResponse response = SendDynamoDbRequest(request.body, request.headers);
-            listTableResponse = {.body = response.body, .headers = response.headers, .status = response.status};
+            auto [body, headers, status] = SendDynamoDbRequest(request.body, request.headers);
+            listTableResponse = {.body = body, .headers = headers, .status = status};
             log_info << "DynamoDb list tables, region: " << request.region;
 
         } catch (Poco::Exception &exc) {

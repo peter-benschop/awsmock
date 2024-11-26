@@ -29,7 +29,7 @@ namespace AwsMock::Database {
         void TearDown() override {
         }
 
-        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
         DatabaseBase _database = DatabaseBase();
     };
 

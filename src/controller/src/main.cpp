@@ -43,7 +43,7 @@ static std::list<std::string> allowedActions() {
 void ShowHelp(const boost::program_options::options_description &desc) {
     constexpr int leftIndent = 40;
     std::cout << std::endl
-              << "AwsMock controller v" << AwsMock::Core::YamlConfiguration::GetVersion() << std::endl
+              << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awsmockctl [Options] Commands" << std::endl
@@ -115,13 +115,13 @@ int main(const int argc, char *argv[]) {
     // Show version
     if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock controller v" << AwsMock::Core::YamlConfiguration::GetVersion() << std::endl
+                  << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read configuration.
-    AwsMock::Core::YamlConfiguration &configuration = AwsMock::Core::YamlConfiguration::instance();
+    AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
     if (vm.contains("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
@@ -131,7 +131,7 @@ int main(const int argc, char *argv[]) {
     // Set log level.
     if (vm.contains("loglevel")) {
         const std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::YamlConfiguration::instance().SetValue("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
         AwsMock::Core::LogStream::SetSeverity("info");
@@ -140,7 +140,7 @@ int main(const int argc, char *argv[]) {
     // Set log file
     if (vm.contains("logfile")) {
         const std::string value = vm["logfile"].as<std::string>();
-        AwsMock::Core::YamlConfiguration::instance().SetValue("awsmock.logging.file", value);
+        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.file", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }
 

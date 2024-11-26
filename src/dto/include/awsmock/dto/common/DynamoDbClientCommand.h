@@ -125,7 +125,7 @@ namespace AwsMock::Dto::Common {
          *
          * @return output stream
          */
-        std::string _secretAccessKey = Core::YamlConfiguration::instance().GetValueString("awsmock.secret.access.key");
+        std::string _secretAccessKey = Core::Configuration::instance().GetValueString("awsmock.secret.access.key");
     };
 
 }// namespace AwsMock::Dto::Common

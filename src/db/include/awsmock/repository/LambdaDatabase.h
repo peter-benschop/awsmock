@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/YamlConfiguration.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/memorydb/LambdaMemoryDb.h>
@@ -192,7 +192,7 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param prefix name prefix
-         * @param maxResult maximal number of results
+         * @param maxResults maximal number of results
          * @param skip number of records to skip
          * @param sortColumns sorting columns
          * @return list of lambda function counters

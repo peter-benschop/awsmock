@@ -39,6 +39,8 @@ namespace AwsMock::Service {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    typedef std::map<std::string, std::shared_ptr<AbstractHandler>> RoutingTable;
+
     /**
      * @brief HTTP session manager
      *
@@ -185,8 +187,7 @@ namespace AwsMock::Service {
         /**
          * Routine table
          */
-        typedef std::map<std::string, std::shared_ptr<AbstractHandler>> RoutingTable;
-        static RoutingTable _routingTable;
+        RoutingTable _routingTable;
 
         /**
          * Metric service

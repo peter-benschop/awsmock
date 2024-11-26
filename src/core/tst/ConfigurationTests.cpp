@@ -10,18 +10,19 @@
 
 // Local includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/core/config/YamlConfiguration.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
     class ConfigurationTest : public ::testing::Test {
-        protected:
-            void SetUp() override {
-            }
+      protected:
 
-            void TearDown() override {
-            }
+        void SetUp() override {
+        }
 
-            //YamlConfiguration _configuration = YamlConfiguration(TMP_PROPERTIES_FILE);
+        void TearDown() override {
+        }
+
+        //YamlConfiguration _configuration = YamlConfiguration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(ConfigurationTest, EmptyFilenameTest) {
@@ -30,22 +31,21 @@ namespace AwsMock::Core {
         // act
         EXPECT_THROW({
                      try {
-                     auto configuration = YamlConfiguration("");
+                     auto configuration = Configuration("");
                      } catch (const CoreException &e) {
                      EXPECT_STREQ("Empty filename", e.message().c_str());
                      throw;
-                     } },
-                     CoreException);
+                     } }, CoreException);
 
         // assert
     }
 
     TEST_F(ConfigurationTest, ConstructorTest) {
         // arrange
-        const YamlConfiguration *configuration = nullptr;
+        Configuration *configuration = nullptr;
 
         // act
-        EXPECT_NO_THROW({ configuration = new YamlConfiguration(TMP_PROPERTIES_FILE); });
+        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
         EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
@@ -54,8 +54,8 @@ namespace AwsMock::Core {
 
     TEST_F(ConfigurationTest, SetValueTest) {
         // arrange
-        YamlConfiguration *configuration = nullptr;
-        EXPECT_NO_THROW({ configuration = new YamlConfiguration(TMP_PROPERTIES_FILE); });
+        Configuration *configuration = nullptr;
+        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // act
         if (configuration != nullptr) {
@@ -69,10 +69,10 @@ namespace AwsMock::Core {
     TEST_F(ConfigurationTest, EnvironmentTest) {
         // arrange
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
-        const YamlConfiguration *configuration = nullptr;
+        Configuration *configuration = nullptr;
 
         // act
-        EXPECT_NO_THROW({ configuration = new YamlConfiguration(TMP_PROPERTIES_FILE); });
+        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
         if (configuration != nullptr) {
@@ -86,14 +86,14 @@ namespace AwsMock::Core {
     TEST_F(ConfigurationTest, YamlConfiggurationTest) {
         // arrange
         const std::string yamlString = "awsmock:\n\t"
-                "region: eu-central-1\n\t"
-                "user: none\n\t"
-                "access: \n\t\t"
-                "key-id: none\n\t\t"
-                "secret-access-key: none\n\t\t"
-                "account-id: 000000000000\n\t\t";
+                                       "region: eu-central-1\n\t"
+                                       "user: none\n\t"
+                                       "access: \n\t\t"
+                                       "key-id: none\n\t\t"
+                                       "secret-access-key: none\n\t\t"
+                                       "account-id: 000000000000\n\t\t";
         const std::string yamlFile = FileUtils::CreateTempFile("yaml", yamlString);
-        const auto configuration = YamlConfiguration(yamlFile);
+        auto configuration = Configuration(yamlFile);
 
         // act
         const std::string region = configuration.GetValueString("awsmock.region");
@@ -103,6 +103,6 @@ namespace AwsMock::Core {
         EXPECT_TRUE(region == "eu-central-1");
         EXPECT_TRUE(keyId == "none");
     }
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_CONFIGURATION_TEST_H

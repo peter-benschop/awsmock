@@ -44,7 +44,7 @@ namespace AwsMock::Dto::Cognito {
          * @param userPoolEntity user pool entity
          * @return UserPool DTO
          */
-        static Dto::Cognito::UserPool map(const Database::Entity::Cognito::UserPool &userPoolEntity);
+        static UserPool map(const Database::Entity::Cognito::UserPool &userPoolEntity);
 
         /**
          * @brief Maps a list of user pool entities to a list of user pool DTOs
@@ -52,7 +52,7 @@ namespace AwsMock::Dto::Cognito {
          * @param userPoolEntities list of user pool entities
          * @return vector of UserPool DTOs
          */
-        static std::vector<Dto::Cognito::UserPool> map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities);
+        static std::vector<UserPool> map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities);
 
         /**
          * @brief Maps a user entity to a user DTO
@@ -60,7 +60,7 @@ namespace AwsMock::Dto::Cognito {
          * @param userEntity user entity
          * @return User DTO
          */
-        static Dto::Cognito::User map(const Database::Entity::Cognito::User &userEntity);
+        static User map(const Database::Entity::Cognito::User &userEntity);
 
         /**
          * @brief Map a list of entities to DTOs
@@ -68,7 +68,7 @@ namespace AwsMock::Dto::Cognito {
          * @param userEntities user entities
          * @return user DTOs
          */
-        static std::vector<Dto::Cognito::User> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
+        static std::vector<User> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
 
         /**
          * @brief Maps a group entity to a group DTO
@@ -76,7 +76,7 @@ namespace AwsMock::Dto::Cognito {
          * @param groupEntity group entity
          * @return Group DTO
          */
-        static Dto::Cognito::Group map(const Database::Entity::Cognito::Group &groupEntity);
+        static Group map(const Database::Entity::Cognito::Group &groupEntity);
 
         /**
          * @brief Maps a list of cognito user pools a list user pool response
@@ -89,7 +89,7 @@ namespace AwsMock::Dto::Cognito {
          * @return ListUserPoolResponse
          * @see ListUserPoolResponse
          */
-        static Dto::Cognito::ListUserPoolResponse map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, long total);
+        static ListUserPoolResponse map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, long total);
 
         /**
          * @brief Maps a list of cognito user pool clients to a list user pool clients response
@@ -97,11 +97,11 @@ namespace AwsMock::Dto::Cognito {
          * Some values will be pulled over from the request.
          *
          * @param request original request
-         * @param userPool cognito user pool entity
+         * @param userPoolClient cognito user pool client entity
          * @return ListUserPoolClientsResponse
          * @see ListUserPoolClientsResponse
          */
-        static Dto::Cognito::ListUserPoolClientsResponse map(const ListUserPoolClientsRequest &request, const std::vector<Database::Entity::Cognito::UserPoolClient> &userPoolClient);
+        static ListUserPoolClientsResponse map(const ListUserPoolClientsRequest &request, const std::vector<Database::Entity::Cognito::UserPoolClient> &userPoolClient);
 
         /**
          * @brief Maps a user pool domain DTO to an entity
@@ -128,7 +128,7 @@ namespace AwsMock::Dto::Cognito {
          * @return UserPoolClient
          * @see UserPoolClient
          */
-        static Dto::Cognito::UserPoolClient map(const Database::Entity::Cognito::UserPoolClient &clientEntity);
+        static UserPoolClient map(const Database::Entity::Cognito::UserPoolClient &clientEntity);
 
         /**
          * @brief Maps a create group DTO request to an entity
@@ -147,7 +147,7 @@ namespace AwsMock::Dto::Cognito {
          * @return CreateGroupResponse
          * @see CreateGroupResponse
          */
-        static Dto::Cognito::CreateGroupResponse map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group);
+        static CreateGroupResponse map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group);
 
         /**
          * @brief Maps a list of cognito groups to a list group response
@@ -159,7 +159,7 @@ namespace AwsMock::Dto::Cognito {
          * @return ListGroupResponse
          * @see ListGroupResponse
          */
-        static Dto::Cognito::ListGroupsResponse map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList);
+        static ListGroupsResponse map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList);
 
         /**
          * @brief Maps a list of cognito users in a group to a list user in group response
@@ -171,7 +171,7 @@ namespace AwsMock::Dto::Cognito {
          * @return ListUsersInGroupResponse
          * @see ListUsersInGroupResponse
          */
-        static Dto::Cognito::ListUsersInGroupResponse map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList);
+        static ListUsersInGroupResponse map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList);
 
         /**
          * @brief Maps a user pool to a describe user pool response
@@ -183,29 +183,30 @@ namespace AwsMock::Dto::Cognito {
          * @return DescribeUserPoolResponse
          * @see DescribeUserPoolResponse
          */
-        static Dto::Cognito::DescribeUserPoolResponse map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool);
+        static DescribeUserPoolResponse map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool);
 
         /**
          * @brief Converts a validity with validity units to seconds
          *
          * @param validity validity value
-         * @param units validity unit
+         * @param validityUnits validity unit
          * @return validity in seconds
          */
-        static long GetValidityInSeconds(long validity, ValidityUnits units);
+        static long GetValidityInSeconds(long validity, ValidityUnits validityUnits);
 
         /**
          * @brief Returns the maximum validity units
          *
          * @param validity
-         * @return
+         * @return validity units
          */
         static ValidityUnits GetMaxTokenUnits(long validity);
 
         /**
          * @brief Returns the scaled validity
          *
-         * @param validity validity in seconds
+         * @param validity validity value
+         * @param validityUnits validity units
          * @return validity in hours, minutes, days, seconds
          */
         static long GetMaxValidityToken(long validity, ValidityUnits validityUnits);

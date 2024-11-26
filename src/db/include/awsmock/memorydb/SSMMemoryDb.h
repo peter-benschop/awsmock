@@ -52,7 +52,7 @@ namespace AwsMock::Database {
         /**
          * @brief Check existence of a parameter by name
          *
-         * @param keyId key ID
+         * @param name parameter name
          * @return true if key already exists
          * @throws DatabaseException
          */
@@ -68,9 +68,9 @@ namespace AwsMock::Database {
         Entity::SSM::Parameter GetParameterById(const std::string &oid);
 
         /**
-         * @brief Returns a SMS parameter by name
+         * @brief Returns an SSM parameter by name
          *
-         * @param oid key primary key
+         * @param name parameter name
          * @return key entity
          * @throws DatabaseException
          */
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
         void DeleteParameter(const Entity::SSM::Parameter &parameter);
 
         /**
-         * @brief Delete a all parameters
+         * @brief Deletes all parameters
          *
          * @throws DatabaseException
          */

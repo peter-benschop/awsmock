@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     KMSServer::KMSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // HTTP manager configuration
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &configuration = Core::Configuration::instance();
         _removePeriod = configuration.GetValueInt("awsmock.modules.kms.remove.period");
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.kms.monitoring.period");
         log_debug << "KMS server initialized";

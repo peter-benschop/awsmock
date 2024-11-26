@@ -134,7 +134,7 @@ namespace AwsMock::Service {
 
         std::string _region, _baseUrl;
         boost::asio::io_service _ios{10};
-        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &_configuration = Core::Configuration::instance();
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         std::shared_ptr<GatewayServer> _gatewayServer;

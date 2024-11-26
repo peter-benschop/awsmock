@@ -46,7 +46,7 @@ namespace AwsMock::Database {
         }
 
         std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         SQSDatabase &_sqsDatabase = SQSDatabase::instance();
     };
 
@@ -401,11 +401,12 @@ namespace AwsMock::Database {
 
         // act
         const Entity::SQS::Message resultMessage = messageList[0];
-        _sqsDatabase.DeleteMessage(resultMessage);
+        const long deleted = _sqsDatabase.DeleteMessage(resultMessage);
         const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(0, result);
+        EXPECT_TRUE(deleted > 0);
     }
 
     TEST_F(SQSMemoryDbTest, MessageDeleteQueueTest) {
@@ -422,11 +423,12 @@ namespace AwsMock::Database {
         _sqsDatabase.CreateMessage(message);
 
         // act
-        _sqsDatabase.DeleteMessages(_queueArn);
+        const long deleted = _sqsDatabase.DeleteMessages(_queueArn);
         const long result = _sqsDatabase.CountMessages(_queueArn);
 
         // assert
         EXPECT_EQ(0, result);
+        EXPECT_TRUE(deleted > 0);
     }
 
 }// namespace AwsMock::Database

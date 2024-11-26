@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -146,7 +146,7 @@ namespace AwsMock::Service {
          *
          * @param request S3 purge request
          */
-        void PurgeBucket(const Dto::S3::PurgeBucketRequest &request);
+        void PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const;
 
         /**
          * @brief Updates a bucket
@@ -342,7 +342,7 @@ namespace AwsMock::Service {
          * @param eventNotification S3 event notification
          * @param lambdaNotification S3 lambda notification
          */
-        void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification);
+        void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const;
 
         /**
          * @brief Check for bucket notifications.

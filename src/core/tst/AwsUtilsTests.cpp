@@ -31,7 +31,7 @@ namespace AwsMock::Core {
       protected:
 
         std::string _region, _accountId, _endpoint;
-        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(AwsUtilsTest, CreateS3ArnTest) {

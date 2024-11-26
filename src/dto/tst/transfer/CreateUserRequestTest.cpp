@@ -37,7 +37,7 @@ namespace AwsMock::Dto::Transfer {
         }
 
         std::string _region;
-        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(CreateUserRequestTest, ToStringTest) {

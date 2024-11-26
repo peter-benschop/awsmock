@@ -201,8 +201,7 @@ namespace AwsMock::Service {
         /**
          * @brief Deletes a cognito user pool client
          *
-         * @param request create user pool client request
-         * @return CreateUserPoolClientResponse DTO
+         * @param request delete user pool client request
          */
         void DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request) const;
 

@@ -10,9 +10,9 @@
 
 // AwsMock includes
 #include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/config/YamlConfiguration.h>
+#include <awsmock/core/config/Configuration.h>
 
-#define TMP_PROPERTIES_FILE "/tmp/awsmock.properties"
+#define TMP_PROPERTIES_FILE "/tmp/awsmock.yml"
 #define JAVA std::string("/usr/lib/jvm/java-21-openjdk-amd64/bin/java")
 
 namespace AwsMock::Core {
@@ -46,7 +46,7 @@ namespace AwsMock::Core {
          * @param withDatabase run with MongoDB database
          * @return name of the generated test configuration file
          */
-        static YamlConfiguration &GetTestConfiguration(bool withDatabase = true);
+        static Configuration &GetTestConfiguration(bool withDatabase = true);
 
         /**
          * @brief Send a CLI command

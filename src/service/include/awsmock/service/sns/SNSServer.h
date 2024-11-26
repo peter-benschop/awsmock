@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Synchronizes the topic available messages counters.
          */
-        void SychronizeCounters() const;
+        void SynchronizeCounters() const;
 
         /**
          * @brief Update counters

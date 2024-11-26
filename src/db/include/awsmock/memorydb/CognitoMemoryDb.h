@@ -165,7 +165,6 @@ namespace AwsMock::Database {
          * Check existence of cognito user
          *
          * @param region AWS region name
-         * @param userPoolId user pool ID
          * @param userName name of the user
          * @return true if cognito user exists
          * @throws DatabaseException

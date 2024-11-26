@@ -393,7 +393,6 @@ namespace AwsMock::Core {
          * @brief Return a simple ok response (200)
          *
          * @param request HTTP request
-         * @param reason reason string
          * @return HTTP response
          */
         static http::response<http::dynamic_body> Ok(const http::request<http::dynamic_body> &request);
@@ -402,7 +401,6 @@ namespace AwsMock::Core {
          * @brief Return a simple ok response (200)
          *
          * @param request HTTP request
-         * @param reason reason string
          * @return HTTP response
          */
         static http::response<http::string_body> Ok(const http::request<http::string_body> &request);

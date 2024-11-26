@@ -43,7 +43,7 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
-#include <awsmock/service/docker/DockerService.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -85,7 +85,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -255,7 +255,7 @@ namespace AwsMock::Service {
          * host machine, the hostname to which we need to send the invocation notification differs. For a host manager we need
          * to use 'localhost', for a dockerized manager we need to use the container name.
          *
-         * @param lambda lambda entity to check
+         * @param instance lambda instance to check
          * @return containerId of the idle instance
          */
         static std::string GetHostname(Database::Entity::Lambda::Instance &instance);
@@ -268,7 +268,7 @@ namespace AwsMock::Service {
          * host machine, the port to which we need to send the invocation notification differs. For a host manager we need
          * to use the container exposed port, for a dockerized manager we need to use the container internal port, i.e. 8080.
          *
-         * @param lambda lambda entity to check
+         * @param instance lambda instance to check
          * @return containerId of the idle instance
          */
         static int GetContainerPort(const Database::Entity::Lambda::Instance &instance);

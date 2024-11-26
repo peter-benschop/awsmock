@@ -35,14 +35,12 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleHandler : public AbstractHandler {
+    class ModuleHandler final : public AbstractHandler {
 
       public:
 
         /**
          * @brief Manager HTTP server
-         *
-         * @param serverMap currently running servers
          */
         explicit ModuleHandler() = default;
 
@@ -52,6 +50,8 @@ namespace AwsMock::Service {
          * Handles all GET requests.
          *
          * @param request HTTP request
+         * @param region AWS region
+         * @param user AWS user
          * @return HTTP response structure
          */
         http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
@@ -62,9 +62,11 @@ namespace AwsMock::Service {
          * Handles all POST requests.
          *
          * @param request HTTP request
+         * @param region AWS region
+         * @param user AWS user
          * @return HTTP response structure
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

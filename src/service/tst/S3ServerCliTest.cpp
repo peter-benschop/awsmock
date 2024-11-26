@@ -62,7 +62,7 @@ namespace AwsMock::Service {
         boost::thread _thread;
         boost::asio::io_service _ios{10};
         std::string _endpoint, _accountId, _output, _region;
-        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };

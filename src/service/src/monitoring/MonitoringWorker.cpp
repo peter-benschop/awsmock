@@ -10,7 +10,7 @@ namespace AwsMock::Service::Monitoring {
 
         log_trace << "Monitoring worker starting";
 
-        const int retentionPeriod = Core::YamlConfiguration::instance().GetValueInt("awsmock.monitoring.retention");
+        const int retentionPeriod = Core::Configuration::instance().GetValueInt("awsmock.monitoring.retention");
         const long deletedCount = _monitoringDatabase.DeleteOldMonitoringData(retentionPeriod);
 
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;

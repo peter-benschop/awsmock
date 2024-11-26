@@ -5,29 +5,29 @@
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
-    GatewaySession::RoutingTable GatewaySession::_routingTable = {
-        {"s3", std::make_shared<S3Handler>()},
-        {"s3api", std::make_shared<S3Handler>()},
-        {"sqs", std::make_shared<SQSHandler>()},
-        {"sns", std::make_shared<SNSHandler>()},
-        {"lambda", std::make_shared<LambdaHandler>()},
-        {"transfer", std::make_shared<TransferHandler>()},
-        {"cognito-idp", std::make_shared<CognitoHandler>()},
-        {"cognito-identity", std::make_shared<CognitoHandler>()},
-        {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
-        {"kms", std::make_shared<KMSHandler>()},
-        {"ssm", std::make_shared<SSMHandler>()},
-        {"dynamodb", std::make_shared<DynamoDbHandler>()},
-        {"monitoring", std::make_shared<MonitoringHandler>()},
-        {"module", std::make_shared<ModuleHandler>()}
-    };
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValueInt("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
         _timeout = configuration.GetValueInt("awsmock.gateway.http.timeout");
         _verifySignature = configuration.GetValueBool("awsmock.aws.signature.verify");
+
+        _routingTable = {
+                {"s3", std::make_shared<S3Handler>()},
+                {"s3api", std::make_shared<S3Handler>()},
+                {"sqs", std::make_shared<SQSHandler>()},
+                {"sns", std::make_shared<SNSHandler>()},
+                {"lambda", std::make_shared<LambdaHandler>()},
+                {"transfer", std::make_shared<TransferHandler>()},
+                {"cognito-idp", std::make_shared<CognitoHandler>()},
+                {"cognito-identity", std::make_shared<CognitoHandler>()},
+                {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
+                {"kms", std::make_shared<KMSHandler>()},
+                {"ssm", std::make_shared<SSMHandler>()},
+                {"dynamodb", std::make_shared<DynamoDbHandler>()},
+                {"monitoring", std::make_shared<MonitoringHandler>()},
+                {"module", std::make_shared<ModuleHandler>()}};
     };
 
     void GatewaySession::Run() {
@@ -89,8 +89,9 @@ namespace AwsMock::Service {
     //
     // The concrete type of the response message (which depends on the
     // request), is type-erased in message_generator.
-    template<class Body, class Allocator> http::message_generator GatewaySession::HandleRequest(
-        http::request<Body, http::basic_fields<Allocator> > &&request) {
+    template<class Body, class Allocator>
+    http::message_generator GatewaySession::HandleRequest(
+            http::request<Body, http::basic_fields<Allocator>> &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -108,8 +109,7 @@ namespace AwsMock::Service {
         }
 
         // Request path must be absolute and not contain "..".
-        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") !=
-            boost::beast::string_view::npos) {
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
             return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
             return HandleOptionsRequest(request);
         } else {
             std::shared_ptr<AbstractHandler> handler;
-            std::string region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
+            std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
             if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
                 std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
                 handler = _routingTable[target];
@@ -139,31 +139,31 @@ namespace AwsMock::Service {
 
             if (handler) {
                 switch (request.method()) {
-                case http::verb::get: {
-                    Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                    return handler->HandleGetRequest(request, region, "none");
-                }
-                case http::verb::put: {
-                    Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                    return handler->HandlePutRequest(request, region, "none");
-                }
-                case http::verb::post: {
-                    Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                    return handler->HandlePostRequest(request, region, "none");
-                }
-                case http::verb::delete_: {
-                    Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                    return handler->HandleDeleteRequest(request, region, "none");
-                }
-                case http::verb::head: {
-                    Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                    return handler->HandleHeadRequest(request, region, "none");
-                }
+                    case http::verb::get: {
+                        Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
+                        return handler->HandleGetRequest(request, region, "none");
+                    }
+                    case http::verb::put: {
+                        Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
+                        return handler->HandlePutRequest(request, region, "none");
+                    }
+                    case http::verb::post: {
+                        Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
+                        return handler->HandlePostRequest(request, region, "none");
+                    }
+                    case http::verb::delete_: {
+                        Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
+                        return handler->HandleDeleteRequest(request, region, "none");
+                    }
+                    case http::verb::head: {
+                        Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
+                        Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
+                        return handler->HandleHeadRequest(request, region, "none");
+                    }
                 }
             }
         }
@@ -239,11 +239,11 @@ namespace AwsMock::Service {
             try {
                 Poco::RegularExpression::MatchVec posVec;
                 if (const Poco::RegularExpression pattern(
-                        R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)")
-                    ; !pattern.match(authorizationHeader, 0, posVec)) {
+                            R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
+                    !pattern.match(authorizationHeader, 0, posVec)) {
                     log_error << "Could not extract authorization, authorization: " << authorizationHeader;
                     throw Core::UnauthorizedException(
-                        "Could not extract authorization, authorization: " + authorizationHeader);
+                            "Could not extract authorization, authorization: " + authorizationHeader);
                 }
                 authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
                 authKeys.dateTime = authorizationHeader.substr(posVec[2].offset, posVec[2].length);
@@ -252,8 +252,7 @@ namespace AwsMock::Service {
                 authKeys.requestVersion = authorizationHeader.substr(posVec[5].offset, posVec[5].length);
                 authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
                 authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
-                authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.
-                        requestVersion;
+                authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
                 return authKeys;
             } catch (Poco::Exception &e) {
                 log_error << e.message();
@@ -261,7 +260,7 @@ namespace AwsMock::Service {
         } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
-                authKeys.region = Core::YamlConfiguration::instance().GetValueString("awsmock.region");
+                authKeys.region = Core::Configuration::instance().GetValueString("awsmock.region");
             }
 
             return authKeys;
@@ -270,7 +269,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(
-        const http::request<http::dynamic_body> &request) {
+            const http::request<http::dynamic_body> &request) {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
@@ -290,4 +289,4 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -247,7 +247,7 @@ namespace AwsMock::Database {
          *
          * @param queueArn queue URL.
          * @param delay delay in seconds.
-         * @reset number of delayed messages
+         * @return number of delayed messages
          */
         long ResetDelayedMessages(const std::string &queueArn, long delay);
 

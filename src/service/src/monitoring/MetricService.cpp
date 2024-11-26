@@ -10,7 +10,7 @@ namespace AwsMock::Monitoring {
 
     MetricService::MetricService() : _database(Database::MonitoringDatabase::instance()) {
 
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _port = configuration.GetValueInt("awsmock.monitoring.port");
     }
 

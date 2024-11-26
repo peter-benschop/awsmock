@@ -54,7 +54,7 @@ namespace AwsMock::Service {
          * @brief Checks the existence of a module server
          *
          * @param name name of the module
-         * @param true if existing
+         * @return true if existing
          */
         bool HasModule(const std::string &name);
 

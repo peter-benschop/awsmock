@@ -19,19 +19,20 @@ namespace AwsMock::Core {
         constexpr int port = 14566;
         const std::string hostName = SystemUtils::GetNodeName();
 
-        const YamlConfiguration config;
-        /*config.SetValue("awsmock.region", "eu-central-1");
+        const Configuration config;
+        config.SetValue("awsmock.region", "eu-central-1");
         config.SetValue("awsmock.access.account-id", "000000000000");
         config.SetValue("awsmock.access.client-id", "00000000");
         config.SetValue("awsmock.user", "none");
         config.SetValue("awsmock.data.dir", "/tmp/awsmock/data");
+        // Gateway
         config.SetValue("awsmock.gateway.active", true);
         config.SetValue("awsmock.gateway.host", hostName);
         config.SetValue("awsmock.gateway.port", port);
         config.SetValue("awsmock.gateway.address", "0.0.0.0");
         config.SetValue("awsmock.gateway.max-queue", 10);
         config.SetValue("awsmock.gateway.max-threads", 10);
-        config.SetValue("awsmock.gateway.timeout", 10);*/
+        config.SetValue("awsmock.gateway.timeout", 10);
         /*
         // Mongo DB
         ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
@@ -97,9 +98,9 @@ namespace AwsMock::Core {
         return TMP_PROPERTIES_FILE;
     }
 
-    YamlConfiguration &TestUtils::GetTestConfiguration(bool withDatabase) {
+    Configuration &TestUtils::GetTestConfiguration(bool withDatabase) {
         CreateTestConfigurationFile(withDatabase);
-        YamlConfiguration &configuration = YamlConfiguration::instance();
+        Configuration &configuration = Configuration::instance();
         configuration.SetFilename(GetTestConfigurationFilename());
         return configuration;
     }
@@ -107,4 +108,4 @@ namespace AwsMock::Core {
     ExecResult TestUtils::SendCliCommand(const std::string &command) {
         return SystemUtils::Exec(command);
     }
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

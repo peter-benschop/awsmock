@@ -13,10 +13,6 @@
 #include <boost/lexical_cast.hpp>
 
 // AwsMock includes
-#include "awsmock/service/docker/DockerService.h"
-#include "awsmock/service/monitoring/MetricDefinition.h"
-#include "awsmock/service/monitoring/MetricService.h"
-#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
@@ -46,15 +42,19 @@
 #include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
 
     /**
      * @brief DynamoDb module service.
      *
-     * Handles all DynamoDb related requests. The DynamoDB itself runs as docker container on the local host. It will started via the DynamoDB server automatically
-     * as soon as the server starts. DynamoDB commands will be send via HTTP to the DynamoDB docker container on port 8000. THe docker posrt can be configured in the
-     * AwsMock configuration properties.
+     * Handles all DynamoDb related requests. The DynamoDB itself runs as docker container on the local host. It will start the DynamoDB server automatically as soon
+     * as the server starts. DynamoDB commands will be sent via HTTP to the DynamoDB docker container on port 8000. THe docker posrt can be configured in the AwsMock
+     * configuration properties.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

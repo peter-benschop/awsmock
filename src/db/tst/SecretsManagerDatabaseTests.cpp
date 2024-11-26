@@ -34,7 +34,7 @@ namespace AwsMock::Database {
         }
 
         std::string _region;
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         SecretsManagerDatabase &_secretsManagerDatabase = SecretsManagerDatabase::instance();
     };
 

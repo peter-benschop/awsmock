@@ -36,7 +36,7 @@ namespace AwsMock::Service {
          *
          * @param configuration application configuration
          */
-        explicit SecretsManagerCmdHandler(Core::YamlConfiguration &configuration);
+        explicit SecretsManagerCmdHandler(Core::Configuration &configuration);
 
       protected:
 
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         /**
          * Configuration
          */
-        Core::YamlConfiguration &_configuration;
+        Core::Configuration &_configuration;
 
         /**
          * Secrets manager module

@@ -18,7 +18,7 @@
 #include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>
-#include <awsmock/core/config/YamlConfiguration.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
@@ -120,7 +120,7 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param prefix name prefix
-         * @param maxResult maximal number of results
+         * @param maxResults maximal number of results
          * @param skip number of records to skip
          * @param sortColumns sorting columns
          * @return BucketList
@@ -309,12 +309,12 @@ namespace AwsMock::Database {
          */
         Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {});
 
-        /**
-         * @brief List all objects.
-         *
-         * @param prefix S3 key prefix
-         * @return ObjectList
-         */
+        // /**
+        //  * @brief List all objects.
+        //  *
+        //  * @param prefix S3 key prefix
+        //  * @return ObjectList
+        //  */
         //Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
 
         /**

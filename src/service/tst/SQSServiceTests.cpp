@@ -37,7 +37,7 @@ namespace AwsMock::Service {
             _database.DeleteAllMessages();
         }
 
-        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_database = Database::SQSDatabase::instance();
         SQSService _service;
     };

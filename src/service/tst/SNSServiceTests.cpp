@@ -40,7 +40,7 @@ namespace AwsMock::Service {
             _sqsDatabase.DeleteAllQueues();
         }
 
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
         SNSService _snsService;

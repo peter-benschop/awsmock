@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
     boost::beast::http::response<boost::beast::http::dynamic_body> ModuleHandler::HandleGetRequest(const boost::beast::http::request<boost::beast::http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &configuration = Core::Configuration::instance();
         Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
         Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
 

@@ -6,13 +6,13 @@
 
 namespace AwsMock::Service {
     DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb"),
-                                                                         _containerService(DockerService::instance()),
+                                                                         _containerService(ContainerService::instance()),
                                                                          _dynamoDbDatabase(
-                                                                             Database::DynamoDbDatabase::instance()),
+                                                                                 Database::DynamoDbDatabase::instance()),
                                                                          _metricService(
-                                                                             Monitoring::MetricService::instance()) {
+                                                                                 Monitoring::MetricService::instance()) {
         // Get HTTP configuration values
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &configuration = Core::Configuration::instance();
         _workerPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.worker.period");
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.monitoring.period");
         _containerHost = configuration.GetValueString("awsmock.modules.dynamodb.container.host");
@@ -62,8 +62,9 @@ namespace AwsMock::Service {
 
         // Start docker container, in case it is not already running.
         if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(
-            DYNAMODB_DOCKER_IMAGE,
-            DYNAMODB_DOCKER_TAG); container.state != "running") {
+                    DYNAMODB_DOCKER_IMAGE,
+                    DYNAMODB_DOCKER_TAG);
+            container.state != "running") {
             _containerService.StartDockerContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
@@ -88,8 +89,9 @@ namespace AwsMock::Service {
 
         // Stop docker container, in case it is running.
         if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(
-            DYNAMODB_DOCKER_IMAGE,
-            DYNAMODB_DOCKER_TAG); container.state == "running") {
+                    DYNAMODB_DOCKER_IMAGE,
+                    DYNAMODB_DOCKER_TAG);
+            container.state == "running") {
             _containerService.StopContainer(container);
             log_info << "Docker containers for DynamoDB stopped";
         } else {
@@ -100,25 +102,24 @@ namespace AwsMock::Service {
     void DynamoDbServer::SynchronizeTables() const {
         // Get the list of tables from DynamoDB
         auto [status, output] = Core::SystemUtils::Exec(
-            "aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+                "aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
         Dto::DynamoDb::ListTableResponse listTableResponse;
         listTableResponse.FromJson(output, {});
 
         if (!listTableResponse.tableNames.empty()) {
-            for (const auto &tableName : listTableResponse.tableNames) {
+            for (const auto &tableName: listTableResponse.tableNames) {
                 auto [status, output] = Core::SystemUtils::Exec(
-                    "aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost +
-                    ":" + std::to_string(_containerPort));
+                        "aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost +
+                        ":" + std::to_string(_containerPort));
                 Dto::DynamoDb::DescribeTableResponse describeTableResponse;
                 describeTableResponse.FromJson(output, {});
 
                 Database::Entity::DynamoDb::Table table = {
-                    .region = describeTableResponse.region,
-                    .name = describeTableResponse.tableName,
-                    .status = Dto::DynamoDb::TableStatusTypeToString(describeTableResponse.tableStatus),
-                    .attributes = describeTableResponse.attributes,
-                    .keySchemas = describeTableResponse.keySchemas
-                };
+                        .region = describeTableResponse.region,
+                        .name = describeTableResponse.tableName,
+                        .status = Dto::DynamoDb::TableStatusTypeToString(describeTableResponse.tableStatus),
+                        .attributes = describeTableResponse.attributes,
+                        .keySchemas = describeTableResponse.keySchemas};
                 _dynamoDbDatabase.CreateOrUpdateTable(table);
             }
         } else {
@@ -137,4 +138,4 @@ namespace AwsMock::Service {
 
         log_trace << "DynamoDb monitoring finished";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
     GatewayServer::GatewayServer(boost::asio::io_service &ios) : AbstractServer("gateway"), _ios(ios) {
         // Get HTTP configuration values
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _port = configuration.GetValueInt("awsmock.gateway.http.port");
         _host = configuration.GetValueString("awsmock.gateway.http.host");
         _address = configuration.GetValueString("awsmock.gateway.http.address");
@@ -27,4 +27,4 @@ namespace AwsMock::Service {
         std::make_shared<GatewayListener>(_ios, ip::tcp::endpoint{address, _port})->Run();
         log_debug << "Gateway server started, port: " << _port;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

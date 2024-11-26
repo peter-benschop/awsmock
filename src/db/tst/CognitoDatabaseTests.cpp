@@ -38,7 +38,7 @@ namespace AwsMock::Database {
 
         std::string _region;
         std::string _accountId;
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         CognitoDatabase _cognitoDatabase = CognitoDatabase();
     };
 

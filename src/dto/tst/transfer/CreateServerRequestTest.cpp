@@ -36,7 +36,7 @@ namespace AwsMock::Dto::Transfer {
         std::vector<std::string> _protocols = {"ftp", "sftp"};
         IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethods = "sftpAuthenticationMethods", .url = "url"};
         std::vector<Tag> _tags = {{.key = "version", .value = "1.0"}};
-        Core::YamlConfiguration _configuration = Core::YamlConfiguration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(CreateServerRequestTest, ToStringTest) {

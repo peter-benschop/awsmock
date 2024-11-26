@@ -10,7 +10,7 @@
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/service/docker/DockerService.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/utils/TestUtils.h>
 
 #define TEST_CONTAINER_NAME std::string("jensvogt/awsmock-test")
@@ -50,7 +50,7 @@ class TestEnvironment : public ::testing::Environment {
 
   private:
 
-    AwsMock::Service::DockerService dockerService = AwsMock::Service::DockerService::instance();
+    AwsMock::Service::ContainerService dockerService = AwsMock::Service::ContainerService::instance();
 };
 
 int main(int argc, char **argv) {

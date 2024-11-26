@@ -41,7 +41,7 @@ namespace AwsMock::Dto::S3 {
          * @return ListObjectVersionsResponse
          * @see ListObjectVersionsResponse
          */
-        static Dto::S3::ListObjectVersionsResponse map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList);
+        static ListObjectVersionsResponse map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList);
 
         /**
          * @brief Maps a S3 object entity list to a get bucket request
@@ -53,7 +53,7 @@ namespace AwsMock::Dto::S3 {
          * @return GetBucketResponse
          * @see GetBucketResponse
          */
-        static Dto::S3::GetBucketResponse map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket);
+        static GetBucketResponse map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket);
 
         /**
          * @brief Maps a S3 DTO to a bucket entity
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::S3 {
          * @return Bucket
          * @see Bucket
          */
-        static Database::Entity::S3::Bucket map(const Dto::S3::Bucket &bucketDto);
+        static Database::Entity::S3::Bucket map(const Bucket &bucketDto);
 
       private:
 
@@ -75,7 +75,7 @@ namespace AwsMock::Dto::S3 {
          * @return QueueConfiguration
          * @see QueueConfiguration
          */
-        static std::vector<Dto::S3::QueueConfiguration> map(const std::vector<Database::Entity::S3::QueueNotification> &queueConfiguration);
+        static std::vector<QueueConfiguration> map(const std::vector<Database::Entity::S3::QueueNotification> &queueConfiguration);
 
         /**
          * @brief Maps a S3 topic configuration entity list to a queue configuration DTO
@@ -84,7 +84,7 @@ namespace AwsMock::Dto::S3 {
          * @return TopicConfiguration
          * @see TopicConfiguration
          */
-        static std::vector<Dto::S3::TopicConfiguration> map(const std::vector<Database::Entity::S3::TopicNotification> &topicConfiguration);
+        static std::vector<TopicConfiguration> map(const std::vector<Database::Entity::S3::TopicNotification> &topicConfiguration);
 
         /**
          * @brief Maps a S3 queue configuration entity list to a queue configuration DTO
@@ -93,7 +93,7 @@ namespace AwsMock::Dto::S3 {
          * @return LambdaConfiguration
          * @see LambdaConfiguration
          */
-        static std::vector<Dto::S3::LambdaConfiguration> map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaConfigurations);
+        static std::vector<LambdaConfiguration> map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaConfigurations);
 
         /**
          * @brief Maps event string to event types.
@@ -101,16 +101,16 @@ namespace AwsMock::Dto::S3 {
          * @param eventStrs event strings
          * @return NotificationEventTypes
          */
-        static std::vector<Dto::S3::NotificationEventType> map(const std::vector<std::string> &eventStrs);
+        static std::vector<NotificationEventType> map(const std::vector<std::string> &eventStrs);
 
         /**
          * @brief Maps a S3 queue configuration DTO list to a queue configuration entity
          *
-         * @param lambdaConfigurations list of lambda configuration
+         * @param lambdaConfiguration list of lambda configuration
          * @return list of LambdaConfiguration
          * @see LambdaConfiguration
          */
-        static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfiguration);
+        static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<LambdaConfiguration> &lambdaConfiguration);
     };
 
 }// namespace AwsMock::Dto::S3

@@ -156,7 +156,6 @@ namespace AwsMock::Core {
         /**
          * @brief Gets the difference in seconds between now and the given time in '00:00:00'
          *
-         * @param timeString time in format '00:00:00'
          * @return number of seconds between now and the given time
          */
         static int GetSecondsUntilMidnight();

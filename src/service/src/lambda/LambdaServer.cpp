@@ -7,9 +7,9 @@
 namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"),
                                                                      _lambdaDatabase(
-                                                                         Database::LambdaDatabase::instance()) {
+                                                                             Database::LambdaDatabase::instance()) {
         // Get HTTP configuration values
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.lambda.monitoring.period");
         _counterPeriod = configuration.GetValueInt("awsmock.modules.lambda.counter.period");
         _removePeriod = configuration.GetValueInt("awsmock.modules.lambda.remove.period");
@@ -49,11 +49,11 @@ namespace AwsMock::Service {
         log_debug << "Lambda server shutdown, region: " << _region;
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
-        for (auto &lambda : lambdas) {
+        for (auto &lambda: lambdas) {
             // Cleanup instances
-            for (const auto &instance : lambda.instances) {
-                Service::DockerService::instance().StopContainer(instance.containerId);
-                Service::DockerService::instance().DeleteContainer(instance.containerId);
+            for (const auto &instance: lambda.instances) {
+                Service::ContainerService::instance().StopContainer(instance.containerId);
+                Service::ContainerService::instance().DeleteContainer(instance.containerId);
                 log_debug << "Lambda instances cleaned up, id: " << instance.containerId;
             }
             lambda.instances.clear();
@@ -72,14 +72,14 @@ namespace AwsMock::Service {
         log_debug << "Cleanup lambdas";
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
-        for (auto &lambda : lambdas) {
+        for (auto &lambda: lambdas) {
             log_debug << "Get containers";
             std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(
-                lambda.function,
-                "latest");
-            for (const auto &container : containers) {
-                Service::DockerService::instance().StopContainer(container.id);
-                Service::DockerService::instance().DeleteContainer(container.id);
+                    lambda.function,
+                    "latest");
+            for (const auto &container: containers) {
+                Service::ContainerService::instance().StopContainer(container.id);
+                Service::ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
             _lambdaDatabase.UpdateLambda(lambda);
@@ -111,26 +111,25 @@ namespace AwsMock::Service {
         log_debug << "Lambda worker starting, count: " << lambdaList.size();
 
         // Get lifetime from configuration
-        const int lifetime = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.lambda.lifetime");
-        const auto expired = std::chrono::system_clock::now() - std::chrono::seconds(lifetime);
+        const int lifetime = Core::Configuration::instance().GetValueInt("awsmock.modules.lambda.lifetime");
+        const auto expired = system_clock::now() - std::chrono::seconds(lifetime);
 
         // Loop over lambdas and remove expired instances
-        for (auto &lambda : lambdaList) {
+        for (auto &lambda: lambdaList) {
             if (lambda.instances.empty()) {
                 continue;
             }
 
             std::vector<Database::Entity::Lambda::Instance> toBeRemoved;
-            for (const auto &instance : lambda.instances) {
+            for (const auto &instance: lambda.instances) {
                 if (instance.status == Database::Entity::Lambda::InstanceIdle && instance.created < expired) {
-                    log_info << "Lambda instance expired, function: " << lambda.function << " containerId: " << instance
-.containerId;
+                    log_info << "Lambda instance expired, function: " << lambda.function << " containerId: " << instance.containerId;
                     _dockerService.StopContainer({.id = instance.containerId});
                     toBeRemoved.emplace_back(instance);
                 }
             }
             if (!toBeRemoved.empty()) {
-                for (const auto &instance : toBeRemoved) {
+                for (const auto &instance: toBeRemoved) {
                     lambda.RemoveInstance(instance);
                 }
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
@@ -141,12 +140,12 @@ namespace AwsMock::Service {
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
     }
 
-    void LambdaServer::UpdateCounter() {
+    void LambdaServer::UpdateCounter() const {
         log_trace << "Lambda monitoring starting";
 
-        long lambdas = _lambdaDatabase.LambdaCount();
+        const long lambdas = _lambdaDatabase.LambdaCount();
         _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, lambdas);
 
         log_trace << "Lambda monitoring finished";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

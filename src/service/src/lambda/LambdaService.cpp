@@ -12,7 +12,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
-        const std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
+        const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
 
         // Save to file
         Database::Entity::Lambda::Lambda lambdaEntity;
@@ -173,7 +173,7 @@ namespace AwsMock::Service {
         Poco::ScopedLock lock(_mutex);
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
+        std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
         // Get the lambda entity
@@ -344,7 +344,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();
 
-        DockerService &dockerService = DockerService::instance();
+        ContainerService &dockerService = ContainerService::instance();
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
@@ -425,11 +425,11 @@ namespace AwsMock::Service {
     }
 
     std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {
-        return Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized") ? instance.containerName : "localhost";
+        return Core::Configuration::instance().GetValueBool("awsmock.dockerized") ? instance.containerName : "localhost";
     }
 
     int LambdaService::GetContainerPort(const Database::Entity::Lambda::Instance &instance) {
-        return Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized") ? 8080 : instance.hostPort;
+        return Core::Configuration::instance().GetValueBool("awsmock.dockerized") ? 8080 : instance.hostPort;
     }
 
 }// namespace AwsMock::Service

@@ -203,7 +203,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Checks whether a SQS queue notification with the given event name exists.
          *
-         * @param queueArn AWS queue ARN
+         * @param event AWS event
          * @return true if notification with the given event name exists.
          */
         [[nodiscard]] bool HasQueueNotificationEvent(const std::string &event) const;
@@ -211,7 +211,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Checks whether a SNS topic notification with the given event name exists.
          *
-         * @param topicArn AWS topic Arn
+         * @param event AWS event
          * @return true if notification with the given event name exists.
          */
         [[nodiscard]] bool HasTopicNotificationEvent(const std::string &event) const;
@@ -219,13 +219,13 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Checks whether a lambda notification with the given event name exists.
          *
-         * @param lambdaArn AWS Lambda ARN
+         * @param event AWS event
          * @return true if notification with the given event name exists.
          */
         [[nodiscard]] bool HasLambdaNotificationEvent(const std::string &event) const;
 
         /**
-         * @brief Checks whether a the bucket has encryption enabled.
+         * @brief Checks whether a bucket has encryption enabled.
          *
          * @return true if encryption is enabled for the bucket.
          */
@@ -265,7 +265,7 @@ namespace AwsMock::Database::Entity::S3 {
         LambdaNotification GetLambdaNotification(const std::string &eventName);
 
         /**
-         * @brief Returns a boolean indicating the versioinig state
+         * @brief Returns a boolean indicating the versioning state
          */
         [[nodiscard]] bool IsVersioned() const;
 
@@ -281,7 +281,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<view> mResult);
 
         /**
          * @brief Converts the entity to a JSON object

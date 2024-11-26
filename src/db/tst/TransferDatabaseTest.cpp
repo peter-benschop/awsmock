@@ -42,7 +42,7 @@ namespace AwsMock::Database {
         }
 
         std::string _region;
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         TransferDatabase &_transferDatabase = TransferDatabase::instance();
     };
 

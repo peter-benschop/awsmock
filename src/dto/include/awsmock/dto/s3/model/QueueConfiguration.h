@@ -88,7 +88,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Convert from a JSON object
          *
-         * @param JSON object
+         * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 

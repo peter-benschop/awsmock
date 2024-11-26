@@ -39,7 +39,7 @@ namespace AwsMock::Database {
             _moduleDatabase.DeleteAllModules();
         }
 
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         ModuleDatabase _moduleDatabase = ModuleDatabase();
     };
 

@@ -32,7 +32,7 @@ class TestEnvironment : public ::testing::Environment {
     static void InitializeDatabase() {
 
         // Get database variables
-        const AwsMock::Core::YamlConfiguration &_configuration = AwsMock::Core::YamlConfiguration::instance();
+        AwsMock::Core::Configuration &_configuration = AwsMock::Core::Configuration::instance();
         const std::string name = _configuration.GetValueString("awsmock.mongodb.name");
         const std::string host = _configuration.GetValueString("awsmock.mongodb.host");
         const std::string user = _configuration.GetValueString("awsmock.mongodb.user");

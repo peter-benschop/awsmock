@@ -19,12 +19,12 @@ namespace AwsMock::Service {
         std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
 
         Database::Entity::Transfer::Transfer transferEntity;
-        std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
+        std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
         std::string transferArn = Core::AwsUtils::CreateTransferArn(request.region, accountId, serverId);
-        std::string listenAddress = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.transfer.ftp.address");
+        std::string listenAddress = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.ftp.address");
 
         // Create entity
-        int ftpPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
+        int ftpPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
         transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .protocols = request.protocols, .port = ftpPort, .listenAddress = listenAddress};
 
         // Add anonymous user
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
             }
 
             // Add user
-            std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account.id");
+            std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account.id");
             std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
             Database::Entity::Transfer::User user = {
                     .userName = request.userName,

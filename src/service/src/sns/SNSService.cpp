@@ -24,7 +24,7 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            const std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
+            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
             const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
             topic = _snsDatabase.CreateTopic(topic);
@@ -198,11 +198,11 @@ namespace AwsMock::Service {
             }
 
             // Create new subscription
-            const std::string accountId = Core::YamlConfiguration::instance().GetValueString("awsmock.access.account-id");
+            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
-            if (Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
+            if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
 
                 // Add subscription
                 topic.subscriptions.push_back({.protocol = request.protocol,

@@ -21,6 +21,7 @@ awsmock:
   docker:
     active: false
     network-mode: local
+    network-name: local
     defaults:
       memory-size: 512
       temp-size: 10240
@@ -103,7 +104,7 @@ awsmock:
       monitoring:
         period: 300
       worker:
-        period: 400
+        period: 300
       container:
         host: localhost
         port: 8000

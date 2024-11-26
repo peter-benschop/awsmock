@@ -135,7 +135,7 @@ namespace AwsMock::Dto::Module {
         /**
          * @brief Convert from BSON document
          *
-         * @param bson document
+         * @param document BSON document
          */
         void FromDocument(const bsoncxx::document::view &document);
 

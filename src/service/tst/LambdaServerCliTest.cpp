@@ -65,7 +65,7 @@ namespace AwsMock::Service {
 
         std::string _endpoint, _accountId;
         boost::asio::io_service _ios{10};
-        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         LambdaService _lambdaService;
         S3Service _s3Service;

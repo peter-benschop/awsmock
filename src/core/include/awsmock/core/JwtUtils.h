@@ -35,7 +35,7 @@ namespace AwsMock::Core {
          * @brief Create a new JWT token using Rs256 as signing algorithm
          *
          * @param privateKey RSA private key
-         * @param issuer issuer of the token
+         * @param subject subject of the token
          * @param payload payload
          * @return JWT token string
          */
@@ -45,7 +45,7 @@ namespace AwsMock::Core {
          * @brief Create a new JWT token using Hs256 as signing algorithm
          *
          * @param privateKey RSA private key
-         * @param issuer issuer of the token
+         * @param subject subject of the token
          * @param payload payload
          * @return JWT token string
          */

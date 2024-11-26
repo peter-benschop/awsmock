@@ -36,7 +36,7 @@ namespace AwsMock::Database {
 
         std::string _region;
         std::string _accountId;
-        Core::YamlConfiguration &_configuration = Core::TestUtils::GetTestConfiguration(true);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(true);
         LambdaDatabase &_lambdaDatabase = LambdaDatabase::instance();
     };
 

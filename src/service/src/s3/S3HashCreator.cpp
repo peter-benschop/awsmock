@@ -6,10 +6,10 @@
 
 namespace AwsMock::Service {
     void S3HashCreator::operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const {
-        const std::string dataDir = Core::YamlConfiguration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
 
         const std::string filename = dataDir + "/" + object.internalName;
-        for (const auto &algorithm : algorithms) {
+        for (const auto &algorithm: algorithms) {
             if (algorithm == "SHA1") {
                 object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
             } else if (algorithm == "SHA256") {
@@ -21,4 +21,4 @@ namespace AwsMock::Service {
             log_debug << "Calculated hashes, key: " << object.key << " hash: " << algorithm;
         }
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

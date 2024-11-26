@@ -140,7 +140,7 @@ namespace AwsMock::Database {
         /**
          * @brief Purge a topic.
          *
-         * @param topicArn topic entity
+         * @param topic topic entity
          * @throws DatabaseException
          */
         void PurgeTopic(const Entity::SNS::Topic &topic);

@@ -62,7 +62,7 @@ namespace AwsMock::Service {
             }
         }
 
-        Core::YamlConfiguration &_configuration = Core::YamlConfiguration::instance();
+        Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
         LambdaService _lambdaService;

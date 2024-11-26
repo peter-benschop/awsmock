@@ -14,7 +14,7 @@ namespace AwsMock::FtpServer {
           data_buffer_strand_(io_service), file_rw_strand_(io_service),
           _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
         // Environment
-        Core::YamlConfiguration &configuration = Core::YamlConfiguration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValueString("awsmock.region");
         _bucket = configuration.GetValueString("awsmock.modules.transfer.bucket");
         _transferDir = configuration.GetValueString("awsmock.modules.transfer.data-dir");
@@ -65,17 +65,17 @@ namespace AwsMock::FtpServer {
         asio::async_write(command_socket_,
                           asio::buffer(command_output_queue_.front()),
                           command_write_strand_.wrap(
-                              [me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                                  if (!ec) {
-                                      me->command_output_queue_.pop_front();
+                                  [me = shared_from_this()](asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
+                                      if (!ec) {
+                                          me->command_output_queue_.pop_front();
 
-                                      if (!me->command_output_queue_.empty()) {
-                                          me->startSendingMessages();
+                                          if (!me->command_output_queue_.empty()) {
+                                              me->startSendingMessages();
+                                          }
+                                      } else {
+                                          log_error << "Command write error: " << ec.message();
                                       }
-                                  } else {
-                                      log_error << "Command write error: " << ec.message();
-                                  }
-                              }));
+                                  }));
     }
 
     void FtpSession::readFtpCommand() {
@@ -94,7 +94,8 @@ namespace AwsMock::FtpServer {
                                        {
                                            asio::error_code ec_;
                                            me->data_acceptor_.close(ec_);
-                                       } {
+                                       }
+                                       {
                                            auto data_socket = me->data_socket_weakptr_.lock();
                                            if (data_socket) {
                                                asio::error_code ec_;
@@ -112,7 +113,7 @@ namespace AwsMock::FtpServer {
                                    // in contiguous memory.
                                    stream.read(&packet_string[0], length - 2);
 
-                                   stream.ignore(2); // Remove the "\r\n"
+                                   stream.ignore(2);// Remove the "\r\n"
                                    log_debug << "FTP << " << packet_string;
 
                                    me->handleFtpCommand(packet_string);
@@ -135,53 +136,53 @@ namespace AwsMock::FtpServer {
             parameters = command.substr(space_index + 1, std::string::npos);
         }
 
-        const std::map<std::string, std::function<void(std::string)> > command_map{
-            // Access control commands
-            {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
-            {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
-            {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
-            {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
-            {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
-            {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
-            {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
+        const std::map<std::string, std::function<void(std::string)>> command_map{
+                // Access control commands
+                {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
+                {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
+                {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
+                {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
+                {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
+                {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
+                {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
 
-            // Transfer parameter commands
-            {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
-            {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
-            {"EPRT", std::bind(&FtpSession::handleFtpCommandEPRT, this, std::placeholders::_1)},
-            {"EPSV", std::bind(&FtpSession::handleFtpCommandEPSV, this, std::placeholders::_1)},
-            {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
-            {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
-            {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
-            {"LPRT", std::bind(&FtpSession::handleFtpCommandLPRT, this, std::placeholders::_1)},
-            {"LPSV", std::bind(&FtpSession::handleFtpCommandLPSV, this, std::placeholders::_1)},
+                // Transfer parameter commands
+                {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
+                {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
+                {"EPRT", std::bind(&FtpSession::handleFtpCommandEPRT, this, std::placeholders::_1)},
+                {"EPSV", std::bind(&FtpSession::handleFtpCommandEPSV, this, std::placeholders::_1)},
+                {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
+                {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
+                {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
+                {"LPRT", std::bind(&FtpSession::handleFtpCommandLPRT, this, std::placeholders::_1)},
+                {"LPSV", std::bind(&FtpSession::handleFtpCommandLPSV, this, std::placeholders::_1)},
 
-            // Ftp module commands
-            {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
-            {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
-            {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
-            {"APPE", std::bind(&FtpSession::handleFtpCommandAPPE, this, std::placeholders::_1)},
-            {"ALLO", std::bind(&FtpSession::handleFtpCommandALLO, this, std::placeholders::_1)},
-            {"REST", std::bind(&FtpSession::handleFtpCommandREST, this, std::placeholders::_1)},
-            {"RNFR", std::bind(&FtpSession::handleFtpCommandRNFR, this, std::placeholders::_1)},
-            {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
-            {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
-            {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
-            {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
-            {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
-            {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
-            {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
-            {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
-            {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
-            {"SYST", std::bind(&FtpSession::handleFtpCommandSYST, this, std::placeholders::_1)},
-            {"STAT", std::bind(&FtpSession::handleFtpCommandSTAT, this, std::placeholders::_1)},
-            {"HELP", std::bind(&FtpSession::handleFtpCommandHELP, this, std::placeholders::_1)},
-            {"NOOP", std::bind(&FtpSession::handleFtpCommandNOOP, this, std::placeholders::_1)},
+                // Ftp module commands
+                {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
+                {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
+                {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
+                {"APPE", std::bind(&FtpSession::handleFtpCommandAPPE, this, std::placeholders::_1)},
+                {"ALLO", std::bind(&FtpSession::handleFtpCommandALLO, this, std::placeholders::_1)},
+                {"REST", std::bind(&FtpSession::handleFtpCommandREST, this, std::placeholders::_1)},
+                {"RNFR", std::bind(&FtpSession::handleFtpCommandRNFR, this, std::placeholders::_1)},
+                {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
+                {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
+                {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
+                {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
+                {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
+                {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
+                {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
+                {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
+                {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
+                {"SYST", std::bind(&FtpSession::handleFtpCommandSYST, this, std::placeholders::_1)},
+                {"STAT", std::bind(&FtpSession::handleFtpCommandSTAT, this, std::placeholders::_1)},
+                {"HELP", std::bind(&FtpSession::handleFtpCommandHELP, this, std::placeholders::_1)},
+                {"NOOP", std::bind(&FtpSession::handleFtpCommandNOOP, this, std::placeholders::_1)},
 
-            // Modern FTP Commands
-            {"FEAT", std::bind(&FtpSession::handleFtpCommandFEAT, this, std::placeholders::_1)},
-            {"OPTS", std::bind(&FtpSession::handleFtpCommandOPTS, this, std::placeholders::_1)},
-            {"SIZE", std::bind(&FtpSession::handleFtpCommandSIZE, this, std::placeholders::_1)},
+                // Modern FTP Commands
+                {"FEAT", std::bind(&FtpSession::handleFtpCommandFEAT, this, std::placeholders::_1)},
+                {"OPTS", std::bind(&FtpSession::handleFtpCommandOPTS, this, std::placeholders::_1)},
+                {"SIZE", std::bind(&FtpSession::handleFtpCommandSIZE, this, std::placeholders::_1)},
         };
 
         auto command_it = command_map.find(ftp_command);
@@ -305,15 +306,16 @@ namespace AwsMock::FtpServer {
 
         // In case of a dockerized FTP server we need to use some special ports
         asio::ip::tcp::endpoint endpoint;
-        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
-            int minPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
-            int maxPort = Core::YamlConfiguration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
+            int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
+            int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
             int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
         }
-        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port(); {
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
+        {
             asio::error_code ec;
             ec = data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
@@ -321,16 +323,17 @@ namespace AwsMock::FtpServer {
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             ec = data_acceptor_.bind(endpoint, ec);
             if (ec) {
-                log_error << "Error binding data acceptor: " << ec.message() << " endpoint: " << endpoint.address().
-to_string() << ":" << endpoint.port();
+                log_error << "Error binding data acceptor: " << ec.message() << " endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             ec = data_acceptor_.listen(asio::socket_base::max_connections, ec);
             if (ec) {
@@ -342,7 +345,7 @@ to_string() << ":" << endpoint.port();
 
         // Split address and port into bytes and get the port the OS chose for us
         boost::asio::ip::address_v4::bytes_type ip_bytes;
-        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
+        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
         } else {
             ip_bytes = command_socket_.local_endpoint().address().to_v6().to_v4().to_bytes();
@@ -375,7 +378,8 @@ to_string() << ":" << endpoint.port();
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0); {
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+        {
             asio::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
@@ -383,7 +387,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
@@ -391,7 +396,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.listen(asio::socket_base::max_connections, ec);
             if (ec) {
@@ -430,7 +436,8 @@ to_string() << ":" << endpoint.port();
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0); {
+        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+        {
             asio::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
@@ -438,7 +445,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
@@ -446,7 +454,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.listen(asio::socket_base::max_connections, ec);
             if (ec) {
@@ -486,17 +495,16 @@ to_string() << ":" << endpoint.port();
         }
 
         asio::ip::tcp::endpoint endpoint;
-        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
-            const int minPort = Core::YamlConfiguration::instance().
-                    GetValueInt("awsmock.modules.transfer.ftp.pasv.min");
-            const int maxPort = Core::YamlConfiguration::instance().
-                    GetValueInt("awsmock.modules.transfer.ftp.pasv.max");
+        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
+            const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.min");
+            const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
         }
-        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port(); {
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
+        {
             asio::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
@@ -504,7 +512,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
@@ -512,7 +521,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.listen(asio::socket_base::max_connections, ec);
             if (ec) {
@@ -552,17 +562,16 @@ to_string() << ":" << endpoint.port();
         }
 
         asio::ip::tcp::endpoint endpoint;
-        if (Core::YamlConfiguration::instance().GetValueBool("awsmock.dockerized")) {
-            const int minPort = Core::YamlConfiguration::instance().
-                    GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
-            const int maxPort = Core::YamlConfiguration::instance().
-                    GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
+            const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
+            const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
         } else {
             endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
         }
-        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port(); {
+        log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
+        {
             asio::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
@@ -570,7 +579,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
@@ -578,7 +588,8 @@ to_string() << ":" << endpoint.port();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
                 return;
             }
-        } {
+        }
+        {
             asio::error_code ec;
             data_acceptor_.listen(asio::socket_base::max_connections, ec);
             if (ec) {
@@ -653,7 +664,7 @@ to_string() << ":" << endpoint.port();
 
         const std::ios::openmode open_mode = (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
         const std::shared_ptr<IoFile> file = std::make_shared<
-            IoFile>(local_path, _logged_in_user->password_, open_mode);
+                IoFile>(local_path, _logged_in_user->password_, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -730,8 +741,7 @@ to_string() << ":" << endpoint.port();
 
         auto existing_file_filestatus = FileStatus(local_path);
         if (existing_file_filestatus.isOk()) {
-            if ((existing_file_filestatus.type() == FileType::RegularFile) && (static_cast<int>(_logged_in_user->
-                permissions_ & Permission::FileDelete) == 0)) {
+            if ((existing_file_filestatus.type() == FileType::RegularFile) && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
                 sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED,
                                "File already exists. Permission denied to overwrite file.");
                 return;
@@ -744,7 +754,7 @@ to_string() << ":" << endpoint.port();
 
         const std::ios::openmode open_mode = (data_type_binary_ ? (std::ios::out | std::ios::binary) : (std::ios::out));
         const std::shared_ptr<IoFile> file = std::make_shared<
-            IoFile>(local_path, _logged_in_user->_username, open_mode);
+                IoFile>(local_path, _logged_in_user->_username, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -783,10 +793,10 @@ to_string() << ":" << endpoint.port();
         }
 
         const std::ios::openmode open_mode = (data_type_binary_
-                                                  ? (std::ios::out | std::ios::app | std::ios::binary)
-                                                  : (std::ios::out | std::ios::app));
+                                                      ? (std::ios::out | std::ios::app | std::ios::binary)
+                                                      : (std::ios::out | std::ios::app));
         const std::shared_ptr<IoFile> file = std::make_shared<
-            IoFile>(local_path, _logged_in_user->_username, open_mode);
+                IoFile>(local_path, _logged_in_user->_username, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -1155,14 +1165,13 @@ to_string() << ":" << endpoint.port();
                                         // Create a Unix-like file list
                                         std::stringstream stream;
                                         // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
-                                        for (const auto &entry : directory_content) {
+                                        for (const auto &entry: directory_content) {
                                             const std::string &filename(entry.first);
                                             const FileStatus &file_status(entry.second);
 
-                                            stream << ((file_status.type() == FileType::Dir) ? 'd' : '-') << file_status
-                                                    .permissionString() << "   1 ";
+                                            stream << ((file_status.type() == FileType::Dir) ? 'd' : '-') << file_status.permissionString() << "   1 ";
                                             stream << std::setw(10) << file_status.ownerString() << " " << std::setw(10)
-                                                    << file_status.groupString() << " ";
+                                                   << file_status.groupString() << " ";
                                             stream << std::setw(10) << file_status.fileSize() << " ";
                                             stream << file_status.timeString() << " ";
                                             stream << filename;
@@ -1171,8 +1180,7 @@ to_string() << ":" << endpoint.port();
 
                                         // Copy the file list into a raw char vector
                                         const std::string dir_listing_string = stream.str();
-                                        const std::shared_ptr<std::vector<char> > dir_listing_rawdata = std::make_shared
-                                                <std::vector<char> >();
+                                        const std::shared_ptr<std::vector<char>> dir_listing_rawdata = std::make_shared<std::vector<char>>();
                                         dir_listing_rawdata->reserve(dir_listing_string.size());
                                         std::copy(dir_listing_string.begin(),
                                                   dir_listing_string.end(),
@@ -1180,7 +1188,7 @@ to_string() << ":" << endpoint.port();
 
                                         // Send the string out
                                         me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-                                        me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
+                                        me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
                                     });
     }
 
@@ -1198,15 +1206,14 @@ to_string() << ":" << endpoint.port();
                                         // Create a file list
                                         std::stringstream stream;
                                         // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
-                                        for (const auto &entry : directory_content) {
+                                        for (const auto &entry: directory_content) {
                                             stream << entry.first;
                                             stream << "\r\n";
                                         }
 
                                         // Copy the file list into a raw char vector
                                         const std::string dir_listing_string = stream.str();
-                                        const std::shared_ptr<std::vector<char> > dir_listing_rawdata = std::make_shared
-                                                <std::vector<char> >();
+                                        const std::shared_ptr<std::vector<char>> dir_listing_rawdata = std::make_shared<std::vector<char>>();
                                         dir_listing_rawdata->reserve(dir_listing_string.size());
                                         std::copy(dir_listing_string.begin(),
                                                   dir_listing_string.end(),
@@ -1214,7 +1221,7 @@ to_string() << ":" << endpoint.port();
 
                                         // Send the string out
                                         me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-                                        me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
+                                        me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
                                         // Nullpointer indicates end of transmission
                                     });
     }
@@ -1245,7 +1252,7 @@ to_string() << ":" << endpoint.port();
             if (file->file_stream_.eof())
                 return;
 
-            const std::shared_ptr<std::vector<char> > buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
+            const std::shared_ptr<std::vector<char>> buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
             file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
             auto bytes_read = file->file_stream_.gcount();
             buffer->resize(static_cast<size_t>(bytes_read));
@@ -1258,12 +1265,12 @@ to_string() << ":" << endpoint.port();
                                            });
             } else {
                 me->addDataToBufferAndSend(buffer, data_socket);
-                me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(nullptr), data_socket);
+                me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(nullptr), data_socket);
             }
         });
     }
 
-    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char> > &data,
+    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char>> &data,
                                             const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
                                             const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post([me = shared_from_this(), data, data_socket, fetch_more]() {
@@ -1280,36 +1287,36 @@ to_string() << ":" << endpoint.port();
     void FtpSession::writeDataToSocket(const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
                                        const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post(
-            [me = shared_from_this(), data_socket, fetch_more]() {
-                auto data = me->data_buffer_.front();
+                [me = shared_from_this(), data_socket, fetch_more]() {
+                    auto data = me->data_buffer_.front();
 
-                if (data) {
-                    // Send out the buffer
-                    asio::async_write(*data_socket,
-                                      asio::buffer(*data),
-                                      me->data_buffer_strand_.wrap(
-                                          [me, data_socket, data, fetch_more](
-                                      asio::error_code ec,
-                                      std::size_t /*bytes_to_transfer*/) {
-                                              me->data_buffer_.pop_front();
+                    if (data) {
+                        // Send out the buffer
+                        asio::async_write(*data_socket,
+                                          asio::buffer(*data),
+                                          me->data_buffer_strand_.wrap(
+                                                  [me, data_socket, data, fetch_more](
+                                                          asio::error_code ec,
+                                                          std::size_t /*bytes_to_transfer*/) {
+                                                      me->data_buffer_.pop_front();
 
-                                              if (ec) {
-                                                  log_error << "Data write error: " << ec.message();
-                                                  return;
-                                              }
+                                                      if (ec) {
+                                                          log_error << "Data write error: " << ec.message();
+                                                          return;
+                                                      }
 
-                                              fetch_more();
+                                                      fetch_more();
 
-                                              if (!me->data_buffer_.empty()) {
-                                                  me->writeDataToSocket(data_socket, fetch_more);
-                                              }
-                                          }));
-                } else {
-                    // we got to the end of transmission
-                    me->data_buffer_.pop_front();
-                    me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
-                }
-            });
+                                                      if (!me->data_buffer_.empty()) {
+                                                          me->writeDataToSocket(data_socket, fetch_more);
+                                                      }
+                                                  }));
+                    } else {
+                        // we got to the end of transmission
+                        me->data_buffer_.pop_front();
+                        me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
+                    }
+                });
     }
 
     ////////////////////////////////////////////////////////
@@ -1333,7 +1340,7 @@ to_string() << ":" << endpoint.port();
 
     void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file,
                                                          const std::shared_ptr<asio::ip::tcp::socket> &data_socket) {
-        const std::shared_ptr<std::vector<char> > buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
+        const std::shared_ptr<std::vector<char>> buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
 
         asio::async_read(*data_socket,
                          asio::buffer(*buffer),
@@ -1356,7 +1363,7 @@ to_string() << ":" << endpoint.port();
                          });
     }
 
-    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char> > &data,
+    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char>> &data,
                                      const std::shared_ptr<IoFile> &file,
                                      const std::function<void(void)> &fetch_more) {
         file_rw_strand_.post([me = shared_from_this(), data, file, fetch_more] {
@@ -1407,9 +1414,9 @@ to_string() << ":" << endpoint.port();
         output.reserve(unquoted_ftp_path.size() * 2 + 2);
         output.push_back('\"');
 
-        for (const char c : unquoted_ftp_path) {
+        for (const char c: unquoted_ftp_path) {
             output.push_back(c);
-            if (c == '\"') // Escape quote by double-quote
+            if (c == '\"')// Escape quote by double-quote
                 output.push_back(c);
         }
 
@@ -1476,14 +1483,12 @@ to_string() << ":" << endpoint.port();
 
         if (!file_status.isOk()) {
             return {
-                FtpReplyCode::ACTION_NOT_TAKEN,
-                "Failed ot change directory: The given resource does not exist or permission denied."
-            };
+                    FtpReplyCode::ACTION_NOT_TAKEN,
+                    "Failed ot change directory: The given resource does not exist or permission denied."};
         }
         if (file_status.type() != FileType::Dir) {
             return {
-                FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory."
-            };
+                    FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory."};
         }
         if (!file_status.canOpenDir()) {
             return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: Permission denied."};
@@ -1499,8 +1504,11 @@ to_string() << ":" << endpoint.port();
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
         Dto::S3::PutObjectRequest request = {
-            .region = _region, .bucket = _bucket, .key = key, .owner = user, .metadata = metadata
-        };
+                .region = _region,
+                .bucket = _bucket,
+                .key = key,
+                .owner = user,
+                .metadata = metadata};
 
         std::ifstream ifs(fileName, std::ios::binary);
         _s3Service->PutObject(request, ifs, false);
@@ -1515,8 +1523,10 @@ to_string() << ":" << endpoint.port();
 
     void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) {
         Dto::S3::DeleteObjectRequest request = {
-            .region = _region, .user = user, .bucket = _bucket, .key = GetKey(fileName)
-        };
+                .region = _region,
+                .user = user,
+                .bucket = _bucket,
+                .key = GetKey(fileName)};
         _s3Service->DeleteObject(request);
 
         log_debug << "Delete object request send, fileName: " << fileName;
@@ -1529,4 +1539,4 @@ to_string() << ":" << endpoint.port();
         }
         return key;
     }
-} // namespace AwsMock::FtpServer
+}// namespace AwsMock::FtpServer
