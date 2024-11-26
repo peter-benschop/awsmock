@@ -85,7 +85,7 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue string default value
          */
-        void DefineStringProperty(const std::string &key,const std::string &envProperty,const std::string &defaultValue);
+        void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
         /**
          * @brief Define a new configuration property.
