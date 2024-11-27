@@ -131,7 +131,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetBucketResponse S3Service::GetBucket(Dto::S3::GetBucketRequest &request) {
+    Dto::S3::GetBucketResponse S3Service::GetBucket(const Dto::S3::GetBucketRequest &request) const {
         log_trace << "Get bucket request, s3Request: " << request.ToString();
 
         // Check existence
@@ -153,7 +153,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(Dto::S3::GetMetadataRequest &request) {
+    Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const {
         log_trace << "Get metadata request, s3Request: " << request.ToString();
 
         // Check existence
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
 
     Dto::S3::GetObjectResponse S3Service::GetObject(const Dto::S3::GetObjectRequest &request) const {
         log_trace << "Get object request, s3Request: " << request.ToString();
-        std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
@@ -249,12 +249,12 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() {
+    Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() const {
         log_trace << "List all buckets request";
 
         try {
 
-            Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
             auto listAllBucketResponse = Dto::S3::ListAllBucketResponse(bucketList);
             log_debug << "Count all buckets, size: " << bucketList.size();
 
@@ -266,15 +266,15 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListBucketCounterResponse S3Service::ListBucketCounters(const Dto::S3::ListBucketCounterRequest &request) {
+    Dto::S3::ListBucketCounterResponse S3Service::ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const {
         log_trace << "List buckets counters request";
 
         try {
 
-            Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
+            Database::Entity::S3::BucketList bucketList = _database.ListBuckets(s3Request.region, s3Request.prefix, s3Request.maxResults, s3Request.skip, s3Request.sortColumns);
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
-            listAllBucketResponse.total = _database.BucketCount(request.region, request.prefix);
+            listAllBucketResponse.total = _database.BucketCount(s3Request.region, s3Request.prefix);
 
             for (const auto &bucket: bucketList) {
                 Dto::S3::BucketCounter bucketCounter;
@@ -293,13 +293,13 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListBucketResponse S3Service::ListBucket(const Dto::S3::ListBucketRequest &request) {
-        log_trace << "List bucket request: " + request.ToString();
+    Dto::S3::ListBucketResponse S3Service::ListBucket(const Dto::S3::ListBucketRequest &s3Request) const {
+        log_trace << "List bucket request: " + s3Request.ToString();
 
         try {
 
-            Database::Entity::S3::ObjectList objectList = _database.ListBucket(request.name, request.prefix);
-            Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponse(request.name, objectList);
+            Database::Entity::S3::ObjectList objectList = _database.ListBucket(s3Request.name, s3Request.prefix);
+            Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponse(s3Request.name, objectList);
             log_debug << "Bucket list returned, count: " << objectList.size();
 
             return listBucketResponse;
@@ -310,24 +310,24 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) {
-        log_trace << "Put bucket versioning request: " << request.ToString();
+    void S3Service::PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &s3Request) const {
+        log_trace << "Put bucket versioning request: " << s3Request.ToString();
 
         // Check existence
-        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            log_error << "Bucket does not exist, region: " << request.region << " bucket: " << request.bucket;
-            throw Core::NotFoundException("Bucket does not exist, name: " + request.bucket);
+        if (!_database.BucketExists({.region = s3Request.region, .name = s3Request.bucket})) {
+            log_error << "Bucket does not exist, region: " << s3Request.region << " bucket: " << s3Request.bucket;
+            throw Core::NotFoundException("Bucket does not exist, name: " + s3Request.bucket);
         }
 
         // Update bucket
-        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-        bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Poco::toLower(request.status));
+        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(s3Request.region, s3Request.bucket);
+        bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Poco::toLower(s3Request.status));
 
         _database.UpdateBucket(bucket);
-        log_info << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status;
+        log_info << "Put bucket versioning, bucket: " << s3Request.bucket << " state: " << s3Request.status;
     }
 
-    Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) {
+    Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const {
         log_trace << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
 
         // Check existence
@@ -336,10 +336,10 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Bucket does not exist, region: " + request.region + " bucket: " + request.bucket);
         }
 
-        std::string uploadId = Core::StringUtils::GenerateRandomString(58);
+        const std::string uploadId = Core::StringUtils::GenerateRandomString(58);
 
         // Create upload directory, if not existing
-        std::string uploadDir = GetMultipartUploadDirectory(uploadId);
+        const std::string uploadDir = GetMultipartUploadDirectory(uploadId);
         Core::DirUtils::EnsureDirectory(uploadDir);
 
         // Create database object
@@ -354,13 +354,13 @@ namespace AwsMock::Service {
         return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};
     }
 
-    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &uploadId) {
-        log_trace << "UploadPart request, part: " << part << " updateId: " << uploadId;
+    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) {
+        log_trace << "UploadPart request, part: " << part << " updateId: " << updateId;
 
-        std::string uploadDir = GetMultipartUploadDirectory(uploadId);
+        std::string uploadDir = GetMultipartUploadDirectory(updateId);
         log_trace << "Using uploadDir: " << uploadDir;
 
-        std::string fileName = uploadDir + Poco::Path::separator() + uploadId + "-" + std::to_string(part);
+        std::string fileName = uploadDir + Poco::Path::separator() + updateId + "-" + std::to_string(part);
         std::ofstream ofs(fileName, std::ios::binary);
         std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
         ofs.close();
@@ -372,22 +372,22 @@ namespace AwsMock::Service {
         return eTag;
     }
 
-    Dto::S3::UploadPartCopyResponse S3Service::UploadPartCopy(const Dto::S3::UploadPartCopyRequest &request) {
+    Dto::S3::UploadPartCopyResponse S3Service::UploadPartCopy(const Dto::S3::UploadPartCopyRequest &request) const {
         log_trace << "UploadPart copy request, part: " << request.partNumber << " updateId: " << request.uploadId;
 
-        std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data.dir");
-        std::string s3DataDir = dataDir + "/s3/";
-        Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
+        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data.dir");
+        const std::string s3DataDir = dataDir + "/s3/";
+        const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
-        std::string sourceFile = s3DataDir + sourceObject.internalName;
-        std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
+        const std::string sourceFile = s3DataDir + sourceObject.internalName;
+        const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
         log_trace << "Using uploadDir: " << uploadDir;
 
         long start = request.min;
-        long length = request.max - request.min + 1;
-        std::string destFile = uploadDir + Poco::Path::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
-        int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
-        int source = open(sourceFile.c_str(), O_RDONLY, 0);
+        const long length = request.max - request.min + 1;
+        const std::string destFile = uploadDir + Poco::Path::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
+        const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        const int source = open(sourceFile.c_str(), O_RDONLY, 0);
         long copied = sendfile(dest, source, &start, length);
         close(source);
         close(dest);
@@ -403,7 +403,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) {
+    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const {
         log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
 
         // Get database object
@@ -492,9 +492,8 @@ namespace AwsMock::Service {
 
         try {
             // Get bucket
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
 
-            if (bucket.IsVersioned()) {
+            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
                 return SaveVersionedObject(request, bucket, stream, chunkEncoding);
             } else {
                 return SaveUnversionedObject(request, bucket, stream, chunkEncoding);
@@ -506,7 +505,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::CopyObjectResponse S3Service::CopyObject(const Dto::S3::CopyObjectRequest &request) {
+    Dto::S3::CopyObjectResponse S3Service::CopyObject(const Dto::S3::CopyObjectRequest &request) const {
         log_trace << "Copy object request: " << request.ToString();
 
         const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
@@ -571,8 +570,7 @@ namespace AwsMock::Service {
 
             // Check notification
             CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
-            log_info << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
-                     << request.targetBucket << " targetKey: " << request.targetKey;
+            log_info << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: " << request.targetBucket << " targetKey: " << request.targetKey;
 
             // Adjust bucket key counter on target bucket
             AdjustBucketCounters(request.region, request.targetBucket);
@@ -584,7 +582,7 @@ namespace AwsMock::Service {
         return {.eTag = targetObject.md5sum, .lastModified = Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
     }
 
-    Dto::S3::MoveObjectResponse S3Service::MoveObject(const Dto::S3::MoveObjectRequest &request) {
+    Dto::S3::MoveObjectResponse S3Service::MoveObject(const Dto::S3::MoveObjectRequest &request) const {
         log_trace << "Move object request: " << request.ToString();
 
         const std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
@@ -598,8 +596,7 @@ namespace AwsMock::Service {
 
         // Check existence of source key
         if (!_database.ObjectExists({.region = request.region, .bucket = request.sourceBucket, .key = request.sourceKey})) {
-            log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: "
-                      << request.sourceKey;
+            log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
             throw Core::NotFoundException("Source object does not exist");
         }
 
@@ -764,7 +761,7 @@ namespace AwsMock::Service {
         }
     }*/
 
-    void S3Service::PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) {
+    void S3Service::PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const {
         log_trace << "Put bucket encryption request, algorithm: " << request.sseAlgorithm;
 
         // Check bucket existence
@@ -776,7 +773,7 @@ namespace AwsMock::Service {
 
             Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
 
-            Database::Entity::S3::BucketEncryption bucketEncryption = {.sseAlgorithm = request.sseAlgorithm, .kmsKeyId = request.kmsKeyId};
+            const Database::Entity::S3::BucketEncryption bucketEncryption = {.sseAlgorithm = request.sseAlgorithm, .kmsKeyId = request.kmsKeyId};
             bucketEntity.bucketEncryption = bucketEncryption;
             bucketEntity = _database.UpdateBucket(bucketEntity);
             log_info << "PutBucketEncryption succeeded, bucket: " << request.bucket;
@@ -787,25 +784,24 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) {
-        log_trace << "List object versions request: " << request.ToString();
+    Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &s3Request) const {
+        log_trace << "List object versions request: " << s3Request.ToString();
 
         // Check bucket existence
-        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+        if (!_database.BucketExists({.region = s3Request.region, .name = s3Request.bucket})) {
             throw Core::NotFoundException("Bucket does not exist");
         }
 
         // Get bucket
-        Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
-        if (!bucketEntity.IsVersioned()) {
+        if (Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(s3Request.region, s3Request.bucket); !bucketEntity.IsVersioned()) {
             throw Core::NotFoundException("Bucket is not versioned");
         }
 
         Dto::S3::ListObjectVersionsResponse response;
         try {
 
-            std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
-            return Dto::S3::Mapper::map(request, objectList);
+            const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(s3Request.region, s3Request.bucket, s3Request.prefix);
+            return Dto::S3::Mapper::map(s3Request, objectList);
 
         } catch (Poco::Exception &ex) {
             log_error << "S3 put bucket encryption request failed, message: " << ex.message();
@@ -845,7 +841,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
+    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const {
         log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
 
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
@@ -856,9 +852,7 @@ namespace AwsMock::Service {
 
         if (bucketEntity.HasQueueNotificationEvent(event)) {
 
-            Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event);
-
-            if (notification.CheckFilter(key)) {
+            if (Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event); notification.CheckFilter(key)) {
 
                 // Create the event record
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
@@ -878,9 +872,7 @@ namespace AwsMock::Service {
 
         if (bucketEntity.HasTopicNotificationEvent(event)) {
 
-            Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event);
-
-            if (notification.CheckFilter(key)) {
+            if (Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event); notification.CheckFilter(key)) {
 
                 // Create the event record
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
@@ -900,9 +892,7 @@ namespace AwsMock::Service {
 
         if (bucketEntity.HasLambdaNotificationEvent(event)) {
 
-            Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event);
-
-            if (notification.CheckFilter(key)) {
+            if (Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event); notification.CheckFilter(key)) {
 
                 // Create the event record
                 Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
@@ -921,7 +911,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) {
+    Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) const {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
@@ -963,15 +953,15 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListObjectCounterResponse S3Service::ListObjectCounters(const Dto::S3::ListObjectCounterRequest &request) {
+    Dto::S3::ListObjectCounterResponse S3Service::ListObjectCounters(const Dto::S3::ListObjectCounterRequest &s3Request) const {
         log_trace << "List objects counters request";
 
         try {
 
-            Database::Entity::S3::ObjectList objectList = _database.ListObjects(request.region, request.prefix, request.bucket, request.pageSize, request.pageIndex, request.sortColumns);
+            Database::Entity::S3::ObjectList objectList = _database.ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, s3Request.sortColumns);
 
             Dto::S3::ListObjectCounterResponse listAllObjectResponse;
-            listAllObjectResponse.total = _database.ObjectCount(request.region, request.prefix, request.bucket);
+            listAllObjectResponse.total = _database.ObjectCount(s3Request.region, s3Request.prefix, s3Request.bucket);
 
             for (const auto &object: objectList) {
                 Dto::S3::ObjectCounter objectCounter;
@@ -994,9 +984,9 @@ namespace AwsMock::Service {
 
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
 
-        std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
-        std::string transferDir = dataDir + Poco::Path::separator() + "transfer";
+        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
+        const std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
+        const std::string transferDir = dataDir + Poco::Path::separator() + "transfer";
         Core::DirUtils::EnsureDirectory(dataS3Dir);
         Core::DirUtils::EnsureDirectory(transferDir);
 
@@ -1004,8 +994,7 @@ namespace AwsMock::Service {
         Core::FileUtils::DeleteFile(filename);
         log_debug << "File system object deleted, filename: " << filename;
 
-        std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
-        if (bucket == transferBucket) {
+        if (const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket"); bucket == transferBucket) {
             filename = transferDir + Poco::Path::separator() + key;
             Core::FileUtils::DeleteFile(filename);
             log_debug << "Transfer file system object deleted, filename: " << filename;
@@ -1039,8 +1028,8 @@ namespace AwsMock::Service {
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
 
         SQSService _sqsService;
-        Dto::SQS::SendMessageRequest request = {.region = region, .queueUrl = queueUrl, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
-        Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
+        const Dto::SQS::SendMessageRequest request = {.region = region, .queueUrl = queueUrl, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
+        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
     }
 
@@ -1069,8 +1058,7 @@ namespace AwsMock::Service {
 
     Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding) {
 
-        std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
-        std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
+        std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Write file
@@ -1148,8 +1136,9 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding) {
-        std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
+
+        // S3 data directory
+        std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Write file
@@ -1158,7 +1147,6 @@ namespace AwsMock::Service {
 
         std::ofstream ofs(filePath, std::ios::out | std::ios::trunc | std::ios::binary);
         ofs << stream.rdbuf();
-        //long size = Poco::StreamCopier::copyStream(stream, ofs);
         ofs.close();
 
         // Get size
@@ -1169,8 +1157,7 @@ namespace AwsMock::Service {
 
         // Check existence by
         std::string md5sum = Core::Crypto::HexEncode(Core::Crypto::Base64Decode(request.md5Sum));
-        Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, md5sum);
-        if (existingObject.oid.empty()) {
+        if (Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, md5sum); existingObject.oid.empty()) {
 
             // Version ID
             std::string versionId = Core::AwsUtils::CreateS3VersionId();
@@ -1246,29 +1233,29 @@ namespace AwsMock::Service {
 
     void S3Service::PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
 
-        for (auto &queueConfiguration: queueConfigurations) {
+        for (const auto &[id, queueArn, filterRules, events]: queueConfigurations) {
 
             // Check existence
-            if (!queueConfiguration.id.empty() && bucket.HasQueueNotificationId(queueConfiguration.id)) {
-                log_info << "Queue notification configuration exists already, id: " << queueConfiguration.id;
+            if (!id.empty() && bucket.HasQueueNotificationId(id)) {
+                log_info << "Queue notification configuration exists already, id: " << id;
                 break;
             }
 
             // General attributes
-            std::string id = queueConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : queueConfiguration.id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::QueueNotification queueNotification = {
-                    .id = id,
-                    .queueArn = queueConfiguration.queueArn,
+                    .id = attrId,
+                    .queueArn = queueArn,
             };
 
             // Get events
-            for (const auto &event: queueConfiguration.events) {
+            for (const auto &event: events) {
                 queueNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
             }
 
             // Get filter rules
-            for (const auto &filterRule: queueConfiguration.filterRules) {
-                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.value};
+            for (const auto &[name, value]: filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = NameTypeToString(name), .value = value};
                 queueNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.queueNotifications.emplace_back(queueNotification);
@@ -1278,28 +1265,28 @@ namespace AwsMock::Service {
 
     void S3Service::PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
 
-        for (auto &topicConfiguration: topicConfigurations) {
+        for (const auto &[id, topicArn, filterRules, events]: topicConfigurations) {
 
             // Check existence
-            if (!topicConfiguration.id.empty() && bucket.HasTopicNotificationId(topicConfiguration.id)) {
-                log_info << "Topic notification configuration exists already, id: " << topicConfiguration.id;
+            if (!id.empty() && bucket.HasTopicNotificationId(id)) {
+                log_info << "Topic notification configuration exists already, id: " << id;
                 break;
             }
 
             // General attributes
-            std::string id = topicConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : topicConfiguration.id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::TopicNotification topicNotification = {
-                    .id = id,
-                    .topicArn = topicConfiguration.topicArn,
+                    .id = attrId,
+                    .topicArn = topicArn,
             };
 
             // Get events
-            for (const auto &event: topicConfiguration.events) {
+            for (const auto &event: events) {
                 topicNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
             }
 
             // Get filter rules
-            for (const auto &filterRule: topicConfiguration.filterRules) {
+            for (const auto &filterRule: filterRules) {
                 Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.value};
                 topicNotification.filterRules.emplace_back(filterRuleEntity);
             }
@@ -1310,28 +1297,28 @@ namespace AwsMock::Service {
 
     void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
 
-        for (auto &lambdaConfiguration: lambdaConfigurations) {
+        for (const auto &[id, lambdaArn, filterRules, events]: lambdaConfigurations) {
 
             // Check existence
-            if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
-                log_info << "Lambda notification configuration exists already, id: " << lambdaConfiguration.id;
+            if (!id.empty() && bucket.HasLambdaNotificationId(id)) {
+                log_info << "Lambda notification configuration exists already, id: " << id;
                 break;
             }
 
             // General attributes
-            const std::string id = lambdaConfiguration.id.empty() ? Poco::UUIDGenerator().createOne().toString() : lambdaConfiguration.id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::LambdaNotification lambdaNotification = {
-                    .id = id,
-                    .lambdaArn = lambdaConfiguration.lambdaArn,
+                    .id = attrId,
+                    .lambdaArn = lambdaArn,
             };
 
             // Get events
-            for (const auto &event: lambdaConfiguration.events) {
+            for (const auto &event: events) {
                 lambdaNotification.events.emplace_back(EventTypeToString(event));
             }
 
             // Get filter rules
-            for (const auto &[name, value]: lambdaConfiguration.filterRules) {
+            for (const auto &[name, value]: filterRules) {
                 Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(name), .value = value};
                 lambdaNotification.filterRules.emplace_back(filterRuleEntity);
             }
@@ -1341,8 +1328,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) {
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
+        const std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
         if (bucket.HasEncryption()) {
             Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
@@ -1354,8 +1340,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) {
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string dataS3Dir = dataDir + Poco::Path::separator() + "s3";
+        const std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
         if (bucket.HasEncryption()) {
             Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();

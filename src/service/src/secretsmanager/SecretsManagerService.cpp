@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SecretsManagerService::SecretsManagerService() : _database(Database::SecretsManagerDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().GetValueString("awsmock.account.id");
+        _accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
 
         // Simulation of KMS key
         _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";
@@ -19,7 +19,7 @@ namespace AwsMock::Service {
         log_trace << "Create secret request, request: " << request.ToString();
 
         // Get region
-        std::string region = request.region;
+        const std::string region = request.region;
 
         // Check existence
         if (_database.SecretExists(request.region, request.name)) {

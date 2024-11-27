@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    void LambdaExecutor::operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload) {
+    void LambdaExecutor::operator()(const std::string &oid, const std::string &containerId, const std::string &host, const int port, const std::string &payload) const {
 
         Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
@@ -15,10 +15,10 @@ namespace AwsMock::Service {
         // Set status
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceRunning);
         Database::LambdaDatabase::instance().SetLastInvocation(oid, system_clock::now());
-        system_clock::time_point start = system_clock::now();
+        const system_clock::time_point start = system_clock::now();
 
         // Send request to lambda docker container
-        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload, {});
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload);
         if (response.statusCode != http::status::ok) {
             log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
             Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceFailed);

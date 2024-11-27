@@ -643,10 +643,10 @@ namespace AwsMock::Database {
     void SQSDatabase::ReceiveMessages(const std::string &queueArn, const int visibility, const int maxResult, const std::string &dlQueueArn, const int maxRetries, Entity::SQS::MessageList &messageList) const {
 
         // First rest resources
-        const long resetCount = ResetMessages(queueArn, visibility);
-        log_debug << "Messages reset, count " << resetCount;
+        //const long resetCount = ResetMessages(queueArn, visibility);
+        //log_trace << "Messages reset, count " << resetCount;
 
-        const auto reset = std::chrono::system_clock::now() + std::chrono::seconds(visibility);
+        const auto reset = system_clock::now() + std::chrono::seconds(visibility);
 
         if (HasDatabase()) {
 
@@ -665,8 +665,7 @@ namespace AwsMock::Database {
 
                 // Get the cursor
                 auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn),
-                                                                          kvp("status",
-                                                                              Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
+                                                                          kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
                                                             opts);
 
                 for (auto message: messageCursor) {
@@ -692,7 +691,7 @@ namespace AwsMock::Database {
                                                                                                  kvp("queueName",
                                                                                                      dlqQueueName),
                                                                                                  kvp("status",
-                                                                                                     Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                                                                                                     MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                             log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
 
                         } else {
@@ -709,8 +708,7 @@ namespace AwsMock::Database {
 
                         messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
                                                      make_document(kvp("$set",
-                                                                       make_document(kvp("status",
-                                                                                         Entity::SQS::MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                                                                       make_document(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
                                                                                      kvp("reset", bsoncxx::types::b_date(reset)),
                                                                                      kvp("receiptHandle", result.receiptHandle),
                                                                                      kvp("retries", result.retries)))));

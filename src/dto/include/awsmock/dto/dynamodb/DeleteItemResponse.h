@@ -6,10 +6,7 @@
 #define AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 // Boost include<
 #include <boost/beast.hpp>

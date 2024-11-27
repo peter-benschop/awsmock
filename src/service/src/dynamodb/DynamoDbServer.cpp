@@ -30,10 +30,10 @@ namespace AwsMock::Service {
         StartLocalDynamoDb();
 
         // Start DynamoDB monitoring update counters
-        //scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing tables
-        //scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
+        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
 
         // Set running
         SetRunning();

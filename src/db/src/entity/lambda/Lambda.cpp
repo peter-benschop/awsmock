@@ -138,7 +138,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
-            for (view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
@@ -152,7 +152,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get instances
         if (mResult.value().find("instances") != mResult.value().end()) {
-            for (view instancesView = mResult.value()["instances"].get_array().value; const bsoncxx::document::element &instanceElement: instancesView) {
+            for (const view instancesView = mResult.value()["instances"].get_array().value; const bsoncxx::document::element &instanceElement: instancesView) {
                 Instance instance;
                 instance.FromDocument(instanceElement.get_document().view());
                 instances.emplace_back(instance);
@@ -161,7 +161,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get event sources
         if (mResult.value().find("eventSources") != mResult.value().end()) {
-            for (view eventSourcesView = mResult.value()["eventSources"].get_array().value; const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
+            for (const view eventSourcesView = mResult.value()["eventSources"].get_array().value; const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
                 EventSourceMapping eventSourceMapping;
                 eventSourceMapping.FromDocument(eventSourceElement.get_document().view());
                 eventSources.emplace_back(eventSourceMapping);

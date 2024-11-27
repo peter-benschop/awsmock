@@ -9,22 +9,17 @@ namespace AwsMock::Dto::DynamoDb {
     std::string ListTableRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            if (!region.empty()) {
-                rootJson.set("Region", region);
-            }
-            if (!exclusiveStartTableName.empty()) {
-                rootJson.set("ExclusiveStartTableName", exclusiveStartTableName);
-            }
-            if (limit > 0) {
-                rootJson.set("Limit", limit);
-            }
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            bsoncxx::builder::basic::document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ExclusiveStartTableName", exclusiveStartTableName);
+            Core::Bson::BsonUtils::SetIntValue(document, "Limit", limit);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -34,7 +29,7 @@ namespace AwsMock::Dto::DynamoDb {
         body = jsonBody;
 
         Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonBody);
+        const Poco::Dynamic::Var result = parser.parse(jsonBody);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {

@@ -38,6 +38,7 @@ namespace AwsMock::Service {
         }
 
         // Update database
+        lambdaEntity.timeout = request.timeout;
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Pending;
         lambdaEntity.stateReason = "Initializing";
         lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
@@ -62,10 +63,10 @@ namespace AwsMock::Service {
         log_debug << "List functions request, region: " << region;
 
         try {
-            std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
 
             auto response = Dto::Lambda::ListFunctionResponse(lambdas);
-            log_trace << "Lambda list outcome: " << response.ToJson();
+            log_debug << "Lambda list outcome: " << response.ToJson();
             return response;
 
         } catch (Poco::Exception &ex) {

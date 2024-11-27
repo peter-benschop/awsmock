@@ -30,7 +30,8 @@ awsmock:
     socket: /var/run/docker.sock
   podman:
     active: true
-    network-mode: local
+    network-mode: podman
+    network-name: podman
     defaults:
       memory-size: 512
       temp-size: 10240

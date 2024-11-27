@@ -40,7 +40,7 @@ namespace AwsMock::Service {
             std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
 
             // Set test config
-            _configuration.SetValue("awsmock.service.gateway.http.port", _port);
+            _configuration.SetValue("awsmock.gateway.http.port", _port);
             _accountId = _configuration.GetValueString("awsmock.access.account-id");
             _endpoint = "http://" + _host + ":" + _port;
             _queueUrl = "http://sqs." + _region + "." + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;

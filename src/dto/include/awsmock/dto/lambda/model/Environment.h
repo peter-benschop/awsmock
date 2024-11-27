@@ -8,6 +8,10 @@
 // C++ standard includes
 #include <string>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/JsonUtils.h>
@@ -16,10 +20,18 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    using bsoncxx::view_or_value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
+    using std::chrono::system_clock;
+
     struct EnvironmentVariables {
 
         /**
-         * Environment variables
+         * @brief Environment variables
          */
         std::map<std::string, std::string> variables;
 
@@ -29,35 +41,28 @@ namespace AwsMock::Dto::Lambda {
         Error error;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
-         * @return JSON object
+         * @return DTO as BSON document
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        view_or_value<view, value> ToDocument() const;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @param object JSON object
          */
         void FromJson(Poco::JSON::Object::Ptr object);
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

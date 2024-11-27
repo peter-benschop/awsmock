@@ -3,10 +3,6 @@
 //
 
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/config/util.hpp>
-#include <bsoncxx/stdx/make_unique.hpp>
-#include <bsoncxx/types/bson_value/view.hpp>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -60,9 +56,9 @@ namespace AwsMock::Dto::DynamoDb {
 
             return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -86,16 +82,16 @@ namespace AwsMock::Dto::DynamoDb {
 
             // Tags
             if (documentValue.find("Tags") != documentValue.end()) {
-                for (const view tagsView = documentValue["Tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                    std::string key = bsoncxx::string::to_string(tagElement.key());
-                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                for (const bsoncxx::array::view arrayView{documentValue["Tags"].get_array().value}; const bsoncxx::array::element &tagElement: arrayView) {
+                    std::string key = Core::Bson::BsonUtils::GetStringValue(tagElement["Key"]);
+                    std::string value = Core::Bson::BsonUtils::GetStringValue(tagElement["Value"]);
                     tags.emplace(key, value);
                 }
             }
 
             // Attributes
             if (documentValue.find("AttributeDefinitions") != documentValue.end()) {
-                for (const view attributesView = documentValue["AttributeDefinitions"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
+                for (const bsoncxx::array::view arrayView{documentValue["AttributeDefinitions"].get_array().value}; const bsoncxx::array::element &attributeElement: arrayView) {
                     const std::string name = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeName"]);
                     const std::string type = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeType"]);
                     attributes[name] = type;
@@ -104,9 +100,9 @@ namespace AwsMock::Dto::DynamoDb {
 
             // Key schemas
             if (documentValue.find("KeySchema") != documentValue.end()) {
-                for (const view attributesView = documentValue["KeySchema"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
-                    const std::string name = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeName"]);
-                    const std::string type = Core::Bson::BsonUtils::GetStringValue(attributeElement["AttributeType"]);
+                for (const bsoncxx::array::view arrayView{documentValue["KeySchema"].get_array().value}; const bsoncxx::array::element &keySchemaElement: arrayView) {
+                    const std::string name = Core::Bson::BsonUtils::GetStringValue(keySchemaElement["AttributeName"]);
+                    const std::string type = Core::Bson::BsonUtils::GetStringValue(keySchemaElement["KeyType"]);
                     keySchemas[name] = type;
                 }
             }

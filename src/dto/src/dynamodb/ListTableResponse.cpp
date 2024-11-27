@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
                 for (const auto &tableName: tableNames) {
                     array.append(tableName);
                 }
-                document.append(kvp("Tables", array));
+                document.append(kvp("TableNames", array));
             }
             return Core::Bson::BsonUtils::ToJsonString(document);
 

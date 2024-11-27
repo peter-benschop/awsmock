@@ -43,14 +43,14 @@ namespace AwsMock::Service {
 
         // Body
         if (!body.empty()) {
-            boost::beast::ostream(response.body()).write(body.c_str(), body.size());
+            ostream(response.body()).write(body.c_str(), body.size());
         }
         response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
             }
         }
 

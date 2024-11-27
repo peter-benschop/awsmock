@@ -59,7 +59,7 @@ namespace AwsMock::Service {
          * @param ec error code
          * @param socket HTTP socket
          */
-        void OnAccept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket);
+        void OnAccept(const boost::beast::error_code &ec, boost::asio::ip::tcp::socket socket);
 
         /**
          * Boost IO context

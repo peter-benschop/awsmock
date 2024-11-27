@@ -200,6 +200,7 @@ namespace AwsMock::Core {
 
     void Configuration::SetValue(const std::string &key, const std::string &value) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -220,6 +221,7 @@ namespace AwsMock::Core {
 
     void Configuration::SetValue(const std::string &key, const int value) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -230,6 +232,7 @@ namespace AwsMock::Core {
 
     std::string Configuration::GetValueString(const std::string &key) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -238,6 +241,7 @@ namespace AwsMock::Core {
 
     int Configuration::GetValueInt(const std::string &key) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -246,6 +250,7 @@ namespace AwsMock::Core {
 
     long Configuration::GetValueLong(const std::string &key) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -254,6 +259,7 @@ namespace AwsMock::Core {
 
     bool Configuration::GetValueBool(const std::string &key) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -262,6 +268,7 @@ namespace AwsMock::Core {
 
     double Configuration::GetValueDouble(const std::string &key) const {
         if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');

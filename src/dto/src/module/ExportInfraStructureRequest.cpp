@@ -11,7 +11,7 @@ namespace AwsMock::Dto::Module {
         using Core::JsonUtils;
 
         Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
+        const Poco::Dynamic::Var result = parser.parse(payload);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {

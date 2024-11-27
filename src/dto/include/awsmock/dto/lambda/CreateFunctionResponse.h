@@ -6,16 +6,10 @@
 #define AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/lambda/model/Environment.h>

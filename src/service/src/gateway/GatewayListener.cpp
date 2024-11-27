@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewayListener::GatewayListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
+    GatewayListener::GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(make_strand(ioc)) {
 
         boost::beast::error_code ec;
 
@@ -40,14 +40,14 @@ namespace AwsMock::Service {
     }
 
     void GatewayListener::Run() {
-        boost::asio::dispatch(_acceptor.get_executor(), boost::beast::bind_front_handler(&GatewayListener::DoAccept, shared_from_this()));
+        dispatch(_acceptor.get_executor(), boost::beast::bind_front_handler(&GatewayListener::DoAccept, shared_from_this()));
     }
 
     void GatewayListener::DoAccept() {
         _acceptor.async_accept(boost::asio::make_strand(_ioc), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
     }
 
-    void GatewayListener::OnAccept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket) {
+    void GatewayListener::OnAccept(const boost::beast::error_code &ec, ip::tcp::socket socket) {
         if (ec) {
             log_error << ec.message();
         } else {

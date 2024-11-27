@@ -12,11 +12,11 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/types/bson_value/view.hpp>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
@@ -35,7 +35,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateTableRequest : public Dto::Common::BaseRequest {
+    struct CreateTableRequest : Common::BaseRequest {
 
         /**
          * Region

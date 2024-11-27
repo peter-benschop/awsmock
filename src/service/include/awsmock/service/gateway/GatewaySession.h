@@ -80,7 +80,7 @@ namespace AwsMock::Service {
         /**
          * @brief On read callback
          */
-        void OnRead(boost::beast::error_code ec, std::size_t bytes_transferred);
+        void OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred);
 
         /**
          * @brief Queue write callback

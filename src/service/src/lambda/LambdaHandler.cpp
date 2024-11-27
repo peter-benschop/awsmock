@@ -79,11 +79,11 @@ namespace AwsMock::Service {
                 } else {
 
                     Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
-                    log_trace << "Lambda function list";
+                    log_trace << "Lambda function list: " << lambdaResponse.ToJson();
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
-
-            } else if (action == "tags") {
+            }
+            if (action == "tags") {
 
                 std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
@@ -91,16 +91,14 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
                 log_trace << "Lambda tag list";
                 return SendOkResponse(request, lambdaResponse.ToJson());
-
-            } else if (action == "account-settings") {
+            }
+            if (action == "account-settings") {
 
                 Dto::Lambda::AccountSettingsResponse lambdaResponse = _lambdaService.GetAccountSettings();
                 log_trace << "Lambda account settings";
                 return SendOkResponse(request, lambdaResponse.ToJson());
-
-            } else {
-                return SendBadRequestError(request, "Unknown method");
             }
+            return SendBadRequestError(request, "Unknown method");
 
         } catch (Core::ServiceException &exc) {
             return Core::HttpUtils::InternalServerError(request, exc.message());

@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         CleanupInstances();
 
         // Create a local network, if it is not existing yet
-        //CreateLocalNetwork();
+        CreateLocalNetwork();
 
         // Start lambda monitoring update counters
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);

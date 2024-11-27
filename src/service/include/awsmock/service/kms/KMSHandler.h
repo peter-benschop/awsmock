@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         /**
          * KMS service
          */
-        Service::KMSService _kmsService;
+        KMSService _kmsService;
     };
 
 }// namespace AwsMock::Service

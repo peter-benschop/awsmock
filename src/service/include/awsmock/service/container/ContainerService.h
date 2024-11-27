@@ -104,7 +104,7 @@ namespace AwsMock::Service {
          * @param tag image tags
          * @param imageCode code of the image
          */
-        void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode);
+        void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode) const;
 
         /**
          * @brief Checks whether a image exists.
@@ -123,20 +123,20 @@ namespace AwsMock::Service {
          * @param locked if true is already locked
          * @return Image
          */
-        Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false);
+        Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
 
         /**
          * @brief Build a docker image for a lambda
          *
          * @param codeDir code directory
          * @param name lambda function name, used as image name
-         * @param tag image tags
+         * @param tag
          * @param handler lambda function handler
          * @param runtime lambda AWS runtime
          * @param environment runtime environment
          * @return file size in bytes
          */
-        std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+        std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Build a docker image from a docker file
@@ -162,7 +162,7 @@ namespace AwsMock::Service {
          * @param tag container tags
          * @return true if container exists, otherwise false
          */
-        bool ContainerExists(const std::string &name, const std::string &tag);
+        bool ContainerExists(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Checks whether a container exists by ID.
@@ -193,7 +193,7 @@ namespace AwsMock::Service {
          * @param hostPort external port of the lambda
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort);
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) const;
 
         /**
          * @brief Creates a container for a predefined image.
@@ -207,7 +207,7 @@ namespace AwsMock::Service {
          * @param containerPort internal port of the container
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, int hostPort, int containerPort);
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, int hostPort, int containerPort) const;
 
         /**
          * @brief Returns a container by name/tags.
@@ -216,7 +216,7 @@ namespace AwsMock::Service {
          * @param tag container tags
          * @return Container
          */
-        Dto::Docker::Container GetFirstContainerByImageName(const std::string &name, const std::string &tag);
+        Dto::Docker::Container GetFirstContainerByImageName(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Returns a container by ID.
@@ -224,7 +224,7 @@ namespace AwsMock::Service {
          * @param containerId container ID
          * @return Container
          */
-        Dto::Docker::Container GetContainerById(const std::string &containerId);
+        Dto::Docker::Container GetContainerById(const std::string &containerId) const;
 
         /**
          * @brief Returns a container by name.
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
          * @param name container name
          * @return Container
          */
-        Dto::Docker::Container GetContainerByName(const std::string &name);
+        Dto::Docker::Container GetContainerByName(const std::string &name) const;
 
         /**
          * @brief List all containers of an given image.
@@ -241,7 +241,7 @@ namespace AwsMock::Service {
          * @param tag image tag
          * @return list of containers
          */
-        std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag);
+        std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Checks whether a network exists.
@@ -249,7 +249,7 @@ namespace AwsMock::Service {
          * @param name network name
          * @return true if network exists, otherwise false
          */
-        bool NetworkExists(const std::string &name);
+        bool NetworkExists(const std::string &name) const;
 
         /**
          * @brief Creates a network with the given name
@@ -257,61 +257,61 @@ namespace AwsMock::Service {
          * @param request create network request
          * @return CreateNetworkResponse
          */
-        Dto::Docker::CreateNetworkResponse CreateNetwork(const Dto::Docker::CreateNetworkRequest &request);
+        Dto::Docker::CreateNetworkResponse CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) const;
 
         /**
          * @brief Start the container
          *
          * @param id container ID
          */
-        void StartDockerContainer(const std::string &id);
+        void StartDockerContainer(const std::string &id) const;
 
         /**
          * @brief Restart the container
          *
          * @param id container ID
          */
-        void RestartDockerContainer(const std::string &id);
+        void RestartDockerContainer(const std::string &id) const;
 
         /**
          * @brief Restart the container
          *
          * @param container container
          */
-        void RestartContainer(const Dto::Docker::Container &container);
+        void RestartContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Stops the container
          *
          * @param container container
          */
-        void StopContainer(const Dto::Docker::Container &container);
+        void StopContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Stops the container by ID
          *
          * @param id container ID
          */
-        void StopContainer(const std::string &id);
+        void StopContainer(const std::string &id) const;
 
         /**
          * @brief Deletes the container
          *
          * @param container container DTO
          */
-        void DeleteContainer(const Dto::Docker::Container &container);
+        void DeleteContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Deletes the container by ID
          *
          * @param id container ID
          */
-        void DeleteContainer(const std::string &id);
+        void DeleteContainer(const std::string &id) const;
 
         /**
          * @brief Deletes all stopped containers.
          */
-        void PruneContainers();
+        void PruneContainers() const;
 
       private:
 

@@ -30,15 +30,15 @@ namespace AwsMock::Core {
         parts.clear();
 
         const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string port = Configuration::instance().GetValueString("awsmock.service.gateway.http.port");
-        const std::string hostname = Configuration::instance().GetValueString("awsmock.service.sqs.hostname");
+        const std::string port = Configuration::instance().GetValueString("awsmock.gateway.http.port");
+        const std::string hostname = Configuration::instance().GetValueString("awsmock.gateway.http.host");
 
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }
 
     std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl) {
         const std::string queueName = queueUrl.substr(queueUrl.rfind('/') + 1);
-        const std::string accountId = Configuration::instance().GetValueString("awsmock.account.id");
+        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -80,8 +80,8 @@ namespace AwsMock::Core {
         return CreateArn("secretsmanager", region, accountId, "secret:" + secretId);
     }
 
-    std::string AwsUtils::CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &keyId) {
-        return CreateArn("kms", region, accountId, "key/" + keyId);
+    std::string AwsUtils::CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId) {
+        return CreateArn("kms", region, accountId, "key/" + kmsId);
     }
 
     std::string AwsUtils::CreateCognitoUserPoolId(const std::string &region) {
@@ -150,8 +150,8 @@ namespace AwsMock::Core {
 
     void AwsUtils::AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
         const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string accessKeyId = Configuration::instance().GetValueString("awsmock.access.key.id");
-        const std::string secretAccessKey = Configuration::instance().GetValueString("awsmock.secret.access.key");
+        const std::string accessKeyId = Configuration::instance().GetValueString("awsmock.access.key-id");
+        const std::string secretAccessKey = Configuration::instance().GetValueString("awsmock.access.secret-access-key");
 
         // Mandatory headers
         request.set(http::field::host, Core::SystemUtils::GetHostName());
@@ -160,11 +160,11 @@ namespace AwsMock::Core {
         request.set("x-amz-date", GetISODateString());
         request.set("x-amz-security-token", secretAccessKey);
 
-        std::string dateString = GetDateString();
-        std::string requestVersion = "aws4_request";
-        std::string scope = dateString + "/" + region + "/" + module + "/" + requestVersion;
+        const std::string dateString = GetDateString();
+        const std::string requestVersion = "aws4_request";
+        const std::string scope = dateString + "/" + region + "/" + module + "/" + requestVersion;
 
-        AuthorizationHeaderKeys authorizationHeaderKeys = {
+        const AuthorizationHeaderKeys authorizationHeaderKeys = {
                 .signingVersion = "AWS4-HMAC-SHA256",
                 .secretAccessKey = secretAccessKey,
                 .dateTime = dateString,
@@ -174,18 +174,18 @@ namespace AwsMock::Core {
                 .module = module,
                 .requestVersion = requestVersion,
                 .signedHeaders = signedHeaders};
-        std::string canonicalRequest = GetCanonicalRequest(request, authorizationHeaderKeys);
-        std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
-        std::string signature = GetSignature(authorizationHeaderKeys, stringToSign);
+        const std::string canonicalRequest = GetCanonicalRequest(request, authorizationHeaderKeys);
+        const std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
+        const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign);
 
-        std::string authorization = "AWS4-HMAC-SHA256 Credential=" + accessKeyId + "/" + dateString + "/" + region + "/" + module + "/" + requestVersion + ",SignedHeaders=" + signedHeaders + ",Signature=" + signature;
+        const std::string authorization = "AWS4-HMAC-SHA256 Credential=" + accessKeyId + "/" + dateString + "/" + region + "/" + module + "/" + requestVersion + ",SignedHeaders=" + signedHeaders + ",Signature=" + signature;
         request.set(http::field::authorization, authorization);
     }
 
     void AwsUtils::AddAuthorizationHeader(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
         const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string accessKeyId = Configuration::instance().GetValueString("awsmock.access.key.id");
-        const std::string secretAccessKey = Configuration::instance().GetValueString("awsmock.secret.access.key");
+        const std::string accessKeyId = Configuration::instance().GetValueString("awsmock.access.key-id");
+        const std::string secretAccessKey = Configuration::instance().GetValueString("awsmock.access.secret-access-key");
 
         // Mandatory headers
         if (!headers.contains("Host")) {
@@ -212,11 +212,7 @@ namespace AwsMock::Core {
                 .module = module,
                 .requestVersion = requestVersion,
                 .signedHeaders = signedHeaders};
-        const std::string canonicalRequest = GetCanonicalRequest(method,
-                                                                 path,
-                                                                 headers,
-                                                                 payload,
-                                                                 authorizationHeaderKeys);
+        const std::string canonicalRequest = GetCanonicalRequest(method, path, headers, payload, authorizationHeaderKeys);
         const std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
         const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign);
 
@@ -231,7 +227,7 @@ namespace AwsMock::Core {
         const std::string canonicalRequest = GetCanonicalRequest(request, authorizationHeaderKeys);
         const std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
 
-        if (const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign); !Core::StringUtils::Equals(signature, authorizationHeaderKeys.signature)) {
+        if (const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign); !StringUtils::Equals(signature, authorizationHeaderKeys.signature)) {
             log_error << "Calculated: " << signature << " provided: " << authorizationHeaderKeys.signature;
             return false;
         }
@@ -332,8 +328,7 @@ namespace AwsMock::Core {
         return Crypto::GetSha256FromString(payload);
     }
 
-    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<http::dynamic_body> &request,
-                                                           const std::string &secretAccessKey) {
+    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {
         const std::string authorizationHeader = request["Authorization"];
 
         // Get signing version

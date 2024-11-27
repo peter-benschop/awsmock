@@ -68,7 +68,7 @@ namespace AwsMock::Service {
          * @param functionId lambda function OID
          * @param instanceId instanceId
          */
-        void operator()(std::string &functionCode, std::string &functionId, std::string &instanceId) const;
+        void operator()(std::string &functionCode, const std::string &functionId, const std::string &instanceId) const;
 
       private:
 
@@ -97,7 +97,7 @@ namespace AwsMock::Service {
          * @param instance lambda entity instance.
          * @param dockerTag docker tag.
          */
-        static void CreateDockerContainer(Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag);
+        static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag);
 
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API

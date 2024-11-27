@@ -51,7 +51,7 @@ namespace AwsMock::Service {
         /**
          * Secrets manager module
          */
-        Service::SecretsManagerService _secretsManagerService;
+        SecretsManagerService _secretsManagerService;
     };
 
 }// namespace AwsMock::Service

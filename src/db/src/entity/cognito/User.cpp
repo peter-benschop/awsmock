@@ -55,8 +55,7 @@ namespace AwsMock::Database::Entity::Cognito {
 
         // Attributes
         if (mResult.value().find("userAttributes") != mResult.value().end()) {
-            bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value};
-            for (const bsoncxx::array::element &attributeElement: attributesView) {
+            for (const bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
                 UserAttribute attribute{
                         .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
                         .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};

@@ -52,7 +52,7 @@ namespace AwsMock::Service {
                          boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
-    void GatewaySession::OnRead(boost::beast::error_code ec, std::size_t bytes_transferred) {
+    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection

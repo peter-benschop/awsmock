@@ -6,13 +6,15 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object DeadLetterConfig::ToJsonObject() const {
+    view_or_value<view, value> DeadLetterConfig::ToDocument() const {
+
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("TargetArn", targetArn);
-            return rootJson;
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "TargetArn", targetArn);
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            throw Core::JsonException(exc.what());
         }
     }
 

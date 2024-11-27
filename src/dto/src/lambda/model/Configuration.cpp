@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Lambda {
 
             rootJson.set("CodeSha256", codeSha256);
             rootJson.set("CodeSize", codeSize);
-            rootJson.set("DeadLetterConfig", deadLetterConfig.ToJsonObject());
+            //rootJson.set("DeadLetterConfig", deadLetterConfig.ToJsonObject());
             rootJson.set("Description", description);
             // TODO: Environment, EphemeralStorage, FileSystemConfig
             rootJson.set("FunctionArn", functionArn);
@@ -33,10 +33,10 @@ namespace AwsMock::Dto::Lambda {
             rootJson.set("LastUpdateStatus", lastUpdateStatusReason);
             rootJson.set("LastUpdateStatusCode", lastUpdateStatusReasonCode);
             rootJson.set("State", state);
-            rootJson.set("StateResaon", stateReason);
+            rootJson.set("StateReason", stateReason);
             rootJson.set("StateReasonCode", stateReasonCode);
             rootJson.set("Timeout", timeout);
-            rootJson.set("Environment", environment.ToJsonObject());
+            //rootJson.set("Environment", environment.ToJsonObject());
             rootJson.set("Version", version);
 
             return rootJson;

@@ -140,28 +140,26 @@ namespace AwsMock::Dto::Lambda {
         long averageRuntime = 0;
 
         /**
-         * Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string for logging.
+         * Tags
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        std::map<std::string, std::string> tags;
 
         /**
-         * Converts the DTO to a JSON string.
+         * @brief Converts the DTO to a BSON document
          *
-         * @return DTO as JSON string
+         * @return DTO as BSON document
          */
-        [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

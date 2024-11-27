@@ -54,7 +54,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime);
+        bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const;
 
         /**
          * Check existence of lambda
@@ -63,7 +63,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const Entity::Lambda::Lambda &lambda);
+        bool LambdaExists(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Check existence of lambda
@@ -72,7 +72,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const std::string &function);
+        bool LambdaExists(const std::string &function) const;
 
         /**
          * @brief Check existence of lambda
@@ -81,7 +81,7 @@ namespace AwsMock::Database {
          * @return true if lambda exists
          * @throws DatabaseException
          */
-        bool LambdaExistsByArn(const std::string &arn);
+        bool LambdaExistsByArn(const std::string &arn) const;
 
         /**
          * @brief Create a new lambda function
@@ -97,7 +97,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        int LambdaCount(const std::string &region = {});
+        int LambdaCount(const std::string &region = {}) const;
 
         /**
          * @brief Updates an existing lambda lambda function
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return updated lambda entity.
          */
-        Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
+        Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Created or updates an existing lambda function
@@ -122,7 +122,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid);
+        Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -131,7 +131,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaById(const std::string &oid);
+        Entity::Lambda::Lambda GetLambdaById(const std::string &oid) const;
 
         /**
          * @brief Returns a lambda entity by ARN
@@ -140,7 +140,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn);
+        Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn) const;
 
         /**
          * @brief Returns a lambda entity by name
@@ -159,7 +159,7 @@ namespace AwsMock::Database {
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
+        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const;
 
         /**
          * @brief Sets the average runtime of a lambda instance
@@ -185,7 +185,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {});
+        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {}) const;
 
         /**
          * @brief Returns a list of lambda functions.

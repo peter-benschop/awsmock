@@ -80,9 +80,9 @@ namespace AwsMock::Core {
 
         // Prepare message
         http::request<http::string_body> request = PrepareJsonMessage(method, host, path, body, headers);
-        Core::AwsUtils::AddAuthorizationHeader(to_string(method), path, headers, module, "application/x-amz-json-1.0", signedHeaders, body);
-        for (const auto &header: headers) {
-            request.set(header.first, header.second);
+        AwsUtils::AddAuthorizationHeader(to_string(method), path, headers, module, "application/x-amz-json-1.0", signedHeaders, body);
+        for (const auto &[fst, snd]: headers) {
+            request.set(fst, snd);
         }
 
         // Write to TCP socket

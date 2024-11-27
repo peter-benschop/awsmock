@@ -10,7 +10,12 @@
 #include <string>
 #include <vector>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -19,8 +24,6 @@
 #include <awsmock/dto/lambda/model/Environment.h>
 
 namespace AwsMock::Dto::Lambda {
-
-    using std::chrono::system_clock;
 
     struct Function {
 
@@ -117,12 +120,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Timeout
          */
-        int timeout = 15;
+        int timeout = 15 * 60;
 
         /**
          * Version
          */
-        std::string version = {};
+        std::string version = "latest";
 
         /**
          * Environment
@@ -130,18 +133,16 @@ namespace AwsMock::Dto::Lambda {
         EnvironmentVariables environment = {};
 
         /**
-         * Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string for logging.
+         * Tags
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        std::map<std::string, std::string> tags = {};
 
         /**
-         * Converts the DTO to a JSON string.
+         * Converts the DTO to a BSON document string.
          *
-         * @return DTO as JSON string
+         * @return DTO as BSON document
          */
-        [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the DTO to a string representation.

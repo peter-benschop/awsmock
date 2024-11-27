@@ -244,7 +244,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_url");
         log_info << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
 
-        std::string queueUrl = Core::SanitizeSQSUrl(request.queueName);
+        const std::string queueUrl = Core::SanitizeSQSUrl(request.queueName);
 
         // Check existence
         if (!_sqsDatabase.QueueUrlExists(request.region, queueUrl)) {

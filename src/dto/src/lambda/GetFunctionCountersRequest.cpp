@@ -6,12 +6,12 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    void GetFunctionCountersRequest::FromJson(const std::string &body) {
+    void GetFunctionCountersRequest::FromJson(const std::string &jsonString) {
 
         try {
             Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(body);
-            Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+            const Poco::Dynamic::Var result = parser.parse(jsonString);
+            const Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
             Core::JsonUtils::GetJsonValueString("region", rootObject, region);
             Core::JsonUtils::GetJsonValueString("functionName", rootObject, functionName);

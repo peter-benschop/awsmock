@@ -45,8 +45,7 @@ namespace AwsMock::Service {
         int filesDeleted = 0, objectsDeleted = 0;
         for (auto &bucket: buckets) {
             // Get objects and delete object, where the file is not existing anymore
-            for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object:
-                                                                                                   objects) {
+            for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object: objects) {
                 if (!Core::FileUtils::FileExists(s3DataDir + object.internalName)) {
                     _s3Database.DeleteObject(object);
                     log_debug << "Object deleted, internalName: " << object.internalName;
@@ -64,8 +63,7 @@ namespace AwsMock::Service {
                 }
             }
         }
-        log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted
-                  << " objectsDeleted: " << objectsDeleted;
+        log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
     }
 
     void S3Server::SyncBuckets() const {

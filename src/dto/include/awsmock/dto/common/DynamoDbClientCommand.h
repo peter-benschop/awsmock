@@ -75,7 +75,7 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DynamoDbClientCommand : public BaseClientCommand {
+    struct DynamoDbClientCommand : BaseClientCommand {
 
         /**
          * @brief Client command
@@ -125,7 +125,7 @@ namespace AwsMock::Dto::Common {
          *
          * @return output stream
          */
-        std::string _secretAccessKey = Core::Configuration::instance().GetValueString("awsmock.secret.access.key");
+        std::string _secretAccessKey = Core::Configuration::instance().GetValueString("awsmock.access.secret-access-key");
     };
 
 }// namespace AwsMock::Dto::Common
