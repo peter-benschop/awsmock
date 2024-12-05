@@ -39,7 +39,7 @@ namespace AwsMock::Database::Entity::S3 {
         return queueNotificationDoc.extract();
     }
 
-    QueueNotification QueueNotification::FromDocument(const mongocxx::stdx::optional<view> &mResult) {
+    QueueNotification QueueNotification::FromDocument(const std::optional<view> &mResult) {
 
         try {
 

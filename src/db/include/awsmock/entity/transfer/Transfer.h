@@ -19,7 +19,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -167,7 +167,7 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<view> mResult);
+        void FromDocument(std::optional<view> mResult);
 
         /**
          * Converts the entity to a JSON object

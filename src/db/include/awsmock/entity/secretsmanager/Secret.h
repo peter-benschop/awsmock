@@ -16,7 +16,7 @@
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/exception/exception.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include "awsmock/core/exception/DatabaseException.h"
@@ -168,7 +168,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object

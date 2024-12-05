@@ -72,7 +72,7 @@ namespace AwsMock::Database::Entity::SQS {
         return redrivePolicyDoc;
     }
 
-    void RedrivePolicy::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void RedrivePolicy::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
         maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;

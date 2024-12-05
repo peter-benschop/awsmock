@@ -65,7 +65,7 @@ namespace AwsMock::Database::Entity::SQS {
         return messageDoc.extract();
     }
 
-    void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Message::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
 

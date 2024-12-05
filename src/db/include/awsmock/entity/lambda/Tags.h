@@ -15,7 +15,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -62,7 +62,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document

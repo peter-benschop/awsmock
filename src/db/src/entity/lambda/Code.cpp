@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Code::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Code::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         if (mResult.value().find("zipFile") != mResult.value().end()) {
             zipFile = Core::Bson::BsonUtils::GetStringValue(mResult, "zipFile");

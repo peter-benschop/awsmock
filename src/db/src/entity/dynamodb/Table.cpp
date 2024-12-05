@@ -52,7 +52,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    void Table::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Table::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

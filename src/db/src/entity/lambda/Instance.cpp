@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Instance::FromDocument(mongocxx::stdx::optional<view> mResult) {
+    void Instance::FromDocument(std::optional<view> mResult) {
 
         id = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
         containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");

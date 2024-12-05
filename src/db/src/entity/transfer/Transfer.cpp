@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::Transfer {
         return transferDoc;
     }
 
-    void Transfer::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Transfer::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

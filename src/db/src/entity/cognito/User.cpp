@@ -41,7 +41,7 @@ namespace AwsMock::Database::Entity::Cognito {
         return userDocument;
     }
 
-    void User::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void User::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

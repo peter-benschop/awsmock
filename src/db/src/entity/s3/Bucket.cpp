@@ -150,7 +150,7 @@ namespace AwsMock::Database::Entity::S3 {
         return bucketDoc;
     }
 
-    void Bucket::FromDocument(mongocxx::stdx::optional<view> mResult) {
+    void Bucket::FromDocument(std::optional<view> mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

@@ -18,7 +18,7 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    void BucketEncryption::FromDocument(const mongocxx::stdx::optional<view> &mResult) {
+    void BucketEncryption::FromDocument(const std::optional<view> &mResult) {
         try {
             sseAlgorithm = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sseAlgorithm"]);
             kmsKeyId = Core::Bson::BsonUtils::GetStringValue(mResult.value()["kmsKeyId"]);

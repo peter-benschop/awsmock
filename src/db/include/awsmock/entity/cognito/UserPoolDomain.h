@@ -10,7 +10,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>

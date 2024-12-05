@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::SQS {
         return queueAttributetDoc;
     }
 
-    void QueueAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void QueueAttribute::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
 

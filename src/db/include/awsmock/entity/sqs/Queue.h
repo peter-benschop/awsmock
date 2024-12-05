@@ -14,7 +14,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -114,7 +114,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @param mResult MongoDB document.
          */
-        Entity::SQS::Queue FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        Entity::SQS::Queue FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object

@@ -13,7 +13,7 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -124,7 +124,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<view> mResult);
+        void FromDocument(std::optional<view> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.

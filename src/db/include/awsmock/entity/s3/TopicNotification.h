@@ -14,7 +14,7 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -84,7 +84,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        TopicNotification FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        TopicNotification FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a JSON object

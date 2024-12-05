@@ -14,7 +14,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -98,7 +98,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        void FromDocument(mongocxx::stdx::optional<view> mResult);
+        void FromDocument(std::optional<view> mResult);
 
         /**
          * @brief Converts the entity to a JSON string

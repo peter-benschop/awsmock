@@ -20,7 +20,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"
@@ -71,7 +71,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult);
+        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view_or_value> mResult);
 
         /**
          * Converts the entity to a JSON object

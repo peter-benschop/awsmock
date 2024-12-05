@@ -17,7 +17,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -42,7 +42,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult database view.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * @brief Converts the JSON object to and entity

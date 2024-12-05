@@ -17,7 +17,7 @@
 #include <bsoncxx/builder/basic/kvp.hpp>
 #include <bsoncxx/types.hpp>
 #include <mongocxx/pipeline.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 namespace AwsMock::Database {
 
@@ -62,7 +62,7 @@ namespace AwsMock::Database {
          * @param attribute attribute name
          * @return time_point
          */
-        static system_clock::time_point GetDatetime(const mongocxx::stdx::optional<bsoncxx::document::view> &result, const std::string &attribute);
+        static system_clock::time_point GetDatetime(const std::optional<bsoncxx::document::view> &result, const std::string &attribute);
     };
 
 }// namespace AwsMock::Database

@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::SQS {
         return queueDoc;
     }
 
-    Entity::SQS::Queue Queue::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    Entity::SQS::Queue Queue::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");

@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return rotationRulesDoc.extract();
     }
 
-    void RotationRules::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void RotationRules::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         automaticallyAfterDays = static_cast<long>(mResult.value()["automaticallyAfterDays"].get_int64().value);
         duration = bsoncxx::string::to_string(mResult.value()["duration"].get_string().value);

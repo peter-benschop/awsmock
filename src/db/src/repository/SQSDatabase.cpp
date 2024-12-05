@@ -99,7 +99,7 @@ namespace AwsMock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-        const mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
+        const std::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
         if (mResult->empty()) {
             log_error << "Queue not found, oid: " << oid.to_string();
             throw Core::DatabaseException("Queue not found, oid: " + oid.to_string());
@@ -176,7 +176,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            if (const mongocxx::stdx::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name))); !mResult) {
+            if (const std::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name))); !mResult) {
                 Entity::SQS::Queue result;
 
                 log_info << "GetQueueByName succeeded, region: " << region << " name: " << name;
@@ -482,7 +482,7 @@ namespace AwsMock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-        mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
+        std::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult->view());
 
@@ -496,7 +496,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-            if (mongocxx::stdx::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
+            if (std::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
                 Entity::SQS::Message result;
                 result.FromDocument(mResult->view());
                 return result;
@@ -989,7 +989,7 @@ namespace AwsMock::Database {
                     system_clock::time_point firstTimestamp = system_clock::now();
                     system_clock::time_point lastTimestamp = system_clock::now();
 
-                    if (const mongocxx::stdx::optional<bsoncxx::document::value> first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts)) {
+                    if (const std::optional<bsoncxx::document::value> first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts)) {
                         Entity::SQS::Message firstMessage;
                         firstMessage.FromDocument(first->view());
                         firstTimestamp = firstMessage.created;
@@ -997,7 +997,7 @@ namespace AwsMock::Database {
 
                     opts.sort(make_document(kvp("created", 1)));
 
-                    mongocxx::stdx::optional<bsoncxx::document::value> last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
+                    std::optional<bsoncxx::document::value> last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts);
                     if (last.has_value()) {
                         Entity::SQS::Message lastMessage;
                         lastMessage.FromDocument(last->view());

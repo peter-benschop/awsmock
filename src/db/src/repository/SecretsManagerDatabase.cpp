@@ -69,7 +69,7 @@ namespace AwsMock::Database {
         auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-        mongocxx::stdx::optional<bsoncxx::document::value>
+        std::optional<bsoncxx::document::value>
                 mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SecretsManager::Secret result;
         result.FromDocument(mResult->view());
@@ -96,7 +96,7 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
+            std::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
             if (mResult->empty()) {
                 return {};
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value>
+            std::optional<bsoncxx::document::value>
                     mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
             if (mResult->empty()) {
                 return {};
