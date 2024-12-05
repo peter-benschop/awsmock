@@ -37,7 +37,7 @@ namespace AwsMock::Database::Entity::SNS {
         return messageDoc.extract();
     }
 
-    void Message::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Message::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
             oid = mResult.value()["_id"].get_oid().value.to_string();

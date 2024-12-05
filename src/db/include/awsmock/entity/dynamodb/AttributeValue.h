@@ -13,7 +13,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock include
 #include <awsmock/core/JsonUtils.h>
@@ -111,7 +111,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.

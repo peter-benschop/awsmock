@@ -11,7 +11,7 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -81,7 +81,7 @@ namespace AwsMock::Database::Entity::Module {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(const mongocxx::stdx::optional<view> &mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
         /**
          * Convert to JSON representation

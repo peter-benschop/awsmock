@@ -52,7 +52,7 @@ namespace AwsMock::Database::Entity::KMS {
         }
     }
 
-    void Key::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Key::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");

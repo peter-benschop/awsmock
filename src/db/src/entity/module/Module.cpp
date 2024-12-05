@@ -23,7 +23,7 @@ namespace AwsMock::Database::Entity::Module {
         return objectDoc;
     }
 
-    void Module::FromDocument(const mongocxx::stdx::optional<view> &mResult) {
+    void Module::FromDocument(const std::optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");

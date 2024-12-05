@@ -43,26 +43,23 @@ class TestEnvironment : public ::testing::Environment {
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize));
 
-        auto instance = bsoncxx::stdx::make_unique<mongocxx::instance>();
+        auto instance = std::make_unique<mongocxx::instance>();
         AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::instance();
 
         // Options
         mongocxx::options::client client_options;
         auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
         client_options.server_api_opts(api);
-        pool.configure(std::move(instance), bsoncxx::stdx::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
+        pool.configure(std::move(instance), std::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
     }
 };
 
 int main(int argc, char **argv) {
 
-    // Initialize MongoDB
-    // mongocxx::instance _instance{};
-
     // Run data
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::AddGlobalTestEnvironment(new TestEnvironment);
-    int ret = RUN_ALL_TESTS();
+    testing::InitGoogleTest(&argc, argv);
+    AddGlobalTestEnvironment(new TestEnvironment);
+    const int ret = RUN_ALL_TESTS();
 
     return ret;
 }

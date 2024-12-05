@@ -15,7 +15,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -113,7 +113,7 @@ namespace AwsMock::Database::Entity::SSM {
          *
          * @param mResult MongoDB document view.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * @brief JSON representation

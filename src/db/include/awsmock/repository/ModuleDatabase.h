@@ -8,9 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>

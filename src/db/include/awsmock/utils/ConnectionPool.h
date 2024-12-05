@@ -8,17 +8,11 @@
 // C++ includes
 #include <memory>
 #include <ranges>
-#include <string>
 
 // MongoDB includes
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/stdx/make_unique.hpp>
 #include <bsoncxx/stdx/optional.hpp>
-#include <bsoncxx/stdx/string_view.hpp>
 #include <mongocxx/instance.hpp>
-#include <mongocxx/logger.hpp>
 #include <mongocxx/pool.hpp>
-#include <mongocxx/uri.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -59,14 +53,14 @@ namespace AwsMock::Database {
          *
          * @return connection from the pool
          */
-        mongocxx::pool::entry GetConnection() const;
+        [[nodiscard]] mongocxx::pool::entry GetConnection() const;
 
         /**
          * @brief Try to get a connection
          *
          * @return optional connection from the pool
          */
-        bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection() const;
+        [[nodiscard]] bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection() const;
 
         /**
          * @brief Shutdown the connection pool

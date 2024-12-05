@@ -15,7 +15,7 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -63,7 +63,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const mongocxx::stdx::optional<view> &mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * Converts the entity to a JSON object

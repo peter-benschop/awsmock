@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::SNS {
         return topicAttributeDoc;
     }
 
-    void TopicAttribute::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void TopicAttribute::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
 

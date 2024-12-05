@@ -41,7 +41,7 @@ namespace AwsMock::Database::Entity::SNS {
         return topicDoc;
     }
 
-    void Topic::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Topic::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
 

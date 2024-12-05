@@ -42,7 +42,7 @@ namespace AwsMock::Database::Entity::Lambda {
         return jsonObject;
     }
 
-    void Environment::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void Environment::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         if (mResult.value().find("variables") != mResult.value().end()) {
             auto [value] = mResult.value()["variables"].get_array();

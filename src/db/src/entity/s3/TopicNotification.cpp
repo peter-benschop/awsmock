@@ -38,7 +38,7 @@ namespace AwsMock::Database::Entity::S3 {
         return topicNotificationDoc.extract();
     }
 
-    TopicNotification TopicNotification::FromDocument(mongocxx::stdx::optional<view> mResult) {
+    TopicNotification TopicNotification::FromDocument(std::optional<view> mResult) {
         try {
             id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
             topicArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["topicArn"]);

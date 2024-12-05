@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::S3 {
         return lambdaNotificationDoc.extract();
     }
 
-    LambdaNotification LambdaNotification::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    LambdaNotification LambdaNotification::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
 

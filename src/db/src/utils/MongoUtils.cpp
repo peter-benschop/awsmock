@@ -48,7 +48,7 @@ namespace AwsMock::Database {
         }
     }
 
-    system_clock::time_point MongoUtils::GetDatetime(const mongocxx::stdx::optional<bsoncxx::document::view> &document, const std::string &attribute) {
+    system_clock::time_point MongoUtils::GetDatetime(const std::optional<bsoncxx::document::view> &document, const std::string &attribute) {
         if (document.value()[attribute].type() != bsoncxx::type::k_null) {
             return bsoncxx::types::b_date(document.value()[attribute].get_date());
         }

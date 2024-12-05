@@ -20,7 +20,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMoc includes
 #include "awsmock/core/exception/ServiceException.h"
@@ -76,7 +76,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<bsoncxx::document::view> mResult);
 
         /**
          * Converts the entity to a string representation.

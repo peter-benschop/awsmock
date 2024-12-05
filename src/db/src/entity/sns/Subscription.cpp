@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::SNS {
         return subscriptionDoc;
     }
 
-    void Subscription::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view_or_value> mResult) {
+    void Subscription::FromDocument(std::optional<bsoncxx::document::view_or_value> mResult) {
 
         protocol = bsoncxx::string::to_string(mResult.value().view()["protocol"].get_string().value);
         endpoint = bsoncxx::string::to_string(mResult.value().view()["endpoint"].get_string().value);

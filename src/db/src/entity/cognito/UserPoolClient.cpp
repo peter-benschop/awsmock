@@ -22,7 +22,7 @@ namespace AwsMock::Database::Entity::Cognito {
         return userPoolDocument;
     }
 
-    void UserPoolClient::FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult) {
+    void UserPoolClient::FromDocument(std::optional<bsoncxx::document::view> mResult) {
 
         try {
 

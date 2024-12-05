@@ -14,7 +14,7 @@
 #include <bsoncxx/exception/exception.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -106,10 +106,10 @@ namespace AwsMock::Core::Bson {
         }
 
         static void SetDateValue(document &document, const std::string &name, const system_clock::time_point &value) {
-            document.append(kvp(name, Core::DateTimeUtils::ToISO8601(value)));
+            document.append(kvp(name, DateTimeUtils::ToISO8601(value)));
         }
 
-        static std::string GetOidValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static std::string GetOidValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetOidValue(view.value()[name]);
             }
@@ -128,7 +128,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static long GetLongValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static long GetLongValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetLongValue(view.value()[name]);
             }
@@ -157,7 +157,7 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static int GetIntValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static int GetIntValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetIntValue(view.value()[name]);
             }
@@ -186,7 +186,7 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static double GetDoubleValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static double GetDoubleValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetDoubleValue(view.value()[name]);
             }
@@ -206,7 +206,7 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static std::string GetStringValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static std::string GetStringValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetStringValue(view.value()[name]);
             }
@@ -232,7 +232,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static bool GetBoolValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static bool GetBoolValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetBoolValue(view.value()[name]);
             }
@@ -251,7 +251,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static system_clock::time_point GetDateValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
+        static system_clock::time_point GetDateValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetDateValue(view.value()[name]);
             }

@@ -35,7 +35,7 @@ namespace AwsMock::Database {
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_parameterCollectionName];
-            mongocxx::stdx::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
+            std::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult->empty()) {
                 log_error << "ssm parameter not found, oid" << oid.to_string();
                 throw Core::DatabaseException("ssm parameter not found, oid" + oid.to_string());
@@ -73,7 +73,7 @@ namespace AwsMock::Database {
 
             try {
 
-                mongocxx::stdx::optional<bsoncxx::document::value> mResult = _parameterCollection.find_one(make_document(kvp("name", name)));
+                std::optional<bsoncxx::document::value> mResult = _parameterCollection.find_one(make_document(kvp("name", name)));
                 if (mResult->empty()) {
                     log_error << "SSM parameter not found, name: " << name;
                     throw Core::DatabaseException("ssm parameter not found, name" + name);
