@@ -6,16 +6,11 @@
 
 namespace AwsMock::Dto::Module {
 
-    Dto::Module::Module::ModuleList Mapper::map(const std::vector<Database::Entity::Module::Module> &moduleList) {
+    Module::ModuleList Mapper::map(const std::vector<Database::Entity::Module::Module> &moduleList) {
 
-        Dto::Module::Module::ModuleList dtoList;
+        Module::ModuleList dtoList;
         for (const auto &module: moduleList) {
-            Dto::Module::Module moduleDto = {
-                    .name = module.name,
-                    .status = module.state,
-                    .created = module.created,
-                    .modified = module.modified};
-            dtoList.emplace_back(moduleDto);
+            dtoList.emplace_back(Module::FromDocument(module.ToDocument()));
         }
         return dtoList;
     }
