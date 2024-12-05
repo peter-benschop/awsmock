@@ -7,6 +7,7 @@
 namespace AwsMock::Dto::Cognito {
 
     std::string AdminCreateUserRequest::ToJson() const {
+
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
@@ -24,38 +25,27 @@ namespace AwsMock::Dto::Cognito {
 
     void AdminCreateUserRequest::FromJson(const std::string &payload) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
-            Core::JsonUtils::GetJsonValueString("Username", rootObject, userName);
-            Core::JsonUtils::GetJsonValueString("TemporaryPassword", rootObject, temporaryPassword);
+            const value document = bsoncxx::from_json(payload);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
+            temporaryPassword = Core::Bson::BsonUtils::GetStringValue(document, "TemporaryPassword");
+            messageAction = MessageActionFromString(Core::Bson::BsonUtils::GetStringValue(document, "MessageAction"));
 
             // Message action
-            if (rootObject->has("MessageAction")) {
-                messageAction = MessageActionFromString(rootObject->get("MessageAction").convert<std::string>());
-            }
-
-            Poco::JSON::Array::Ptr attributesArray = rootObject->getArray("UserAttributes");
-
-            if (attributesArray != nullptr) {
-                for (const auto &it: *attributesArray) {
-                    if (!it.isEmpty()) {
-                        const auto &object = it.extract<Poco::JSON::Object::Ptr>();
-                        UserAttribute userAttribute;
-                        userAttribute.FromJsonObject(object);
-                        userAttributes.emplace_back(userAttribute);
-                    }
+            if (document.find("UserAttributes") != document.end()) {
+                array array;
+                for (const auto &element: document["UserAttributes"].get_array().value) {
+                    UserAttribute userAttribute;
+                    userAttribute.FromDocument(element.get_document());
+                    userAttributes.emplace_back(userAttribute);
                 }
             }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

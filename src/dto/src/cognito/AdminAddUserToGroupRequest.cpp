@@ -12,9 +12,9 @@ namespace AwsMock::Dto::Cognito {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "Username", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
 
             return Core::Bson::BsonUtils::ToJsonString(document);
 

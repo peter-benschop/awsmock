@@ -95,7 +95,7 @@ COPY --from=build /usr/bin/aws /usr/bin/
 COPY --from=build /usr/local/bin/awsmockmgr /usr/bin/
 COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
-COPY --from=build /etc/awsmock.properties /etc/
+COPY --from=build /etc/awsmock.yml /etc/
 COPY --from=build /usr/local/bin/awslocal /usr/bin/
 
 # Configure awslocal

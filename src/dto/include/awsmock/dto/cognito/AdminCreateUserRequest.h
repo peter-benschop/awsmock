@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_ADMIN_CREATE_USER_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/common/BaseRequest.h>
@@ -24,7 +22,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminCreateUserRequest : public Dto::Common::BaseRequest {
+    struct AdminCreateUserRequest : Common::BaseRequest {
 
         /**
          * ID of the user pool
@@ -39,7 +37,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Message action
          */
-        MessageAction messageAction = MessageAction::SUPPRESS;
+        MessageAction messageAction = SUPPRESS;
 
         /**
          * Temporary password

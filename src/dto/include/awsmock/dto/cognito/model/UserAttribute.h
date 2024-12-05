@@ -6,14 +6,12 @@
 #define AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -36,11 +34,11 @@ namespace AwsMock::Dto::Cognito {
         std::string value;
 
         /**
-         * @brief Converts the JSON string to a DTO
+         * @brief Converts the BSON string to a DTO
          *
-         * @param jsonObject JSON object
+         * @param document BSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const std::optional<view> &document);
 
         /**
          * @brief Convert to a JSON string.
@@ -50,11 +48,11 @@ namespace AwsMock::Dto::Cognito {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * @brief Convert to a JSON string.
+         * @brief Convert to a BSON document.
          *
-         * @return user pools json string
+         * @return user pools BSON document
          */
-        Poco::JSON::Object ToJsonObject() const;
+        Poco::JSON::Object ToDocument() const;
 
         /**
          * @brief Converts the DTO to a string representation.
