@@ -13,7 +13,8 @@ namespace AwsMock::Database::Entity::S3 {
         return std::ranges::any_of(filterRules,
                                    [key](const FilterRule &rule) {
                                        return (rule.name == "prefix" && key.starts_with(rule.value)) || (rule.name ==
-                                           "suffix" && key.ends_with(rule.value));
+                                                                                                                 "suffix" &&
+                                                                                                         key.ends_with(rule.value));
                                    });
     }
 
@@ -24,13 +25,13 @@ namespace AwsMock::Database::Entity::S3 {
 
         // Events
         auto eventsDoc = bsoncxx::builder::basic::array{};
-        for (const auto &event : events) {
+        for (const auto &event: events) {
             eventsDoc.append(event);
         }
         topicNotificationDoc.append(kvp("events", eventsDoc));
 
         auto filterRulesDoc = bsoncxx::builder::basic::array{};
-        for (const auto &filterRule : filterRules) {
+        for (const auto &filterRule: filterRules) {
             filterRulesDoc.append(filterRule.ToDocument());
         }
         topicNotificationDoc.append(kvp("filterRules", filterRulesDoc));
@@ -45,8 +46,7 @@ namespace AwsMock::Database::Entity::S3 {
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const
-                     bsoncxx::array::element &filterRuleElement : filterRulesView) {
+                for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document());
                     filterRules.emplace_back(filterRule);
@@ -69,4 +69,4 @@ namespace AwsMock::Database::Entity::S3 {
         os << "TopicNotification=" << to_json(n.ToDocument());
         return os;
     }
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::S3
