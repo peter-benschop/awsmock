@@ -8,53 +8,43 @@ namespace AwsMock::Dto::Module {
 
     void ExportInfrastructureRequest::FromJson(const std::string &payload) {
 
-        using Core::JsonUtils;
-
-        Poco::JSON::Parser parser;
-        const Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            JsonUtils::GetJsonValueBool("includeObjects", rootObject, includeObjects);
-            JsonUtils::GetJsonValueBool("prettyPrint", rootObject, prettyPrint);
+            const value documentValue = bsoncxx::from_json(payload);
+            includeObjects = Core::Bson::BsonUtils::GetBoolValue(documentValue, "includeObjects");
+            prettyPrint = Core::Bson::BsonUtils::GetBoolValue(documentValue, "prettyPrint");
 
-            if (rootObject->has("modules")) {
-                Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("modules");
-                for (auto &it: *jsonArray) {
-                    modules.emplace_back(it);
-                }
+            if (documentValue.find("modules") != documentValue.end()) {
+                Core::Bson::FromBsonStringArray(documentValue, "modules", &modules);
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string ExportInfrastructureRequest::ToJson() const {
 
-        using Core::JsonUtils;
-
         try {
 
-            Poco::JSON::Object rootJson;
-            JsonUtils::SetJsonValueBool(rootJson, "includeObjects", includeObjects);
-            JsonUtils::SetJsonValueBool(rootJson, "prettyPrint", prettyPrint);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "includeObjects", includeObjects);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "prettyPrint", prettyPrint);
 
             if (!modules.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &it: modules) {
-                    jsonArray.add(it);
+                    jsonArray.append(it);
                 }
-                rootJson.set("modules", jsonArray);
+                rootDocument.append(kvp("modules", jsonArray));
             }
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -55,6 +55,27 @@ namespace AwsMock::Core::Bson {
         }
     }
 
+    template<class Element>
+    void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
+
+        if (value.find(name) != value.end()) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+                Element element;
+                element.FromDocument(arrayElement.get_document().view());
+                a->emplace_back(element);
+            }
+        }
+    }
+
+    inline void FromBsonStringArray(const value &value, const std::string &name, std::vector<std::string> *a) {
+
+        if (value.find(name) != value.end()) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+                a->emplace_back(arrayElement.get_string().value);
+            }
+        }
+    }
+
     inline void FromBsonArray(const view &value, const std::string &name, std::vector<std::string> *a) {
 
         if (value.find(name) != value.end()) {
@@ -77,6 +98,10 @@ namespace AwsMock::Core::Bson {
         }
 
         static void SetLongValue(document &document, const std::string &name, long value) {
+            document.append(kvp(name, value));
+        }
+
+        static void SetBoolValue(document &document, const std::string &name, bool value) {
             document.append(kvp(name, value));
         }
 
@@ -249,6 +274,10 @@ namespace AwsMock::Core::Bson {
 
         static std::string ToJsonString(const view &document) {
             return bsoncxx::to_json(document);
+        }
+
+        static std::string ToJsonString(const array &array) {
+            return bsoncxx::to_json(array);
         }
     };
 }// namespace AwsMock::Core::Bson
