@@ -9,8 +9,8 @@ namespace AwsMock::Database::Entity::S3 {
     view_or_value<view, value> BucketEncryption::ToDocument() const {
         try {
             view_or_value<view, value> notificationDoc = make_document(
-                kvp("sseAlgorithm", sseAlgorithm),
-                kvp("kmsKeyId", kmsKeyId));
+                    kvp("sseAlgorithm", sseAlgorithm),
+                    kvp("kmsKeyId", kmsKeyId));
             return notificationDoc;
         } catch (std::exception &exc) {
             log_error << exc.what();
@@ -50,4 +50,4 @@ namespace AwsMock::Database::Entity::S3 {
         os << "BucketEncryption=" << to_json(n.ToDocument());
         return os;
     }
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::S3

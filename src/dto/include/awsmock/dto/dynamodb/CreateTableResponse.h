@@ -13,7 +13,6 @@
 
 // BSON includes
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/stdx/make_unique.hpp>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
