@@ -233,7 +233,22 @@ namespace AwsMock::Core {
          * @param path absolute file path
          */
         static void StripChunkSignature(const std::string &path);
+
+        /**
+         * @brief File path separator
+         *
+         * @return file path separator
+         */
+        static char separator();
     };
+
+    inline char FileUtils::separator() {
+#if _WIN32
+        return '\\';
+#else
+        return '/';
+#endif
+    }
 
 }// namespace AwsMock::Core
 

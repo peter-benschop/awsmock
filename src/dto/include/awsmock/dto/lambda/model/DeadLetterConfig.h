@@ -6,18 +6,11 @@
 #define AWSMOCK_DTO_LAMBDA_DEAD_LETTER_CONFIG_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/JSON/Object.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -33,7 +26,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        view_or_value<view, value> ToDocument() const;
     };
 
 }// namespace AwsMock::Dto::Lambda

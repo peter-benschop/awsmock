@@ -10,25 +10,29 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("FunctionArn", functionArn);
-            rootJson.set("FunctionName", functionName);
-            rootJson.set("Runtime", runtime);
-            rootJson.set("Role", role);
-            rootJson.set("Handler", handler);
-            rootJson.set("MemorySize", memorySize);
-            rootJson.set("CodeSize", codeSize);
-            rootJson.set("Timeout", timeout);
-            rootJson.set("CodeSha256", codeSha256);
-            rootJson.set("LastModified", modified);
-            rootJson.set("Environment", environment.ToJsonObject());
-            rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
-            rootJson.set("MemorySize", memorySize);
+            bsoncxx::builder::basic::document document;
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "Runtime", runtime);
+            Core::Bson::BsonUtils::SetStringValue(document, "Role", role);
+            Core::Bson::BsonUtils::SetStringValue(document, "Handler", handler);
+            Core::Bson::BsonUtils::SetLongValue(document, "MemorySize", memorySize);
+            Core::Bson::BsonUtils::SetLongValue(document, "CodeSize", codeSize);
+            Core::Bson::BsonUtils::SetLongValue(document, "Timeout", timeout);
+            Core::Bson::BsonUtils::SetStringValue(document, "CodeSha256", codeSha256);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastModified", modified);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            // Environment
+            document.append(kvp("Environment", environment.ToDocument()));
+
+            // Ephemeral storage
+            document.append(kvp("EphemeralStorage", ephemeralStorage.ToDocument()));
+
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

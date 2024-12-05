@@ -6,23 +6,19 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _databaseName(GetDatabaseName()), _collectionName("lambda") {}
 
-    bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) {
+    bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
-                int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region),
-                                                                                kvp("function", function),
-                                                                                kvp("runtime", runtime)));
+                const int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region),
+                                                                                      kvp("function", function),
+                                                                                      kvp("runtime", runtime)));
                 log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -37,12 +33,12 @@ namespace AwsMock::Database {
         }
     }
 
-    bool LambdaDatabase::LambdaExists(const Entity::Lambda::Lambda &lambda) {
+    auto LambdaDatabase::LambdaExists(const Entity::Lambda::Lambda &lambda) const -> bool {
 
         return LambdaExists(lambda.region, lambda.function, lambda.runtime);
     }
 
-    bool LambdaDatabase::LambdaExists(const std::string &functionName) {
+    bool LambdaDatabase::LambdaExists(const std::string &functionName) const {
 
         if (HasDatabase()) {
 
@@ -65,7 +61,7 @@ namespace AwsMock::Database {
         }
     }
 
-    bool LambdaDatabase::LambdaExistsByArn(const std::string &arn) {
+    bool LambdaDatabase::LambdaExistsByArn(const std::string &arn) const {
 
         if (HasDatabase()) {
 
@@ -88,7 +84,7 @@ namespace AwsMock::Database {
         }
     }
 
-    int LambdaDatabase::LambdaCount(const std::string &region) {
+    int LambdaDatabase::LambdaCount(const std::string &region) const {
 
         if (HasDatabase()) {
 
@@ -143,7 +139,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) {
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) const {
 
         try {
 
@@ -165,7 +161,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) {
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) const {
 
         if (HasDatabase()) {
 
@@ -177,7 +173,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) {
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) const {
 
         if (HasDatabase()) {
 
@@ -244,7 +240,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
+    Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) const {
 
         if (HasDatabase()) {
 
@@ -270,7 +266,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void LambdaDatabase::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+    void LambdaDatabase::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
 
         if (HasDatabase()) {
 
@@ -349,30 +345,25 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdas(const std::string &region) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
-                if (region.empty()) {
 
-                    auto lambdaCursor = _lambdaCollection.find({});
-                    for (auto lambda: lambdaCursor) {
-                        Entity::Lambda::Lambda result;
-                        result.FromDocument(lambda);
-                        lambdas.push_back(result);
-                    }
-                } else {
-                    auto lambdaCursor = _lambdaCollection.find(make_document(kvp("region", region)));
-                    for (auto lambda: lambdaCursor) {
-                        Entity::Lambda::Lambda result;
-                        result.FromDocument(lambda);
-                        lambdas.push_back(result);
-                    }
+                bsoncxx::builder::basic::document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+
+                for (auto lambdaCursor = _lambdaCollection.find(query.extract()); auto lambda: lambdaCursor) {
+                    Entity::Lambda::Lambda result;
+                    result.FromDocument(lambda);
+                    lambdas.push_back(result);
                 }
 
             } catch (const mongocxx::exception &exc) {

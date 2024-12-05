@@ -17,9 +17,6 @@
 #include <mongocxx/pool.hpp>
 #include <mongocxx/uri.hpp>
 
-// Boost includes
-#include <boost/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
@@ -127,7 +124,7 @@ namespace AwsMock::Database {
         /**
          * Database client
          */
-        std::unique_ptr<mongocxx::pool> _pool;
+        std::unique_ptr<mongocxx::pool> _pool{};
 
         /**
          * Database flag

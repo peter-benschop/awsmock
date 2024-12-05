@@ -6,10 +6,12 @@
 #define AWSMOCK_DTO_DYNAMODB_DELETE_ITEM_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
+
+// BSON includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/types/bson_value/view.hpp>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -20,6 +22,13 @@
 #include <awsmock/dto/dynamodb/model/Key.h>
 
 namespace AwsMock::Dto::DynamoDb {
+
+    using bsoncxx::view_or_value;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
+    using bsoncxx::document::value;
+    using bsoncxx::document::view;
 
     /**
      * @brief DynamoDB delete item request

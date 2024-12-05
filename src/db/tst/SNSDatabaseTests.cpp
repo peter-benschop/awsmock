@@ -10,7 +10,6 @@
 
 // Local includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/SNSDatabase.h>
 
 #define REGION "eu-central-1"
@@ -28,7 +27,7 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {
@@ -47,7 +46,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
+        const Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
 
         // assert
         EXPECT_TRUE(result.topicName == TOPIC);

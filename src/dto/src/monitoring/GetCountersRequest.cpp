@@ -6,33 +6,18 @@
 
 namespace AwsMock::Dto::Monitoring {
 
-    GetCountersRequest GetCountersRequest::FromJson(const std::string &jsonString) {
-
-        GetCountersRequest request;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    GetCountersRequest GetCountersRequest::FromJson(const std::string &body) {
 
         try {
-            if (!rootObject->get("region").isEmpty()) {
-                request.region = rootObject->get("region").convert<std::string>();
-            }
-            if (!rootObject->get("name").isEmpty()) {
-                request.name = rootObject->get("name").convert<std::string>();
-            }
-            if (!rootObject->get("labelName").isEmpty()) {
-                request.labelName = rootObject->get("labelName").convert<std::string>();
-            }
-            if (!rootObject->get("labelValue").isEmpty()) {
-                request.labelValue = rootObject->get("labelValue").convert<std::string>();
-            }
-            if (!rootObject->get("step").isEmpty()) {
-                request.step = rootObject->get("step").convert<int>();
-            }
-
-            request.start = Core::DateTimeUtils::FromUnixtimestamp(rootObject->get("start").convert<long>());
-            request.end = Core::DateTimeUtils::FromUnixtimestamp(rootObject->get("end").convert<long>());
+            const value documentValue = bsoncxx::from_json(body);
+            GetCountersRequest request;
+            request.region = Core::Bson::BsonUtils::GetStringValue(documentValue, "region");
+            request.name = Core::Bson::BsonUtils::GetStringValue(documentValue, "name");
+            request.labelName = Core::Bson::BsonUtils::GetStringValue(documentValue, "labelName");
+            request.labelValue = Core::Bson::BsonUtils::GetStringValue(documentValue, "labelValue");
+            request.step = Core::Bson::BsonUtils::GetIntValue(documentValue, "step");
+            request.start = Core::DateTimeUtils::FromUnixtimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "start"));
+            request.end = Core::DateTimeUtils::FromUnixtimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "end"));
 
             return request;
 
@@ -45,16 +30,16 @@ namespace AwsMock::Dto::Monitoring {
     std::string GetCountersRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("name", name);
-            rootJson.set("labelName", labelName);
-            rootJson.set("labelValue", labelValue);
-            rootJson.set("start", Core::DateTimeUtils::ToISO8601(start));
-            rootJson.set("end", Core::DateTimeUtils::ToISO8601(end));
-            rootJson.set("step", step);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "labelName", labelName);
+            Core::Bson::BsonUtils::SetStringValue(document, "labelValue", labelValue);
+            Core::Bson::BsonUtils::SetIntValue(document, "step", step);
+            Core::Bson::BsonUtils::SetDateValue(document, "start", start);
+            Core::Bson::BsonUtils::SetDateValue(document, "end", end);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

@@ -9,9 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/sqs/SQSService.h"
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 // AwsMOck includes
 #include <awsmock/core/TestUtils.h>

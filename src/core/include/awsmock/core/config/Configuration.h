@@ -2,26 +2,33 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_CONFIGURATION_H
-#define AWSMOCK_CORE_CONFIGURATION_H
+#ifndef AWSMOCK_CORE_YAML_CONFIGURATION_H
+#define AWSMOCK_CORE_YAML_CONFIGURATION_H
 
 // Standard C++ includes
-#include <fstream>
 #include <string>
-
-// Poco includes
-#include <Poco/Util/PropertyFileConfiguration.h>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
 
+// YAML-cpp includes
+#include <yaml-cpp/yaml.h>
+
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
 namespace AwsMock::Core {
+
+    // Node lookup
+    template<typename Iter>
+    YAML::Node lookup(const YAML::Node &node, Iter start, Iter end) {
+        if (start == end) {
+            return node;
+        }
+        return lookup(node[*start], next(start), end);
+    }
 
     /**
      * @brief Configuration handler.
@@ -37,7 +44,7 @@ namespace AwsMock::Core {
      * </ul>
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
-     * @code{.ini}
+     * @code{.yaml}
      * awsmock.monitoring.port=9100
      * awsmock.monitoring.timeout=60000
      * awsmock.logging.level=debug
@@ -45,8 +52,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class Configuration final : public Poco::Util::PropertyFileConfiguration {
-
+    class Configuration {
       public:
 
         /**
@@ -110,7 +116,7 @@ namespace AwsMock::Core {
          *
          * @return file name of the configuration file.
          */
-        std::string GetFilename() const;
+        [[nodiscard]] std::string GetFilename() const;
 
         /**
          * @brief Sets the file name of the configuration file.
@@ -125,7 +131,55 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, const std::string &value);
+        void SetValue(const std::string &key, const std::string &value) const;
+
+        /**
+         * @brief Sets a string configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValueByPath(const std::string &key, const std::string &value);
+
+        /**
+         * @brief Returns a string configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] std::string GetValueString(const std::string &key) const;
+
+        /**
+         * @brief Returns a integer configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] int GetValueInt(const std::string &key) const;
+
+        /**
+         * @brief Returns a integer configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] long GetValueLong(const std::string &key) const;
+
+        /**
+         * @brief Returns a boolean configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] bool GetValueBool(const std::string &key) const;
+
+        /**
+         * @brief Returns a boolean configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] double GetValueDouble(const std::string &key) const;
 
         /**
          * @brief Sets a bool configuration value
@@ -133,7 +187,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, bool value);
+        void SetValue(const std::string &key, bool value) const;
 
         /**
          * @brief Sets an integer configuration value
@@ -141,7 +195,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, int value);
+        void SetValue(const std::string &key, int value) const;
 
         /**
          * @brief Returns the application name
@@ -190,7 +244,14 @@ namespace AwsMock::Core {
          * Reapply the environment variables to the properties, as environment variables have precedence over
          * file variables.
          */
-        void ApplyEnvSettings();
+        void ApplyEnvSettings() const;
+
+        /**
+         * @brief Checks existence of a property key
+         *
+         * @return true if property key exists
+         */
+        bool HasProperty(const std::string &key) const;
 
         /**
          * Name of the configuration file
@@ -215,9 +276,17 @@ namespace AwsMock::Core {
          */
         friend std::ostream &operator<<(std::ostream &, const Configuration &);
 
+        /**
+         * Property mutex
+         */
         static boost::mutex _configurationMutex;
+
+        /**
+         * YAML config
+         */
+        YAML::Node _yamlConfig;
     };
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_CONFIGURATION_H
+#endif// AWSMOCK_CORE_YAML_CONFIGURATION_H

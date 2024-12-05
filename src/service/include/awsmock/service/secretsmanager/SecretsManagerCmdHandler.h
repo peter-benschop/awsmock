@@ -5,19 +5,12 @@
 #ifndef AWSMOCK_SERVICE_SECRETSMANAGER_CMD_HANDLER_H
 #define AWSMOCK_SERVICE_SECRETSMANAGER_CMD_HANDLER_H
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
@@ -34,7 +27,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerCmdHandler : public virtual AbstractHandler {
+    class SecretsManagerCmdHandler final : public virtual AbstractHandler {
 
       public:
 
@@ -67,7 +60,7 @@ namespace AwsMock::Service {
         /**
          * Secrets manager module
          */
-        Service::SecretsManagerService _secretsManagerService;
+        SecretsManagerService _secretsManagerService;
 
         /**
          * Default account ID

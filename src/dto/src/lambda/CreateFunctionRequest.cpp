@@ -23,15 +23,15 @@ namespace AwsMock::Dto::Lambda {
 
             // Tags
             Poco::JSON::Array tagsArray;
-            for (const auto &tag: tags) {
+            for (const auto &[fst, snd]: tags) {
                 Poco::JSON::Object tagObject;
-                tagObject.set(tag.first, tag.second);
+                tagObject.set(fst, snd);
                 tagsArray.add(tagObject);
             }
             rootJson.set("Tags", tagsArray);
 
             // Ephemeral storage
-            rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
+            //rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
 
             // Code
             rootJson.set("Code", code.ToJsonObject());
@@ -47,8 +47,8 @@ namespace AwsMock::Dto::Lambda {
     void CreateFunctionRequest::FromJson(const std::string &jsonString) {
 
         Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        const Poco::Dynamic::Var result = parser.parse(jsonString);
+        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
             Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);

@@ -5,22 +5,14 @@
 #ifndef AWSMOCK_SERVICE_SQS_SERVER_H
 #define AWSMOCK_SERVICE_SQS_SERVER_H
 
-// C++ standard includes
-#include <chrono>
-#include <string>
-
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
-
-#define SQS_DEFAULT_MONITORING_PERIOD 300
-#define SQS_DEFAULT_WORKER_PERIOD 30
 
 namespace AwsMock::Service {
 
@@ -47,7 +39,7 @@ namespace AwsMock::Service {
          * This is only done once per startup, do synchronize the current state of the messages to the queue counters. All following message
          * operations (send, delete, purge etc.) will adjust the queue counters by itself.
          */
-        void AdjustCounters();
+        void AdjustCounters() const;
 
         /**
          * @brief Reset resources
@@ -58,7 +50,7 @@ namespace AwsMock::Service {
          * @par
          * Checks also the expiration date and removed the resources, which are older than the max retention period.
          */
-        void ResetMessages();
+        void ResetMessages() const;
 
         /**
          * @brief Collect waiting time statistics
@@ -66,12 +58,12 @@ namespace AwsMock::Service {
          * @par
          * Collects the average waiting time for messages in that queue.
          */
-        void CollectWaitingTimeStatistics();
+        void CollectWaitingTimeStatistics() const;
 
         /**
          * @brief Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * Metric service

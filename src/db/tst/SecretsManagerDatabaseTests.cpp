@@ -12,7 +12,6 @@
 #include <Poco/Path.h>
 
 // Local includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
@@ -27,7 +26,7 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {

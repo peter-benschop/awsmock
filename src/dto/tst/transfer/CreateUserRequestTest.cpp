@@ -14,7 +14,6 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/dto/transfer/CreateUserRequest.h>
 
 // Test includes
@@ -31,7 +30,7 @@ namespace AwsMock::Dto::Transfer {
 
         void SetUp() override {
             // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {

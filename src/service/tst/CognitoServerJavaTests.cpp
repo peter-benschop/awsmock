@@ -32,8 +32,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            _configuration.setInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.setString("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/cognito/";

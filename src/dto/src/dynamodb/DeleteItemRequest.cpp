@@ -9,15 +9,16 @@ namespace AwsMock::Dto::DynamoDb {
     std::string DeleteItemRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            bsoncxx::builder::basic::document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -26,19 +27,18 @@ namespace AwsMock::Dto::DynamoDb {
         // Save original body
         body = jsonBody;
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonBody);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        bsoncxx::builder::basic::document document;
+        const value documentValue = bsoncxx::from_json(body);
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
-            key.FromJsonObject(rootObject->getObject("Key"));
+            region = Core::Bson::BsonUtils::GetStringValue(documentValue, "Region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(documentValue, "TableName");
+            key.FromDocument(documentValue["Key"].get_document());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

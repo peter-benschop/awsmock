@@ -29,11 +29,11 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", GATEWAY_DEFAULT_HOST);
+            const std::string _port = _configuration.GetValueString("awsmock.modules.sqs.http.port");
+            const std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
 
             // Set test config
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
+            _configuration.SetValue("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
@@ -45,7 +45,6 @@ namespace AwsMock::Service {
             _snsDatabase.DeleteAllTopics();
             _sqsDatabase.DeleteAllMessages();
             _sqsDatabase.DeleteAllQueues();
-            //  _gatewayServer->Stop();
         }
 
         static std::string GetTopicArn(const std::string &jsonString) {

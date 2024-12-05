@@ -59,9 +59,9 @@ namespace AwsMock::Dto::Common {
     }
 
     [[maybe_unused]] static DynamoDbCommandType DynamoDbCommandTypeFromString(const std::string &commandType) {
-        for (auto &it: DynamoDbCommandTypeNames) {
-            if (Core::StringUtils::StartsWith(commandType, it.second)) {
-                return it.first;
+        for (auto &[fst, snd]: DynamoDbCommandTypeNames) {
+            if (Core::StringUtils::StartsWith(commandType, snd)) {
+                return fst;
             }
         }
         return DynamoDbCommandType::UNKNOWN;
@@ -75,7 +75,7 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DynamoDbClientCommand : public BaseClientCommand {
+    struct DynamoDbClientCommand : BaseClientCommand {
 
         /**
          * @brief Client command
@@ -125,7 +125,7 @@ namespace AwsMock::Dto::Common {
          *
          * @return output stream
          */
-        std::string _secretAccessKey = Core::Configuration::instance().getString("awsmock.secret.access.key", "none");
+        std::string _secretAccessKey = Core::Configuration::instance().GetValueString("awsmock.access.secret-access-key");
     };
 
 }// namespace AwsMock::Dto::Common

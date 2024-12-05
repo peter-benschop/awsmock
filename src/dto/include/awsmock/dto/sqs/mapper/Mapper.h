@@ -27,7 +27,6 @@ namespace AwsMock::Dto::SQS {
          *
          * Some values will be pulled over from the request.
          *
-         * @param objectList S3 object entity list
          * @param request request struct
          * @return ListObjectVersionsResponse
          * @see ListObjectVersionsResponse
@@ -39,12 +38,12 @@ namespace AwsMock::Dto::SQS {
          *
          * Some values will be pulled over from the request.
          *
-         * @param objectList S3 object entity list
          * @param request request struct
+         * @param messageEntity message entity
          * @return ListObjectVersionsResponse
          * @see ListObjectVersionsResponse
          */
-        static Dto::SQS::SendMessageResponse map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity);
+        static SendMessageResponse map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity);
     };
 
 }// namespace AwsMock::Dto::SQS

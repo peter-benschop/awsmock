@@ -26,9 +26,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
+                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     log_info << "Table created, name: " << tableRequest.tableName;
                 }
 
@@ -44,9 +43,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::ListTableResponse tableResponse = _dynamoDbService.ListTables(tableRequest);
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
+                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     log_info << "Table listed, region: " << tableRequest.region;
                 }
 
@@ -62,9 +60,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
+                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::DELETE_TABLE: {
@@ -79,9 +76,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     }
+                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::GET_ITEM: {
@@ -97,9 +93,8 @@ namespace AwsMock::Service {
                     //itemResponse.headers["Content-Length"] = itemResponse.body.length();
                     if (itemResponse.status == http::status::ok) {
                         return SendOkResponse(request, itemResponse.body, itemResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
                     }
+                    return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
@@ -114,9 +109,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
                     if (itemResponse.status == http::status::ok) {
                         return SendOkResponse(request, itemResponse.body, itemResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
                     }
+                    return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::QUERY: {
@@ -131,9 +125,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
                     if (queryResponse.status == http::status::ok) {
                         return SendOkResponse(request, queryResponse.body, queryResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, queryResponse.body, queryResponse.headers);
                     }
+                    return SendInternalServerError(request, queryResponse.body, queryResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::SCAN: {
@@ -148,9 +141,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
                     if (scanResponse.status == http::status::ok) {
                         return SendOkResponse(request, scanResponse.body, scanResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, scanResponse.body, scanResponse.headers);
                     }
+                    return SendInternalServerError(request, scanResponse.body, scanResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::DELETE_ITEM: {
@@ -165,9 +157,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::DeleteItemResponse dynamoDbResponse = _dynamoDbService.DeleteItem(dynamoDbRequest);
                     if (dynamoDbResponse.status == http::status::ok) {
                         return SendOkResponse(request, dynamoDbResponse.body, dynamoDbResponse.headers);
-                    } else {
-                        return SendInternalServerError(request, dynamoDbResponse.body, dynamoDbResponse.headers);
                     }
+                    return SendInternalServerError(request, dynamoDbResponse.body, dynamoDbResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {

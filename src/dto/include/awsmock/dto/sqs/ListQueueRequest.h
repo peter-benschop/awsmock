@@ -66,7 +66,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Convert to JSON representation
          *
-         * @return JSON string
+         * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 

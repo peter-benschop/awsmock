@@ -8,66 +8,59 @@ namespace AwsMock::Dto::Module {
 
     std::string GatewayConfig::ToJson() const {
         try {
-            Poco::JSON::Object gatewayConfigJson;
-            gatewayConfigJson.set("region", region);
-            gatewayConfigJson.set("protocol", protocol);
-            gatewayConfigJson.set("endpoint", endpoint);
-            gatewayConfigJson.set("host", host);
-            gatewayConfigJson.set("address", address);
-            gatewayConfigJson.set("port", port);
-            gatewayConfigJson.set("pid", pid);
-            gatewayConfigJson.set("pretty", prettyPrint);
-            gatewayConfigJson.set("accessId", accessId);
-            gatewayConfigJson.set("clientId", clientId);
-            gatewayConfigJson.set("user", user);
-            gatewayConfigJson.set("dataDir", dataDir);
-            gatewayConfigJson.set("prettyPrint", prettyPrint);
-            gatewayConfigJson.set("databaseActive", databaseActive);
-            gatewayConfigJson.set("version", version);
 
-            return Core::JsonUtils::ToJsonString(gatewayConfigJson);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "protocol", protocol);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "endpoint", endpoint);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "host", host);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "address", address);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "port", port);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "pid", pid);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "pretty", prettyPrint);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "accessId", accessId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "clientId", clientId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "dataDir", dataDir);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "databaseActive", databaseActive);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "version", version);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     GatewayConfig GatewayConfig::FromJson(const std::string &payload) {
+
         if (payload.empty()) {
             return {};
         }
-        GatewayConfig gatewayConfig;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        const value documentValue = bsoncxx::from_json(payload);
 
         try {
-            Core::JsonUtils::GetJsonValueString("region", rootObject, gatewayConfig.region);
-            Core::JsonUtils::GetJsonValueString("protocol", rootObject, gatewayConfig.protocol);
-            Core::JsonUtils::GetJsonValueString("endpoint", rootObject, gatewayConfig.endpoint);
-            Core::JsonUtils::GetJsonValueString("host", rootObject, gatewayConfig.host);
-            Core::JsonUtils::GetJsonValueString("address", rootObject, gatewayConfig.address);
-            Core::JsonUtils::GetJsonValueInt("port", rootObject, gatewayConfig.port);
-            Core::JsonUtils::GetJsonValueInt("pid", rootObject, gatewayConfig.pid);
-            Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
-            Core::JsonUtils::GetJsonValueString("accessId", rootObject, gatewayConfig.accessId);
-            Core::JsonUtils::GetJsonValueString("clientId", rootObject, gatewayConfig.clientId);
-            Core::JsonUtils::GetJsonValueString("user", rootObject, gatewayConfig.user);
-            Core::JsonUtils::GetJsonValueString("dataDir", rootObject, gatewayConfig.dataDir);
-            Core::JsonUtils::GetJsonValueBool("prettyPrint", rootObject, gatewayConfig.prettyPrint);
-            Core::JsonUtils::GetJsonValueBool("databaseActive", rootObject, gatewayConfig.databaseActive);
-            Core::JsonUtils::GetJsonValueString("version", rootObject, gatewayConfig.version);
+            GatewayConfig gatewayConfig;
+            gatewayConfig.region = Core::Bson::BsonUtils::GetStringValue(documentValue, "region");
+            gatewayConfig.protocol = Core::Bson::BsonUtils::GetStringValue(documentValue, "protocol");
+            gatewayConfig.endpoint = Core::Bson::BsonUtils::GetStringValue(documentValue, "endpoint");
+            gatewayConfig.host = Core::Bson::BsonUtils::GetStringValue(documentValue, "host");
+            gatewayConfig.port = Core::Bson::BsonUtils::GetIntValue(documentValue, "port");
+            gatewayConfig.pid = Core::Bson::BsonUtils::GetIntValue(documentValue, "pid");
+            gatewayConfig.prettyPrint = Core::Bson::BsonUtils::GetBoolValue(documentValue, "prettyPrint");
+            gatewayConfig.accessId = Core::Bson::BsonUtils::GetStringValue(documentValue, "accessId");
+            gatewayConfig.clientId = Core::Bson::BsonUtils::GetStringValue(documentValue, "clientId");
+            gatewayConfig.user = Core::Bson::BsonUtils::GetStringValue(documentValue, "user");
+            gatewayConfig.dataDir = Core::Bson::BsonUtils::GetStringValue(documentValue, "dataDir");
+            gatewayConfig.databaseActive = Core::Bson::BsonUtils::GetBoolValue(documentValue, "databaseActive");
+            gatewayConfig.version = Core::Bson::BsonUtils::GetStringValue(documentValue, "version");
+            return gatewayConfig;
 
-            // Cleanup
-            parser.reset();
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        return gatewayConfig;
     }
 
     std::string GatewayConfig::ToString() const {

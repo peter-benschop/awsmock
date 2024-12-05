@@ -5,15 +5,18 @@
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 
 namespace AwsMock::Service {
-
-    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb", 10), _containerService(DockerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
-
+    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb"),
+                                                                         _containerService(ContainerService::instance()),
+                                                                         _dynamoDbDatabase(
+                                                                                 Database::DynamoDbDatabase::instance()),
+                                                                         _metricService(
+                                                                                 Monitoring::MetricService::instance()) {
         // Get HTTP configuration values
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.dynamodb.worker.period", DYNAMODB_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.dynamodb.monitoring.period", DYNAMODB_DEFAULT_MONITORING_PERIOD);
-        _containerHost = configuration.getString("awsmock.dynamodb.host", DYNAMODB_DOCKER_HOST);
-        _containerPort = configuration.getInt("awsmock.dynamodb.port", DYNAMODB_DOCKER_PORT);
+        Core::Configuration &configuration = Core::Configuration::instance();
+        _workerPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.worker.period");
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.monitoring.period");
+        _containerHost = configuration.GetValueString("awsmock.modules.dynamodb.container.host");
+        _containerPort = configuration.GetValueInt("awsmock.modules.dynamodb.container.port");
         log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
         // Check module active
@@ -27,10 +30,10 @@ namespace AwsMock::Service {
         StartLocalDynamoDb();
 
         // Start DynamoDB monitoring update counters
-        //scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod, 10);
+        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing tables
-        //scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 60);
+        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
 
         // Set running
         SetRunning();
@@ -51,11 +54,17 @@ namespace AwsMock::Service {
 
         // Check container image
         if (!_containerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            _containerService.CreateContainer(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG, _containerPort, _containerPort);
+            _containerService.CreateContainer(DYNAMODB_DOCKER_IMAGE,
+                                              DYNAMODB_DOCKER_TAG,
+                                              _containerPort,
+                                              _containerPort);
         }
 
         // Start docker container, in case it is not already running.
-        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG); container.state != "running") {
+        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(
+                    DYNAMODB_DOCKER_IMAGE,
+                    DYNAMODB_DOCKER_TAG);
+            container.state != "running") {
             _containerService.StartDockerContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
@@ -68,16 +77,21 @@ namespace AwsMock::Service {
 
         // Check docker image
         if (!_containerService.ImageExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            throw Core::ServiceException("Image does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("Image does not exist",
+                                         Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Check container image
         if (!_containerService.ContainerExists(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG)) {
-            throw Core::ServiceException("Container does not exist", Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("Container does not exist",
+                                         Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Stop docker container, in case it is running.
-        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(DYNAMODB_DOCKER_IMAGE, DYNAMODB_DOCKER_TAG); container.state == "running") {
+        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(
+                    DYNAMODB_DOCKER_IMAGE,
+                    DYNAMODB_DOCKER_TAG);
+            container.state == "running") {
             _containerService.StopContainer(container);
             log_info << "Docker containers for DynamoDB stopped";
         } else {
@@ -86,16 +100,17 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbServer::SynchronizeTables() const {
-
         // Get the list of tables from DynamoDB
-        auto [status, output] = Core::SystemUtils::Exec("aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+        auto [status, output] = Core::SystemUtils::Exec(
+                "aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
         Dto::DynamoDb::ListTableResponse listTableResponse;
         listTableResponse.FromJson(output, {});
 
         if (!listTableResponse.tableNames.empty()) {
             for (const auto &tableName: listTableResponse.tableNames) {
                 auto [status, output] = Core::SystemUtils::Exec(
-                        "aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+                        "aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost +
+                        ":" + std::to_string(_containerPort));
                 Dto::DynamoDb::DescribeTableResponse describeTableResponse;
                 describeTableResponse.FromJson(output, {});
 
@@ -107,9 +122,7 @@ namespace AwsMock::Service {
                         .keySchemas = describeTableResponse.keySchemas};
                 _dynamoDbDatabase.CreateOrUpdateTable(table);
             }
-
         } else {
-
             _dynamoDbDatabase.DeleteAllTables();
         }
         log_debug << "DynamoDB synchronized";
@@ -125,5 +138,4 @@ namespace AwsMock::Service {
 
         log_trace << "DynamoDb monitoring finished";
     }
-
 }// namespace AwsMock::Service

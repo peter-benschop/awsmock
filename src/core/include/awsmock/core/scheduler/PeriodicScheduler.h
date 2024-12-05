@@ -20,6 +20,7 @@
 // AwsMOck includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <map>
 
 namespace AwsMock::Core {
 
@@ -42,7 +43,7 @@ namespace AwsMock::Core {
          * @param name name of the task
          * @param task task function
          * @param interval interval in seconds
-         * @param startTime time for the first execution (should be something like (00:00, oder 04:00)
+         * @param delay start delay in seconds
          */
         void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval, int delay = 0);
 
@@ -61,7 +62,7 @@ namespace AwsMock::Core {
         /**
          * Task list
          */
-        std::vector<std::unique_ptr<PeriodicTask>> _tasks;
+        std::map<std::string, std::unique_ptr<PeriodicTask>> _tasks;
     };
 
 }// namespace AwsMock::Core

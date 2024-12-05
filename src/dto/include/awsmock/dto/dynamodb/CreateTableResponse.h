@@ -6,13 +6,14 @@
 #define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 // Boost include<
 #include <boost/beast.hpp>
+
+// BSON includes
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/stdx/make_unique.hpp>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -144,14 +145,6 @@ namespace AwsMock::Dto::DynamoDb {
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Parse a JSON stream
-         *
-         * @param body JSON body
-         * @param headerMap HTTP header map
-         */
-        void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
 
         /**
          * Converts the DTO to a string representation.

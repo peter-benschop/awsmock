@@ -6,11 +6,9 @@
 #define AWSMOCK_DTO_COGNITO_MODEL_TOKEN_VALIDITY_UNITS_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -27,22 +25,22 @@ namespace AwsMock::Dto::Cognito {
     };
 
     static std::map<ValidityUnits, std::string> ValidityUnitsNames{
-            {ValidityUnits::seconds, "seconds"},
-            {ValidityUnits::minutes, "minutes"},
-            {ValidityUnits::hours, "hours"},
-            {ValidityUnits::days, "days"}};
+            {seconds, "seconds"},
+            {minutes, "minutes"},
+            {hours, "hours"},
+            {days, "days"}};
 
     [[maybe_unused]] static std::string ValidityUnitToString(ValidityUnits validityUnits) {
         return ValidityUnitsNames[validityUnits];
     }
 
     [[maybe_unused]] static ValidityUnits ValidityUnitFromString(const std::string &validityUnits) {
-        for (auto &it: ValidityUnitsNames) {
-            if (it.second == validityUnits) {
-                return it.first;
+        for (auto &[fst, snd]: ValidityUnitsNames) {
+            if (snd == validityUnits) {
+                return fst;
             }
         }
-        return ValidityUnits::days;
+        return days;
     }
 
     struct TokenValidityUnits {
@@ -50,17 +48,17 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Access token
          */
-        ValidityUnits accessToken = ValidityUnits::hours;
+        ValidityUnits accessToken = hours;
 
         /**
          * ID token
          */
-        ValidityUnits idToken = ValidityUnits::hours;
+        ValidityUnits idToken = hours;
 
         /**
          * Refresh token
          */
-        ValidityUnits refreshToken = ValidityUnits::hours;
+        ValidityUnits refreshToken = hours;
 
         /**
          * @brief Convert to a JSON string
@@ -72,7 +70,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Convert from a JSON object
          *
-         * @param JSON object
+         * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
@@ -80,6 +78,7 @@ namespace AwsMock::Dto::Cognito {
          * @brief Convert to a JSON object
          *
          * @return JSON object
+         * @throws JsonException
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 

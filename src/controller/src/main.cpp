@@ -30,7 +30,7 @@
 // AwsMock includes
 #include <awsmock/controller/Controller.h>
 
-#define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
+#define DEFAULT_CONFIG_FILE "/etc/awsmock.yml"
 
 // Allowed actions
 static std::list<std::string> allowedActions() {
@@ -40,8 +40,8 @@ static std::list<std::string> allowedActions() {
 /**
  * Show help
  */
-void ShowHelp(boost::program_options::options_description desc) {
-    int leftIndent = 40;
+void ShowHelp(const boost::program_options::options_description &desc) {
+    constexpr int leftIndent = 40;
     std::cout << std::endl
               << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
               << std::endl
@@ -80,7 +80,7 @@ void ShowHelp(boost::program_options::options_description desc) {
  * @param argv command line arguments.
  * @return system exit code.
  */
-int main(int argc, char *argv[]) {
+int main(const int argc, char *argv[]) {
 
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
@@ -97,8 +97,8 @@ int main(int argc, char *argv[]) {
 
     // Get command line options.
     boost::program_options::variables_map vm;
-    boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
-    boost::program_options::notify(vm);
+    store(parse_command_line(argc, argv, desc), vm);
+    notify(vm);
 
     // Get commands.
     std::vector<std::string> commands;
@@ -107,13 +107,13 @@ int main(int argc, char *argv[]) {
     }
 
     // Show usage.
-    if (vm.count("help")) {
+    if (vm.contains("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show version
-    if (vm.count("version")) {
+    if (vm.contains("version")) {
         std::cout << std::endl
                   << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
@@ -122,31 +122,31 @@ int main(int argc, char *argv[]) {
 
     // Read configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.count("config")) {
+    if (vm.contains("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
     // Set log level.
-    if (vm.count("loglevel")) {
-        std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
+    if (vm.contains("loglevel")) {
+        const std::string value = vm["loglevel"].as<std::string>();
+        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
         AwsMock::Core::LogStream::SetSeverity("info");
     }
 
     // Set log file
-    if (vm.count("logfile")) {
-        std::string value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.file", value);
+    if (vm.contains("logfile")) {
+        const std::string value = vm["logfile"].as<std::string>();
+        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.file", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }
 
     // Check command
     bool found = false;
-    std::string action = commands.front();
+    const std::string action = commands.front();
     for (const std::string &s: allowedActions()) {
         if (s == action) {
             found = true;

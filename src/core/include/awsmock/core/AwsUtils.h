@@ -10,10 +10,6 @@
 #include <iostream>
 #include <string>
 
-// Poco includes
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/UUIDGenerator.h>
-
 // Boost includes
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -21,12 +17,11 @@
 #include <boost/uuid/uuid_io.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/UnauthorizedException.h>
 
 #define S3_FILE_NAME_LENGTH 64
@@ -554,8 +549,8 @@ namespace AwsMock::Core {
      * @return HTTP endpoint
      */
     inline std::string GetEndpoint() {
-        int port = Core::Configuration::instance().getInt("awsmock.service.gateway.http.port", GATEWAY_DEFAULT_PORT);
-        std::string hostname = Core::Configuration::instance().getString("awsmock.service.sqs.hostname", SystemUtils::GetHostName());
+        const int port = Configuration::instance().GetValueInt("awsmock.gateway.http.port");
+        const std::string hostname = SystemUtils::GetHostName();
         return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
     }
 
@@ -580,11 +575,11 @@ namespace AwsMock::Core {
      * @return SQS queue URL
      */
     inline std::string CreateSQSQueueUrl(const std::string &queueName) {
-        std::string hostname = Core::SystemUtils::GetHostName();
-        std::string port = Core::Configuration::instance().getString("awsmock.service.gateway.http.port");
-        std::string region = Core::Configuration::instance().getString("awsmock.region", SQS_DEFAULT_REGION);
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
-        std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+        const std::string hostname = SystemUtils::GetHostName();
+        const std::string port = Configuration::instance().GetValueString("awsmock.gateway.http.port");
+        const std::string region = Configuration::instance().GetValueString("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
+        const std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
         log_trace << "queueUrl: " << queueUrl;
         return queueUrl;
     }
@@ -596,8 +591,8 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &queueName) {
-        std::string region = Core::Configuration::instance().getString("awsmock.region", GATEWAY_DEFAULT_REGION);
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+        const std::string region = Configuration::instance().GetValueString("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -610,7 +605,7 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &region, const std::string &queueName) {
-        std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", SQS_DEFAULT_ACCOUNT_ID);
+        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -654,11 +649,11 @@ namespace AwsMock::Core {
     inline std::string SanitizeSQSUrl(const std::string &queue) {
         if (IsSQSUrl(queue)) {
             return queue;
-        } else if (IsSQSArn(queue)) {
-            return AwsUtils::ConvertSQSQueueArnToUrl(queue);
-        } else {
-            return CreateSQSQueueUrl(queue);
         }
+        if (IsSQSArn(queue)) {
+            return AwsUtils::ConvertSQSQueueArnToUrl(queue);
+        }
+        return CreateSQSQueueUrl(queue);
     }
 
 }// namespace AwsMock::Core

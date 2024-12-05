@@ -7,15 +7,12 @@
 
 // Boost includes
 #include <boost/beast.hpp>
-#include <boost/beast/http/impl/message.hpp>
-#include <boost/lexical_cast.hpp>
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/secretsmanager/SecretsManagerCmdHandler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
@@ -29,7 +26,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerHandler : public AbstractHandler {
+    class SecretsManagerHandler final : public AbstractHandler {
 
       public:
 
@@ -54,7 +51,7 @@ namespace AwsMock::Service {
         /**
          * Secrets manager module
          */
-        Service::SecretsManagerService _secretsManagerService;
+        SecretsManagerService _secretsManagerService;
     };
 
 }// namespace AwsMock::Service

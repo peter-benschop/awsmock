@@ -7,10 +7,8 @@
 
 // Boost includes
 #include <boost/beast.hpp>
-#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/MonitoringClientCommand.h>
@@ -29,7 +27,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MonitoringHandler : public AbstractHandler {
+    class MonitoringHandler final : public AbstractHandler {
 
       public:
 

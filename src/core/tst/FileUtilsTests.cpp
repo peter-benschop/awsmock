@@ -73,7 +73,7 @@ namespace AwsMock::Core {
 
         // arrange
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
-        const std::string targetFilename = tempDir + Poco::Path::separator() + "test1/test2/test3/test4.gif";
+        const std::string targetFilename = tempDir + Core::FileUtils::separator() + "test1/test2/test3/test4.gif";
 
         // act
         FileUtils::MoveTo(fileName, targetFilename);
@@ -112,7 +112,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetParentPathTest) {
 
         // arrange
-        const std::string fileName = tempDir + Poco::Path::separator() + "testFile.txt";
+        const std::string fileName = tempDir + Core::FileUtils::separator() + "testFile.txt";
 
         // act
         const std::string tempPath = FileUtils::GetParentPath(fileName);

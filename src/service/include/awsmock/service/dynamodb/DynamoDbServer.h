@@ -15,7 +15,7 @@
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/docker/DockerService.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         /**
          * Docker module
          */
-        Service::DockerService &_containerService;
+        Service::ContainerService &_containerService;
 
         /**
          * Database connection

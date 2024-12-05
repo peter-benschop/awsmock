@@ -64,17 +64,17 @@ namespace AwsMock::Dto::S3 {
         /**
          * List of queue notifications
          */
-        std::vector<Dto::S3::QueueConfiguration> queueConfigurations;
+        std::vector<QueueConfiguration> queueConfigurations;
 
         /**
          * List of topic notifications
          */
-        std::vector<Dto::S3::TopicConfiguration> topicConfigurations;
+        std::vector<TopicConfiguration> topicConfigurations;
 
         /**
          * List of lambda notifications
          */
-        std::vector<Dto::S3::LambdaConfiguration> lambdaConfigurations;
+        std::vector<LambdaConfiguration> lambdaConfigurations;
 
         /**
          * Create timestamp
@@ -87,9 +87,9 @@ namespace AwsMock::Dto::S3 {
         system_clock::time_point modified;
 
         /**
-         * @brief Convert to a JSON string
+         * @brief Convert to a JSON object
          *
-         * @return JSON string
+         * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 

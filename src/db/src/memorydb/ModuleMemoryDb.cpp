@@ -10,22 +10,22 @@ namespace AwsMock::Database {
 
     bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
-        return find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                    return module.second.name == name;
                }) != _modules.end();
     }
 
     bool ModuleMemoryDb::IsActive(const std::string &name) {
 
-        return find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                    return module.second.name == name && module.second.status == Entity::Module::ModuleStatus::ACTIVE;
                }) != _modules.end();
     }
 
     Entity::Module::Module ModuleMemoryDb::GetModuleById(const std::string &oid) {
 
-        auto it =
-                find_if(_modules.begin(), _modules.end(), [oid](const std::pair<std::string, Entity::Module::Module> &module) {
+        const auto it =
+                std::ranges::find_if(_modules, [oid](const std::pair<std::string, Entity::Module::Module> &module) {
                     return module.first == oid;
                 });
 
@@ -39,8 +39,8 @@ namespace AwsMock::Database {
 
     Entity::Module::Module ModuleMemoryDb::GetModuleByName(const std::string &name) {
 
-        auto it =
-                find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                     return module.second.name == name;
                 });
 
@@ -55,8 +55,8 @@ namespace AwsMock::Database {
     std::vector<std::string> ModuleMemoryDb::GetAllModuleNames() {
 
         std::vector<std::string> moduleNameList;
-        for (const auto &module: _modules) {
-            moduleNameList.emplace_back(module.second.name);
+        for (const auto &val: _modules | std::views::values) {
+            moduleNameList.emplace_back(val.name);
         }
 
         log_trace << "Got module name list, size: " << moduleNameList.size();
@@ -66,7 +66,7 @@ namespace AwsMock::Database {
     Entity::Module::Module ModuleMemoryDb::CreateModule(const Entity::Module::Module &module) {
         Poco::ScopedLock lock(_moduleMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _modules[oid] = module;
         log_trace << "Module created, oid: " << oid;
         return GetModuleById(oid);
@@ -87,8 +87,8 @@ namespace AwsMock::Database {
         Poco::ScopedLock lock(_moduleMutex);
 
         std::string name = module.name;
-        auto it =
-                find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                     return module.second.name == name;
                 });
 
@@ -104,8 +104,8 @@ namespace AwsMock::Database {
     Entity::Module::Module ModuleMemoryDb::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
         Poco::ScopedLock lock(_moduleMutex);
 
-        auto it =
-                find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                     return module.second.name == name;
                 });
 
@@ -122,8 +122,8 @@ namespace AwsMock::Database {
     void ModuleMemoryDb::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
         Poco::ScopedLock lock(_moduleMutex);
 
-        auto it =
-                find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                     return module.second.name == name;
                 });
 
@@ -139,8 +139,8 @@ namespace AwsMock::Database {
     void ModuleMemoryDb::SetPort(const std::string &name, int port) {
         Poco::ScopedLock lock(_moduleMutex);
 
-        auto it =
-                find_if(_modules.begin(), _modules.end(), [name](const std::pair<std::string, Entity::Module::Module> &module) {
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                     return module.second.name == name;
                 });
 
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
         _modules[it->first] = it->second;
     }
 
-    int ModuleMemoryDb::ModuleCount() {
+    int ModuleMemoryDb::ModuleCount() const {
         return static_cast<int>(_modules.size());
     }
 

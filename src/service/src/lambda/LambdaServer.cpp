@@ -5,20 +5,21 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-
-    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
-
+    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"),
+                                                                     _lambdaDatabase(
+                                                                             Database::LambdaDatabase::instance()) {
         // Get HTTP configuration values
         Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.getInt("awsmock.service.lambda.monitoring.period", LAMBDA_DEFAULT_MONITORING_PERIOD);
-        _workerPeriod = configuration.getInt("awsmock.service.lambda.worker.period", LAMBDA_DEFAULT_WORKER_PERIOD);
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.lambda.monitoring.period");
+        _counterPeriod = configuration.GetValueInt("awsmock.modules.lambda.counter.period");
+        _removePeriod = configuration.GetValueInt("awsmock.modules.lambda.remove.period");
 
         // Directories
-        _lambdaDir = configuration.getString("awsmock.data.dir") + Poco::Path::separator() + "lambda";
+        _lambdaDir = configuration.GetValueString("awsmock.modules.lambda.data-dir");
         log_debug << "Lambda directory: " << _lambdaDir;
 
         // Create environment
-        _region = configuration.getString("awsmock.region");
+        _region = configuration.GetValueString("awsmock.region");
 
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
@@ -30,13 +31,13 @@ namespace AwsMock::Service {
         CleanupInstances();
 
         // Create a local network, if it is not existing yet
-        //CreateLocalNetwork();
+        CreateLocalNetwork();
 
         // Start lambda monitoring update counters
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
-        scheduler.AddTask("lambda-remove-lambdas", [this] { RemoveExpiredLambdas(); }, _workerPeriod);
+        scheduler.AddTask("lambda-remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
 
         // Set running
         SetRunning();
@@ -49,11 +50,10 @@ namespace AwsMock::Service {
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
         for (auto &lambda: lambdas) {
-
             // Cleanup instances
             for (const auto &instance: lambda.instances) {
-                Service::DockerService::instance().StopContainer(instance.containerId);
-                Service::DockerService::instance().DeleteContainer(instance.containerId);
+                Service::ContainerService::instance().StopContainer(instance.containerId);
+                Service::ContainerService::instance().DeleteContainer(instance.containerId);
                 log_debug << "Lambda instances cleaned up, id: " << instance.containerId;
             }
             lambda.instances.clear();
@@ -69,17 +69,17 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::CleanupInstances() {
-
         log_debug << "Cleanup lambdas";
         std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
         for (auto &lambda: lambdas) {
-
             log_debug << "Get containers";
-            std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest");
+            std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(
+                    lambda.function,
+                    "latest");
             for (const auto &container: containers) {
-                Service::DockerService::instance().StopContainer(container.id);
-                Service::DockerService::instance().DeleteContainer(container.id);
+                Service::ContainerService::instance().StopContainer(container.id);
+                Service::ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
             _lambdaDatabase.UpdateLambda(lambda);
@@ -91,7 +91,6 @@ namespace AwsMock::Service {
         log_debug << "Create networks, name: local";
 
         if (!_dockerService.NetworkExists("local")) {
-
             Dto::Docker::CreateNetworkRequest request;
             request.name = "local";
             request.driver = "bridge";
@@ -104,7 +103,6 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::RemoveExpiredLambdas() {
-
         // Get lambda list
         Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
         if (lambdaList.empty()) {
@@ -113,12 +111,11 @@ namespace AwsMock::Service {
         log_debug << "Lambda worker starting, count: " << lambdaList.size();
 
         // Get lifetime from configuration
-        int lifetime = Core::Configuration::instance().getInt("awsmock.service.lambda.lifetime", LAMBDA_DEFAULT_LIFETIME);
-        auto expired = std::chrono::system_clock::now() - std::chrono::seconds(lifetime);
+        const int lifetime = Core::Configuration::instance().GetValueInt("awsmock.modules.lambda.lifetime");
+        const auto expired = system_clock::now() - std::chrono::seconds(lifetime);
 
         // Loop over lambdas and remove expired instances
         for (auto &lambda: lambdaList) {
-
             if (lambda.instances.empty()) {
                 continue;
             }
@@ -143,13 +140,12 @@ namespace AwsMock::Service {
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
     }
 
-    void LambdaServer::UpdateCounter() {
+    void LambdaServer::UpdateCounter() const {
         log_trace << "Lambda monitoring starting";
 
-        long lambdas = _lambdaDatabase.LambdaCount();
+        const long lambdas = _lambdaDatabase.LambdaCount();
         _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, lambdas);
 
         log_trace << "Lambda monitoring finished";
     }
-
 }// namespace AwsMock::Service

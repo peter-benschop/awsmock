@@ -11,10 +11,19 @@ RUN mkdir -p /usr/src
 RUN cd /usr/src && \
     git clone https://github.com/SergiusTheBest/plog.git && \
     cd plog && \
-    cmake . && \
+    cmake . -DPLOG_BUILD_SAMPLES=OFF && \
+    cmake --build . -j 8 && \
     cmake --install .
 
-# Install jwt-cpp
+# Install YAML
+RUN cd /usr/src && \
+    git clone https://github.com/jbeder/yaml-cpp.git && \
+    cd yaml-cpp && \
+    cmake . && \
+    cmake --build . -j 8 && \
+    cmake --install .
+ \
+    # Install jwt-cpp
 RUN cd /usr/src && \
     git clone https://github.com/Thalhammer/jwt-cpp.git && \
     cd jwt-cpp && \
@@ -37,14 +46,6 @@ RUN cd /usr/src && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
-    cmake --install . --prefix /usr/local
-
-# Install date/tz library
-RUN cd /usr/src && \
-    git clone https://github.com/HowardHinnant/date.git && \
-    cd date && \
-    cmake . && \
-    cmake --build . --config Release -j 8 && \
     cmake --install . --prefix /usr/local
 
 # Cleanup

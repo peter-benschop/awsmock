@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Dto::Monitoring::GetCountersResponse MonitoringService::GetCounters(const Dto::Monitoring::GetCountersRequest &request) {
+    Dto::Monitoring::GetCountersResponse MonitoringService::GetCounters(const Dto::Monitoring::GetCountersRequest &request) const {
         log_trace << "Get counters request, request: " << request.ToString();
 
         Dto::Monitoring::GetCountersResponse response;

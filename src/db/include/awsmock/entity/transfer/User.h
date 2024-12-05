@@ -6,21 +6,11 @@
 #define AWSMOCK_DB_ENTITY_USER_H
 
 // C++ includes
-#include <iostream>
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/stdx.hpp>
 
 namespace AwsMock::Database::Entity::Transfer {
 
@@ -75,12 +65,12 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(bsoncxx::document::view mResult);
+        [[maybe_unused]] void FromDocument(view mResult);
 
         /**
          * @brief Converts from a JSON object
          *
-         * @return JSON object
+         * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 

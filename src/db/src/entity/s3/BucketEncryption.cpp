@@ -2,19 +2,16 @@
 // Created by vogje01 on 06/09/2023.
 //
 
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/s3/BucketEncryption.h>
 
 namespace AwsMock::Database::Entity::S3 {
-
     view_or_value<view, value> BucketEncryption::ToDocument() const {
-
         try {
-
             view_or_value<view, value> notificationDoc = make_document(
-                    kvp("sseAlgorithm", sseAlgorithm),
-                    kvp("kmsKeyId", kmsKeyId));
+                kvp("sseAlgorithm", sseAlgorithm),
+                kvp("kmsKeyId", kmsKeyId));
             return notificationDoc;
-
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
@@ -22,12 +19,9 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     void BucketEncryption::FromDocument(const mongocxx::stdx::optional<view> &mResult) {
-
         try {
-
-            sseAlgorithm = mResult.value()["sseAlgorithm"].get_string().value;
-            kmsKeyId = mResult.value()["kmsKeyId"].get_string();
-
+            sseAlgorithm = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sseAlgorithm"]);
+            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(mResult.value()["kmsKeyId"]);
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
@@ -42,7 +36,6 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     void BucketEncryption::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
         Core::JsonUtils::GetJsonValueString("sseAlgorithm", jsonObject, sseAlgorithm);
         Core::JsonUtils::GetJsonValueString("kmsKeyId", jsonObject, kmsKeyId);
     }
@@ -57,5 +50,4 @@ namespace AwsMock::Database::Entity::S3 {
         os << "BucketEncryption=" << to_json(n.ToDocument());
         return os;
     }
-
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

@@ -12,7 +12,6 @@
 #include <Poco/Path.h>
 
 // Local includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/Database.h>
 

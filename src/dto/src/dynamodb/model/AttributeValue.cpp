@@ -74,6 +74,32 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
+    void AttributeValue::FromDocument(const bsoncxx::document::view &jsonObject) {
+
+        for (bsoncxx::document::element ele: jsonObject) {
+            type = ele["type"].get_string();
+            if (type == "S") {
+                stringValue = ele["S"].get_string();
+            } else if (type == "SS") {
+                /*Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("SS");
+                for (const auto &nValue: *jsonNumberArray) {
+                    stringSetValue.emplace_back(nValue.convert<std::string>());
+                }*/
+            } else if (type == "N") {
+                numberValue = ele["S"].get_int64();
+            } else if (type == "NS") {
+                /*Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("NS");
+                for (const auto &nValue: *jsonNumberArray) {
+                    numberSetValue.emplace_back(nValue.convert<std::string>());
+                }*/
+            } else if (type == "BOOL") {
+                boolValue = ele["S"].get_bool();
+            } else if (type == "NULL") {
+                nullValue = true;
+            }
+        }
+    }
+
     std::string AttributeValue::ToJson() const {
         return Core::JsonUtils::ToJsonString(ToJsonObject());
     }

@@ -73,17 +73,16 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::IsNumeric(const std::string &value) {
-        return !value.empty() && std::find_if(value.begin(), value.end(), [](unsigned char c) { return !std::isdigit(c); }) == value.end();
+        return !value.empty() && std::ranges::find_if(value, [](unsigned char c) { return !std::isdigit(c); }) == value.end();
     }
 
     bool StringUtils::IsUuid(const std::string &value) {
-        std::regex regex("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}", std::regex_constants::icase);
+        const std::regex regex("[[:xdigit:]]{8}(-[[:xdigit:]]{4}){3}-[[:xdigit:]]{12}", std::regex_constants::icase);
         return std::regex_match(value, regex);
     }
 
     std::string StringUtils::CreateRandomUuid() {
-        boost::uuids::uuid uuid = boost::uuids::random_generator()();
-        return boost::uuids::to_string(uuid);
+        return to_string(boost::uuids::random_generator()());
     }
 
     std::vector<std::string> StringUtils::Split(const std::string &s, char delimiter) {
@@ -109,18 +108,18 @@ namespace AwsMock::Core {
 
     std::string StringUtils::StripWhiteSpaces(std::string &str) {
         const std::string &chars = "\t\n\r\v\f ";
-        str.erase(remove_if(str.begin(), str.end(), [&chars](const char &c) {
+        str.erase(std::ranges::remove_if(str, [&chars](const char &c) {
                       return chars.find(c) != std::string::npos;
-                  }),
+                  }).begin(),
                   str.end());
         return str;
     }
 
     std::string StringUtils::StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> str) {
         const std::string &chars = "\n\r";
-        str.erase(remove_if(str.begin(), str.end(), [&chars](const char &c) {
+        str.erase(std::ranges::remove_if(str, [&chars](const char &c) {
                       return chars.find(c) != std::string::npos;
-                  }),
+                  }).begin(),
                   str.end());
         return str;
     }
@@ -133,7 +132,7 @@ namespace AwsMock::Core {
         if (s1.empty() || s2.empty()) {
             return false;
         }
-        return s1.compare(s2) == 0;
+        return s1 == s2;
     }
 
     bool StringUtils::EqualsIgnoreCase(const std::string &s1, const std::string &s2) {
@@ -165,7 +164,7 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::SubString(const std::string &string, int beginIndex, int endIndex) {
-        int size = (int) string.size();
+        const int size = static_cast<int>(string.size());
         if (beginIndex < 0 || beginIndex > size - 1)
             return "-1";// Index out of bounds
         if (endIndex < 0 || endIndex > size - 1)
@@ -207,10 +206,9 @@ namespace AwsMock::Core {
 
         size_t patcnt = 0;
         const char *oriptr;
-        const char *patloc;
 
         // find how many times the pattern occurs in the original string
-        patloc = strstr(original, pattern);
+        const char *patloc = strstr(original, pattern);
         for (oriptr = original; patloc; oriptr = patloc + patlen) {
             patcnt++;
             patloc = strstr(oriptr, pattern);
@@ -218,9 +216,9 @@ namespace AwsMock::Core {
         {
             // allocate memory for the new string
             size_t const retlen = orilen + patcnt * (replen - patlen);
-            char *const returned = (char *) malloc(sizeof(char) * (retlen + 1));
+            const auto returned = static_cast<char *>(malloc(sizeof(char) * (retlen + 1)));
 
-            if (returned != NULL) {
+            if (returned != nullptr) {
 
                 // copy the original string,
                 // replacing all the instances of the pattern
@@ -228,7 +226,7 @@ namespace AwsMock::Core {
                 for (oriptr = original; patloc = strstr(oriptr, pattern); oriptr = patloc + patlen) {
 
                     size_t const skplen = patloc - oriptr;
-                    // copy the section until the occurence of the pattern
+                    // copy the section until the occurrence of the pattern
                     strncpy(retptr, oriptr, skplen);
                     retptr += skplen;
                     // copy the replacement
@@ -257,14 +255,14 @@ namespace AwsMock::Core {
     std::string StringUtils::SanitizeUtf8(std::string &input) {
 #ifndef _WIN32
         size_t inbytes_len = input.length();
-        char *inbuf = const_cast<char *>(input.c_str());
+        auto inbuf = const_cast<char *>(input.c_str());
 
         size_t outbytes_len = input.length();
-        char *result = static_cast<char *>(calloc(outbytes_len + 1, sizeof(char)));
+        const auto result = static_cast<char *>(calloc(outbytes_len + 1, sizeof(char)));
         char *outbuf = result;
 
-        iconv_t cd = iconv_open("UTF-8//IGNORE", "UTF-8");
-        if (cd == (iconv_t) -1) {
+        const iconv_t cd = iconv_open("UTF-8//IGNORE", "UTF-8");
+        if (cd == reinterpret_cast<iconv_t>(-1)) {
             perror("iconv_open");
         }
         if (iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
@@ -300,16 +298,14 @@ namespace AwsMock::Core {
         std::string result;
 
         // Append first character(in lower case) to result string
-        char c = (char) tolower(in[0]);
-        result += (char(c));
+        const char c = static_cast<char>(tolower(in[0]));
+        result += c;
 
         // Traverse the string from first index to last index
         for (int i = 1; i < in.length(); i++) {
 
-            char ch = in[i];
-
             // Check if the character is upper case then append '-' and such character (in lower case) to result string
-            if (isupper(ch)) {
+            if (const char ch = in[i]; isupper(ch)) {
                 result += '-';
                 result += char(tolower(ch));
             } else {

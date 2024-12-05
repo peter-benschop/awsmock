@@ -13,15 +13,10 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3Service.h>
-
-#define S3_DEFAULT_MONITORING_PERIOD 300
-#define S3_DEFAULT_SYNC_PERIOD 3600
-#define S3_DEFAULT_SIZE_PERIOD 300
 
 namespace AwsMock::Service {
 
@@ -32,7 +27,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Server : public AbstractServer {
+    class S3Server final : public AbstractServer {
 
       public:
 
@@ -46,17 +41,17 @@ namespace AwsMock::Service {
         /**
          * @brief Synchronize S3 object between filesystem and database.
          */
-        [[maybe_unused]] void SyncObjects();
+        [[maybe_unused]] void SyncObjects() const;
 
         /**
          * @brief Synchronize S3 bucket size and object counts
          */
-        [[maybe_unused]] void SyncBuckets();
+        [[maybe_unused]] void SyncBuckets() const;
 
         /**
          * Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * Metric service

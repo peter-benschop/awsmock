@@ -6,8 +6,8 @@
 #define AWSMOCK_CORE_CONNECTION_POOL_H
 
 // C++ includes
-#include <cstdlib>
 #include <memory>
+#include <ranges>
 #include <string>
 
 // MongoDB includes
@@ -21,7 +21,6 @@
 #include <mongocxx/uri.hpp>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Database {

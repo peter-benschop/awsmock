@@ -6,50 +6,58 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object FunctionCounter::ToJsonObject() const {
+    view_or_value<view, value> FunctionCounter::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
 
-            // Architectures array
-            Poco::JSON::Array architectureArray;
-            for (const auto &architecture: architectures) {
-                architectureArray.add(architecture);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "Handler", handler);
+            Core::Bson::BsonUtils::SetStringValue(document, "Runtime", runtime);
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetLongValue(document, "CodeSize", codeSize);
+            Core::Bson::BsonUtils::SetStringValue(document, "CodeSha256", codeSha256);
+            Core::Bson::BsonUtils::SetStringValue(document, "Version", version);
+            Core::Bson::BsonUtils::SetIntValue(document, "Timeout", timeout);
+            Core::Bson::BsonUtils::SetStringValue(document, "State", state);
+            Core::Bson::BsonUtils::SetStringValue(document, "StateReason", stateReason);
+            Core::Bson::BsonUtils::SetStringValue(document, "StateReasonCode", stateReasonCode);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatus", lastUpdateStatusReason);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatusCode", lastUpdateStatusReasonCode);
+
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModified", lastModified);
+
+            // Tags
+            if (!tags.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: tags) {
+                    bsoncxx::builder::basic::document jsonObject;
+                    jsonObject.append(kvp(fst, snd));
+                }
+                document.append(kvp("Tags", jsonArray));
             }
-            rootJson.set("architectures", architectureArray);
 
-            rootJson.set("codeSha256", codeSha256);
-            rootJson.set("codeSize", codeSize);
-            rootJson.set("deadLetterConfig", deadLetterConfig.ToJsonObject());
-            rootJson.set("description", description);
-            // TODO: Environment, EphemeralStorage, FileSystemConfig
-            rootJson.set("functionArn", functionArn);
-            rootJson.set("functionName", functionName);
-            rootJson.set("handler", handler);
-            rootJson.set("runtime", runtime);
-            rootJson.set("functionName", functionName);
-            // TODO: ImageConfig
-            rootJson.set("lastModified", Core::DateTimeUtils::ToISO8601(lastModified));
-            rootJson.set("lastUpdateStatus", lastUpdateStatusReason);
-            rootJson.set("lastUpdateStatusCode", lastUpdateStatusReasonCode);
-            rootJson.set("state", state);
-            rootJson.set("stateReason", stateReason);
-            rootJson.set("stateReasonCode", stateReasonCode);
-            rootJson.set("timeout", timeout);
-            rootJson.set("environment", environment.ToJsonObject());
-            rootJson.set("version", version);
-            rootJson.set("invocations", invocations);
-            rootJson.set("averageRuntime", averageRuntime);
+            // Environment
+            document.append(kvp("Environment", environment.ToDocument()));
 
-            return rootJson;
+            // Architectures
+            if (!architectures.empty()) {
+                array jsonArray;
+                for (const auto &architecture: architectures) {
+                    jsonArray.append(architecture);
+                }
+                document.append(kvp("Architectures", jsonArray));
+            }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            // Dead letter config
+            document.append(kvp("DeadLetterConfig", deadLetterConfig.ToDocument()));
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-    }
-
-    std::string FunctionCounter::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
     }
 
     std::string FunctionCounter::ToString() const {
@@ -59,7 +67,7 @@ namespace AwsMock::Dto::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const FunctionCounter &f) {
-        os << "FunctionCounter=" << f.ToJson();
+        os << "FunctionCounter=" << to_json(f.ToDocument());
         return os;
     }
 }// namespace AwsMock::Dto::Lambda

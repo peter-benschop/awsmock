@@ -9,19 +9,18 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/DateTimeUtils.h"
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/entity/module/Module.h"
-#include "awsmock/entity/module/ModuleState.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/entity/module/Module.h>
+#include <awsmock/entity/module/ModuleState.h>
 
 namespace AwsMock::Dto::Module {
 
     using std::chrono::system_clock;
 
     /**
-     * AwsMock module
+     * @brief AwsMock module
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -78,7 +77,7 @@ namespace AwsMock::Dto::Module {
          * @param moduleList module entity list
          * @return JSON string
          */
-        typedef std::vector<Dto::Module::Module> ModuleList;
+        typedef std::vector<Module> ModuleList;
         static std::string ToJson(const ModuleList &moduleList);
 
         /**
@@ -88,6 +87,15 @@ namespace AwsMock::Dto::Module {
          * @return Module
          */
         static Module FromJson(const std::string &payload);
+
+
+        /**
+         * @brief Convert from BSON representation
+         *
+         * @param document BSON representation
+         * @return Module
+         */
+        static Module FromDocument(const view &document);
 
         /**
          * @brief Convert from JSON representation

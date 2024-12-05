@@ -7,7 +7,6 @@
 
 // C++ standard includes
 #include <chrono>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -82,6 +81,11 @@ namespace AwsMock::Dto::SQS {
          * Maximal message size
          */
         long maxMessageSize;
+
+        /**
+         * Is DQL
+         */
+        bool isDlq;
 
         /**
          * @brief Converts the DTO to a JSON string.

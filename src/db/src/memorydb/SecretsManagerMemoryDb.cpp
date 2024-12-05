@@ -10,11 +10,10 @@ namespace AwsMock::Database {
 
     bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
-        return find_if(_secrets.begin(),
-                       _secrets.end(),
-                       [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                           return secret.second.region == region && secret.second.name == name;
-                       }) != _secrets.end();
+        return std::ranges::find_if(_secrets,
+                                    [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                        return secret.second.region == region && secret.second.name == name;
+                                    }) != _secrets.end();
     }
 
     bool SecretsManagerMemoryDb::SecretExists(const Entity::SecretsManager::Secret &secret) {
@@ -23,20 +22,18 @@ namespace AwsMock::Database {
 
     bool SecretsManagerMemoryDb::SecretExists(const std::string &secretId) {
 
-        return find_if(_secrets.begin(),
-                       _secrets.end(),
-                       [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                           return secret.second.secretId == secretId;
-                       }) != _secrets.end();
+        return std::ranges::find_if(_secrets,
+                                    [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                        return secret.second.secretId == secretId;
+                                    }) != _secrets.end();
     }
 
     Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretById(const std::string &oid) {
 
-        auto it = find_if(_secrets.begin(),
-                          _secrets.end(),
-                          [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                              return secret.first == oid;
-                          });
+        const auto it = std::ranges::find_if(_secrets,
+                                             [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                                 return secret.first == oid;
+                                             });
 
         if (it != _secrets.end()) {
             it->second.oid = oid;
@@ -49,11 +46,10 @@ namespace AwsMock::Database {
 
         Entity::SecretsManager::Secret result;
 
-        auto it = find_if(_secrets.begin(),
-                          _secrets.end(),
-                          [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                              return secret.second.region == region && secret.second.name == name;
-                          });
+        const auto it = std::ranges::find_if(_secrets,
+                                             [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                                 return secret.second.region == region && secret.second.name == name;
+                                             });
 
         if (it != _secrets.end()) {
             it->second.oid = it->first;
@@ -66,11 +62,10 @@ namespace AwsMock::Database {
 
         Entity::SecretsManager::Secret result;
 
-        auto it = find_if(_secrets.begin(),
-                          _secrets.end(),
-                          [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                              return secret.second.secretId == secretId;
-                          });
+        const auto it = std::ranges::find_if(_secrets,
+                                             [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                                 return secret.second.secretId == secretId;
+                                             });
 
         if (it != _secrets.end()) {
             it->second.oid = it->first;
@@ -82,7 +77,7 @@ namespace AwsMock::Database {
     Entity::SecretsManager::Secret SecretsManagerMemoryDb::CreateSecret(const Entity::SecretsManager::Secret &secret) {
         Poco::ScopedLock lock(_secretMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _secrets[oid] = secret;
         log_trace << "Secret created, oid: " << oid;
         return GetSecretById(oid);
@@ -93,38 +88,37 @@ namespace AwsMock::Database {
         Poco::ScopedLock lock(_secretMutex);
 
         std::string secretId = secret.secretId;
-        auto it = find_if(_secrets.begin(),
-                          _secrets.end(),
-                          [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
-                              return secret.second.secretId == secretId;
-                          });
+        const auto it = std::ranges::find_if(_secrets,
+                                             [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                                 return secret.second.secretId == secretId;
+                                             });
         _secrets[it->first] = secret;
         return _secrets[it->first];
     }
 
-    Entity::SecretsManager::SecretList SecretsManagerMemoryDb::ListSecrets() {
+    Entity::SecretsManager::SecretList SecretsManagerMemoryDb::ListSecrets() const {
 
         Entity::SecretsManager::SecretList secretList;
 
-        for (const auto &secret: _secrets) {
-            secretList.emplace_back(secret.second);
+        for (const auto &val: _secrets | std::views::values) {
+            secretList.emplace_back(val);
         }
 
         log_trace << "Got secret list, size: " << secretList.size();
         return secretList;
     }
 
-    long SecretsManagerMemoryDb::CountSecrets(const std::string &region) {
+    long SecretsManagerMemoryDb::CountSecrets(const std::string &region) const {
 
         long count = 0;
         if (region.empty()) {
 
-            return (long) _secrets.size();
+            return static_cast<long>(_secrets.size());
 
         } else {
 
-            for (const auto &secret: _secrets) {
-                if (secret.second.region == region) {
+            for (const auto &val: _secrets | std::views::values) {
+                if (val.region == region) {
                     count++;
                 }
             }

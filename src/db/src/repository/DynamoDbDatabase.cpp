@@ -40,11 +40,11 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(bsoncxx::oid oid) {
+    Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(bsoncxx::oid oid) const {
 
         try {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
@@ -63,16 +63,15 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) {
+    Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                mongocxx::stdx::optional<bsoncxx::document::value>
-                        mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                const mongocxx::stdx::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Table not found ";
                     throw Core::DatabaseException("Database exception, Table not found ");
@@ -94,7 +93,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) {
+    Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(const std::string &oid) const {
 
         if (HasDatabase()) {
 
@@ -207,11 +206,11 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) {
+    Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
@@ -317,13 +316,13 @@ namespace AwsMock::Database {
         }
     }*/
 
-    bool DynamoDbDatabase::ItemExists(const Entity::DynamoDb::Item &item) {
+    bool DynamoDbDatabase::ItemExists(const Entity::DynamoDb::Item &item) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
 
                 Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
@@ -333,22 +332,21 @@ namespace AwsMock::Database {
                                 kvp("tableName", item.tableName));
 
                 // Add primary keys
-                for (const auto &key: table.keySchemas) {
-                    std::string keyName = key.first;
+                for (const auto &key: table.keySchemas | std::views::keys) {
+                    std::string keyName = key;
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
-                    auto it = find_if(att.begin(),
-                                      att.end(),
-                                      [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
-                                          return attribute.first == keyName;
-                                      });
+                    auto it = std::ranges::find_if(att,
+                                                   [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
+                                                       return attribute.first == keyName;
+                                                   });
                     if (it != att.end()) {
-                        queryDoc.append(kvp("attributes." + key.first + ".S", it->second.stringValue));
-                        queryDoc.append(kvp("attributes." + key.first + ".N", it->second.numberValue));
-                        queryDoc.append(kvp("attributes." + key.first + ".BOOL", it->second.boolValue));
-                        queryDoc.append(kvp("attributes." + key.first + ".NULL", it->second.boolValue));
+                        queryDoc.append(kvp("attributes." + key + ".S", it->second.stringValue));
+                        queryDoc.append(kvp("attributes." + key + ".N", it->second.numberValue));
+                        queryDoc.append(kvp("attributes." + key + ".BOOL", it->second.boolValue));
+                        queryDoc.append(kvp("attributes." + key + ".NULL", it->second.boolValue));
                     }
                 }
-                int64_t count = _itemCollection.count_documents(queryDoc.extract());
+                const int64_t count = _itemCollection.count_documents(queryDoc.extract());
 
                 log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
@@ -364,41 +362,28 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) {
+    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
 
         Entity::DynamoDb::ItemList items;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
             try {
 
-                if (region.empty() && tableName.empty()) {
+                bsoncxx::builder::basic::document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
 
-                    auto itemCursor = _itemCollection.find({});
-                    for (auto item: itemCursor) {
-                        Entity::DynamoDb::Item result;
-                        result.FromDocument(item);
-                        items.push_back(result);
-                    }
+                if (!tableName.empty()) {
+                    query.append(kvp("name", tableName));
+                }
 
-                } else if (tableName.empty()) {
-
-                    auto itemCursor = _itemCollection.find(make_document(kvp("region", region)));
-                    for (auto item: itemCursor) {
-                        Entity::DynamoDb::Item result;
-                        result.FromDocument(item);
-                        items.push_back(result);
-                    }
-
-                } else {
-
-                    auto itemCursor = _itemCollection.find(make_document(kvp("region", region), kvp("name", tableName)));
-                    for (auto item: itemCursor) {
-                        Entity::DynamoDb::Item result;
-                        result.FromDocument(item);
-                        items.push_back(result);
-                    }
+                for (auto itemCursor = _itemCollection.find(query.extract()); auto item: itemCursor) {
+                    Entity::DynamoDb::Item result;
+                    result.FromDocument(item);
+                    items.push_back(result);
                 }
 
             } catch (const mongocxx::exception &exc) {
@@ -415,11 +400,11 @@ namespace AwsMock::Database {
         return items;
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::GetItemById(bsoncxx::oid oid) {
+    Entity::DynamoDb::Item DynamoDbDatabase::GetItemById(bsoncxx::oid oid) const {
 
         try {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
             mongocxx::stdx::optional<bsoncxx::document::value> mResult = _itemCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
@@ -438,11 +423,11 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(const Entity::DynamoDb::Item &item) {
+    Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(const Entity::DynamoDb::Item &item) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
             auto session = client->start_session();
 
@@ -450,7 +435,7 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 log_info << bsoncxx::to_json(item.ToDocument());
-                auto result = _itemCollection.insert_one(item.ToDocument());
+                const auto result = _itemCollection.insert_one(item.ToDocument());
                 session.commit_transaction();
                 log_trace << "DynamoDb item created, oid: " << result->inserted_id().get_oid().value.to_string();
                 return GetItemById(result->inserted_id().get_oid().value);
@@ -467,11 +452,11 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(const Entity::DynamoDb::Item &item) {
+    Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(const Entity::DynamoDb::Item &item) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
             auto session = client->start_session();
 
@@ -484,25 +469,24 @@ namespace AwsMock::Database {
                                 kvp("tableName", item.tableName));
 
                 // Add primary keys
-                for (const auto &key: table.keySchemas) {
-                    std::string keyName = key.first;
+                for (const auto &key: table.keySchemas | std::views::keys) {
+                    std::string keyName = key;
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
-                    auto it = find_if(att.begin(),
-                                      att.end(),
-                                      [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
-                                          return attribute.first == keyName;
-                                      });
+                    auto it = std::ranges::find_if(att,
+                                                   [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
+                                                       return attribute.first == keyName;
+                                                   });
                     if (it != att.end()) {
-                        queryDoc.append(kvp("attributes." + key.first + ".S", it->second.stringValue));
-                        queryDoc.append(kvp("attributes." + key.first + ".N", it->second.numberValue));
-                        queryDoc.append(kvp("attributes." + key.first + ".BOOL", it->second.boolValue));
-                        queryDoc.append(kvp("attributes." + key.first + ".NULL", it->second.boolValue));
+                        queryDoc.append(kvp("attributes." + key + ".S", it->second.stringValue));
+                        queryDoc.append(kvp("attributes." + key + ".N", it->second.numberValue));
+                        queryDoc.append(kvp("attributes." + key + ".BOOL", it->second.boolValue));
+                        queryDoc.append(kvp("attributes." + key + ".NULL", it->second.boolValue));
                     }
                 }
 
                 session.start_transaction();
                 auto result = _itemCollection.replace_one(queryDoc.extract(), item.ToDocument());
-                auto findResult = _itemCollection.find_one(queryDoc.extract());
+                const auto findResult = _itemCollection.find_one(queryDoc.extract());
                 session.commit_transaction();
 
                 log_info << "DynamoDb item updated, oid: " << findResult.value()["_id"].get_oid().value.to_string();
@@ -520,7 +504,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::CreateOrUpdateItem(const Entity::DynamoDb::Item &item) {
+    Entity::DynamoDb::Item DynamoDbDatabase::CreateOrUpdateItem(const Entity::DynamoDb::Item &item) const {
 
         if (ItemExists(item)) {
             return UpdateItem(item);
@@ -529,13 +513,13 @@ namespace AwsMock::Database {
         }
     }
 
-    long DynamoDbDatabase::CountItems(const std::string &region) {
+    long DynamoDbDatabase::CountItems(const std::string &region) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
                 if (region.empty()) {
 
@@ -557,15 +541,15 @@ namespace AwsMock::Database {
         }
     }
 
-    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
+    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-                auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
+                const auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: "
                           << result->deleted_count();
 

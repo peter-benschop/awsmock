@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
@@ -18,7 +17,7 @@
 #include <awsmock/dto/lambda/model/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/docker/DockerService.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/s3/S3Service.h>
@@ -79,7 +78,7 @@ namespace AwsMock::Service {
         /**
          * Update counters
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * lambda database
@@ -89,7 +88,7 @@ namespace AwsMock::Service {
         /**
          * Docker module
          */
-        Service::DockerService _dockerService;
+        Service::ContainerService _dockerService;
 
         /**
          * Metric service
@@ -112,9 +111,14 @@ namespace AwsMock::Service {
         int _monitoringPeriod;
 
         /**
-         * Worker period
+         * Counter period
          */
-        int _workerPeriod;
+        int _counterPeriod;
+
+        /**
+         * Remove period
+         */
+        int _removePeriod;
     };
 
 }// namespace AwsMock::Service

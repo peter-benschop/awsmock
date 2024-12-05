@@ -6,15 +6,14 @@
 #define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 

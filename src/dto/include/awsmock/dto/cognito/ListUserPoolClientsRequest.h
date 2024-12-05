@@ -26,9 +26,10 @@ namespace AwsMock::Dto::Cognito {
      *   "NextToken": "string",
      *   "UserPoolId": "string"
      * }
+     * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolClientsRequest : public Dto::Common::BaseRequest {
+    struct ListUserPoolClientsRequest : Common::BaseRequest {
 
         /**
          * User pool ID

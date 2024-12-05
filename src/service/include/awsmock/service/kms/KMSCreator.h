@@ -6,12 +6,9 @@
 #define AWSMOCK_SERVICE_KMS_CREATOR_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/monitoring/MetricService.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
@@ -21,6 +18,7 @@
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 

@@ -36,7 +36,7 @@ namespace AwsMock::Service::Monitoring {
          * @par
          * Delete al monitoring data oder than the retention period. Default is 3 days, which means monitoring data older than 3 days will be deleted.
          */
-        [[maybe_unused]] void DeleteMonitoringData();
+        [[maybe_unused]] void DeleteMonitoringData() const;
 
       private:
 

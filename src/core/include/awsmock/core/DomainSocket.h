@@ -6,13 +6,9 @@
 #define AWSMOCK_CORE_DOMAIN_SOCKET_H
 
 // C++ includes
-#include <cstring>
-#include <iostream>
 #include <map>
 #include <regex>
-#include <sstream>
 #include <string>
-#include <utility>
 
 // Boost includes
 #include <boost/asio.hpp>
@@ -35,7 +31,7 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit DomainSocket(std::string &path) : _path(path){};
+        explicit DomainSocket(const std::string &path) : _path(path) {};
 
         /**
          * @brief Send JSON data
@@ -50,7 +46,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(http::verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+        DomainSocketResult SendJson(http::verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}) const;
 
         /**
          * @brief Send binary data
@@ -65,7 +61,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendBinary(http::verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {});
+        DomainSocketResult SendBinary(http::verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {}) const;
 
       private:
 

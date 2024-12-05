@@ -6,17 +6,13 @@
 #define AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
 // Poco includes
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/cognito/Group.h>
@@ -30,7 +26,7 @@ namespace AwsMock::Database {
      * @brief Cognito in-memory database.
      *
      * @par
-     * Provides a in-memory database using a simple hash map. The key is a randomly generated UUID.
+     * Provides an in-memory database using a simple hash map. The key is a randomly generated UUID.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -121,7 +117,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of user pools.
          */
-        long CountUserPools(const std::string &region = {});
+        long CountUserPools(const std::string &region = {}) const;
 
         /**
          * @brief Returns a list of cognito user pools.
@@ -169,7 +165,6 @@ namespace AwsMock::Database {
          * Check existence of cognito user
          *
          * @param region AWS region name
-         * @param userPoolId user pool ID
          * @param userName name of the user
          * @return true if cognito user exists
          * @throws DatabaseException
@@ -211,7 +206,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return total number of users.
          */
-        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {});
+        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
          * @brief Returns a list of cognito users.
@@ -220,7 +215,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito users
          */
-        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
+        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
          * @brief Returns a list of cognito users in given group.

@@ -47,10 +47,10 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
-            {LambdaInstanceStatus::InstanceIdle, "Idle"},
-            {LambdaInstanceStatus::InstanceRunning, "Running"},
-            {LambdaInstanceStatus::InstanceFailed, "Failed"},
-            {LambdaInstanceStatus::InstanceUnknown, "Unknown"},
+            {InstanceIdle, "Idle"},
+            {InstanceRunning, "Running"},
+            {InstanceFailed, "Failed"},
+            {InstanceUnknown, "Unknown"},
     };
 
     [[maybe_unused]] static std::string LambdaInstanceStatusToString(LambdaInstanceStatus lambdaInstanceStatus) {
@@ -58,9 +58,9 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     [[maybe_unused]] static LambdaInstanceStatus LambdaInstanceStatusFromString(const std::string &lambdaInstanceStatus) {
-        for (auto &it: LambdaInstanceStatusNames) {
-            if (it.second == lambdaInstanceStatus) {
-                return it.first;
+        for (auto &[fst, snd]: LambdaInstanceStatusNames) {
+            if (snd == lambdaInstanceStatus) {
+                return fst;
             }
         }
         return LambdaInstanceStatus::InstanceUnknown;

@@ -146,7 +146,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Timeout
          */
-        int timeout = 3;
+        int timeout = 15 * 60;
 
         /**
          * Creates a JSON string from the object.

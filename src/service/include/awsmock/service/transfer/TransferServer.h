@@ -12,130 +12,122 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-
-#define TRANSFER_DEFAULT_MONITORING_PERIOD 300
-#define DEFAULT_BASE_DIR "transfer"
+#include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
+  /**
+   * @brief Transfer module server
+   *
+   * @author jens.vogt\@opitz-consulting.com
+   */
+  class TransferServer final : public AbstractServer {
+    public:
+      /**
+       * @brief Constructor
+       */
+      explicit TransferServer(Core::PeriodicScheduler &scheduler);
 
-    /**
-     * @brief Transfer module server
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    class TransferServer : public AbstractServer {
+    private:
+      /**
+       * @brief Creates the transfer server bucket
+       */
+      static void CreateTransferBucket();
 
-      public:
+      /**
+       * @brief Starts a single transfer manager
+       *
+       * @param server transfer manager entity
+       */
+      void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
-        /**
-         * @brief Constructor
-         */
-        explicit TransferServer(Core::PeriodicScheduler &scheduler);
+      /**
+       * @brief Stops a single transfer manager
+       *
+       * @param server transfer manager entity
+       */
+      void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
-      private:
+      /**
+       * @brief Start all transfer servers, if they are not existing
+       */
+      void StartTransferServers();
 
-        /**
-         * @brief Creates the transfer server bucket
-         */
-        static void CreateTransferBucket();
+      /**
+       * @brief Check transfer servers
+       */
+      void CheckTransferServers();
 
-        /**
-         * @brief Starts a single transfer manager
-         *
-         * @param server transfer manager entity
-         */
-        void StartTransferServer(Database::Entity::Transfer::Transfer &server);
+      /**
+       * @brief Update counters
+       */
+      void UpdateCounter() const;
 
-        /**
-         * @brief Stops a single transfer manager
-         *
-         * @param server transfer manager entity
-         */
-        void StopTransferServer(Database::Entity::Transfer::Transfer &server);
+      /**
+       * Transfer database
+       */
+      Database::TransferDatabase &_transferDatabase;
 
-        /**
-         * @brief Start all transfer servers, if they are not existing
-         */
-        void StartTransferServers();
+      /**
+       * @brief Metric service
+       */
+      Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
-        /**
-         * @brief Check transfer servers
-         */
-        void CheckTransferServers();
+      /**
+       * AWS region
+       */
+      std::string _region;
 
-        /**
-         * @brief Update counters
-         */
-        void UpdateCounter();
+      /**
+       * AWS client ID
+       */
+      std::string _clientId;
 
-        /**
-         * Transfer database
-         */
-        Database::TransferDatabase &_transferDatabase;
+      /**
+       * AWS user
+       */
+      std::string _user;
 
-        /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+      /**
+       * AWS S3 bucket
+       */
+      std::string _bucket;
 
-        /**
-         * AWS region
-         */
-        std::string _region;
+      /**
+       * Base dir for all FTP users
+       */
+      std::string _baseDir;
 
-        /**
-         * AWS client ID
-         */
-        std::string _clientId;
+      /**
+       * Base URL for all S3 request
+       */
+      std::string _baseUrl;
 
-        /**
-         * AWS user
-         */
-        std::string _user;
+      /**
+       * Server userPoolId
+       */
+      std::string _serverId;
 
-        /**
-         * AWS S3 bucket
-         */
-        std::string _bucket;
+      /**
+       * Monitoring period
+       */
+      int _monitoringPeriod;
 
-        /**
-         * Base dir for all FTP users
-         */
-        std::string _baseDir;
+      /**
+       * List of transfer servers
+       */
+      std::map<std::string, std::shared_ptr<FtpServer::FtpServer> > _transferServerList;
 
-        /**
-         * Base URL for all S3 request
-         */
-        std::string _baseUrl;
-
-        /**
-         * Server userPoolId
-         */
-        std::string _serverId;
-
-        /**
-         * Monitoring period
-         */
-        int _monitoringPeriod;
-
-        /**
-         * List of transfer servers
-         */
-        std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
-
-        /**
-         * Actual FTP manager
-         */
-        std::shared_ptr<FtpServer::FtpServer> _ftpServer;
-    };
-
-}// namespace AwsMock::Service
+      /**
+       * Actual FTP manager
+       */
+      std::shared_ptr<FtpServer::FtpServer> _ftpServer;
+  };
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_H

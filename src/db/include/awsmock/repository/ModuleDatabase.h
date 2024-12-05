@@ -13,7 +13,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/memorydb/ModuleMemoryDb.h>
@@ -140,6 +139,17 @@ namespace AwsMock::Database {
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
         Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
+
+        /**
+         * @brief Sets the state of module.
+         *
+         * <p>State can be one of STARTING, RUNNING, STOPPED, UNKNOWN.</p>
+         *
+         * @param name module name
+         * @return module state
+         * @see AwsMock::Database::Entity::Module::ModuleState()
+         */
+        Entity::Module::ModuleState GetState(const std::string &name);
 
         /**
          * @brief Sets the status of module.

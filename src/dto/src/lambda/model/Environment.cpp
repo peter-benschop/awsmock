@@ -4,28 +4,35 @@
 
 #include "awsmock/dto/lambda/model/Environment.h"
 
+#include <bsoncxx/builder/basic/helpers.hpp>
+#include <bsoncxx/json.hpp>
+
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object EnvironmentVariables::ToJsonObject() const {
+    view_or_value<view, value> EnvironmentVariables::ToDocument() const {
 
-        Poco::JSON::Object environmentJson;
         try {
 
-            Poco::JSON::Object variableJson;
-            for (auto &variable: variables) {
-                variableJson.set(variable.first, variable.second);
+            bsoncxx::builder::basic::document document;
+            if (!variables.empty()) {
+                bsoncxx::builder::basic::document variablesDocument;
+                for (const auto &[fst, snd]: variables) {
+                    variablesDocument.append(kvp(fst, snd));
+                }
+                document.append(kvp("Variables", variablesDocument));
             }
-            environmentJson.set("Variables", variableJson);
 
-            Poco::JSON::Object errorJson;
-            errorJson.set("ErrorCode", error.errorCode);
-            errorJson.set("Message", error.message);
-            environmentJson.set("Error", errorJson);
+            bsoncxx::builder::basic::document errorDocument;
+            errorDocument.append(kvp("ErrorCode", error.errorCode));
+            errorDocument.append(kvp("Message", error.message));
+            document.append(kvp("Error", errorDocument));
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            return document.extract();
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
-        return environmentJson;
     }
 
     void EnvironmentVariables::FromJson(Poco::JSON::Object::Ptr object) {
@@ -33,18 +40,13 @@ namespace AwsMock::Dto::Lambda {
         try {
 
             Poco::JSON::Object::Ptr varObject = object->getObject("Variables");
-            Poco::JSON::Object::NameList nameList = varObject->getNames();
-            for (const auto &name: nameList) {
+            for (Poco::JSON::Object::NameList nameList = varObject->getNames(); const auto &name: nameList) {
                 variables[name] = varObject->get(name).convert<std::string>();
             }
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message(), 500);
         }
-    }
-
-    std::string EnvironmentVariables::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
     }
 
     std::string EnvironmentVariables::ToString() const {
@@ -54,7 +56,7 @@ namespace AwsMock::Dto::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const EnvironmentVariables &r) {
-        os << "EnvironmentVariables=" << r.ToJson();
+        os << "EnvironmentVariables=" << to_json(r.ToDocument());
         return os;
     }
 

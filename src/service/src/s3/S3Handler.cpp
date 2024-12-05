@@ -79,8 +79,7 @@ namespace AwsMock::Service {
                             .key = clientCommand.key};
 
                     // Get version ID
-                    std::string versionId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "versionId");
-                    if (!versionId.empty()) {
+                    if (std::string versionId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "versionId"); !versionId.empty()) {
                         s3Request.versionId = versionId;
                     }
 
@@ -97,8 +96,8 @@ namespace AwsMock::Service {
                     headerMap["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
 
                     // Set user headers
-                    for (const auto &m: s3Response.metadata) {
-                        headerMap["x-amz-meta-" + m.first] = m.second;
+                    for (const auto &[fst, snd]: s3Response.metadata) {
+                        headerMap["x-amz-meta-" + fst] = snd;
                     }
 
                     if (Core::HttpUtils::HasHeader(request, "Range")) {
@@ -135,8 +134,8 @@ namespace AwsMock::Service {
                     headerMap["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
 
                     // Set user headers
-                    for (const auto &m: s3Response.metadata) {
-                        headerMap["x-amz-meta-" + m.first] = m.second;
+                    for (const auto &[fst, snd]: s3Response.metadata) {
+                        headerMap["x-amz-meta-" + fst] = snd;
                     }
 
                     // Send range response
@@ -802,8 +801,8 @@ namespace AwsMock::Service {
             headers["x-amz-location-name"] = s3Response.region;
 
             // User supplied metadata
-            for (const auto &m: s3Response.metadata) {
-                headers["x-amz-meta-" + m.first] = m.second;
+            for (const auto &[fst, snd]: s3Response.metadata) {
+                headers["x-amz-meta-" + fst] = snd;
             }
 
             return SendOkResponse(request, {}, headers);
@@ -821,8 +820,8 @@ namespace AwsMock::Service {
         if (!Core::HttpUtils::HasHeader(request, "Range")) {
             return;
         }
-        std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "Range");
-        std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
+        const std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "Range");
+        const std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
         min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
         max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
         size = max - min + 1;

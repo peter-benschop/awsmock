@@ -6,21 +6,18 @@
 #define AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
 // Poco includes
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/core/exception/DatabaseException.h"
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/Database.h>
 
@@ -128,7 +125,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        long LambdaCount(const std::string &region = {});
+        long LambdaCount(const std::string &region = {}) const;
 
         /**
          * Returns a list of lambda functions.

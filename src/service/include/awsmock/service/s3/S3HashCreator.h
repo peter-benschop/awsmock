@@ -5,12 +5,8 @@
 #ifndef AWSMOCK_SERVICE_S3_HASH_CREATOR_H
 #define AWSMOCK_SERVICE_S3_HASH_CREATOR_H
 
-// Poco includes
-#include <Poco/Path.h>
-
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/repository/S3Database.h>
 
@@ -51,7 +47,7 @@ namespace AwsMock::Service {
          * @param algorithms vector of algorithm names
          * @param object S3 object to hash
          */
-        void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object);
+        void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const;
     };
 
 }// namespace AwsMock::Service

@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSService.h>
 
@@ -29,7 +28,7 @@ namespace AwsMock::Service {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {

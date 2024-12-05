@@ -67,7 +67,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::ListKeysRequest
          * @see Dto::KMS::ListKeysResponse
          */
-        Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request);
+        Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
 
         /**
          * Creates a new key
@@ -77,7 +77,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::CreateKeyRequest
          * @see Dto::KMS::CreateKeyResponse
          */
-        Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request);
+        Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
 
         /**
          * @brief Wait for the asynchronous key creation
@@ -85,7 +85,7 @@ namespace AwsMock::Service {
          * @param keyId key ID
          * @param maxSeconds maximal seconds
          */
-        void WaitForRsaKey(const std::string &keyId, int maxSeconds);
+        void WaitForRsaKey(const std::string &keyId, int maxSeconds) const;
 
         /**
          * @brief Wait for the asynchronous key creation
@@ -93,7 +93,7 @@ namespace AwsMock::Service {
          * @param keyId key ID
          * @param maxSeconds maximal seconds
          */
-        void WaitForAesKey(const std::string &keyId, int maxSeconds);
+        void WaitForAesKey(const std::string &keyId, int maxSeconds) const;
 
         /**
          * Schedules a key deletion
@@ -103,7 +103,7 @@ namespace AwsMock::Service {
          * @throws Core::DatabaseException
          * @see Dto::KMS::ScheduledKeyDeletionResponse
          */
-        Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request);
+        Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
 
         /**
          * Describe a key
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DescribeKeyRequest
          * @see Dto::KMS::DescribeKeyResponse
          */
-        Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request);
+        Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
 
         /**
          * Encrypt a plain text using a given algorithm
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::EncryptRequest
          * @see Dto::KMS::EncryptResponse
          */
-        Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request);
+        Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
 
         /**
          * Decrypts a cipher text using a given algorithm
@@ -136,7 +136,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DecryptRequest
          * @see Dto::KMS::DecryptResponse
          */
-        Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request);
+        Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
 
       private:
 

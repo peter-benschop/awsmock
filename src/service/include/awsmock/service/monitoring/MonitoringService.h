@@ -38,7 +38,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {};
+        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()){};
 
         /**
          * @brief Get counters request
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
          * @return GetCountersResponse
          * @see GetCountersResponse
          */
-        Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request);
+        Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
       private:
 

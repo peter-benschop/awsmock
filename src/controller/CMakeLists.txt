@@ -15,11 +15,11 @@ if (SYSTEMD)
     # systemd available
     add_definitions(-DHAS_SYSTEMD)
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoPrometheus PocoNet PocoJSON PocoXML PocoZip
-            PocoFoundation PocoUtil boost_program_options boost_thread boost_filesystem pthread crypto ssl z archive tbb systemd curl)
+            PocoFoundation PocoUtil boost_program_options boost_thread boost_filesystem yaml-cpp pthread crypto ssl z archive tbb systemd curl)
 else ()
     # systemd not available
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation PocoUtil
-            ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_program_options boost_filesystem boost_thread pthread crypto ssl z archive tbb curl)
+            ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_program_options boost_filesystem boost_thread yaml-cpp pthread crypto ssl z archive tbb curl)
 endif ()
 
 add_library(${BINARY}_lib STATIC ${SOURCES})

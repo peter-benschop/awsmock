@@ -14,6 +14,9 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/stdx/make_unique.hpp>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -49,6 +52,13 @@ namespace AwsMock::Dto::DynamoDb {
          * @param jsonObject JSON object
          */
         void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+
+        /**
+         * Convert from JSON object.
+         *
+         * @param document JSON object
+         */
+        void FromDocument(const bsoncxx::document::view &document);
 
         /**
          * Converts the DTO to a string representation.

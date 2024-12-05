@@ -15,9 +15,11 @@ namespace AwsMock::Database {
             {"cognito", {.name = "cognito", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"dynamodb", {.name = "dynamodb", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-            {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-            {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-            {"monitoring", {.name = "monitoring", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
+            {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
+
+    //    ,
+    //            {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+    //            {"monitoring", {.name = "monitoring", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}
 
     void ModuleDatabase::Initialize() {
 
@@ -263,6 +265,20 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.SetState(name, state);
+        }
+    }
+
+    Entity::Module::ModuleState ModuleDatabase::GetState(const std::string &name) {
+
+        if (HasDatabase()) {
+
+            const Entity::Module::Module module = GetModuleByName(name);
+            log_trace << "Module state, name: " << name;
+            return module.state;
+
+        } else {
+
+            return _memoryDb.GetModuleByName(name).state;
         }
     }
 

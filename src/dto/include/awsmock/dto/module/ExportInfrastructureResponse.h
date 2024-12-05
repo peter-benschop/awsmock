@@ -61,7 +61,7 @@ namespace AwsMock::Dto::Module {
         /**
          * Convert from a JSON object.
          *
-         * @param payload json string object
+         * @return payload json string
          */
         std::string ToJson();
 

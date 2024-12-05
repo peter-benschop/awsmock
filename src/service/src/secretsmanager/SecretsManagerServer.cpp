@@ -6,11 +6,11 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::PeriodicScheduler &scheduler) : AbstractServer("secretsmanager", 10) {
+    SecretsManagerServer::SecretsManagerServer(Core::PeriodicScheduler &scheduler) : AbstractServer("secretsmanager") {
 
         // HTTP manager configuration
-        Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.getInt("awsmock.service.secretsmanager.monitoring.period", SECRETSMANAGER_DEFAULT_MONITORING_PERIOD);
+        const Core::Configuration &configuration = Core::Configuration::instance();
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.secretsmanager.monitoring.period");
         log_debug << "SecretsManager rest module initialized";
 
         // Check module active

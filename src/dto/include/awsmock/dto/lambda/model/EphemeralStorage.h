@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -28,28 +29,17 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+        view_or_value<view, value> ToDocument() const {
 
-            Poco::JSON::Object ephemeralStorageJson;
             try {
+                bsoncxx::builder::basic::document document;
+                Core::Bson::BsonUtils::SetLongValue(document, "Size", size);
+                return view_or_value<view, value>(document);
 
-                ephemeralStorageJson.set("Size", size);
-                return ephemeralStorageJson;
-
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
-        }
-
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
-
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
         }
 
         /**
@@ -84,7 +74,7 @@ namespace AwsMock::Dto::Lambda {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &r) {
-            os << "EphemeralStorage=" << r.ToJson();
+            os << "EphemeralStorage=" << to_json(r.ToDocument());
             return os;
         }
     };

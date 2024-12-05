@@ -5,32 +5,30 @@
 #include <awsmock/server/Manager.h>
 
 namespace AwsMock::Manager {
-
     void CreateIndexes() {
         Database::ModuleDatabase::instance().CreateIndexes();
         log_debug << "Database indexes created";
     }
 
     void Manager::Initialize() {
-
         InitializeDatabase();
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
-                 << " loglevel: " << Core::Configuration::instance().getString("awsmock.service.logging.level");
+                 << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
-        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().getBool("awsmock.dockerized");
+        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
     }
 
     void Manager::InitializeDatabase() {
 
         // Get database variables
-        if (const Core::Configuration &configuration = Core::Configuration::instance(); configuration.getBool("awsmock.mongodb.active")) {
-
-            const std::string name = configuration.getString("awsmock.mongodb.name", DEFAULT_MONGO_DBNAME);
-            const std::string host = configuration.getString("awsmock.mongodb.host", DEFAULT_MONGO_DBHOST);
-            const std::string user = configuration.getString("awsmock.mongodb.user", DEFAULT_MONGO_DBUSER);
-            const std::string password = configuration.getString("awsmock.mongodb.password", DEFAULT_MONGO_DBPWD);
-            const int _port = configuration.getInt("awsmock.mongodb.port", DEFAULT_MONGO_DBPORT);
-            const int poolSize = configuration.getInt("awsmock.mongodb.pool.size", DEFAULT_MONGO_POOL_SIZE);
+        if (const Core::Configuration &configuration = Core::Configuration::instance();
+            configuration.GetValueBool("awsmock.mongodb.active")) {
+            const std::string name = configuration.GetValueString("awsmock.mongodb.name");
+            const std::string host = configuration.GetValueString("awsmock.mongodb.host");
+            const std::string user = configuration.GetValueString("awsmock.mongodb.user");
+            const std::string password = configuration.GetValueString("awsmock.mongodb.password");
+            const int _port = configuration.GetValueInt("awsmock.mongodb.port");
+            const int poolSize = configuration.GetValueInt("awsmock.mongodb.pool-size");
 
             // MongoDB URL
             const std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
@@ -47,15 +45,12 @@ namespace AwsMock::Manager {
             // Create database indexes in a background thread
             boost::thread t{CreateIndexes};
             t.detach();
-
         } else {
-
             log_info << "In-memory database initialized";
         }
     }
 
     void Manager::StopModules() {
-
         log_info << "Stopping services";
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
@@ -73,16 +68,18 @@ namespace AwsMock::Manager {
     }
 
     void Manager::Run() {
-
-        const Core::Configuration &configuration = Core::Configuration::instance();
+        Core::Configuration &configuration = Core::Configuration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &module: existingModules) {
-            if (!moduleDatabase.ModuleExists(module.first)) {
-                Database::Entity::Module::Module m = {.name = module.first, .state = Database::Entity::Module::ModuleState::STOPPED, .status = Database::Entity::Module::ModuleStatus::ACTIVE};
+        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
+            if (!moduleDatabase.ModuleExists(key)) {
+                Database::Entity::Module::Module m = {
+                        .name = key,
+                        .state = Database::Entity::Module::ModuleState::STOPPED,
+                        .status = Database::Entity::Module::ModuleStatus::ACTIVE};
                 moduleDatabase.CreateModule(m);
             }
-            if (configuration.has("awsmock.service." + module.first + ".active") && configuration.getBool("awsmock.service." + module.first + ".active")) {
-                moduleDatabase.SetStatus(module.first, Database::Entity::Module::ModuleStatus::ACTIVE);
+            if (configuration.GetValueBool("awsmock.modules." + key + ".active")) {
+                moduleDatabase.SetStatus(key, Database::Entity::Module::ModuleStatus::ACTIVE);
             }
         }
         Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
@@ -95,43 +92,76 @@ namespace AwsMock::Manager {
         boost::asio::io_service ios;
 
         Core::PeriodicScheduler scheduler(ios);
-        auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        auto monitoringServer =
+                std::make_shared<Service::MonitoringServer>(scheduler);
 
         boost::asio::signal_set signals(ios, SIGINT, SIGTERM);
-        signals.async_wait(
-                [&](boost::beast::error_code const &, int) {
-                    // Stop the `io_context`. This will cause `run()` to return immediately, eventually
-                    // destroying the `io_context` and all the sockets in it.
-                    log_info << "Manager stopped on signal";
-                    StopModules();
-                    pool.stop();
-                    ios.stop();
-                });
+        signals.async_wait([&](boost::beast::error_code const &, int) {
+            // Stop the `io_context`. This will cause `run()` to return immediately,
+            // eventually destroying the `io_context` and all the sockets in it.
+            log_info << "Manager stopped on signal";
+            StopModules();
+            pool.stop();
+            ios.stop();
+        });
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         for (const auto &module: modules) {
-            if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
-            } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
-            } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
-            } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
-            } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler));
-            } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler));
-            } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
-            } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>(scheduler));
-            } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
-            } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
-            } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
+            if (module.name == "gateway" &&
+                module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::GatewayServer>(ios));
+            } else if (module.name == "s3" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::S3Server>(scheduler));
+            } else if (module.name == "sqs" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::SQSServer>(scheduler));
+            } else if (module.name == "sns" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::SNSServer>(scheduler));
+            } else if (module.name == "lambda" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::LambdaServer>(scheduler));
+            } else if (module.name == "transfer" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::TransferServer>(scheduler));
+            } else if (module.name == "cognito" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::CognitoServer>(scheduler));
+            } else if (module.name == "dynamodb" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::DynamoDbServer>(scheduler));
+            } else if (module.name == "kms" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::KMSServer>(scheduler));
+            } else if (module.name == "ssm" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name,
+                                    std::make_shared<Service::SSMServer>(scheduler));
+            } else if (module.name == "secretsmanager" &&
+                       module.status ==
+                               Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(
+                        module.name,
+                        std::make_shared<Service::SecretsManagerServer>(scheduler));
             }
         }
 
@@ -141,5 +171,4 @@ namespace AwsMock::Manager {
         ios.run();
         log_info << "So long, and thanks for all the fish!";
     }
-
 }// namespace AwsMock::Manager

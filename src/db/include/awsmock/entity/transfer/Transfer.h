@@ -7,17 +7,11 @@
 
 // C++ includes
 #include <chrono>
-#include <iostream>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
 // Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Array.h>
 #include <Poco/JSON/Object.h>
 
 // MongoDB includes
@@ -173,7 +167,7 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(mongocxx::stdx::optional<bsoncxx::document::view> mResult);
+        void FromDocument(mongocxx::stdx::optional<view> mResult);
 
         /**
          * Converts the entity to a JSON object
@@ -185,7 +179,7 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Converts the entity to a JSON object
          *
-         * @param JSON object
+         * @param jsonObject JSON object
          */
         void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 

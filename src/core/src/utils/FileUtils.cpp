@@ -199,4 +199,5 @@ namespace AwsMock::Core {
         CopyTo(tempFile, path);
         DeleteFile(tempFile);
     }
+
 }// namespace AwsMock::Core

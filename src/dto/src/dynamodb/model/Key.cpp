@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/dynamodb/model/Key.h>
+#include <bsoncxx/builder/basic/document.hpp>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -12,8 +13,8 @@ namespace AwsMock::Dto::DynamoDb {
 
             Poco::JSON::Object rootJson;
 
-            for (const auto &key: keys) {
-                rootJson.set(key.first, key.second.ToJsonObject());
+            for (const auto &[fst, snd]: keys) {
+                rootJson.set(fst, snd.ToJsonObject());
             }
             return rootJson;
 
@@ -32,6 +33,23 @@ namespace AwsMock::Dto::DynamoDb {
                 Poco::JSON::Object::Ptr keyObject = jsonObject->getObject(name);
                 AttributeValue attributeValue;
                 attributeValue.FromJsonObject(keyObject);
+                keys[name] = attributeValue;
+            }
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }
+    }
+
+    void Key::FromDocument(const bsoncxx::document::view &document) {
+
+        try {
+            for (bsoncxx::document::element ele: document) {
+
+                std::string name(ele.key());
+                AttributeValue attributeValue;
+                attributeValue.FromDocument(ele.get_document());
                 keys[name] = attributeValue;
             }
 

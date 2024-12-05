@@ -6,19 +6,13 @@
 #define AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H
 
 // C++ standard includes
-#include <iostream>
 #include <string>
 #include <vector>
 
 // Poco includes
 #include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/dynamodb/Item.h>
@@ -178,7 +172,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return number of DynamoDB items
          */
-        long CountItems(const std::string &region = {});
+        long CountItems(const std::string &region = {}) const;
 
         /**
          * @brief Deletes an item

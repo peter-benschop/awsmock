@@ -5,168 +5,131 @@
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
-
     boost::mutex Configuration::_configurationMutex;
 
     Configuration::Configuration() {
         Initialize();
     }
 
-    Configuration::Configuration(const std::string &filename) {
+    Configuration::Configuration(const std::string &basename) {
         Initialize();
-        SetFilename(filename);
+        SetFilename(basename);
     }
 
     void Configuration::Initialize() {
-
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
-        DefineStringProperty("awsmock.account.id", "AWSMOCK_ACCOUNT_ID", "000000000000");
-        DefineStringProperty("awsmock.client.id", "AWSMOCK_CLIENT_ID", "00000000");
+        DefineStringProperty("awsmock.access.account-id", "AWSMOCK_ACCOUNT_ID", "000000000000");
+        DefineStringProperty("awsmock.access.client-id", "AWSMOCK_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
-        DefineStringProperty("awsmock.data.dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
-        DefineStringProperty("awsmock.temp.dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
-        DefineBoolProperty("awsmock.pretty", "AWSMOCK_PRETTY", false);
-        DefineBoolProperty("awsmock.verifysignature", "AWSMOCK_VERIFY_SIGNATURE", false);
+        DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
+        DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
+        DefineBoolProperty("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
+        DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
 
-        // Manager
-        DefineStringProperty("awsmock.manager.http.host", "AWSMOCK_MANAGER_HOST", "localhost");
-        DefineIntProperty("awsmock.manager.http.port", "AWSMOCK_MANAGER_PORT", 4567);
-        DefineIntProperty("awsmock.manager.http.max.queue", "AWSMOCK_MANAGER_MAX_QUEUE", 50);
-        DefineIntProperty("awsmock.manager.http.max.threads", "AWSMOCK_MANAGER_MAX_THREADS", 10);
-
         // Gateway
-        DefineBoolProperty("awsmock.service.gateway.active", "AWSMOCK_SERVICE_GATEWAY_ACTIVE", true);
-        DefineStringProperty("awsmock.service.gateway.http.host", "AWSMOCK_SERVICE_GATEWAY_HOST", "localhost");
-        DefineIntProperty("awsmock.service.gateway.http.port", "AWSMOCK_SERVICE_GATEWAY_PORT", 4566);
-        DefineIntProperty("awsmock.service.gateway.http.max.queue", "AWSMOCK_SERVICE_GATEWAY_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.gateway.http.max.threads", "AWSMOCK_SERVICE_GATEWAY_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.gateway.http.timeout", "AWSMOCK_SERVICE_GATEWAY_TIMEOUT", 900);
+        DefineBoolProperty("awsmock.gateway.active", "AWSMOCK_GATEWAY_ACTIVE", true);
+        DefineStringProperty("awsmock.gateway.http.host", "AWSMOCK_GATEWAY_HOST", "localhost");
+        DefineStringProperty("awsmock.gateway.http.address", "AWSMOCK_GATEWAY_ADDRESS", "0.0.0.0");
+        DefineIntProperty("awsmock.gateway.http.port", "AWSMOCK_GATEWAY_PORT", 4566);
+        DefineIntProperty("awsmock.gateway.http.max-queue", "AWSMOCK_GATEWAY_MAX_QUEUE", 10);
+        DefineIntProperty("awsmock.gateway.http.max-threads", "AWSMOCK_GATEWAY_MAX_THREADS", 50);
+        DefineIntProperty("awsmock.gateway.http.max-body", "AWSMOCK_GATEWAY_MAX_BODY", 104857600);
+        DefineIntProperty("awsmock.gateway.http.timeout", "AWSMOCK_GATEWAY_TIMEOUT", 900);
 
         // S3
-        DefineBoolProperty("awsmock.service.s3.active", "AWSMOCK_SERVICE_S3_ACTIVE", true);
-        DefineStringProperty("awsmock.service.s3.http.host", "AWSMOCK_SERVICE_S3_HOST", "localhost");
-        DefineIntProperty("awsmock.service.s3.http.port", "AWSMOCK_SERVICE_S3_PORT", 9500);
-        DefineIntProperty("awsmock.service.s3.http.max.queue", "AWSMOCK_SERVICE_S3_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.s3.http.max.threads", "AWSMOCK_SERVICE_S3_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.s3.http.timeout", "AWSMOCK_SERVICE_S3_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.s3.monitoring.period", "AWSMOCK_SERVICE_S3_MONITORING_PERIOD", 900);
+        DefineBoolProperty("awsmock.modules.s3.active", "AWSMOCK_MODULES_S3_ACTIVE", true);
+        DefineStringProperty("awsmock.modules.s3.data-dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data/s3");
+        DefineIntProperty("awsmock.modules.s3.monitoring.period", "AWSMOCK_MODULES_S3_MONITORING_PERIOD", 900);
+        DefineIntProperty("awsmock.modules.s3.sync.object.period", "AWSMOCK_MODULES_S3_SYNC_OBJECT_PERIOD", 3600);
+        DefineIntProperty("awsmock.modules.s3.sync.bucket.period", "AWSMOCK_MODULES_S3_SYNC_BUCKET_PERIOD", 300);
 
         // SQS
-        DefineBoolProperty("awsmock.service.sqs.active", "AWSMOCK_SERVICE_SQS_ACTIVE", true);
-        DefineStringProperty("awsmock.service.sqs.http.host", "AWSMOCK_SERVICE_SQS_HOST", "localhost");
-        DefineIntProperty("awsmock.service.sqs.http.port", "AWSMOCK_SERVICE_SQS_PORT", 9501);
-        DefineIntProperty("awsmock.service.sqs.http.max.queue", "AWSMOCK_SERVICE_SQS_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.sqs.http.max.threads", "AWSMOCK_SERVICE_SQS_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.sqs.http.timeout", "AWSMOCK_SERVICE_SQS_TIMEOUT", 900);
-        DefineStringProperty("awsmock.service.sqs.hostname", "AWSMOCK_SERVICE_SQS_HOSTNAME", "localstack");
-        DefineIntProperty("awsmock.service.s3.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
-        DefineIntProperty("awsmock.service.s3.worker.period", "AWSMOCK_WORKER_SQS_PERIOD", 30);
+        DefineBoolProperty("awsmock.modules.sqs.active", "AWSMOCK_MODULES_SQS_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.s3.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.s3.reset.period", "AWSMOCK_WORKER_SQS_RESET_PERIOD", 30);
+        DefineIntProperty("awsmock.modules.s3.counter.period", "AWSMOCK_WORKER_SQS_COUNTER_PERIOD", 30);
 
         // SNS
-        DefineBoolProperty("awsmock.service.sns.active", "AWSMOCK_SERVICE_SNS_ACTIVE", true);
-        DefineStringProperty("awsmock.service.sns.http.host", "AWSMOCK_SERVICE_SNS_HOST", "localhost");
-        DefineIntProperty("awsmock.service.sns.http.port", "AWSMOCK_SERVICE_SNS_PORT", 9502);
-        DefineIntProperty("awsmock.service.sns.http.max.queue", "AWSMOCK_SERVICE_SNS_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.sns.http.max.threads", "AWSMOCK_SERVICE_SNS_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.sns.http.timeout", "AWSMOCK_SERVICE_SNS_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.sns.message.timeout", "AWSMOCK_SERVICE_SNS_MESSAGE_TIMEOUT", 14);
-        DefineIntProperty("awsmock.monitoring.sns.worker.period", "AWSMOCK_SNS_WORKER_PERIOD", 300);
+        DefineBoolProperty("awsmock.modules.sns.active", "AWSMOCK_MODULES_SNS_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.sns.timeout", "AWSMOCK_MODULES_SNS_TIMEOUT", 14);
         DefineIntProperty("awsmock.monitoring.sns.monitoring.period", "AWSMOCK_SNS_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.monitoring.sns.delete.period", "AWSMOCK_SNS_DELETE_PERIOD", 300);
+        DefineIntProperty("awsmock.monitoring.sns.counter.period", "AWSMOCK_SNS_COUNTER_PERIOD", 300);
 
         // Lambda
-        DefineBoolProperty("awsmock.service.lambda.active", "AWSMOCK_SERVICE_LAMBDA_ACTIVE", true);
-        DefineStringProperty("awsmock.service.lambda.http.host", "AWSMOCK_SERVICE_LAMBDA_HOST", "localhost");
-        DefineIntProperty("awsmock.service.lambda.http.port", "AWSMOCK_SERVICE_LAMBDA_PORT", 9503);
-        DefineIntProperty("awsmock.service.lambda.http.max.queue", "AWSMOCK_SERVICE_LAMBDA_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.lambda.http.max.threads", "AWSMOCK_SERVICE_LAMBDA_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.lambda.http.timeout", "AWSMOCK_SERVICE_LAMBDA_TIMEOUT", 900);
-        DefineIntProperty("awsmock.monitoring.lambda.period", "AWSMOCK_MONITORING_LAMBDA_PERIOD", 300);
+        DefineBoolProperty("awsmock.modules.lambda.active", "AWSMOCK_MODULES_LAMBDA_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.lambda.lifetime", "AWSMOCK_MODULES_LAMBDA_LIFETIME", 3600);
+        DefineStringProperty("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "/home/awsmock/data/lambda");
+        DefineIntProperty("awsmock.modules.lambda.monitoring.period", "AWSMOCK_MODULES_LAMBDA_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.lambda.remove.period", "AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.lambda.counter.period", "AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD", 300);
 
         // Transfer server
-        DefineBoolProperty("awsmock.service.transfer.active", "AWSMOCK_SERVICE_TRANSFER_ACTIVE", true);
-        DefineStringProperty("awsmock.service.transfer.http.host", "AWSMOCK_SERVICE_TRANSFER_HOST", "localhost");
-        DefineIntProperty("awsmock.service.transfer.http.port", "AWSMOCK_SERVICE_TRANSFER_PORT", 9504);
-        DefineIntProperty("awsmock.service.transfer.http.max.queue", "AWSMOCK_SERVICE_TRANSFER_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.transfer.http.max.threads", "AWSMOCK_SERVICE_TRANSFER_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.transfer.http.timeout", "AWSMOCK_SERVICE_TRANSFER_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.transfer.ftp.port", "AWSMOCK_SERVICE_TRANSFER_FTP_PORT", 21);
-        DefineStringProperty("awsmock.service.transfer.bucket", "AWSMOCK_SERVICE_TRANSFER_BUCKET", "transfer-server");
-        DefineStringProperty("awsmock.service.transfer.base.dir", "AWSMOCK_SERVICE_TRANSFER_BASE_DIR", "/tmp/awsmock/data/transfer");
-        DefineIntProperty("awsmock.service.transfer.monitoring.period", "AWSMOCK_SERVICE_TRANSFER_MONITORING_PERIOD", 300);
+        DefineBoolProperty("awsmock.modules.transfer.active", "AWSMOCK_MODULES_TRANSFER_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.transfer.ftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 21);
+        DefineStringProperty("awsmock.modules.transfer.bucket", "AWSMOCK_MODULES_TRANSFER_BUCKET", "transfer-server");
+        DefineStringProperty("awsmock.modules.transfer.base.dir", "AWSMOCK_MODULES_TRANSFER_BASE_DIR", "/tmp/awsmock/data/transfer");
+        DefineIntProperty("awsmock.modules.transfer.monitoring.period", "AWSMOCK_MODULES_TRANSFER_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.transfer.worker.period", "AWSMOCK_MODULES_TRANSFER_WORKER_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.transfer.ftp.pasv-min", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MIN", 6000);
+        DefineIntProperty("awsmock.modules.transfer.ftp.pasv-max", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MAX", 6100);
 
         // Cognito
-        DefineBoolProperty("awsmock.service.cognito.active", "AWSMOCK_SERVICE_COGNITO_ACTIVE", true);
-        DefineStringProperty("awsmock.service.cognito.http.host", "AWSMOCK_SERVICE_COGNITO_HOST", "localhost");
-        DefineIntProperty("awsmock.service.cognito.http.port", "AWSMOCK_SERVICE_COGNITO_PORT", 9505);
-        DefineIntProperty("awsmock.service.cognito.http.max.queue", "AWSMOCK_SERVICE_COGNITO_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.cognito.http.max.threads", "AWSMOCK_SERVICE_COGNITO_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.cognito.http.timeout", "AWSMOCK_SERVICE_COGNITO_TIMEOUT", 120);
-        DefineIntProperty("awsmock.service.cognito.monitoring.period", "AWSMOCK_SERVICE_COGNITO_MONITORING_PERIOD", 300);
+        DefineBoolProperty("awsmock.modules.cognito.active", "AWSMOCK_MODULES_COGNITO_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.cognito.monitoring.period", "AWSMOCK_MODULES_COGNITO_MONITORING_PERIOD", 300);
 
         // DynamoDB
-        DefineBoolProperty("awsmock.service.dynamodb.active", "AWSMOCK_SERVICE_DYNAMODB_ACTIVE", true);
-        DefineStringProperty("awsmock.service.dynamodb.http.host", "AWSMOCK_SERVICE_DYNAMODB_HOST", "localhost");
-        DefineIntProperty("awsmock.service.dynamodb.http.port", "AWSMOCK_SERVICE_DYNAMODB_PORT", 9506);
-        DefineIntProperty("awsmock.service.dynamodb.http.max.queue", "AWSMOCK_SERVICE_DYNAMODB_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.dynamodb.http.max.threads", "AWSMOCK_SERVICE_DYNAMODB_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.dynamodb.http.timeout", "AWSMOCK_SERVICE_DYNAMODB_TIMEOUT", 120);
-        DefineIntProperty("awsmock.service.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
-        DefineStringProperty("awsmock.dynamodb.host", "AWSMOCK_DYNAMODB_HOST", "localhost");
-        DefineIntProperty("awsmock.dynamodb.port", "AWSMOCK_DYNAMODB_PORT", 8000);
+        DefineBoolProperty("awsmock.modules.dynamodb.active", "AWSMOCK_MODULES_DYNAMODB_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.dynamodb.worker.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
+        DefineStringProperty("awsmock.modules.dynamodb.container.host", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_HOST", "localhost");
+        DefineIntProperty("awsmock.modules.dynamodb.container.port", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_PORT", 8000);
 
         // SecretsManager
-        DefineBoolProperty("awsmock.service.secretsmanager.active", "AWSMOCK_SERVICE_SECRETSMANAGER_ACTIVE", true);
-        DefineStringProperty("awsmock.service.secretsmanager.http.host", "AWSMOCK_SERVICE_SECRETSMANAGER_HOST", "localhost");
-        DefineIntProperty("awsmock.service.secretsmanager.http.port", "AWSMOCK_SERVICE_SECRETSMANAGER_PORT", 9507);
-        DefineIntProperty("awsmock.service.secretsmanager.http.max.queue", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.secretsmanager.http.max.threads", "AWSMOCK_SERVICE_SECRETSMANAGER_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.secretsmanager.http.timeout", "AWSMOCK_SERVICE_SECRETSMANAGER_TIMEOUT", 120);
-        DefineIntProperty("awsmock.service.secretsmanager.monitoring.period", "AWSMOCK_SERVICE_SECRETSMANAGER_MONITORING_PERIOD", 300);
+        DefineBoolProperty("awsmock.modules.secretsmanager.active", "AWSMOCK_MODULES_SECRETSMANAGER_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.secretsmanager.monitoring.period", "AWSMOCK_MODULES_SECRETSMANAGER_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.secretsmanager.worker.period", "AWSMOCK_MODULES_SECRETSMANAGER_WORKER_PERIOD", 300);
 
         // KMS
-        DefineBoolProperty("awsmock.service.kms.active", "AWSMOCK_SERVICE_KMS_ACTIVE", true);
-        DefineStringProperty("awsmock.service.kms.http.host", "AWSMOCK_SERVICE_KMS_HOST", "localhost");
-        DefineIntProperty("awsmock.service.kms.http.port", "AWSMOCK_SERVICE_KMS_PORT", 9508);
-        DefineIntProperty("awsmock.service.kms.http.max.queue", "AWSMOCK_SERVICE_KMS_MAX_QUEUE", 250);
-        DefineIntProperty("awsmock.service.kms.http.max.threads", "AWSMOCK_SERVICE_KMS_MAX_THREADS", 50);
-        DefineIntProperty("awsmock.service.kms.http.timeout", "AWSMOCK_SERVICE_KMS_TIMEOUT", 900);
-        DefineIntProperty("awsmock.service.kms.monitoring.period", "AWSMOCK_SERVICEK_KMS_MONITORING_PERIOD", 300);
-        DefineIntProperty("awsmock.service.kms.worker.period", "AWSMOCK_WORKER_KMS_PERIOD", 300);
+        DefineBoolProperty("awsmock.modules.kms.active", "AWSMOCK_MODULES_KMS_ACTIVE", true);
+        DefineIntProperty("awsmock.modules.kms.monitoring.period", "AWSMOCK_SERVICEK_KMS_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.kms.remove.period", "AWSMOCK_WORKER_KMS_REMOVE_PERIOD", 300);
 
         // Docker
         DefineBoolProperty("awsmock.docker.active", "AWSMOCK_DOCKER_ACTIVE", false);
         DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "local");
-        DefineIntProperty("awsmock.docker.default.memory.size", "AWSMOCK_DOCKER_DEFAULT_MEMORY_SIZE", 512);
-        DefineIntProperty("awsmock.docker.default.temp.size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
+        DefineStringProperty("awsmock.docker.network.name", "AWSMOCK_DOCKER_NETWORK_NAME", "local");
+        DefineIntProperty("awsmock.docker.default.memory-size", "AWSMOCK_DOCKER_DEFAULT_MEMORY_SIZE", 512);
+        DefineIntProperty("awsmock.docker.default.temp-size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.docker.socket", "AWSMOCK_DOCKER_SOCKET", "/var/run/docker.sock");
 
         // Podman
         DefineBoolProperty("awsmock.podman.active", "AWSMOCK_PODMAN_ACTIVE", true);
         DefineStringProperty("awsmock.podman.network.mode", "AWSMOCK_PODMAN_NETWORK_MODE", "local");
-        DefineIntProperty("awsmock.podman.default.memory.size", "AWSMOCK_PODMAN_DEFAULT_MEMORY_SIZE", 512);
-        DefineIntProperty("awsmock.podman.default.temp.size", "AWSMOCK_PODMAN_DEFAULT_TEMP_SIZE", 10240);
+        DefineIntProperty("awsmock.podman.default.memory-size", "AWSMOCK_PODMAN_DEFAULT_MEMORY_SIZE", 512);
+        DefineIntProperty("awsmock.podman.default.temp-size", "AWSMOCK_PODMAN_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.podman.socket", "AWSMOCK_PODMAN_SOCKET", "/run/podman/podman.sock");
 
         // FTP server
-        DefineIntProperty("awsmock.service.ftp.port", "AWSMOCK_SERVICE_FTP_ACTIVE", 21);
-        DefineStringProperty("awsmock.service.ftp.host", "AWSMOCK_SERVICE_FTP_HOST", "localhost");
-        DefineIntProperty("awsmock.service.ftp.max.thread", "AWSMOCK_SERVICE_FTP_MAX_THREADS", 4);
-        DefineStringProperty("awsmock.service.ftp.base.dir", "AWSMOCK_SERVICE_FTP_BASE_DIR", "/home/awsmock/data/transfer");
-        DefineIntProperty("awsmock.service.ftp.pasv.min", "AWSMOCK_SERVICE_FTP_PASV_MIN", 6000);
-        DefineIntProperty("awsmock.service.ftp.pasv.max", "AWSMOCK_SERVICE_FTP_PASV_MAX", 6010);
-        DefineStringProperty("awsmock.service.ftp.address", "AWSMOCK_SERVICE_FTP_ADDRESS", "::");
+        DefineIntProperty("awsmock.modules.ftp.port", "AWSMOCK_MODULES_FTP_ACTIVE", 21);
+        DefineStringProperty("awsmock.modules.ftp.host", "AWSMOCK_MODULES_FTP_HOST", "localhost");
+        DefineIntProperty("awsmock.modules.ftp.max.thread", "AWSMOCK_MODULES_FTP_MAX_THREADS", 4);
+        DefineStringProperty("awsmock.modules.ftp.base.dir", "AWSMOCK_MODULES_FTP_BASE_DIR", "/home/awsmock/data/transfer");
+        DefineIntProperty("awsmock.modules.ftp.pasv.min", "AWSMOCK_MODULES_FTP_PASV_MIN", 6000);
+        DefineIntProperty("awsmock.modules.ftp.pasv.max", "AWSMOCK_MODULES_FTP_PASV_MAX", 6010);
+        DefineStringProperty("awsmock.modules.ftp.address", "AWSMOCK_MODULES_FTP_ADDRESS", "::");
 
         // Monitoring
-        DefineIntProperty("awsmock.service.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9091);
-        DefineIntProperty("awsmock.service.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
+        DefineIntProperty("awsmock.modules.monitoring.port", "AWSMOCK_CORE_METRIC_PORT", 9091);
+        DefineIntProperty("awsmock.modules.monitoring.timeout", "AWSMOCK_CORE_METRIC_TIMEOUT", 60000);
 
         // Logging
-        DefineStringProperty("awsmock.service.logging.level", "AWSMOCK_LOG_LEVEL", "info");
-        DefineStringProperty("awsmock.service.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
+        DefineStringProperty("awsmock.logging.level", "AWSMOCK_LOG_LEVEL", "info");
+        DefineStringProperty("awsmock.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
 
         // Database
         DefineBoolProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
@@ -174,34 +137,36 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.mongodb.host", "AWSMOCK_MONGODB_HOST", "localhost");
         DefineIntProperty("awsmock.mongodb.port", "AWSMOCK_MONGODB_PORT", 27017);
         DefineStringProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "root");
+        DefineStringProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "secret");
+        DefineIntProperty("awsmock.mongodb.pool-size", "AWSMOCK_MONGODB_POOL_SIZE", 256);
     }
 
     void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
-            setString(key, getenv(envProperty.c_str()));
+            _yamlConfig[key] = envProperty.c_str();
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!has(key)) {
-            setString(key, defaultValue);
+        } else if (!HasProperty(key)) {
+            _yamlConfig[key] = defaultValue;
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
-    void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue) {
+    void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
-            setBool(key, std::string(getenv(envProperty.c_str())) == "true");
+            _yamlConfig[key] = envProperty.c_str();
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!has(key)) {
-            setBool(key, defaultValue);
+        } else if (!HasProperty(key)) {
+            _yamlConfig[key] = defaultValue;
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
-    void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue) {
+    void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
-            setInt(key, std::stoi(getenv(envProperty.c_str())));
+            _yamlConfig[key] = envProperty.c_str();
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!has(key)) {
-            setInt(key, defaultValue);
+        } else if (!HasProperty(key)) {
+            _yamlConfig[key] = defaultValue;
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
@@ -217,11 +182,15 @@ namespace AwsMock::Core {
         if (filename.empty()) {
             throw CoreException("Empty filename");
         }
-        if (!Core::FileUtils::FileExists(filename)) {
+        if (!FileUtils::FileExists(filename)) {
             log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
         }
+
+        // Save file name
         _filename = filename;
-        load(_filename);
+
+        // Parse YAML file
+        _yamlConfig = YAML::LoadFile(filename);
 
         // Reapply environment settings
         ApplyEnvSettings();
@@ -229,28 +198,81 @@ namespace AwsMock::Core {
         log_debug << ToString();
     }
 
-    void Configuration::SetValue(const std::string &key, const std::string &value) {
-        if (!hasProperty(key)) {
+    void Configuration::SetValue(const std::string &key, const std::string &value) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
-        setString(key, value);
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
+        node.as<std::string>() = value;
         log_trace << "Value set, key: " << key;
     }
 
-    void Configuration::SetValue(const std::string &key, bool value) {
-        if (!hasProperty(key)) {
+    void Configuration::SetValue(const std::string &key, const bool value) const {
+        if (!HasProperty(key)) {
             throw CoreException("Property not found, key: " + key);
         }
-        setBool(key, value);
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
+        node.as<std::string>() = std::to_string(value);
         log_trace << "Value set, key: " << key;
     }
 
-    void Configuration::SetValue(const std::string &key, int value) {
-        if (!hasProperty(key)) {
+    void Configuration::SetValue(const std::string &key, const int value) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
-        setInt(key, value);
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
+        node.as<std::string>() = std::to_string(value);
         log_trace << "Value set, key: " << key;
+    }
+
+    std::string Configuration::GetValueString(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<std::string>();
+    }
+
+    int Configuration::GetValueInt(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<int>();
+    }
+
+    long Configuration::GetValueLong(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<long>();
+    }
+
+    bool Configuration::GetValueBool(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<bool>();
+    }
+
+    double Configuration::GetValueDouble(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<double>();
     }
 
     std::string Configuration::GetAppName() {
@@ -268,30 +290,32 @@ namespace AwsMock::Core {
     }
 
     void Configuration::WriteFile(const std::string &filename) const {
-        std::vector<std::string> pKeys;
-        this->keys(pKeys);
-        std::ofstream ofs(filename, std::ofstream::trunc);
-        for (const auto &key: *this) {
-            ofs << key.first << "=" << key.second;
-        }
+        std::ofstream ofs(filename);
+        ofs << _yamlConfig;
+        ofs.close();
     }
 
     void Configuration::AddToEnvList(const std::string &key, const std::string &value) {
         _envList[key] = value;
     }
 
-    void Configuration::ApplyEnvSettings() {
-        for (const auto &it: _envList) {
-            setString(it.first, it.second);
+    void Configuration::ApplyEnvSettings() const {
+        for (const auto &[fst, snd]: _envList) {
+            SetValue(fst, snd);
         }
+    }
+
+    bool Configuration::HasProperty(const std::string &key) const {
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        YAML::Node traverse = _yamlConfig;
+        for (std::string &path_element: paths) {
+            traverse.reset(traverse[path_element]);
+        }
+        return traverse.IsDefined();
     }
 
     std::ostream &operator<<(std::ostream &os, const Configuration &s) {
-        os << "Configuration={";
-        for (const auto &it: s) {
-            os << it.first << " = " << it.second + ", ";
-        }
+        os << "Configuration={" + s.ToString() + "}";
         return os;
     }
-
 }// namespace AwsMock::Core

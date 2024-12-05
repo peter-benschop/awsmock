@@ -13,12 +13,14 @@
 
 namespace AwsMock::Core {
 
+    using namespace boost::beast::http;
+
     struct DomainSocketResult {
 
         /**
          * Status code
          */
-        boost::beast::http::status statusCode;
+        status statusCode;
 
         /**
           * Body

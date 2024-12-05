@@ -9,10 +9,10 @@ namespace AwsMock::Service {
     SSMService::SSMService() : _ssmDatabase(Database::SSMDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_SSM_ACCOUNT_ID);
+        _accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
     }
 
-    Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) {
+    Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "put_parameter");
         log_trace << "Put parameter request: " << request.ToString();
 
@@ -23,7 +23,7 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
+            const std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
             Database::Entity::SSM::Parameter parameterEntity = {
                     .region = request.region,
                     .parameterName = request.name,
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) {
+    Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "get_parameter");
         log_trace << "Get parameter request: " << request.ToString();
 
@@ -69,7 +69,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) {
+    Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "describe_parameters");
         log_trace << "Describe parameters request: " << request.ToString();
 
@@ -86,7 +86,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) {
+    void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 

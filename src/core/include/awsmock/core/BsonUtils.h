@@ -11,6 +11,7 @@
 // Bson includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/exception/exception.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
 #include <mongocxx/stdx.hpp>
@@ -18,13 +19,17 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 
-namespace AwsMock::Core::Bson {
+using bsoncxx::view_or_value;
+using bsoncxx::builder::basic::array;
+using bsoncxx::builder::basic::document;
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_array;
+using bsoncxx::builder::basic::make_document;
+using bsoncxx::document::value;
+using bsoncxx::document::view;
+using std::chrono::system_clock;
 
-    using bsoncxx::builder::basic::array;
-    using bsoncxx::builder::basic::document;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::document::value;
-    using std::chrono::system_clock;
+namespace AwsMock::Core::Bson {
 
     template<class Element>
     void ToBsonArray(document &d, const std::string &name, std::vector<Element> a) {
@@ -39,11 +44,10 @@ namespace AwsMock::Core::Bson {
     }
 
     template<class Element>
-    void FromBsonArray(const bsoncxx::document::view &value, const std::string &name, std::vector<Element> *a) {
+    void FromBsonArray(const view &value, const std::string &name, std::vector<Element> *a) {
 
         if (value.find(name) != value.end()) {
-            bsoncxx::array::view arrayView{value[name].get_array().value};
-            for (const bsoncxx::array::element &arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -51,7 +55,28 @@ namespace AwsMock::Core::Bson {
         }
     }
 
-    inline void FromBsonArray(const bsoncxx::document::view &value, const std::string &name, std::vector<std::string> *a) {
+    template<class Element>
+    void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
+
+        if (value.find(name) != value.end()) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+                Element element;
+                element.FromDocument(arrayElement.get_document().view());
+                a->emplace_back(element);
+            }
+        }
+    }
+
+    inline void FromBsonStringArray(const value &value, const std::string &name, std::vector<std::string> *a) {
+
+        if (value.find(name) != value.end()) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+                a->emplace_back(arrayElement.get_string().value);
+            }
+        }
+    }
+
+    inline void FromBsonArray(const view &value, const std::string &name, std::vector<std::string> *a) {
 
         if (value.find(name) != value.end()) {
             for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
@@ -76,11 +101,15 @@ namespace AwsMock::Core::Bson {
             document.append(kvp(name, value));
         }
 
+        static void SetBoolValue(document &document, const std::string &name, bool value) {
+            document.append(kvp(name, value));
+        }
+
         static void SetDateValue(document &document, const std::string &name, const system_clock::time_point &value) {
             document.append(kvp(name, Core::DateTimeUtils::ToISO8601(value)));
         }
 
-        static std::string GetOidValue(mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static std::string GetOidValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetOidValue(view.value()[name]);
             }
@@ -99,7 +128,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static long GetLongValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static long GetLongValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetLongValue(view.value()[name]);
             }
@@ -128,7 +157,7 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static int GetIntValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static int GetIntValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetIntValue(view.value()[name]);
             }
@@ -157,7 +186,7 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static double GetDoubleValue(mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static double GetDoubleValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetDoubleValue(view.value()[name]);
             }
@@ -177,7 +206,7 @@ namespace AwsMock::Core::Bson {
             return 0;
         }
 
-        static std::string GetStringValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static std::string GetStringValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetStringValue(view.value()[name]);
             }
@@ -203,7 +232,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static bool GetBoolValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static bool GetBoolValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetBoolValue(view.value()[name]);
             }
@@ -222,7 +251,7 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
-        static system_clock::time_point GetDateValue(const mongocxx::stdx::optional<bsoncxx::document::view> &view, const std::string &name) {
+        static system_clock::time_point GetDateValue(const mongocxx::stdx::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetDateValue(view.value()[name]);
             }
@@ -235,14 +264,20 @@ namespace AwsMock::Core::Bson {
                     return system_clock::now();
                 case bsoncxx::type::k_date:
                     return bsoncxx::types::b_date(element.get_date());
+                case bsoncxx::type::k_timestamp:
+                    return std::chrono::time_point<system_clock, std::chrono::milliseconds>{std::chrono::milliseconds{element.get_timestamp().timestamp}};
                 default:
                     break;
             }
             return {};
         }
 
-        static std::string ToJsonString(const bsoncxx::document::view &document) {
+        static std::string ToJsonString(const view &document) {
             return bsoncxx::to_json(document);
+        }
+
+        static std::string ToJsonString(const array &array) {
+            return bsoncxx::to_json(array);
         }
     };
 }// namespace AwsMock::Core::Bson

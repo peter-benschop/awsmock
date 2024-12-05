@@ -69,7 +69,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
 
         /**
          * @brief Creates a new topic
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
          * @param request create topic request
          * @return CreateTopicResponse
          */
-        Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request);
+        Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request) const;
 
         /**
          * @brief Returns a list of all available topics
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
          * @return ListTopicsResponse
          * @see ListTopicsResponse
          */
-        Dto::SNS::ListTopicsResponse ListTopics(const std::string &region);
+        Dto::SNS::ListTopicsResponse ListTopics(const std::string &region) const;
 
         /**
          * @brief Returns a list of all topic counters
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
          * @see ListTopicCountersResponse
          * @see ListTopicCountersResponse
          */
-        Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request);
+        Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const;
 
         /**
          * @brief Publish a message to a SNS topic
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
          * @param request subscribe request DTO
          * @return SubscribeResponse DTO
          */
-        Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request);
+        Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request) const;
 
         /**
          * @brief Unsubscribe from a topic
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
          * @param request unsubscribe request DTO
          * @return UnsubscribeResponse DTO
          */
-        Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request);
+        Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const;
 
         /**
          * @brief Sets tags for a topic

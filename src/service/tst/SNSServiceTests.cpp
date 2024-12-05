@@ -9,10 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/sns/SNSService.h"
-#include "awsmock/service/sqs/SQSService.h"
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/sns/SNSService.h>
+#include <awsmock/service/sqs/SQSService.h>
 
 // AwsMOck includes
 #include <awsmock/core/TestUtils.h>
@@ -27,7 +26,7 @@
 
 namespace AwsMock::Service {
 
-    class SNSServiceTest : public ::testing::Test {
+    class SNSServiceTest : public testing::Test {
 
       protected:
 
@@ -51,10 +50,10 @@ namespace AwsMock::Service {
     TEST_F(SNSServiceTest, TopicCreateTest) {
 
         // arrange
-        Dto::SNS::CreateTopicRequest request = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
+        const Dto::SNS::CreateTopicRequest request = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
 
         // act
-        Dto::SNS::CreateTopicResponse response = _snsService.CreateTopic(request);
+        const Dto::SNS::CreateTopicResponse response = _snsService.CreateTopic(request);
 
         // assert
         EXPECT_TRUE(response.region == REGION);
@@ -64,8 +63,8 @@ namespace AwsMock::Service {
     TEST_F(SNSServiceTest, TopicDeleteTest) {
 
         // arrange
-        Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
-        Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
+        const Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
+        const Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
 
         // act
         EXPECT_NO_THROW({ _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn); });

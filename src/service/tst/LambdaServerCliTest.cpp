@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/lambda/LambdaServer.h>
@@ -45,16 +44,14 @@ namespace AwsMock::Service {
             }
 
             // Define endpoint
-            std::string _port = _configuration.getString("awsmock.service.lambda.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.lambda.host", GATEWAY_DEFAULT_HOST);
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.id", ACCOUNT_ID);
+            const std::string _port = _configuration.GetValueString("awsmock.modules.lambda.port");
+            const std::string _host = _configuration.GetValueString("awsmock.modules.lambda.host");
+            _configuration.SetValue("awsmock.service.gateway.http.port", _port);
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
             _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
-            //            _gatewayServer->Initialize();
-            //_gatewayServer->Start();
         }
 
         void TearDown() override {
@@ -64,15 +61,14 @@ namespace AwsMock::Service {
             } catch (Core::ServiceException &ex) {
                 // Do nothing
             }
-            // _gatewayServer->Stop();
         }
 
         std::string _endpoint, _accountId;
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
-        Service::LambdaService _lambdaService;
-        Service::S3Service _s3Service;
+        LambdaService _lambdaService;
+        S3Service _s3Service;
         std::shared_ptr<Service::GatewayServer> _gatewayServer;
     };
 

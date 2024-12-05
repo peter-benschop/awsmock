@@ -13,7 +13,6 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
@@ -36,13 +35,13 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _region = _configuration.getString("awsmock.region");
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", GATEWAY_DEFAULT_HOST);
+            std::string _region = _configuration.GetValueString("awsmock.region");
+            std::string _port = _configuration.GetValueString("awsmock.modules.sqs.http.port");
+            std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
 
             // Set test config
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.getString("awsmock.account.id", SQS_ACCOUNT_ID);
+            _configuration.SetValue("awsmock.gateway.http.port", _port);
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
             _endpoint = "http://" + _host + ":" + _port;
             _queueUrl = "http://sqs." + _region + "." + Core::SystemUtils::GetHostName() + ":" + _port + "/" + _accountId + "/" + TEST_QUEUE;
 

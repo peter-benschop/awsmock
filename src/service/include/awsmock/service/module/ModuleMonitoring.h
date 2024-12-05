@@ -31,7 +31,6 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         * @param timeout monitoring period
          */
         explicit ModuleMonitoring() = default;
 

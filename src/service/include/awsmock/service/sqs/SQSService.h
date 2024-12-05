@@ -70,11 +70,6 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
-#define DEFAULT_USER "none"
-#define DEFAULT_REGION "eu-central-1"
-#define SQS_DEFAULT_ACCOUNT_ID "000000000000"
-#define SQS_DEFAULT_VISIBILITY_TIMEOUT 300
-
 namespace AwsMock::Service {
 
     using std::chrono::system_clock;
@@ -266,7 +261,7 @@ namespace AwsMock::Service {
          * @param request delete message request DTO
          * @throws ServiceException
          */
-        void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request);
+        void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
 
         /**
          * @brief Deletes a message in a batch
@@ -275,7 +270,7 @@ namespace AwsMock::Service {
          * @return DeleteMessageBatchResponse
          * @throws ServiceException
          */
-        Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request);
+        Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
 
       private:
 
@@ -299,9 +294,9 @@ namespace AwsMock::Service {
         /**
          * @brief Adjust queue counters after update/delete of messages
          *
-         * @param message message object
+         * @param queueArn SQS queue ARN
          */
-        void AdjustMessageCounters(const Database::Entity::SQS::Message &message) const;
+        void AdjustMessageCounters(const std::string &queueArn) const;
 
         /**
          * SQS database connection

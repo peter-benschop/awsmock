@@ -8,7 +8,7 @@ namespace AwsMock::Dto::Lambda {
 
     std::string ListFunctionResponse::ToJson() {
 
-        for (auto &lambda: lambdaList) {
+        for (const auto &lambda: lambdaList) {
             Function function = {
                     .codeSha256 = lambda.codeSha256,
                     .codeSize = lambda.memorySize,
@@ -16,24 +16,29 @@ namespace AwsMock::Dto::Lambda {
                     .functionName = lambda.function,
                     .handler = lambda.handler,
                     .runtime = lambda.runtime,
-                    .lastModified = lambda.modified};
+                    .lastModified = lambda.modified,
+                    .tags = lambda.tags};
             function.environment.variables = lambda.environment.variables;
             functions.push_back(function);
         }
 
         try {
-            Poco::JSON::Object rootJson;
-            Poco::JSON::Array recordsJsonArray;
-            for (const auto &function: functions) {
-                recordsJsonArray.add(function.ToJsonObject());
+
+            bsoncxx::builder::basic::document document;
+
+            if (!functions.empty()) {
+                bsoncxx::builder::basic::array jsonArray;
+                for (const auto &function: functions) {
+                    jsonArray.append(function.ToDocument());
+                }
+                document.append(kvp("Functions", jsonArray));
             }
-            rootJson.set("Functions", recordsJsonArray);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

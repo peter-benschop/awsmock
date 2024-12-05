@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/s3/S3Server.h>
@@ -33,15 +32,15 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", GATEWAY_DEFAULT_HOST);
+            std::string _port = _configuration.GetValueString("awsmock.modules.sqs.http.port");
+            std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
 
             // Set test config
             std::string p = std::to_string(Core::RandomUtils::NextInt(32678, 65480));
-            _configuration.setString("awsmock.service.gateway.http.host", p);
+            _configuration.SetValue("awsmock.service.gateway.http.host", p);
             _endpoint = "http://localhost:" + p;
             std::cout << "port: " << p << std::endl;
 

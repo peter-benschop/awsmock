@@ -2,9 +2,6 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include "awsmock/core/BsonUtils.h"
-
-
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -13,16 +10,16 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "LastEvaluatedTableName", lastEvaluatedTableName);
 
             if (!tableNames.empty()) {
-                bsoncxx::builder::basic::array array;
+                array array;
                 for (const auto &tableName: tableNames) {
                     array.append(tableName);
                 }
-                document.append(kvp("Tables", array));
+                document.append(kvp("TableNames", array));
             }
             return Core::Bson::BsonUtils::ToJsonString(document);
 
@@ -45,7 +42,7 @@ namespace AwsMock::Dto::DynamoDb {
         try {
 
             if (const value documentValue = bsoncxx::from_json(body); documentValue.find("TableNames") != documentValue.end()) {
-                Core::Bson::FromBsonArray(documentValue, "TableNames", &tableNames);
+                Core::Bson::FromBsonStringArray(documentValue, "TableNames", &tableNames);
             }
 
         } catch (std::exception &exc) {

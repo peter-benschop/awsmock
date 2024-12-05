@@ -30,9 +30,10 @@
 #include <boost/program_options/variables_map.hpp>
 
 // AwsMock includes
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/server/Manager.h>
 
-#define DEFAULT_CONFIG_FILE "/etc/awsmock.properties"
+#define DEFAULT_CONFIG_FILE "/etc/awsmock.yml"
 
 /**
  * Main routine.
@@ -85,17 +86,17 @@ int main(int argc, char *argv[]) {
     // Set log level
     if (vm.contains("loglevel")) {
         auto value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.level", value);
+        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        std::string level = AwsMock::Core::Configuration::instance().getString("awsmock.service.logging.level");
+        std::string level = AwsMock::Core::Configuration::instance().GetValueString("awsmock.logging.level");
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
     // Set log file
     if (vm.contains("logfile")) {
         auto value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().setString("awsmock.service.logging.file", value);
+        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.filename", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }
 

@@ -6,14 +6,14 @@
 
 namespace AwsMock::Service {
 
-    Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) {
+    Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
 
         // Check existence
         if (_snsDatabase.TopicExists(request.region, request.topicName)) {
             log_warning << "SNS topic '" + request.topicName + "' exists already";
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByName(request.region, request.topicName);
+            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByName(request.region, request.topicName);
             log_debug << "Got topic: " << topic.topicArn;
             return {
                     .region = topic.region,
@@ -24,8 +24,8 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
-            std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
+            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+            const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
             topic = _snsDatabase.CreateTopic(topic);
             log_trace << "SNS topic created: " << topic.ToString();
@@ -38,13 +38,13 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) {
+    Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_topics");
         log_trace << "List all topics request, region: " << region;
 
         try {
 
-            Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
             auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
             log_trace << "SNS list topics response: " << listTopicsResponse.ToXml();
 
@@ -56,7 +56,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) {
+    Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_topic_counters");
         log_trace << "List all topics counters request, request: " << request.ToString();
 
@@ -179,7 +179,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) {
+    Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "subscribe");
         log_trace << "Subscribe request: " << request.ToString();
 
@@ -198,12 +198,11 @@ namespace AwsMock::Service {
             }
 
             // Create new subscription
-            std::string accountId = Core::Configuration::instance().getString("awsmock.account.id", DEFAULT_SQS_ACCOUNT_ID);
+            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-            std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
+            const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
-            Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint};
-            if (!topic.HasSubscription(subscription)) {
+            if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
 
                 // Add subscription
                 topic.subscriptions.push_back({.protocol = request.protocol,
@@ -223,7 +222,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SNS::UnsubscribeResponse SNSService::Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) {
+    Dto::SNS::UnsubscribeResponse SNSService::Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "unsubscribe");
         log_trace << "Unsubscribe request: " << request.ToString();
 

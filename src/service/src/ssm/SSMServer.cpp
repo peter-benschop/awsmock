@@ -6,12 +6,12 @@
 
 namespace AwsMock::Service {
 
-    SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms", 10) {
+    SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms") {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.ssm.worker.period", SSM_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.ssm.monitoring.period", SSM_DEFAULT_MONITORING_PERIOD);
+        _workerPeriod = configuration.GetValueInt("awsmock.modules.ssm.worker.period");
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.ssm.monitoring.period");
         log_debug << "SSM server initialized";
 
         // Check module active
@@ -34,11 +34,11 @@ namespace AwsMock::Service {
         log_debug << "SSM server started, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
 
-    void SSMServer::UpdateCounter() {
+    void SSMServer::UpdateCounter() const {
         log_trace << "SSM monitoring starting";
 
         // Get total counts
-        long parameters = _ssmDatabase.CountParameters();
+        const long parameters = _ssmDatabase.CountParameters();
         _metricService.SetGauge(SSM_PARAMETER_COUNT, parameters);
 
         log_trace << "SSM monitoring finished";

@@ -41,7 +41,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * @brief Convert from a JSON string
          *
-         * @param JSON string
+         * @param body JSON string
          */
         void FromJson(const std::string &body);
 

@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_MONITORING_GET_COUNTERS_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/monitoring/Counter.h>

@@ -9,9 +9,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/cognito/CognitoService.h"
 #include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/service/cognito/CognitoService.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -28,7 +27,7 @@ namespace AwsMock::Service {
       protected:
 
         void SetUp() override {
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
         }
 
         void TearDown() override {

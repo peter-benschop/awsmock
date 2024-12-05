@@ -5,13 +5,12 @@
 #include "awsmock/service/sns/SNSServer.h"
 
 namespace AwsMock::Service {
-
-    SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns", 10) {
-
+    SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.getInt("awsmock.service.sns.worker.period", SNS_DEFAULT_WORKER_PERIOD);
-        _monitoringPeriod = configuration.getInt("awsmock.service.sns.monitoring.period", SNS_DEFAULT_MONITORING_PERIOD);
+        _deletePeriod = configuration.GetValueInt("awsmock.modules.sns.delete.period");
+        _counterPeriod = configuration.GetValueInt("awsmock.modules.sns.counter.period");
+        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.sns.monitoring.period");
 
         // Check module active
         if (!IsActive("sns")) {
@@ -24,43 +23,44 @@ namespace AwsMock::Service {
         scheduler.AddTask("monitoring-sns-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start delete old message task
-        scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _workerPeriod);
-        scheduler.AddTask("sns-synchronize-counters", [this] { SychronizeCounters(); }, _workerPeriod);
+        scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
+        scheduler.AddTask("sns-synchronize-counters", [this] { SynchronizeCounters(); }, _counterPeriod);
 
         // Set running
         SetRunning();
 
-        log_debug << "SNS server initialized, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+        log_debug << "SNS server initialized, workerPeriod: " << _deletePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
 
-    void SNSServer::DeleteOldMessages() {
-        Core::Configuration &configuration = Core::Configuration::instance();
-        int messageTimeout = configuration.getInt("awsmock.service.sns.message.timeout", SNS_DEFAULT_MESSAGE_TIMEOUT);
+    void SNSServer::DeleteOldMessages() const {
+        const int messageTimeout = Core::Configuration::instance().GetValueInt("awsmock.modules.sns.timeout");
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 
-    void SNSServer::SychronizeCounters() {
+    void SNSServer::SynchronizeCounters() const {
         for (auto &topic: _snsDatabase.ListTopics()) {
             topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
             _snsDatabase.UpdateTopic(topic);
         }
     }
 
-    void SNSServer::UpdateCounter() {
+    void SNSServer::UpdateCounter() const {
         log_trace << "SNS Monitoring starting";
 
         // Get total counts
-        long topics = _snsDatabase.CountTopics();
-        long messages = _snsDatabase.CountMessages();
+        const long topics = _snsDatabase.CountTopics();
+        const long messages = _snsDatabase.CountMessages();
         _metricService.SetGauge(SNS_TOPIC_COUNT, static_cast<double>(topics));
         _metricService.SetGauge(SNS_MESSAGE_COUNT, static_cast<double>(messages));
 
         // Count resources per topic
         for (const auto &topic: _snsDatabase.ListTopics()) {
             std::string labelValue = Poco::replace(topic.topicName, "-", "_");
-            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(topic.topicAttribute.availableMessages));
+            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT,
+                                    "topic",
+                                    labelValue,
+                                    static_cast<double>(topic.topicAttribute.availableMessages));
         }
         log_trace << "SNS monitoring finished";
     }
-
 }// namespace AwsMock::Service

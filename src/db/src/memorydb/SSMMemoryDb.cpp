@@ -6,18 +6,18 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex SSMMemoryDb::_parameterMutex;
+    boost::mutex SSMMemoryDb::_parameterMutex;
 
     bool SSMMemoryDb::ParameterExists(const std::string &name) {
 
-        return find_if(_parameters.begin(), _parameters.end(), [name](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
+        return std::ranges::find_if(_parameters, [name](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
                    return topic.second.parameterName == name;
                }) != _parameters.end();
     }
 
     Entity::SSM::Parameter SSMMemoryDb::GetParameterById(const std::string &oid) {
 
-        auto it = find_if(_parameters.begin(), _parameters.end(), [oid](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
+        const auto it = std::ranges::find_if(_parameters, [oid](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
             return topic.first == oid;
         });
 
@@ -32,7 +32,7 @@ namespace AwsMock::Database {
 
     Entity::SSM::Parameter SSMMemoryDb::GetParameterByName(const std::string &name) {
 
-        auto it = find_if(_parameters.begin(), _parameters.end(), [name](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
+        const auto it = std::ranges::find_if(_parameters, [name](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
             return topic.second.parameterName == name;
         });
 
@@ -45,21 +45,21 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SSM::ParameterList SSMMemoryDb::ListParameters(const std::string &region) {
+    Entity::SSM::ParameterList SSMMemoryDb::ListParameters(const std::string &region) const {
 
         Entity::SSM::ParameterList parameterList;
 
         if (region.empty()) {
 
-            for (const auto &parameter: _parameters) {
-                parameterList.emplace_back(parameter.second);
+            for (const auto &val: _parameters | std::views::values) {
+                parameterList.emplace_back(val);
             }
 
         } else {
 
-            for (const auto &parameter: _parameters) {
-                if (parameter.second.region == region) {
-                    parameterList.emplace_back(parameter.second);
+            for (const auto &val: _parameters | std::views::values) {
+                if (val.region == region) {
+                    parameterList.emplace_back(val);
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SSM::Parameter SSMMemoryDb::CreateParameter(const Entity::SSM::Parameter &topic) {
-        Poco::ScopedLock loc(_parameterMutex);
+        boost::mutex::scoped_lock loc(_parameterMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _parameters[oid] = topic;
@@ -83,7 +83,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SSM::Parameter SSMMemoryDb::UpdateParameter(const Entity::SSM::Parameter &parameter) {
-        Poco::ScopedLock lock(_parameterMutex);
+        boost::mutex::scoped_lock lock(_parameterMutex);
 
         std::string oid = parameter.oid;
         const auto it = std::ranges::find_if(_parameters,
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
     }
 
     void SSMMemoryDb::DeleteParameter(const Entity::SSM::Parameter &parameter) {
-        Poco::ScopedLock lock(_parameterMutex);
+        boost::mutex::scoped_lock lock(_parameterMutex);
 
         std::string oid = parameter.oid;
         const auto count = std::erase_if(_parameters, [oid](const auto &item) {
@@ -110,7 +110,7 @@ namespace AwsMock::Database {
     }
 
     void SSMMemoryDb::DeleteAllParameters() {
-        Poco::ScopedLock lock(_parameterMutex);
+        boost::mutex::scoped_lock lock(_parameterMutex);
         _parameters.clear();
         log_debug << "All ssm parameters deleted";
     }

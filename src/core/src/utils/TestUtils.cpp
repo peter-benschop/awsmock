@@ -5,36 +5,35 @@
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
-
     void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
-
         // Logging
         if (getenv("AWSMOCK_TEST_LOG") != nullptr) {
-            Core::LogStream::Initialize();
-            Core::LogStream::SetFilename("/tmp/awsmock-test.log");
-            Core::LogStream::SetSeverity("debug");
+            LogStream::Initialize();
+            LogStream::SetFilename("/tmp/awsmock-test.log");
+            LogStream::SetSeverity("debug");
         } else {
-            Core::LogStream::Initialize();
-            Core::LogStream::SetSeverity("none");
+            LogStream::Initialize();
+            LogStream::SetSeverity("none");
         }
 
-        int port = 14566;//SystemUtils::GetRandomPort();
-        std::string hostName = SystemUtils::GetNodeName();
-        std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
-        // AWS configuration
-        ofs << "awsmock.region=eu-central-1" << std::endl;
-        ofs << "awsmock.account.id=000000000000" << std::endl;
-        ofs << "awsmock.client.id=00000000" << std::endl;
-        ofs << "awsmock.user=none" << std::endl;
-        ofs << "awsmock.data.dir=/tmp/awsmock/data" << std::endl;
-        // Rest configuration
-        ofs << "awsmock.service.gateway.active=true" << std::endl;
-        ofs << "awsmock.service.gateway.http.host=" << hostName << std::endl;
-        ofs << "awsmock.service.gateway.http.port=" << port << std::endl;
-        ofs << "awsmock.service.gateway.http.address=0.0.0.0" << std::endl;
-        ofs << "awsmock.service.gateway.http.max.queue=10" << std::endl;
-        ofs << "awsmock.service.gateway.http.max.threads=10" << std::endl;
-        ofs << "awsmock.service.gateway.http.timeout=10" << std::endl;
+        constexpr int port = 14566;
+        const std::string hostName = SystemUtils::GetNodeName();
+
+        const Configuration config;
+        config.SetValue("awsmock.region", "eu-central-1");
+        config.SetValue("awsmock.access.account-id", "000000000000");
+        config.SetValue("awsmock.access.client-id", "00000000");
+        config.SetValue("awsmock.user", "none");
+        config.SetValue("awsmock.data.dir", "/tmp/awsmock/data");
+        // Gateway
+        config.SetValue("awsmock.gateway.active", true);
+        config.SetValue("awsmock.gateway.host", hostName);
+        config.SetValue("awsmock.gateway.port", port);
+        config.SetValue("awsmock.gateway.address", "0.0.0.0");
+        config.SetValue("awsmock.gateway.max-queue", 10);
+        config.SetValue("awsmock.gateway.max-threads", 10);
+        config.SetValue("awsmock.gateway.timeout", 10);
+        /*
         // Mongo DB
         ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
         ofs << "awsmock.mongodb.name=test" << std::endl;
@@ -90,25 +89,23 @@ namespace AwsMock::Core {
         // Logging
         ofs << "awsmock.service.logging.level=debug" << std::endl;
         ofs << "awsmock.service.logging.file=/tmp/awsmock-test.log" << std::endl;
-        ofs.close();
-
-        Core::Configuration &configuration = Core::Configuration::instance();
-        configuration.SetFilename(TMP_PROPERTIES_FILE);
+        ofs.close();*/
+        //config.SetFilename(TMP_PROPERTIES_FILE);
+        // config.WriteFile(TMP_PROPERTIES_FILE);
     }
 
     std::string TestUtils::GetTestConfigurationFilename() {
         return TMP_PROPERTIES_FILE;
     }
 
-    Core::Configuration &TestUtils::GetTestConfiguration(bool withDatabase) {
+    Configuration &TestUtils::GetTestConfiguration(bool withDatabase) {
         CreateTestConfigurationFile(withDatabase);
-        Core::Configuration &configuration = Core::Configuration::instance();
+        Configuration &configuration = Configuration::instance();
         configuration.SetFilename(GetTestConfigurationFilename());
         return configuration;
     }
 
-    Core::ExecResult TestUtils::SendCliCommand(const std::string &command) {
-        return Core::SystemUtils::Exec(command);
+    ExecResult TestUtils::SendCliCommand(const std::string &command) {
+        return SystemUtils::Exec(command);
     }
-
 }// namespace AwsMock::Core

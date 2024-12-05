@@ -9,8 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
-#include "awsmock/service/docker/DockerService.h"
+#include <awsmock/service/container/ContainerService.h>
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
@@ -31,7 +30,7 @@ namespace AwsMock::Service {
         }
 
         Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
-        DockerService _service = DockerService();
+        ContainerService _service = ContainerService();
     };
 
     TEST_F(DockerServiceTest, ImageExistsTest) {

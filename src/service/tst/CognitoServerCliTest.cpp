@@ -9,7 +9,6 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
-#include "awsmock/core/config/Configuration.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/cognito/CognitoServer.h>
@@ -38,27 +37,24 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.getString("awsmock.region", "eu-central-1");
+            _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.getString("awsmock.service.sqs.http.port", std::to_string(GATEWAY_DEFAULT_PORT));
-            std::string _host = _configuration.getString("awsmock.service.sqs.http.host", GATEWAY_DEFAULT_HOST);
+            const std::string _port = _configuration.GetValueString("awsmock.service.sqs.http.port");
+            const std::string _host = _configuration.GetValueString("awsmock.service.sqs.http.host");
 
             // Set test config
-            _configuration.setString("awsmock.service.gateway.http.port", _port);
+            _configuration.SetValue("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
             _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
-            //            _gatewayServer->Initialize();
-            //            _gatewayServer->Start();
         }
 
         void TearDown() override {
             _database.DeleteAllUsers();
             _database.DeleteAllGroups();
             _database.DeleteAllUserPools();
-            //      _gatewayServer->Shutdown();
         }
 
         std::string _endpoint, _accountId, _region;
