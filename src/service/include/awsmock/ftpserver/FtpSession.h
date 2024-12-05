@@ -33,8 +33,8 @@ namespace AwsMock::FtpServer {
       private:
 
         struct IoFile {
-            IoFile(const std::string &filename, std::string user, std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
-                                                                                             _fileName(filename), _user(std::move(user)) {
+            IoFile(const std::string &filename, std::string user, const std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
+                                                                                                   _fileName(filename), _user(std::move(user)) {
 
                 file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));
             }
@@ -65,10 +65,7 @@ namespace AwsMock::FtpServer {
         ////////////////////////////////////////////////////////
       public:
 
-        FtpSession(asio::io_service &io_service,
-                   const UserDatabase &user_database,
-                   std::string serverName,
-                   const std::function<void()> &completion_handler);
+        FtpSession(asio::io_service &io_service, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
         FtpSession(const FtpSession &) = delete;
@@ -219,7 +216,7 @@ namespace AwsMock::FtpServer {
 
         void receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
 
-        void writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void(void)> &fetch_more = []() { return; });
+        void writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more = []() { return; });
 
         void endDataReceiving(const std::shared_ptr<IoFile> &file);
 
@@ -258,7 +255,7 @@ namespace AwsMock::FtpServer {
          * @param user user name
          * @param fileName filename
          */
-        void SendCreateObjectRequest(const std::string &user, const std::string &fileName);
+        void SendCreateObjectRequest(const std::string &user, const std::string &fileName) const;
 
         /**
          * @brief Delete file in AWS S3
@@ -266,7 +263,7 @@ namespace AwsMock::FtpServer {
          * @param user user name
          * @param fileName filename
          */
-        void SendDeleteObjectRequest(const std::string &user, const std::string &fileName);
+        void SendDeleteObjectRequest(const std::string &user, const std::string &fileName) const;
 
         /**
          * @brief Extract the S3 key from the file path.
@@ -274,7 +271,7 @@ namespace AwsMock::FtpServer {
          * @param path file system path
          * @return S3 key
          */
-        std::string GetKey(const std::string &path);
+        std::string GetKey(const std::string &path) const;
 
         ////////////////////////////////////////////////////////
         // Member variables
@@ -337,16 +334,6 @@ namespace AwsMock::FtpServer {
          * Server name
          */
         std::string _serverName;
-
-        /**
-         * S3 module host
-         */
-        std::string _s3ServiceHost;
-
-        /**
-         * S3 module port
-         */
-        int _s3ServicePort;
 
         /**
          * S3 service

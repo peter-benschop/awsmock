@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-    DomainSocketResult DomainSocket::SendJson(http::verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
+    DomainSocketResult DomainSocket::SendJson(http::verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) const {
 
         boost::system::error_code ec;
 
@@ -38,7 +38,7 @@ namespace AwsMock::Core {
         return PrepareResult(response);
     }
 
-    DomainSocketResult DomainSocket::SendBinary(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
+    DomainSocketResult DomainSocket::SendBinary(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) const {
 
         boost::system::error_code ec;
 
@@ -55,7 +55,7 @@ namespace AwsMock::Core {
         http::request<http::file_body> request = PrepareBinaryMessage(method, path, filename, headers);
 
         // Write to unix socket
-        boost::beast::http::write(socket, request);
+        http::write(socket, request);
 
         boost::beast::flat_buffer buffer;
         http::response<http::string_body> response;

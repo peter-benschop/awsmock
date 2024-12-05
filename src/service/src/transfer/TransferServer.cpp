@@ -5,9 +5,7 @@
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
-    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"),
-                                                                         _transferDatabase(
-                                                                                 Database::TransferDatabase::instance()) {
+    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
         // REST manager configuration
         const Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.transfer.monitoring.period");
@@ -40,7 +38,8 @@ namespace AwsMock::Service {
         request.owner = Core::Configuration::instance().GetValueString("awsmock.user");
         request.region = Core::Configuration::instance().GetValueString("awsmock.region");
         if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
-            s3Service.CreateBucket(request);
+            Dto::S3::CreateBucketResponse response = s3Service.CreateBucket(request);
+            log_debug << "Created bucket " << request.name;
         }
     }
 
@@ -54,16 +53,20 @@ namespace AwsMock::Service {
 
         // Add users
         for (const auto &user: server.users) {
-            std::string homeDir = baseDir + Poco::Path::separator() + user.homeDirectory;
+            std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
 
             // Ensure the home directory exists
             Core::DirUtils::EnsureDirectory(homeDir);
             log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
 
             // Add to FTP manager
-            _ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All);
+            if (_ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All)) {
+                log_debug << "User created successfully";
+            }
         }
-        _ftpServer->start(server.concurrency);
+        if (_ftpServer->start(server.concurrency)) {
+            log_debug << "FTP server started";
+        }
 
         // Update database
         server.state = Database::Entity::Transfer::ServerState::ONLINE;

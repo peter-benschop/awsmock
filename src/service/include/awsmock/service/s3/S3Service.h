@@ -239,7 +239,7 @@ namespace AwsMock::Service {
          * @param chunkEncoding chunk encoding settings
          * @return PutObjectResponse
          */
-        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream, bool chunkEncoding);
+        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream, bool chunkEncoding) const;
 
         /**
          * @brief Copy object
@@ -408,10 +408,9 @@ namespace AwsMock::Service {
          * @param request put object request
          * @param bucket S3 bucket
          * @param stream input stream
-         * @param chunkEncoding chunk encoding settings
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding);
+        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
 
         /**
          * @brief Save a un-versioned S3 object.
@@ -422,7 +421,7 @@ namespace AwsMock::Service {
          * @param chunkEncoding chunk encoding settings
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding);
+        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.

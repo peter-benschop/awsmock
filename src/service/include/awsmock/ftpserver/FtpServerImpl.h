@@ -110,14 +110,14 @@ namespace AwsMock::FtpServer {
          *
          * @return listening port
          */
-        uint16_t getPort();
+        uint16_t getPort() const;
 
         /**
          * Return the listen address
          *
          * @return listening address
          */
-        std::string getAddress();
+        std::string getAddress() const;
 
       private:
 

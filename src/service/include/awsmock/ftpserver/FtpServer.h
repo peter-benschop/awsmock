@@ -88,7 +88,7 @@ namespace AwsMock::FtpServer {
          *
          * @return True if adding the user was successful (i.e. it didn't exit already).
          */
-        bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions);
+        bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions) const;
 
         /**
          * @brief Adds the "anonymous" / "ftp" user that FTP clients use to access FTP servers without password
@@ -98,7 +98,7 @@ namespace AwsMock::FtpServer {
          *
          * @return True if adding the anonymous user was successful (i.e. it didn't exit already).
          */
-        bool addUserAnonymous(const std::string &local_root_path, Permission permissions);
+        bool addUserAnonymous(const std::string &local_root_path, Permission permissions) const;
 
         /**
          * @brief Starts the FTP Server
@@ -107,7 +107,7 @@ namespace AwsMock::FtpServer {
          *
          * @return True if the Server has been started successfully.
          */
-        bool start(size_t thread_count = 1);
+        bool start(size_t thread_count = 1) const;
 
         /**
          * @brief Stops the FTP Server
@@ -115,7 +115,7 @@ namespace AwsMock::FtpServer {
          * All operations will be cancelled as fast as possible. The clients will
          * not be informed about the shutdown.
          */
-        void stop();
+        void stop() const;
 
         /**
          * @brief Sets the name of the manager

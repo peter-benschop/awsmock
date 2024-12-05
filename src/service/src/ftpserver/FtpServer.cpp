@@ -8,7 +8,7 @@
 
 namespace AwsMock::FtpServer {
 
-    FtpServer::FtpServer(std::string serverName, int port, std::string address) : _serverName(std::move(serverName)), _address(std::move(address)), _port(port) {
+    FtpServer::FtpServer(std::string serverName, int port, std::string address) : _serverName(std::move(serverName)), _address(std::move(address)), _port(port), _maxThreads(8) {
 
         _ftp_server = std::make_unique<FtpServerImpl>(_serverName, _address, _port);
         log_debug << "FTP manager configured, name: " << _serverName << " endpoint: " << _address << ":" << port;
@@ -16,20 +16,20 @@ namespace AwsMock::FtpServer {
 
     FtpServer::~FtpServer() = default;
 
-    bool FtpServer::addUser(const std::string &username, const std::string &password, const std::string &local_root_path, const Permission permissions) {
+    bool FtpServer::addUser(const std::string &username, const std::string &password, const std::string &local_root_path, const Permission permissions) const {
         return _ftp_server->addUser(username, password, local_root_path, permissions);
     }
 
-    bool FtpServer::addUserAnonymous(const std::string &local_root_path, const Permission permissions) {
+    bool FtpServer::addUserAnonymous(const std::string &local_root_path, const Permission permissions) const {
         return _ftp_server->addUserAnonymous(local_root_path, permissions);
     }
 
-    bool FtpServer::start(size_t thread_count) {
+    bool FtpServer::start(const size_t thread_count) const {
         assert(thread_count > 0);
         return _ftp_server->start(thread_count);
     }
 
-    void FtpServer::stop() {
+    void FtpServer::stop() const {
         _ftp_server->stop();
     }
 

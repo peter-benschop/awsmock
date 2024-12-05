@@ -105,7 +105,7 @@ namespace AwsMock::Service {
     std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime) {
 
         std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        std::string tempDir = dataDir + Poco::Path::separator() + "tmp";
+        std::string tempDir = dataDir + Core::FileUtils::separator() + "tmp";
 
         // Decode Base64 file
         std::stringstream stringStream;
@@ -121,7 +121,7 @@ namespace AwsMock::Service {
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create classes directory
-                std::string classesDir = codeDir + Poco::Path::separator() + "classes";
+                std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress
@@ -187,10 +187,10 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, const std::string &dataDir) {
 
-        std::string s3DataDir = dataDir + Poco::Path::separator() + "s3";
-        std::string lambdaDir = dataDir + Poco::Path::separator() + "lambda";
+        std::string s3DataDir = dataDir + Core::FileUtils::separator() + "s3";
+        std::string lambdaDir = dataDir + Core::FileUtils::separator() + "lambda";
 
-        std::string base64Path = lambdaDir + Poco::Path::separator();
+        std::string base64Path = lambdaDir + Core::FileUtils::separator();
         std::string base64File = lambdaEntity.function + "-" + dockerTag + ".zip";
         std::string base64FullFile = base64Path + base64File;
 
@@ -201,7 +201,7 @@ namespace AwsMock::Service {
 
             // Get internal name of S3 object
             Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambdaEntity.region, lambdaEntity.code.s3Bucket, lambdaEntity.code.s3Key);
-            std::string s3CodeFile = s3DataDir + Poco::Path::separator() + s3Object.internalName;
+            std::string s3CodeFile = s3DataDir + Core::FileUtils::separator() + s3Object.internalName;
 
             // Load file
             std::vector<char> input;

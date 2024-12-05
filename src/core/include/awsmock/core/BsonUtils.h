@@ -239,6 +239,8 @@ namespace AwsMock::Core::Bson {
                     return system_clock::now();
                 case bsoncxx::type::k_date:
                     return bsoncxx::types::b_date(element.get_date());
+                case bsoncxx::type::k_timestamp:
+                    return std::chrono::time_point<system_clock, std::chrono::milliseconds>{std::chrono::milliseconds{element.get_timestamp().timestamp}};
                 default:
                     break;
             }

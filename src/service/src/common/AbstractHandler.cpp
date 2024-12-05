@@ -192,20 +192,20 @@ namespace AwsMock::Service {
             response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
             // Body is part of file from min -> max
-            char *buffer = new char[size];
+            auto buffer = new char[size];
             std::ifstream file(fileName.c_str(), std::ios::binary);
             file.seekg(min, std::ios::beg);
             file.read(buffer, size);
             int count = file.gcount();
-            boost::beast::ostream(response.body()).write(buffer, size);
+            ostream(response.body()).write(buffer, size);
             response.prepare_payload();
             file.close();
             delete[] buffer;
 
             // Copy headers
             if (!headers.empty()) {
-                for (const auto &header: headers) {
-                    response.set(header.first, header.second);
+                for (const auto &[fst, snd]: headers) {
+                    response.set(fst, snd);
                 }
             }
 

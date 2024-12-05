@@ -23,8 +23,8 @@ namespace AwsMock::FtpServer {
         return _ftpUsers.addUser("anonymous", "", local_root_path, permissions);
     }
 
-    bool FtpServerImpl::start(size_t thread_count) {
-        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { _openConnectionCount--; });
+    bool FtpServerImpl::start(const size_t thread_count) {
+        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
 
         // set up the acceptor to listen on the tcp port
         asio::error_code make_address_ec;
@@ -74,7 +74,7 @@ namespace AwsMock::FtpServer {
         log_info << "Listening at address " << _acceptor.local_endpoint().address() << ":" << _acceptor.local_endpoint().port();
 
         _acceptor.async_accept(ftp_session->getSocket(), [this, ftp_session](auto ec) {
-            _openConnectionCount++;
+            ++_openConnectionCount;
 
             acceptFtpSession(ftp_session, ec);
         });
@@ -108,7 +108,7 @@ namespace AwsMock::FtpServer {
         auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { _openConnectionCount--; });
 
         _acceptor.async_accept(new_session->getSocket(), [this, new_session](auto ec) {
-            _openConnectionCount++;
+            ++_openConnectionCount;
             acceptFtpSession(new_session, ec);
         });
     }
@@ -117,11 +117,11 @@ namespace AwsMock::FtpServer {
         return _openConnectionCount;
     }
 
-    uint16_t FtpServerImpl::getPort() {
+    uint16_t FtpServerImpl::getPort() const {
         return _acceptor.local_endpoint().port();
     }
 
-    std::string FtpServerImpl::getAddress() {
+    std::string FtpServerImpl::getAddress() const {
         return _acceptor.local_endpoint().address().to_string();
     }
 }// namespace AwsMock::FtpServer

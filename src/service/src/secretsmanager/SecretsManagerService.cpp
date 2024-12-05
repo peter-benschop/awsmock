@@ -39,7 +39,7 @@ namespace AwsMock::Service {
         try {
 
             // Update database
-            secret.versionId = Poco::UUIDGenerator().createRandom().toString();
+            secret.versionId = Core::StringUtils::CreateRandomUuid();
             secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
             secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
             secret.createdDate = Poco::Timestamp().epochTime();
@@ -145,8 +145,6 @@ namespace AwsMock::Service {
             Dto::SecretsManager::ListSecretsResponse response;
 
             // Get object from database
-
-            // Convert to DTO
             for (Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets(); const auto &s: secrets) {
                 Dto::SecretsManager::Secret secret;
                 secret.primaryRegion = s.primaryRegion;

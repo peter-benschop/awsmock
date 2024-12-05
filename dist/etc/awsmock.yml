@@ -64,7 +64,7 @@ awsmock:
         period: 300
       sync:
         object:
-          period: 3600
+          period: 300
         bucket:
           period: 300
     sqs:

@@ -68,7 +68,7 @@ namespace AwsMock::Core {
         }
 
         // act
-        EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName, true); });
+        EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName); });
 
         // assert
         EXPECT_FALSE(DirUtils::DirectoryExists(dirName));

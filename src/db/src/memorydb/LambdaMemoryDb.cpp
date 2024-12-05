@@ -10,38 +10,35 @@ namespace AwsMock::Database {
 
     bool LambdaMemoryDb::LambdaExists(const std::string &function) {
 
-        return find_if(_lambdas.begin(),
-                       _lambdas.end(),
-                       [function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                           return lambda.second.function == function;
-                       }) != _lambdas.end();
+        return std::ranges::find_if(_lambdas,
+                                    [function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                                        return lambda.second.function == function;
+                                    }) != _lambdas.end();
     }
 
     bool LambdaMemoryDb::LambdaExists(const Entity::Lambda::Lambda &lambda) {
 
         std::string region = lambda.region;
         std::string function = lambda.function;
-        return find_if(_lambdas.begin(),
-                       _lambdas.end(),
-                       [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                           return lambda.second.region == region && lambda.second.function == function;
-                       }) != _lambdas.end();
+        return std::ranges::find_if(_lambdas,
+                                    [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                                        return lambda.second.region == region && lambda.second.function == function;
+                                    }) != _lambdas.end();
     }
 
     bool LambdaMemoryDb::LambdaExists(const std::string &region,
                                       const std::string &function,
                                       const std::string &runtime) {
 
-        return find_if(_lambdas.begin(),
-                       _lambdas.end(),
-                       [region, function, runtime](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                           return lambda.second.region == region && lambda.second.function == function && lambda.second.runtime == runtime;
-                       }) != _lambdas.end();
+        return std::ranges::find_if(_lambdas,
+                                    [region, function, runtime](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                                        return lambda.second.region == region && lambda.second.function == function && lambda.second.runtime == runtime;
+                                    }) != _lambdas.end();
     }
 
     bool LambdaMemoryDb::LambdaExistsByArn(const std::string &arn) {
 
-        return find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+        return std::ranges::find_if(_lambdas, [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                    return lambda.second.arn == arn;
                }) != _lambdas.end();
     }
@@ -49,9 +46,9 @@ namespace AwsMock::Database {
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdasWithEventSource(const std::string &eventSourceArn) {
 
         Entity::Lambda::LambdaList lambdaList;
-        for (const auto &lambda: _lambdas) {
-            if (lambda.second.HasEventSource(eventSourceArn)) {
-                lambdaList.emplace_back(lambda.second);
+        for (const auto &val: _lambdas | std::views::values) {
+            if (val.HasEventSource(eventSourceArn)) {
+                lambdaList.emplace_back(val);
             }
         }
 
@@ -63,13 +60,13 @@ namespace AwsMock::Database {
 
         Entity::Lambda::LambdaList lambdaList;
         if (region.empty()) {
-            for (const auto &lambda: _lambdas) {
-                lambdaList.emplace_back(lambda.second);
+            for (const auto &val: _lambdas | std::views::values) {
+                lambdaList.emplace_back(val);
             }
         } else {
-            for (const auto &lambda: _lambdas) {
-                if (lambda.second.region == region) {
-                    lambdaList.emplace_back(lambda.second);
+            for (const auto &val: _lambdas | std::views::values) {
+                if (val.region == region) {
+                    lambdaList.emplace_back(val);
                 }
             }
         }
@@ -81,7 +78,7 @@ namespace AwsMock::Database {
     Entity::Lambda::Lambda LambdaMemoryDb::CreateLambda(const Entity::Lambda::Lambda &lambda) {
         Poco::ScopedLock lock(_lambdaMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _lambdas[oid] = lambda;
         log_trace << "Lambda created, oid: " << oid;
         return GetLambdaById(oid);
@@ -89,8 +86,8 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaById(const std::string &oid) {
 
-        auto it =
-                find_if(_lambdas.begin(), _lambdas.end(), [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+        const auto it =
+                std::ranges::find_if(_lambdas, [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                     return lambda.first == oid;
                 });
 
@@ -105,8 +102,8 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByArn(const std::string &arn) {
 
-        auto it =
-                find_if(_lambdas.begin(), _lambdas.end(), [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+        const auto it =
+                std::ranges::find_if(_lambdas, [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                     return lambda.second.arn == arn;
                 });
 
@@ -121,8 +118,8 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByName(const std::string &region, const std::string &name) {
 
-        auto it =
-                find_if(_lambdas.begin(), _lambdas.end(), [region, name](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+        const auto it =
+                std::ranges::find_if(_lambdas, [region, name](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                     return lambda.second.region == region && lambda.second.function == name;
                 });
 
@@ -135,16 +132,15 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    long LambdaMemoryDb::LambdaCount(const std::string &region) {
+    long LambdaMemoryDb::LambdaCount(const std::string &region) const {
 
         long count = 0;
         if (region.empty()) {
             return static_cast<long>(_lambdas.size());
-        } else {
-            for (const auto &lambda: _lambdas) {
-                if (lambda.second.region == region) {
-                    count++;
-                }
+        }
+        for (const auto &val: _lambdas | std::views::values) {
+            if (val.region == region) {
+                count++;
             }
         }
         return count;
@@ -155,11 +151,10 @@ namespace AwsMock::Database {
 
         std::string region = lambda.region;
         std::string function = lambda.function;
-        auto it = find_if(_lambdas.begin(),
-                          _lambdas.end(),
-                          [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                              return lambda.second.region == region && lambda.second.function == function;
-                          });
+        const auto it = std::ranges::find_if(_lambdas,
+                                             [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                                                 return lambda.second.region == region && lambda.second.function == function;
+                                             });
 
         if (it == _lambdas.end()) {
             log_error << "Update lambda failed, region: " << lambda.region << " function: " << lambda.function;
@@ -172,8 +167,8 @@ namespace AwsMock::Database {
     void LambdaMemoryDb::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
         Poco::ScopedLock lock(_lambdaMutex);
 
-        for (auto &lambda: _lambdas) {
-            for (auto &instance: lambda.second.instances) {
+        for (auto &val: _lambdas | std::views::values) {
+            for (auto &instance: val.instances) {
                 if (instance.containerId == containerId) {
                     instance.status = status;
                 }

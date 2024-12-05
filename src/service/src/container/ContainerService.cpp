@@ -119,7 +119,7 @@ namespace AwsMock::Service {
 
         // Write docker file
         std::string codeDir = Core::DirUtils::CreateTempDir();
-        std::string fileName = codeDir + Poco::Path::separator() + "Dockerfile";
+        std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::ofstream ofs(fileName);
         ofs << dockerFile;
         ofs.close();
@@ -575,7 +575,7 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &functionName) {
-        std::string tarFileName = codeDir + Poco::Path::separator() + functionName + ".tgz";
+        std::string tarFileName = codeDir + Core::FileUtils::separator() + functionName + ".tgz";
         Core::TarUtils::TarDirectory(tarFileName, codeDir + "/");
         log_debug << "Zipped TAR file written: " << tarFileName;
 

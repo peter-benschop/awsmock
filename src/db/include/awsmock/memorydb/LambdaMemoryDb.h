@@ -125,7 +125,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        long LambdaCount(const std::string &region = {});
+        long LambdaCount(const std::string &region = {}) const;
 
         /**
          * Returns a list of lambda functions.

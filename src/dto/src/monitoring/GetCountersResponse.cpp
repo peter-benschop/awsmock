@@ -9,19 +9,19 @@ namespace AwsMock::Dto::Monitoring {
     std::string GetCountersResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
 
+            document rootDocument;
             if (!counters.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &counter: counters) {
-                    Poco::JSON::Array counterArray;
-                    counterArray.add(Core::DateTimeUtils::ToISO8601(counter.timestamp));
-                    counterArray.add(counter.performanceValue);
-                    jsonArray.add(counterArray);
+                    array jsonElement;
+                    jsonElement.append(Core::DateTimeUtils::ToISO8601(counter.timestamp));
+                    jsonElement.append(counter.performanceValue);
+                    jsonArray.append(jsonElement);
                 }
-                rootJson.set("counters", jsonArray);
+                rootDocument.append(kvp("counters", jsonArray));
             }
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.displayText();

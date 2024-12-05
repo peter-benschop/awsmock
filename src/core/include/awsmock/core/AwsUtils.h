@@ -550,7 +550,7 @@ namespace AwsMock::Core {
      */
     inline std::string GetEndpoint() {
         const int port = Configuration::instance().GetValueInt("awsmock.gateway.http.port");
-        const std::string hostname = Configuration::instance().GetValueString("awsmock.gateway.http.host");
+        const std::string hostname = SystemUtils::GetHostName();
         return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
     }
 

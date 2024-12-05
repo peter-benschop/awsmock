@@ -8,33 +8,39 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/DirectoryIterator.h>
-#include <Poco/File.h>
-#include <Poco/Path.h>
-#include <Poco/RecursiveDirectoryIterator.h>
-#include <Poco/RegularExpression.h>
-#include <Poco/String.h>
-#include <Poco/UUIDGenerator.h>
+// Boost includes
+#include <boost/algorithm/string/replace.hpp>
 
 // AwsMock includes
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
 
     /**
-     * Substring comparison
+     * @brief Substring comparison
      */
     struct SubstringCompare {
 
         char _delimiter;
 
-        explicit SubstringCompare(char delimiter) : _delimiter(delimiter) {}
+        /**
+         * @brief Constructor
+         *
+         * @param delimiter delimiter character
+         */
+        explicit SubstringCompare(const char delimiter) : _delimiter(delimiter) {}
 
+        /**
+         * @brief Comparison
+         *
+         * @param a comparison value
+         * @param b comparison value
+         */
         bool operator()(std::string const &a, std::string const &b) const {
 
-            std::string sa = Core::StringUtils::Split(a, _delimiter)[1];
-            std::string sb = Core::StringUtils::Split(b, _delimiter)[1];
+            const std::string sa = StringUtils::Split(a, _delimiter)[1];
+            const std::string sb = StringUtils::Split(b, _delimiter)[1];
 
             return std::stol(sa) < std::stol(sb);
         }
@@ -91,7 +97,7 @@ namespace AwsMock::Core {
          * @brief Count the number of files in the geven directory.
          *
          * @param dirName name of the directory.
-         * @return toal number of files.
+         * @return total number of files.
          */
         static long DirectoryCountFiles(const std::string &dirName);
 
@@ -104,7 +110,7 @@ namespace AwsMock::Core {
         static bool DirectoryEmpty(const std::string &dirName);
 
         /**
-         * @brief Creates an directory tree recursively
+         * @brief Creates a directory tree recursively
          *
          * @param dirName name of the directory.
          * @param recursive if true, create also all parent directories.
@@ -157,12 +163,11 @@ namespace AwsMock::Core {
         static std::vector<std::string> ListFilesByPattern(const std::string &dirName, const std::string &pattern, bool recursive = true);
 
         /**
-         * @brief Deletes an whole directory tree.
+         * @brief Deletes a whole directory tree.
          *
          * @param dirName directory name.
-         * @param recursive if true deletes also all files in all directories recursively.
          */
-        static void DeleteDirectory(const std::string &dirName, bool recursive = true);
+        static void DeleteDirectory(const std::string &dirName);
 
         /**
          * @brief Deletes all files in the directory, but not the directory itself.
