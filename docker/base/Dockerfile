@@ -22,8 +22,8 @@ RUN cd /usr/src && \
     cmake . && \
     cmake --build . -j 8 && \
     cmake --install .
- \
-    # Install jwt-cpp
+
+# Install jwt-cpp
 RUN cd /usr/src && \
     git clone https://github.com/Thalhammer/jwt-cpp.git && \
     cd jwt-cpp && \
