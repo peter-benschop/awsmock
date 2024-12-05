@@ -3,25 +3,24 @@
 
 namespace AwsMock::Core {
 
-    void SortColumn::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void SortColumn::FromDocument(const std::optional<view> &document) {
 
-        Core::JsonUtils::GetJsonValueString("column", jsonObject, column);
-        Core::JsonUtils::GetJsonValueInt("sortDirection", jsonObject, sortDirection);
+        column = Bson::BsonUtils::GetStringValue(document, "column");
+        sortDirection = Bson::BsonUtils::GetIntValue(document, "sortDirection");
     }
 
-    Poco::JSON::Object SortColumn::ToJsonObject() const {
+    view_or_value<view, value> SortColumn::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
+            document document;
+            Bson::BsonUtils::SetStringValue(document, "column", column);
+            Bson::BsonUtils::SetIntValue(document, "sortDirection", sortDirection);
 
-            rootJson.set("column", column);
-            rootJson.set("sortDirection", sortDirection);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw JsonException(exc.what());
         }
     }
 

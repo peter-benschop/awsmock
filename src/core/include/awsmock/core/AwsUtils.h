@@ -471,14 +471,6 @@ namespace AwsMock::Core {
         static std::string GetCanonicalQueryParameters(const std::string &path);
 
         /**
-         * @brief Returns the canonical query parameters
-         *
-         * @param request HTTP request
-         * @return canonical request parameters
-         */
-        static std::string GetCanonicalQueryParameters(const Poco::Net::HTTPRequest &request);
-
-        /**
          * @brief Returns the canonical header string.
          *
          * @param request HTTP request

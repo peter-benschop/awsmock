@@ -5,8 +5,9 @@
 #ifndef AWSMOCK_CORE_FORBIDDEN_H
 #define AWSMOCK_CORE_FORBIDDEN_H
 
-#include <Poco/Exception.h>
-#include <Poco/Net/HTTPResponse.h>
+// Boost includes
+#include <boost/beast/http/basic_parser.hpp>
+#include <boost/beast/http/status.hpp>
 
 namespace AwsMock::Core {
 
@@ -15,7 +16,7 @@ namespace AwsMock::Core {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ForbiddenException : public Poco::Exception {
+    class ForbiddenException final : public std::exception {
 
       public:
 
@@ -24,7 +25,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit ForbiddenException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_FORBIDDEN);
+        explicit ForbiddenException(boost::beast::http::status code = boost::beast::http::status::forbidden);
 
         /**
          * Constructor.
@@ -32,7 +33,7 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit ForbiddenException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_FORBIDDEN);
+        explicit ForbiddenException(const std::string &msg, boost::beast::http::status code = boost::beast::http::status::forbidden);
 
         /**
          * Copy constructor.
@@ -55,6 +56,11 @@ namespace AwsMock::Core {
          * Rethrows the exception.
          */
         void rethrow() const;
+
+      private:
+
+        std::string message;
+        boost::beast::http::status code;
     };
 
 }// namespace AwsMock::Core

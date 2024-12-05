@@ -15,23 +15,12 @@ namespace AwsMock::Core {
 
     class SystemUtilsTest : public ::testing::Test {};
 
-    TEST_F(SystemUtilsTest, GetNodeNameTest) {
-
-        // arrange
-
-        // act
-        std::string nodeName = SystemUtils::GetNodeName();
-
-        // assert
-        EXPECT_FALSE(nodeName.empty());
-    }
-
     TEST_F(SystemUtilsTest, GetHostNameTest) {
 
         // arrange
 
         // act
-        std::string hostName = SystemUtils::GetHostName();
+        std::string hostName = Core::SystemUtils::GetHostName();
 
         // assert
         EXPECT_FALSE(hostName.empty());

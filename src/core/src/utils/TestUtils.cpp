@@ -17,7 +17,7 @@ namespace AwsMock::Core {
         }
 
         constexpr int port = 14566;
-        const std::string hostName = SystemUtils::GetNodeName();
+        const std::string hostName = SystemUtils::GetHostName();
 
         const Configuration config;
         config.SetValue("awsmock.region", "eu-central-1");

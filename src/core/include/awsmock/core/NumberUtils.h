@@ -8,9 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/String.h>
-
 // Boost includes
 #include <boost/lexical_cast.hpp>
 

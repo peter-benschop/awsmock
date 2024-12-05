@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void EventSourceMapping::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void EventSourceMapping::FromDocument(std::optional<view> mResult) {
 
         eventSourceArn = Core::Bson::BsonUtils::GetStringValue(mResult, "eventSourceArn");
         batchSize = Core::Bson::BsonUtils::GetIntValue(mResult, "batchSize");

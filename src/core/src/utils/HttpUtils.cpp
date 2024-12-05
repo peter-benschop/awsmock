@@ -202,14 +202,6 @@ namespace AwsMock::Core {
         return request.base().find(name) != request.end();
     }
 
-    std::string HttpUtils::GetHeaderValue(const Poco::Net::HTTPRequest &request, const std::string &name) {
-        std::string headerValue = request.get(name);
-        if (headerValue.empty()) {
-            log_debug << "Header value not found, key: " << name;
-        }
-        return headerValue;
-    }
-
     std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &defaultValue) {
         if (request.base().find(name) == request.end()) {
             if (!defaultValue.empty()) {
@@ -226,15 +218,6 @@ namespace AwsMock::Core {
             }
         }
         return request.base()[name];
-    }
-
-    std::map<std::string, std::string> HttpUtils::GetHeaders(const Poco::Net::HTTPRequest &request) {
-
-        std::map<std::string, std::string> headers;
-        for (const auto &header: request) {
-            headers[header.first] = header.second;
-        }
-        return headers;
     }
 
     std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::dynamic_body> &request) {
@@ -279,16 +262,6 @@ namespace AwsMock::Core {
             log_info << header.name_string() << ": " << header.value();
         }
         log_info << SEPARATOR;
-    }
-
-    std::string HttpUtils::GetContentType(const Poco::Net::HTTPRequest &request) {
-
-        return Core::StringUtils::ContainsIgnoreCase(request.getContentType(), "json") ? "json" : "xml";
-    }
-
-    long HttpUtils::GetContentLength(const Poco::Net::HTTPRequest &request) {
-
-        return static_cast<long>(request.getContentLength64());
     }
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {

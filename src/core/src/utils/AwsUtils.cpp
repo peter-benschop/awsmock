@@ -265,24 +265,6 @@ namespace AwsMock::Core {
         return stringToSign.str();
     }
 
-    std::string AwsUtils::GetCanonicalQueryParameters(const Poco::Net::HTTPRequest &request) {
-        std::stringstream canonicalParameters;
-
-        // Get query parameter
-        std::map<std::string, std::string> queryParameters = HttpUtils::GetQueryParameters(request.getURI());
-        for (const auto &[fst, snd]: queryParameters) {
-            canonicalParameters << fst << "=" << snd + "&";
-        }
-
-        std::string canonicalParameterStr = canonicalParameters.str();
-
-        // Remove last character
-        if (Core::StringUtils::Contains(canonicalParameterStr, "&")) {
-            canonicalParameterStr.pop_back();
-        }
-        return canonicalParameterStr;
-    }
-
     std::string AwsUtils::GetCanonicalQueryParameters(const std::string &path) {
         std::stringstream canonicalParameters;
 
@@ -294,7 +276,7 @@ namespace AwsMock::Core {
         std::string canonicalParameterStr = canonicalParameters.str();
 
         // Remove last character
-        if (Core::StringUtils::Contains(canonicalParameterStr, "&")) {
+        if (StringUtils::Contains(canonicalParameterStr, "&")) {
             canonicalParameterStr.pop_back();
         }
         return canonicalParameterStr;
@@ -306,7 +288,7 @@ namespace AwsMock::Core {
         // Get header
         for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
             if (HttpUtils::HasHeader(request, header)) {
-                canonicalHeaders << Poco::toLower(header) << ":" << StringUtils::Trim(HttpUtils::GetHeaderValue(request, header)) + '\n';
+                canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(HttpUtils::GetHeaderValue(request, header)) + '\n';
             }
         }
         return canonicalHeaders.str();
