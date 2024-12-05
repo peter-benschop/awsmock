@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Common {
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Command
-        std::string action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
+        const std::string action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
 
         switch (method) {
             case http::verb::get:
@@ -46,13 +46,8 @@ namespace AwsMock::Dto::Common {
                     command = SecretsManagerCommandType::LIST_SECRETS;
                 }
                 break;
+            default:;
         }
-    }
-
-    std::string SecretsManagerClientCommand::GetBodyAsString(Poco::Net::HTTPServerRequest &request) {
-        std::stringstream sstream;
-        sstream << request.stream().rdbuf();
-        return sstream.str();
     }
 
     std::string SecretsManagerClientCommand::ToJson() const {

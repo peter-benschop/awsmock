@@ -67,7 +67,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
 
-        bsoncxx::builder::basic::document lambdaDoc;
+        document lambdaDoc;
         lambdaDoc.append(
                 kvp("region", region),
                 kvp("user", user),
@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::Lambda {
         return lambdaDoc.extract();
     }
 
-    void Lambda::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Lambda::FromDocument(const std::optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

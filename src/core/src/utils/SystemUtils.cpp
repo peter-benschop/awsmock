@@ -44,16 +44,12 @@ namespace AwsMock::Core {
 #endif
     }
 
-    std::string SystemUtils::GetNodeName() {
-        return Poco::Environment::nodeName();
-    }
-
     std::string SystemUtils::GetHostName() {
         return boost::asio::ip::host_name();
     }
 
     int SystemUtils::GetRandomPort() {
-        return Core::RandomUtils::NextInt(RANDOM_PORT_MIN, RANDOM_PORT_MAX);
+        return RandomUtils::NextInt(RANDOM_PORT_MIN, RANDOM_PORT_MAX);
     }
 
     int SystemUtils::GetPid() {

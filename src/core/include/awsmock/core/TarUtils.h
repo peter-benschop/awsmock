@@ -6,12 +6,10 @@
 #define AWSMOCK_CORE_TAR_UTILS_H
 
 // C++ standard includes
-#include <fcntl.h>
 #include <string>
 
-// Poco includes
-#include <Poco/RecursiveDirectoryIterator.h>
-#include <Poco/String.h>
+// Boost includes
+#include <boost/filesystem/directory.hpp>
 
 // Archive includes
 #include <archive.h>
@@ -19,6 +17,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
 
@@ -55,7 +54,7 @@ namespace AwsMock::Core {
          * @param isDir directory flag
          * @param isLink link flag, needed to preserve links
          */
-        static void WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink);
+        static void WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink);
 
         /**
          * @brief Read a symbolic link.
@@ -68,4 +67,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif//A WSMOCK_CORE_TAR_UTILS_H
+#endif// AWSMOCK_CORE_TAR_UTILS_H

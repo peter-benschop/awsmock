@@ -98,18 +98,18 @@ namespace AwsMock::Core {
 
     std::vector<std::string> DirUtils::ListFilesByPattern(const std::string &dirName, const std::string &pattern, const bool recursive) {
 
-        const Poco::RegularExpression re(pattern);
+        const std::regex regex(pattern);
         std::vector<std::string> fileNames;
 
         if (recursive) {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::recursive_directory_iterator(dirName), {})) {
-                if (is_regular_file(entry) && re.match(entry.path().c_str())) {
+                if (is_regular_file(entry) && std::regex_match(entry.path().c_str(), regex)) {
                     fileNames.emplace_back(entry.path().c_str());
                 }
             }
         } else {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
-                if (is_regular_file(entry) && re.match(entry.path().c_str())) {
+                if (is_regular_file(entry) && std::regex_match(entry.path().c_str(), regex)) {
                     fileNames.emplace_back(entry.path().c_str());
                 }
             }

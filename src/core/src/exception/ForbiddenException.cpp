@@ -6,20 +6,15 @@
 
 namespace AwsMock::Core {
 
-    ForbiddenException::ForbiddenException(int code) : Poco::Exception(code) {
+    ForbiddenException::ForbiddenException(const boost::beast::http::status code) : code(code) {
     }
 
-    ForbiddenException::ForbiddenException(const std::string &msg, int code) : Poco::Exception(msg, code) {
+    ForbiddenException::ForbiddenException(const std::string &msg, const boost::beast::http::status code) : message(msg), code(code) {
     }
 
     ForbiddenException::ForbiddenException(const ForbiddenException &exc) = default;
 
     ForbiddenException::~ForbiddenException() noexcept = default;
-
-    ForbiddenException &ForbiddenException::operator=(const ForbiddenException &exc) {
-        Poco::Exception::operator=(exc);
-        return *this;
-    }
 
     void ForbiddenException::rethrow() const { throw *this; }
 

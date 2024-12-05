@@ -15,15 +15,14 @@
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
 
-
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 using bsoncxx::view_or_value;
 using bsoncxx::builder::basic::array;
 using bsoncxx::builder::basic::document;
 using bsoncxx::builder::basic::kvp;
-using bsoncxx::builder::basic::make_array;
 using bsoncxx::builder::basic::make_document;
 using bsoncxx::document::value;
 using bsoncxx::document::view;

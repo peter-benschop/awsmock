@@ -7,10 +7,6 @@
 
 // C includes
 #include <fcntl.h>
-#ifndef _WIN32
-#include <pwd.h>
-#include <unistd.h>
-#endif
 
 // C++ includes
 #include <array>
@@ -23,25 +19,17 @@
 #include <regex>
 #include <stdexcept>
 #include <string>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
-// Poco includes
-#include <Poco/Environment.h>
-#include <Poco/RegularExpression.h>
-#include <Poco/String.h>
 
 // Boost includes
 #include <boost/asio/detail/config.hpp>
 #include <boost/asio/ip/host_name.hpp>
 
 // AwsMock includes
-#include "awsmock/core/exception/CoreException.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
+#include <awsmock/core/exception/CoreException.h>
 
 #define RANDOM_PORT_MIN 32768
 #define RANDOM_PORT_MAX 65536
@@ -84,13 +72,6 @@ namespace AwsMock::Core {
          * @return absolute path of the home directory.
          */
         static std::string GetHomeDir();
-
-        /**
-         * @brief Returns the node name (uname -n) of the server
-         *
-         * @return node name of the server
-         */
-        static std::string GetNodeName();
 
         /**
          * @brief Returns the DNS host name of the server

@@ -2,14 +2,14 @@
 // Created by vogje01 on 9/30/24.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_SORT_COLUMN_H
-#define AWSMOCK_DTO_COMMON_SORT_COLUMN_H
+#ifndef AWSMOCK_CORE_SORT_COLUMN_H
+#define AWSMOCK_CORE_SORT_COLUMN_H
 
 // C++ includes
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 
@@ -28,20 +28,20 @@ namespace AwsMock::Core {
         int sortDirection;
 
         /**
-         * @brief Convert from JSON object
+         * @brief Convert from BSON object
          *
-         * @param jsonObject JSON object
+         * @param document BSON document
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const std::optional<view> &document);
 
         /**
          * @brief Convert to JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        view_or_value<view, value> ToDocument() const;
     };
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_DTO_COMMON_SORT_COLUMN_H
+#endif// AWSMOCK_CORE_SORT_COLUMN_H

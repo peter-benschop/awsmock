@@ -6,15 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_ADMIN_ADD_USER_TO_GROUP_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/MessageAction.h>
-#include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -22,7 +18,7 @@ namespace AwsMock::Dto::Cognito {
     /**
      * @brief Adds a user to a group
      *
-     * Exanple:
+     * Example:
      * @code{.json}
      * {
      *   "GroupName": "string",

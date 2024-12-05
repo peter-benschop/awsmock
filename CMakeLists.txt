@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_BUILD_PARALLEL_LEVEL 30)
 
 # ignore BOOST deprecated headers
-add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+#add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 
 # Doxygen

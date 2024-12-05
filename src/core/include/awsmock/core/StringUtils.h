@@ -307,7 +307,7 @@ namespace AwsMock::Core {
         static std::string UrlDecode(const std::string &input);
 
         /**
-         * @brief Returns a escaped string.
+         * @brief Returns an escaped string.
          *
          * @param input input string
          * @return escaped string.
@@ -354,7 +354,31 @@ namespace AwsMock::Core {
          * @return string in snake case
          */
         static std::string ToSnakeCase(const std::string &in);
+
+        /**
+         * @brief Return lower case string
+         *
+         * @param input input string
+         * @return lower case string
+         */
+        static std::string ToLower(const std::string &input);
+
+        /**
+         * @brief Return upper case string
+         *
+         * @param input input string
+         * @return upper case string
+         */
+        static std::string ToUpper(const std::string &input);
     };
+
+    inline std::string StringUtils::ToLower(const std::string &input) {
+        return boost::algorithm::to_lower_copy(input);
+    }
+
+    inline std::string StringUtils::ToUpper(const std::string &input) {
+        return boost::algorithm::to_upper_copy(input);
+    }
 
 }// namespace AwsMock::Core
 

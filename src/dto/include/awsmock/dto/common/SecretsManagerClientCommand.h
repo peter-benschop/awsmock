@@ -78,14 +78,6 @@ namespace AwsMock::Dto::Common {
         SecretsManagerCommandType command{};
 
         /**
-         * @brief Returns the message body as string.
-         *
-         * @param request HTTP request
-         * @return message body as string
-         */
-        static std::string GetBodyAsString(Poco::Net::HTTPServerRequest &request);
-
-        /**
          * @brief Gets the value from the user-agent string
          *
          * @param request HTTP server request

@@ -8,41 +8,36 @@ namespace AwsMock::Core {
 
     void TarUtils::TarDirectory(const std::string &tarFile, const std::string &directory) {
 
-        struct archive *a;
-        a = archive_write_new();
+        using namespace boost::filesystem;
+
+        archive *a = archive_write_new();
         archive_write_add_filter_gzip(a);
-        //archive_write_set_format_ustar(a);
-        //archive_write_set_format_pax(a); // Note 1
         archive_write_set_format_gnutar(a);
         archive_write_open_filename(a, tarFile.c_str());
 
-        Poco::RecursiveDirectoryIterator it(directory);
-        Poco::RecursiveDirectoryIterator end;
+        recursive_directory_iterator dir(directory), end;
         int count = 0;
-        while (it != end) {
-            if (it.path().toString() != tarFile) {
-                WriteFile(a, it->path(), directory, it->isDirectory(), it->isLink());
+        while (dir != end) {
+            if (dir->path() != tarFile) {
+                WriteFile(a, dir->path().c_str(), directory, dir->is_directory(), dir->is_symlink());
                 count++;
             }
-            ++it;
+            ++dir;
         }
         archive_write_close(a);
         archive_write_free(a);
     }
 
-    void TarUtils::WriteFile(struct archive *archive, const std::string &fileName, const std::string &removeDir, bool isDir, bool isLink) {
+    void TarUtils::WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, const bool isDir, const bool isLink) {
 
-        struct stat st {};
-        struct archive_entry *entry;
+        struct stat st{};
         char buff[8192];
-        long len;
-        int fd;
 
-        std::string entryName = Poco::replace(fileName, removeDir.c_str(), "");
+        const std::string entryName = StringUtils::Replace(fileName.c_str(), removeDir.c_str(), "");
         log_trace << "Removed directory, name: " << entryName;
 
         stat(fileName.c_str(), &st);
-        entry = archive_entry_new();// Note 2
+        archive_entry *entry = archive_entry_new();// Note 2
         archive_entry_set_pathname(entry, entryName.c_str());
         archive_entry_set_size(entry, st.st_size);
         std::string link;
@@ -65,8 +60,8 @@ namespace AwsMock::Core {
             archive_entry_set_gid(entry, 0);
         }
         archive_write_header(archive, entry);
-        fd = open(fileName.c_str(), O_RDONLY);
-        len = read(fd, buff, sizeof(buff));
+        const int fd = open(fileName.c_str(), O_RDONLY);
+        long len = read(fd, buff, sizeof(buff));
         while (len > 0) {
             archive_write_data(archive, buff, len);
             len = read(fd, buff, sizeof(buff));
@@ -77,14 +72,13 @@ namespace AwsMock::Core {
     }
 
     std::string TarUtils::Readsymlink(const std::string &path) {
-#ifndef _WIN32		
-        char buf[1024];
+#ifndef _WIN32
         size_t len;
-        if ((len = readlink(path.c_str(), buf, sizeof(buf) - 1)) != -1) {
+        if (char buf[1024]; (len = readlink(path.c_str(), buf, sizeof(buf) - 1)) != -1) {
             buf[len] = '\0';
             return {buf};
         }
-#endif		
+#endif
         return "";
     }
 }// namespace AwsMock::Core
