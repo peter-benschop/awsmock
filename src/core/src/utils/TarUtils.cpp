@@ -30,7 +30,7 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, const bool isDir, const bool isLink) {
 
-        struct stat st{};
+        struct stat st {};
         char buff[8192];
 
         const std::string entryName = StringUtils::Replace(fileName.c_str(), removeDir.c_str(), "");

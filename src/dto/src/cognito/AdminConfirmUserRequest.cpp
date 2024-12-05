@@ -8,19 +8,16 @@ namespace AwsMock::Dto::Cognito {
 
     void AdminConfirmUserRequest::FromJson(const std::string &payload) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Username", rootObject, userName);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
+            const value document = bsoncxx::from_json(payload);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -28,16 +25,16 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Username", userName);
-            rootJson.set("UserPoolId", userPoolId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

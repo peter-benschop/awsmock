@@ -2,20 +2,18 @@
 // Created by vogje01 on 23/11/2023.
 //
 
-#include "awsmock/dto/cognito/model/UserAttribute.h"
+#include <awsmock/dto/cognito/model/UserAttribute.h>
 
 namespace AwsMock::Dto::Cognito {
 
     std::string UserAttribute::ToJson() const {
 
         try {
-            Poco::JSON::Object rootObject;
-            rootObject.set("Name", name);
-            rootObject.set("Value", value);
+            Poco::JSON::Object rootJson;
+            rootJson.set("Name", name);
+            rootJson.set("Value", value);
 
-            std::ostringstream os;
-            rootObject.stringify(os);
-            return os.str();
+            return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
@@ -23,12 +21,12 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    void UserAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void UserAttribute::FromDocument(const std::optional<view> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-            Core::JsonUtils::GetJsonValueString("Value", jsonObject, value);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            value = Core::Bson::BsonUtils::GetStringValue(document, "Value");
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

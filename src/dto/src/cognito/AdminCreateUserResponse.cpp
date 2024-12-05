@@ -8,31 +8,24 @@ namespace AwsMock::Dto::Cognito {
 
     void AdminCreateUserResponse::FromJson(const std::string &payload) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("UserName", rootObject, userName);
+            const value document = bsoncxx::from_json(payload);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
 
-            Poco::JSON::Array::Ptr attributesArray = rootObject->getArray("UserAttributes");
-
-            if (attributesArray != nullptr) {
-                for (const auto &it: *attributesArray) {
-                    if (!it.isEmpty()) {
-                        const auto &object = it.extract<Poco::JSON::Object::Ptr>();
-                        UserAttribute userAttribute;
-                        userAttribute.FromJsonObject(object);
-                        userAttributes.emplace_back(userAttribute);
-                    }
+            // Message action
+            if (document.find("UserAttributes") != document.end()) {
+                array array;
+                for (const auto &element: document["UserAttributes"].get_array().value) {
+                    UserAttribute userAttribute;
+                    userAttribute.FromDocument(element.get_document());
+                    userAttributes.emplace_back(userAttribute);
                 }
             }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -40,11 +33,9 @@ namespace AwsMock::Dto::Cognito {
 
         try {
             Poco::JSON::Object rootJson;
-
-            Poco::JSON::Object userJson;
-            userJson.set("Username", userName);
-            userJson.set("Enabled", enabled);
-            rootJson.set("User", userJson);
+            rootJson.set("Region", region);
+            rootJson.set("Username", userName);
+            rootJson.set("Enabled", enabled);
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
