@@ -205,7 +205,7 @@ namespace AwsMock::Service {
             log_warning << "Docker container exists failed, httpStatus: " << statusCode;
             return false;
         }
-        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/images/" + name + "/exists");
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/containers/" + name + "/exists");
         if (statusCode == http::status::no_content) {
             log_debug << "Podman container found, name: " << name << ":" << tag;
             return true;

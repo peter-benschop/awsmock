@@ -33,6 +33,7 @@ namespace AwsMock::Manager {
             // MongoDB URL
             const std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
             mongocxx::uri _uri(url.c_str());
+            log_info << "Using MongoDB database url: " << url;
 
             auto instance = std::make_unique<mongocxx::instance>();
             Database::ConnectionPool &pool = Database::ConnectionPool::instance();
