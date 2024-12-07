@@ -54,7 +54,7 @@ namespace AwsMock::Service {
         // Check container image
         if (!_containerService.ContainerExistsByName(_containerName)) {
             const Dto::Docker::CreateContainerResponse response = _containerService.CreateContainer(_imageName, _imageTag, _containerName, _containerPort, _containerPort);
-            log_trace << "CreateContainer, name: " << _imageName << " id: " << response.id;
+            log_trace << "CreateContainer, containerName: " << _containerName << " id: " << response.id;
         }
 
         // Start docker container, in case it is not already running.
@@ -94,29 +94,34 @@ namespace AwsMock::Service {
 
     void DynamoDbServer::SynchronizeTables() const {
 
-        // Get the list of tables from DynamoDB
-        auto [status, output] = Core::SystemUtils::Exec("aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
-        Dto::DynamoDb::ListTableResponse listTableResponse;
-        listTableResponse.FromJson(output, {});
+        try {
+            // Get the list of tables from DynamoDB
+            auto [status, output] = Core::SystemUtils::Exec("aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+            Dto::DynamoDb::ListTableResponse listTableResponse;
+            listTableResponse.FromJson(output, {});
 
-        if (!listTableResponse.tableNames.empty()) {
-            for (const auto &tableName: listTableResponse.tableNames) {
-                auto [status, output] = Core::SystemUtils::Exec("aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
-                Dto::DynamoDb::DescribeTableResponse describeTableResponse;
-                describeTableResponse.FromJson(output, {});
+            if (!listTableResponse.tableNames.empty()) {
+                for (const auto &tableName: listTableResponse.tableNames) {
+                    auto [status, output] = Core::SystemUtils::Exec("aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
+                    Dto::DynamoDb::DescribeTableResponse describeTableResponse;
+                    describeTableResponse.FromJson(output, {});
 
-                Database::Entity::DynamoDb::Table table = {
-                        .region = describeTableResponse.region,
-                        .name = describeTableResponse.tableName,
-                        .status = Dto::DynamoDb::TableStatusTypeToString(describeTableResponse.tableStatus),
-                        .attributes = describeTableResponse.attributes,
-                        .keySchemas = describeTableResponse.keySchemas};
-                _dynamoDbDatabase.CreateOrUpdateTable(table);
+                    Database::Entity::DynamoDb::Table table = {
+                            .region = describeTableResponse.region,
+                            .name = describeTableResponse.tableName,
+                            .status = Dto::DynamoDb::TableStatusTypeToString(describeTableResponse.tableStatus),
+                            .attributes = describeTableResponse.attributes,
+                            .keySchemas = describeTableResponse.keySchemas};
+                    _dynamoDbDatabase.CreateOrUpdateTable(table);
+                }
+            } else {
+                _dynamoDbDatabase.DeleteAllTables();
             }
-        } else {
-            _dynamoDbDatabase.DeleteAllTables();
+            log_debug << "DynamoDB synchronized";
+
+        } catch (Core::JsonException &exc) {
+            log_error << exc.what();
         }
-        log_debug << "DynamoDB synchronized";
     }
 
     void DynamoDbServer::UpdateCounter() const {
