@@ -21,8 +21,6 @@
 
 #define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
 #define DYNAMODB_DEFAULT_WORKER_PERIOD 300
-#define DYNAMODB_DOCKER_IMAGE std::string("dynamodb-local")
-#define DYNAMODB_DOCKER_TAG std::string("latest")
 #define DYNAMODB_DOCKER_PORT 8000
 #define DYNAMODB_DOCKER_HOST "localhost"
 #define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
@@ -88,7 +86,7 @@ namespace AwsMock::Service {
         /**
          * Docker module
          */
-        Service::ContainerService &_containerService;
+        ContainerService &_containerService;
 
         /**
          * Database connection
@@ -111,6 +109,11 @@ namespace AwsMock::Service {
         int _workerPeriod;
 
         /**
+         * Dynamo DB docker name
+         */
+        std::string _containerName;
+
+        /**
          * Dynamo DB docker host
          */
         std::string _containerHost;
@@ -119,6 +122,16 @@ namespace AwsMock::Service {
          * Dynamo DB docker host
          */
         int _containerPort;
+
+        /**
+         * Dynamo DB image name
+         */
+        std::string _imageName;
+
+        /**
+         * Dynamo DB image tag
+         */
+        std::string _imageTag;
     };
 
 }// namespace AwsMock::Service

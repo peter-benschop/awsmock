@@ -14,6 +14,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/DirUtils.h>
 #include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
@@ -173,6 +174,14 @@ namespace AwsMock::Service {
         bool ContainerExists(const std::string &id) const;
 
         /**
+         * @brief Checks whether a container exists by name.
+         *
+         * @param containerName container name
+         * @return true if container exists, otherwise false
+         */
+        bool ContainerExistsByName(const std::string &containerName) const;
+
+        /**
          * @brief List all docker images, with the given name and different tags.
          *
          * @param name name of the image
@@ -203,11 +212,12 @@ namespace AwsMock::Service {
          *
          * @param imageName image name
          * @param tag image tags
+         * @param containerName name of the container
          * @param hostPort external port of the container
          * @param containerPort internal port of the container
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, int hostPort, int containerPort) const;
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const;
 
         /**
          * @brief Returns a container by name/tags.

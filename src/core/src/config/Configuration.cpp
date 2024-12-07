@@ -86,6 +86,9 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.modules.dynamodb.worker.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineStringProperty("awsmock.modules.dynamodb.container.host", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_HOST", "localhost");
         DefineIntProperty("awsmock.modules.dynamodb.container.port", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_PORT", 8000);
+        DefineStringProperty("awsmock.modules.dynamodb.container.name", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_NAME", "dynamodb-local");
+        DefineStringProperty("awsmock.modules.dynamodb.container.image-name", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_IMAGE_NAME", "docker.io/library/dynamodb-local");
+        DefineStringProperty("awsmock.modules.dynamodb.container.image-tag", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_IMAGE_TAG", "latest");
 
         // SecretsManager
         DefineBoolProperty("awsmock.modules.secretsmanager.active", "AWSMOCK_MODULES_SECRETSMANAGER_ACTIVE", true);

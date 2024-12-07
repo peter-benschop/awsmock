@@ -109,6 +109,9 @@ awsmock:
       container:
         host: localhost
         port: 8000
+        name: dynamodb-local                                          # Container name, default: dynamodb-local
+        image-name: docker.io/library/dynamodb-local                  # AWS dynamodb image name, default: docker.io/library/dynamodb-local
+        image-tag: latest                                             # AWS dynamodb image tag, default: latest
     cognito:
       active: true
       monitoring:
