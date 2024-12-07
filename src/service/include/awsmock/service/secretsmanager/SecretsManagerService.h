@@ -106,7 +106,7 @@ namespace AwsMock::Service {
          * @param request delete secret request
          * @return DeleteSecretResponse
          */
-        Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request);
+        Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
 
       private:
 

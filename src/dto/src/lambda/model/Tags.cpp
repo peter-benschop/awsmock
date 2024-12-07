@@ -7,13 +7,13 @@
 namespace AwsMock::Dto::Lambda {
 
     bool Tags::HasTag(const std::string &key) {
-        return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+        return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
                    return t.first == key;
                }) != tags.end();
     }
 
     std::string Tags::GetTagValue(const std::string &key) {
-        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+        auto it = std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
             return t.first == key;
         });
         return it->second;
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Lambda {
             }
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -37,9 +37,9 @@ namespace AwsMock::Dto::Lambda {
 
         Poco::JSON::Array tagArray;
         try {
-            for (const auto &tag: tags) {
+            for (const auto &[fst, snd]: tags) {
                 Poco::JSON::Object tagJson;
-                tagJson.set(tag.first, tag.second);
+                tagJson.set(fst, snd);
                 tagArray.add(tagJson);
             }
 

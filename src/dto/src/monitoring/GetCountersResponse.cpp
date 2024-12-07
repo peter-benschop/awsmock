@@ -23,9 +23,9 @@ namespace AwsMock::Dto::Monitoring {
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.displayText();
-            throw Core::JsonException(exc.message());
+        } catch (Core::JsonException &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

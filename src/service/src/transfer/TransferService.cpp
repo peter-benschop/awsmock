@@ -47,7 +47,7 @@ namespace AwsMock::Service {
 
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
 
-            throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
 
         } else {
 
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
             // Check user
             if (transferEntity.HasUser(request.userName)) {
-                throw Core::ServiceException("Transfer manager has already a user with name '" + request.userName + "'", Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::ServiceException("Transfer manager has already a user with name '" + request.userName + "'");
             }
 
             // Get home directory
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
             }
 
             // Add user
-            std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account.id");
+            std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
             std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
             Database::Entity::Transfer::User user = {
                     .userName = request.userName,
@@ -107,7 +107,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "Handler list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -126,7 +126,7 @@ namespace AwsMock::Service {
 
         } catch (Poco::Exception &ex) {
             log_error << "Handler list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer server;
         try {
             if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist", 500);
+                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist");
             }
 
             // Get the manager
@@ -183,7 +183,7 @@ namespace AwsMock::Service {
             server = _transferDatabase.UpdateTransfer(server);
 
             log_error << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.message();
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message());
         }
     }
 
@@ -193,7 +193,7 @@ namespace AwsMock::Service {
         Database::Entity::Transfer::Transfer server;
         try {
             if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist", 500);
+                throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist");
             }
 
             // Get the manager
@@ -214,7 +214,7 @@ namespace AwsMock::Service {
             server = _transferDatabase.UpdateTransfer(server);
 
             log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message();
-            throw Core::ServiceException(ex.message(), 500);
+            throw Core::ServiceException(ex.message());
         }
     }
 }// namespace AwsMock::Service

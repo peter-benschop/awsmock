@@ -391,7 +391,7 @@ namespace AwsMock::Service {
                 .networkMode = GetNetworkName(),
                 .containerPort = std::to_string(containerPort),
                 .hostPort = std::to_string(hostPort)};
-        std::string jsonBody = request.ToJson();
+        const std::string jsonBody = request.ToJson();
 
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + containerName, jsonBody);
         if (statusCode != http::status::created) {

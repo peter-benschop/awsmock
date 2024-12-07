@@ -42,7 +42,7 @@ namespace AwsMock::Dto::Lambda {
             return rootJson;
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

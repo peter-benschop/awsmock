@@ -837,7 +837,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), Poco::Net::HTTPServerResponse::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::DatabaseException(exc.what());
             }
 
         } else {

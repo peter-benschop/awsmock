@@ -6,11 +6,6 @@
 
 namespace AwsMock::Dto::SQS {
 
-    RestErrorResponse::RestErrorResponse(const Core::ServiceException &exc) {
-        message = exc.message();
-        code = exc.code();
-    }
-
     std::string RestErrorResponse::ToJson() const {
 
         try {
@@ -33,52 +28,52 @@ namespace AwsMock::Dto::SQS {
             return os.str();
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            throw Core::ServiceException(exc.message());
         }
     }
 
     std::string RestErrorResponse::ToXml() const {
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+        Poco::XML::AutoPtr pDoc = new Poco::XML::Document;
 
         // ErrorResponse
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ErrorResponse");
+        Poco::XML::AutoPtr pRoot = pDoc->createElement("ErrorResponse");
         pDoc->appendChild(pRoot);
 
         // Error
-        Poco::XML::AutoPtr<Poco::XML::Element> pError = pDoc->createElement("Error");
+        Poco::XML::AutoPtr pError = pDoc->createElement("Error");
         pRoot->appendChild(pError);
 
         // Type
-        Poco::XML::AutoPtr<Poco::XML::Element> pType = pDoc->createElement("Type");
+        Poco::XML::AutoPtr pType = pDoc->createElement("Type");
         pError->appendChild(pType);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTypeText = pDoc->createTextNode("Sender");
+        Poco::XML::AutoPtr pTypeText = pDoc->createTextNode("Sender");
         pType->appendChild(pTypeText);
 
         // Code
-        Poco::XML::AutoPtr<Poco::XML::Element> pCode = pDoc->createElement("Code");
+        Poco::XML::AutoPtr pCode = pDoc->createElement("Code");
         pError->appendChild(pCode);
-        Poco::XML::AutoPtr<Poco::XML::Text> pCodeText = pDoc->createTextNode(std::to_string(code));
+        Poco::XML::AutoPtr pCodeText = pDoc->createTextNode(std::to_string(code));
         pCode->appendChild(pCodeText);
 
         // Message <Message>
-        Poco::XML::AutoPtr<Poco::XML::Element> pMessage = pDoc->createElement("Message");
+        Poco::XML::AutoPtr pMessage = pDoc->createElement("Message");
         pError->appendChild(pMessage);
-        Poco::XML::AutoPtr<Poco::XML::Text> pMessageText = pDoc->createTextNode(message);
+        Poco::XML::AutoPtr pMessageText = pDoc->createTextNode(message);
         pMessage->appendChild(pMessageText);
 
         // Resource <Resource>
         if (!resource.empty()) {
-            Poco::XML::AutoPtr<Poco::XML::Element> pResource = pDoc->createElement("Resource");
+            Poco::XML::AutoPtr pResource = pDoc->createElement("Resource");
             pRoot->appendChild(pResource);
-            Poco::XML::AutoPtr<Poco::XML::Text> pResourceText = pDoc->createTextNode(resource);
+            Poco::XML::AutoPtr pResourceText = pDoc->createTextNode(resource);
             pResource->appendChild(pResourceText);
         }
 
         // RequestId <RequestId>
         if (!requestId.empty()) {
-            Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
+            Poco::XML::AutoPtr pRequestId = pDoc->createElement("RequestId");
             pRoot->appendChild(pRequestId);
-            Poco::XML::AutoPtr<Poco::XML::Text> pRequestIdText = pDoc->createTextNode(requestId);
+            Poco::XML::AutoPtr pRequestIdText = pDoc->createTextNode(requestId);
             pRequestId->appendChild(pRequestIdText);
         }
 

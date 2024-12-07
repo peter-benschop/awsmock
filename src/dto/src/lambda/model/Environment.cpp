@@ -45,7 +45,7 @@ namespace AwsMock::Dto::Lambda {
             }
 
         } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message(), 500);
+            throw Core::ServiceException(exc.message());
         }
     }
 

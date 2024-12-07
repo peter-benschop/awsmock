@@ -19,9 +19,9 @@ namespace AwsMock::Dto::Module {
 
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -44,9 +44,9 @@ namespace AwsMock::Dto::Module {
 
             return Core::Bson::BsonUtils::ToJsonString(jsonArray);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -69,9 +69,9 @@ namespace AwsMock::Dto::Module {
 
             return Core::Bson::BsonUtils::ToJsonString(jsonArray);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

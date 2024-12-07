@@ -5,19 +5,19 @@
 #ifndef AWSMOCK_CORE_JSON_EXCEPTION_H
 #define AWSMOCK_CORE_JSON_EXCEPTION_H
 
-// Poco includes
-#include <Poco/Exception.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/Net/HTTPServerResponse.h>
+// Boost includes
+#include <boost/beast/http.hpp>
 
 namespace AwsMock::Core {
+
+    namespace http = boost::beast::http;
 
     /**
      * JSON exception class. In case of a JSON serialization/deserialization error.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class JsonException : public Poco::Exception {
+    class JsonException final : public std::exception {
 
       public:
 
@@ -28,7 +28,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit JsonException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+        explicit JsonException(http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * Constructor.
@@ -38,29 +38,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit JsonException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
-
-        /**
-         * Constructor.
-         *
-         * @param msg exception message
-         * @param arg exception argument, will be appended to the message, separated with a ':'.
-         * @param code exception code, default: 0
-         * @param resource exception resource
-         * @param requestId exception resource ID
-         */
-        JsonException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
-
-        /**
-         * Constructor.
-         *
-         * @param msg exception message
-         * @param exc parent exception.
-         * @param code exception code, default: 0
-         * @param resource exception resource
-         * @param requestId exception resource ID
-         */
-        JsonException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR, const char *resource = nullptr, const char *requestId = nullptr);
+        explicit JsonException(const std::string &msg, http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * Copy constructor.
@@ -80,14 +58,14 @@ namespace AwsMock::Core {
         JsonException &operator=(const JsonException &exc);
 
         /**
-         * Returns the exception name.
+         * Returns the exception message.
          */
-        [[nodiscard]] const char *name() const noexcept override;
+        [[nodiscard]] std::string message() const noexcept;
 
         /**
-         * Returns the exception class name.
+         * Returns the exception message.
          */
-        [[nodiscard]] const char *className() const noexcept override;
+        [[nodiscard]] http::status code() const noexcept;
 
         /**
          * Returns the exception resource.
@@ -99,17 +77,17 @@ namespace AwsMock::Core {
          */
         [[nodiscard]] const char *requestId() const noexcept;
 
-        /**
-         * Returns a clone of the exception
-         */
-        [[nodiscard]] Poco::Exception *clone() const override;
-
-        /**
-         * Rethrows the exception.
-         */
-        void rethrow() const override;
-
       private:
+
+        /**
+         * Code
+         */
+        const http::status _code;
+
+        /**
+         * Message
+         */
+        std::string _message;
 
         /**
          * Resource

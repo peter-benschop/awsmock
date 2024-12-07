@@ -229,7 +229,7 @@ namespace AwsMock::Service {
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
             log_warning << "Lambda function does not exist, arn: " << request.arn;
-            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Get the existing entity
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
 
         if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
             log_warning << "Lambda function does not exist, arn: " << arn;
-            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Get the existing entity
@@ -349,7 +349,7 @@ namespace AwsMock::Service {
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
-            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Delete the containers, if existing
@@ -381,7 +381,7 @@ namespace AwsMock::Service {
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
             log_error << "Lambda function does not exist, arn: " + request.arn;
-            throw Core::ServiceException("Lambda function does not exist", Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Get the existing entity

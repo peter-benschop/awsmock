@@ -175,7 +175,7 @@ namespace AwsMock::Service {
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
         }
