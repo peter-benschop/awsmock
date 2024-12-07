@@ -16,11 +16,11 @@ namespace AwsMock::Core {
         ec = socket.connect(endpoint, ec);
         if (ec) {
             log_error << "Could not connect to docker UNIX domain socket, error: " << ec.message();
-            return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket, error: " + ec.message()};
+            return {.statusCode = status::internal_server_error, .body = "Could not connect to docker UNIX domain socket, error: " + ec.message()};
         }
 
         // Prepare message
-        http::request<http::string_body> request = PrepareJsonMessage(method, path, body, headers);
+        request<string_body> request = PrepareJsonMessage(method, path, body, headers);
 
         // Write to unix socket
         std::ostringstream oss;
@@ -28,11 +28,11 @@ namespace AwsMock::Core {
         boost::asio::write(socket, boost::asio::buffer(oss.str()), boost::asio::transfer_all());
 
         boost::beast::flat_buffer buffer;
-        http::response<http::string_body> response;
+        response<string_body> response;
         read(socket, buffer, response, ec);
         if (ec) {
             log_error << "Read from docker daemon failed, error: " << ec.message();
-            return {.statusCode = http::status::internal_server_error, .body = "Read from docker daemon failed, error: " + ec.message()};
+            return {.statusCode = status::internal_server_error, .body = "Read from docker daemon failed, error: " + ec.message()};
         }
         socket.close();
         return PrepareResult(response);

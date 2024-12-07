@@ -2,7 +2,6 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include <awsmock/core/DirUtils.h>
 #include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
@@ -198,7 +197,7 @@ namespace AwsMock::Service {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
             if (statusCode == http::status::ok) {
-                Dto::Docker::ListContainerResponse response(body);
+                const Dto::Docker::ListContainerResponse response(body);
                 log_debug << "Docker container found, name: " << name << ":" << tag;
                 return !response.containerList.empty();
             }
@@ -208,6 +207,33 @@ namespace AwsMock::Service {
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/containers/" + name + "/exists");
         if (statusCode == http::status::no_content) {
             log_debug << "Podman container found, name: " << name << ":" << tag;
+            return true;
+        }
+        if (statusCode == http::status::not_found) {
+            log_info << "Podman container not found";
+        } else {
+            log_error << "Podman container exists request failed, httpStatus: " << statusCode;
+        }
+        return false;
+    }
+
+    bool ContainerService::ContainerExistsByName(const std::string &containerName) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        if (_isDocker) {
+            const std::string filters = Core::StringUtils::UrlEncode(R"({"name":[")" + containerName + "\"]}");
+            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters);
+            if (statusCode == http::status::ok) {
+                const Dto::Docker::ListContainerResponse response(body);
+                log_debug << "Docker container found, name: " << containerName;
+                return !response.containerList.empty();
+            }
+            log_warning << "Docker container exists failed, httpStatus: " << statusCode;
+            return false;
+        }
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/containers/" + containerName + "/exists");
+        if (statusCode == http::status::no_content) {
+            log_debug << "Podman container found, name: " << containerName;
             return true;
         }
         if (statusCode == http::status::not_found) {
@@ -354,17 +380,11 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &tag, int hostPort, int containerPort) const {
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        // Check container name
-        std::string containerName = imageName;
-        if (Core::StringUtils::Contains(imageName, "/")) {
-            containerName = Core::StringUtils::SubStringAfter(containerName, "/");
-        }
-
         // Create the request
-        Dto::Docker::CreateContainerRequest request = {
+        const Dto::Docker::CreateContainerRequest request = {
                 .hostName = imageName,
                 .user = "root",
                 .image = imageName + ":" + tag,
@@ -404,7 +424,7 @@ namespace AwsMock::Service {
             }
             log_error << "Network exists request failed, httpStatus: " << statusCode;
         } else {
-            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/network/" + name + "/exists");
+            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/v5.0.0/libpod/networks/" + name + "/exists");
             if (statusCode == http::status::no_content) {
                 log_debug << "Podman network found, name: " << name;
                 return true;
