@@ -50,19 +50,18 @@ namespace AwsMock::Dto::Docker {
 
             try {
                 Poco::JSON::Parser parser;
-                Poco::Dynamic::Var result = parser.parse(jsonString);
-                Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+                const Poco::Dynamic::Var result = parser.parse(jsonString);
+                auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
                 Core::JsonUtils::GetJsonValueLong("SpaceReclaimed", rootObject, spaceReclaimed);
-                Poco::JSON::Array::Ptr deletedArray = rootObject->getArray("ContainersDeleted");
-                if (deletedArray != nullptr) {
+                if (Poco::JSON::Array::Ptr deletedArray = rootObject->getArray("ContainersDeleted"); deletedArray != nullptr) {
                     for (const auto &nt: *deletedArray) {
                         containersDeleted.push_back(nt.convert<std::string>());
                     }
                 }
 
             } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
         }
 

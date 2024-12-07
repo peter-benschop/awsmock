@@ -5,19 +5,19 @@
 #ifndef AWSMOCK_CORE_SERVICE_EXCEPTION_H
 #define AWSMOCK_CORE_SERVICE_EXCEPTION_H
 
-// Poco includes
-#include <Poco/Exception.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/Net/HTTPServerResponse.h>
+// Boost includes
+#include <boost/beast/http.hpp>
 
 namespace AwsMock::Core {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief Service exception class. In case of a request failure a ServiceException is thrown.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ServiceException : public Poco::Exception {
+    class ServiceException final : public std::exception {
 
       public:
 
@@ -26,7 +26,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit ServiceException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        explicit ServiceException(http::status code = http::status::internal_server_error);
 
         /**
          *@brief  Constructor.
@@ -34,25 +34,7 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit ServiceException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
-
-        /**
-         * @brief Constructor.
-         *
-         * @param msg exception message
-         * @param arg exception argument, will be appended to the message, separated with a ':'.
-         * @param code exception code, default: 0
-         */
-        ServiceException(const std::string &msg, const std::string &arg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
-
-        /**
-         * @brief Constructor.
-         *
-         * @param msg exception message
-         * @param exc parent exception.
-         * @param code exception code, default: 0
-         */
-        ServiceException(const std::string &msg, const Poco::Exception &exc, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+        explicit ServiceException(const std::string &msg, http::status code = http::status::internal_server_error);
 
         /**
          * @brief Copy constructor.
@@ -67,37 +49,26 @@ namespace AwsMock::Core {
         ~ServiceException() noexcept override;
 
         /**
-         * @brief Assigment operator.
-         *
-         * @return service exception
+         * Returns the exception message.
          */
-        ServiceException &operator=(const ServiceException &exc);
+        [[nodiscard]] std::string message() const noexcept;
 
         /**
-         * @brief Returns the exception name.
-         *
-         * @return name of the exception
+         * Returns the exception message.
          */
-        [[nodiscard]] const char *name() const noexcept override;
+        [[nodiscard]] http::status code() const noexcept;
+
+      private:
 
         /**
-         * @brief Returns the exception class name.
-         *
-         * @return class name
+         * Code
          */
-        [[nodiscard]] const char *className() const noexcept override;
+        const http::status _code;
 
         /**
-         * @brief Returns a clone of the exception
-         *
-         * @return clone of the exception
+         * Message
          */
-        [[nodiscard]] Poco::Exception *clone() const override;
-
-        /**
-         * @brief Rethrows the exception.
-         */
-        void rethrow() const override;
+        std::string _message;
     };
 
 }// namespace AwsMock::Core

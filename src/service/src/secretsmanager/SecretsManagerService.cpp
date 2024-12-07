@@ -97,7 +97,7 @@ namespace AwsMock::Service {
         // Check bucket existence
         if (!_database.SecretExists(request.secretId)) {
             log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId);
         }
 
         try {
@@ -186,7 +186,7 @@ namespace AwsMock::Service {
         // Check bucket existence
         if (!_database.SecretExists(request.secretId)) {
             log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId);
         }
 
         try {
@@ -246,20 +246,20 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) {
+    Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const {
         log_trace << "Delete secret request: " << request.ToString();
 
         // Check bucket existence
         if (!_database.SecretExists(request.region, request.name)) {
             log_warning << "Secret does not exist, name: " << request.name;
-            throw Core::ServiceException("Secret does not exist, name: " + request.name, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+            throw Core::ServiceException("Secret does not exist, name: " + request.name);
         }
 
         Dto::SecretsManager::DeleteSecretResponse response;
         try {
 
             // Get object from database
-            Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
+            const Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
 
             // Delete from database
             _database.DeleteSecret(secret);

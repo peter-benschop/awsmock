@@ -41,13 +41,13 @@ namespace AwsMock::Dto::Docker {
          *
          * @param jsonObject JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+        void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
 
             try {
                 Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
         }
     };
@@ -100,7 +100,7 @@ namespace AwsMock::Dto::Docker {
 
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
         }
     };
@@ -143,7 +143,7 @@ namespace AwsMock::Dto::Docker {
 
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
         }
     };
@@ -196,7 +196,7 @@ namespace AwsMock::Dto::Docker {
 
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message(), 500);
+                throw Core::ServiceException(exc.message());
             }
         }
     };

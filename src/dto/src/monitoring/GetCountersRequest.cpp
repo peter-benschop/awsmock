@@ -21,9 +21,9 @@ namespace AwsMock::Dto::Monitoring {
 
             return request;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (Core::JsonException &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -41,9 +41,9 @@ namespace AwsMock::Dto::Monitoring {
 
             return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (Core::JsonException &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

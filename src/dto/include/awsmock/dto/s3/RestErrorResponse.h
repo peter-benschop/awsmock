@@ -19,7 +19,7 @@
 #include <Poco/XML/XMLWriter.h>
 
 // AwsMok includes
-#include "awsmock/core/exception/ServiceException.h"
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::S3 {
          */
         explicit RestErrorResponse(const Core::ServiceException &exc) {
             message = exc.message();
-            code = exc.code();
+            // code = exc.code();
         }
 
         /**
