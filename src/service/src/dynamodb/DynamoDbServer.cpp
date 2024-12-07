@@ -37,11 +37,6 @@ namespace AwsMock::Service {
         SetRunning();
     }
 
-    void DynamoDbServer::CleanupContainers() const {
-        _containerService.PruneContainers();
-        log_debug << "Docker containers cleaned up";
-    }
-
     void DynamoDbServer::StartLocalDynamoDb() const {
         log_debug << "Starting DynamoDB docker image";
 
@@ -109,12 +104,13 @@ namespace AwsMock::Service {
                     Database::Entity::DynamoDb::Table table = {
                             .region = describeTableResponse.region,
                             .name = describeTableResponse.tableName,
-                            .status = Dto::DynamoDb::TableStatusTypeToString(describeTableResponse.tableStatus),
+                            .status = TableStatusTypeToString(describeTableResponse.tableStatus),
                             .attributes = describeTableResponse.attributes,
                             .keySchemas = describeTableResponse.keySchemas};
-                    _dynamoDbDatabase.CreateOrUpdateTable(table);
+                    table = _dynamoDbDatabase.CreateOrUpdateTable(table);
                 }
             } else {
+                log_debug << "Empty table list";
                 _dynamoDbDatabase.DeleteAllTables();
             }
             log_debug << "DynamoDB synchronized";

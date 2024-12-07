@@ -52,7 +52,7 @@ namespace AwsMock::Service {
         /**
          * @brief Delete dangling, stopped containers
          */
-        void CleanupContainers();
+        void CleanupContainers() const;
 
         /**
          * @brief Delete instances from database, which are not running

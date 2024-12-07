@@ -48,11 +48,6 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Delete dangling, stopped containers
-         */
-        void CleanupContainers() const;
-
-        /**
          * @brief Start the local DynamoDB container.
          *
          * <p>
