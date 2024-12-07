@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         Core::DirUtils::EnsureDirectory(_lambdaDir);
 
         // Cleanup container
-        CleanupContainers();
+        //CleanupContainers();
 
         // Cleanup instances
         CleanupInstances();
@@ -63,7 +63,7 @@ namespace AwsMock::Service {
         log_debug << "All lambda instances cleaned up";
     }
 
-    void LambdaServer::CleanupContainers() {
+    void LambdaServer::CleanupContainers() const {
         _dockerService.PruneContainers();
         log_debug << "Docker containers cleaned up";
     }
@@ -134,7 +134,7 @@ namespace AwsMock::Service {
                 }
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
                 log_debug << "Lambda updated, function" << lambda.function << " removed: " << toBeRemoved.size();
-                _dockerService.PruneContainers();
+                //_dockerService.PruneContainers();
             }
         }
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
