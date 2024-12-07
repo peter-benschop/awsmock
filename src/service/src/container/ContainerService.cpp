@@ -380,7 +380,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const {
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, const int hostPort, const int containerPort) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         // Create the request
