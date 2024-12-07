@@ -23,15 +23,18 @@ namespace AwsMock::Service {
 
         // Check existence
         if (_database.SecretExists(request.region, request.name)) {
+            log_error << "Secrets exists already";
             throw Core::ServiceException("Secret exists already");
         }
 
         // Check consistency
         if (!request.secretString.empty() && !request.secretBinary.empty()) {
+            log_error << "Secret must not have secretString and secretBinary";
             throw Core::ServiceException("Secret must not have secretString and secretBinary");
         }
 
         if (request.secretString.empty() && request.secretBinary.empty()) {
+            log_error << "Secret must have either secretString or secretBinary";
             throw Core::ServiceException("Secret must have either secretString or secretBinary");
         }
 
