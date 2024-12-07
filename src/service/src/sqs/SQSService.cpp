@@ -242,7 +242,7 @@ namespace AwsMock::Service {
 
     Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_url");
-        log_info << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
+        log_debug << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
 
         const std::string queueUrl = Core::SanitizeSQSUrl(request.queueName);
 
@@ -255,7 +255,7 @@ namespace AwsMock::Service {
         try {
 
             // Get queue
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, queueUrl);
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, queueUrl);
             log_info << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
             return {.queueUrl = queue.queueUrl};
 
@@ -432,12 +432,12 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
             // Set tags and update database
-            for (const auto &tag: request.tags) {
-                queue.tags[tag.first] = tag.second;
+            for (const auto &[fst, snd]: request.tags) {
+                queue.tags[fst] = snd;
             }
 
             queue = _sqsDatabase.UpdateQueue(queue);
-            log_info << "SQS queue tags updated, count: " << request.tags.size();
+            log_info << "SQS queue tags updated, count: " << request.tags.size() << " queue: " << queue.name;
 
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
@@ -497,14 +497,13 @@ namespace AwsMock::Service {
             message.attributes["SenderId"] = request.senderId;
 
             // Set userAttributes
-            for (const auto &attribute: request.messageAttributes) {
-                message.messageAttributes.push_back({.attributeName = attribute.first,
-                                                     .attributeValue = attribute.second.stringValue,
-                                                     .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(attribute.second.type))});
+            for (const auto &[fst, snd]: request.messageAttributes) {
+                message.messageAttributes.push_back({.attributeName = fst,
+                                                     .attributeValue = snd.stringValue,
+                                                     .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))});
             }
 
             // Set delay
-            system_clock::time_point reset = system_clock::now();
             if (queue.attributes.delaySeconds > 0) {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.delaySeconds);
                 queue.attributes.approximateNumberOfMessagesDelayed++;
@@ -790,7 +789,7 @@ namespace AwsMock::Service {
                }) != attributes.end();
     }
 
-    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, Database::Entity::SQS::Message &message, const std::string &eventSourceArn) {
+    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, size: " << lambda.function;
 
         const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
@@ -803,7 +802,7 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        _lambdaService.InvokeLambdaFunction(lambda.function, eventNotification.ToJson(), region, user);
+        std::string output = _lambdaService.InvokeLambdaFunction(lambda.function, eventNotification.ToJson(), region, user);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 
