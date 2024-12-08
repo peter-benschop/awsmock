@@ -96,7 +96,7 @@ namespace AwsMock::Service {
                 Dto::Transfer::Server server = {
                         .arn = s.arn,
                         .serverId = s.serverId,
-                        .state = Database::Entity::Transfer::ServerStateToString(s.state),
+                        .state = ServerStateToString(s.state),
                         .userCount = static_cast<int>(s.users.size())};
                 response.servers.emplace_back(server);
             }
@@ -185,12 +185,13 @@ namespace AwsMock::Service {
         }
     }
 
-    void TransferService::DeleteServer(const Dto::Transfer::DeleteServerRequest &request) {
+    void TransferService::DeleteServer(const Dto::Transfer::DeleteServerRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_server");
 
         Database::Entity::Transfer::Transfer server;
         try {
             if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+                log_error << "Handler with ID '" + request.serverId + "' does not exist";
                 throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist");
             }
 
