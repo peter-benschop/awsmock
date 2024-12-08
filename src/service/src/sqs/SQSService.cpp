@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) {
+    Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
 
@@ -16,7 +16,7 @@ namespace AwsMock::Service {
         // Check existence. In case the queue exists already return the existing queue.
         if (_sqsDatabase.QueueArnExists(queueArn)) {
             log_warning << "Queue exists already, region: " << request.region << " queueUrl: " << request.queueUrl;
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
             return {.region = queue.region, .name = queue.name, .owner = queue.owner, .queueUrl = queue.queueUrl, .queueArn = queue.queueArn};
         }
 
@@ -79,20 +79,17 @@ namespace AwsMock::Service {
             if (request.maxResults > 0) {
 
                 // Get total number
-                long total = _sqsDatabase.CountQueues(request.region);
-                Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
-                std::string nextToken = queueList.size() > 0 ? queueList.back().oid : "";
+                const long total = _sqsDatabase.CountQueues(request.region);
+                const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
+                const std::string nextToken = queueList.size() > 0 ? queueList.back().oid : "";
                 Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList, .nextToken = nextToken, .total = total};
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
                 return listQueueResponse;
-
-            } else {
-
-                Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
-                Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList};
-                log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
-                return listQueueResponse;
             }
+            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
+            Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList};
+            log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
+            return listQueueResponse;
         } catch (Poco::Exception &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

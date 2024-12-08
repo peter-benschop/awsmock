@@ -96,7 +96,9 @@ namespace AwsMock::Service {
             listTableResponse.FromJson(output, {});
 
             if (!listTableResponse.tableNames.empty()) {
+
                 for (const auto &tableName: listTableResponse.tableNames) {
+
                     auto [status, output] = Core::SystemUtils::Exec("aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
                     Dto::DynamoDb::DescribeTableResponse describeTableResponse;
                     describeTableResponse.FromJson(output, {});
@@ -108,6 +110,7 @@ namespace AwsMock::Service {
                             .attributes = describeTableResponse.attributes,
                             .keySchemas = describeTableResponse.keySchemas};
                     table = _dynamoDbDatabase.CreateOrUpdateTable(table);
+                    log_debug << "Table synchronized, table: " << table.name;
                 }
             } else {
                 log_debug << "Empty table list";
@@ -116,6 +119,8 @@ namespace AwsMock::Service {
             log_debug << "DynamoDB synchronized";
 
         } catch (Core::JsonException &exc) {
+            log_error << exc.what();
+        } catch (Core::DatabaseException &exc) {
             log_error << exc.what();
         }
     }

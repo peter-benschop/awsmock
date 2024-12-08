@@ -73,7 +73,7 @@ namespace AwsMock::Service {
          * @return CreateUserResponse
          * @see Dto::Transfer::CreateUserResponse
          */
-        Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request);
+        Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request) const;
 
         /**
          * @brief Returns a list of available servers
@@ -82,7 +82,7 @@ namespace AwsMock::Service {
          * @return ListServerResponse
          * @see Dto::Transfer::ListServerResponse
          */
-        Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request);
+        Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request) const;
 
         /**
          * @brief Returns a list of available servers

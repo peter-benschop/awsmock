@@ -7,25 +7,36 @@
 namespace AwsMock::Database::Entity::Transfer {
 
     bool Transfer::HasUser(const std::string &userName) {
-        return find_if(users.begin(), users.end(), [userName](const User &user) {
+        return std::ranges::find_if(users, [userName](const User &user) {
                    return user.userName == userName;
                }) != users.end();
     }
 
     bool Transfer::HasProtocol(const std::string &p) {
-        return find_if(protocols.begin(), protocols.end(), [p](const std::string &protocol) {
+        return std::ranges::find_if(protocols, [p](const std::string &protocol) {
                    return protocol == p;
                }) != protocols.end();
     }
 
+    User Transfer::GetUser(const std::string &userName) {
+
+        auto it = std::ranges::find_if(users, [userName](const User &user) {
+            return user.userName == userName;
+        });
+        if (it != users.end()) {
+            return *it;
+        }
+        return {};
+    }
+
     view_or_value<view, value> Transfer::ToDocument() const {
 
-        auto protocolsDoc = bsoncxx::builder::basic::array{};
+        auto protocolsDoc = array{};
         for (const auto &protocol: protocols) {
             protocolsDoc.append(protocol);
         }
 
-        auto usersDoc = bsoncxx::builder::basic::array{};
+        auto usersDoc = array{};
         for (const auto &user: users) {
             usersDoc.append(user.ToDocument());
         }

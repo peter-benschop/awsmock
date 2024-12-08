@@ -39,7 +39,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Transfer::CreateUserResponse TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) {
+    Dto::Transfer::CreateUserResponse TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_user_server");
         log_debug << "Create user request";
 
@@ -48,44 +48,43 @@ namespace AwsMock::Service {
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
 
             throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
-
-        } else {
-
-            transferEntity = _transferDatabase.GetTransferByServerId(request.serverId);
-
-            // Check user
-            if (transferEntity.HasUser(request.userName)) {
-                throw Core::ServiceException("Transfer manager has already a user with name '" + request.userName + "'");
-            }
-
-            // Get home directory
-            std::string homeDirectory = request.userName;
-            if (!Core::StringUtils::IsNullOrEmpty(&request.homeDirectory)) {
-                homeDirectory = request.homeDirectory;
-            }
-
-            // Add user
-            std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
-            std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
-            Database::Entity::Transfer::User user = {
-                    .userName = request.userName,
-                    .password = Core::StringUtils::GenerateRandomPassword(8),
-                    .homeDirectory = request.homeDirectory,
-                    .arn = userArn};
-            transferEntity.users.emplace_back(user);
-
-            // Update database
-            transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
-            log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
         }
+        transferEntity = _transferDatabase.GetTransferByServerId(request.serverId);
+
+        // Check user
+        if (transferEntity.HasUser(request.userName)) {
+            log_warning << "Transfer manager has already a user with name '" + request.userName + "'";
+            Database::Entity::Transfer::User user = transferEntity.GetUser(request.userName);
+            return {.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = user.userName};
+        }
+
+        // Get home directory
+        std::string homeDirectory = request.userName;
+        if (!Core::StringUtils::IsNullOrEmpty(&request.homeDirectory)) {
+            homeDirectory = request.homeDirectory;
+        }
+
+        // Add user
+        std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+        std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
+        Database::Entity::Transfer::User user = {
+                .userName = request.userName,
+                .password = Core::StringUtils::GenerateRandomPassword(8),
+                .homeDirectory = homeDirectory,
+                .arn = userArn};
+        transferEntity.users.emplace_back(user);
+
+        // Update database
+        transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
+        log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
 
         // Create response
         Dto::Transfer::CreateUserResponse response{.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = request.userName};
 
         return response;
-    }// namespace AwsMock::Service
+    }
 
-    Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) {
+    Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_servers");
 
         try {
@@ -115,8 +114,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
 
         try {
-            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId);
-
+            const std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId);
 
             Dto::Transfer::ListUsersResponse response = Dto::Transfer::Mapper::map(request, users);
             response.nextToken = Core::StringUtils::CreateRandomUuid();

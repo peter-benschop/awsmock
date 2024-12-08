@@ -261,7 +261,7 @@ namespace AwsMock::Service {
         log_debug << "List user pools clients request, userPoolId: " << request.userPoolId << " maxResults: " << request.maxResults;
 
         try {
-            Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
+            const Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
             log_trace << "Got user pool, region: " << userPool.region << " userPoolId: " << userPool.userPoolId;
             return Dto::Cognito::Mapper::map(request, userPool.userPoolClients);
         } catch (Poco::Exception &ex) {

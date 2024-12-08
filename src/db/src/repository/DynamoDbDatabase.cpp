@@ -102,15 +102,18 @@ namespace AwsMock::Database {
 
             try {
 
-                int64_t count;
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
+                document query;
                 if (!region.empty()) {
-                    count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
-                } else {
-                    count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
+                    query.append(kvp("region", region));
                 }
+                if (!tableName.empty()) {
+                    query.append(kvp("name", tableName));
+                }
+
+                const int64_t count = _tableCollection.count_documents(query.extract());
                 log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -131,7 +134,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
@@ -175,11 +178,8 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            return _memoryDb.CountTables(region);
         }
+        return _memoryDb.CountTables(region);
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(const Entity::DynamoDb::Table &table) const {
@@ -187,11 +187,8 @@ namespace AwsMock::Database {
         if (TableExists(table.region, table.name)) {
 
             return UpdateTable(table);
-
-        } else {
-
-            return CreateTable(table);
         }
+        return CreateTable(table);
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) const {
@@ -462,7 +459,7 @@ namespace AwsMock::Database {
 
                 // Add primary keys
                 for (const auto &key: table.keySchemas | std::views::keys) {
-                    std::string keyName = key;
+                    const std::string &keyName = key;
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
                     auto it = std::ranges::find_if(att,
                                                    [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
