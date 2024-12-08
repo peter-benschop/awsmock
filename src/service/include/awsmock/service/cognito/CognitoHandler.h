@@ -26,7 +26,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class CognitoHandler : public AbstractHandler {
+    class CognitoHandler final : public AbstractHandler {
 
       public:
 
@@ -54,12 +54,12 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @return Cognito action
          */
-        static std::string GetActionFromHeader(const http::request<http::dynamic_body> &request);
+        static Dto::Common::CognitoCommandType GetActionFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
          * Cognito service
          */
-        Service::CognitoService _cognitoService;
+        CognitoService _cognitoService;
 
         /**
          * @brief Create static default headers map.
