@@ -178,6 +178,11 @@ namespace AwsMock::Service {
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
+        } catch (...) {
+            return SendInternalServerError(request, "Unknown exception");
         }
     }
 
