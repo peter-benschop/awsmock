@@ -47,24 +47,24 @@ namespace AwsMock::Database::Entity::Transfer {
     };
 
     static std::map<ServerState, std::string> ServerStateNames{
-            {ServerState::OFFLINE, "OFFLINE"},
-            {ServerState::ONLINE, "ONLINE"},
-            {ServerState::STARTING, "STARTING"},
-            {ServerState::STOPPING, "STOPPING"},
-            {ServerState::START_FAILED, "START_FAILED"},
-            {ServerState::STOP_FAILED, "STOP_FAILED"}};
+            {OFFLINE, "OFFLINE"},
+            {ONLINE, "ONLINE"},
+            {STARTING, "STARTING"},
+            {STOPPING, "STOPPING"},
+            {START_FAILED, "START_FAILED"},
+            {STOP_FAILED, "STOP_FAILED"}};
 
     static std::string ServerStateToString(const ServerState &serverState) {
         return ServerStateNames[serverState];
     }
 
     static ServerState ServerStateFromString(const std::string &serverState) {
-        for (auto &it: ServerStateNames) {
-            if (it.second == serverState) {
-                return it.first;
+        for (auto &[fst, snd]: ServerStateNames) {
+            if (snd == serverState) {
+                return fst;
             }
         }
-        return ServerState::OFFLINE;
+        return OFFLINE;
     }
 
     /**
@@ -107,7 +107,7 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * State
          */
-        ServerState state = ServerState::OFFLINE;
+        ServerState state = OFFLINE;
 
         /**
          * Concurrency, number of FTP manager threads
@@ -140,7 +140,7 @@ namespace AwsMock::Database::Entity::Transfer {
         system_clock::time_point modified;
 
         /**
-         * Checks whether a user exists already.
+         * @brief Checks whether a user exists already.
          *
          * @param userName name of the user
          * @return true if transfer manager with the given user exists.
@@ -148,7 +148,15 @@ namespace AwsMock::Database::Entity::Transfer {
         bool HasUser(const std::string &userName);
 
         /**
-         * Checks whether a protocol exists already.
+         * @brief Return a user.
+         *
+         * @param userName name of the user
+         * @return true if transfer manager with the given user exists.
+         */
+        User GetUser(const std::string &userName);
+
+        /**
+         * @brief Checks whether a protocol exists already.
          *
          * @param p name of the protocol
          * @return true if transfer manager with the given protocol exists.
@@ -156,42 +164,42 @@ namespace AwsMock::Database::Entity::Transfer {
         bool HasProtocol(const std::string &p);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
         void FromDocument(std::optional<view> mResult);
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @param jsonObject JSON object
          */
         void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param m transfer
@@ -200,7 +208,7 @@ namespace AwsMock::Database::Entity::Transfer {
         friend std::ostream &operator<<(std::ostream &os, const Transfer &m);
     };
 
-    typedef struct Transfer Transfer;
+    typedef Transfer Transfer;
     typedef std::vector<Transfer> TransferList;
 
 }// namespace AwsMock::Database::Entity::Transfer

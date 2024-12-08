@@ -96,7 +96,7 @@ namespace AwsMock::Service {
          * @param request create queue request
          * @return CreateQueueResponse
          */
-        Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request);
+        Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues
