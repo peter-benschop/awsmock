@@ -43,10 +43,10 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateUserRequestTest, ToStringTest) {
 
         // arrange
-        Dto::Transfer::CreateUserRequest createRequest = {.region = _region, .serverId = "test-server_id", .userName = "test-user", .password = "password", .homeDirectory = "test-user"};
+        const CreateUserRequest createRequest = {.region = _region, .serverId = "test-server_id", .userName = "test-user", .password = "password", .homeDirectory = "test-user"};
 
         // act
-        std::string stringRepresentation = createRequest.ToString();
+        const std::string stringRepresentation = createRequest.ToString();
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
@@ -56,10 +56,10 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateUserRequestTest, ToJsonTest) {
 
         // arrange
-        Dto::Transfer::CreateUserRequest createRequest = {.region = _region, .serverId = "test-server_id", .userName = "test-user", .password = "password", .homeDirectory = "test-user"};
+        const CreateUserRequest createRequest = {.region = _region, .serverId = "test-server_id", .userName = "test-user", .password = "password", .homeDirectory = "test-user"};
 
         // act
-        std::string jsonRepresentation = createRequest.ToJson();
+        const std::string jsonRepresentation = createRequest.ToJson();
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
@@ -69,8 +69,8 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateUserRequestTest, FromJsonTest) {
 
         // arrange
-        Dto::Transfer::CreateUserRequest createRequest;
-        std::string jsonRepresentation = CREATE_USER_REQUEST_FROM_JSON;
+        CreateUserRequest createRequest;
+        const std::string jsonRepresentation = CREATE_USER_REQUEST_FROM_JSON;
 
         // act
         createRequest.FromJson(jsonRepresentation);

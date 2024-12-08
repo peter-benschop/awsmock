@@ -29,8 +29,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint
-            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValueInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValueBool("awsmock.service.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/dynamodb/";

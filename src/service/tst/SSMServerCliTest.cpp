@@ -27,11 +27,11 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.GetValueString("awsmock.modules.ssm.http.port");
-            std::string _host = _configuration.GetValueString("awsmock.modules.ssm.http.host");
+            const std::string _port = _configuration.GetValueString("awsmock.modules.ssm.http.port");
+            const std::string _host = _configuration.GetValueString("awsmock.modules.ssm.http.host");
 
             // Set test config
-            _configuration.SetValue("awsmock.gateway.http.port", _port);
+            _configuration.SetValueString("awsmock.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
@@ -54,20 +54,20 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::ExecResult putResult = Core::TestUtils::SendCliCommand("aws ssm put-parameter --name " + TEST_PARAMETER_NAME + " --value " + TEST_PARAMETER_VALUE + " --endpoint " + _endpoint);
+        auto [status, output] = Core::TestUtils::SendCliCommand("aws ssm put-parameter --name " + TEST_PARAMETER_NAME + " --value " + TEST_PARAMETER_VALUE + " --endpoint " + _endpoint);
         Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
 
         // assert
-        EXPECT_EQ(0, putResult.status);
+        EXPECT_EQ(0, status);
         EXPECT_EQ(1, parameterList.size());
-        EXPECT_TRUE(Core::StringUtils::Contains(putResult.output, "Version"));
+        EXPECT_TRUE(Core::StringUtils::Contains(output, "Version"));
     }
 
     TEST_F(SSMServerCliTest, ParameterGetTest) {
 
         // arrange
         Core::ExecResult putResult = Core::TestUtils::SendCliCommand("aws ssm put-parameter --name " + TEST_PARAMETER_NAME + " --value " + TEST_PARAMETER_VALUE + " --endpoint " + _endpoint);
-        Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
+        const Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
         EXPECT_EQ(1, parameterList.size());
 
         // act

@@ -25,11 +25,11 @@ namespace AwsMock::Core {
       protected:
 
         void SetUp() override {
-            tempDir = Core::DirUtils::CreateTempDir();
+            tempDir = DirUtils::CreateTempDir();
         }
 
         void TearDown() override {
-            Core::DirUtils::DeleteDirectory(tempDir);
+            DirUtils::DeleteDirectory(tempDir);
         }
 
         std::string tempDir;
@@ -38,7 +38,7 @@ namespace AwsMock::Core {
     TEST_F(DirUtilsTest, DeleteDirTest) {
 
         // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
+        const std::string dirName = DirUtils::CreateTempDir(tempDir);
 
         // act
         EXPECT_NO_THROW({ DirUtils::DeleteDirectory(dirName); });
@@ -50,10 +50,10 @@ namespace AwsMock::Core {
     TEST_F(DirUtilsTest, IsDirectoryTest) {
 
         // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
+        const std::string dirName = DirUtils::CreateTempDir(tempDir);
 
         // act
-        bool result = DirUtils::IsDirectory(dirName);
+        const bool result = DirUtils::IsDirectory(dirName);
 
         // assert
         EXPECT_TRUE(result);
@@ -77,7 +77,7 @@ namespace AwsMock::Core {
     TEST_F(DirUtilsTest, DirectoryFileCountTest) {
 
         // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
+        const std::string dirName = DirUtils::CreateTempDir(tempDir);
         for (int i = 0; i < 3; i++) {
             FileUtils::CreateTempFile(dirName, "json", 100);
         }
@@ -93,7 +93,7 @@ namespace AwsMock::Core {
     TEST_F(DirUtilsTest, DirectoryEmptyTest) {
 
         // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
+        const std::string dirName = DirUtils::CreateTempDir(tempDir);
 
         // act
         bool result = false;

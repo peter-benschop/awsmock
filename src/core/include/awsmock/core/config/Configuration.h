@@ -6,6 +6,7 @@
 #define AWSMOCK_CORE_YAML_CONFIGURATION_H
 
 // Standard C++ includes
+#include <ranges>
 #include <string>
 
 // Boost includes
@@ -18,6 +19,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
+#include <boost/accumulators/statistics/stats.hpp>
 
 namespace AwsMock::Core {
 
@@ -28,6 +30,46 @@ namespace AwsMock::Core {
             return node;
         }
         return lookup(node[*start], next(start), end);
+    }
+
+    template<typename T>
+    void SetValueByPath(YAML::Node &_yamlConfig, const std::string &key, T value) {
+
+        const std::vector<std::string> tags = StringUtils::Split(key, '.');
+        const int numTags = static_cast<int>(tags.size());
+
+        // Reads root node.
+        assert(numTags > 0);
+        assert(_yamlConfig);
+        YAML::Node *parentNode = &_yamlConfig;
+
+        // Determines index of first non-existing node.
+        int i = 0;
+        for (; i < numTags - 1; i++) {
+            if (const std::string &tag = tags.at(i); (*parentNode)[tag]) {
+                auto childNode = (*parentNode)[tag];
+                parentNode = &childNode;
+            } else {
+                break;
+            }
+        }
+        // Note: necessary because *parentNode will later point to a different node due to lib behavior .
+        YAML::Node lastExistingNode = *parentNode;
+
+        // Sets node value and creates missing nodes.
+        if (i == numTags - 1) {
+            lastExistingNode[tags.back()] = value;
+        } else {
+            YAML::Node newNode;
+            newNode = value;
+            for (int j = numTags - 1; j > i; j--) {
+                YAML::Node tmpNode;
+                tmpNode[tags.at(j)] = newNode;
+                newNode = tmpNode;
+            }
+            // Inserts missing nodes.
+            lastExistingNode[tags.at(i)] = newNode;
+        }
     }
 
     /**
@@ -112,6 +154,30 @@ namespace AwsMock::Core {
         void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
 
         /**
+         * @brief Define a new configuration property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue integer default value
+         */
+        void DefineLongProperty(const std::string &key, const std::string &envProperty, long defaultValue);
+
+        /**
+         * @brief Define a new configuration property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue integer default value
+         */
+        void DefineDoubleProperty(const std::string &key, const std::string &envProperty, double defaultValue);
+
+        /**
          * @brief Returns the file name of the configuration file.
          *
          * @return file name of the configuration file.
@@ -124,22 +190,6 @@ namespace AwsMock::Core {
          * @param filename file name of the configuration file.
          */
         void SetFilename(const std::string &filename);
-
-        /**
-         * @brief Sets a string configuration value
-         *
-         * @param key property key
-         * @param value configuration value
-         */
-        void SetValue(const std::string &key, const std::string &value) const;
-
-        /**
-         * @brief Sets a string configuration value
-         *
-         * @param key property key
-         * @param value configuration value
-         */
-        void SetValueByPath(const std::string &key, const std::string &value);
 
         /**
          * @brief Returns a string configuration value
@@ -182,12 +232,20 @@ namespace AwsMock::Core {
         [[nodiscard]] double GetValueDouble(const std::string &key) const;
 
         /**
+         * @brief Sets a string configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValueString(const std::string &key, const std::string &value);
+
+        /**
          * @brief Sets a bool configuration value
          *
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, bool value) const;
+        void SetValueBool(const std::string &key, bool value);
 
         /**
          * @brief Sets an integer configuration value
@@ -195,7 +253,23 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, int value) const;
+        void SetValueInt(const std::string &key, int value);
+
+        /**
+         * @brief Sets an long integer configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValue(const std::string &key, long value);
+
+        /**
+         * @brief Sets an double configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValue(const std::string &key, double value);
 
         /**
          * @brief Returns the application name
@@ -244,7 +318,7 @@ namespace AwsMock::Core {
          * Reapply the environment variables to the properties, as environment variables have precedence over
          * file variables.
          */
-        void ApplyEnvSettings() const;
+        void ApplyEnvSettings();
 
         /**
          * @brief Checks existence of a property key

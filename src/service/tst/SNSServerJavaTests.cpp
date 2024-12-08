@@ -35,8 +35,8 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValueInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValueBool("awsmock.service.gateway.http.host", "localhost");
 
             // Set base URLs
             _snsBaseUrl = "/api/sns/";

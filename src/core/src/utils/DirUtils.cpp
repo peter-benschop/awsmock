@@ -19,12 +19,12 @@ namespace AwsMock::Core {
 
     std::string DirUtils::CreateTempDir() {
         const boost::filesystem::path temp = boost::filesystem::unique_path();
-        return temp.c_str();
+        return boost::filesystem::temp_directory_path().string() + "/" + temp.c_str();
     }
 
     std::string DirUtils::CreateTempDir(const std::string &parent) {
         auto tempDir = parent + FileUtils::separator() + GetTempDir();
-        MakeDirectory(tempDir);
+        MakeDirectory(tempDir, true);
         return tempDir;
     }
 
@@ -54,11 +54,10 @@ namespace AwsMock::Core {
     }
 
     void DirUtils::MakeDirectory(const std::string &dirName, const bool recursive) {
-        boost::filesystem::create_directory(dirName);
         if (recursive) {
-            boost::filesystem::create_directory(dirName);
-        } else {
             boost::filesystem::create_directories(dirName);
+        } else {
+            boost::filesystem::create_directory(dirName);
         }
     }
 

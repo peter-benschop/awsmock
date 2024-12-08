@@ -16,82 +16,72 @@ namespace AwsMock::Core {
             LogStream::SetSeverity("none");
         }
 
-        constexpr int port = 14566;
+        constexpr int port = 14566;//SystemUtils::GetRandomPort();
         const std::string hostName = SystemUtils::GetHostName();
+        std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
 
-        const Configuration config;
-        config.SetValue("awsmock.region", "eu-central-1");
-        config.SetValue("awsmock.access.account-id", "000000000000");
-        config.SetValue("awsmock.access.client-id", "00000000");
-        config.SetValue("awsmock.user", "none");
-        config.SetValue("awsmock.data.dir", "/tmp/awsmock/data");
+        // General
+        Configuration::instance().SetValueString("awsmock.region", "eu-central-1");
+        Configuration::instance().SetValueString("awsmock.user", "none");
+        Configuration::instance().SetValueString("awsmock.access.key-id", "none");
+        Configuration::instance().SetValueString("awsmock.access.account-id", "000000000000");
+        Configuration::instance().SetValueString("awsmock.access.client-id", "00000000");
+        Configuration::instance().SetValueString("awsmock.access.secret-access-key", "none");
+        Configuration::instance().SetValueString("awsmock.data-dir", "/tmp/awsmock/data");
+        Configuration::instance().SetValueString("awsmock.temp-dir", "/tmp/awsmock/data/tmp");
+
         // Gateway
-        config.SetValue("awsmock.gateway.active", true);
-        config.SetValue("awsmock.gateway.host", hostName);
-        config.SetValue("awsmock.gateway.port", port);
-        config.SetValue("awsmock.gateway.address", "0.0.0.0");
-        config.SetValue("awsmock.gateway.max-queue", 10);
-        config.SetValue("awsmock.gateway.max-threads", 10);
-        config.SetValue("awsmock.gateway.timeout", 10);
-        /*
+        Configuration::instance().SetValueBool("awsmock.gateway.active", true);
+        Configuration::instance().SetValueString("awsmock.gateway.http.host", hostName);
+        Configuration::instance().SetValueInt("awsmock.gateway.http.port", port);
+        Configuration::instance().SetValueString("awsmock.gateway.http.address", "0.0.0.0");
+        Configuration::instance().SetValueInt("awsmock.gateway.http.max-queue", 10);
+        Configuration::instance().SetValueInt("awsmock.gateway.http.max-body", 104857600);
+        Configuration::instance().SetValueInt("awsmock.gateway.http.timeout", 900);
+
         // Mongo DB
-        ofs << "awsmock.mongodb.active=" << (withDatabase ? "true" : "false") << std::endl;
-        ofs << "awsmock.mongodb.name=test" << std::endl;
-        ofs << "awsmock.mongodb.http.host=" << hostName << std::endl;
-        ofs << "awsmock.mongodb.http.port=27017" << std::endl;
-        ofs << "awsmock.mongodb.user=root" << std::endl;
-        ofs << "awsmock.mongodb.password=password" << std::endl;
+        Configuration::instance().SetValueBool("awsmock.mongodb.active", withDatabase);
+        Configuration::instance().SetValueString("awsmock.mongodb.name", "test");
+        Configuration::instance().SetValueString("awsmock.mongodb.host", hostName);
+        Configuration::instance().SetValueInt("awsmock.mongodb.port", 27017);
+        Configuration::instance().SetValueString("awsmock.mongodb.user", "root");
+        Configuration::instance().SetValueString("awsmock.mongodb.password", "password");
+        Configuration::instance().SetValueInt("awsmock.mongodb.pool-size", 64);
+
         // S3 configuration
-        ofs << "awsmock.service.s3.http.port=19500" << std::endl;
-        ofs << "awsmock.service.s3.http.host=localhost" << std::endl;
-        ofs << "awsmock.monitoring.s3.period=-1" << std::endl;
-        // S3 api configuration
-        ofs << "awsmock.service.s3api.http.port=19501" << std::endl;
-        ofs << "awsmock.service.s3api.http.host=localhost" << std::endl;
-        ofs << "awsmock.monitoring.s3api.period=-1" << std::endl;
+        Configuration::instance().SetValueBool("awsmock.modules.s3.active", true);
+        Configuration::instance().SetValueString("awsmock.modules.s3.data-dir", "/tmp/awsmock/data/s3");
+
         // SQS configuration
-        ofs << "awsmock.service.sqs.http.port=19502" << std::endl;
-        ofs << "awsmock.service.sqs.http.host=" << hostName << std::endl;
-        ofs << "awsmock.monitoring.sqs.period=-1" << std::endl;
-        // SQS configuration
-        ofs << "awsmock.service.sns.http.port=19503" << std::endl;
-        ofs << "awsmock.service.sns.http.host=" << hostName << std::endl;
-        ofs << "awsmock.monitoring.sns.period=-1" << std::endl;
+        Configuration::instance().SetValueBool("awsmock.modules.sqs.active", true);
+
+        // SNS configuration
+        Configuration::instance().SetValueBool("awsmock.modules.sns.active", true);
+
         // Lambda configuration
-        ofs << "awsmock.service.lambda.active=true" << std::endl;
-        ofs << "awsmock.service.lambda.http.port=19504" << std::endl;
-        ofs << "awsmock.service.lambda.http.host=localhost" << std::endl;
-        ofs << "awsmock.monitoring.lambda.period=-1" << std::endl;
+        Configuration::instance().SetValueBool("awsmock.modules.lambda.active", true);
+
         // Transfer configuration
-        ofs << "awsmock.service.transfer.active=true" << std::endl;
-        ofs << "awsmock.service.transfer.http.port=19505" << std::endl;
-        ofs << "awsmock.service.transfer.http.host=localhost" << std::endl;
-        ofs << "awsmock.monitoring.transfer.period=-1" << std::endl;
+        Configuration::instance().SetValueBool("awsmock.modules.transfer.active", true);
+
         // Cognito configuration
-        ofs << "awsmock.service.cognito.active=true" << std::endl;
-        ofs << "awsmock.service.cognito.http.port=19506" << std::endl;
-        ofs << "awsmock.service.cognito.http.host=localhost" << std::endl;
-        ofs << "awsmock.monitoring.cognito.period=-1" << std::endl;
-        // Cognito configuration
-        ofs << "awsmock.service.dynamodb.active=true" << std::endl;
-        ofs << "awsmock.service.dynamodb.http.port=19507" << std::endl;
-        ofs << "awsmock.service.dynamodb.http.host=localhost" << std::endl;
-        ofs << "awsmock.monitoring.dynamodb.period=-1" << std::endl;
-        ofs << "awsmock.dynamodb.port=8000" << std::endl;
+        Configuration::instance().SetValueBool("awsmock.modules.cognito.active", true);
+
+        // DynamoDB configuration
+        Configuration::instance().SetValueBool("awsmock.modules.dynamodb.active", true);
+        Configuration::instance().SetValueString("awsmock.modules.dynamodb.container.host", "localhost");
+        Configuration::instance().SetValueInt("awsmock.modules.dynamodb.container.port", 8000);
+
         // Docker
-        ofs << "awsmock.docker.network.mode=bridge" << std::endl;
-        ofs << "awsmock.docker.network.name=.dockerhost.net" << std::endl;
-        ofs << "awsmock.docker.default.memory.size=512" << std::endl;
-        ofs << "awsmock.docker.default.temp.size=10240" << std::endl;
-        ofs << "awsmock.docker.container.port=8080" << std::endl;
-        // Monitoring configuration
-        ofs << "awsmock.service.monitoring.port=9091" << std::endl;
+        Configuration::instance().SetValueString("awsmock.docker.network-mode", "bridge");
+        Configuration::instance().SetValueString("awsmock.docker.network-name", "default");
+
         // Logging
-        ofs << "awsmock.service.logging.level=debug" << std::endl;
-        ofs << "awsmock.service.logging.file=/tmp/awsmock-test.log" << std::endl;
-        ofs.close();*/
-        //config.SetFilename(TMP_PROPERTIES_FILE);
-        // config.WriteFile(TMP_PROPERTIES_FILE);
+        Configuration::instance().SetValueString("awsmock.logging.level", "debug");
+        Configuration::instance().SetValueString("awsmock.logging.file", "/tmp/awsmock-test.log");
+
+        // Write file
+        Configuration::instance().WriteFile(TMP_PROPERTIES_FILE);
     }
 
     std::string TestUtils::GetTestConfigurationFilename() {

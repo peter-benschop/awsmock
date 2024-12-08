@@ -32,7 +32,7 @@ class TestEnvironment : public ::testing::Environment {
     static void InitializeDatabase() {
 
         // Get database variables
-        AwsMock::Core::Configuration &_configuration = AwsMock::Core::Configuration::instance();
+        const AwsMock::Core::Configuration &_configuration = AwsMock::Core::Configuration::instance();
         const std::string name = _configuration.GetValueString("awsmock.mongodb.name");
         const std::string host = _configuration.GetValueString("awsmock.mongodb.host");
         const std::string user = _configuration.GetValueString("awsmock.mongodb.user");
@@ -48,7 +48,7 @@ class TestEnvironment : public ::testing::Environment {
 
         // Options
         mongocxx::options::client client_options;
-        auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
+        const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
         client_options.server_api_opts(api);
         pool.configure(std::move(instance), std::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
     }

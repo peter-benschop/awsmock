@@ -93,8 +93,8 @@ namespace AwsMock::Service {
             _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValue("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValue("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValueInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValueBool("awsmock.service.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/sqs/";
@@ -173,13 +173,13 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSGetAllQueueAttributes) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
+        const std::string queueUrl = result.body;
 
         // act
-        Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "getAllQueueAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), {});
-        std::string queueAttributes = resultQueueAttributes.body;
+        const Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "getAllQueueAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), {});
+        const std::string queueAttributes = resultQueueAttributes.body;
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -189,13 +189,13 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSGetSingleQueueAttributes) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
+        const std::string queueUrl = result.body;
 
         // act
-        Core::HttpSocketResponse resultQueueAttributes = SendGetCommand(_baseUrl + "getSingleQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeName=" + Core::StringUtils::UrlEncode("APPROXIMATE_NUMBER_OF_MESSAGES"), {});
-        std::string queueAttributes = resultQueueAttributes.body;
+        const Core::HttpSocketResponse resultQueueAttributes = SendGetCommand(_baseUrl + "getSingleQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeName=" + Core::StringUtils::UrlEncode("APPROXIMATE_NUMBER_OF_MESSAGES"), {});
+        const std::string queueAttributes = resultQueueAttributes.body;
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -205,9 +205,9 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSSetQueueAttributes) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
+        const std::string queueUrl = result.body;
 
         // act
         Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "setQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeValue=3600", {});

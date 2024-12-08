@@ -9,9 +9,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-// Poco includes
-#include <Poco/Path.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
@@ -23,26 +20,25 @@ namespace AwsMock::Core {
       public:
 
         void SetUp() override {
-            _region = _configuration.GetValueString("awsmock.region");
-            _accountId = _configuration.GetValueString("awsmock.access.account-id");
-            _endpoint = SystemUtils::GetHostName() + ":" + _configuration.GetValueString("awsmock.gateway.http.port");
+            _region = Configuration::instance().GetValueString("awsmock.region");
+            _accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
+            _endpoint = SystemUtils::GetHostName() + ":" + std::to_string(Configuration::instance().GetValueInt("awsmock.gateway.http.port"));
         }
 
       protected:
 
         std::string _region, _accountId, _endpoint;
-        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(AwsUtilsTest, CreateS3ArnTest) {
 
         // arrange
-        std::string bucket = "testBucket";
-        std::string key = "testKey";
-        std::string s3Arn = "arn:aws:s3:" + _region + ":" + _accountId + ":" + bucket + "/" + key;
+        const std::string bucket = "testBucket";
+        const std::string key = "testKey";
+        const std::string s3Arn = "arn:aws:s3:" + _region + ":" + _accountId + ":" + bucket + "/" + key;
 
         // act
-        std::string result = AwsUtils::CreateS3ObjectArn(_region, _accountId, bucket, key);
+        const std::string result = AwsUtils::CreateS3ObjectArn(_region, _accountId, bucket, key);
 
         // assert
         EXPECT_STREQ(result.c_str(), s3Arn.c_str());
@@ -51,11 +47,11 @@ namespace AwsMock::Core {
     TEST_F(AwsUtilsTest, CreateSqsArnTest) {
 
         // arrange
-        std::string queueName = "testQueue";
-        std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+        const std::string queueName = "testQueue";
+        const std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act
-        std::string result = Core::CreateSQSQueueArn(queueName);
+        const std::string result = Core::CreateSQSQueueArn(queueName);
 
         // assert
         EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());
@@ -64,11 +60,11 @@ namespace AwsMock::Core {
     TEST_F(AwsUtilsTest, CreateSNSTopicTest) {
 
         // arrange
-        std::string topicName = "testTopic";
-        std::string snsTopic3Arn = "arn:aws:sns:" + _region + ":" + _accountId + ":" + topicName;
+        const std::string topicName = "testTopic";
+        const std::string snsTopic3Arn = "arn:aws:sns:" + _region + ":" + _accountId + ":" + topicName;
 
         // act
-        std::string result = AwsUtils::CreateSNSTopicArn(_region, _accountId, topicName);
+        const std::string result = AwsUtils::CreateSNSTopicArn(_region, _accountId, topicName);
 
         // assert
         EXPECT_STREQ(result.c_str(), snsTopic3Arn.c_str());
@@ -77,12 +73,12 @@ namespace AwsMock::Core {
     TEST_F(AwsUtilsTest, ConvertArnToUrlTest) {
 
         // arrange
-        std::string queueName = "file-delivery1-queue";
-        std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
-        std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+        const std::string queueName = "file-delivery1-queue";
+        const std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
+        const std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act
-        std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn);
+        const std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn);
 
         // assert
         EXPECT_STREQ(result.c_str(), sqsQueueUrl.c_str());
@@ -91,12 +87,12 @@ namespace AwsMock::Core {
     TEST_F(AwsUtilsTest, ConvertUrlToArnTest) {
 
         // arrange
-        std::string queueName = "file-delivery1-queue";
-        std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
-        std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+        const std::string queueName = "file-delivery1-queue";
+        const std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
+        const std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
 
         // act
-        std::string result = AwsUtils::ConvertSQSQueueUrlToArn(_region, sqsQueueUrl);
+        const std::string result = AwsUtils::ConvertSQSQueueUrlToArn(_region, sqsQueueUrl);
 
         // assert
         EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());
@@ -125,10 +121,10 @@ namespace AwsMock::Core {
         request.set(http::field::range, "bytes=0-9");
         request.set("x-amz-content-sha256", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
         request.set("x-amz-date", "20130524T000000Z");
-        std::string secretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
+        const std::string secretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
 
         // act
-        bool result = AwsUtils::VerifySignature(request, secretAccessKey);
+        const bool result = AwsUtils::VerifySignature(request, secretAccessKey);
 
         // assert
         ASSERT_TRUE(result);

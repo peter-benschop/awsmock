@@ -41,63 +41,45 @@ namespace AwsMock::Core {
     }
 
     TEST_F(ConfigurationTest, ConstructorTest) {
+
         // arrange
-        Configuration *configuration = nullptr;
+        const Configuration configuration = Configuration::instance();
+        Configuration::instance().SetFilename(TMP_PROPERTIES_FILE);
 
         // act
-        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
-        EXPECT_STREQ(configuration->GetFilename().c_str(), TMP_PROPERTIES_FILE);
-        EXPECT_FALSE(configuration->GetValueString("awsmock.logging.level").empty());
-    }
-
-    TEST_F(ConfigurationTest, SetValueTest) {
-        // arrange
-        Configuration *configuration = nullptr;
-        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
-
-        // act
-        if (configuration != nullptr) {
-            configuration->SetValue("awsmock.logging.level", std::string("error"));
-        }
-
-        // assert
-        EXPECT_STREQ(configuration->GetValueString("awsmock.logging.level").c_str(), "error");
+        EXPECT_STREQ(Configuration::instance().GetFilename().c_str(), TMP_PROPERTIES_FILE);
+        EXPECT_FALSE(Configuration::instance().GetValueString("awsmock.logging.level").empty());
     }
 
     TEST_F(ConfigurationTest, EnvironmentTest) {
         // arrange
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
-        Configuration *configuration = nullptr;
+        const Configuration configuration = Configuration::instance();
+        Configuration::instance().SetFilename(TMP_PROPERTIES_FILE);
 
         // act
-        EXPECT_NO_THROW({ configuration = new Configuration(TMP_PROPERTIES_FILE); });
 
         // assert
-        if (configuration != nullptr) {
-            std::string tmp = configuration->GetValueString("service.logging.level");
-            EXPECT_STREQ(configuration->GetValueString("awsmock.logging.level").c_str(), "error");
-        } else {
-            FAIL();
-        }
+        EXPECT_STREQ(configuration.GetValueString("awsmock.logging.level").c_str(), "debug");
     }
 
     TEST_F(ConfigurationTest, YamlConfiggurationTest) {
         // arrange
-        const std::string yamlString = "awsmock:\n\t"
-                                       "region: eu-central-1\n\t"
-                                       "user: none\n\t"
-                                       "access: \n\t\t"
-                                       "key-id: none\n\t\t"
-                                       "secret-access-key: none\n\t\t"
-                                       "account-id: 000000000000\n\t\t";
+        const std::string yamlString = "awsmock:\n"
+                                       "  region: eu-central-1\n"
+                                       "  user: none\n"
+                                       "  access: \n"
+                                       "    key-id: none\n"
+                                       "    secret-access-key: none\n"
+                                       "    account-id: 000000000000\n";
         const std::string yamlFile = FileUtils::CreateTempFile("yaml", yamlString);
-        auto configuration = Configuration(yamlFile);
+        Configuration::instance().SetFilename(yamlFile);
 
         // act
-        const std::string region = configuration.GetValueString("awsmock.region");
-        const std::string keyId = configuration.GetValueString("awsmock.access.key-id");
+        const std::string region = Configuration::instance().GetValueString("awsmock.region");
+        const std::string keyId = Configuration::instance().GetValueString("awsmock.access.key-id");
 
         // assert
         EXPECT_TRUE(region == "eu-central-1");

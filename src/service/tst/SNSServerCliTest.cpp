@@ -33,7 +33,7 @@ namespace AwsMock::Service {
             const std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
 
             // Set test config
-            _configuration.SetValue("awsmock.service.gateway.http.port", _port);
+            _configuration.SetValueString("awsmock.service.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
