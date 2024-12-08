@@ -55,7 +55,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return created DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
+        Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table) const;
 
         /**
          * @brief Updates a new DynamoDb table
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return created or updated DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table);
+        Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table) const;
 
         /**
          * @brief Returns a table entity by primary key
@@ -214,14 +214,14 @@ namespace AwsMock::Database {
          * @param tableName name of the table
          * @throws DatabaseException
          */
-        void DeleteItems(const std::string &region, const std::string &tableName);
+        void DeleteItems(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Deletes all items
          *
          * @throws DatabaseException
          */
-        void DeleteAllItems();
+        void DeleteAllItems() const;
 
       private:
 

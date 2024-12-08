@@ -108,8 +108,7 @@ namespace AwsMock::Manager {
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         for (const auto &module: modules) {
-            if (module.name == "gateway" &&
-                module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+            if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
