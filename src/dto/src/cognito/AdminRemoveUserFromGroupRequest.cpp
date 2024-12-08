@@ -9,16 +9,15 @@ namespace AwsMock::Dto::Cognito {
     std::string AdminRemoveUserFromGroupRequest::ToJson() const {
 
         try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("GroupName", groupName);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("Username", userName);
+            return Core::Bson ::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
         }
@@ -26,20 +25,17 @@ namespace AwsMock::Dto::Cognito {
 
     void AdminRemoveUserFromGroupRequest::FromJson(const std::string &payload) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("GroupName", rootObject, groupName);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
-            Core::JsonUtils::GetJsonValueString("Username", rootObject, userName);
+            const value document = bsoncxx::from_json(payload);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            groupName = Core::Bson::BsonUtils::GetStringValue(document, "GroupName");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "userPoolId");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

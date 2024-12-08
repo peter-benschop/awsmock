@@ -48,7 +48,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferService() : _transferDatabase(Database::TransferDatabase::instance()) {};
+        explicit TransferService() : _transferDatabase(Database::TransferDatabase::instance()){};
 
         /**
          * @brief Create transfer server request
