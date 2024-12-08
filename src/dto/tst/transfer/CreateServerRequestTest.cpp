@@ -29,23 +29,20 @@ namespace AwsMock::Dto::Transfer {
             _region = _configuration.GetValueString("awsmock.region");
         }
 
-        void TearDown() override {
-        }
-
         std::string _region;
         std::vector<std::string> _protocols = {"ftp", "sftp"};
         IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethods = "sftpAuthenticationMethods", .url = "url"};
         std::vector<Tag> _tags = {{.key = "version", .value = "1.0"}};
-        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration::instance();
     };
 
     TEST_F(CreateServerRequestTest, ToStringTest) {
 
         // arrange
-        Dto::Transfer::CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
 
         // act
-        std::string stringRepresentation = createRequest.ToString();
+        const std::string stringRepresentation = createRequest.ToString();
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
@@ -55,10 +52,10 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerRequestTest, ToJsonTest) {
 
         // arrange
-        Dto::Transfer::CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
 
         // act
-        std::string jsonRepresentation = createRequest.ToJson();
+        const std::string jsonRepresentation = createRequest.ToJson();
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
@@ -68,8 +65,8 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerRequestTest, FromJsonTest) {
 
         // arrange
-        Dto::Transfer::CreateServerRequest createRequest;
-        std::string jsonRepresentation = CREATE_SERVER_REQUEST_FROM_JSON;
+        CreateServerRequest createRequest;
+        const std::string jsonRepresentation = CREATE_SERVER_REQUEST_FROM_JSON;
 
         // act
         createRequest.FromJson(jsonRepresentation);
@@ -78,9 +75,9 @@ namespace AwsMock::Dto::Transfer {
         EXPECT_TRUE(createRequest.region == _region);
         EXPECT_TRUE(createRequest.domain == "test.com");
         //    ASSERT_THAT(createRequest.protocols, testing::ElementsAre("ftp", "sftp"));
-        for (const auto &it: createRequest.tags) {
-            EXPECT_TRUE(it.key == "key");
-            EXPECT_TRUE(it.value == "value");
+        for (const auto &[key, value]: createRequest.tags) {
+            EXPECT_TRUE(key == "key");
+            EXPECT_TRUE(value == "value");
         }
     }
 }// namespace AwsMock::Dto::Transfer

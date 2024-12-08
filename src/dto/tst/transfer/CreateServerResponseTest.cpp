@@ -30,17 +30,17 @@ namespace AwsMock::Dto::Transfer {
 
         std::string _region;
         std::vector<std::string> _protocols = {"ftp", "sftp"};
-        std::vector<Dto::Transfer::Tag> _tags = {{.key = "version", .value = "1.0"}};
+        std::vector<Tag> _tags = {{.key = "version", .value = "1.0"}};
         Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
     };
 
     TEST_F(CreateServerResponseTest, ToStringTest) {
 
         // arrange
-        Dto::Transfer::CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
+        const CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
 
         // act
-        std::string stringRepresentation = createResponse.ToString();
+        const std::string stringRepresentation = createResponse.ToString();
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
@@ -50,10 +50,10 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerResponseTest, ToJsonTest) {
 
         // arrange
-        Dto::Transfer::CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
+        const CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
 
         // act
-        std::string jsonRepresentation = createResponse.ToJson();
+        const std::string jsonRepresentation = createResponse.ToJson();
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());

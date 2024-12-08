@@ -18,7 +18,7 @@
 
 namespace AwsMock::Core {
 
-    class JsonUtilsTest : public ::testing::Test {};
+    class JsonUtilsTest : public testing::Test {};
 
     TEST_F(JsonUtilsTest, BoolTest) {
 

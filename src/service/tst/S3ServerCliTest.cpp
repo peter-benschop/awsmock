@@ -40,7 +40,7 @@ namespace AwsMock::Service {
 
             // Set test config
             std::string p = std::to_string(Core::RandomUtils::NextInt(32678, 65480));
-            _configuration.SetValue("awsmock.service.gateway.http.host", p);
+            _configuration.SetValueString("awsmock.service.gateway.http.host", p);
             _endpoint = "http://localhost:" + p;
             std::cout << "port: " << p << std::endl;
 

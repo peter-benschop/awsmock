@@ -131,7 +131,7 @@ int main(const int argc, char *argv[]) {
     // Set log level.
     if (vm.contains("loglevel")) {
         const std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
         AwsMock::Core::LogStream::SetSeverity("info");
@@ -140,7 +140,7 @@ int main(const int argc, char *argv[]) {
     // Set log file
     if (vm.contains("logfile")) {
         const std::string value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValue("awsmock.logging.file", value);
+        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.file", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }
 

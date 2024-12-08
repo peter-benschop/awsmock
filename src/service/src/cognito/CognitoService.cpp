@@ -6,12 +6,12 @@
 #include <awsmock/service/cognito/CognitoService.h>
 
 namespace AwsMock::Service {
+
     CognitoService::CognitoService() : _database(Database::CognitoDatabase::instance()) {
         _accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
     }
 
-    Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(
-            const Dto::Cognito::CreateUserPoolRequest &request) const {
+    Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.name;
 

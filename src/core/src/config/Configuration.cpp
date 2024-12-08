@@ -11,7 +11,7 @@ namespace AwsMock::Core {
         Initialize();
     }
 
-    Configuration::Configuration(const std::string &basename) {
+    Configuration::Configuration(const std::string &basename) : _yamlConfig(YAML::Null) {
         Initialize();
         SetFilename(basename);
     }
@@ -19,9 +19,11 @@ namespace AwsMock::Core {
     void Configuration::Initialize() {
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
-        DefineStringProperty("awsmock.access.account-id", "AWSMOCK_ACCOUNT_ID", "000000000000");
-        DefineStringProperty("awsmock.access.client-id", "AWSMOCK_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
+        DefineStringProperty("awsmock.access.key-id", "AWSMOCK_ACCESS_ACCOUNT_KEY_ID", "none");
+        DefineStringProperty("awsmock.access.account-id", "AWSMOCK_ACCESS_ACCOUNT_ID", "000000000000");
+        DefineStringProperty("awsmock.access.client-id", "AWSMOCK_ACCESS_CLIENT_ID", "00000000");
+        DefineStringProperty("awsmock.access.secret-access-key", "AWSMOCK_ACCESS_SECRET_ACCESS_KEY", "none");
         DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
         DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
         DefineBoolProperty("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
@@ -102,8 +104,8 @@ namespace AwsMock::Core {
 
         // Docker
         DefineBoolProperty("awsmock.docker.active", "AWSMOCK_DOCKER_ACTIVE", false);
-        DefineStringProperty("awsmock.docker.network.mode", "AWSMOCK_DOCKER_NETWORK_MODE", "local");
-        DefineStringProperty("awsmock.docker.network.name", "AWSMOCK_DOCKER_NETWORK_NAME", "local");
+        DefineStringProperty("awsmock.docker.network-mode", "AWSMOCK_DOCKER_NETWORK_MODE", "local");
+        DefineStringProperty("awsmock.docker.network-name", "AWSMOCK_DOCKER_NETWORK_NAME", "local");
         DefineIntProperty("awsmock.docker.default.memory-size", "AWSMOCK_DOCKER_DEFAULT_MEMORY_SIZE", 512);
         DefineIntProperty("awsmock.docker.default.temp-size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
@@ -142,34 +144,56 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "root");
         DefineStringProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "secret");
         DefineIntProperty("awsmock.mongodb.pool-size", "AWSMOCK_MONGODB_POOL_SIZE", 256);
+        // Debug
+        log_debug << "Default configuration defined, config: " << _yamlConfig;
     }
 
     void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
-            _yamlConfig[key] = envProperty.c_str();
+            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
             AddToEnvList(key, getenv(envProperty.c_str()));
         } else if (!HasProperty(key)) {
-            _yamlConfig[key] = defaultValue;
+            SetValueByPath(_yamlConfig, key, defaultValue);
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
-            _yamlConfig[key] = envProperty.c_str();
+            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
             AddToEnvList(key, getenv(envProperty.c_str()));
         } else if (!HasProperty(key)) {
-            _yamlConfig[key] = defaultValue;
+            SetValueByPath(_yamlConfig, key, defaultValue);
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
         if (getenv(envProperty.c_str()) != nullptr) {
-            _yamlConfig[key] = envProperty.c_str();
+            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
             AddToEnvList(key, getenv(envProperty.c_str()));
         } else if (!HasProperty(key)) {
-            _yamlConfig[key] = defaultValue;
+            SetValueByPath(_yamlConfig, key, defaultValue);
+        }
+        log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
+    }
+
+    void Configuration::DefineLongProperty(const std::string &key, const std::string &envProperty, const long defaultValue) {
+        if (getenv(envProperty.c_str()) != nullptr) {
+            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            AddToEnvList(key, getenv(envProperty.c_str()));
+        } else if (!HasProperty(key)) {
+            SetValueByPath(_yamlConfig, key, defaultValue);
+        }
+        log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
+    }
+
+    void Configuration::DefineDoubleProperty(const std::string &key, const std::string &envProperty, const double defaultValue) {
+        if (getenv(envProperty.c_str()) != nullptr) {
+            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            AddToEnvList(key, getenv(envProperty.c_str()));
+        } else if (!HasProperty(key)) {
+            SetValueByPath(_yamlConfig, key, defaultValue);
         }
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
@@ -201,35 +225,29 @@ namespace AwsMock::Core {
         log_debug << ToString();
     }
 
-    void Configuration::SetValue(const std::string &key, const std::string &value) const {
+    void Configuration::SetValueString(const std::string &key, const std::string &value) {
         if (!HasProperty(key)) {
             log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
-        node.as<std::string>() = value;
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Value set, key: " << key;
     }
 
-    void Configuration::SetValue(const std::string &key, const bool value) const {
+    void Configuration::SetValueBool(const std::string &key, const bool value) {
         if (!HasProperty(key)) {
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
-        node.as<std::string>() = std::to_string(value);
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Value set, key: " << key;
     }
 
-    void Configuration::SetValue(const std::string &key, const int value) const {
+    void Configuration::SetValueInt(const std::string &key, const int value) {
         if (!HasProperty(key)) {
             log_error << "Property not found, key: " + key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        const YAML::Node node = lookup(_yamlConfig, paths.begin(), paths.end());
-        node.as<std::string>() = std::to_string(value);
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Value set, key: " << key;
     }
 
@@ -302,9 +320,9 @@ namespace AwsMock::Core {
         _envList[key] = value;
     }
 
-    void Configuration::ApplyEnvSettings() const {
+    void Configuration::ApplyEnvSettings() {
         for (const auto &[fst, snd]: _envList) {
-            SetValue(fst, snd);
+            SetValueString(fst, snd);
         }
     }
 

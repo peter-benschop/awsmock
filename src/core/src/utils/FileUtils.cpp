@@ -1,3 +1,4 @@
+#include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 
 namespace AwsMock::Core {
@@ -23,8 +24,9 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
+        DirUtils::EnsureDirectory(dir);
         const boost::filesystem::path temp = boost::filesystem::unique_path();
-        return dir + "/" + GetBasename(temp.native()) + "." + extension;
+        return dir + "/" + temp.string() + "." + extension;
     }
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
@@ -107,7 +109,7 @@ namespace AwsMock::Core {
         return tempFilename;
     }
 
-    std::string FileUtils::CreateTempFile(const std::string &extension, int numBytes) {
+    std::string FileUtils::CreateTempFile(const std::string &extension, const int numBytes) {
         std::string tempFilename = GetTempFile(extension);
         std::ofstream tempFile;
         tempFile.open(tempFilename);
@@ -116,7 +118,7 @@ namespace AwsMock::Core {
         return tempFilename;
     }
 
-    std::string FileUtils::CreateTempFile(const std::string &dirName, const std::string &extension, int numBytes) {
+    std::string FileUtils::CreateTempFile(const std::string &dirName, const std::string &extension, const int numBytes) {
         std::string tmpFileName = GetTempFile(dirName, extension);
         std::ofstream tempFile;
         tempFile.open(tmpFileName);
