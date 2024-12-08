@@ -9,13 +9,13 @@ namespace AwsMock::Dto::Cognito {
     std::string AdminCreateUserRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("Username", userName);
-            rootJson.set("TemporaryPassword", temporaryPassword);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
+            Core::Bson::BsonUtils::SetStringValue(document, "TemporaryPassword", temporaryPassword);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson ::BsonUtils::ToJsonString(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

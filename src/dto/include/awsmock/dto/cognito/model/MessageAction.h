@@ -7,8 +7,6 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -19,20 +17,20 @@ namespace AwsMock::Dto::Cognito {
     };
 
     static std::map<MessageAction, std::string> MessageActionNames{
-            {MessageAction::RESEND, "RESEND"},
-            {MessageAction::SUPPRESS, "SUPPRESS"}};
+            {RESEND, "RESEND"},
+            {SUPPRESS, "SUPPRESS"}};
 
     [[maybe_unused]] static std::string MessageActionToString(MessageAction messageAction) {
         return MessageActionNames[messageAction];
     }
 
     [[maybe_unused]] static MessageAction MessageActionFromString(const std::string &messageActionName) {
-        for (auto &it: MessageActionNames) {
-            if (it.second == messageActionName) {
-                return it.first;
+        for (auto &[fst, snd]: MessageActionNames) {
+            if (snd == messageActionName) {
+                return fst;
             }
         }
-        return MessageAction::SUPPRESS;
+        return SUPPRESS;
     }
 
 }// namespace AwsMock::Dto::Cognito

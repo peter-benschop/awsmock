@@ -39,28 +39,28 @@ namespace AwsMock::Dto::Cognito {
         UserAttributeList userAttributes;
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @param payload json string object
          */
         void FromJson(const std::string &payload);
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @return JSON representation of the object
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

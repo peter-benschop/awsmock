@@ -32,12 +32,12 @@ namespace AwsMock::Dto::Cognito {
     std::string AdminCreateUserResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Username", userName);
-            rootJson.set("Enabled", enabled);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
+            Core::Bson::BsonUtils::SetBoolValue(document, "Enabled", enabled);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson ::BsonUtils::ToJsonString(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

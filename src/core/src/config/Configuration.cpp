@@ -149,52 +149,52 @@ namespace AwsMock::Core {
     }
 
     void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
+        std::string value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            value = getenv(envProperty.c_str());
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
-            SetValueByPath(_yamlConfig, key, defaultValue);
         }
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
+        bool value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            value = getenv(envProperty.c_str()) == "true";
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
-            SetValueByPath(_yamlConfig, key, defaultValue);
         }
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
+        int value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            value = std::stoi(getenv(envProperty.c_str()));
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
-            SetValueByPath(_yamlConfig, key, defaultValue);
         }
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineLongProperty(const std::string &key, const std::string &envProperty, const long defaultValue) {
+        long value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            value = std::stol(getenv(envProperty.c_str()));
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
-            SetValueByPath(_yamlConfig, key, defaultValue);
         }
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineDoubleProperty(const std::string &key, const std::string &envProperty, const double defaultValue) {
+        double value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            SetValueByPath(_yamlConfig, key, getenv(envProperty.c_str()));
+            value = std::stod(getenv(envProperty.c_str()));
             AddToEnvList(key, getenv(envProperty.c_str()));
-        } else if (!HasProperty(key)) {
-            SetValueByPath(_yamlConfig, key, defaultValue);
         }
+        SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
