@@ -6,7 +6,6 @@
 #define AWSMOCK_DTO_S3_CREATE_BUCKET_CONSTRAINT_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
@@ -25,14 +24,14 @@ namespace AwsMock::Dto::S3 {
         std::string location;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * Example:
          * @code{.xml}
@@ -46,14 +45,14 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -176,8 +176,8 @@ namespace AwsMock::Core {
         request.prepare_payload();
 
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                request.base().set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                request.base().set(fst, snd);
             }
         }
         return request;

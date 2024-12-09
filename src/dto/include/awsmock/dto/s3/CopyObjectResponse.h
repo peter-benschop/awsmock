@@ -6,7 +6,6 @@
 #define AWSMOCK_DTO_S3_COPY_OBJECT_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes

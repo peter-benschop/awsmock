@@ -88,8 +88,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Attributes
             if (mResult.value().find("messageAttributes") != mResult.value().end()) {
-                bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value};
-                for (const bsoncxx::array::element &attributeElement: attributesView) {
+                for (const bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
                     MessageAttribute attribute{
                             .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
                             .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
@@ -101,8 +100,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Get attributes
             if (mResult.value().find("attributes") != mResult.value().end()) {
-                bsoncxx::document::view attributesView = mResult.value()["attributes"].get_document().value;
-                for (const bsoncxx::document::element &attributeElement: attributesView) {
+                for (const view attributesView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
                     std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);
                     attributes.emplace(key, value);

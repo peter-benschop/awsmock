@@ -29,19 +29,17 @@ namespace AwsMock::Dto::S3 {
 
     std::string CompleteMultipartUploadResult::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CompleteMultipartUploadResult");
+        boost::property_tree::ptree root;
+        root.add("CompleteMultipartUploadResult.Location", location);
+        root.add("CompleteMultipartUploadResult.Bucket", bucket);
+        root.add("CompleteMultipartUploadResult.Key", key);
+        root.add("CompleteMultipartUploadResult.ETag", etag);
+        root.add("CompleteMultipartUploadResult.ChecksumCRC32", checksumCrc32);
+        root.add("CompleteMultipartUploadResult.ChecksumCRC32C", checksumCrc32c);
+        root.add("CompleteMultipartUploadResult.ChecksumSHA1", checksumSha1);
+        root.add("CompleteMultipartUploadResult.ChecksumSHA256", checksumSha256);
 
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Location", location);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Bucket", bucket);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", etag);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32", checksumCrc32);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32C", checksumCrc32c);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA1", checksumSha1);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA256", checksumSha256);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string CompleteMultipartUploadResult::ToString() const {

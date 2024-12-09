@@ -31,7 +31,7 @@ namespace AwsMock::Core {
 
         const std::string region = Configuration::instance().GetValueString("awsmock.region");
         const std::string port = Configuration::instance().GetValueString("awsmock.gateway.http.port");
-        const std::string hostname = Configuration::instance().GetValueString("awsmock.gateway.http.host");
+        const std::string hostname = SystemUtils::GetHostName();
 
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }

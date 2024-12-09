@@ -6,32 +6,16 @@
 #define AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/entity/sqs/Message.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::SQS {
 
     /**
-     * Receive message request.
+     * @brief Receive message request.
      *
      * Example:
      * @code{.json}
@@ -46,6 +30,11 @@ namespace AwsMock::Dto::SQS {
      *   "WaitTimeSeconds": number
      * }
      * @endcode
+     *
+     * @par
+     * The wait time seconds parameter is the duration (in seconds) for which the call waits for a message to arrive in the queue before returning. If a message is available, the call returns sooner
+     * than WaitTimeSeconds. If no messages are available and the wait time expires, the call does not return a message list. If you are using the Java SDK, it returns a ReceiveMessageResponse object,
+     * which has an empty list instead of a Null object.
      */
     struct ReceiveMessageRequest {
 
@@ -77,7 +66,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Wait time in seconds
          */
-        int waitTimeSeconds = 1;
+        int waitTimeSeconds = 10;
 
         /**
          * List of attribute names
@@ -100,28 +89,28 @@ namespace AwsMock::Dto::SQS {
         std::string requestId;
 
         /**
-         * Converts the JSON string to DTO.
+         * @brief Converts the JSON string to DTO.
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

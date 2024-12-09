@@ -10,48 +10,46 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object MessageSuccessful::ToJsonObject() const {
+    view_or_value<view, value> MessageSuccessful::ToDocument() const {
 
         try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(document, "SequenceNumber", sequenceNumber);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageBody", md5Body);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageAttributes", md5UserAttr);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageSystemAttributes", md5SystemAttr);
+            return document.extract();
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("MessageId", messageId);
-            rootJson.set("SequenceNumber", sequenceNumber);
-            rootJson.set("MD5OfMessageBody", md5Body);
-            rootJson.set("MD5OfMessageAttributes", md5UserAttr);
-            rootJson.set("MD5OfMessageSystemAttributes", md5SystemAttr);
-
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void MessageSuccessful::FromJson(const Poco::JSON::Object::Ptr &object) {
+    void MessageSuccessful::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Id", object, id);
-            Core::JsonUtils::GetJsonValueString("MessageId", object, messageId);
-            Core::JsonUtils::GetJsonValueString("SequenceNumber", object, sequenceNumber);
-            Core::JsonUtils::GetJsonValueString("MD5OfMessageBody", object, md5Body);
-            Core::JsonUtils::GetJsonValueString("MD5OfMessageAttributes", object, md5UserAttr);
-            Core::JsonUtils::GetJsonValueString("MD5OfMessageSystemAttributes", object, md5SystemAttr);
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            messageId = Core::Bson::BsonUtils::GetStringValue(document, "MessageId");
+            sequenceNumber = Core::Bson::BsonUtils::GetStringValue(document, "SequenceNumber");
+            md5Body = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageBody");
+            md5UserAttr = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageAttributes");
+            md5SystemAttr = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageSystemAttributes");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

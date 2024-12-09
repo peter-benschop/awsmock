@@ -2,7 +2,6 @@
 // Created by vogje01 on 03/10/2023.
 //
 
-#include "awsmock/core/XmlUtils.h"
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 
 namespace AwsMock::Dto::SQS {
@@ -10,111 +9,102 @@ namespace AwsMock::Dto::SQS {
     std::string ReceiveMessageResponse::ToJson() {
 
         try {
-            Poco::JSON::Object rootJson;
 
-            Poco::JSON::Array messageArray;
+            document rootDocument;
+
+            array messageArray;
             for (const auto &message: messageList) {
 
-                Poco::JSON::Object messageObject;
-                messageObject.set("Body", message.body);
-                messageObject.set("ReceiptHandle", message.receiptHandle);
-                messageObject.set("MD5OfBody", message.md5Body);
-                messageObject.set("MessageId", message.messageId);
-
-                Dto::SQS::MessageAttributeList messageAttributeListDto;
+                document messageDocument;
+                Core::Bson::BsonUtils::SetStringValue(messageDocument, "Body", message.body);
+                Core::Bson::BsonUtils::SetStringValue(messageDocument, "ReceiptHandle", message.receiptHandle);
+                Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfBody", message.md5Body);
+                Core::Bson::BsonUtils::SetStringValue(messageDocument, "MessageId", message.messageId);
 
                 // Message attributes
-                Poco::JSON::Object messageAttributeObject;
+                document messageAttributeDocument;
+                MessageAttributeList messageAttributeListDto;
                 for (const auto &at: message.messageAttributes) {
 
-                    Dto::SQS::MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
+                    MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
 
-                    Poco::JSON::Object messageAttributesObject;
                     if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
-                        messageAttributesObject.set("DataType", "String");
-                        messageAttributesObject.set("StringValue", at.attributeValue);
-                        messageAttributeDto.type = MessageAttributeDataType::STRING;
+                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "DataType", "String");
+                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "StringValue", at.attributeValue);
+                        messageAttributeDto.type = STRING;
                     } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
-                        messageAttributesObject.set("DataType", "Number");
-                        messageAttributesObject.set("StringValue", at.attributeValue);
-                        messageAttributeDto.type = MessageAttributeDataType::NUMBER;
+                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "DataType", "Number");
+                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "StringValue", at.attributeValue);
+                        messageAttributeDto.type = NUMBER;
                     }
                     messageAttributeListDto[at.attributeName] = messageAttributeDto;
-                    messageAttributeObject.set(at.attributeName, messageAttributesObject);
+                    messageAttributeDocument.append(kvp(at.attributeName, messageAttributeDocument));
                 }
-                messageObject.set("MessageAttributes", messageAttributeObject);
+                messageDocument.append(kvp("MessageAttributes", messageAttributeDocument));
 
                 // Attributes
-                Poco::JSON::Object attributeObject;
-                for (const auto &at: message.attributes) {
-                    attributeObject.set(at.first, at.second);
+                document attributeDocument;
+                for (const auto &[fst, snd]: message.attributes) {
+                    attributeDocument.append(kvp(fst, snd));
                 }
-                messageObject.set("Attributes", attributeObject);
+                messageDocument.append(kvp("Attributes", attributeDocument));
 
                 // MD5 of message attributes
-                messageObject.set("MD5OfMessageAttributes", Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto));
-                messageArray.add(messageObject);
+                messageDocument.append(kvp("MD5OfMessageAttributes", MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto)));
+                messageArray.append(messageDocument);
             }
 
             // Add message array
-            rootJson.set("Messages", messageArray);
+            rootDocument.append(kvp("Messages", messageArray));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 
     std::string ReceiveMessageResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "ReceiveMessageResponse");
-
-        // ReceiveMessageResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "ReceiveMessageResult");
-
+        boost::property_tree::ptree rootTree;
+        const boost::property_tree::ptree messagesTree;
         for (auto &it: messageList) {
 
             // Message
-            Poco::XML::AutoPtr<Poco::XML::Element> pMessage = Core::XmlUtils::CreateNode(pDoc, pResult, "Message");
+            boost::property_tree::ptree messageTree;
+            messageTree.put("MessageId", it.messageId);
+            messageTree.put("ReceiptHandle", it.receiptHandle);
+            messageTree.put("Body", it.body);
+            messageTree.put("MD5OfBody", it.md5Body);
+            messageTree.put("MD5OfMessageAttributes", it.md5UserAttr);
 
-            // MessageId
-            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "MessageId", it.messageId);
-            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "ReceiptHandle", it.receiptHandle);
-            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "Body", it.body);
-            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "MD5OfBody", it.md5Body);
-            Core::XmlUtils::CreateTextNode(pDoc, pMessage, "MD5OfMessageAttributes", it.md5UserAttr);
-
-            // MessageAttribute
-            Poco::XML::AutoPtr<Poco::XML::Element> pAttribute = Core::XmlUtils::CreateNode(pDoc, pMessage, "Attributes");
-
-            for (const auto &at: it.attributes) {
-
-                // Nodes
-                Core::XmlUtils::CreateTextNode(pDoc, pAttribute, "Name", at.first);
-                Core::XmlUtils::CreateTextNode(pDoc, pAttribute, "Value", at.second);
+            // Attribute
+            boost::property_tree::ptree attributesTree;
+            for (const auto &[fst, snd]: it.attributes) {
+                boost::property_tree::ptree attributeTree;
+                attributeTree.put("Name", fst);
+                attributeTree.put("Value", snd);
+                attributesTree.push_back(std::make_pair("", attributeTree));
             }
+            messageTree.push_back(std::make_pair("Attributes", attributesTree));
 
             // Message attributes
-            Poco::XML::AutoPtr<Poco::XML::Element> pMessageAttributes = Core::XmlUtils::CreateNode(pDoc, pMessage, "MessageAttributes");
-
+            boost::property_tree::ptree messageAttributesTree;
             for (const auto &at: it.messageAttributes) {
-
-                // MessageAttribute
-                Poco::XML::AutoPtr<Poco::XML::Element> pMessageAttribute = Core::XmlUtils::CreateNode(pDoc, pMessageAttributes, at.attributeName);
-                Core::XmlUtils::CreateTextNode(pDoc, pMessageAttribute, "DataType", at.attributeType);
-                Core::XmlUtils::CreateTextNode(pDoc, pMessageAttribute, "StringValue", at.attributeValue);
+                boost::property_tree::ptree attributeTree;
+                attributeTree.put("DataType", at.attributeType);
+                attributeTree.put("StringValue", at.attributeValue);
+                messageAttributesTree.push_back(std::make_pair("", attributeTree));
             }
+            messageTree.push_back(std::make_pair("MessageAttributes", messageAttributesTree));
         }
+        rootTree.add_child("ReceiveMessageResponse.ReceiveMessageResult.Messages", messagesTree);
 
         // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
-        Core::XmlUtils::CreateTextNode(pDoc, pMetaData, "RequestId", requestId);
+        rootTree.put("ResponseMetadata.RequestId", requestId);
 
-        return Core::XmlUtils::ToXmlString(pDoc);
+        return Core::XmlUtils::ToXmlString(rootTree);
     }
 
     std::string ReceiveMessageResponse::ToString() {

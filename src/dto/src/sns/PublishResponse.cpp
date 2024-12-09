@@ -8,37 +8,24 @@ namespace AwsMock::Dto::SNS {
 
     std::string PublishResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "PublishResponse");
-
-        // SendMessageResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pSendMessageResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "PublishResult");
-
-        // MessageID
-        Core::XmlUtils::CreateTextNode(pDoc, pSendMessageResult, "MessageId", messageId);
-
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
-
-        // Request ID
-        Core::XmlUtils::CreateTextNode(pDoc, pMetaData, "RequestId", requestId);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        boost::property_tree::ptree root;
+        root.add("PublishResponse.PublishResult.MessageId", messageId);
+        root.add("PublishResponse.ResponseMetadata.RequestId", requestId);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string PublishResponse::ToJson() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("messageId", messageId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "messageId", messageId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

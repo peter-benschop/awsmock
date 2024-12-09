@@ -519,21 +519,18 @@ namespace AwsMock::Service {
 
                         log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendOkResponse(request, result.ToXml());
-
-                    } else {
-
-                        std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
-                        log_debug << "Finish multipart upload request, uploadId: " << uploadId;
-
-                        Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
-                        Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
-
-                        std::map<std::string, std::string> headers;
-                        headers["ETag"] = Core::StringUtils::Quoted(result.etag);
-
-                        log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                        return SendOkResponse(request, result.ToXml(), headers);
                     }
+                    std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    log_debug << "Finish multipart upload request, uploadId: " << uploadId;
+
+                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
+
+                    std::map<std::string, std::string> headers;
+                    headers["ETag"] = Core::StringUtils::Quoted(result.etag);
+
+                    log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    return SendOkResponse(request, result.ToXml(), headers);
                 }
 
                 case Dto::Common::S3CommandType::DELETE_OBJECTS: {

@@ -6,17 +6,14 @@
 #define AWSMOCK_DTO_SQS_MESSAGE_ENTRY_SUCCESS_H
 
 // C++ includes
-#include <map>
 #include <string>
-#include <vector>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -78,14 +75,14 @@ namespace AwsMock::Dto::SQS {
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts a JSON representation to s DTO.
          *
-         * @param object JSON object.
+         * @param document JSON object.
          */
-        void FromJson(const Poco::JSON::Object::Ptr &object);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts the DTO to a string representation.

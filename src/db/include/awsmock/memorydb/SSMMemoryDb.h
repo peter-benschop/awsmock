@@ -14,9 +14,11 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/repository/Database.h>
 
@@ -59,7 +61,7 @@ namespace AwsMock::Database {
         bool ParameterExists(const std::string &name);
 
         /**
-         * @brief Returns a SMS parameter by primary key
+         * @brief Returns an SMS parameter by primary key
          *
          * @param oid key primary key
          * @return key entity
@@ -128,7 +130,7 @@ namespace AwsMock::Database {
       private:
 
         /**
-         * ssm parameter vector, when running without database
+         * SSM parameter vector, when running without database
          */
         std::map<std::string, Entity::SSM::Parameter> _parameters{};
 

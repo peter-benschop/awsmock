@@ -9,16 +9,12 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
@@ -58,7 +54,7 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const std::string &region, const std::string &name);
+        bool BucketExists(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Bucket exists
@@ -67,7 +63,7 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const Entity::S3::Bucket &bucket);
+        bool BucketExists(const Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief Returns the total number of buckets
@@ -77,7 +73,7 @@ namespace AwsMock::Database {
          * @return total number of buckets
          * @throws DatabaseException
          */
-        long BucketCount(const std::string &region = {}, const std::string &prefix = {});
+        long BucketCount(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -86,7 +82,7 @@ namespace AwsMock::Database {
          * @return bucket, if existing
          * @throws DatabaseException
          */
-        Entity::S3::Bucket GetBucketById(bsoncxx::oid oid);
+        Entity::S3::Bucket GetBucketById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -95,7 +91,7 @@ namespace AwsMock::Database {
          * @return bucket, if existing
          * @throws DatabaseException
          */
-        Entity::S3::Bucket GetBucketById(const std::string &oid);
+        Entity::S3::Bucket GetBucketById(const std::string &oid) const;
 
         /**
          * @brief Returns the bucket by region and name.
@@ -113,7 +109,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief List all buckets
@@ -134,7 +130,7 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool HasObjects(const Entity::S3::Bucket &bucket);
+        bool HasObjects(const Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief List objects in a bucket.
@@ -153,7 +149,7 @@ namespace AwsMock::Database {
          * @param bucket bucket name
          * @return number of S3 objects
          */
-        long GetBucketObjectCount(const std::string &region, const std::string &bucket);
+        long GetBucketObjectCount(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief Purges a bucket
@@ -162,7 +158,7 @@ namespace AwsMock::Database {
          * @return number of deleted objects
          * @throws DatabaseException
          */
-        long PurgeBucket(Entity::S3::Bucket &bucket);
+        long PurgeBucket(Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief Updates a bucket
@@ -180,7 +176,7 @@ namespace AwsMock::Database {
          * @param bucket bucket name
          * @return bucket size in bytes
          */
-        long GetBucketSize(const std::string &region, const std::string &bucket);
+        long GetBucketSize(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief Create a new bucket or updated a existing bucket
@@ -307,7 +303,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {});
+        Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
 
         // /**
         //  * @brief List all objects.
@@ -367,7 +363,7 @@ namespace AwsMock::Database {
          * @param bucket bucket entity
          * @throws DatabaseException
          */
-        void DeleteBucket(const Entity::S3::Bucket &bucket);
+        void DeleteBucket(const Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief Deletes all buckets

@@ -10,44 +10,43 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object MessageFailed::ToJsonObject() const {
+    view_or_value<view, value> MessageFailed::ToDocument() const {
 
         try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "Code", code);
+            Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
+            Core::Bson::BsonUtils::SetBoolValue(document, "SenderFault", senderFault);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("Code", code);
-            rootJson.set("Message", message);
-            rootJson.set("SenderFault", senderFault);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void MessageFailed::FromJson(const Poco::JSON::Object::Ptr &object) {
+    void MessageFailed::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Id", object, id);
-            Core::JsonUtils::GetJsonValueString("Code", object, code);
-            Core::JsonUtils::GetJsonValueString("Message", object, message);
-            Core::JsonUtils::GetJsonValueBool("SenderFault", object, senderFault);
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            code = Core::Bson::BsonUtils::GetStringValue(document, "code");
+            message = Core::Bson::BsonUtils::GetStringValue(document, "message");
+            senderFault = Core::Bson::BsonUtils::GetBoolValue(document, "senderFault");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -58,7 +57,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const MessageFailed &r) {
-        os << "MessageFailed=" + r.ToJson();
+        os << "MessageFailed=" << r.ToJson();
         return os;
     }
 };// namespace AwsMock::Dto::SQS

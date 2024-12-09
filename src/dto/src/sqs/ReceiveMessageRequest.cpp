@@ -8,40 +8,31 @@ namespace AwsMock::Dto::SQS {
 
     void ReceiveMessageRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
+            waitTimeSeconds = Core::Bson::BsonUtils::GetIntValue(document, "WaitTimeSeconds");
+            maxMessages = Core::Bson::BsonUtils::GetIntValue(document, "MaxNumberOfMessages");
+            visibilityTimeout = Core::Bson::BsonUtils::GetIntValue(document, "VisibilityTimeout");
+
             // Attributes
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
-            Core::JsonUtils::GetJsonValueInt("MaxNumberOfMessages", rootObject, maxMessages);
-            Core::JsonUtils::GetJsonValueInt("WaitTimeSeconds", rootObject, waitTimeSeconds);
-            Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
+            if (document.find("AttributeNames") != document.end()) {
+                Core::Bson::FromBsonStringArray(document, "AttributeNames", &messageAttributeNames);
+            }
+
+            // Message attributes
+            if (document.find("MessageAttributeNames") != document.end()) {
+                Core::Bson::FromBsonStringArray(document, "MessageAttributeNames", &messageAttributeNames);
+            }
 
             // Sanitize
             queueUrl = Core::SanitizeSQSUrl(queueUrl);
 
-            // Attributes
-            if (rootObject->has("AttributeNames")) {
-                Poco::JSON::Array::Ptr attributes = rootObject->getArray("AttributeNames");
-                for (const auto &attribute: *attributes) {
-                    messageAttributeNames.emplace_back(attribute.convert<std::string>());
-                }
-            }
-
-            // Message attributes
-            if (rootObject->has("MessageAttributeNames")) {
-                Poco::JSON::Array::Ptr messageAttributes = rootObject->getArray("MessageAttributeNames");
-                for (const auto &messageAttribute: *messageAttributes) {
-                    messageAttributeNames.emplace_back(messageAttribute.convert<std::string>());
-                }
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -49,32 +40,35 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("QueueUrl", queueUrl);
-            rootJson.set("RequestId", requestId);
-            rootJson.set("MaxNumberOfMessages", maxMessages);
-            rootJson.set("WaitTimeSeconds", waitTimeSeconds);
-            rootJson.set("VisibilityTimeout", visibilityTimeout);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", requestId);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxNumberOfMessages", maxMessages);
+            Core::Bson::BsonUtils::SetIntValue(document, "WaitTimeSeconds", waitTimeSeconds);
+            Core::Bson::BsonUtils::SetIntValue(document, "VisibilityTimeout", visibilityTimeout);
 
             if (!attributeNames.empty()) {
-                Poco::JSON::Array jsonAttributeNamesArray;
+                array jsonArray;
                 for (const auto &attributeName: attributeNames) {
-                    jsonAttributeNamesArray.add(attributeName);
+                    jsonArray.append(attributeName);
                 }
+                document.append(kvp("Attributes", jsonArray));
             }
 
             if (!messageAttributeNames.empty()) {
-                Poco::JSON::Array jsonMessageAttributeNamesArray;
-                for (const auto &messageAttributeName: messageAttributeNames) {
-                    jsonMessageAttributeNamesArray.add(messageAttributeName);
+                array jsonArray;
+                for (const auto &attributeName: messageAttributeNames) {
+                    jsonArray.append(attributeName);
                 }
+                document.append(kvp("Attributes", jsonArray));
             }
-            return Core::JsonUtils::ToJsonString(rootJson);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
