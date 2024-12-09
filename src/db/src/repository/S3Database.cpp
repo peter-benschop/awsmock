@@ -6,18 +6,13 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::builder::stream::document;
-
     std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    S3Database::S3Database() : _memoryDb(S3MemoryDb::instance()), _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object") {}
+    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {}
 
-    bool S3Database::BucketExists(const std::string &region, const std::string &name) {
+    bool S3Database::BucketExists(const std::string &region, const std::string &name) const {
 
         if (HasDatabase()) {
 
@@ -26,7 +21,7 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-                int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+                const int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
                 log_trace << "Bucket exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -41,11 +36,11 @@ namespace AwsMock::Database {
         }
     }
 
-    bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) {
+    bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) const {
         return BucketExists(bucket.region, bucket.name);
     }
 
-    Entity::S3::Bucket S3Database::CreateBucket(Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::CreateBucket(Entity::S3::Bucket &bucket) const {
 
         if (HasDatabase()) {
 
@@ -75,15 +70,15 @@ namespace AwsMock::Database {
         }
     }
 
-    long S3Database::BucketCount(const std::string &region, const std::string &prefix) {
+    long S3Database::BucketCount(const std::string &region, const std::string &prefix) const {
 
         if (HasDatabase()) {
 
             try {
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
 
                 if (!region.empty()) {
                     query.append(kvp("region", region));
@@ -92,7 +87,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                long count = _bucketCollection.count_documents(query.extract());
+                const long count = _bucketCollection.count_documents(query.extract());
                 log_trace << "Bucket count: " << count;
                 return count;
 
@@ -107,29 +102,25 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::S3::Bucket S3Database::GetBucketById(bsoncxx::oid oid) {
+    Entity::S3::Bucket S3Database::GetBucketById(bsoncxx::oid oid) const {
 
-        auto client = ConnectionPool::instance().GetConnection();
+        const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-        std::optional<bsoncxx::document::value>
-                mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
+        const std::optional<value> mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
         Entity::S3::Bucket result;
         result.FromDocument(mResult->view());
 
         return result;
     }
 
-    Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) {
+    Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) const {
 
         if (HasDatabase()) {
 
             return GetBucketById(bsoncxx::oid(oid));
-
-        } else {
-
-            return _memoryDb.GetBucketById(oid);
         }
+        return _memoryDb.GetBucketById(oid);
     }
 
     Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) {
@@ -158,14 +149,14 @@ namespace AwsMock::Database {
         Entity::S3::BucketList bucketList;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
             mongocxx::options::find opts;
             if (!sortColumns.empty()) {
-                bsoncxx::builder::basic::document sort = {};
-                for (const auto &sortColumn: sortColumns) {
-                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                document sort = {};
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    sort.append(kvp(column, sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -176,7 +167,7 @@ namespace AwsMock::Database {
                 opts.limit(maxResults);
             }
 
-            bsoncxx::builder::basic::document query = {};
+            document query = {};
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }
@@ -184,8 +175,7 @@ namespace AwsMock::Database {
                 query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
 
-            auto bucketCursor = _bucketCollection.find(query.extract(), opts);
-            for (const auto &bucket: bucketCursor) {
+            for (auto bucketCursor = _bucketCollection.find(query.extract(), opts); const auto &bucket: bucketCursor) {
                 Entity::S3::Bucket result;
                 result.FromDocument(bucket);
                 bucketList.push_back(result);
@@ -199,15 +189,14 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
-    bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) {
+    bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
-            int64_t count =
-                    _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
+            const int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
             log_trace << "Objects exists: " << std::boolalpha << count;
             return count > 0;
 
@@ -245,7 +234,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long S3Database::GetBucketObjectCount(const std::string &region, const std::string &bucket) {
+    long S3Database::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
 
         std::vector<Entity::S3::Object> objectList;
         if (HasDatabase()) {
@@ -263,7 +252,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long S3Database::PurgeBucket(Entity::S3::Bucket &bucket) {
+    long S3Database::PurgeBucket(Entity::S3::Bucket &bucket) const {
 
         if (HasDatabase()) {
 
@@ -342,86 +331,41 @@ namespace AwsMock::Database {
     }
 
     // TODO: Combine with Listobject
-    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) {
+    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) const {
 
         Entity::S3::ObjectList objectList;
         if (HasDatabase()) {
 
-            if (prefix.empty()) {
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
-                auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-                auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket)));
-                for (auto object: objectCursor) {
-                    Entity::S3::Object result;
-                    result.FromDocument(object);
-                    objectList.push_back(result);
-                }
+            document query;
+            if (!bucket.empty()) {
+                query.append(kvp("bucket", bucket));
+            }
+            if (!prefix.empty()) {
+                query.append(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"}));
+            }
 
-            } else {
-
-                auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-                auto objectCursor = _objectCollection.find(make_document(kvp("bucket", bucket),
-                                                                         kvp("key",
-                                                                             bsoncxx::types::b_regex{"^" + prefix + ".*"})));
-                for (auto object: objectCursor) {
-                    Entity::S3::Object result;
-                    result.FromDocument(object);
-                    objectList.push_back(result);
-                }
+            for (auto objectCursor = _objectCollection.find(query.extract()); auto object: objectCursor) {
+                Entity::S3::Object result;
+                result.FromDocument(object);
+                objectList.push_back(result);
             }
 
         } else {
 
             objectList = _memoryDb.ListBucket(bucket, prefix);
         }
-
         log_trace << "Got object list, size:" << objectList.size();
-
         return objectList;
     }
 
-    /*Entity::S3::ObjectList S3Database::ListObjects(const std::string &prefix) {
-
-        Entity::S3::ObjectList objectList;
-        if (HasDatabase()) {
-
-            auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-
-            if (prefix.empty()) {
-
-                auto objectCursor = _objectCollection.find({});
-                for (const auto &object: objectCursor) {
-                    Entity::S3::Object result;
-                    result.FromDocument(object);
-                    objectList.push_back(result);
-                }
-            } else {
-
-                auto objectCursor = _objectCollection.find(make_document(kvp("key", bsoncxx::types::b_regex{"^" + prefix + ".*"})));
-                for (const auto &object: objectCursor) {
-                    Entity::S3::Object result;
-                    result.FromDocument(object);
-                    objectList.push_back(result);
-                }
-            }
-
-        } else {
-
-            objectList = _memoryDb.ListObjects(prefix);
-        }
-
-        log_trace << "Got object list in all buckets, size:" << objectList.size();
-        return objectList;
-    }*/
-
-    long S3Database::GetBucketSize(const std::string &region, const std::string &bucket) {
+    long S3Database::GetBucketSize(const std::string &region, const std::string &bucket) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
             try {
@@ -432,8 +376,7 @@ namespace AwsMock::Database {
                                           make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 auto totalSizeCursor = _objectCollection.aggregate(p);
-                auto t = *totalSizeCursor.begin();
-                if (!t.empty()) {
+                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
                     return t["totalSize"].get_int64().value;
                 }
             } catch (const mongocxx::exception &exc) {
@@ -448,18 +391,18 @@ namespace AwsMock::Database {
         return 0;
     }
 
-    void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) {
+    void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
+                const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
                 session.commit_transaction();
                 log_debug << "Bucket deleted, count: " << delete_many_result->deleted_count();
 

@@ -27,7 +27,7 @@ namespace AwsMock::Dto::DynamoDb {
         // Save original body
         body = jsonBody;
 
-        bsoncxx::builder::basic::document document;
+        document document;
         const value documentValue = bsoncxx::from_json(body);
 
         try {

@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
+#include <mongocxx/options/gridfs/bucket.hpp>
 
 namespace AwsMock::Dto::S3 {
 
@@ -22,13 +23,11 @@ namespace AwsMock::Dto::S3 {
 
     std::string DeleteObjectsResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "DeleteResult");
-
-        Core::XmlUtils::CreateTextArray(pDoc, pRoot, "Deleted", "Key", keys);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        boost::property_tree::ptree root;
+        for (const auto &key: keys) {
+            root.add("DeleteResult.Key", key);
+        }
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string DeleteObjectsResponse::ToString() const {

@@ -90,9 +90,9 @@ namespace AwsMock::Service {
             Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList};
             log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
             return listQueueResponse;
-        } catch (Poco::Exception &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -110,9 +110,9 @@ namespace AwsMock::Service {
             log_trace << "SQS create queue ARN list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -144,9 +144,9 @@ namespace AwsMock::Service {
             log_trace << "SQS create queue counters list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
         try {
 
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
-            long size = _sqsDatabase.CountMessageSize(request.queueArn);
+            const long size = _sqsDatabase.CountMessageSize(request.queueArn);
 
             Dto::SQS::GetQueueDetailsResponse sqsResponse;
             sqsResponse.messageCount = _sqsDatabase.CountMessages(request.queueArn);
@@ -180,9 +180,9 @@ namespace AwsMock::Service {
             log_trace << "SQS get queue details response: " << sqsResponse.ToJson();
             return sqsResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
         }
     }
 
@@ -200,7 +200,7 @@ namespace AwsMock::Service {
             log_trace << "SQS create queue tags list response: " << listQueueTagsResponse.ToJson();
             return listQueueTagsResponse;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -231,7 +231,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
             log_trace << "SQS queue counter updated, queueArn: " << queue.queueArn;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -256,7 +256,7 @@ namespace AwsMock::Service {
             log_info << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
             return {.queueUrl = queue.queueUrl};
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -376,7 +376,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
             log_trace << "Queue updated: " << queue.ToString();
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -408,7 +408,7 @@ namespace AwsMock::Service {
             message = _sqsDatabase.UpdateMessage(message);
             log_trace << "Message updated: " << message.ToString();
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -436,7 +436,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
             log_info << "SQS queue tags updated, count: " << request.tags.size() << " queue: " << queue.name;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -463,7 +463,7 @@ namespace AwsMock::Service {
 
             return {.region = request.region, .queueUrl = request.queueUrl, .requestId = request.requestId};
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -538,7 +538,7 @@ namespace AwsMock::Service {
 
             return Dto::SQS::Mapper::map(request, message);
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -572,7 +572,7 @@ namespace AwsMock::Service {
                     Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
                     Dto::SQS::MessageSuccessful s = {.id = entry.id, .messageId = response.messageId, .md5Body = response.md5Body, .md5UserAttr = response.md5UserAttr, .md5SystemAttr = response.md5SystemAttr};
                     sqsResponse.successful.emplace_back(s);
-                } catch (Poco::Exception &exc) {
+                } catch (Core::DatabaseException &exc) {
                     Dto::SQS::MessageFailed f = {.id = Core::StringUtils::CreateRandomUuid(), .message = exc.message(), .senderFault = false};
                     sqsResponse.failed.emplace_back(f);
                 }
@@ -580,7 +580,7 @@ namespace AwsMock::Service {
 
             return sqsResponse;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -606,7 +606,6 @@ namespace AwsMock::Service {
                 maxRetries = queue.attributes.redrivePolicy.maxReceiveCount;
             }
 
-            const auto begin = system_clock::now();
             Database::Entity::SQS::MessageList messageList;
             if (request.waitTimeSeconds == 0) {
 
@@ -618,6 +617,7 @@ namespace AwsMock::Service {
                 long elapsed = 0;
 
                 // Long polling period
+                const auto begin = system_clock::now();
                 while (elapsed < request.waitTimeSeconds) {
 
                     Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
@@ -647,7 +647,7 @@ namespace AwsMock::Service {
 
             return response;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -659,7 +659,7 @@ namespace AwsMock::Service {
 
         try {
 
-            long total = _sqsDatabase.CountMessages(request.queueArn);
+            const long total = _sqsDatabase.CountMessages(request.queueArn);
 
             Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, {}, request.pageSize, request.pageIndex, request.sortColumns);
 
@@ -680,7 +680,7 @@ namespace AwsMock::Service {
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
             return listMessagesResponse;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -692,7 +692,7 @@ namespace AwsMock::Service {
 
         try {
 
-            long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
+            const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
             Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
 
@@ -712,7 +712,7 @@ namespace AwsMock::Service {
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
             return listMessagesResponse;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -736,7 +736,7 @@ namespace AwsMock::Service {
             // Update queue counters
             AdjustMessageCounters(message.queueArn);
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
@@ -774,7 +774,7 @@ namespace AwsMock::Service {
             log_debug << "Message batch deleted, count: " << deleted;
             return deleteMessageBatchResponse;
 
-        } catch (Poco::Exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }

@@ -23,11 +23,8 @@ namespace AwsMock::Database {
             const int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
             log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
-
-        } else {
-
-            return _memoryDb.QueueExists(region, name);
         }
+        return _memoryDb.QueueExists(region, name);
     }
 
     bool SQSDatabase::QueueUrlExists(const std::string &region, const std::string &queueUrl) const {
@@ -37,14 +34,19 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            const int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("queueUrl", queueUrl)));
+            document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!queueUrl.empty()) {
+                query.append(kvp("queueUrl", queueUrl));
+            }
+
+            const int64_t count = _queueCollection.count_documents(query.extract());
             log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
-
-        } else {
-
-            return _memoryDb.QueueUrlExists(region, queueUrl);
         }
+        return _memoryDb.QueueUrlExists(region, queueUrl);
     }
 
     bool SQSDatabase::QueueArnExists(const std::string &queueArn) const {
@@ -57,11 +59,8 @@ namespace AwsMock::Database {
             const int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
             log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
-
-        } else {
-
-            return _memoryDb.QueueArnExists(queueArn);
         }
+        return _memoryDb.QueueArnExists(queueArn);
     }
 
     Entity::SQS::Queue SQSDatabase::CreateQueue(Entity::SQS::Queue &queue) const {
@@ -87,11 +86,8 @@ namespace AwsMock::Database {
                 log_error << "Collection transaction exception: " << e.what();
                 throw Core::DatabaseException("Insert queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl + " message: " + e.what());
             }
-
-        } else {
-
-            return _memoryDb.CreateQueue(queue);
         }
+        return _memoryDb.CreateQueue(queue);
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) const {

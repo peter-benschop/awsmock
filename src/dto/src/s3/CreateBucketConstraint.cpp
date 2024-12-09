@@ -22,12 +22,9 @@ namespace AwsMock::Dto::S3 {
 
     std::string CreateBucketConstraint::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CreateBucketConfiguration");
-
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LocationConstraint", location);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        boost::property_tree::ptree root;
+        root.add("CreateBucketConfiguration.LocationConstraint", location);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string CreateBucketConstraint::ToString() const {

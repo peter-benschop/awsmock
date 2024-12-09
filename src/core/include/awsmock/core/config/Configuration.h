@@ -6,11 +6,7 @@
 #define AWSMOCK_CORE_YAML_CONFIGURATION_H
 
 // Standard C++ includes
-#include <ranges>
 #include <string>
-
-// Boost includes
-#include <boost/thread/mutex.hpp>
 
 // YAML-cpp includes
 #include <yaml-cpp/yaml.h>
@@ -349,11 +345,6 @@ namespace AwsMock::Core {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &, const Configuration &);
-
-        /**
-         * Property mutex
-         */
-        static boost::mutex _configurationMutex;
 
         /**
          * YAML config

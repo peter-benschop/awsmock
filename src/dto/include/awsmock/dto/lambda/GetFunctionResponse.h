@@ -7,7 +7,6 @@
 
 // C++ standard includes
 #include <map>
-#include <sstream>
 #include <string>
 
 // AwsMock includes

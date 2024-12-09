@@ -36,16 +36,11 @@ namespace AwsMock::Service {
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, std::to_string(body.length()));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-
-        // Body
-        if (!body.empty()) {
-            ostream(response.body()).write(body.c_str(), body.size());
-        }
-        response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
@@ -53,6 +48,13 @@ namespace AwsMock::Service {
                 response.set(fst, snd);
             }
         }
+
+        // Body
+        if (!body.empty()) {
+            ostream(response.body()).write(body.c_str(), body.length());
+            response.set(http::field::content_length, std::to_string(body.length()));
+        }
+        response.prepare_payload();
 
         // Send the response to the client
         return response;
@@ -74,14 +76,14 @@ namespace AwsMock::Service {
 
         // Body
         std::ifstream ifs(fileName);
-        boost::beast::ostream(response.body()) << ifs.rdbuf();
+        ostream(response.body()) << ifs.rdbuf();
         ifs.close();
         response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
             }
         }
         // Send the response to the client
@@ -103,8 +105,8 @@ namespace AwsMock::Service {
 
         // Copy headers
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
             }
         }
 
@@ -127,14 +129,14 @@ namespace AwsMock::Service {
 
         // Body
         if (!body.empty()) {
-            boost::beast::ostream(response.body()).write(body.c_str(), body.size());
+            ostream(response.body()).write(body.c_str(), body.size());
         }
         response.prepare_payload();
 
         // Copy headers
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
             }
         }
 
@@ -163,8 +165,8 @@ namespace AwsMock::Service {
 
         // Copy headers
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                response.set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
             }
         }
 

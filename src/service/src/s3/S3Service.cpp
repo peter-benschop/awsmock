@@ -846,7 +846,7 @@ namespace AwsMock::Service {
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
         // Create S3 bucket and object
-        Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Core::StringUtils::CreateRandomUuid()};
         Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
 
         if (bucketEntity.HasQueueNotificationEvent(event)) {

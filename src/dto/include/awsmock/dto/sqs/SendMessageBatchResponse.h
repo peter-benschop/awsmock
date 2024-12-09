@@ -6,30 +6,11 @@
 #define AWSMOCK_DTO_SQS_SEND_MESSAGE_BATCH_RESPONSE_H
 
 // C++ standard includes
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <utility>
-
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMParser.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
-#include <Poco/DateTime.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/model/MessageFailed.h>
 #include <awsmock/dto/sqs/model/MessageSuccessful.h>
@@ -71,12 +52,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Successful messages
          */
-        std::vector<Dto::SQS::MessageSuccessful> successful;
+        std::vector<MessageSuccessful> successful;
 
         /**
          * Failed messages
          */
-        std::vector<Dto::SQS::MessageFailed> failed;
+        std::vector<MessageFailed> failed;
 
         /**
          * Convert to JSON representation

@@ -22,6 +22,10 @@
 #include <Poco/DateTimeFormatter.h>
 #include <Poco/XML/XMLWriter.h>
 
+// Boost includes
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 namespace AwsMock::Core {
 
     /**
@@ -176,6 +180,14 @@ namespace AwsMock::Core {
          * @return XML string
          */
         static std::string ToXmlString(const Poco::XML::AutoPtr<Poco::XML::Document> &document);
+
+        /**
+       * @brief Returns the XML string for the document.
+       *
+       * @param rootTree property tree
+       * @return XML string
+       */
+        static std::string ToXmlString(const boost::property_tree::ptree &rootTree);
     };
 
 }// namespace AwsMock::Core

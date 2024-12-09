@@ -26,14 +26,11 @@ namespace AwsMock::Dto::S3 {
 
     std::string CreateMultipartUploadResult::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "InitiateMultipartUploadResult");
-
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Bucket", bucket);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "UploadId", uploadId);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        boost::property_tree::ptree root;
+        root.add("InitiateMultipartUploadResult.Bucket", bucket);
+        root.add("CreateBucketResult.Key", key);
+        root.add("CreateBucketResult.UploadId", uploadId);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     void CreateMultipartUploadResult::FromJson(const std::string &jsonString) {

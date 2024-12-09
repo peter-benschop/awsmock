@@ -6,32 +6,14 @@
 #define AWSMOCK_DTO_SQS_SEND_MESSAGE_RESPONSE_H
 
 // C++ standard includes
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <utility>
-
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMParser.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-
-#include <Poco/DateTime.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include "awsmock/dto/sqs/model/MessageAttribute.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -89,7 +71,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message sequence number
          */
-        std::string sequenceNumber = Poco::UUIDGenerator().createRandom().toString();
+        std::string sequenceNumber = Core::StringUtils::CreateRandomUuid();
 
         /**
          * Request ID

@@ -48,14 +48,14 @@ namespace AwsMock::Database::Entity::S3 {
 
             // Extract events
             if (mResult.value().find("events") != mResult.value().end()) {
-                for (view eventsView = mResult.value()["events"].get_array().value; const bsoncxx::document::element &eventElement: eventsView) {
+                for (const view eventsView = mResult.value()["events"].get_array().value; const bsoncxx::document::element &eventElement: eventsView) {
                     events.emplace_back(eventElement.get_string().value);
                 }
             }
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                for (view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
+                for (const view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document().view());
                     filterRules.emplace_back(filterRule);

@@ -23,13 +23,10 @@ namespace AwsMock::Dto::S3 {
 
     std::string CopyObjectResponse::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CopyObjectResult");
-
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        boost::property_tree::ptree root;
+        root.add("CopyObjectResult.ETag", eTag);
+        root.add("CopyObjectResult.LastModified", lastModified);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string CopyObjectResponse::ToString() const {

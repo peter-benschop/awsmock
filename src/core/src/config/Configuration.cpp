@@ -5,7 +5,6 @@
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
-    boost::mutex Configuration::_configurationMutex;
 
     Configuration::Configuration() {
         Initialize();

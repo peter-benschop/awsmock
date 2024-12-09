@@ -23,13 +23,10 @@ namespace AwsMock::Dto::S3 {
 
     std::string CreateBucketResponse::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CreateBucketResult");
-
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "BucketArn", arn);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Location", location);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        boost::property_tree::ptree root;
+        root.add("CreateBucketResult.BucketArn", arn);
+        root.add("CreateBucketResult.Location", location);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string CreateBucketResponse::ToString() const {

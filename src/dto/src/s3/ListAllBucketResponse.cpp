@@ -9,41 +9,19 @@ namespace AwsMock::Dto::S3 {
 
     std::string ListAllBucketResponse::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListAllMyBucketsResult");
-        pDoc->appendChild(pRoot);
+        boost::property_tree::ptree root;
+        root.add("ListAllMyBucketsResult.Total", total);
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pTotal = pDoc->createElement("Total");
-        pRoot->appendChild(pTotal);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTotalText = pDoc->createTextNode(std::to_string(total));
-        pTotal->appendChild(pTotalText);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pBuckets;
-        pBuckets = pDoc->createElement("Buckets");
-        pRoot->appendChild(pBuckets);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pBucket;
-        Poco::XML::AutoPtr<Poco::XML::Element> pName;
-        Poco::XML::AutoPtr<Poco::XML::Element> pCreated;
-        Poco::XML::AutoPtr<Poco::XML::Text> pNameText;
-        Poco::XML::AutoPtr<Poco::XML::Text> pCreatedText;
+        boost::property_tree::ptree bucketsTree;
         for (auto &it: bucketList) {
-
-            pBucket = pDoc->createElement("Bucket");
-            pBuckets->appendChild(pBucket);
-
-            pName = pDoc->createElement("Name");
-            pBucket->appendChild(pName);
-            pNameText = pDoc->createTextNode(it.name);
-            pName->appendChild(pNameText);
-
-            pCreated = pDoc->createElement("CreationDate");
-            pBucket->appendChild(pCreated);
-            pCreatedText = pDoc->createTextNode(Core::DateTimeUtils::ToISO8601(it.created));
-            pCreated->appendChild(pCreatedText);
+            boost::property_tree::ptree bucketTree;
+            bucketTree.add("BucketRegion", it.region);
+            bucketTree.add("Name", it.name);
+            bucketTree.add("CreationDate", Core::DateTimeUtils::ToISO8601(it.created));
+            bucketsTree.push_back(std::make_pair("Bucket", bucketTree));
         }
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        root.add_child("ListAllMyBucketsResult.Buckets", bucketsTree);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string ListAllBucketResponse::ToString() const {

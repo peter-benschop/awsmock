@@ -18,8 +18,8 @@ namespace AwsMock::Dto::Lambda {
 
             if (!tags.empty()) {
                 Poco::JSON::Object jsonTags;
-                for (const auto &tag: tags) {
-                    jsonTags.set(tag.first, tag.second);
+                for (const auto &[fst, snd]: tags) {
+                    jsonTags.set(fst, snd);
                 }
                 rootJson.set("Tags", jsonTags);
             }
@@ -34,19 +34,13 @@ namespace AwsMock::Dto::Lambda {
 
     std::string GetFunctionResponse::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("GetFunctionResponse");
-        Poco::XML::AutoPtr<Poco::XML::Element> pConfig = pDoc->createElement("Configuration");
+        boost::property_tree::ptree root;
+        root.add("GetFunctionResponse.Configuration.Region", region);
+        root.add("GetFunctionResponse.Configuration.FunctionName", configuration.functionName);
+        root.add("GetFunctionResponse.Configuration.FunctionArn", configuration.functionArn);
+        root.add("GetFunctionResponse.Configuration.State", configuration.state);
 
-        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "Region", region);
-        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "FunctionName", configuration.functionName);
-        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "FunctionArn", configuration.functionArn);
-        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "State", configuration.state);
-        Core::XmlUtils::CreateTextNode(pDoc, pConfig, "State", configuration.state);
-        pRoot->appendChild(pConfig);
-        pDoc->appendChild(pRoot);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        return Core::XmlUtils::ToXmlString(root);
     }
 
     std::string GetFunctionResponse::ToString() const {

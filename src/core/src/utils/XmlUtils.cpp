@@ -62,8 +62,7 @@ namespace AwsMock::Core {
 
     void XmlUtils::CreateTextArray(const Poco::XML::AutoPtr<Poco::XML::Document> &document, Poco::XML::AutoPtr<Poco::XML::Element> &parent, const std::string &parentName, const std::string &elementName, const std::vector<std::string> &elements) {
 
-        Poco::XML::AutoPtr<Poco::XML::Element> array;
-        array = document->createElement(parentName);
+        Poco::XML::AutoPtr array = document->createElement(parentName);
         parent->appendChild(array);
 
         for (const auto &element: elements) {
@@ -76,8 +75,7 @@ namespace AwsMock::Core {
             return false;
         }
         for (int i = 0; i < node->childNodes()->length(); i++) {
-            Poco::XML::Node *child = node->childNodes()->item(i);
-            if (child->nodeName() == name) {
+            if (const Poco::XML::Node *child = node->childNodes()->item(i); child->nodeName() == name) {
                 return true;
             }
         }
@@ -92,6 +90,12 @@ namespace AwsMock::Core {
         writer.writeNode(output, document);
         document->release();
         return output.str();
+    }
+
+    std::string XmlUtils::ToXmlString(const boost::property_tree::ptree &rootTree) {
+        std::stringstream os;
+        write_xml(os, rootTree);
+        return os.str();
     }
 
 }// namespace AwsMock::Core
