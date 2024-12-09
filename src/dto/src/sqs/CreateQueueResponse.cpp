@@ -2,7 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 
 namespace AwsMock::Dto::SQS {
@@ -26,10 +25,9 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            boost::property_tree::ptree pt;
-            read_xml(jsonString, pt);
-            name = pt.get<std::string>("QueueName");
-            queueUrl = pt.get<std::string>("QueueUrl");
+            const value document = bsoncxx::from_json(jsonString);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "QueueName");
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
