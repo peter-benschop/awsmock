@@ -8,9 +8,9 @@ namespace AwsMock::Database::Entity::Cognito {
 
     UserPoolClient UserPool::GetClient(const std::string &clientId) {
         const auto it = std::ranges::find_if(userPoolClients,
-                          [clientId](const UserPoolClient &client) {
-                              return client.clientId == clientId;
-                          });
+                                             [clientId](const UserPoolClient &client) {
+                                                 return client.clientId == clientId;
+                                             });
         if (it != userPoolClients.end()) {
             return *it;
         }
