@@ -50,7 +50,7 @@ namespace AwsMock::Dto::SQS {
             md5Body = pt.get<std::string>("MD5OfMessageBody");
             md5UserAttr = pt.get<std::string>("MD5OfMessageAttributes");
             md5SystemAttr = pt.get<std::string>("MD5OfMessageSystemAttributes");
-            sequenceNumber = pt.get<int>("SequenceNumber");
+            sequenceNumber = pt.get<std::string>("SequenceNumber");
 
         } catch (std::exception &exc) {
             log_error << exc.what();

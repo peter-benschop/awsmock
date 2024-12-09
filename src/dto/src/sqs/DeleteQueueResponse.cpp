@@ -9,17 +9,16 @@ namespace AwsMock::Dto::SQS {
     std::string DeleteQueueResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("QueueUrl", queueUrl);
-            rootJson.set("RequestId", requestId);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", requestId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -27,27 +26,13 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            // Root
-            Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-            Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteQueueResponse");
-            pDoc->appendChild(pRoot);
+            boost::property_tree::ptree root;
+            root.add("DeleteQueueResponse.ResponseMetadata.RequestId", requestId);
+            return Core::XmlUtils::ToXmlString(root);
 
-            // Metadata
-            Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-            pRoot->appendChild(pMetaData);
-
-            Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-            pMetaData->appendChild(pRequestId);
-            Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(requestId);
-            pRequestId->appendChild(pRequestText);
-
-            std::stringstream output;
-            Poco::XML::DOMWriter writer;
-            writer.writeNode(output, pDoc);
-            return output.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

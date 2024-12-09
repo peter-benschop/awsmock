@@ -6,25 +6,15 @@
 #define AWSMOCK_DTO_SQS_GET_QUEUE_ATTRIBUTE_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -43,31 +33,31 @@ namespace AwsMock::Dto::SQS {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 
 namespace AwsMock::Dto::SQS {
@@ -10,62 +11,46 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueName", name);
-            rootJson.set("QueueUrl", queueUrl);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueName", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void CreateQueueResponse::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
 
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+            boost::property_tree::ptree pt;
+            read_xml(jsonString, pt);
+            name = pt.get<std::string>("QueueName");
+            queueUrl = pt.get<std::string>("QueueUrl");
 
-        } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message());
-        }
-    }
-
-    void CreateQueueResponse::FromXml(const std::string &xmlString) {
-
-        Poco::XML::DOMParser parser;
-        Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
-
-        Poco::XML::Node *node = pDoc->getNodeByPath("/CreateQueueResponse/CreateQueueResult/QueueUrl");
-        if (node) {
-            queueUrl = node->innerText();
-        } else {
-            std::cerr << "Exception: Wrong create queue payload" << std::endl;
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string CreateQueueResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "CreateQueueResponse");
+        try {
 
-        // CreateQueueResult
+            boost::property_tree::ptree pt;
+            pt.put("CreateQueueResponse.CreateQueueResult.QueueName", name);
+            pt.put("CreateQueueResponse.CreateQueueResult.QueueUrl", queueUrl);
+            pt.put("CreateQueueResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::XmlUtils::ToXmlString(pt);
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "CreateQueueResult");
-
-        Core::XmlUtils::CreateTextNode(pDoc, pListQueueResult, "QueueUrl", queueUrl);
-
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
-        Core::XmlUtils::CreateTextNode(pDoc, pMetaData, "RequestId", Poco::UUIDGenerator().createRandom().toString());
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateQueueResponse::ToString() const {
