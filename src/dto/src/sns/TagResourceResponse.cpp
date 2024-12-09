@@ -6,33 +6,33 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string TagResourceResponse::ToJson() const {
+
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string TagResourceResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("TagResourceResponse");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // CreateQueueResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pTagResourceResult = pDoc->createElement("TagResourceResult");
-        pRoot->appendChild(pTagResourceResult);
+            boost::property_tree::ptree root;
+            root.add("TagResourceResponse.TagResourceResult", "");
+            root.add("TagResourceResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::XmlUtils::ToXmlString(root);
 
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
-
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string TagResourceResponse::ToString() const {
@@ -42,7 +42,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const TagResourceResponse &r) {
-        os << "TagResourceResponse={}";
+        os << "TagResourceResponse=" << r.ToJson();
         return os;
     }
 

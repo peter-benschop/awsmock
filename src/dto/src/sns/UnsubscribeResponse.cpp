@@ -6,29 +6,35 @@
 
 namespace AwsMock::Dto::SNS {
 
-    std::string UnsubscribeResponse::ToXml() {
+    std::string UnsubscribeResponse::ToJson() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("UnsubscribeResponse");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
+            document document;
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
+            Core::Bson::BsonUtils::SetStringValue(document, "SubscriptionArn", subscriptionArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
+        } catch (const std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
 
-        return output.str();
+    std::string UnsubscribeResponse::ToXml() const {
+
+        try {
+
+            boost::property_tree::ptree root;
+            root.add("UnsubscribeResponse.SubscriptionArn", subscriptionArn);
+            root.add("UnsubscribeResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::XmlUtils::ToXmlString(root);
+
+        } catch (const std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string UnsubscribeResponse::ToString() const {
@@ -38,7 +44,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const UnsubscribeResponse &r) {
-        os << "UnsubscribeResponse={subscriptionArn='" + r.subscriptionArn + "'}";
+        os << "UnsubscribeResponse=" << r.ToJson();
         return os;
     }
 

@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
+#include <jwt-cpp/jwt.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -10,28 +11,29 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object BatchResultErrorEntry::ToJsonObject() const {
+    view_or_value<view, value> BatchResultErrorEntry::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Code", code);
-            rootJson.set("Id", id);
-            rootJson.set("SenderFault", senderFault);
-            rootJson.set("Message", message);
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "Code", code);
+            Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
+            Core::Bson::BsonUtils::SetBoolValue(document, "SenderFault", senderFault);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
