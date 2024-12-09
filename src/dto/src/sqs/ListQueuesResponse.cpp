@@ -10,46 +10,38 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            // Root
-            Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-            Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "ListQueuesResponse");
-
-            // ListQueuesResult
-            Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = Core::XmlUtils::CreateNode(pDoc, pRoot, "ListQueuesResult");
+            boost::property_tree::ptree root;
 
             for (auto &it: queueList) {
-                Core::XmlUtils::CreateTextNode(pDoc, pListQueueResult, "QueueUrl", it.queueUrl);
+                root.add("ListQueuesResponse.ListQueuesResult.QueueUrl", it.queueUrl);
             }
+            root.add("ListQueuesResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::XmlUtils::ToXmlString(root);
 
-            // Metadata
-            Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = Core::XmlUtils::CreateNode(pDoc, pRoot, "ResponseMetadata");
-            Core::XmlUtils::CreateTextNode(pDoc, pListQueueResult, "RequestId", Poco::UUIDGenerator().createRandom().toString());
-            return Core::XmlUtils::ToXmlString(pDoc);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 
     std::string ListQueuesResponse::ToJson() const {
 
         try {
-            Poco::JSON::Array queuesArrayJson;
-            for (const auto &queue: queueList) {
-                queuesArrayJson.add(queue.queueUrl);
+            document document;
+            if (!queueList.empty()) {
+                array jsonArray;
+                for (const auto &queue: queueList) {
+                    jsonArray.append(queue.queueUrl);
+                }
+                document.append(kvp("QueueUrls", jsonArray));
             }
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+            Core::Bson::BsonUtils::SetIntValue(document, "Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueUrls", queuesArrayJson);
-            rootJson.set("NextToken", nextToken);
-            rootJson.set("Total", total);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

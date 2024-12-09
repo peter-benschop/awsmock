@@ -6,41 +6,24 @@ namespace AwsMock::Dto::SQS {
     std::string DeleteMessageResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("RequestId", requestId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", requestId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Resource", resource);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     [[nodiscard]] std::string DeleteMessageResponse::ToXml() const {
 
         // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteMessageResponse");
-        pDoc->appendChild(pRoot);
-
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(requestId);
-        pRequestId->appendChild(pRequestText);
-
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        boost::property_tree::ptree pt;
+        pt.put("DeleteMessageResponse.ResponseMetadata.RequestId", requestId);
+        pt.put("DeleteMessageResponse.ResponseMetadata.Resource", resource);
+        return Core::XmlUtils::ToXmlString(pt);
     }
 
     [[nodiscard]] std::string DeleteMessageResponse::ToString() const {

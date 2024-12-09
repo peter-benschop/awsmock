@@ -114,7 +114,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @param mResult MongoDB document.
          */
-        Entity::SQS::Queue FromDocument(std::optional<bsoncxx::document::view> mResult);
+        Queue FromDocument(std::optional<view> mResult);
 
         /**
          * Converts the entity to a JSON object
