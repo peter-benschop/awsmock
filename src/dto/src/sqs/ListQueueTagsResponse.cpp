@@ -9,20 +9,21 @@ namespace AwsMock::Dto::SQS {
     std::string ListQueueTagsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object queueTagsObject;
-            for (const auto &tag: tags) {
-                queueTagsObject.set(tag.first, tag.second);
+            document document;
+
+            if (!tags.empty()) {
+                array tagsArrayJson;
+                for (const auto &queueArn: tags) {
+                    tagsArrayJson.append(queueArn);
+                }
+                document.append(kvp("Tags", tagsArrayJson));
             }
+            Core::Bson::BsonUtils::SetIntValue(document, "Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Tags", queueTagsObject);
-            rootJson.set("Total", total);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

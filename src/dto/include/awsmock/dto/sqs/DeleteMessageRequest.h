@@ -6,19 +6,12 @@
 #define AWSMOCK_DTO_SQS_DELETE_MESSAGE_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -47,7 +40,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
          * Convert to a JSON string

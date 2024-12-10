@@ -187,7 +187,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-            for (const auto secretCursor = _secretCollection.find({}); auto secret: secretCursor) {
+            for (auto secretCursor = _secretCollection.find({}); auto secret: secretCursor) {
                 Entity::SecretsManager::Secret result;
                 result.FromDocument(secret);
                 secretList.push_back(result);

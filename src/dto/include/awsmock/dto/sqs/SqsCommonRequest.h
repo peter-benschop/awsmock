@@ -6,16 +6,12 @@
 #define AWSMOCK_DTO_SQS_COMMON_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -30,6 +26,13 @@ namespace AwsMock::Dto::SQS {
          * AWS request ID
          */
         std::string requestId;
+
+        /**
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Converts the JSON string to DTO.

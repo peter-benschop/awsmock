@@ -6,17 +6,30 @@
 
 namespace AwsMock::Dto::SQS {
 
-    void SqsCommonRequest::FromJson(const std::string &jsonString) {
+    std::string SqsCommonRequest::ToJson() const {
+
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", requestId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-            Core::JsonUtils::GetJsonValueString("RequestId", rootObject, requestId);
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+    void SqsCommonRequest::FromJson(const std::string &jsonString) {
+
+        try {
+            const value document = bsoncxx::from_json(jsonString);
+            requestId = Core::Bson::BsonUtils::GetStringValue(document, "RequestId");
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -27,7 +40,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const SqsCommonRequest &r) {
-        os << "SqsCommonRequest={region='" << r.region << "', requestId='" << r.requestId << "'}";
+        os << "SqsCommonRequest=" << r.ToJson();
         return os;
     }
 

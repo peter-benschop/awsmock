@@ -9,15 +9,10 @@
 #include <sstream>
 #include <string>
 
-// Boost includes
-#include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
-#include <boost/lexical_cast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
@@ -49,9 +44,9 @@ namespace AwsMock::Dto::Common {
     }
 
     [[maybe_unused]] static SSMCommandType SSMCommandTypeFromString(const std::string &commandType) {
-        for (auto &it: SSMCommandTypeNames) {
-            if (Core::StringUtils::EqualsIgnoreCase(commandType, it.second)) {
-                return it.first;
+        for (auto &[fst, snd]: SSMCommandTypeNames) {
+            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
+                return fst;
             }
         }
         return SSMCommandType::UNKNOWN;
@@ -66,7 +61,7 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SSMClientCommand : public BaseClientCommand {
+    struct SSMClientCommand : BaseClientCommand {
 
         /**
          * Client command

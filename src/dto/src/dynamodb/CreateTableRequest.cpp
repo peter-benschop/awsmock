@@ -10,7 +10,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
             Core::Bson::BsonUtils::SetStringValue(document, "TableClass", tableClass);

@@ -9,29 +9,29 @@ namespace AwsMock::Dto::SQS {
     std::string DeleteMessageBatchEntry::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("ReceiptHandle", receiptHandle);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "ReceiptHandle", receiptHandle);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object DeleteMessageBatchEntry::ToJsonObject() const {
+    view_or_value<view, value> DeleteMessageBatchEntry::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("ReceiptHandle", receiptHandle);
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "ReceiptHandle", receiptHandle);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

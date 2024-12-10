@@ -6,18 +6,12 @@
 #define AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 
 namespace AwsMock::Dto::SQS {
@@ -47,31 +41,31 @@ namespace AwsMock::Dto::SQS {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO from a JSON representation.
+         * @brief Converts the DTO from a JSON representation.
          *
          * @param payload HTTP message body.
          */
         void FromJson(const std::string &payload);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

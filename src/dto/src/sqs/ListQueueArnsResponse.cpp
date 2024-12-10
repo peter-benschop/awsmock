@@ -9,19 +9,21 @@ namespace AwsMock::Dto::SQS {
     std::string ListQueueArnsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Array queueArnsArrayJson;
-            for (const auto &queueArn: queueArns) {
-                queueArnsArrayJson.add(queueArn);
+
+            document document;
+
+            if (!queueArns.empty()) {
+                array queueArnsArrayJson;
+                for (const auto &queueArn: queueArns) {
+                    queueArnsArrayJson.append(queueArn);
+                }
+                document.append(kvp("QueueArns", queueArnsArrayJson));
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueArns", queueArnsArrayJson);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

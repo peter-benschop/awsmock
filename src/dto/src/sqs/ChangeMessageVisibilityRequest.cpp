@@ -9,35 +9,31 @@ namespace AwsMock::Dto::SQS {
     std::string ChangeMessageVisibilityRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueUrl", queueUrl);
-            rootJson.set("ReceiptHandle", receiptHandle);
-            rootJson.set("VisibilityTimeout", visibilityTimeout);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
+            Core::Bson::BsonUtils::SetStringValue(document, "ReceiptHandle", receiptHandle);
+            Core::Bson::BsonUtils::SetIntValue(document, "VisibilityTimeout", visibilityTimeout);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 
     void ChangeMessageVisibilityRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
+            const value document = bsoncxx::from_json(jsonString);
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
-            Core::JsonUtils::GetJsonValueString("ReceiptHandle", rootObject, receiptHandle);
-            Core::JsonUtils::GetJsonValueInt("VisibilityTimeout", rootObject, visibilityTimeout);
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
+            receiptHandle = Core::Bson::BsonUtils::GetStringValue(document, "ReceiptHandle");
+            visibilityTimeout = Core::Bson::BsonUtils::GetIntValue(document, "VisibilityTimeout");
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

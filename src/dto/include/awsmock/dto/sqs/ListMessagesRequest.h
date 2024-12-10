@@ -6,12 +6,10 @@
 #define AWSMOCK_DTO_SQS_LIST_MESSAGES_REQUEST_H
 
 // C++ standard includes
-#include <iostream>
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
@@ -53,21 +51,21 @@ namespace AwsMock::Dto::SQS {
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

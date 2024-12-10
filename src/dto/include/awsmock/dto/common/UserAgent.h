@@ -6,15 +6,11 @@
 #define AWSMOCK_DTO_COMMON_USER_AGENT_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
-// Boost includes
-#include <boost/beast/http/message.hpp>
-
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/UserAgent.h>

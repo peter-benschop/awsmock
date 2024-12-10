@@ -9,49 +9,49 @@ namespace AwsMock::Dto::SQS {
     std::string DeleteMessageBatchRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("QueueUrl", queueUrl);
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
 
             // Entries
-            Poco::JSON::Array entriesArray;
-            for (const auto &e: deleteMessageBatchEntries) {
-                entriesArray.add(e.ToJsonObject());
+            if (!deleteMessageBatchEntries.empty()) {
+                array entriesArray;
+                for (const auto &e: deleteMessageBatchEntries) {
+                    entriesArray.append(e.ToDocument());
+                }
+                document.append(kvp("DeleteMessageBatchEntries", entriesArray));
             }
-            rootJson.set("DeleteMessageBatchEntries", entriesArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 
     void DeleteMessageBatchRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
             // Queue
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+            const value document = bsoncxx::from_json(jsonString);
+
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
 
             // Entries
-            Poco::JSON::Array::Ptr jsonEntriesArray = rootObject->getArray("Entries");
-            for (int i = 0; i < jsonEntriesArray->size(); i++) {
-                DeleteMessageBatchEntry entry;
-                Poco::JSON::Object::Ptr jsonEntryObject = jsonEntriesArray->getObject(i);
-                Core::JsonUtils::GetJsonValueString("Id", jsonEntryObject, entry.id);
-                Core::JsonUtils::GetJsonValueString("ReceiptHandle", jsonEntryObject, entry.receiptHandle);
-                deleteMessageBatchEntries.emplace_back(entry);
+            if (document.find("Entries") != document.end()) {
+                for (const bsoncxx::array::view arrayView{document["Entries"].get_array().value}; const bsoncxx::array::element &tagElement: arrayView) {
+                    DeleteMessageBatchEntry entry;
+                    entry.id = Core::Bson::BsonUtils::GetStringValue(tagElement["Key"]);
+                    entry.receiptHandle = Core::Bson::BsonUtils::GetStringValue(tagElement["Value"]);
+                    deleteMessageBatchEntries.emplace_back(entry);
+                }
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

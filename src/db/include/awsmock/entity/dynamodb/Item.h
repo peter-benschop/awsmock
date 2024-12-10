@@ -73,7 +73,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        Item FromDocument(optional<view> mResult);
+        Item FromDocument(const optional<view> &mResult);
 
         /**
          * Converts the entity to a JSON string
