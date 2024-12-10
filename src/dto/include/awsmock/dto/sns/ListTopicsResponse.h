@@ -10,8 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/sns/Topic.h>
 
