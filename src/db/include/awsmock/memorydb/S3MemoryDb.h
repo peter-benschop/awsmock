@@ -9,15 +9,13 @@
 #include <ranges>
 #include <string>
 
-// Poco includes
-#include <Poco/Mutex.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
+#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 
@@ -115,7 +113,7 @@ namespace AwsMock::Database {
          * @param maxKeys maximal number of return elements
          * @return list of S3 objects
          */
-        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) const;
 
         /**
          * @brief Count objects in a bucket.
@@ -124,7 +122,7 @@ namespace AwsMock::Database {
          * @param bucket bucket name
          * @return number of S3 objects
          */
-        long GetBucketObjectCount(const std::string &region, const std::string &bucket);
+        long GetBucketObjectCount(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief Sum of all object sizes in bytes.
@@ -133,7 +131,7 @@ namespace AwsMock::Database {
          * @param bucket bucket name
          * @return size of S3 objects in bytes
          */
-        long GetBucketSize(const std::string &region, const std::string &bucket);
+        long GetBucketSize(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief List all objects of a bucket
@@ -142,7 +140,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {});
+        Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
 
         /**
          * @brief Returns the total number of buckets
@@ -150,7 +148,7 @@ namespace AwsMock::Database {
          * @return total number of buckets
          * @throws DatabaseException
          */
-        long BucketCount();
+        long BucketCount() const;
 
 
         /**
@@ -318,12 +316,12 @@ namespace AwsMock::Database {
         /**
          * Bucket mutex
          */
-        static Poco::Mutex _bucketMutex;
+        static boost::mutex _bucketMutex;
 
         /**
          * Object mutex
          */
-        static Poco::Mutex _objectMutex;
+        static boost::mutex _objectMutex;
     };
 
 }// namespace AwsMock::Database

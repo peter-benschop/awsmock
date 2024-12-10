@@ -6,28 +6,38 @@
 
 namespace AwsMock::Dto::SQS {
 
-    void GetQueueAttributesRequest::FromJson(const std::string &jsonString) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    std::string GetQueueAttributesRequest::ToJson() const {
 
         try {
-
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
-            Poco::JSON::Array::Ptr attributesArray = rootObject->getArray("AttributeNames");
-
-            if (attributesArray != nullptr) {
-                for (const auto &it: *attributesArray) {
-                    if (!it.isEmpty()) {
-                        attributeNames.emplace_back(it.extract<std::string>());
-                    }
+            document document;
+            if (!attributeNames.empty()) {
+                array jsonArray;
+                for (const auto &name: attributeNames) {
+                    jsonArray.append(name);
                 }
+                document.append(kvp("AttributeName", jsonArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void GetQueueAttributesRequest::FromJson(const std::string &jsonString) {
+
+        try {
+            const value document = bsoncxx::from_json(jsonString);
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
+
+            if (document.find("AttributeNames") != document.end()) {
+                Core::Bson::FromBsonStringArray(document, "AttributeNames", &attributeNames);
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -38,12 +48,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const GetQueueAttributesRequest &r) {
-        os << "GetQueueAttributesRequest={region='" << r.region
-           << "' queueUrl='" + r.queueUrl + "' resource='" + r.resource + "' requestId='" + r.requestId + "' attributeNames=[";
-        for (const auto &it: r.attributeNames) {
-            os << it;
-        }
-        os << "]}";
+        os << "GetQueueAttributesRequest=" << r.ToJson();
         return os;
     }
 

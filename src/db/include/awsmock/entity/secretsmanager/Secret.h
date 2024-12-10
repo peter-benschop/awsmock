@@ -6,33 +6,17 @@
 #define AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
 
 // C++ includes
-#include <algorithm>
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-#include <mongocxx/exception/exception.hpp>
-
-
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * SecretManager secrets entity.
@@ -168,21 +152,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * Converts the DTO to a string representation.

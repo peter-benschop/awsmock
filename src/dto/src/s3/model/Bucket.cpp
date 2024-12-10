@@ -18,8 +18,9 @@ namespace AwsMock::Dto::S3 {
         if (jsonObject->has("queueConfigurations")) {
             Poco::JSON::Array::Ptr jsonQueueConfigurationArray = jsonObject->getArray("queueConfigurations");
             for (int i = 0; i < jsonQueueConfigurationArray->size(); i++) {
-                Dto::S3::QueueConfiguration queueConfiguration;
-                queueConfiguration.FromJsonObject(jsonQueueConfigurationArray->getObject(i));
+                QueueConfiguration queueConfiguration;
+                // TODO: Fix
+                //queueConfiguration.FromJsonObject(jsonQueueConfigurationArray->getObject(i));
                 queueConfigurations.emplace_back(queueConfiguration);
             }
         }
@@ -43,7 +44,8 @@ namespace AwsMock::Dto::S3 {
             if (!queueConfigurations.empty()) {
                 Poco::JSON::Array jsonArray;
                 for (const auto &queueNotification: queueConfigurations) {
-                    jsonArray.add(queueNotification.ToJsonObject());
+                    // TODO: Fix
+                    //                    jsonArray.add(queueNotification.ToJsonObject());
                 }
                 rootJson.set("queueConfigurations", jsonArray);
             }
@@ -51,7 +53,7 @@ namespace AwsMock::Dto::S3 {
             if (!topicConfigurations.empty()) {
                 Poco::JSON::Array jsonArray;
                 for (const auto &topicNotification: topicConfigurations) {
-                    jsonArray.add(topicNotification.ToJsonObject());
+                    jsonArray.add(topicNotification.ToDocument());
                 }
                 rootJson.set("topicConfigurations", jsonArray);
             }
@@ -59,7 +61,7 @@ namespace AwsMock::Dto::S3 {
             if (!lambdaConfigurations.empty()) {
                 Poco::JSON::Array jsonArray;
                 for (const auto &lambdaNotification: lambdaConfigurations) {
-                    jsonArray.add(lambdaNotification.ToJsonObject());
+                    jsonArray.add(lambdaNotification.ToDocument());
                 }
                 rootJson.set("lambdaConfigurations", jsonArray);
             }

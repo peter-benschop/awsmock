@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.set(http::field::content_length, std::to_string(body.length()));
+        response.set(http::field::content_length, "0");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");

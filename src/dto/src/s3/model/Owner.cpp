@@ -9,42 +9,32 @@ namespace AwsMock::Dto::S3 {
     std::string Owner::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("id", id);
-            rootJson.set("displayName", displayName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "displayName", displayName);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Owner::ToJsonObject() const {
+    view_or_value<view, value> Owner::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("DisplayName", displayName);
-            rootJson.set("Id", id);
-            return rootJson;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
-    }
+            document document;
 
-    Poco::XML::AutoPtr<Poco::XML::Element> Owner::ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const {
+            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "displayName", displayName);
+            return document.extract();
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Owner");
-        if (!id.empty()) {
-            Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ID", id);
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        if (!displayName.empty()) {
-            Core::XmlUtils::CreateTextNode(pDoc, pRoot, "DisplayName", displayName);
-        }
-        return pRoot;
     }
 
     std::string Owner::ToString() const {

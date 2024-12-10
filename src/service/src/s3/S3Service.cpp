@@ -38,7 +38,7 @@ namespace AwsMock::Service {
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
             log_info << "Bucket created, bucket: " << s3Request.name;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -59,12 +59,12 @@ namespace AwsMock::Service {
             Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
 
             // Purge bucket
-            long deleted = _database.PurgeBucket(bucket);
+            const long deleted = _database.PurgeBucket(bucket);
             AdjustBucketCounters(bucket.region, bucket.name);
 
-            log_info << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName;
+            log_info << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "S3 purge bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
             _database.UpdateBucket(bucket);
             log_info << "Bucket updated, bucket: " << request.bucket.bucketName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -429,7 +429,7 @@ namespace AwsMock::Service {
                 fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
                 log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
 
-            } catch (Poco::Exception &exc) {
+            } catch (Core::JsonException &exc) {
                 log_error << "Append to binary file failed, error: " << exc.message();
             }
 
@@ -685,7 +685,7 @@ namespace AwsMock::Service {
 
                 log_info << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
 
-            } catch (Poco::Exception &exc) {
+            } catch (Core::JsonException &exc) {
                 log_error << "S3 delete object failed, message: " + exc.message();
                 throw Core::ServiceException(exc.message());
             }

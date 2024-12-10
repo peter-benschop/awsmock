@@ -8,17 +8,8 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 
@@ -64,20 +55,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * Converts the DTO to a string representation.

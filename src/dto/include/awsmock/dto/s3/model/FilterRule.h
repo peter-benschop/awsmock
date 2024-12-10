@@ -7,9 +7,10 @@
 
 // C++ standard includes
 #include <string>
+#include <map>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -35,9 +36,9 @@ namespace AwsMock::Dto::S3 {
     }
 
     [[maybe_unused]] static NameType NameTypeFromString(const std::string &nameType) {
-        for (auto &it: NameTypeNames) {
-            if (it.second == nameType) {
-                return it.first;
+        for (auto &[fst, snd]: NameTypeNames) {
+            if (snd == nameType) {
+                return fst;
             }
         }
         return NameType::prefix;
@@ -58,21 +59,14 @@ namespace AwsMock::Dto::S3 {
         /**
          * Value
          */
-        std::string value;
-
-        /**
-          * Convert from XML representation
-          *
-          * @param rootNode XML rootNode
-          */
-        void FromXmlNode(Poco::XML::Node *rootNode);
+        std::string filterValue;
 
         /**
          * Converts the DTO to a JSON object.
          *
          * @return DTO as object.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the DTO to a JSON string.
@@ -84,9 +78,9 @@ namespace AwsMock::Dto::S3 {
         /**
          * Converts a JSON representation to s DTO.
          *
-         * @param jsonObject JSON object.
+         * @param document JSON object.
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * Converts the DTO to a string representation.

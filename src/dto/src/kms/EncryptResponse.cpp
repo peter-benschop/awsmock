@@ -37,7 +37,7 @@ namespace AwsMock::Dto::KMS {
             rootJson.set("Region", region);
             rootJson.set("KeyId", keyId);
             rootJson.set("CiphertextBlob", ciphertext);
-            rootJson.set("EncryptionAlgorithm", Dto::KMS::EEncryptionAlgorithmsToString(encryptionAlgorithm));
+            rootJson.set("EncryptionAlgorithm", Dto::KMS::EncryptionAlgorithmsToString(encryptionAlgorithm));
 
             return Core::JsonUtils::ToJsonString(rootJson);
 

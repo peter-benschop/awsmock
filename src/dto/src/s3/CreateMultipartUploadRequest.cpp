@@ -9,34 +9,42 @@ namespace AwsMock::Dto::S3 {
     std::string CreateMultipartUploadRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("user", user);
-            rootJson.set("uploadId", uploadId);
 
-            Poco::JSON::Object jsonMetadata;
-            for (const auto &meta: metadata) {
-                jsonMetadata.set(meta.first, meta.second);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "uploadId", uploadId);
+
+            if (!metadata.empty()) {
+                document jsonMetadata;
+                for (const auto &[fst, snd]: metadata) {
+                    jsonMetadata.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("metadata", jsonMetadata));
             }
-            rootJson.set("metadata", jsonMetadata);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void CreateMultipartUploadRequest::FromXml(const std::string &xmlString) {
 
-        Poco::XML::DOMParser parser;
-        Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+        try {
 
-        Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
-        region = node->innerText();
+            boost::property_tree::ptree pt;
+            read_xml(xmlString, pt);
+            region = pt.get<std::string>("CreateBucketConfiguration.LocationConstraint");
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateMultipartUploadRequest::ToString() const {

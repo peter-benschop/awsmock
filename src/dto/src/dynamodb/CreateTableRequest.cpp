@@ -17,7 +17,7 @@ namespace AwsMock::Dto::DynamoDb {
 
             // Attributes
             if (!attributes.empty()) {
-                bsoncxx::builder::basic::array attributeArray;
+                array attributeArray;
                 for (const auto &[fst, snd]: attributes) {
                     bsoncxx::builder::basic::document attributeDocument;
                     Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeName", fst);
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::DynamoDb {
 
             // Key schema
             if (!keySchemas.empty()) {
-                bsoncxx::builder::basic::array keySchemasArray;
+                array keySchemasArray;
                 for (const auto &[fst, snd]: keySchemas) {
                     bsoncxx::builder::basic::document keySchemaDocument;
                     Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "AttributeName", fst);
@@ -44,7 +44,7 @@ namespace AwsMock::Dto::DynamoDb {
 
             // Tags
             if (!tags.empty()) {
-                bsoncxx::builder::basic::array tagsArray;
+                array tagsArray;
                 for (const auto &[fst, snd]: tags) {
                     bsoncxx::builder::basic::document tagDocument;
                     Core::Bson::BsonUtils::SetStringValue(tagDocument, "Key", fst);
@@ -73,7 +73,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
             const value documentValue = bsoncxx::from_json(body);
 
             region = Core::Bson::BsonUtils::GetStringValue(documentValue, "Region");

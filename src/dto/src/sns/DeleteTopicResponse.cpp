@@ -6,31 +6,33 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string DeleteTopicResponse::ToJson() const {
+
+        try {
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "RequestId", requestId);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string DeleteTopicResponse::ToXml() const {
 
-        // XML Document
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+        try {
 
-        // Root element
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteTopicResponse");
-        pDoc->appendChild(pRoot);
+            boost::property_tree::ptree root;
+            root.add("DeleteTopicResponse.ResponseMetadata.RequestId", requestId);
 
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
+            return Core::XmlUtils::ToXmlString(root);
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
-
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DeleteTopicResponse::ToString() const {
@@ -40,7 +42,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const DeleteTopicResponse &r) {
-        os << "DeleteTopicResponse={}";
+        os << "DeleteTopicResponse=" << r.ToJson();
         return os;
     }
 

@@ -9,67 +9,62 @@ namespace AwsMock::Dto::DynamoDb {
     std::string DescribeTableResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
-            rootJson.set("TableId", tableId);
-            rootJson.set("TableArn", tableArn);
-            rootJson.set("TableStatus", TableStatusTypeToString(tableStatus));
-            rootJson.set("ProvisionedThroughput", provisionedThroughput.ToDocument());
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableName", tableName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableId", tableId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableArn", tableArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableStatus", TableStatusTypeToString(tableStatus));
+            rootDocument.append(kvp("ProvisionedThroughput", provisionedThroughput.ToDocument()));
 
             if (!keySchemas.empty()) {
-                Poco::JSON::Array jsonKeySchemasArray;
-                for (const auto &keySchema: keySchemas) {
-                    Poco::JSON::Object object;
-                    object.set("AttributeName", keySchema.first);
-                    object.set("KeyType", keySchema.second);
-                    jsonKeySchemasArray.add(object);
+                array jsonKeySchemasArray;
+                for (const auto &[fst, snd]: keySchemas) {
+                    document object;
+                    object.append(kvp("AttributeName", fst));
+                    object.append(kvp("KeyType", snd));
+                    jsonKeySchemasArray.append(object);
                 }
-                rootJson.set("KeySchema", jsonKeySchemasArray);
+                rootDocument.append(kvp("KeySchema", jsonKeySchemasArray));
             }
 
             if (!attributes.empty()) {
-                Poco::JSON::Array jsonAttributesArray;
-                for (const auto &attribute: attributes) {
-                    Poco::JSON::Object object;
-                    object.set("AttributeName", attribute.first);
-                    object.set("AttributeType", attribute.second);
-                    jsonAttributesArray.add(object);
+                array jsonAttributesArray;
+                for (const auto &[fst, snd]: attributes) {
+                    document object;
+                    object.append(kvp("AttributeName", fst));
+                    object.append(kvp("AttributeType", snd));
+                    jsonAttributesArray.append(object);
                 }
-                rootJson.set("AttributeDefinitions", jsonAttributesArray);
+                rootDocument.append(kvp("AttributeDefinitions", jsonAttributesArray));
             }
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void DescribeTableResponse::FromJson(const std::string &jsonString, const std::map<std::string, std::string> &headerMap) {
+    void DescribeTableResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        body = jsonString;
-        headers = headerMap;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        this->body = body;
+        this->headers = headers;
 
         try {
-            Poco::JSON::Object::Ptr tableObject = rootObject->getObject("Table");
 
-            Core::JsonUtils::GetJsonValueString("Region", tableObject, region);
-            Core::JsonUtils::GetJsonValueString("TableName", tableObject, tableName);
-            Core::JsonUtils::GetJsonValueString("TableId", tableObject, tableId);
-            Core::JsonUtils::GetJsonValueString("TableArn", tableObject, tableArn);
-            //provisionedThroughput.FromJsonObject(tableObject->getObject("ProvisionedThroughput"));
-            std::string tableStatusStr;
-            Core::JsonUtils::GetJsonValueString("TableStatus", tableObject, tableStatusStr);
-            tableStatus = TableStatusTypeFromString(tableStatusStr);
+            boost::property_tree::ptree root;
+            read_xml(body, root);
+            region = root.get<std::string>("Table.Region");
+            tableName = root.get<std::string>("Table.TableName");
+            tableId = root.get<std::string>("Table.TableId");
+            tableArn = root.get<std::string>("Table.TableArn");
+            tableStatus = TableStatusTypeFromString(root.get<std::string>("Table.TableStatus"));
 
-            // Attributes
-            if (tableObject->has("AttributeDefinitions")) {
+            // TODO: FIx
+            /*// Attributes
+            if (root.find("Table.AttributeDefinitions") != root.end()) {
                 Poco::JSON::Array::Ptr jsonAttributeArray = tableObject->getArray("AttributeDefinitions");
                 for (int i = 0; i < jsonAttributeArray->size(); i++) {
                     Poco::JSON::Object::Ptr jsonObject = jsonAttributeArray->getObject(i);
@@ -102,10 +97,11 @@ namespace AwsMock::Dto::DynamoDb {
                     Core::JsonUtils::GetJsonValueString("Value", jsonObject, type);
                     tags[name] = type;
                 }
-            }
+            }*/
 
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

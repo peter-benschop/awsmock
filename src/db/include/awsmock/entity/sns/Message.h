@@ -7,34 +7,17 @@
 
 // C++ includes
 #include <chrono>
-#include <sstream>
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-
 // AwsMock includes
-#include "awsmock/core/exception/DatabaseException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/sns/MessageAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SNS {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * SNS message status
@@ -45,9 +28,9 @@ namespace AwsMock::Database::Entity::SNS {
         RESEND
     };
     static std::map<MessageStatus, std::string> MessageStatusNames{
-            {MessageStatus::INITIAL, "INITIAL"},
-            {MessageStatus::SEND, "SEND"},
-            {MessageStatus::RESEND, "RESEND"},
+            {INITIAL, "INITIAL"},
+            {SEND, "SEND"},
+            {RESEND, "RESEND"},
     };
 
     [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
@@ -55,12 +38,12 @@ namespace AwsMock::Database::Entity::SNS {
     }
 
     [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatusString) {
-        for (auto &it: MessageStatusNames) {
-            if (it.second == messageStatusString) {
-                return it.first;
+        for (auto &[fst, snd]: MessageStatusNames) {
+            if (snd == messageStatusString) {
+                return fst;
             }
         }
-        return MessageStatus::INITIAL;
+        return INITIAL;
     }
 
     /**
@@ -142,21 +125,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Converts the jsonObject to a entity
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * Converts the DTO to a string representation.
@@ -175,7 +144,7 @@ namespace AwsMock::Database::Entity::SNS {
         friend std::ostream &operator<<(std::ostream &os, const Message &message);
     };
 
-    typedef struct Message Message;
+    typedef Message Message;
     typedef std::vector<Message> MessageList;
 
 }// namespace AwsMock::Database::Entity::SNS

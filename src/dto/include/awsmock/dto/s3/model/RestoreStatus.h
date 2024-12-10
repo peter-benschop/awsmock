@@ -2,19 +2,18 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_RESTORESTATUS_H
-#define AWSMOCK_RESTORESTATUS_H
+#ifndef AWSMOCK_RESTORE_STATUS_H
+#define AWSMOCK_RESTORE_STATUS_H
 
 // C++ includes
 #include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -28,15 +27,16 @@ namespace AwsMock::Dto::S3 {
         /**
          * Expiration datetime
          */
-        Poco::DateTime restoreExpiryDate;
+        system_clock::time_point restoreExpiryDate;
 
         /**
          * Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        view_or_value<view, value> ToDocument() const;
     };
 
 }// namespace AwsMock::Dto::S3
-#endif//AWSMOCK_RESTORESTATUS_H
+
+#endif// AWSMOCK_RESTORE_STATUS_H

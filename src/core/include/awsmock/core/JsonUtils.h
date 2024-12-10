@@ -8,12 +8,6 @@
 // Standard C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-
 // Boost includes
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -42,7 +36,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueString(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::string &attribute);
+        //static void GetJsonValueString(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::string &attribute);
 
         /**
          * @brief Sets the supplied JSON value in the object.
@@ -51,7 +45,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueString(Poco::JSON::Object &jsonObject, const std::string &name, const std::string &value);
+        //static void SetJsonValueString(Poco::JSON::Object &jsonObject, const std::string &name, const std::string &value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -60,7 +54,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueLong(const std::string &name, Poco::JSON::Object::Ptr jsonObject, long &attribute);
+        //static void GetJsonValueLong(const std::string &name, Poco::JSON::Object::Ptr jsonObject, long &attribute);
 
         /**
          * @brief Sets the supplied JSON value in the object.
@@ -69,7 +63,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueLong(Poco::JSON::Object &jsonObject, const std::string &name, long value);
+        //static void SetJsonValueLong(Poco::JSON::Object &jsonObject, const std::string &name, long value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -78,7 +72,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueDouble(const std::string &name, Poco::JSON::Object::Ptr jsonObject, double &attribute);
+        //static void GetJsonValueDouble(const std::string &name, Poco::JSON::Object::Ptr jsonObject, double &attribute);
 
         /**
          * @brief Sets the supplied JSON value in the object.
@@ -87,7 +81,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueDouble(Poco::JSON::Object &jsonObject, const std::string &name, double value);
+        //static void SetJsonValueDouble(Poco::JSON::Object &jsonObject, const std::string &name, double value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -96,7 +90,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueFloat(const std::string &name, Poco::JSON::Object::Ptr jsonObject, float &attribute);
+        //static void GetJsonValueFloat(const std::string &name, Poco::JSON::Object::Ptr jsonObject, float &attribute);
 
         /**
          * @brief Sets the supplied JSON value in the object.
@@ -105,7 +99,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueFloat(Poco::JSON::Object &jsonObject, const std::string &name, float value);
+        //static void SetJsonValueFloat(Poco::JSON::Object &jsonObject, const std::string &name, float value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -114,7 +108,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueInt(const std::string &name, Poco::JSON::Object::Ptr jsonObject, int &attribute);
+        //static void GetJsonValueInt(const std::string &name, Poco::JSON::Object::Ptr jsonObject, int &attribute);
 
         /**
          * @brief Sets the supplied JSON value int the object.
@@ -123,7 +117,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueInt(Poco::JSON::Object &jsonObject, const std::string &name, int value);
+        //static void SetJsonValueInt(Poco::JSON::Object &jsonObject, const std::string &name, int value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -132,7 +126,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueBool(const std::string &name, Poco::JSON::Object::Ptr jsonObject, bool &attribute);
+        //static void GetJsonValueBool(const std::string &name, Poco::JSON::Object::Ptr jsonObject, bool &attribute);
 
         /**
          * @brief Sets the supplied JSON value in the object.
@@ -141,7 +135,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueBool(Poco::JSON::Object &jsonObject, const std::string &name, bool value);
+        //static void SetJsonValueBool(Poco::JSON::Object &jsonObject, const std::string &name, bool value);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -150,7 +144,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON parentObject
          * @param attribute JSON attribute
          */
-        static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute);
+        //static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, Poco::DateTime &attribute);
 
         /**
          * @brief Extracts the supplied JSON value from the object.
@@ -159,7 +153,7 @@ namespace AwsMock::Core {
          * @param jsonObject JSON object
          * @param attribute JSON attribute
          */
-        static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::chrono::system_clock::time_point &attribute);
+        //static void GetJsonValueDate(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::chrono::system_clock::time_point &attribute);
 
         /**
          * @brief Sets the supplied JSON value int the object.
@@ -168,7 +162,7 @@ namespace AwsMock::Core {
          * @param name name of the JSON attribute
          * @param value JSON attribute
          */
-        static void SetJsonValueDate(Poco::JSON::Object &jsonObject, const std::string &name, const std::chrono::system_clock::time_point &value);
+        //static void SetJsonValueDate(Poco::JSON::Object &jsonObject, const std::string &name, const std::chrono::system_clock::time_point &value);
 
         /**
          * @brief Creates a JSON string array.
@@ -176,7 +170,7 @@ namespace AwsMock::Core {
          * @param values vector of string values
          * @return JSON string array
          */
-        static Poco::JSON::Array GetJsonStringArray(const std::vector<std::string> &values);
+        //static Poco::JSON::Array GetJsonStringArray(const std::vector<std::string> &values);
 
         /**
          * @brief Creates a JSON object from a string map.
@@ -195,7 +189,7 @@ namespace AwsMock::Core {
          * @param values vector of string values
          * @return JSON object
          */
-        static Poco::JSON::Object GetJsonObject(const std::map<std::string, std::string> &values);
+        //static Poco::JSON::Object GetJsonObject(const std::map<std::string, std::string> &values);
 
         /**
          * @brief Returns the JSON string for the document.
@@ -205,7 +199,7 @@ namespace AwsMock::Core {
          * @param indent indentation size
          * @return JSON string
          */
-        static std::string ToJsonString(const Poco::JSON::Object &jsonObject, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
+        //static std::string ToJsonString(const Poco::JSON::Object &jsonObject, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
 
         /**
          * @brief Returns the JSON string for the array.
@@ -215,7 +209,7 @@ namespace AwsMock::Core {
          * @param indent indentation size
          * @return JSON string
          */
-        static std::string ToJsonString(const Poco::JSON::Array &jsonArray, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
+        //static std::string ToJsonString(const Poco::JSON::Array &jsonArray, bool prettyPrint = false, int indent = JSON_DEFAULT_INDENT);
     };
 
 }// namespace AwsMock::Core

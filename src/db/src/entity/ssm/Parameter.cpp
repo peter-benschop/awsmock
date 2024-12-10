@@ -8,10 +8,10 @@ namespace AwsMock::Database::Entity::SSM {
 
     view_or_value<view, value> Parameter::ToDocument() const {
 
-        auto tagsDoc = bsoncxx::builder::basic::document{};
+        auto tagsDoc = document{};
         if (!tags.empty()) {
-            for (const auto &t: tags) {
-                tagsDoc.append(kvp(t.first, t.second));
+            for (const auto &[fst, snd]: tags) {
+                tagsDoc.append(kvp(fst, snd));
             }
         }
 
@@ -47,32 +47,13 @@ namespace AwsMock::Database::Entity::SSM {
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             if (mResult.value().find("tags") != mResult.value().end()) {
-                bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-                for (const bsoncxx::document::element &tagElement: tagsView) {
+                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);
                 }
             }
         }
-    }
-
-
-    Poco::JSON::Object Parameter::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("arn", arn);
-        jsonObject.set("name", parameterName);
-        jsonObject.set("value", parameterValue);
-        jsonObject.set("type", type);
-        jsonObject.set("description", description);
-        jsonObject.set("tier", tier);
-        jsonObject.set("version", version);
-        jsonObject.set("created", Core::DateTimeUtils::ToISO8601(created));
-        jsonObject.set("modified", Core::DateTimeUtils::ToISO8601(modified));
-
-        return jsonObject;
     }
 
     std::string Parameter::ToString() const {
@@ -82,7 +63,7 @@ namespace AwsMock::Database::Entity::SSM {
     }
 
     std::ostream &operator<<(std::ostream &os, const Parameter &u) {
-        os << "Parameter=" << bsoncxx::to_json(u.ToDocument());
+        os << "Parameter=" << to_json(u.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::SSM

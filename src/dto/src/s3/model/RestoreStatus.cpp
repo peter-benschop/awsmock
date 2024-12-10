@@ -6,18 +6,18 @@
 
 namespace AwsMock::Dto::S3 {
 
-    Poco::JSON::Object RestoreStatus::ToJsonObject() const {
+    view_or_value<view, value> RestoreStatus::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("IsRestoreInProgress", isRestoreInProgress);
-            rootJson.set("RestoreExpiryDate", Poco::DateTimeFormatter::format(restoreExpiryDate, Poco::DateTimeFormat::ISO8601_FORMAT));
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetBoolValue(document, "IsRestoreInProgress", isRestoreInProgress);
+            Core::Bson::BsonUtils::SetDateValue(document, "RestoreExpiryDate", restoreExpiryDate);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

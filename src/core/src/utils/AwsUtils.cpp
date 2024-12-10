@@ -300,7 +300,7 @@ namespace AwsMock::Core {
         // Get header
         for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
             if (headers.contains(header)) {
-                canonicalHeaders << Poco::toLower(header) << ":" << StringUtils::Trim(headers[header]) + '\n';
+                canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(headers[header]) + '\n';
             }
         }
         return canonicalHeaders.str();
@@ -343,8 +343,7 @@ namespace AwsMock::Core {
         return {};
     }
 
-    std::string AwsUtils::GetSignature(const AuthorizationHeaderKeys &authorizationHeaderKeys,
-                                       const std::string &stringToSign) {
+    std::string AwsUtils::GetSignature(const AuthorizationHeaderKeys &authorizationHeaderKeys, const std::string &stringToSign) {
         std::vector<unsigned char> digest = Crypto::GetHmacSha256FromStringRaw("AWS4" + authorizationHeaderKeys.secretAccessKey, authorizationHeaderKeys.dateTime);
         digest = Crypto::GetHmacSha256FromStringRaw(digest, authorizationHeaderKeys.region);
         digest = Crypto::GetHmacSha256FromStringRaw(digest, authorizationHeaderKeys.module);

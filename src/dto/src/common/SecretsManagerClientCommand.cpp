@@ -53,17 +53,16 @@ namespace AwsMock::Dto::Common {
     std::string SecretsManagerClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("command", SecretsManagerCommandTypeToString(command));
-            rootJson.set("user", user);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(document, "command", SecretsManagerCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "user", user);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

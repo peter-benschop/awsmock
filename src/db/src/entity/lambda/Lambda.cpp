@@ -41,26 +41,26 @@ namespace AwsMock::Database::Entity::Lambda {
     view_or_value<view, value> Lambda::ToDocument() const {
 
         // Convert instances
-        auto instancesDoc = bsoncxx::builder::basic::array{};
+        auto instancesDoc = array{};
         for (const auto &instance: instances) {
             instancesDoc.append(instance.ToDocument());
         }
 
         // Convert environment to document
-        auto variablesDoc = bsoncxx::builder::basic::array{};
+        auto variablesDoc = array{};
         for (const auto &[fst, snd]: environment.variables) {
             variablesDoc.append(make_document(kvp(fst, snd)));
         }
         view_or_value<view, value> varDoc = make_document(kvp("variables", variablesDoc));
 
         // Convert tags to document
-        auto tagsDoc = bsoncxx::builder::basic::document{};
+        auto tagsDoc = document{};
         for (const auto &[fst, snd]: tags) {
             tagsDoc.append(kvp(fst, snd));
         }
 
         // Convert event source mappings
-        auto eventSourcesDoc = bsoncxx::builder::basic::array{};
+        auto eventSourcesDoc = array{};
         for (const auto &e: eventSources) {
             eventSourcesDoc.append(e.ToDocument());
         }
@@ -176,7 +176,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const Lambda &l) {
-        os << "Lambda=" << bsoncxx::to_json(l.ToDocument());
+        os << "Lambda=" << to_json(l.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Lambda

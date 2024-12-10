@@ -29,7 +29,7 @@ namespace AwsMock::Dto::KMS {
             {EncryptionAlgorithm::RSAES_OAEP_SHA_256, "RSAES_OAEP_SHA_256"},
             {EncryptionAlgorithm::SM2PKE, "SM2PKE"}};
 
-    [[maybe_unused]] static std::string EEncryptionAlgorithmsToString(EncryptionAlgorithm encryptionAlgorithm) {
+    [[maybe_unused]] static std::string EncryptionAlgorithmsToString(EncryptionAlgorithm encryptionAlgorithm) {
         return EncryptionAlgorithmsNames[encryptionAlgorithm];
     }
 

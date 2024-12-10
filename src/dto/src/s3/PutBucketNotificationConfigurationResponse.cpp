@@ -8,65 +8,87 @@ namespace AwsMock::Dto::S3 {
 
     std::string PutBucketNotificationConfigurationResponse::ToXml() {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = Core::XmlUtils::CreateDocument();
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = Core::XmlUtils::CreateRootNode(pDoc, "NotificationConfiguration");
+        try {
+            boost::property_tree::ptree root;
 
-        // Queue notification configurations
-        for (const auto &queueConfiguration: queueConfigurations) {
+            // Queue notification configurations
+            for (const auto &queueConfiguration: queueConfigurations) {
 
-            Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "QueueNotification");
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", queueConfiguration.id);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "QueueArn", queueConfiguration.queueArn);
+                boost::property_tree::ptree xmlQueueNotification;
+                xmlQueueNotification.add("Id", queueConfiguration.id);
+                xmlQueueNotification.add("QueueArn", queueConfiguration.queueArn);
 
-            // Events
-            if (!queueConfiguration.events.empty()) {
-                std::vector<std::string> stringArray;
-                for (const auto &event: queueConfiguration.events) {
-                    stringArray.emplace_back(EventTypeToString(event));
+                // Events
+                if (!queueConfiguration.events.empty()) {
+                    boost::property_tree::ptree xmlEventArray;
+                    for (const auto &event: queueConfiguration.events) {
+                        std::string strEvent = EventTypeToString(event);
+                        xmlEventArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", strEvent)));
+                    }
+                    xmlQueueNotification.add_child("Events", xmlEventArray);
                 }
-                Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
+                root.add_child("NotificationConfiguration.QueueConfiguration", xmlQueueNotification);
             }
-        }
+            /*
+            // Topic notification configurations
+            for (const auto &topicConfiguration: topicConfigurations) {
 
-        // Topic notification configurations
-        for (const auto &topicConfiguration: topicConfigurations) {
+                Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "TopicNotification");
+                Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", topicConfiguration.id);
+                Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Topic", topicConfiguration.topicArn);
 
-            Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "TopicNotification");
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", topicConfiguration.id);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Topic", topicConfiguration.topicArn);
-
-            // Events
-            if (!topicConfiguration.events.empty()) {
-                std::vector<std::string> stringArray;
-                for (const auto &event: topicConfiguration.events) {
-                    stringArray.emplace_back(EventTypeToString(event));
+                // Events
+                if (!topicConfiguration.events.empty()) {
+                    std::vector<std::string> stringArray;
+                    for (const auto &event: topicConfiguration.events) {
+                        stringArray.emplace_back(EventTypeToString(event));
+                    }
+                    Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
                 }
-                Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
             }
-        }
 
-        // Lambda notification configurations
-        for (const auto &lambdaConfiguration: lambdaConfigurations) {
+            // Lambda notification configurations
+            for (const auto &lambdaConfiguration: lambdaConfigurations) {
 
-            Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "CloudFunctionNotification");
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", lambdaConfiguration.id);
-            Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "CloudFunction", lambdaConfiguration.lambdaArn);
+                Poco::XML::AutoPtr<Poco::XML::Element> pQueueConfiguration = Core::XmlUtils::CreateNode(pDoc, pRoot, "CloudFunctionNotification");
+                Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "Id", lambdaConfiguration.id);
+                Core::XmlUtils::CreateTextNode(pDoc, pQueueConfiguration, "CloudFunction", lambdaConfiguration.lambdaArn);
 
-            // Events
-            if (!lambdaConfiguration.events.empty()) {
-                std::vector<std::string> stringArray;
-                for (const auto &event: lambdaConfiguration.events) {
-                    stringArray.emplace_back(EventTypeToString(event));
+                // Events
+                if (!lambdaConfiguration.events.empty()) {
+                    std::vector<std::string> stringArray;
+                    for (const auto &event: lambdaConfiguration.events) {
+                        stringArray.emplace_back(EventTypeToString(event));
+                    }
+                    Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
                 }
-                Core::XmlUtils::CreateTextArray(pDoc, pQueueConfiguration, "Events", "Event", stringArray);
             }
+*/
+            return Core::XmlUtils::ToXmlString(root);
+        } catch (std::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
         }
-
-        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string PutBucketNotificationConfigurationResponse::ToJson() const {
-        return {};
+
+        try {
+            document document;
+            if (queueConfigurations.empty()) {
+                array queueArray;
+                for (const auto &queueConfiguration: queueConfigurations) {
+                    queueArray.append(queueConfiguration.ToDocument());
+                }
+                document.append(kvp("NotificationConfigurations", queueArray));
+            }
+
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
+        }
     }
 
     std::string PutBucketNotificationConfigurationResponse::ToString() const {

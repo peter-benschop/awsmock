@@ -6,50 +6,53 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string ListTopicsResponse::ToJson() const {
+
+        try {
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "NextToken", nextToken);
+
+            if (!topicList.empty()) {
+                array topicArray;
+                for (auto &it: topicList) {
+                    document topicElement;
+                    Core::Bson::BsonUtils::SetStringValue(topicElement, "TopicArn", it.topicArn);
+                    topicArray.append(topicElement);
+                }
+                rootDocument.append(kvp("Topics", topicArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string ListTopicsResponse::ToXml() const {
 
-        // XML Document
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
+        try {
 
-        // Root element
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListTopicsResponse");
-        pDoc->appendChild(pRoot);
+            boost::property_tree::ptree root;
 
-        // ListTopicsResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pListTopicResult = pDoc->createElement("ListTopicsResult");
-        pRoot->appendChild(pListTopicResult);
+            if (!topicList.empty()) {
+                boost::property_tree::ptree xmlTopics;
+                for (auto &it: topicList) {
+                    boost::property_tree::ptree xmlTopic;
+                    xmlTopic.add("TopicArn", it.topicArn);
+                    xmlTopics.add_child("member", xmlTopic);
+                }
+                root.add_child("ListTopicsResponse.ListTopicsResult.Topics", xmlTopics);
+            }
+            root.add("ListTopicsResponse.ListTopicsResult.NextToken", nextToken);
+            root.add("ListTopicsResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopics = pDoc->createElement("Topics");
-        pListTopicResult->appendChild(pTopics);
+            return Core::XmlUtils::ToXmlString(root);
 
-        for (auto &it: topicList) {
-
-            Poco::XML::AutoPtr<Poco::XML::Element> pTopicMember = pDoc->createElement("member");
-            pTopics->appendChild(pTopicMember);
-
-            Poco::XML::AutoPtr<Poco::XML::Element> pTopicArn = pDoc->createElement("TopicArn");
-            pTopicMember->appendChild(pTopicArn);
-
-            Poco::XML::AutoPtr<Poco::XML::Text> pTopicArnText = pDoc->createTextNode(it.topicArn);
-            pTopicArn->appendChild(pTopicArnText);
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-
-        // Total
-        Poco::XML::AutoPtr<Poco::XML::Element> pNextToken = pDoc->createElement("NextToken");
-        pListTopicResult->appendChild(pNextToken);
-        Poco::XML::AutoPtr<Poco::XML::Text> pNextTokenText = pDoc->createTextNode(nextToken);
-        pNextToken->appendChild(pNextTokenText);
-
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string ListTopicsResponse::ToString() const {
@@ -59,11 +62,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const ListTopicsResponse &r) {
-        os << "ListTopicsResponse={topicList=[";
-        for (auto &l: r.topicList) {
-            os << l.ToString();
-        }
-        os << "]}";
+        os << "ListTopicsResponse=" << r.ToJson();
         return os;
     }
 

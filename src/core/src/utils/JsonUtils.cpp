@@ -3,7 +3,7 @@
 
 namespace AwsMock::Core {
 
-    void JsonUtils::GetJsonValueString(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::string &attribute) {
+    /*    void JsonUtils::GetJsonValueString(const std::string &name, Poco::JSON::Object::Ptr jsonObject, std::string &attribute) {
         if (jsonObject->has(name)) {
             attribute = jsonObject->get(name).convert<std::string>();
         }
@@ -124,6 +124,6 @@ namespace AwsMock::Core {
             jsonArray.stringify(os);
         }
         return os.str();
-    }
+    }*/
 
 }// namespace AwsMock::Core

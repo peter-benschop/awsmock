@@ -6,13 +6,6 @@
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-
     view_or_value<view, value> Secret::ToDocument() const {
 
         view_or_value<view, value> rotationRulesDoc = make_document(
@@ -47,7 +40,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return secretDoc;
     }
 
-    void Secret::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Secret::FromDocument(const std::optional<view> &mResult) {
 
         try {
             oid = mResult.value()["_id"].get_oid().value.to_string();
@@ -75,63 +68,15 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
             // Get rotation rules
             if (mResult.value().find("rotationRules") != mResult.value().end()) {
-                bsoncxx::document::view rotationView = mResult.value()["rotationRules"].get_document().value;
+                const view rotationView = mResult.value()["rotationRules"].get_document().value;
                 rotationRules.automaticallyAfterDays = rotationView["automaticallyAfterDays"].get_int64().value;
                 rotationRules.duration = bsoncxx::string::to_string(rotationView["duration"].get_string().value);
                 rotationRules.scheduleExpression = bsoncxx::string::to_string(rotationView["scheduleExpression"].get_string().value);
             }
-        } catch (const mongocxx::exception &exc) {
+        } catch (const bsoncxx::exception &exc) {
             log_error << "Exception: oid: " << oid << " error: " << exc.what();
-            throw Core::DatabaseException(exc.what());
+            throw Core::JsonException(exc.what());
         }
-    }
-
-    Poco::JSON::Object Secret::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("name", name);
-        jsonObject.set("arn", arn);
-        jsonObject.set("secretId", secretId);
-        jsonObject.set("kmsKeyId", kmsKeyId);
-        jsonObject.set("versionId", versionId);
-        jsonObject.set("secretString", secretString);
-        jsonObject.set("secretBinary", secretBinary);
-        jsonObject.set("description", description);
-        jsonObject.set("owningService", owningService);
-        jsonObject.set("primaryRegion", primaryRegion);
-        jsonObject.set("createdDate", createdDate);
-        jsonObject.set("deletedDate", deletedDate);
-        jsonObject.set("lastAccessedDate", lastAccessedDate);
-        jsonObject.set("lastChangedDate", lastChangedDate);
-        jsonObject.set("lastRotatedDate", lastRotatedDate);
-        jsonObject.set("nextRotatedDate", nextRotatedDate);
-        jsonObject.set("rotationEnabled", rotationEnabled);
-        jsonObject.set("rotationLambdaARN", rotationLambdaARN);
-        jsonObject.set("RotationRules", rotationRules.ToJsonObject());
-        return jsonObject;
-    }
-
-    void Secret::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
-        Core::JsonUtils::GetJsonValueString("arn", jsonObject, arn);
-        Core::JsonUtils::GetJsonValueString("secretId", jsonObject, secretId);
-        Core::JsonUtils::GetJsonValueString("kmsKeyId", jsonObject, kmsKeyId);
-        Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
-        Core::JsonUtils::GetJsonValueString("secretString", jsonObject, secretString);
-        Core::JsonUtils::GetJsonValueString("secretBinary", jsonObject, secretBinary);
-        Core::JsonUtils::GetJsonValueString("description", jsonObject, description);
-        Core::JsonUtils::GetJsonValueString("owningService", jsonObject, owningService);
-        Core::JsonUtils::GetJsonValueString("primaryRegion", jsonObject, primaryRegion);
-        Core::JsonUtils::GetJsonValueLong("createdDate", jsonObject, createdDate);
-        Core::JsonUtils::GetJsonValueLong("deletedDate", jsonObject, deletedDate);
-        Core::JsonUtils::GetJsonValueLong("lastAccessedDate", jsonObject, lastAccessedDate);
-        Core::JsonUtils::GetJsonValueLong("lastRotatedDate", jsonObject, lastRotatedDate);
-        Core::JsonUtils::GetJsonValueLong("nextRotatedDate", jsonObject, nextRotatedDate);
-        Core::JsonUtils::GetJsonValueBool("rotationEnabled", jsonObject, rotationEnabled);
-        Core::JsonUtils::GetJsonValueString("rotationLambdaARN", jsonObject, rotationLambdaARN);
     }
 
     std::string Secret::ToString() const {
@@ -141,7 +86,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
     }
 
     std::ostream &operator<<(std::ostream &os, const Secret &s) {
-        os << "Secret=" << bsoncxx::to_json(s.ToDocument());
+        os << "Secret=" << to_json(s.ToDocument());
         return os;
     }
 

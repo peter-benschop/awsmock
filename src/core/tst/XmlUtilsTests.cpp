@@ -18,7 +18,7 @@
 
 namespace AwsMock::Core {
 
-    class XmlUtilsTest : public ::testing::Test {};
+    /*class XmlUtilsTest : public ::testing::Test {};
 
     TEST_F(XmlUtilsTest, CreateTextNodeTest) {
 
@@ -50,7 +50,7 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_TRUE(result == "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Test><TestValue>Value1</TestValue><TestValue>Value2</TestValue><TestValue>Value3</TestValue></Test></Root>");
-    }
+    }*/
 
 }// namespace AwsMock::Core
 

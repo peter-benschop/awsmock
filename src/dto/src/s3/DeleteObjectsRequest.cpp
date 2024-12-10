@@ -9,31 +9,36 @@ namespace AwsMock::Dto::S3 {
     std::string DeleteObjectsRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("keys", Core::JsonUtils::GetJsonStringArray(keys));
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            if (!keys.empty()) {
+                array keyArray;
+                for (const auto &key: keys) {
+                    keyArray.append(key);
+                }
+                document.append(kvp("keys", keyArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void DeleteObjectsRequest::FromXml(const std::string &xmlString) {
 
-        Poco::XML::DOMParser parser;
-        Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
-
-        Poco::XML::Node *deleteNode = pDoc->getNodeByPath("/Delete");
-        if (deleteNode) {
-
-            for (unsigned long i = 0; i < deleteNode->childNodes()->length(); i++) {
-                Poco::XML::Node *objectNode = deleteNode->childNodes()->item(i);
-                keys.push_back(objectNode->innerText());
+        try {
+            boost::property_tree::ptree pt;
+            read_xml(xmlString, pt);
+            for (const auto &key: pt.get_child("Delete").data()) {
+                keys.emplace_back(&key);
             }
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

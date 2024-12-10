@@ -6,38 +6,39 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string CreateTopicResponse::ToJson() const {
+
+        try {
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "owner", owner);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "topicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "requestId", requestId);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string CreateTopicResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CreateTopicResponse");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // CreateQueueResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pListQueueResult = pDoc->createElement("CreateTopicResult");
-        pRoot->appendChild(pListQueueResult);
+            boost::property_tree::ptree root;
+            root.add("CreateTopicResponse.CreateTopicResult.TopicArn", topicArn);
+            root.add("CreateTopicResponse.CreateTopicResult.Name", name);
+            root.add("CreateTopicResponse.CreateTopicResult.Owner", owner);
+            root.add("CreateTopicResponse.ResponseMetadata.RequestId", requestId);
+            return Core::XmlUtils::ToXmlString(root);
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pQueueUrl = pDoc->createElement("TopicArn");
-        pListQueueResult->appendChild(pQueueUrl);
-        Poco::XML::AutoPtr<Poco::XML::Text> pQueueUrlText = pDoc->createTextNode(topicArn);
-        pQueueUrl->appendChild(pQueueUrlText);
-
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
-
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setNewLine("\n");
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
-        writer.writeNode(output, pDoc);
-
-        return output.str();
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateTopicResponse::ToString() const {
@@ -47,7 +48,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const CreateTopicResponse &r) {
-        os << "CreateTopicResponse={region='" << r.region << "', name='" << r.name << "', owner='" << r.owner << "', topicArn='" << r.topicArn << "'}";
+        os << "CreateTopicResponse=" << r.ToJson();
         return os;
     }
 

@@ -47,7 +47,7 @@ namespace AwsMock::Dto::KMS {
             rootJson.set("KeyId", keyId);
             rootJson.set("DryRun", dryRun);
             rootJson.set("PlainText", plainText);
-            rootJson.set("EncryptionAlgorithm", Dto::KMS::EEncryptionAlgorithmsToString(encryptionAlgorithm));
+            rootJson.set("EncryptionAlgorithm", Dto::KMS::EncryptionAlgorithmsToString(encryptionAlgorithm));
 
             // Algorithms
             Poco::JSON::Array grantsArray;

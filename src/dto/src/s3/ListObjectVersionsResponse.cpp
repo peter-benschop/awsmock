@@ -4,121 +4,146 @@
 
 // AwsMock includes
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
+#include <ranges>
 
 namespace AwsMock::Dto::S3 {
 
-    Poco::JSON::Object DeleteMarker::ToJsonObject() const {
+    view_or_value<view, value> DeleteMarker::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Key", key);
-            rootJson.set("IsLatest", isLatest);
-            rootJson.set("LastModified", Poco::DateTimeFormatter::format(lastModified, Poco::DateTimeFormat::ISO8601_FORMAT));
-            rootJson.set("Owner", owner.ToJsonObject());
-            rootJson.set("VersionId", versionId);
-            return rootJson;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Key", key);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "IsLatest", isLatest);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "VersionId", versionId);
+            rootDocument.append(kvp("Owner", owner.ToDocument()));
+            return rootDocument.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
-
-    Poco::XML::AutoPtr<Poco::XML::Element> DeleteMarker::ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const {
-
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("DeleteMarker");
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Key", key);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsLatest", isLatest);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", lastModified);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "VersionId", versionId);
-        pRoot->appendChild(owner.ToXmlElement(pDoc));
-        return pRoot;
-    }
-
 
     std::string ListObjectVersionsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Name", name);
-            rootJson.set("Prefix", prefix);
-            rootJson.set("Delimiter", delimiter);
-            rootJson.set("EncodingType", encodingType);
-            rootJson.set("MaxKeys", maxKeys);
-            rootJson.set("IsTruncated", isTruncated);
-            rootJson.set("KeyMarker", keyMarker);
-            rootJson.set("VersionIdMarker", versionIdMarker);
-            rootJson.set("NextKeyMarker", keyMarker);
-            rootJson.set("NextVersionIdMarker", versionIdMarker);
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Prefix", prefix);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Delimiter", delimiter);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "EncodingType", encodingType);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "MaxKeys", maxKeys);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "IsTruncated", isTruncated);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "KeyMarker", keyMarker);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "VersionIdMarker", versionIdMarker);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "NextKeyMarker", keyMarker);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "NextVersionIdMarker", versionIdMarker);
 
             // Prefixes
-            Poco::JSON::Array jsonPrefixArray;
-            for (const auto &p: commonPrefixes) {
-                Poco::JSON::Object prefixObject;
-                prefixObject.set("prefix", p);
-                jsonPrefixArray.add(prefixObject);
+            if (!commonPrefixes.empty()) {
+                array jsonPrefixArray;
+                for (const auto &p: commonPrefixes) {
+                    document prefixObject;
+                    Core::Bson::BsonUtils::SetStringValue(prefixObject, "prefix", p);
+                    jsonPrefixArray.append(prefixObject);
+                }
+                rootDocument.append(kvp("CommonPrefixes", jsonPrefixArray));
             }
-            rootJson.set("CommonPrefixes", jsonPrefixArray);
 
             // Versions
-            Poco::JSON::Array jsonVersionArray;
-            for (const auto &v: versions) {
-                jsonVersionArray.add(v.ToJsonObject());
+            if (!versions.empty()) {
+                array jsonVersionArray;
+                for (const auto &v: versions) {
+                    jsonVersionArray.append(v.ToDocument());
+                }
+                rootDocument.append(kvp("Versions", jsonVersionArray));
             }
-            rootJson.set("Versions", jsonVersionArray);
 
             // Delete markers
-            Poco::JSON::Array jsonDeleteMarkerArray;
-            for (const auto &m: deleteMarkers) {
-                jsonDeleteMarkerArray.add(m.ToJsonObject());
+            if (!deleteMarkers.empty()) {
+                array jsonDeleteMarkerArray;
+                for (const auto &m: deleteMarkers) {
+                    jsonDeleteMarkerArray.append(m.ToDocument());
+                }
+                rootDocument.append(kvp("DeleteMarkers", jsonDeleteMarkerArray));
             }
-            rootJson.set("DeleteMarkers", jsonDeleteMarkerArray);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string ListObjectVersionsResponse::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("ListVersionsResult");
+        try {
 
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Region", region);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Name", name);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Prefix", prefix);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "Delimiter", delimiter);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "EncodingType", encodingType);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "MaxKeys", maxKeys);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "IsTruncated", isTruncated);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "KeyMarker", keyMarker);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "VersionIdMarker", versionIdMarker);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "NextKeyMarker", nextKeyMarker);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "NextVersionIdMarker", nextVersionIdMarker);
-        pDoc->appendChild(pRoot);
+            boost::property_tree::ptree root;
+            root.add("ListVersionsResult.Region", region);
+            root.add("ListVersionsResult.Name", region);
+            root.add("ListVersionsResult.Prefix", region);
+            root.add("ListVersionsResult.Delimiter", region);
+            root.add("ListVersionsResult.EncodingType", region);
+            root.add("ListVersionsResult.MaxKeys", region);
+            root.add("ListVersionsResult.IsTruncated", region);
+            root.add("ListVersionsResult.KeyMarker", region);
+            root.add("ListVersionsResult.VersionIdMarker", region);
+            root.add("ListVersionsResult.NextKeyMarker", region);
+            root.add("ListVersionsResult.NextVersionIdMarker", region);
 
-        // Prefixes
-        Core::XmlUtils::CreateTextArray(pDoc, pRoot, "CommonPrefixes", "Prefix", commonPrefixes);
+            // Prefixes
+            if (!commonPrefixes.empty()) {
+                boost::property_tree::ptree prefixArray;
+                for (const auto &p: commonPrefixes) {
+                    prefixArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", p)));
+                }
+                root.add_child("CommonPrefixes", prefixArray);
+            }
 
-        // Versions
-        for (const auto &it: versions) {
-            Poco::XML::AutoPtr<Poco::XML::Element> pVersion = it.ToXmlElement(pDoc);
-            pRoot->appendChild(pVersion);
+            // Versions
+            if (!versions.empty()) {
+                boost::property_tree::ptree jsonVersionArray;
+                for (const auto &v: versions) {
+
+                    boost::property_tree::ptree jsonVersionObject;
+                    jsonVersionObject.add("Key", v.key);
+                    jsonVersionObject.add("ETag", v.eTag);
+                    jsonVersionObject.add("VersionId", v.versionId);
+                    jsonVersionObject.add("StorageClass", v.storageClass);
+                    jsonVersionObject.add("IsLatest", v.isLatest);
+                    jsonVersionObject.add("Size", v.size);
+                    jsonVersionObject.add("LastModified", Core::DateTimeUtils::ToISO8601(v.lastModified));
+                    jsonVersionArray.push_back(std::make_pair("", jsonVersionObject));
+                }
+                root.add_child("Versions", jsonVersionArray);
+            }
+
+            // Versions
+            if (!deleteMarkers.empty()) {
+                boost::property_tree::ptree jsonDeleteArray;
+                for (const auto &m: deleteMarkers) {
+                    boost::property_tree::ptree jsonDeleteObject;
+                    jsonDeleteObject.add("Key", m.key);
+                    jsonDeleteObject.add("IsLatest", m.isLatest);
+                    jsonDeleteObject.add("VersionId", m.versionId);
+                    jsonDeleteObject.add("LastModified", Core::DateTimeUtils::ToISO8601(m.lastModified));
+                    jsonDeleteArray.push_back(std::make_pair("", jsonDeleteObject));
+                }
+                root.add_child("DeleteMarkers", jsonDeleteArray);
+            }
+
+            return Core::XmlUtils::ToXmlString(root);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-
-        // Delete marker
-        for (const auto &it: deleteMarkers) {
-            Poco::XML::AutoPtr<Poco::XML::Element> pDeleteMarker = it.ToXmlElement(pDoc);
-            pRoot->appendChild(pDeleteMarker);
-        }
-
-        return Core::XmlUtils::ToXmlString(pDoc);
     }
 
     std::string ListObjectVersionsResponse::ToString() const {

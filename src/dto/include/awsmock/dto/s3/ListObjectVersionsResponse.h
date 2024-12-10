@@ -6,23 +6,11 @@
 #define AWSMOCK_DTO_S3_LIST_OBJECT_VERSIONS_RESPONSE_H
 
 // C++ Standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/XML/XMLWriter.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/s3/model/ObjectVersion.h>
@@ -99,7 +87,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Last modified
          */
-        Poco::DateTime lastModified;
+        system_clock::time_point lastModified;
 
         /**
          * Owner
@@ -116,15 +104,7 @@ namespace AwsMock::Dto::S3 {
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Convert to a XML element
-         *
-         * @param pDoc XML document
-         * @return XML element
-         */
-        [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
+        view_or_value<view, value> ToDocument() const;
     };
 
     struct ListObjectVersionsResponse {

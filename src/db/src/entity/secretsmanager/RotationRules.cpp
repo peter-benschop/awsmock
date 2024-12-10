@@ -8,7 +8,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
     view_or_value<view, value> RotationRules::ToDocument() const {
 
-        auto rotationRulesDoc = bsoncxx::builder::basic::document{};
+        auto rotationRulesDoc = document{};
         rotationRulesDoc.append(kvp("automaticallyAfterDays", static_cast<bsoncxx::types::b_int64>(automaticallyAfterDays)));
         rotationRulesDoc.append(kvp("duration", duration));
         rotationRulesDoc.append(kvp("scheduleExpression", scheduleExpression));
@@ -16,20 +16,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return rotationRulesDoc.extract();
     }
 
-    void RotationRules::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void RotationRules::FromDocument(std::optional<view> mResult) {
 
-        automaticallyAfterDays = static_cast<long>(mResult.value()["automaticallyAfterDays"].get_int64().value);
+        automaticallyAfterDays = mResult.value()["automaticallyAfterDays"].get_int64().value;
         duration = bsoncxx::string::to_string(mResult.value()["duration"].get_string().value);
         scheduleExpression = bsoncxx::string::to_string(mResult.value()["scheduleExpression"].get_string().value);
-    }
-
-    Poco::JSON::Object RotationRules::ToJsonObject() const {
-
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("automaticallyAfterDays", automaticallyAfterDays);
-        jsonObject.set("duration", duration);
-        jsonObject.set("scheduleExpression", scheduleExpression);
-        return jsonObject;
     }
 
     std::string RotationRules::ToString() const {
@@ -39,7 +30,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
     }
 
     std::ostream &operator<<(std::ostream &os, const RotationRules &s) {
-        os << "RotationRules=" << bsoncxx::to_json(s.ToDocument());
+        os << "RotationRules=" << to_json(s.ToDocument());
         return os;
     }
 

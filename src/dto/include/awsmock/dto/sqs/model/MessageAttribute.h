@@ -6,16 +6,12 @@
 #define AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_H
 
 // C++ standard includes
-#include <algorithm>
-#include <cstring>
-#include <sstream>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/dto/sqs/MessageAttributeDataType.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/dto/sqs/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -88,7 +84,7 @@ namespace AwsMock::Dto::SQS {
          *
          * @param attributeObject attribute object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &attributeObject);
+        void FromDocument(const view_or_value<view, value> &attributeObject);
 
 
         /**
@@ -96,7 +92,7 @@ namespace AwsMock::Dto::SQS {
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Name comparator

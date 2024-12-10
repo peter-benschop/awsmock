@@ -6,42 +6,35 @@
 
 namespace AwsMock::Dto::S3 {
 
-    void FilterRule::FromXmlNode(Poco::XML::Node *rootNode) {
-
-        name = NameTypeFromString(rootNode->firstChild()->innerText());
-        value = rootNode->lastChild()->innerText();
-    }
-
-    Poco::JSON::Object FilterRule::ToJsonObject() const {
+    view_or_value<view, value> FilterRule::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("name", NameTypeToString(name));
-            rootJson.set("value", value);
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "name", NameTypeToString(name));
+            Core::Bson::BsonUtils::SetStringValue(document, "value", filterValue);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string FilterRule::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    void FilterRule::FromJson(Poco::JSON::Object::Ptr jsonObject) {
+    void FilterRule::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            if (jsonObject->has("S3Key")) {
-            }
-            Core::JsonUtils::GetJsonValueString("value", jsonObject, value);
+            name = NameTypeFromString(Core::Bson::BsonUtils::GetStringValue(document, "name"));
+            filterValue = Core::Bson::BsonUtils::GetStringValue(document, "value");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

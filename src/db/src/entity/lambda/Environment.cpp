@@ -7,46 +7,49 @@
 namespace AwsMock::Database::Entity::Lambda {
 
 
-    void Environment::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    /*void Environment::FromDocument(const view_or_value<view, value> &jsonObject) {
 
         try {
-
-            if (jsonObject->has("variables")) {
-                Poco::JSON::Object::Ptr variablesJsonObject = jsonObject->getObject("variables");
-                for (size_t i = 0; i < variablesJsonObject->getNames().size(); i++) {
-                    const std::string key = jsonObject->getNames()[i];
-                    const std::string value = jsonObject->get(key);
-                    variables[key] = value;
+            if (jsonObject.view().find("variables") != jsonObject.view().end()) {
+                for (auto [value] = jsonObject.view()["variables"].get_array(); auto &v: value) {
+                    for (auto &it: v.get_document().value) {
+                        variables[std::string{it.key()}] = bsoncxx::string::to_string(it.get_string().value);
+                    }
                 }
             }
 
-        } catch (Poco::Exception &e) {
-            log_error << "JSON Exception" << e.message();
-            throw Core::JsonException(e.message());
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
         }
-    }
+    }*/
 
-    Poco::JSON::Object Environment::ToJsonObject() const {
+    view_or_value<view, value> Environment::ToDocument() const {
 
-        Poco::JSON::Object jsonObject;
-        if (!variables.empty()) {
-            Poco::JSON::Array jsonArray;
-            for (const auto &[fst, snd]: variables) {
-                Poco::JSON::Object object;
-                object.set("name", fst);
-                object.set("value", snd);
-                jsonArray.add(object);
+        try {
+            document rootDocument;
+            if (!variables.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: variables) {
+                    document object;
+                    object.append(kvp("name", fst));
+                    object.append(kvp("value", snd));
+                    jsonArray.append(object);
+                }
+                rootDocument.append(kvp("variables", jsonArray));
             }
-            jsonObject.set("variables", jsonArray);
+            return rootDocument.extract();
+
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
         }
-        return jsonObject;
     }
 
-    void Environment::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Environment::FromDocument(const std::optional<view> &mResult) {
 
         if (mResult.value().find("variables") != mResult.value().end()) {
-            auto [value] = mResult.value()["variables"].get_array();
-            for (auto &v: value) {
+            for (auto [value] = mResult.value()["variables"].get_array(); auto &v: value) {
                 for (auto &it: v.get_document().value) {
                     variables[std::string{it.key()}] = bsoncxx::string::to_string(it.get_string().value);
                 }

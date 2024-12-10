@@ -9,26 +9,31 @@ namespace AwsMock::Dto::S3 {
     std::string CreateBucketRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("name", name);
-            rootJson.set("owner", owner);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void CreateBucketRequest::FromXml(const std::string &xmlString) {
 
-        Poco::XML::DOMParser parser;
-        Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+        try {
 
-        Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
-        region = node->innerText();
+            boost::property_tree::ptree pt;
+            read_xml(xmlString, pt);
+            region = pt.get<std::string>("CreateBucketConfiguration.LocationConstraint");
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateBucketRequest::ToString() const {

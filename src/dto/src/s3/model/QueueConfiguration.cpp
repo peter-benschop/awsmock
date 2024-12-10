@@ -6,110 +6,61 @@
 
 namespace AwsMock::Dto::S3 {
 
-    void QueueConfiguration::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void QueueConfiguration::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("id", jsonObject, id);
-            Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
+            id = Core::Bson::BsonUtils::GetStringValue(document, "id");
+            queueArn = Core::Bson::BsonUtils::GetStringValue(document, "queueArn");
 
             // Events
-            if (jsonObject->has("events")) {
-                Poco::JSON::Array::Ptr jsonEventArray = jsonObject->getArray("events");
-                for (const auto &event: *jsonEventArray) {
-                    events.emplace_back(EventTypeFromString(event));
+            if (document.view().find("events") != document.view().end()) {
+                for (const view eventsView = document.view()["events"].get_array().value; bsoncxx::document::element event: eventsView) {
+                    events.emplace_back(EventTypeFromString(std::string(event.get_string().value)));
                 }
             }
 
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
         }
     }
 
-    void QueueConfiguration::FromXmlNode(Poco::XML::Node *rootNode) {
-
-        if (rootNode->hasChildNodes()) {
-
-            Poco::XML::NodeList *childNodes = rootNode->childNodes();
-            for (int i = 0; i < childNodes->length(); i++) {
-
-                Poco::XML::Node *child = childNodes->item(i);
-                log_trace << "NodeName: " << child->nodeName();
-                if (child->nodeName() == "Id") {
-
-                    id = child->innerText();
-
-                } else if (child->nodeName() == "Queue") {
-
-                    queueArn = child->innerText();
-
-                } else if (child->nodeName() == "Filter") {
-
-                    // Filter
-                    if (child->hasChildNodes()) {
-
-                        Poco::XML::Node *filterNode = child->firstChild();
-                        Poco::XML::Node *s3KeyNode = filterNode->firstChild();
-
-                        // Filter rules
-                        if (s3KeyNode->hasChildNodes()) {
-                            FilterRule filterRule;
-                            filterRule.FromXmlNode(s3KeyNode);
-                            filterRules.emplace_back(filterRule);
-                        }
-                    }
-                } else if (child->nodeName() == "Event") {
-
-                    // Events
-                    if (child->hasChildNodes()) {
-
-                        Poco::XML::NodeList *eventNodes = child->childNodes();
-                        for (int j = 0; j < eventNodes->length(); j++) {
-                            events.emplace_back(EventTypeFromString(eventNodes->item(j)->innerText()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Poco::JSON::Object QueueConfiguration::ToJsonObject() const {
+    view_or_value<view, value> QueueConfiguration::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-
-            Core::JsonUtils::SetJsonValueString(rootJson, "Id", id);
-            Core::JsonUtils::SetJsonValueString(rootJson, "Queue", queueArn);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "Queue", queueArn);
 
             // Filters
             if (!filterRules.empty()) {
-                Poco::JSON::Array::Ptr jsonArray;
+                array jsonArray;
                 for (const auto &filter: filterRules) {
-                    jsonArray->add(filter.ToJsonObject());
+                    jsonArray.append(filter.ToDocument());
                 }
-                rootJson.set("Filter", jsonArray);
+                document.append(kvp("Filter", jsonArray));
             }
 
             // Event
             if (!events.empty()) {
-                Poco::JSON::Array::Ptr jsonArray;
+                array jsonArray;
                 for (const auto &event: events) {
-                    jsonArray->add(event);
+                    jsonArray.append(EventTypeToString(event));
                 }
-                rootJson.set("Event", jsonArray);
+                document.append(kvp("Event", jsonArray));
             }
-            return rootJson;
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string QueueConfiguration::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string QueueConfiguration::ToString() const {

@@ -8,18 +8,14 @@ namespace AwsMock::Dto::SQS {
 
     void GetQueueUrlRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("QueueName", rootObject, queueName);
+            const value document = bsoncxx::from_json(jsonString);
+            queueName = Core::Bson::BsonUtils::GetStringValue(document, "QueueName");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -27,14 +23,13 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueName", queueName);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueName", queueName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
