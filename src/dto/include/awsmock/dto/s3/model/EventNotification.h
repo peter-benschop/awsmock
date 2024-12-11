@@ -12,7 +12,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/UserIdentity.h>
 
@@ -80,7 +79,27 @@ namespace AwsMock::Dto::S3 {
         std::string sourceIPAddress;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Convert to JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const {
+
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "requestParameters", requestParameters);
+                Core::Bson::BsonUtils::SetStringValue(document, "sourceIPAddress", sourceIPAddress);
+                return Core::Bson::BsonUtils::ToJsonString(document);
+
+            } catch (bsoncxx::exception &e) {
+                log_error << e.what();
+                throw Core::JsonException(e.what());
+            }
+        }
+
+        /**
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -91,12 +110,12 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const RequestParameter &r) {
-            os << "RequestParameter={requestParameters='" + r.requestParameters + "' sourceIPAddress='" + r.sourceIPAddress + "'}";
+            os << "RequestParameter=" << r.ToString();
             return os;
         }
     };
@@ -114,7 +133,27 @@ namespace AwsMock::Dto::S3 {
         std::string xAmzId2;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Convert to JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const {
+
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "xAmzRequestId", xAmzRequestId);
+                Core::Bson::BsonUtils::SetStringValue(document, "xAmzId2", xAmzId2);
+                return Core::Bson::BsonUtils::ToJsonString(document);
+
+            } catch (bsoncxx::exception &e) {
+                log_error << e.what();
+                throw Core::JsonException(e.what());
+            }
+        }
+
+        /**
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -125,12 +164,12 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const ResponseElements &r) {
-            os << "ResponseElements={xAmzRequestId='" + r.xAmzRequestId + "' xAmzId2='" + r.xAmzId2 + "'}";
+            os << "ResponseElements=" << r.ToJson();
             return os;
         }
     };
@@ -143,23 +182,31 @@ namespace AwsMock::Dto::S3 {
         std::string principalId;
 
         /**
+         * @brief Convert to JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const {
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+        }
+
+        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-            /* Todo
             try {
 
-                Poco::JSON::Object rootJson;
-                rootJson.set("principalId", principalId);
-                return rootJson;
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "principalId", principalId);
+                return document.extract();
 
             } catch (Poco::Exception &exc) {
+                log_error << exc.what();
                 throw Core::JsonException(exc.message());
-            }*/
-            return {};
+            }
         }
 
         /**
@@ -167,19 +214,20 @@ namespace AwsMock::Dto::S3 {
          *
          * @param document JSON object.
          */
-        void FromJson(const view_or_value<view, value> &document) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
-            /* TOdo
             try {
-                Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
+
+                principalId = Core::Bson::BsonUtils::GetStringValue(document, "principalId");
+
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
+            }
         }
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -190,12 +238,12 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const OwnerIdentity &o) {
-            os << "OwnerIdentity={principalId='" + o.principalId + "'}";
+            os << "OwnerIdentity=" << o.ToJson();
             return os;
         }
     };
@@ -232,43 +280,52 @@ namespace AwsMock::Dto::S3 {
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] view_or_value<view, value> ToJsonObject() const {
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-            /* Todo
             try {
-
-                Poco::JSON::Object rootJson;
-                rootJson.set("key", key);
-                rootJson.set("size", size);
-                rootJson.set("etag", etag);
-                rootJson.set("versionId", versionId);
-                rootJson.set("sequencer", sequencer);
-                return rootJson;
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+                Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+                Core::Bson::BsonUtils::SetStringValue(document, "etag", etag);
+                Core::Bson::BsonUtils::SetStringValue(document, "versionId", versionId);
+                Core::Bson::BsonUtils::SetStringValue(document, "sequencer", sequencer);
+                return document.extract();
 
             } catch (Poco::Exception &exc) {
+                log_error << exc.what();
                 throw Core::JsonException(exc.message());
-            }*/
-            return {};
+            }
         }
 
         /**
-         * @brief Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to a DTO.
          *
          * @param document JSON object
          */
-        void FromJson(const view_or_value<view, value> &document) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
-            /* TOdo:
             try {
-                Core::JsonUtils::GetJsonValueString("key", jsonObject, key);
-                Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
-                Core::JsonUtils::GetJsonValueString("etag", jsonObject, etag);
-                Core::JsonUtils::GetJsonValueString("versionId", jsonObject, versionId);
-                Core::JsonUtils::GetJsonValueString("sequencer", jsonObject, sequencer);
+
+                key = Core::Bson::BsonUtils::GetStringValue(document, "key");
+                size = Core::Bson::BsonUtils::GetLongValue(document, "size");
+                etag = Core::Bson::BsonUtils::GetStringValue(document, "etag");
+                versionId = Core::Bson::BsonUtils::GetStringValue(document, "versionId");
+                sequencer = Core::Bson::BsonUtils::GetStringValue(document, "sequencer");
+                key = Core::Bson::BsonUtils::GetStringValue(document, "key");
+
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
+            }
+        }
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as JSON string
+         */
+        [[nodiscard]] std::string ToJson() const {
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
         }
 
         /**
@@ -288,8 +345,7 @@ namespace AwsMock::Dto::S3 {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Object &o) {
-            os << "Object={key='" + o.key + "' size='" + std::to_string(o.size) + "' etag='" + o.etag + "' versionId='" + o.versionId +
-                            "' sequencer='" + o.sequencer + "'}";
+            os << "Object=" << o.ToJson();
             return os;
         }
     };
@@ -317,55 +373,68 @@ namespace AwsMock::Dto::S3 {
         Object object;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToJson() const {
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+        }
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
-            /* TOdo:
+
             try {
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
+                Core::Bson::BsonUtils::SetStringValue(document, "configurationId", configurationId);
+                Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
+                Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
 
-                Poco::JSON::Object rootJson;
-                rootJson.set("s3SchemaVersion", s3SchemaVersion);
-                rootJson.set("configurationId", configurationId);
-                rootJson.set("bucket", bucket.ToJsonObject());
-                rootJson.set("object", object.ToJsonObject());
-                return rootJson;
+                document.append(kvp("bucket", bucket.ToDocument()));
+                document.append(kvp("object", object.ToDocument()));
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
-            }*/
-            return {};
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
         }
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
-         * @param jsonObject JSON object.
+         * @param document JSON object.
          */
-        void FromJson(const view_or_value<view, value> &jsonObject) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
-            /* Todo
             try {
-                Core::JsonUtils::GetJsonValueString("s3SchemaVersion", jsonObject, s3SchemaVersion);
-                Core::JsonUtils::GetJsonValueString("configurationId", jsonObject, configurationId);
-                if (jsonObject->has("bucket")) {
-                    // TODO: FIx me
-                    //bucket.FromJson(jsonObject->getObject("bucket"));
+
+                s3SchemaVersion = Core::Bson::BsonUtils::GetStringValue(document, "s3SchemaVersion");
+                configurationId = Core::Bson::BsonUtils::GetStringValue(document, "configurationId");
+
+                if (document.view().find("bucket") != document.view().end()) {
+
+                    bucket.FromDocument(document.view()["bucket"].get_document().value);
                 }
-                if (jsonObject->has("object")) {
-                    object.FromJson(jsonObject->getObject("object"));
+                if (document.view().find("object") != document.view().end()) {
+
+                    object.FromDocument(document.view()["object"].get_document().value);
                 }
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
+            }
         }
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -376,13 +445,12 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const S3 &s) {
-            os << "S3={s3SchemaVersion='" + s.s3SchemaVersion + "' configurationId='" + s.configurationId + "' bucket='" + s.bucket.ToString() +
-                            "' object='" + s.object.ToString() + "'}";
+            os << "S3=" << s.ToJson();
             return os;
         }
     };
@@ -435,40 +503,29 @@ namespace AwsMock::Dto::S3 {
         S3 s3;
 
         /**
-         * @brief Converts the DTO to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
-
-            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-        }
-
-        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-            /* Todo:
             try {
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "eventVersion", eventVersion);
+                Core::Bson::BsonUtils::SetStringValue(document, "eventSource", eventSource);
+                Core::Bson::BsonUtils::SetStringValue(document, "awsRegion", region);
+                Core::Bson::BsonUtils::SetDateValue(document, "eventTime", eventTime);
+                Core::Bson::BsonUtils::SetStringValue(document, "eventName", eventName);
 
-                Poco::JSON::Object rootJson;
-                rootJson.set("eventVersion", eventVersion);
-                rootJson.set("eventSource", eventSource);
-                rootJson.set("awsRegion", region);
-                rootJson.set("eventTime", Core::DateTimeUtils::ToISO8601(eventTime));
-                rootJson.set("eventName", eventName);
-                rootJson.set("userIdentity", userIdentity.ToJsonObject());
-                rootJson.set("s3", s3.ToJsonObject());
-                return rootJson;
+                document.append(kvp("userIdentity", userIdentity.ToDocument()));
+                document.append(kvp("s3", s3.ToDocument()));
+
+                return document.extract();
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
-            return {};
+            }
         }
 
         /**
@@ -477,19 +534,32 @@ namespace AwsMock::Dto::S3 {
          * @param document JSON object.
          */
         void FromDocument(const view_or_value<view, value> &document) {
-            /* Todo
+
             try {
-                Core::JsonUtils::GetJsonValueString("eventVersion", object, eventVersion);
-                Core::JsonUtils::GetJsonValueString("eventSource", object, eventSource);
-                Core::JsonUtils::GetJsonValueString("awsRegion", object, region);
-                Core::JsonUtils::GetJsonValueDate("eventTime", object, eventTime);
-                Core::JsonUtils::GetJsonValueString("eventName", object, eventName);
-                s3.FromJson(object->getObject("s3"));
+                eventVersion = Core::Bson::BsonUtils::GetStringValue(document, "eventVersion");
+                eventSource = Core::Bson::BsonUtils::GetStringValue(document, "eventSource");
+                region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+                eventTime = Core::Bson::BsonUtils::GetDateValue(document, "eventTime");
+                eventName = Core::Bson::BsonUtils::GetStringValue(document, "eventName");
+
+                // S3
+                if (document.view().find("s3") != document.view().end()) {
+                    s3.FromDocument(document.view()["s3"].get_document().value);
+                }
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
+            }
+        }
+
+        /**
+         * @brief Converts the DTO to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const {
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
         }
 
         /**
@@ -528,25 +598,23 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToJson() const {
 
-            /* Todo
             try {
-                Poco::JSON::Object rootJson;
 
+                document document;
                 if (!records.empty()) {
-                    Poco::JSON::Array recordsJsonArray;
+                    array recordsJsonArray;
                     for (const auto &record: records) {
-                        recordsJsonArray.add(record.ToJsonObject());
+                        recordsJsonArray.append(record.ToDocument());
                     }
-                    rootJson.set("Records", recordsJsonArray);
+                    document.append(kvp("Records", recordsJsonArray));
                 }
 
-                return Core::JsonUtils::ToJsonString(rootJson);
+                return Core::Bson::BsonUtils::ToJsonString(document);
 
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
-            return {};
+            }
         }
 
         /**
@@ -556,27 +624,21 @@ namespace AwsMock::Dto::S3 {
          */
         void FromJson(const std::string &jsonString) {
 
-            /* Todo:
             try {
-                Poco::JSON::Parser parser;
-                Poco::Dynamic::Var result = parser.parse(jsonString);
-                const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
                 // Record parsing
-                if (rootObject->has("Records")) {
-                    Poco::JSON::Array::Ptr recordArray = rootObject->getArray("Records");
-                    if (recordArray != nullptr) {
-                        for (const auto &it: *recordArray) {
-                            Record record;
-                            record.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-                            records.push_back(record);
-                        }
+                if (const value document = bsoncxx::from_json(jsonString); document.view().find("Records") != document.view().end()) {
+                    for (const bsoncxx::array::view recordArray = document.view()["Records"].get_array().value; const auto &it: recordArray) {
+                        Record record;
+                        record.FromDocument(it.get_document().value);
+                        records.push_back(record);
                     }
                 }
+
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }*/
+            }
         }
 
         /**

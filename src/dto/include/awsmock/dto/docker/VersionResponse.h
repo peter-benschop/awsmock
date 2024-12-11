@@ -11,37 +11,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/docker/model/Platform.h>
 
 namespace AwsMock::Dto::Docker {
-
-    /**
-     * Docker platform
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    struct Platform {
-
-        /**
-         * Platform name
-         */
-        std::string name;
-
-        /**
-         * Deserialize from a JSON object
-         *
-         * @param jsonObject JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &jsonObject) {
-
-            /* Todo
-            try {
-                Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-            } catch (Poco::Exception &exc) {
-                std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message());
-            }*/
-        }
-    };
 
     /**
      * Docker details

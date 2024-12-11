@@ -6,7 +6,6 @@
 #define AWSMOCK_DTO_DOCKER_PRUNE_CONTAINER_RESPONSE_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -37,56 +36,28 @@ namespace AwsMock::Dto::Docker {
          *
          * @return JSON string
          */
-        std::string ToJson() const {
-            return {};
-        }
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Convert to a JSON string
          *
          * @param jsonString JSON string
          */
-        void FromJson(const std::string &jsonString) {
-
-            /* Todo
-            try {
-                Poco::JSON::Parser parser;
-                const Poco::Dynamic::Var result = parser.parse(jsonString);
-                auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-                Core::JsonUtils::GetJsonValueLong("SpaceReclaimed", rootObject, spaceReclaimed);
-                if (Poco::JSON::Array::Ptr deletedArray = rootObject->getArray("ContainersDeleted"); deletedArray != nullptr) {
-                    for (const auto &nt: *deletedArray) {
-                        containersDeleted.push_back(nt.convert<std::string>());
-                    }
-                }
-
-            } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message());
-            }*/
-        }
+        void FromJson(const std::string &jsonString);
 
         /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] std::string
-        ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const PruneContainerResponse &i) {
-            os << "PruneContainerResponse=" << i.ToJson();
-            return os;
-        }
+        friend std::ostream &operator<<(std::ostream &os, const PruneContainerResponse &i);
     };
 
 }// namespace AwsMock::Dto::Docker
