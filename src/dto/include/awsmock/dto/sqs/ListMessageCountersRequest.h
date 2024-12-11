@@ -6,12 +6,10 @@
 #define AWSMOCK_DTO_SQS_LIST_MESSAGE_COUNTERS_REQUEST_H
 
 // C++ standard includes
-#include <iostream>
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>

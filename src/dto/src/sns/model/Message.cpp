@@ -7,22 +7,21 @@
 namespace AwsMock::Dto::SNS {
 
     std::string Message::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    Poco::JSON::Object Message::ToJsonObject() const {
+    view_or_value<view, value> Message::ToDocument() const {
 
-        Poco::JSON::Object rootObject;
         try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TopicArn", topicArn);
+            return document.extract();
 
-            rootObject.set("Region", region);
-            rootObject.set("TopicArn", topicArn);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        return rootObject;
     }
 
     std::string Message::ToString() const {

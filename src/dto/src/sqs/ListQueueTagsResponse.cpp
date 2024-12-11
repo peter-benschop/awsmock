@@ -9,17 +9,17 @@ namespace AwsMock::Dto::SQS {
     std::string ListQueueTagsResponse::ToJson() const {
 
         try {
-            document document;
+            document rootDocument;
 
             if (!tags.empty()) {
-                array tagsArrayJson;
-                for (const auto &queueArn: tags) {
-                    tagsArrayJson.append(queueArn);
+                document tagsArrayJson;
+                for (const auto &[fst, snd]: tags) {
+                    tagsArrayJson.append(kvp(fst, snd));
                 }
-                document.append(kvp("Tags", tagsArrayJson));
+                rootDocument.append(kvp("Tags", tagsArrayJson));
             }
-            Core::Bson::BsonUtils::SetIntValue(document, "Total", total);
-            return Core::Bson::BsonUtils::ToJsonString(document);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

@@ -9,20 +9,21 @@ namespace AwsMock::Dto::SQS {
     std::string ListMessageCountersResponse::ToJson() const {
 
         try {
-            Poco::JSON::Array messageArrayJson;
-            for (const auto &message: messages) {
-                messageArrayJson.add(message.ToJsonObject());
+            document document;
+            if (!messages.empty()) {
+                array messageArrayJson;
+                for (const auto &message: messages) {
+                    messageArrayJson.append(message.ToDocument());
+                }
+                document.append(kvp("Messages", messageArrayJson));
             }
+            document.append(kvp("Total", total));
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Messages", messageArrayJson);
-            rootJson.set("Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

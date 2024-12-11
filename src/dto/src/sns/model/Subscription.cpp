@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/10/2023.
 //
 
-#include "awsmock/dto/sns/model/Subscription.h"
+#include <awsmock/dto/sns/model/Subscription.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -10,31 +10,30 @@ namespace AwsMock::Dto::SNS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Subscription::ToJsonObject() const {
+    view_or_value<view, value> Subscription::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("id", id);
-            rootJson.set("region", region);
-            rootJson.set("topicArn", topicArn);
-            rootJson.set("protocol", protocol);
-            rootJson.set("subscriptionArn", subscriptionArn);
-            rootJson.set("endpoint", endpoint);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "protocol", protocol);
+            Core::Bson::BsonUtils::SetStringValue(document, "subscriptionArn", subscriptionArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "endpoint", endpoint);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -45,8 +44,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const Subscription &r) {
-        os << "Subscription={region='" << r.region << "', topicArn='" << r.topicArn + "', owner='" << r.owner << "', protocol='" << r.protocol << "', endpoint='"
-           << r.endpoint << "'}";
+        os << "Subscription=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::SNS

@@ -10,29 +10,27 @@ namespace AwsMock::Dto::SQS {
     std::string GetQueueDetailsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("queueName", queueName);
-            rootJson.set("queueUrl", queueUrl);
-            rootJson.set("queueArn", queueArn);
-            rootJson.set("messageCount", messageCount);
-            rootJson.set("retentionPeriod", retentionPeriod);
-            rootJson.set("size", size);
-            rootJson.set("delay", delay);
-            rootJson.set("maxMessageSize", maxMessageSize);
-            rootJson.set("visibilityTimeout", visibilityTimeout);
-            rootJson.set("owner", owner);
-            rootJson.set("available", available);
-            rootJson.set("invisible", invisible);
-            rootJson.set("delayed", delayed);
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "queueName", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "queueArn", queueArn);
+            Core::Bson::BsonUtils::SetLongValue(document, "messageCount", messageCount);
+            Core::Bson::BsonUtils::SetLongValue(document, "retentionPeriod", retentionPeriod);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetLongValue(document, "delay", delay);
+            Core::Bson::BsonUtils::SetLongValue(document, "maxMessageSize", maxMessageSize);
+            Core::Bson::BsonUtils::SetLongValue(document, "visibilityTimeout", visibilityTimeout);
+            Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
+            Core::Bson::BsonUtils::SetLongValue(document, "available", available);
+            Core::Bson::BsonUtils::SetLongValue(document, "delayed", delayed);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

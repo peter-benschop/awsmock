@@ -2,6 +2,7 @@
 // Created by vogje01 on 7/6/24.
 //
 
+#include <Poco/JSON/Object.h>
 #include <awsmock/dto/sqs/model/Message.h>
 
 namespace AwsMock::Dto::SQS {
@@ -10,88 +11,79 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Message::ToJsonObject() const {
+    view_or_value<view, value> Message::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("messageId", messageId);
-            rootJson.set("receiptHandle", receiptHandle);
-            rootJson.set("body", body);
-            rootJson.set("md5OfBody", md5Sum);
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "messageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "receiptHandle", receiptHandle);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "body", body);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5OfBody", md5Sum);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
 
             if (!messageAttributes.empty()) {
-                Poco::JSON::Array jsonMessageAttributeArray;
-                for (const auto &messageAttribute: messageAttributes) {
-                    Poco::JSON::Object jsonAttribute;
-                    jsonAttribute.set(messageAttribute.first, messageAttribute.second.ToJsonObject());
-                    jsonMessageAttributeArray.add(jsonAttribute);
+                array jsonMessageAttributeArray;
+                for (const auto &[fst, snd]: messageAttributes) {
+                    document jsonAttribute;
+                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
+                    jsonMessageAttributeArray.append(jsonAttribute);
                 }
-                rootJson.set("messageAttributes", jsonMessageAttributeArray);
+                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
             }
 
             if (!attributes.empty()) {
-                Poco::JSON::Array jsonAttributeArray;
-                for (const auto &attribute: attributes) {
-                    Poco::JSON::Object jsonAttribute;
-                    jsonAttribute.set(attribute.first, attribute.second);
-                    jsonAttributeArray.add(jsonAttribute);
+                array jsonAttributeArray;
+                for (const auto &[fst, snd]: attributes) {
+                    document jsonAttribute;
+                    jsonAttribute.append(kvp(fst, snd));
+                    jsonAttributeArray.append(jsonAttribute);
                 }
-                rootJson.set("attributes", jsonAttributeArray);
+                rootDocument.append(kvp("attributes", jsonAttributeArray));
             }
-            return rootJson;
+            return rootDocument.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void Message::FromJson(const Poco::JSON::Object::Ptr &rootObject) {
+    void Message::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Id", rootObject, id);
-            Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            body = Core::Bson::BsonUtils::GetStringValue(document, "MessageBody");
 
-            // User attributes
-            if (rootObject->has("MessageAttributes")) {
-
-                Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageAttributes");
-
-                if (!attributesObject.isNull()) {
-                    for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
-                        std::string attributeName = attributesObject->getNames()[i];
-                        MessageAttribute attributeValue;
-                        attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
-                        messageAttributes[attributeName] = attributeValue;
-                    }
+            // Attributes
+            if (document.view().find("MessageAttributes") != document.view().end()) {
+                for (const bsoncxx::array::view attributesView{document.view()["MessageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+                    MessageAttribute attribute;
+                    std::string key = bsoncxx::string::to_string(attributeElement.key());
+                    attribute.FromDocument(attributeElement.get_document().value);
+                    messageAttributes[key] = attribute;
                 }
             }
 
             // System attributes
-            if (rootObject->has("MessageSystemAttributes")) {
+            if (document.view().find("MessageSystemAttributes") != document.view().end()) {
 
-                Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageSystemAttributes");
-
-                if (!attributesObject.isNull()) {
-                    for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
-                        auto name = attributesObject->getNames()[i];
-                        auto value = attributesObject->get(name).convert<std::string>();
-                        attributes[name] = value;
-                    }
+                for (const bsoncxx::array::view attributesView{document.view()["MessageSystemAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+                    std::string key = bsoncxx::string::to_string(attributeElement.key());
+                    const std::string value = bsoncxx::string::to_string(attributeElement.get_string().value);
+                    attributes[key] = value;
                 }
             }
 
