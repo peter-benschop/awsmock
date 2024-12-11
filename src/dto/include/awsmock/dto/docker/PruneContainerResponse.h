@@ -10,17 +10,8 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -44,10 +35,20 @@ namespace AwsMock::Dto::Docker {
         /**
          * Convert to a JSON string
          *
+         * @return JSON string
+         */
+        std::string ToJson() const {
+            return {};
+        }
+
+        /**
+         * Convert to a JSON string
+         *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString) {
 
+            /* Todo
             try {
                 Poco::JSON::Parser parser;
                 const Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -62,7 +63,7 @@ namespace AwsMock::Dto::Docker {
 
             } catch (Poco::Exception &exc) {
                 throw Core::ServiceException(exc.message());
-            }
+            }*/
         }
 
         /**
@@ -83,12 +84,7 @@ namespace AwsMock::Dto::Docker {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const PruneContainerResponse &i) {
-            os << "PruneContainerResponse={spaceReclaimed='" << i.spaceReclaimed << "' containersDeleted=[";
-            for (auto &it: i.containersDeleted) {
-                os << it << ",";
-            }
-            os.seekp(-1, std::ios_base::end);
-            os << "]}";
+            os << "PruneContainerResponse=" << i.ToJson();
             return os;
         }
     };

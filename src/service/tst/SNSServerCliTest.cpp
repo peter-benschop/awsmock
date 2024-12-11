@@ -5,6 +5,9 @@
 #ifndef AWMOCK_SERVICE_SNS_CLI_INTEGRATION_TEST_H
 #define AWMOCK_SERVICE_SNS_CLI_INTEGRATION_TEST_H
 
+// C++ includes
+#include <string>
+
 // GTest includes
 #include <gtest/gtest.h>
 
@@ -49,6 +52,7 @@ namespace AwsMock::Service {
 
         static std::string GetTopicArn(const std::string &jsonString) {
 
+            /*
             std::string topicArn;
             Poco::JSON::Parser parser;
             const Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -66,11 +70,13 @@ namespace AwsMock::Service {
             } catch (Poco::Exception &exc) {
                 throw Core::ServiceException(exc.message());
             }
-            return topicArn;
+            return topicArn;*/
+            return {};
         }
 
         static std::string GetMessageId(const std::string &jsonString) {
 
+            /*
             std::string messageId;
             Poco::JSON::Parser parser;
             const Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -83,11 +89,13 @@ namespace AwsMock::Service {
             } catch (Poco::Exception &exc) {
                 throw Core::ServiceException(exc.message());
             }
-            return messageId;
+            return messageId;*/
+            return {};
         }
 
         static std::string GetQueueUrl(const std::string &jsonString) {
 
+            /*
             std::string queueUrl;
             Poco::JSON::Parser parser;
             const Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -100,11 +108,13 @@ namespace AwsMock::Service {
             } catch (Poco::Exception &exc) {
                 throw Core::ServiceException(exc.message());
             }
-            return queueUrl;
+            return queueUrl;*/
+            return {};
         }
 
         static std::string GetSubscriptionArn(const std::string &jsonString) {
 
+            /*
             std::string subscriptionArn;
             Poco::JSON::Parser parser;
             const Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -117,7 +127,8 @@ namespace AwsMock::Service {
             } catch (Poco::Exception &exc) {
                 throw Core::ServiceException(exc.message());
             }
-            return subscriptionArn;
+            return subscriptionArn;*/
+            return {};
         }
 
         std::string _endpoint;

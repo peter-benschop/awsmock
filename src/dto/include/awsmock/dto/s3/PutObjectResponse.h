@@ -6,18 +6,20 @@
 #define AWSMOCK_CORE_DTO_PUT_OBJECT_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
+#include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::S3 {
 
     struct PutObjectResponse {
+
+        /**
+         * Region
+         */
+        std::string region;
 
         /**
          * Bucket
@@ -47,12 +49,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Base64 encoded SHA1 checksum
          */
-        std::string checksumSha1 = {};
+        std::string sha1Sum = {};
 
         /**
          * Base64 encoded SHA256 checksum
          */
-        std::string checksumSha256 = {};
+        std::string sha256sum = {};
 
         /**
          * Metadata

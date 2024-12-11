@@ -8,7 +8,7 @@ namespace AwsMock::Dto::Common {
 
     void LambdaClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
-        Dto::Common::UserAgent userAgent;
+        UserAgent userAgent;
         userAgent.FromRequest(request);
 
         // Basic values
@@ -24,25 +24,24 @@ namespace AwsMock::Dto::Common {
 
         if (userAgent.clientCommand.empty()) {
 
-            this->command = Dto::Common::LambdaCommandTypeFromString(GetCommandFromHeader(request));
+            this->command = LambdaCommandTypeFromString(GetCommandFromHeader(request));
 
         } else {
 
-            this->command = Dto::Common::LambdaCommandTypeFromString(userAgent.clientCommand);
+            this->command = LambdaCommandTypeFromString(userAgent.clientCommand);
         }
     }
 
     std::string LambdaClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) const {
 
         std::string cmd;
-        std::string cType = request["Content-Type"];
-        if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
+        if (const std::string cType = request["Content-Type"]; Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
 
             cmd = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
-            std::string headerValue = request["X-Amz-Target"];
+            const std::string headerValue = request["X-Amz-Target"];
             cmd = Core::StringUtils::Split(headerValue, '.')[1];
 
         } else if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "lambda") {
@@ -55,25 +54,27 @@ namespace AwsMock::Dto::Common {
     std::string LambdaClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("region", region);
-            rootJson.set("user", user);
-            rootJson.set("url", url);
-            rootJson.set("contentType", contentType);
-            rootJson.set("payload", payload);
-            rootJson.set("command", LambdaCommandTypeToString(command));
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "url", url);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "payload", payload);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "command", LambdaCommandTypeToString(command));
 
             // Headers
-            Poco::JSON::Array jsonHeaders;
-            for (const auto &header: headers) {
-                Poco::JSON::Object jsonHeader;
-                jsonHeader.set(header.first, header.second);
-                jsonHeaders.add(jsonHeader);
+            if (!headers.empty()) {
+                array jsonHeaders;
+                for (const auto &[fst, snd]: headers) {
+                    document jsonHeader;
+                    jsonHeader.append(kvp(fst, snd));
+                    jsonHeaders.append(jsonHeader);
+                }
+                rootDocument.append(kvp("headers", jsonHeaders));
             }
-            rootJson.set("headers", jsonHeaders);
-
-            return Core::JsonUtils::ToJsonString(rootJson, true);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

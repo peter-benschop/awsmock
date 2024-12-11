@@ -7,12 +7,12 @@
 
 // C++ standard includes
 #include <string>
+#include <map>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 

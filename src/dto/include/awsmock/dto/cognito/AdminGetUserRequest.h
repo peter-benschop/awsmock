@@ -6,14 +6,10 @@
 #define AWSMOCK_DTO_COGNITO_ADMIN_GET_USER_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/MessageAction.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
@@ -24,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminGetUserRequest : public Dto::Common::BaseRequest {
+    struct AdminGetUserRequest : Common::BaseRequest {
 
         /**
          * ID of the user pool

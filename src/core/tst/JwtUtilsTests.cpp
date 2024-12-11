@@ -8,9 +8,6 @@
 // GTest includes
 #include <gtest/gtest.h>
 
-// Poco includes
-#include <Poco/Path.h>
-
 // Local includes
 #include <awsmock/core/JwtUtils.h>
 
@@ -87,7 +84,7 @@ namespace AwsMock::Core {
         payload["first2"] = "second2";
 
         // act
-        std::string result = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
+        const std::string result = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
 
         // assert
         EXPECT_FALSE(result.empty());
@@ -99,11 +96,11 @@ namespace AwsMock::Core {
         std::map<std::string, std::string> payload;
         payload["first1"] = "second1";
         payload["first2"] = "second2";
-        std::string createResult = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
+        const std::string createResult = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
         EXPECT_FALSE(createResult.empty());
 
         // act
-        bool result = JwtUtils::VerifyTokenRs256(publicKey, createResult, "auth0");
+        const bool result = JwtUtils::VerifyTokenRs256(publicKey, createResult, "auth0");
 
         // assert
         EXPECT_TRUE(result);

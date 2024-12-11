@@ -80,7 +80,7 @@ namespace AwsMock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.maxResults, request.skip, request.sortColumns);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
             const long count = _lambdaDatabase.LambdaCount(request.region);
 
             Dto::Lambda::ListFunctionCountersResponse response = Dto::Lambda::Mapper::map(request, lambdas);

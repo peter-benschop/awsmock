@@ -6,21 +6,16 @@
 #define AWSMOCK_DTO_COMMON_COGNITO_CLIENT_COMMAND_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // Boost includes
 #include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -143,14 +138,14 @@ namespace AwsMock::Dto::Common {
         std::string poolName;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Getś the value from the user-agent string
+         * @brief Gets the value from the user-agent string
          *
          * @param request HTTP server request
          * @param region AWS region
@@ -159,14 +154,14 @@ namespace AwsMock::Dto::Common {
         void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

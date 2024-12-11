@@ -8,29 +8,12 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/FilterRule.h>
-#include <bsoncxx/json.hpp>
 
 namespace AwsMock::Database::Entity::S3 {
-
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * S3 bucket topic notification entity
@@ -85,20 +68,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         TopicNotification FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
 
         /**
          * Converts the DTO to a string representation.

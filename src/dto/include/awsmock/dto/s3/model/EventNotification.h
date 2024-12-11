@@ -11,10 +11,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/lambda/model/UserIdentity.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/UserIdentity.h>
 
@@ -145,12 +143,13 @@ namespace AwsMock::Dto::S3 {
         std::string principalId;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
+            /* Todo
             try {
 
                 Poco::JSON::Object rootJson;
@@ -159,22 +158,24 @@ namespace AwsMock::Dto::S3 {
 
             } catch (Poco::Exception &exc) {
                 throw Core::JsonException(exc.message());
-            }
+            }*/
+            return {};
         }
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
-         * @param jsonObject JSON object.
+         * @param document JSON object.
          */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+        void FromJson(const view_or_value<view, value> &document) {
 
+            /* TOdo
             try {
                 Core::JsonUtils::GetJsonValueString("principalId", jsonObject, principalId);
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
         }
 
         /**
@@ -227,12 +228,13 @@ namespace AwsMock::Dto::S3 {
         std::string sequencer;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+        [[nodiscard]] view_or_value<view, value> ToJsonObject() const {
 
+            /* Todo
             try {
 
                 Poco::JSON::Object rootJson;
@@ -245,16 +247,18 @@ namespace AwsMock::Dto::S3 {
 
             } catch (Poco::Exception &exc) {
                 throw Core::JsonException(exc.message());
-            }
+            }*/
+            return {};
         }
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+        void FromJson(const view_or_value<view, value> &document) {
 
+            /* TOdo:
             try {
                 Core::JsonUtils::GetJsonValueString("key", jsonObject, key);
                 Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
@@ -264,7 +268,7 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
         }
 
         /**
@@ -317,8 +321,8 @@ namespace AwsMock::Dto::S3 {
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
-
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+            /* TOdo:
             try {
 
                 Poco::JSON::Object rootJson;
@@ -331,7 +335,8 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
+            return {};
         }
 
         /**
@@ -339,8 +344,9 @@ namespace AwsMock::Dto::S3 {
          *
          * @param jsonObject JSON object.
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+        void FromJson(const view_or_value<view, value> &jsonObject) {
 
+            /* Todo
             try {
                 Core::JsonUtils::GetJsonValueString("s3SchemaVersion", jsonObject, s3SchemaVersion);
                 Core::JsonUtils::GetJsonValueString("configurationId", jsonObject, configurationId);
@@ -355,7 +361,7 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
         }
 
         /**
@@ -435,16 +441,17 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] std::string ToJson() const {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
         }
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
+            /* Todo:
             try {
 
                 Poco::JSON::Object rootJson;
@@ -460,16 +467,17 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
+            return {};
         }
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
-         * @param object JSON object.
+         * @param document JSON object.
          */
-        void FromJson(Poco::JSON::Object::Ptr object) {
-
+        void FromDocument(const view_or_value<view, value> &document) {
+            /* Todo
             try {
                 Core::JsonUtils::GetJsonValueString("eventVersion", object, eventVersion);
                 Core::JsonUtils::GetJsonValueString("eventSource", object, eventSource);
@@ -481,11 +489,11 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
         }
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -496,7 +504,7 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
@@ -514,12 +522,13 @@ namespace AwsMock::Dto::S3 {
         std::vector<Record> records;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToJson() const {
 
+            /* Todo
             try {
                 Poco::JSON::Object rootJson;
 
@@ -536,16 +545,18 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
+            return {};
         }
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
          * @param jsonString JSON string.
          */
         void FromJson(const std::string &jsonString) {
 
+            /* Todo:
             try {
                 Poco::JSON::Parser parser;
                 Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -565,11 +576,11 @@ namespace AwsMock::Dto::S3 {
             } catch (Poco::Exception &exc) {
                 log_error << exc.message();
                 throw Core::JsonException(exc.message());
-            }
+            }*/
         }
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -580,16 +591,12 @@ namespace AwsMock::Dto::S3 {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const EventNotification &e) {
-            os << "EventNotification={";
-            for (const auto &r: e.records) {
-                os << r.ToString();
-            }
-            os << "'}";
+            os << "EventNotification=" << e.ToJson();
             return os;
         }
     };

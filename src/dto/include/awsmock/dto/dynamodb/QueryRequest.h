@@ -6,15 +6,11 @@
 #define AWSMOCK_DTO_DYNAMODB_QUERY_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
+#include <map>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::DynamoDb {

@@ -17,6 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>

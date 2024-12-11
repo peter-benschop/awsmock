@@ -8,82 +8,71 @@ namespace AwsMock::Dto::SQS {
 
     void SendMessageRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-
-            // General
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, queueUrl);
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
-            Core::JsonUtils::GetJsonValueString("MessageBody", rootObject, body);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
+            body = Core::Bson::BsonUtils::GetStringValue(document, "MessageBody");
 
             // Sanitize
             queueUrl = Core::SanitizeSQSUrl(queueUrl);
 
-            // User attributes
-            if (rootObject->has("MessageAttributes")) {
-
-                Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageAttributes");
-
-                if (!attributesObject.isNull()) {
-                    for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
-                        std::string attributeName = attributesObject->getNames()[i];
-                        MessageAttribute attributeValue;
-                        attributeValue.FromJsonObject(attributesObject->getObject(attributeName));
-                        messageAttributes[attributeName] = attributeValue;
-                    }
+            // Attributes
+            if (document.view().find("MessageAttributes") != document.view().end()) {
+                for (const bsoncxx::array::view attributesView{document.view()["MessageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+                    MessageAttribute attribute;
+                    std::string key = bsoncxx::string::to_string(attributeElement.key());
+                    attribute.FromDocument(attributeElement.get_document().value);
+                    messageAttributes[key] = attribute;
                 }
             }
 
             // System attributes
-            if (rootObject->has("MessageSystemAttributes")) {
+            if (document.view().find("MessageSystemAttributes") != document.view().end()) {
 
-                Poco::JSON::Object::Ptr attributesObject = rootObject->getObject("MessageSystemAttributes");
-
-                if (!attributesObject.isNull()) {
-                    for (size_t i = 0; i < attributesObject->getNames().size(); i++) {
-                        auto name = attributesObject->getNames()[i];
-                        auto value = attributesObject->get(name).convert<std::string>();
-                        attributes[name] = value;
-                    }
+                for (const bsoncxx::array::view attributesView{document.view()["MessageSystemAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+                    std::string key = bsoncxx::string::to_string(attributeElement.key());
+                    const std::string value = bsoncxx::string::to_string(attributeElement.get_string().value);
+                    attributes[key] = value;
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string SendMessageRequest::ToJson() {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueUrl", queueUrl);
-            rootJson.set("MessageBody", body);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "QueueUrl", queueUrl);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "MessageBody", body);
 
-            Poco::JSON::Array jsonMessageAttributeArray;
-            for (const auto &messageAttribute: messageAttributes) {
-                Poco::JSON::Object jsonAttribute;
-                jsonAttribute.set(messageAttribute.first, messageAttribute.second.ToJsonObject());
-                jsonMessageAttributeArray.add(jsonAttribute);
+            if (!messageAttributes.empty()) {
+                array jsonMessageAttributeArray;
+                for (const auto &[fst, snd]: messageAttributes) {
+                    document jsonAttribute;
+                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
+                    jsonMessageAttributeArray.append(jsonAttribute);
+                }
+                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
             }
-            rootJson.set("MessageAttributes", jsonMessageAttributeArray);
 
-            Poco::JSON::Array jsonAttributeArray;
-            for (const auto &attribute: attributes) {
-                Poco::JSON::Object jsonAttribute;
-                jsonAttribute.set(attribute.first, attribute.second);
-                jsonMessageAttributeArray.add(jsonAttribute);
+            if (!attributes.empty()) {
+                document jsonAttributeObject;
+                for (const auto &[fst, snd]: attributes) {
+                    jsonAttributeObject.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("attributes", jsonAttributeObject));
             }
-            rootJson.set("Attributes", jsonMessageAttributeArray);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

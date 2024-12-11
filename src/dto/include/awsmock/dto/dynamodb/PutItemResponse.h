@@ -38,7 +38,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PutItemResponse : public Dto::Common::BaseRequest {
+    struct PutItemResponse : Common::BaseRequest {
 
         /**
          * Region
@@ -66,18 +66,18 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Parse a JSON stream
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
+
+        /**
+         * @brief Creates a JSON string from the object.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

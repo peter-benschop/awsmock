@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/secretsmanager/RotationRules.h>
 
 namespace AwsMock::Dto::SecretsManager {

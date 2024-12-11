@@ -271,7 +271,7 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::S3::BucketList bucketList = _database.ListBuckets(s3Request.region, s3Request.prefix, s3Request.maxResults, s3Request.skip, s3Request.sortColumns);
+            Database::Entity::S3::BucketList bucketList = _database.ListBuckets(s3Request.region, s3Request.prefix, s3Request.pageSize, s3Request.pageIndex, s3Request.sortColumns);
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
             listAllBucketResponse.total = _database.BucketCount(s3Request.region, s3Request.prefix);
@@ -578,7 +578,7 @@ namespace AwsMock::Service {
             log_error << "S3 copy object request failed, error: " << ex.what();
             throw Core::ServiceException(ex.message());
         }
-        return {.eTag = targetObject.md5sum, .lastModified = Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
+        return {.eTag = targetObject.md5sum, .modified = system_clock::now()};
     }
 
     Dto::S3::MoveObjectResponse S3Service::MoveObject(const Dto::S3::MoveObjectRequest &request) const {
@@ -1129,8 +1129,8 @@ namespace AwsMock::Service {
                 .etag = object.md5sum,
                 .md5Sum = object.md5sum,
                 .contentLength = size,
-                .checksumSha1 = object.sha1sum,
-                .checksumSha256 = object.sha256sum,
+                .sha1Sum = object.sha1sum,
+                .sha256sum = object.sha256sum,
                 .metadata = request.metadata};
     }
 
@@ -1224,8 +1224,8 @@ namespace AwsMock::Service {
                 .etag = object.md5sum,
                 .md5Sum = object.md5sum,
                 .contentLength = size,
-                .checksumSha1 = object.sha1sum,
-                .checksumSha256 = object.sha256sum,
+                .sha1Sum = object.sha1sum,
+                .sha256sum = object.sha256sum,
                 .metadata = request.metadata,
                 .versionId = object.versionId};
     }
@@ -1249,7 +1249,7 @@ namespace AwsMock::Service {
 
             // Get events
             for (const auto &event: events) {
-                queueNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+                queueNotification.events.emplace_back(EventTypeToString(event));
             }
 
             // Get filter rules

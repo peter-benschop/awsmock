@@ -8,6 +8,7 @@ namespace AwsMock::Dto::KMS {
 
     std::string ScheduledKeyDeletionResponse::ToJson() const {
 
+        /* Todo:
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("KeyId", keyId);
@@ -20,7 +21,7 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string ScheduledKeyDeletionResponse::ToString() const {

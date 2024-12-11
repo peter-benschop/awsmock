@@ -8,11 +8,6 @@
 // GTest includes
 #include <gtest/gtest.h>
 
-// Poco includes
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/Path.h>
-
 // Local includes
 #include <awsmock/core/XmlUtils.h>
 

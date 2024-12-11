@@ -5,6 +5,9 @@
 #ifndef AWMOCK_SQS_CLI_INTEGRATIONTEST_H
 #define AWMOCK_SQS_CLI_INTEGRATIONTEST_H
 
+// C++ includes
+#include <string>
+
 // GTest includes
 #include <gtest/gtest.h>
 
@@ -63,7 +66,7 @@ namespace AwsMock::Service {
 
         static std::string GetReceiptHandle(const std::string &jsonString) {
 
-            std::string receiptHandle;
+            /*            std::string receiptHandle;
             Poco::JSON::Parser parser;
             Poco::Dynamic::Var result = parser.parse(jsonString);
             const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -80,7 +83,8 @@ namespace AwsMock::Service {
             } catch (Poco::Exception &exc) {
                 throw Core::ServiceException(exc.message());
             }
-            return receiptHandle;
+            return receiptHandle;*/
+            return {};
         }
 
         boost::thread _thread;

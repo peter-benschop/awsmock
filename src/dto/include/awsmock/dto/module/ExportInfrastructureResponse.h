@@ -7,17 +7,10 @@
 
 // C++ includes
 #include <string>
-#include <vector>
-
-// Boost includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/exception/exception.hpp>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
 
 namespace AwsMock::Dto::Module {
@@ -59,7 +52,7 @@ namespace AwsMock::Dto::Module {
         bool prettyPrint = false;
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @return payload json string
          */

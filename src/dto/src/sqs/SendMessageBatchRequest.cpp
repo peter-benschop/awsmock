@@ -8,6 +8,7 @@ namespace AwsMock::Dto::SQS {
 
     void SendMessageBatchRequest::FromJson(const std::string &jsonString) {
 
+        /* Todo
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -37,11 +38,12 @@ namespace AwsMock::Dto::SQS {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
     }
 
     std::string SendMessageBatchRequest::ToJson() const {
 
+        /* Todo
         try {
 
             Poco::JSON::Object rootJson;
@@ -58,7 +60,8 @@ namespace AwsMock::Dto::SQS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string SendMessageBatchRequest::ToString() {

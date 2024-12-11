@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_DYNAMODB_RESTORESTATUS_H
 
 // C++ includes
-#include <sstream>
+#include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -58,9 +55,9 @@ namespace AwsMock::Dto::DynamoDb {
     }
 
     [[maybe_unused]] static TableStatusType TableStatusTypeFromString(const std::string &tableStatusName) {
-        for (auto &it: TableStatusTypeNames) {
-            if (it.second == tableStatusName) {
-                return it.first;
+        for (auto &[fst, snd]: TableStatusTypeNames) {
+            if (snd == tableStatusName) {
+                return fst;
             }
         }
         return TableStatusType::UNKNOWN;

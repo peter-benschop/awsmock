@@ -11,30 +11,13 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::Transfer {
 
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
     using std::chrono::system_clock;
 
     enum ServerState {
@@ -176,20 +159,6 @@ namespace AwsMock::Database::Entity::Transfer {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(Poco::JSON::Object::Ptr jsonObject);
 
         /**
          * @brief Converts the DTO to a string representation.

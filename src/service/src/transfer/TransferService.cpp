@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/transfer/TransferService.h>
+#include <gtest/internal/gtest-port.h>
 
 namespace AwsMock::Service {
 
@@ -16,7 +17,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Transfer manager exists already");
         }
 
-        std::string serverId = "s-" + Poco::toLower(Core::StringUtils::GenerateRandomHexString(20));
+        std::string serverId = "s-" + Core::StringUtils::ToLower(Core::StringUtils::GenerateRandomHexString(20));
 
         Database::Entity::Transfer::Transfer transferEntity;
         std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");

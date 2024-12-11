@@ -56,17 +56,17 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    void Record::FromJson(const view_or_value<view, value> &object) {
+    void Record::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            region = Core::Bson::BsonUtils::GetStringValue(object, "awsRegion");
-            messageId = Core::Bson::BsonUtils::GetStringValue(object, "messageId");
-            receiptHandle = Core::Bson::BsonUtils::GetStringValue(object, "receiptHandle");
-            body = Core::Bson::BsonUtils::GetStringValue(object, "body");
-            md5Sum = Core::Bson::BsonUtils::GetStringValue(object, "md5OfBody");
-            eventSource = Core::Bson::BsonUtils::GetStringValue(object, "eventSource");
-            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(object, "eventSourceArn");
+            region = Core::Bson::BsonUtils::GetStringValue(document, "awsRegion");
+            messageId = Core::Bson::BsonUtils::GetStringValue(document, "messageId");
+            receiptHandle = Core::Bson::BsonUtils::GetStringValue(document, "receiptHandle");
+            body = Core::Bson::BsonUtils::GetStringValue(document, "body");
+            md5Sum = Core::Bson::BsonUtils::GetStringValue(document, "md5OfBody");
+            eventSource = Core::Bson::BsonUtils::GetStringValue(document, "eventSource");
+            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "eventSourceArn");
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

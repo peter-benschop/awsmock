@@ -1,7 +1,6 @@
 
 #include <awsmock/core/StringUtils.h>
-
-static const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+#include <boost/exception/info.hpp>
 
 namespace AwsMock::Core {
 
@@ -16,7 +15,7 @@ namespace AwsMock::Core {
         return T{seed_seq};
     }
 
-    auto randomString(std::size_t len) -> std::string {
+    auto randomString(const std::size_t len) -> std::string {
         static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
@@ -25,15 +24,15 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string StringUtils::GenerateRandomString(int length) {
+    std::string StringUtils::GenerateRandomString(const int length) {
         return randomString(length);
     }
 
-    std::string StringUtils::GenerateRandomAlphanumericString(int length) {
-        return Poco::toLower(randomString(length));
+    std::string StringUtils::GenerateRandomAlphanumericString(const int length) {
+        return Core::StringUtils::ToLower(randomString(length));
     }
 
-    auto randomHexString(std::size_t len) -> std::string {
+    auto randomHexString(const std::size_t len) -> std::string {
         static constexpr auto chars = "0123456789abcdef";
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
@@ -42,11 +41,11 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string StringUtils::GenerateRandomHexString(int length) {
+    std::string StringUtils::GenerateRandomHexString(const int length) {
         return randomHexString(length);
     }
 
-    auto randomPasswordString(std::size_t len) -> std::string {
+    auto randomPasswordString(const std::size_t len) -> std::string {
         static constexpr auto chars = R"(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~)";
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
@@ -55,11 +54,11 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string StringUtils::GenerateRandomPassword(int length) {
+    std::string StringUtils::GenerateRandomPassword(const int length) {
         return randomPasswordString(length);
     }
 
-    auto randomVersionString(std::size_t len) -> std::string {
+    auto randomVersionString(const std::size_t len) -> std::string {
         static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
@@ -68,7 +67,7 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string StringUtils::GenerateRandomVersion(int length) {
+    std::string StringUtils::GenerateRandomVersion(const int length) {
         return randomVersionString(length);
     }
 
@@ -95,7 +94,7 @@ namespace AwsMock::Core {
         return tokens;
     }
 
-    std::string StringUtils::Join(const std::vector<std::string> &vec, char delimiter, int startIndex) {
+    std::string StringUtils::Join(const std::vector<std::string> &vec, const int startIndex) {
         std::string result;
         for (int i = startIndex; i < vec.size(); i++) {
             result += vec[i];
@@ -115,7 +114,7 @@ namespace AwsMock::Core {
         return str;
     }
 
-    std::string StringUtils::StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> str) {
+    std::string StringUtils::StripLineEndings(std::basic_string<char> str) {
         const std::string &chars = "\n\r";
         str.erase(std::ranges::remove_if(str, [&chars](const char &c) {
                       return chars.find(c) != std::string::npos;
@@ -136,7 +135,7 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::EqualsIgnoreCase(const std::string &s1, const std::string &s2) {
-        return Poco::icompare(s1, s2) == 0;
+        return boost::beast::iequals(s1, s2);
     }
 
     bool StringUtils::IsNullOrEmpty(const std::string *s1) {
@@ -148,7 +147,7 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::ContainsIgnoreCase(const std::string &s1, const std::string &s2) {
-        return boost::algorithm::to_lower_copy(s1).find(Poco::toLower(s2)) != std::string::npos;
+        return boost::algorithm::to_lower_copy(s1).find(ToLower(s2)) != std::string::npos;
     }
 
     bool StringUtils::StartsWith(const std::string &s1, const std::string &s2) {
@@ -163,7 +162,7 @@ namespace AwsMock::Core {
         return s1.ends_with(s2);
     }
 
-    std::string StringUtils::SubString(const std::string &string, int beginIndex, int endIndex) {
+    std::string StringUtils::SubString(const std::string &string, const int beginIndex, const int endIndex) {
         const int size = static_cast<int>(string.size());
         if (beginIndex < 0 || beginIndex > size - 1)
             return "-1";// Index out of bounds
@@ -194,9 +193,11 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::UrlEncode(const std::string &input) {
-        std::string encoded;
-        Poco::URI::encode(input, "!*'();:@&=+$,?#[] ", encoded);
-        return encoded;
+        // TODO: fix
+        // boost::urls::encoding_opts opt;
+        // opt.space_as_plus = true;
+        // return encode(input, "&!*'();:@&=+$,?#[] ", opt);
+        return input;
     }
 
     char *StringUtils::Replace(const char *original, char const *const pattern, char const *const replacement) {
@@ -241,9 +242,7 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::UrlDecode(const std::string &input) {
-        std::string decoded;
-        Poco::URI::decode(input, decoded, true);
-        return Poco::replace(decoded, '+', ' ');
+        return boost::to_string(boost::urls::decode_view(input));
     }
 
     std::string StringUtils::Quoted(const std::string &input) {
@@ -252,30 +251,7 @@ namespace AwsMock::Core {
         return escaped.str();
     }
 
-    std::string StringUtils::SanitizeUtf8(std::string &input) {
-#ifndef _WIN32
-        size_t inbytes_len = input.length();
-        auto inbuf = const_cast<char *>(input.c_str());
-
-        size_t outbytes_len = input.length();
-        const auto result = static_cast<char *>(calloc(outbytes_len + 1, sizeof(char)));
-        char *outbuf = result;
-
-        const iconv_t cd = iconv_open("UTF-8//IGNORE", "UTF-8");
-        if (cd == reinterpret_cast<iconv_t>(-1)) {
-            perror("iconv_open");
-        }
-        if (iconv(cd, &inbuf, &inbytes_len, &outbuf, &outbytes_len)) {
-            perror("iconv");
-        }
-        iconv_close(cd);
-        input.assign(result);
-        delete result;
-#endif
-        return input;
-    }
-
-    std::string StringUtils::ToHexString(unsigned char *input, size_t length) {
+    std::string StringUtils::ToHexString(const unsigned char *input, const size_t length) {
         std::stringstream ss;
         for (size_t i = 0; i < length; i++) {
             ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(input[i]);
@@ -283,12 +259,12 @@ namespace AwsMock::Core {
         return ss.str();
     }
 
-    std::string StringUtils::ToString(bool value) {
+    std::string StringUtils::ToString(const bool value) {
         return value ? "true" : "false";
     }
 
-    std::string StringUtils::StripChunkSignature(std::string &input) {
-        std::regex regex("(^|\r\n)[0-9a-fA-F]+;chunk-signature=[0-9a-f]{64}(\r\n)(\r\n$)?", std::regex_constants::icase);
+    std::string StringUtils::StripChunkSignature(const std::string &input) {
+        const std::regex regex("(^|\r\n)[0-9a-fA-F]+;chunk-signature=[0-9a-f]{64}(\r\n)(\r\n$)?", std::regex_constants::icase);
         return std::regex_replace(input, regex, "");
     }
 

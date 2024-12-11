@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <string>
+#include <map>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>

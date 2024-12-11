@@ -8,6 +8,7 @@ namespace AwsMock::Dto::KMS {
 
     void DecryptRequest::FromJson(const std::string &jsonString) {
 
+        /* TOdo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -36,11 +37,12 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string DecryptRequest::ToJson() const {
 
+        /* Todo:
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
@@ -61,7 +63,8 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string DecryptRequest::ToString() const {

@@ -196,29 +196,29 @@ namespace AwsMock::Dto::Common {
     std::string S3ClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("method", std::string(to_string(method)));
-            rootJson.set("region", region);
-            rootJson.set("user", user);
-            rootJson.set("command", Dto::Common::S3CommandTypeToString(command));
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("prefix", prefix);
-            rootJson.set("contentType", contentType);
-            rootJson.set("contentLength", contentLength);
-            rootJson.set("versionRequest", versionRequest);
-            rootJson.set("notificationRequest", notificationRequest);
-            rootJson.set("multipartRequest", multipartRequest);
-            rootJson.set("uploads", uploads);
-            rootJson.set("partNumber", partNumber);
-            rootJson.set("copyRequest", copyRequest);
-            rootJson.set("uploadId", uploadId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "method", std::string(to_string(method)));
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "command", S3CommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
+            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            Core::Bson::BsonUtils::SetIntValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetBoolValue(document, "versionRequest", versionRequest);
+            Core::Bson::BsonUtils::SetBoolValue(document, "notificationRequest", notificationRequest);
+            Core::Bson::BsonUtils::SetBoolValue(document, "multipartRequest", multipartRequest);
+            Core::Bson::BsonUtils::SetBoolValue(document, "uploads", uploads);
+            Core::Bson::BsonUtils::SetIntValue(document, "partNumber", partNumber);
+            Core::Bson::BsonUtils::SetBoolValue(document, "copyRequest", copyRequest);
+            Core::Bson::BsonUtils::SetStringValue(document, "uploadId", uploadId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

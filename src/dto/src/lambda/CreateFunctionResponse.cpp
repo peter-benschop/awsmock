@@ -10,8 +10,7 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            bsoncxx::builder::basic::document document;
-
+            document document;
             Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
             Core::Bson::BsonUtils::SetStringValue(document, "Runtime", runtime);
             Core::Bson::BsonUtils::SetStringValue(document, "Role", role);
@@ -32,7 +31,7 @@ namespace AwsMock::Dto::Lambda {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::ServiceException(exc.what());
+            throw Core::JsonException(exc.what());
         }
     }
 

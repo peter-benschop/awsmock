@@ -11,10 +11,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -67,13 +63,6 @@ namespace AwsMock::Dto::SQS {
         std::string eventSourceArn;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
@@ -85,14 +74,14 @@ namespace AwsMock::Dto::SQS {
          *
          * @return DTO as string for logging.
          */
-        void FromDocument(const view_or_value<view, value> &document) const;
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
-         * @brief Converts a JSON representation to s DTO.
+         * @brief Converts the DTO to a JSON string.
          *
-         * @param object JSON object.
+         * @return DTO as JSON string.
          */
-        void FromJson(const view_or_value<view, value> &object);
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

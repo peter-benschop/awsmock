@@ -6,25 +6,20 @@
 #define AWSMOCK_CORE_STRING_UTILS_H
 
 // C++ standard includes
-#include <algorithm>
-#include <array>
-#include <iconv.h>
 #include <iomanip>
-#include <iterator>
 #include <random>
 #include <regex>
-#include <sstream>
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/RegularExpression.h>
-#include <Poco/String.h>
-#include <Poco/URI.h>
+// Boost includes
+#include <boost/beast/core/string.hpp>
+#include <boost/url/decode_view.hpp>
+#include <boost/url/encode.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 // Boost includes
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 namespace AwsMock::Core {
@@ -114,11 +109,10 @@ namespace AwsMock::Core {
          * @brief Joins a string array to a string using the given delimiter.
          *
          * @param vec vector of strings
-         * @param delimiter delimiter character
          * @param startIndex starting index default = 0
          * @return joined string
          */
-        static std::string Join(const std::vector<std::string> &vec, char delimiter, int startIndex = 0);
+        static std::string Join(const std::vector<std::string> &vec, int startIndex = 0);
 
         /**
          * @brief Strip whitespaces
@@ -321,7 +315,7 @@ namespace AwsMock::Core {
          * @param length length of the byte array
          * @return hex encoded string
          */
-        static std::string ToHexString(unsigned char *input, size_t length);
+        static std::string ToHexString(const unsigned char *input, size_t length);
 
         /**
          * @brief Sanitizes the string and removes Convert the given string to a hex encoded string.
@@ -337,7 +331,7 @@ namespace AwsMock::Core {
          * @param input input string
          * @return stripped input string
          */
-        static std::string StripChunkSignature(std::string &input);
+        static std::string StripChunkSignature(const std::string &input);
 
         /**
          * @brief Converts a bool variable to a string.

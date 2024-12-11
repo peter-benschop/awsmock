@@ -9,28 +9,28 @@ namespace AwsMock::Dto::S3 {
     std::string CompleteMultipartUploadRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("user", user);
-            rootJson.set("uploadId", uploadId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "uploadId", uploadId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void CompleteMultipartUploadRequest::FromXml(const std::string &xmlString) {
 
+        /* Todo:
         Poco::XML::DOMParser parser;
         Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
         Poco::XML::Node *node = pDoc->getNodeByPath("/CreateBucketConfiguration/LocationConstraint");
-        region = node->innerText();
+        region = node->innerText();*/
     }
 
     std::string CompleteMultipartUploadRequest::ToString() const {

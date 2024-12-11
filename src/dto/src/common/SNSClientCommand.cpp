@@ -8,7 +8,7 @@ namespace AwsMock::Dto::Common {
 
     void SNSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
-        Dto::Common::UserAgent userAgent;
+        UserAgent userAgent;
         userAgent.FromRequest(request);
 
         // Basic values
@@ -24,18 +24,18 @@ namespace AwsMock::Dto::Common {
 
         if (userAgent.clientCommand.empty()) {
 
-            this->command = Dto::Common::SNSCommandTypeFromString(GetCommandFromHeader(request));
+            this->command = SNSCommandTypeFromString(GetCommandFromHeader(request));
 
         } else {
 
-            this->command = Dto::Common::SNSCommandTypeFromString(userAgent.clientCommand);
+            this->command = SNSCommandTypeFromString(userAgent.clientCommand);
         }
     }
 
     std::string SNSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) const {
 
         std::string cmd;
-        std::string cType = request["Content-Type"];
+        const std::string cType = request["Content-Type"];
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             // awsmock command from UI
@@ -47,7 +47,7 @@ namespace AwsMock::Dto::Common {
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
-            std::string headerValue = request["X-Amz-Target"];
+            const std::string headerValue = request["X-Amz-Target"];
             cmd = Core::StringUtils::Split(headerValue, '.')[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);
@@ -56,17 +56,18 @@ namespace AwsMock::Dto::Common {
     std::string SNSClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("command", SNSCommandTypeToString(command));
-            rootJson.set("user", user);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(document, "command", SNSCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "user", user);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

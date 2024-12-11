@@ -11,7 +11,7 @@ namespace AwsMock::Dto::SSM {
         Dto::SSM::Parameter responseDto;
         responseDto.region = parameterEntity.region;
         responseDto.name = parameterEntity.parameterName;
-        responseDto.value = parameterEntity.parameterValue;
+        responseDto.parameterValue = parameterEntity.parameterValue;
         responseDto.description = parameterEntity.description;
         responseDto.arn = parameterEntity.arn;
         responseDto.tier = parameterEntity.tier;

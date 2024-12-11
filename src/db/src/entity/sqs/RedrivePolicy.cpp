@@ -18,6 +18,20 @@ namespace AwsMock::Database::Entity::SQS {
         }
     }
 
+    void RedrivePolicy::FromJson(const std::string &jsonString) {
+
+        try {
+
+            const value document = bsoncxx::from_json(jsonString);
+            deadLetterTargetArn = Core::Bson::BsonUtils::GetStringValue(document, "deadLetterTargetArn");
+            maxReceiveCount = Core::Bson::BsonUtils::GetIntValue(document, "maxReceiveCount");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     view_or_value<view, value> RedrivePolicy::ToDocument() const {
 
         view_or_value<view, value> redrivePolicyDoc = make_document(

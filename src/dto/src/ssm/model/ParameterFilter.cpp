@@ -8,6 +8,7 @@ namespace AwsMock::Dto::SSM {
 
     std::string ParameterFilter::ToJson() const {
 
+        /* Todo
         try {
 
             Poco::JSON::Object jsonObject = ToJsonObject();
@@ -16,11 +17,12 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
-    Poco::JSON::Object ParameterFilter::ToJsonObject() const {
+    view_or_value<view, value> ParameterFilter::ToDocument() const {
 
+        /* TOdo:
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Key", key);
@@ -38,11 +40,12 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
-    void ParameterFilter::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void ParameterFilter::FromDocument(const view_or_value<view, value> &document) {
 
+        /* Todo
         try {
 
             // Attributes
@@ -63,7 +66,7 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string ParameterFilter::ToString() const {

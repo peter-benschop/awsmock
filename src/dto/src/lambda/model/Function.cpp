@@ -57,7 +57,7 @@ namespace AwsMock::Dto::Lambda {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            throw Core::ServiceException(exc.what());
+            throw Core::JsonException(exc.what());
         }
     }
 

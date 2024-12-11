@@ -12,7 +12,7 @@ namespace AwsMock::Dto::Cognito {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
-            Core::Bson::BsonUtils::SetStringValue(document, "Value", value);
+            Core::Bson::BsonUtils::SetStringValue(document, "Value", attributeValue);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {
@@ -26,11 +26,11 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
-            value = Core::Bson::BsonUtils::GetStringValue(document, "Value");
+            attributeValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

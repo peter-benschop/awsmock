@@ -7,14 +7,10 @@
 
 // C++ standard includes
 #include <string>
-#include <utility>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
@@ -137,7 +133,7 @@ namespace AwsMock::Dto::Module {
          *
          * @param document BSON document
          */
-        void FromDocument(const bsoncxx::document::view &document);
+        void FromDocument(const view &document);
 
         /**
          * @brief From JSON representation

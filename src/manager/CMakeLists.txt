@@ -9,7 +9,7 @@ link_directories(../core ../dto ../db ../service)
 add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
-target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx PocoPrometheus PocoNet PocoJSON PocoXML PocoZip PocoFoundation
-        PocoUtil boost_program_options boost_filesystem boost_thread pthread crypto ssl z archive tbb curl yaml-cpp)
+target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx PocoPrometheus PocoNet PocoZip PocoFoundation PocoUtil
+        boost_program_options boost_filesystem boost_thread boost_url pthread crypto ssl z archive yaml-cpp)
 
 install(TARGETS ${BINARY} DESTINATION bin)

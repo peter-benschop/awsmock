@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * MessageAttribute value
          */
-        std::string value;
+        std::string attributeValue;
 
         /**
          * @brief Converts the BSON string to a DTO
@@ -52,7 +52,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return user pools BSON document
          */
-        Poco::JSON::Object ToDocument() const;
+        view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the DTO to a string representation.

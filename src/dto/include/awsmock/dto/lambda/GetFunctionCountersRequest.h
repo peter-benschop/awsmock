@@ -6,19 +6,10 @@
 #define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
-
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/lambda/model/Environment.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {

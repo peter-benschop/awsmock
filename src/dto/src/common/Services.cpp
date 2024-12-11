@@ -26,6 +26,7 @@ namespace AwsMock::Dto::Common {
 
     std::string Services::ToJson() {
 
+        /* Todo
         try {
             Poco::JSON::Object jsonServices;
             Poco::JSON::Array jsonServiceArray;
@@ -41,6 +42,8 @@ namespace AwsMock::Dto::Common {
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
         }
+        */
+        return {};
     }
 
     void Services::FromJson(const std::string &jsonString) {
@@ -50,6 +53,7 @@ namespace AwsMock::Dto::Common {
             return;
         }
 
+        /* Todo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -64,6 +68,6 @@ namespace AwsMock::Dto::Common {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
     }
 }// namespace AwsMock::Dto::Common
