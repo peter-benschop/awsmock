@@ -9,17 +9,32 @@ namespace AwsMock::Dto::S3 {
     std::string CreateMultipartUploadResult::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("uploadId", uploadId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "uploadId", uploadId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void CreateMultipartUploadResult::FromJson(const std::string &jsonString) {
+
+        try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            bucket = Core::Bson::BsonUtils::GetStringValue(document, "Bucket");
+            key = Core::Bson::BsonUtils::GetStringValue(document, "Key");
+            uploadId = Core::Bson::BsonUtils::GetStringValue(document, "UploadId");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -33,41 +48,12 @@ namespace AwsMock::Dto::S3 {
         return Core::XmlUtils::ToXmlString(root);
     }
 
-    void CreateMultipartUploadResult::FromJson(const std::string &jsonString) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-        try {
-
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Bucket", rootObject, bucket);
-            Core::JsonUtils::GetJsonValueString("Key", rootObject, key);
-            Core::JsonUtils::GetJsonValueString("UploadId", rootObject, uploadId);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
-    }
-
-    /**
-   * Converts the DTO to a string representation.
-   *
-   * @return DTO as string for logging.
-   */
     std::string CreateMultipartUploadResult::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    /**
-   * Stream provider.
-   *
-   * @return output stream
-   */
     std::ostream &operator<<(std::ostream &os, const CreateMultipartUploadResult &r) {
         os << "CreateMultipartUploadResult=" << r.ToJson();
         return os;

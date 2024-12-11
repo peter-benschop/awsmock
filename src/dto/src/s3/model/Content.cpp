@@ -9,20 +9,21 @@ namespace AwsMock::Dto::S3 {
     std::string Content::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("etag", etag);
-            rootJson.set("key", key);
-            rootJson.set("owner", owner);
-            rootJson.set("size", size);
-            rootJson.set("storageClass", storageClass);
-            rootJson.set("modified", lastModified);
-            rootJson.set("checksumAlgorithms", Core::JsonUtils::GetJsonStringArray(checksumAlgorithms));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "etag", etag);
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetStringValue(document, "storageClass", storageClass);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            document.append(kvp("owner", owner.ToDocument()));
+
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

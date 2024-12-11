@@ -7,16 +7,15 @@
 namespace AwsMock::Dto::S3 {
 
     std::string CreateBucketConstraint::ToJson() const {
-
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("location", location);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "location", location);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

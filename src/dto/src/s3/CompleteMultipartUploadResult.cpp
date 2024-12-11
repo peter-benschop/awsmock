@@ -7,23 +7,22 @@
 namespace AwsMock::Dto::S3 {
 
     std::string CompleteMultipartUploadResult::ToJson() const {
-
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("location", location);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("etag", etag);
-            rootJson.set("checksumCrc32", checksumCrc32);
-            rootJson.set("checksumCrc32c", checksumCrc32c);
-            rootJson.set("checksumSha1", checksumSha1);
-            rootJson.set("checksumSha256", checksumSha256);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "location", location);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "etag", etag);
+            Core::Bson::BsonUtils::SetStringValue(document, "checksumCrc32", checksumCrc32);
+            Core::Bson::BsonUtils::SetStringValue(document, "checksumCrc32c", checksumCrc32);
+            Core::Bson::BsonUtils::SetStringValue(document, "checksumSha1", checksumSha1);
+            Core::Bson::BsonUtils::SetStringValue(document, "checksumSha256", checksumSha256);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

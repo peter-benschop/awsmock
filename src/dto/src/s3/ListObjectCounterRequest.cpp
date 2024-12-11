@@ -6,72 +6,58 @@
 
 namespace AwsMock::Dto::S3 {
 
-    ListObjectCounterRequest ListObjectCounterRequest::FromJson(const std::string &jsonString) {
-
-        ListObjectCounterRequest request;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    ListObjectCounterRequest ListObjectCounterRequest::FromJson(const std::string &body) {
 
         try {
-            if (!rootObject->get("region").isEmpty()) {
-                request.region = rootObject->get("region").convert<std::string>();
-            }
-            if (!rootObject->get("bucket").isEmpty()) {
-                request.bucket = rootObject->get("bucket").convert<std::string>();
-            }
-            if (!rootObject->get("prefix").isEmpty()) {
-                request.prefix = rootObject->get("prefix").convert<std::string>();
-            }
-            if (!rootObject->get("pageSize").isEmpty()) {
-                request.pageSize = rootObject->get("pageSize").convert<int>();
-            }
-            if (!rootObject->get("pageIndex").isEmpty()) {
-                request.pageIndex = rootObject->get("pageIndex").convert<int>();
-            }
-            if (!rootObject->get("sortColumns").isEmpty()) {
+            ListObjectCounterRequest request;
 
-                Poco::JSON::Array::Ptr sortColumnArray = rootObject->getArray("sortColumns");
-                if (sortColumnArray != nullptr) {
-                    for (int i = 0; i < sortColumnArray->size(); i++) {
-                        Core::SortColumn sortColumn;
-                        Poco::JSON::Object::Ptr jsonColumnObject = sortColumnArray->getObject(i);
-                        Core::JsonUtils::GetJsonValueString("column", jsonColumnObject, sortColumn.column);
-                        Core::JsonUtils::GetJsonValueInt("sortDirection", jsonColumnObject, sortColumn.sortDirection);
-                        request.sortColumns.emplace_back(sortColumn);
-                    }
+            const value document = bsoncxx::from_json(body);
+            request.region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            request.bucket = Core::Bson::BsonUtils::GetStringValue(document, "bucket");
+            request.prefix = Core::Bson::BsonUtils::GetStringValue(document, "prefix");
+            request.pageSize = Core::Bson::BsonUtils::GetIntValue(document, "pageSize");
+            request.pageIndex = Core::Bson::BsonUtils::GetIntValue(document, "pageIndex");
+
+            if (document.find("sortColumns") != document.end()) {
+
+                for (const bsoncxx::array::view arrayView{document["sortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                    Core::SortColumn sortColumn;
+                    sortColumn.FromDocument(element.get_document());
+                    request.sortColumns.emplace_back(sortColumn);
                 }
             }
             return request;
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string ListObjectCounterRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("prefix", prefix);
-            rootJson.set("bucket", bucket);
-            rootJson.set("pageSize", pageSize);
-            rootJson.set("pageIndex", pageIndex);
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
+            Core::Bson::BsonUtils::SetIntValue(document, "pageIndex", pageIndex);
 
             if (!sortColumns.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &sortColumn: sortColumns) {
-                    jsonArray.add(sortColumn);
+                    jsonArray.append(sortColumn.ToDocument());
                 }
-                rootJson.set("sortColumns", sortColumns);
+                document.append(kvp("sortColumns", jsonArray));
             }
-            return Core::JsonUtils::ToJsonString(rootJson);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

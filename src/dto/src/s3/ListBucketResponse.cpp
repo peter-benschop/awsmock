@@ -23,7 +23,7 @@ namespace AwsMock::Dto::S3 {
             content.size = it.size;
             content.owner = owner;
             content.storageClass = "STANDARD";
-            content.lastModified = Core::DateTimeUtils::ToISO8601(it.modified);
+            content.modified = Core::DateTimeUtils::ToISO8601(it.modified);
             contents.push_back(content);
         }
     }
@@ -51,7 +51,7 @@ namespace AwsMock::Dto::S3 {
                 for (auto &it: contents) {
                     document element;
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", it.key);
-                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "lastModified", it.lastModified);
+                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "lastModified", it.modified);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "etag", it.etag);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "owner", it.owner.id);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "displayName", it.owner.displayName);
@@ -91,7 +91,7 @@ namespace AwsMock::Dto::S3 {
             for (auto &it: contents) {
                 boost::property_tree::ptree xmlContent;
                 xmlContent.add("Key", it.key);
-                xmlContent.add("LastModified", it.lastModified);
+                xmlContent.add("LastModified", it.modified);
                 xmlContent.add("ETag", it.etag);
                 xmlContent.add("Size", it.size);
                 xmlContent.add("StorageClass", it.storageClass);

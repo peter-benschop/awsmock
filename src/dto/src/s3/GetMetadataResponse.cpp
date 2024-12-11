@@ -9,20 +9,27 @@ namespace AwsMock::Dto::S3 {
     std::string GetMetadataResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("md5sum", md5Sum);
-            rootJson.set("contentType", contentType);
-            rootJson.set("size", size);
-            rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5sum", md5Sum);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            document metadataDocument;
+            for (const auto &[fst, snd]: metadata) {
+                Core::Bson::BsonUtils::SetStringValue(metadataDocument, fst, snd);
+            }
+            rootDocument.append(kvp("metadata", metadataDocument));
+
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

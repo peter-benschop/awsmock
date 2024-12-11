@@ -9,16 +9,16 @@ namespace AwsMock::Dto::S3 {
     std::string DeleteBucketRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("owner", owner);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
