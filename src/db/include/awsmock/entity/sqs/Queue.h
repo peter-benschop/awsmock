@@ -99,7 +99,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @param mResult MongoDB document.
          */
-        Queue FromDocument(std::optional<view> mResult);
+        Queue FromDocument(const std::optional<view> &mResult);
 
         /**
          * Converts the DTO to a string representation.

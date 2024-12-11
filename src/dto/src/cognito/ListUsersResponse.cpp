@@ -9,26 +9,28 @@ namespace AwsMock::Dto::Cognito {
     std::string ListUsersResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootObject;
 
-            Poco::JSON::Array usersArray;
-            for (const auto &user: users) {
-                Poco::JSON::Object userJson;
-                userJson.set("Username", user.userName);
-                userJson.set("Enabled", user.enabled);
-                userJson.set("UserStatus", Database::Entity::Cognito::UserStatusToString(user.userStatus));
-                userJson.set("LastModifiedDate", std::to_string(user.modified.time_since_epoch().count()));
-                userJson.set("CreationDate", std::to_string(user.created.time_since_epoch().count()));
-                usersArray.add(userJson);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Total", total);
+
+            if (!users.empty()) {
+                array usersArray;
+                for (const auto &user: users) {
+                    document userJson;
+                    Core::Bson::BsonUtils::SetStringValue(userJson, "Username", user.userName);
+                    Core::Bson::BsonUtils::SetBoolValue(userJson, "Enabled", user.enabled);
+                    Core::Bson::BsonUtils::SetStringValue(userJson, "UserStatus", UserStatusToString(user.userStatus));
+                    Core::Bson::BsonUtils::SetDateValue(userJson, "LastModifiedDate", user.modified);
+                    Core::Bson::BsonUtils::SetDateValue(userJson, "CreationDate", user.created);
+                    usersArray.append(userJson);
+                }
+                rootDocument.append(kvp("Users", usersArray));
             }
-            rootObject.set("Users", usersArray);
-            rootObject.set("Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootObject);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.displayText();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

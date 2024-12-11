@@ -171,7 +171,7 @@ namespace AwsMock::Dto::Cognito {
                 .idTokenValidity = GetMaxValidityToken(clientEntity.idTokenValidity, tokenValidityUnits.idToken),
                 .refreshTokenValidity = GetMaxValidityToken(clientEntity.refreshTokenValidity, tokenValidityUnits.refreshToken),
                 .created = clientEntity.created,
-                .lastModified = clientEntity.modified};
+                .modified = clientEntity.modified};
         return userPoolClient;
     }
 

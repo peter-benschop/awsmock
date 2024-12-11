@@ -6,29 +6,28 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object EventSourceMapping::ToJsonObject() const {
+    view_or_value<view, value> EventSourceMapping::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("User", user);
-            rootJson.set("FunctionArn", functionArn);
-            rootJson.set("EventSourceArn", eventSourceArn);
-            rootJson.set("BatchSize", batchSize);
-            rootJson.set("MaximumBatchingWindowInSeconds", maximumBatchingWindowInSeconds);
-            rootJson.set("UUID", uuid);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "User", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "EventSourceArn", eventSourceArn);
+            Core::Bson::BsonUtils::SetIntValue(document, "BatchSize", batchSize);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaximumBatchingWindowInSeconds", maximumBatchingWindowInSeconds);
+            Core::Bson::BsonUtils::SetStringValue(document, "UUID", uuid);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string EventSourceMapping::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string EventSourceMapping::ToString() const {

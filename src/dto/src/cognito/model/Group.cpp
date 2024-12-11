@@ -10,29 +10,30 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Group::ToJsonObject() const {
+    view_or_value<view, value> Group::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("GroupName", groupName);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("Description", description);
-            rootJson.set("Precedence", precedence);
-            rootJson.set("CreationDate", Core::DateTimeUtils::UnixTimestamp(created));
-            rootJson.set("LastModifiedDate", Core::DateTimeUtils::UnixTimestamp(modified));
-            return rootJson;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetIntValue(document, "Precedence", precedence);
+            Core::Bson::BsonUtils::SetDateValue(document, "CreationDate", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModifiedDate", modified);
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

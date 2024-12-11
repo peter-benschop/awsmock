@@ -6,31 +6,31 @@ namespace AwsMock::Dto::Lambda {
     std::string ListFunctionCountersResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("total", total);
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "total", total);
 
             // Contents
             if (!functionCounters.empty()) {
 
-                Poco::JSON::Array jsonBucketArray;
+                array jsonBucketArray;
                 for (auto &functionCounter: functionCounters) {
-                    Poco::JSON::Object jsonObject;
-                    jsonObject.set("functionName", functionCounter.functionName);
-                    jsonObject.set("runtime", functionCounter.runtime);
-                    jsonObject.set("handler", functionCounter.handler);
-                    jsonObject.set("averageRuntime", functionCounter.averageRuntime);
-                    jsonObject.set("invocations", functionCounter.invocations);
-                    jsonBucketArray.add(jsonObject);
+                    document jsonObject;
+                    jsonObject.append(kvp("functionName", functionCounter.functionName));
+                    jsonObject.append(kvp("runtime", functionCounter.runtime));
+                    jsonObject.append(kvp("handler", functionCounter.handler));
+                    jsonObject.append(kvp("averageRuntime", functionCounter.averageRuntime));
+                    jsonObject.append(kvp("invocations", functionCounter.invocations));
+                    jsonBucketArray.append(jsonObject);
                 }
 
-                rootJson.set("functionCounters", jsonBucketArray);
+                rootDocument.append(kvp("functionCounters", jsonBucketArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

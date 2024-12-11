@@ -7,35 +7,29 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("FunctionName", functionName);
-            rootJson.set("Qualifier", qualifier);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "Qualifier", qualifier);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void DeleteFunctionRequest::FromJson(std::istream &jsonString) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void DeleteFunctionRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
+            qualifier = Core::Bson::BsonUtils::GetStringValue(document, "Qualifier");
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
-            Core::JsonUtils::GetJsonValueString("Qualifier", rootObject, qualifier);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

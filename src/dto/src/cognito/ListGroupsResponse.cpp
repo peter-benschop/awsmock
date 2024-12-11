@@ -10,17 +10,19 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootObject;
-            Poco::JSON::Array groupsArray;
-            for (const auto &group: groups) {
-                groupsArray.add(group.ToJsonObject());
+            document document;
+            if (!groups.empty()) {
+                array jsonArray;
+                for (const auto &group: groups) {
+                    jsonArray.append(group.ToDocument());
+                }
+                document.append(kvp("Groups", jsonArray));
             }
-            rootObject.set("Groups", groupsArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootObject);
-
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

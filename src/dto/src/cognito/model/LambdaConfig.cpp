@@ -10,24 +10,25 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", createAuthChallenge);
-            rootJson.set("CustomMessage", customMessage);
-            rootJson.set("CustomEmailSender", customEmailSender.ToJsonObject());
-            rootJson.set("CustomSmsSender", customSmsSender.ToJsonObject());
-            rootJson.set("DefineAuthChallenge", defineAuthChallenge);
-            rootJson.set("KMSKeyID", kmsKeyId);
-            rootJson.set("PostAuthentication", postAuthentication);
-            rootJson.set("PostConfirmation", postConfirmation);
-            rootJson.set("PreAuthentication", preAuthentication);
-            rootJson.set("PreSignUp", preSignUp);
-            rootJson.set("PreTokenGeneration", preTokenGeneration);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "CreateAuthChallenge", createAuthChallenge);
+            Core::Bson::BsonUtils::SetStringValue(document, "CustomMessage", customMessage);
+            Core::Bson::BsonUtils::SetStringValue(document, "DefineAuthChallenge", defineAuthChallenge);
+            Core::Bson::BsonUtils::SetStringValue(document, "KMSKeyID", kmsKeyId);
+            Core::Bson::BsonUtils::SetStringValue(document, "PostAuthentication", postAuthentication);
+            Core::Bson::BsonUtils::SetStringValue(document, "PostConfirmation", postConfirmation);
+            Core::Bson::BsonUtils::SetStringValue(document, "PreAuthentication", preAuthentication);
+            Core::Bson::BsonUtils::SetStringValue(document, "PreSignUp", preSignUp);
+            Core::Bson::BsonUtils::SetStringValue(document, "PreTokenGeneration", preTokenGeneration);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document.append(kvp("CustomEmailSender", customEmailSender.ToDocument()));
+            document.append(kvp("CustomSmsSender", customSmsSender.ToDocument()));
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -10,29 +10,28 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object AuthenticationResult::ToJsonObject() const {
+    view_or_value<view, value> AuthenticationResult::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("AccessToken", accessToken);
-            rootJson.set("IdToken", idToken);
-            rootJson.set("RefreshToken", refreshToken);
-            rootJson.set("TokenType", tokenType);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "AccessToken", accessToken);
+            Core::Bson::BsonUtils::SetStringValue(document, "IdToken", idToken);
+            Core::Bson::BsonUtils::SetStringValue(document, "RefreshToken", refreshToken);
+            Core::Bson::BsonUtils::SetStringValue(document, "TokenType", tokenType);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

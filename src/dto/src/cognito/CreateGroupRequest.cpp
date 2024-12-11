@@ -6,24 +6,20 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void CreateGroupRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void CreateGroupRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            groupName = Core::Bson::BsonUtils::GetStringValue(document, "GroupName");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            precedence = Core::Bson::BsonUtils::GetIntValue(document, "Precedence");
+            description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
+            roleArn = Core::Bson::BsonUtils::GetStringValue(document, "RoleArn");
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("GroupName", rootObject, groupName);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
-            Core::JsonUtils::GetJsonValueInt("Precedence", rootObject, precedence);
-            Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
-            Core::JsonUtils::GetJsonValueString("RoleArn", rootObject, roleArn);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -31,18 +27,18 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("GroupName", groupName);
-            rootJson.set("Description", description);
-            rootJson.set("Precedence", precedence);
-            rootJson.set("RoleArn", roleArn);
-            rootJson.set("UserPoolId", userPoolId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetIntValue(document, "Precedence", precedence);
+            Core::Bson::BsonUtils::SetStringValue(document, "RoleArn", roleArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

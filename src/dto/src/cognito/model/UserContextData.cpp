@@ -10,27 +10,26 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object UserContextData::ToJsonObject() const {
+    view_or_value<view, value> UserContextData::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("EncodedData", encodedData);
-            rootJson.set("IpAddress", ipAddress);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "EncodedData", encodedData);
+            Core::Bson::BsonUtils::SetStringValue(document, "IpAddress", ipAddress);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

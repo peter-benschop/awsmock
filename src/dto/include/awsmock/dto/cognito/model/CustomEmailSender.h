@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -31,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomEmailSender : public Dto::Common::BaseRequest {
+    struct CustomEmailSender : Common::BaseRequest {
 
         /**
          * Lambda ARN
@@ -44,28 +41,28 @@ namespace AwsMock::Dto::Cognito {
         std::string lambdaVersion;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

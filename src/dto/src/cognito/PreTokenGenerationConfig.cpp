@@ -10,31 +10,28 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("lambdaArn", lambdaArn);
-            rootJson.set("lambdaVersion", lambdaVersion);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "lambdaArn", lambdaArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "lambdaVersion", lambdaVersion);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object PreTokenGenerationConfig::ToJsonObject() const {
-
+    view_or_value<view, value> PreTokenGenerationConfig::ToDocument() const {
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("lambdaArn", lambdaArn);
-            rootJson.set("lambdaVersion", lambdaVersion);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "lambdaArn", lambdaArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "lambdaVersion", lambdaVersion);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

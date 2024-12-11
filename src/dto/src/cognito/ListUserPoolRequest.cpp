@@ -6,28 +6,26 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void ListUserPoolRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void ListUserPoolRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            pageSize = Core::Bson::BsonUtils::GetIntValue(document, "PageSize");
+            pageIndex = Core::Bson::BsonUtils::GetIntValue(document, "PageIndex");
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
-            Core::JsonUtils::GetJsonValueInt("PageIndex", rootObject, pageIndex);
+            if (document.find("sortColumns") != document.end()) {
 
-            if (rootObject->has("SortColumns")) {
-                Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("SortColumns");
-                for (const auto &it: *jsonArray) {
-                    sortColumns.emplace_back(it.extract<std::string>());
+                for (const bsoncxx::array::view arrayView{document["sortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                    Core::SortColumn sortColumn;
+                    sortColumn.FromDocument(element.get_document());
+                    sortColumns.emplace_back(sortColumn);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -35,14 +33,15 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("MaxResults", maxResults);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetLongValue(document, "PageSize", pageSize);
+            Core::Bson::BsonUtils::SetLongValue(document, "PageIndex", pageIndex);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

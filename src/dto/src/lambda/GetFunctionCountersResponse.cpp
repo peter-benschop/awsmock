@@ -10,7 +10,7 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
 
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "functionName", functionName);
@@ -30,27 +30,27 @@ namespace AwsMock::Dto::Lambda {
             // Environment
             if (!environment.empty()) {
                 bsoncxx::builder::basic::document envDoc;
-                for (const auto &env: environment) {
-                    envDoc.append(bsoncxx::builder::basic::kvp(env.first, env.second));
+                for (const auto &[fst, snd]: environment) {
+                    envDoc.append(kvp(fst, snd));
                 }
-                document.append(bsoncxx::builder::basic::kvp("environment", envDoc));
+                document.append(kvp("environment", envDoc));
             }
 
             // Tags
             if (!tags.empty()) {
                 bsoncxx::builder::basic::document tagDoc;
-                for (const auto &tag: tags) {
-                    tagDoc.append(bsoncxx::builder::basic::kvp(tag.first, tag.second));
+                for (const auto &[fst, snd]: tags) {
+                    tagDoc.append(kvp(fst, snd));
                 }
-                document.append(bsoncxx::builder::basic::kvp("tags", tagDoc));
+                document.append(kvp("tags", tagDoc));
             }
             log_info << bsoncxx::to_json(document);
 
             return bsoncxx::to_json(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

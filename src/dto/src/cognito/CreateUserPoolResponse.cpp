@@ -10,19 +10,20 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootObject;
-            Poco::JSON::Object userPoolObject;
-            userPoolObject.set("Region", region);
-            userPoolObject.set("Name", name);
-            userPoolObject.set("Arn", arn);
-            userPoolObject.set("Id", userPoolId);
-            rootObject.set("UserPool", userPoolObject);
+            document rootDocument;
 
-            return Core::JsonUtils::ToJsonString(rootObject);
+            document userPoolObject;
+            Core::Bson::BsonUtils::SetStringValue(userPoolObject, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(userPoolObject, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(userPoolObject, "Arn", arn);
+            Core::Bson::BsonUtils::SetStringValue(userPoolObject, "Id", userPoolId);
+            rootDocument.append(kvp("UserPool", userPoolObject));
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

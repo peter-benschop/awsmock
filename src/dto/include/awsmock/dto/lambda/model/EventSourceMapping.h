@@ -7,14 +7,11 @@
 
 
 // C++ standard includes
-#include <chrono>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -56,28 +53,28 @@ namespace AwsMock::Dto::Lambda {
         std::string uuid;
 
         /**
-         * Creates a JSON object.
+         * @brief Creates a JSON object.
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

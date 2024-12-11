@@ -10,25 +10,27 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootObject;
-            Poco::JSON::Array userPoolArray;
-            for (const auto &userPool: userPools) {
-                Poco::JSON::Object userPoolJson;
-                userPoolJson.set("Id", userPool.userPoolId);
-                userPoolJson.set("Name", userPool.name);
-                userPoolJson.set("Region", userPool.region);
-                userPoolJson.set("LastModifiedDate", std::chrono::duration_cast<std::chrono::seconds>(userPool.modified.time_since_epoch()).count());
-                userPoolJson.set("CreationDate", std::chrono::duration_cast<std::chrono::seconds>(userPool.created.time_since_epoch()).count());
-                userPoolArray.add(userPoolJson);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Total", total);
+
+            if (!userPools.empty()) {
+                array userPoolArray;
+                for (const auto &userPool: userPools) {
+                    document userPoolJson;
+                    userPoolJson.append(kvp("Id", userPool.userPoolId));
+                    userPoolJson.append(kvp("Name", userPool.name));
+                    userPoolJson.append(kvp("Region", userPool.region));
+                    userPoolJson.append(kvp("LastModifiedDate", std::chrono::duration_cast<std::chrono::seconds>(userPool.modified.time_since_epoch()).count()));
+                    userPoolJson.append(kvp("CreationDate", std::chrono::duration_cast<std::chrono::seconds>(userPool.created.time_since_epoch()).count()));
+                    userPoolArray.append(userPoolJson);
+                }
+                rootDocument.append(kvp("UserPools", userPoolArray));
             }
-            rootObject.set("UserPools", userPoolArray);
-            rootObject.set("Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootObject);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

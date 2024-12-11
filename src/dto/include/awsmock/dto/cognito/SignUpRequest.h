@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_SIGN_UP_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/cognito/model/UserContextData.h>
 #include <awsmock/dto/common/BaseRequest.h>
@@ -55,7 +53,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SignUpRequest : public Dto::Common::BaseRequest {
+    struct SignUpRequest : Common::BaseRequest {
 
         /**
          * Client ID
@@ -65,7 +63,7 @@ namespace AwsMock::Dto::Cognito {
         std::string clientId;
 
         /**
-         * User name
+         * Username
          *
          * The username of the user that you want to sign up. The value of this parameter is typically a username, but can be any alias attribute in your user pool.
          */
@@ -110,9 +108,9 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Convert from a JSON object.
          *
-         * @param payload json string object
+         * @param jsonString json string object
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Convert to a JSON string

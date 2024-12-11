@@ -10,31 +10,31 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object UserPool::ToJsonObject() const {
+    view_or_value<view, value> UserPool::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("Region", region);
-            rootJson.set("Name", name);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("Arn", arn);
-            rootJson.set("CreationDate", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("LastModifiedDate", Core::DateTimeUtils::ToISO8601(modified));
 
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
+            Core::Bson::BsonUtils::SetDateValue(document, "CreationDate", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModifiedDate", modified);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

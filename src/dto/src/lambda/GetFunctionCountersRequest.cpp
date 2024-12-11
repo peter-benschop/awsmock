@@ -9,16 +9,13 @@ namespace AwsMock::Dto::Lambda {
     void GetFunctionCountersRequest::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            const Poco::Dynamic::Var result = parser.parse(jsonString);
-            const Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "functionName");
 
-            Core::JsonUtils::GetJsonValueString("region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("functionName", rootObject, functionName);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -26,15 +23,14 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootObject;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "functionName", functionName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            rootObject.set("region", region);
-            rootObject.set("functionName", functionName);
-
-            return Core::JsonUtils::ToJsonString(rootObject);
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

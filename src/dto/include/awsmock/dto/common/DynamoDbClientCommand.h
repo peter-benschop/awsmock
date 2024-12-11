@@ -6,21 +6,13 @@
 #define AWSMOCK_DTO_COMMON_DYNAMODB_CLIENT_COMMAND_H
 
 // C++ includes
-#include <sstream>
 #include <string>
-
-// Boost includes
-#include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
-#include <boost/lexical_cast.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/exception/UnauthorizedException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 
 namespace AwsMock::Dto::Common {

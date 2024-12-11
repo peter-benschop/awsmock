@@ -9,9 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -36,17 +35,17 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Convert from a JSON object.
          *
-         * @param jsonObject json object
+         * @param document json object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
             try {
 
-                Core::JsonUtils::GetJsonValueString("CertificateArn", jsonObject, certificateArn);
+                certificateArn = Core::Bson::BsonUtils::GetStringValue(document, "CertificateArn");
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -55,17 +54,16 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const {
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
             try {
 
-                Poco::JSON::Object rootJson;
-                rootJson.set("CertificateArn", certificateArn);
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "CertificateArn", certificateArn);
+                return document.extract();
 
-                return rootJson;
-
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
     };

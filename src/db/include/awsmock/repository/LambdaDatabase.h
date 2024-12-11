@@ -197,7 +197,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {});
+        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.
@@ -205,7 +205,7 @@ namespace AwsMock::Database {
          * @param eventSourceArn event source ARN
          * @return list of lambda functions
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn);
+        std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn) const;
 
         /**
          * @brief Deletes an existing lambda function

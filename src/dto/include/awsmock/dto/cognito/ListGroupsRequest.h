@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_LIST_GROUPS_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -42,9 +40,9 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Convert from a JSON object.
          *
-         * @param payload json string object
+         * @param jsonString json string object
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Convert to a JSON string

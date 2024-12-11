@@ -8,8 +8,8 @@ namespace AwsMock::Dto::S3 {
 
     ListBucketCounterRequest ListBucketCounterRequest::FromJson(const std::string &body) {
 
-        ListBucketCounterRequest request;
         try {
+            ListBucketCounterRequest request;
 
             const value document = bsoncxx::from_json(body);
             request.region = Core::Bson::BsonUtils::GetStringValue(document, "region");

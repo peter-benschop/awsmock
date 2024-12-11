@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_LAMBDA_DELETE_FUNCTION_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -43,7 +41,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @param jsonString JSON string
          */
-        void FromJson(std::istream &jsonString);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Converts the DTO to a string representation.

@@ -6,25 +6,18 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void CreateUserPoolDomainRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void CreateUserPoolDomainRequest::FromJson(const std::string &jsonString) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
 
-            if (rootObject->has("CustomDomainConfig")) {
-                customDomainConfig.FromJsonObject(rootObject->getObject("CustomDomainConfig"));
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -32,18 +25,18 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Domain", domain);
-            rootJson.set("UserPoolId", userPoolId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
 
-            rootJson.set("CustomDomainConfig", customDomainConfig.ToJsonObject());
+            document.append(kvp("CustomDomainConfig", customDomainConfig.ToDocument()));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
