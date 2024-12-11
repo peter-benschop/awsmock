@@ -6,17 +6,11 @@
 #define AWSMOCK_DTO_LAMBDA_CODE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/lambda/model/Environment.h>
-#include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -78,9 +72,9 @@ namespace AwsMock::Dto::Lambda {
         /**
          * @brief Convert from a JSON object.
          *
-         * @param jsonObject json object
+         * @param document json object
          */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Creates a JSON string from the object.
@@ -94,7 +88,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the DTO to a string representation.

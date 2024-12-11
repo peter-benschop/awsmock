@@ -9,12 +9,10 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
+// TODO: Split into header code
 namespace AwsMock::Dto::Lambda {
 
     struct EphemeralStorage {
@@ -25,14 +23,14 @@ namespace AwsMock::Dto::Lambda {
         long size = 512;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
         view_or_value<view, value> ToDocument() const {
 
             try {
-                bsoncxx::builder::basic::document document;
+                document document;
                 Core::Bson::BsonUtils::SetLongValue(document, "Size", size);
                 return view_or_value<view, value>(document);
 
@@ -43,22 +41,22 @@ namespace AwsMock::Dto::Lambda {
         }
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
-         * @param jsonObject JSON string
+         * @param document JSON string
          */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
             try {
-                Core::JsonUtils::GetJsonValueLong("Size", jsonObject, size);
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+                size = Core::Bson::BsonUtils::GetLongValue(document, "Size");
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
@@ -69,7 +67,7 @@ namespace AwsMock::Dto::Lambda {
         }
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

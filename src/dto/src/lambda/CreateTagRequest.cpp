@@ -6,42 +6,41 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    void CreateTagRequest::FromJson(const std::string &body) {
+    void CreateTagRequest::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(body);
-            Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
-            Poco::JSON::Object::Ptr tagsObject = rootObject->getObject("Tags");
-
-            Poco::JSON::Object::NameList nameList = tagsObject->getNames();
-            for (const auto &name: nameList) {
-                tags[name] = tagsObject->get(name).convert<std::string>();
+            if (const value document = bsoncxx::from_json(jsonString); document.view().find("Tags") != document.view().end()) {
+                for (const bsoncxx::array::view jsonArray = document.view()["Tags"].get_array().value; const auto &tag: jsonArray) {
+                    std::string key = bsoncxx::string::to_string(tag.key());
+                    const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                    tags[key] = value;
+                }
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string CreateTagRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootObject;
+            document rootDocument;
 
-            Poco::JSON::Object tagsJson;
-            for (const auto &tag: tags) {
-                tagsJson.set(tag.first, tag.second);
+            if (!tags.empty()) {
+                document jsonObject;
+                for (const auto &[fst, snd]: tags) {
+                    jsonObject.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("Tags", jsonObject));
             }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            rootObject.set("Tags", tagsJson);
-            std::ostringstream os;
-            rootObject.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

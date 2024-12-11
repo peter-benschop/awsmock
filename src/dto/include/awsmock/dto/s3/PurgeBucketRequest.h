@@ -41,9 +41,9 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Parse values from a JSON stream
          *
-         * @param body json input stream
+         * @param jsonString json input stream
          */
-        static PurgeBucketRequest FromJson(const std::string &body);
+        static PurgeBucketRequest FromJson(const std::string &jsonString);
 
         /**
          * @brief Convert to a JSON string

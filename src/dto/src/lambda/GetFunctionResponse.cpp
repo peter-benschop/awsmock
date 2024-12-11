@@ -9,26 +9,31 @@ namespace AwsMock::Dto::Lambda {
     std::string GetFunctionResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("User", user);
-            rootJson.set("Configuration", configuration.ToJsonObject());
-            rootJson.set("Code", code.ToJson());
-            rootJson.set("Timeout", timeout);
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "User", user);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "Timeout", timeout);
+
+            // Configuration
+            rootDocument.append(kvp("Configuration", configuration.ToDocument()));
+
+            // Code
+            rootDocument.append(kvp("Code", code.ToDocument()));
 
             if (!tags.empty()) {
-                Poco::JSON::Object jsonTags;
+                document jsonObject;
                 for (const auto &[fst, snd]: tags) {
-                    jsonTags.set(fst, snd);
+                    jsonObject.append(kvp(fst, snd));
                 }
-                rootJson.set("Tags", jsonTags);
+                rootDocument.append(kvp("Tags", jsonObject));
             }
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

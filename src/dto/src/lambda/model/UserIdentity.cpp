@@ -9,25 +9,27 @@ namespace AwsMock::Dto::Lambda {
     std::string UserIdentity::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("principalId", principalId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "principalId", principalId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object UserIdentity::ToJsonObject() const {
+    view_or_value<view, value> UserIdentity::ToDocument() const {
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("principalId", principalId);
-            return rootJson;
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "principalId", principalId);
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

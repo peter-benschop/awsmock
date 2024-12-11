@@ -3,25 +3,28 @@
 //
 
 #include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <jwt-cpp/jwt.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string ListTagsResponse::ToJson() {
+    std::string ListTagsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            Poco::JSON::Object tagsObject;
-            for (const auto &t: tags) {
-                tagsObject.set(t.first, t.second);
+
+            document rootDocument;
+            if (!tags.empty()) {
+                document jsonObject;
+                for (const auto &t: tags) {
+                    jsonObject.append(kvp(t.first, t.second));
+                }
+                rootDocument.append(kvp("Tags", jsonObject));
             }
-            rootJson.set("Tags", tagsObject);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

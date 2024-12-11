@@ -6,24 +6,23 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object AccountUsage::ToJsonObject() const {
+    view_or_value<view, value> AccountUsage::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("FunctionCount", functionCount);
-            rootJson.set("TotalCodeSize", totalCodeSize);
+            document document;
+            Core::Bson::BsonUtils::SetLongValue(document, "FunctionCount", functionCount);
+            Core::Bson::BsonUtils::SetLongValue(document, "TotalCodeSize", totalCodeSize);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string AccountUsage::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string AccountUsage::ToString() const {

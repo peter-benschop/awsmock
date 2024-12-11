@@ -12,33 +12,29 @@ namespace AwsMock::Dto::Docker {
             return;
         }
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            warning = Core::Bson::BsonUtils::GetStringValue(document, "Warning");
 
-            Core::JsonUtils::GetJsonValueString("Id", rootObject, id);
-            Core::JsonUtils::GetJsonValueString("Warning", rootObject, warning);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string CreateNetworkResponse::ToJson() const {
-
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("Warning", warning);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "Warning", warning);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

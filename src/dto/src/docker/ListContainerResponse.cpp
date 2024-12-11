@@ -13,21 +13,16 @@ namespace AwsMock::Dto::Docker {
     void ListContainerResponse::FromJson(const std::string &body) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(body);
-            Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-
-            if (rootArray != nullptr) {
-                for (const auto &it: *rootArray) {
-                    Container container;
-                    container.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-                    containerList.push_back(container);
-                }
+            const value document = bsoncxx::from_json(body);
+            for (const auto &element: document.view()) {
+                Container container;
+                container.FromDocument(element.get_document().value);
+                containerList.push_back(container);
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -35,18 +30,17 @@ namespace AwsMock::Dto::Docker {
 
         try {
 
-            Poco::JSON::Object rootJson;
-
-            Poco::JSON::Array containerArray;
-            for (const auto &container: containerList) {
-                containerArray.add(container.ToJsonObject());
+            array document;
+            if (!containerList.empty()) {
+                for (const auto &container: containerList) {
+                    document.append(container.ToDocument());
+                }
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

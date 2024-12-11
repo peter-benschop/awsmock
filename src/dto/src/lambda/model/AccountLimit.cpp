@@ -6,27 +6,26 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object AccountLimit::ToJsonObject() const {
+    view_or_value<view, value> AccountLimit::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("CodeSizeUnzipped", codeSizeUnzipped);
-            rootJson.set("CodeSizeZipped", codeSizeZipped);
-            rootJson.set("ConcurrentExecutions", concurrentExecutions);
-            rootJson.set("TotalCodeSize", totalCodeSize);
-            rootJson.set("UnreservedConcurrentExecutions", unreservedConcurrentExecutions);
+            document document;
+            Core::Bson::BsonUtils::SetLongValue(document, "CodeSizeUnzipped", codeSizeUnzipped);
+            Core::Bson::BsonUtils::SetLongValue(document, "CodeSizeZipped", codeSizeZipped);
+            Core::Bson::BsonUtils::SetLongValue(document, "ConcurrentExecutions", concurrentExecutions);
+            Core::Bson::BsonUtils::SetLongValue(document, "TotalCodeSize", totalCodeSize);
+            Core::Bson::BsonUtils::SetLongValue(document, "UnreservedConcurrentExecutions", unreservedConcurrentExecutions);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string AccountLimit::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string AccountLimit::ToString() const {

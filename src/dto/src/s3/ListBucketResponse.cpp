@@ -23,7 +23,7 @@ namespace AwsMock::Dto::S3 {
             content.size = it.size;
             content.owner = owner;
             content.storageClass = "STANDARD";
-            content.modified = Core::DateTimeUtils::ToISO8601(it.modified);
+            content.modified = system_clock::now();
             contents.push_back(content);
         }
     }
@@ -42,7 +42,7 @@ namespace AwsMock::Dto::S3 {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "continuationToken", continuationToken);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "nextContinuationToken", nextContinuationToken);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "startAfter", startAfter);
-            Core::Bson::BsonUtils::SetIntValue(rootDocument, "total", total);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "total", total);
 
             // Contents
             if (!contents.empty()) {
@@ -51,16 +51,15 @@ namespace AwsMock::Dto::S3 {
                 for (auto &it: contents) {
                     document element;
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", it.key);
-                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "lastModified", it.modified);
+                    Core::Bson::BsonUtils::SetDateValue(rootDocument, "lastModified", it.modified);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "etag", it.etag);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "owner", it.owner.id);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "displayName", it.owner.displayName);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "id", it.owner.id);
-                    Core::Bson::BsonUtils::SetIntValue(rootDocument, "size", it.size);
+                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", it.size);
                     Core::Bson::BsonUtils::SetStringValue(rootDocument, "storageClass", it.storageClass);
                     jsonArray.append(element);
                 }
-
                 rootDocument.append(kvp("content", jsonArray));
             }
 

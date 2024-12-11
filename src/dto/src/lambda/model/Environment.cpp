@@ -2,10 +2,7 @@
 // Created by vogje01 on 21/06/2023.
 //
 
-#include "awsmock/dto/lambda/model/Environment.h"
-
-#include <bsoncxx/builder/basic/helpers.hpp>
-#include <bsoncxx/json.hpp>
+#include <awsmock/dto/lambda/model/Environment.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -13,7 +10,7 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
             if (!variables.empty()) {
                 bsoncxx::builder::basic::document variablesDocument;
                 for (const auto &[fst, snd]: variables) {
@@ -35,17 +32,19 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    void EnvironmentVariables::FromJson(Poco::JSON::Object::Ptr object) {
+    void EnvironmentVariables::FromDocument(const view_or_value<view, value> &document) {
 
         try {
-
-            Poco::JSON::Object::Ptr varObject = object->getObject("Variables");
-            for (Poco::JSON::Object::NameList nameList = varObject->getNames(); const auto &name: nameList) {
-                variables[name] = varObject->get(name).convert<std::string>();
+            if (document.view().find("Variables") != document.view().end()) {
+                for (const bsoncxx::array::view jsonArray = document.view()["Variables"].get_array().value; const auto &element: jsonArray) {
+                    std::string key = bsoncxx::string::to_string(element.key());
+                    const std::string value = bsoncxx::string::to_string(element[key].get_string().value);
+                    variables[key] = value;
+                }
             }
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

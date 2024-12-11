@@ -55,7 +55,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON object
          */
-        Poco::JSON::Object ToJsonObject() const;
+        view_or_value<view, value> ToDocument() const;
 
         /**
          * Convert to a JSON object

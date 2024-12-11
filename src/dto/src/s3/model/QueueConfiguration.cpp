@@ -10,8 +10,8 @@ namespace AwsMock::Dto::S3 {
 
         try {
 
-            id = Core::Bson::BsonUtils::GetStringValue(document, "id");
-            queueArn = Core::Bson::BsonUtils::GetStringValue(document, "queueArn");
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            queueArn = Core::Bson::BsonUtils::GetStringValue(document, "Queue");
 
             // Events
             if (document.view().find("events") != document.view().end()) {

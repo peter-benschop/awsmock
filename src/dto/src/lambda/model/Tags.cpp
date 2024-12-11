@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/30/24.
 //
 
-#include "awsmock/dto/lambda/model/Tags.h"
+#include <awsmock/dto/lambda/model/Tags.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -13,46 +13,53 @@ namespace AwsMock::Dto::Lambda {
     }
 
     std::string Tags::GetTagValue(const std::string &key) {
-        auto it = std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
+        const auto it = std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
             return t.first == key;
         });
         return it->second;
     }
 
-    void Tags::FromJson(Poco::JSON::Object::Ptr object) {
+    void Tags::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Poco::JSON::Object::NameList nameList = object->getNames();
-            for (const auto &name: nameList) {
-                tags[name] = object->get(name).convert<std::string>();
+            if (document.view().find("Tags") != document.view().end()) {
+                for (const bsoncxx::array::view jsonArray = document.view()["Tags"].get_array().value; const auto &tag: jsonArray) {
+                    std::string key = bsoncxx::string::to_string(tag.key());
+                    const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                    tags[key] = value;
+                }
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Array Tags::ToJsonObject() const {
+    array Tags::ToDocument() const {
 
-        Poco::JSON::Array tagArray;
         try {
-            for (const auto &[fst, snd]: tags) {
-                Poco::JSON::Object tagJson;
-                tagJson.set(fst, snd);
-                tagArray.add(tagJson);
+            // Tags
+            array jsonArray;
+            if (!tags.empty()) {
+                for (const auto &[fst, snd]: tags) {
+                    document tagObject;
+                    tagObject.append(kvp(fst, snd));
+                    jsonArray.append(tagObject);
+                }
             }
+            return jsonArray;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        return tagArray;
     }
 
     std::string Tags::ToJson() const {
 
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Tags::ToString() const {

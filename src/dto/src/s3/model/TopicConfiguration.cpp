@@ -6,6 +6,26 @@
 
 namespace AwsMock::Dto::S3 {
 
+    void TopicConfiguration::FromDocument(const view_or_value<view, value> &document) {
+
+        try {
+
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            topicArn = Core::Bson::BsonUtils::GetStringValue(document, "Topic");
+
+            // Events
+            if (document.view().find("events") != document.view().end()) {
+                for (const view eventsView = document.view()["events"].get_array().value; bsoncxx::document::element event: eventsView) {
+                    events.emplace_back(EventTypeFromString(std::string(event.get_string().value)));
+                }
+            }
+
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
+        }
+    }
+
     view_or_value<view, value> TopicConfiguration::ToDocument() const {
 
         try {

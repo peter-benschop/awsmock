@@ -8,12 +8,10 @@
 // C++ includes
 #include <chrono>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/BsonUtils.h"
 #include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
 
 namespace AwsMock::Dto::Docker {
 
@@ -66,16 +64,16 @@ namespace AwsMock::Dto::Docker {
         /**
          * Convert to a JSON string
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * Convert to a JSON object
          *
          * @return object JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Convert to a JSON string

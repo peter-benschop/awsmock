@@ -6,48 +6,43 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Poco::JSON::Object Configuration::ToJsonObject() const {
+    view_or_value<view, value> Configuration::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
 
-            // Architectures array
-            Poco::JSON::Array architectureArray;
-            for (const auto &architecture: architectures) {
-                architectureArray.add(architecture);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "CodeSha256", codeSha256);
+            Core::Bson::BsonUtils::SetLongValue(document, "CodeSize", codeSize);
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "Handler", handler);
+            Core::Bson::BsonUtils::SetStringValue(document, "Runtime", runtime);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModified", lastModified);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatus", lastUpdateStatusReason);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatusCode", lastUpdateStatusReasonCode);
+            Core::Bson::BsonUtils::SetStringValue(document, "State", state);
+            Core::Bson::BsonUtils::SetStringValue(document, "StateReasonCode", stateReasonCode);
+            Core::Bson::BsonUtils::SetStringValue(document, "Version", version);
+
+            // Architectures
+            if (!architectures.empty()) {
+                array jsonArray;
+                for (const auto &architecture: architectures) {
+                    jsonArray.append(architecture);
+                }
+                document.append(kvp("Architectures", jsonArray));
             }
-            rootJson.set("Architectures", architectureArray);
+            return document.extract();
 
-            rootJson.set("CodeSha256", codeSha256);
-            rootJson.set("CodeSize", codeSize);
-            //rootJson.set("DeadLetterConfig", deadLetterConfig.ToJsonObject());
-            rootJson.set("Description", description);
-            // TODO: Environment, EphemeralStorage, FileSystemConfig
-            rootJson.set("FunctionArn", functionArn);
-            rootJson.set("FunctionName", functionName);
-            rootJson.set("Handler", handler);
-            rootJson.set("Runtime", runtime);
-            rootJson.set("FunctionName", functionName);
-            // TODO: ImageConfig
-            rootJson.set("LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
-            rootJson.set("LastUpdateStatus", lastUpdateStatusReason);
-            rootJson.set("LastUpdateStatusCode", lastUpdateStatusReasonCode);
-            rootJson.set("State", state);
-            rootJson.set("StateReason", stateReason);
-            rootJson.set("StateReasonCode", stateReasonCode);
-            rootJson.set("Timeout", timeout);
-            //rootJson.set("Environment", environment.ToJsonObject());
-            rootJson.set("Version", version);
-
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string Configuration::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Configuration::ToString() const {

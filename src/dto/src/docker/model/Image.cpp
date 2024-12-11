@@ -2,70 +2,73 @@
 // Created by JVO on 22.04.2024.
 //
 
-#include "awsmock/dto/docker/model/Image.h"
+#include <awsmock/dto/docker/model/Image.h>
 
 namespace AwsMock::Dto::Docker {
 
     void Image::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
+            const value document = bsoncxx::from_json(jsonString);
+            FromDocument(document.view());
 
-            this->FromJson(result.extract<Poco::JSON::Object::Ptr>());
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void Image::FromJson(Poco::JSON::Object::Ptr jsonObject) {
+    void Image::FromDocument(const view_or_value<view, value> &document) {
 
         try {
-            Core::JsonUtils::GetJsonValueString("Id", jsonObject, id);
-            Core::JsonUtils::GetJsonValueString("ParentId", jsonObject, parentId);
-            Core::JsonUtils::GetJsonValueLong("Size", jsonObject, size);
-            Core::JsonUtils::GetJsonValueLong("SharedSize", jsonObject, sharedSize);
-            Core::JsonUtils::GetJsonValueLong("VirtualSize", jsonObject, virtualSize);
-            Core::JsonUtils::GetJsonValueInt("Containers", jsonObject, containers);
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            parentId = Core::Bson::BsonUtils::GetStringValue(document, "ParentId");
+            size = Core::Bson::BsonUtils::GetLongValue(document, "Size");
+            sharedSize = Core::Bson::BsonUtils::GetLongValue(document, "SharedSize");
+            virtualSize = Core::Bson::BsonUtils::GetLongValue(document, "VirtualSize");
+            containers = Core::Bson::BsonUtils::GetIntValue(document, "Containers");
 
-            Poco::JSON::Array::Ptr reproTagsArray = jsonObject->getArray("RepoTags");
-            if (reproTagsArray != nullptr) {
-                for (const auto &nt: *reproTagsArray) {
-                    repoTags.push_back(nt.convert<std::string>());
+            if (document.view().find("RepoTags") != document.view().end()) {
+                for (const bsoncxx::array::view repoTagsArray = document.view()["ReproTags"].get_array().value; const auto &tag: repoTagsArray) {
+                    repoTags.emplace_back(tag.get_string().value);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Image::ToJsonObject() const {
+    view_or_value<view, value> Image::ToDocument() const {
 
         try {
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ParentId", parentId);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Size", size);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "SharedSize", sharedSize);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "VirtualSize", virtualSize);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Containers", containers);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ParentId", parentId);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("ParentId", parentId);
-            rootJson.set("Size", size);
-            rootJson.set("SharedSize", sharedSize);
-            rootJson.set("VirtualSize", virtualSize);
-            rootJson.set("Containers", containers);
-            rootJson.set("RepoTags", Core::JsonUtils::GetJsonStringArray(repoTags));
+            if (!repoTags.empty()) {
+                array jsonArray;
+                for (const auto &tag: repoTags) {
+                    jsonArray.append(tag);
+                }
+                rootDocument.append(kvp("RepoTags", jsonArray));
+            }
+            return rootDocument.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string Image::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Image::ToString() const {

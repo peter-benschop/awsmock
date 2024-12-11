@@ -72,28 +72,35 @@ namespace AwsMock::Dto::S3 {
         std::vector<NotificationEventType> events;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert from a JSON object
+         *
+         * @param document JSON object
+         */
+        void FromDocument(const view_or_value<view, value> &document);
+
+        /**
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
