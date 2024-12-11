@@ -8,21 +8,14 @@ namespace AwsMock::Dto::Lambda {
 
     void ResetFunctionCountersRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-            if (!rootObject->get("region").isEmpty()) {
-                region = rootObject->get("region").convert<std::string>();
-            }
-            if (!rootObject->get("functionName").isEmpty()) {
-                functionName = rootObject->get("functionName").convert<std::string>();
-            }
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "functionName");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -30,14 +23,14 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("functionName", functionName);
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "functionName", functionName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

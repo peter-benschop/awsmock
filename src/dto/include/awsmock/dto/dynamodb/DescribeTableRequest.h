@@ -6,17 +6,13 @@
 #define AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
+#include <map>
 #include <string>
-#include <utility>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -25,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeTableRequest : public Dto::Common::BaseRequest {
+    struct DescribeTableRequest : Common::BaseRequest {
 
         /**
          * Region
@@ -48,28 +44,28 @@ namespace AwsMock::Dto::DynamoDb {
         std::map<std::string, std::string> headers;
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Parse a JSON stream
+         * @brief Parse a JSON stream
          *
          * @param jsonBody JSON string
          */
         void FromJson(const std::string &jsonBody);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

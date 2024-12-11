@@ -10,18 +10,19 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            Poco::JSON::Array jsonMappingArray;
-            for (const auto &eventSourceMapping: eventSourceMappings) {
-                jsonMappingArray.add(eventSourceMapping.ToJsonObject());
+            document document;
+            if (!eventSourceMappings.empty()) {
+                array jsonArray;
+                for (const auto &eventSourceMapping: eventSourceMappings) {
+                    jsonArray.append(eventSourceMapping.ToDocument());
+                }
+                document.append(kvp("EventSourceMappings", jsonArray));
             }
-            rootJson.set("EventSourceMappings", jsonMappingArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

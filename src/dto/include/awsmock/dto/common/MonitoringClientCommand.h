@@ -6,7 +6,6 @@
 #define AWSMOCK_DTO_COMMON_MONITORING_CLIENT_COMMAND_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // Boost includes
@@ -16,8 +15,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
@@ -41,9 +40,9 @@ namespace AwsMock::Dto::Common {
     }
 
     [[maybe_unused]] static MonitoringCommandType MonitoringCommandTypeFromString(const std::string &commandType) {
-        for (auto &it: MonitoringCommandTypeNames) {
-            if (Core::StringUtils::EqualsIgnoreCase(commandType, it.second)) {
-                return it.first;
+        for (auto &[fst, snd]: MonitoringCommandTypeNames) {
+            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
+                return fst;
             }
         }
         return MonitoringCommandType::UNKNOWN;

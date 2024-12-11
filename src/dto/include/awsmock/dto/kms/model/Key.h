@@ -8,20 +8,14 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include "EncryptionAlgorithm.h"
-#include "KeySpec.h"
-#include "KeyState.h"
-#include "KeyUsage.h"
-#include "Origin.h"
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
+#include <awsmock/dto/kms/model/KeySpec.h>
+#include <awsmock/dto/kms/model/KeyState.h>
+#include <awsmock/dto/kms/model/KeyUsage.h>
+#include <awsmock/dto/kms/model/Origin.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -114,7 +108,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate = static_cast<long>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+        long creationDate = system_clock::to_time_t(system_clock::now());
 
         /**
          * Deletion date
@@ -134,38 +128,38 @@ namespace AwsMock::Dto::KMS {
         /**
          * Encryption algorithms
          */
-        std::vector<Dto::KMS::EncryptionAlgorithm> encryptionAlgorithms;
+        std::vector<EncryptionAlgorithm> encryptionAlgorithms;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert from JSON representation
+         * @brief Convert from JSON representation
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

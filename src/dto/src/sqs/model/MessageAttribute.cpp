@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    bool MessageAttribute::operator<(const AwsMock::Dto::SQS::MessageAttribute &other) const {
+    bool MessageAttribute::operator<(const MessageAttribute &other) const {
         return name < other.name;
     }
 
@@ -19,19 +19,19 @@ namespace AwsMock::Dto::SQS {
         auto *bytes = new unsigned char[1];
 
         EVP_DigestInit(context, md);
-        for (const auto &a: attributes) {
+        for (const auto &[fst, snd]: attributes) {
 
             // Encoded name
-            UpdateLengthAndBytes(context, a.first);
+            UpdateLengthAndBytes(context, fst);
 
             // Encoded data type
             //UpdateLengthAndBytes(context, Dto::SQS::MessageAttributeDataTypeToString(a.second));
 
             // Encoded value
-            if (!a.second.empty()) {
+            if (!snd.empty()) {
                 bytes[0] = 1;
                 EVP_DigestUpdate(context, bytes, 1);
-                UpdateLengthAndBytes(context, a.second);
+                UpdateLengthAndBytes(context, snd);
             }
         }
         EVP_DigestFinal(context, md_value, &md_len);
@@ -79,7 +79,7 @@ namespace AwsMock::Dto::SQS {
         return Core::Crypto::HexEncode(md_value, md_len);
     }
 
-    void MessageAttribute::GetIntAsByteArray(size_t n, unsigned char *bytes) {
+    void MessageAttribute::GetIntAsByteArray(const size_t n, unsigned char *bytes) {
         bytes[3] = n & 0x000000ff;
         bytes[2] = (n & 0x0000ff00) >> 8;
         bytes[1] = (n & 0x00ff0000) >> 16;
@@ -94,27 +94,39 @@ namespace AwsMock::Dto::SQS {
         free(bytes);
     }
 
-    void MessageAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void MessageAttribute::FromDocument(const view_or_value<view, value> &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-        Core::JsonUtils::GetJsonValueString("StringValue", jsonObject, stringValue);
-        if (!stringValue.empty()) {
-            type = MessageAttributeDataType::STRING;
-        }
-        Core::JsonUtils::GetJsonValueLong("NumberValue", jsonObject, numberValue);
-        if (numberValue > 0) {
-            type = MessageAttributeDataType::NUMBER;
+        try {
+            name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Name");
+            stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+
+            if (!stringValue.empty()) {
+                type = STRING;
+            }
+            numberValue = Core::Bson::BsonUtils::GetLongValue(jsonObject, "NumberValue");
+            if (numberValue > 0) {
+                type = NUMBER;
+            }
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
         }
     }
 
-    Poco::JSON::Object MessageAttribute::ToJsonObject() const {
+    view_or_value<view, value> MessageAttribute::ToDocument() const {
 
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("Name", name);
-        jsonObject.set("StringValue", stringValue);
-        jsonObject.set("NumberValue", numberValue);
-        jsonObject.set("DataType", MessageAttributeDataTypeToString(type));
-        return jsonObject;
+        try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
+            Core::Bson::BsonUtils::SetIntValue(document, "NumberValue", numberValue);
+            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
+            return document.extract();
+
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
+        }
     }
 
     std::string MessageAttribute::ToString() const {
@@ -124,12 +136,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const MessageAttribute &r) {
-        os << "MessageAttribute={name='" << r.name << "', type='" << MessageAttributeDataTypeToString(r.type) << "', stringValue='" << r.stringValue << "', numberValue="
-           << r.numberValue;
-        if (r.binaryValue != nullptr) {
-            os << ", binaryValue='" << r.binaryValue << "'";
-        }
-        os << "}";
+        os << "MessageAttribute=" << to_json(r.ToDocument());
         return os;
     }
 }// namespace AwsMock::Dto::SQS

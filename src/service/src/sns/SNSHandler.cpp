@@ -106,12 +106,14 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC: {
-
                     std::string topicArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TopicArn");
 
                     Dto::SNS::ListSubscriptionsByTopicResponse snsResponse = _snsService.ListSubscriptionsByTopic({.region = clientCommand.region, .topicArn = topicArn});
                     log_info << "List subscriptions by topic, topicArn: " << topicArn << " count: " << snsResponse.subscriptions.size();
-                    return SendOkResponse(request, snsResponse.ToXml());
+                    std::map<std::string, std::string> headers;
+                    headers["Content-Type"] = "application/xml";
+
+                    return SendOkResponse(request, snsResponse.ToXml(), headers);
                 }
 
                 case Dto::Common::SNSCommandType::TAG_RESOURCE: {

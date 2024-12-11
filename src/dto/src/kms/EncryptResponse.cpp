@@ -8,6 +8,7 @@ namespace AwsMock::Dto::KMS {
 
     void EncryptResponse::FromJson(const std::string &jsonString) {
 
+        /* Todo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -27,24 +28,26 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string EncryptResponse::ToJson() const {
 
+        /* Todo
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
             rootJson.set("KeyId", keyId);
             rootJson.set("CiphertextBlob", ciphertext);
-            rootJson.set("EncryptionAlgorithm", Dto::KMS::EEncryptionAlgorithmsToString(encryptionAlgorithm));
+            rootJson.set("EncryptionAlgorithm", Dto::KMS::EncryptionAlgorithmsToString(encryptionAlgorithm));
 
             return Core::JsonUtils::ToJsonString(rootJson);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string EncryptResponse::ToString() const {

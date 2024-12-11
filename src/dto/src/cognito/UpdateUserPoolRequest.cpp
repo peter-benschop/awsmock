@@ -6,28 +6,26 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void UpdateUserPoolRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void UpdateUserPoolRequest::FromJson(const std::string &jsonString) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
 
-            if (rootObject->has("UserPoolTags")) {
-                Poco::JSON::Array::Ptr jsonTagsArray = rootObject->getArray("UserPoolTags");
-                for (int i = 0; i < jsonTagsArray->size(); i++) {
-                    Poco::JSON::Object::Ptr jsonTagObject = jsonTagsArray->getObject(i);
-                    tags[jsonTagObject->getNames().front()] = jsonTagObject->getValue<std::string>(jsonTagObject->getNames().front());
+            // Tags
+            if (document.view().find("Tags") != document.view().end()) {
+                for (const bsoncxx::array::view jsonArray = document.view()["Tags"].get_array().value; const auto &tag: jsonArray) {
+                    std::string key = bsoncxx::string::to_string(tag.key());
+                    const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                    tags[key] = value;
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -35,24 +33,27 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserPoolId", userPoolId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
 
             // Tags
-            Poco::JSON::Array tagsArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object tagsObject;
-                tagsObject.set(tag.first, tag.second);
-                tagsArray.add(tagsObject);
+            if (!tags.empty()) {
+                array tagsArray;
+                for (const auto &[fst, snd]: tags) {
+                    bsoncxx::builder::basic::document tagDocument;
+                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Key", fst);
+                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Value", snd);
+                    tagsArray.append(tagDocument);
+                }
+                document.append(kvp("Tags", tagsArray));
             }
-            rootJson.set("UserPoolTags", tagsArray);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

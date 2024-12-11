@@ -6,16 +6,8 @@
 #define AWSMOCK_CORE_DTO_PUT_BUCKET_VERSIONING_REQUEST_H
 
 // C++ standard includes
-#include <iostream>
-#include <map>
 #include <sstream>
 #include <string>
-
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMParser.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
 
 namespace AwsMock::Dto::S3 {
 

@@ -9,18 +9,18 @@ namespace AwsMock::Dto::S3 {
     std::string ListBucketRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("prefix", prefix);
-            rootJson.set("listType", listType);
-            rootJson.set("delimiter", delimiter);
-            rootJson.set("encodingType", encodingType);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
+            Core::Bson::BsonUtils::SetIntValue(document, "listType", listType);
+            Core::Bson::BsonUtils::SetStringValue(document, "delimiter", delimiter);
+            Core::Bson::BsonUtils::SetStringValue(document, "encodingType", encodingType);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

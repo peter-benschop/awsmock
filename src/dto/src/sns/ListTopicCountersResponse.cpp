@@ -9,20 +9,22 @@ namespace AwsMock::Dto::SNS {
     std::string ListTopicCountersResponse::ToJson() const {
 
         try {
-            Poco::JSON::Array queueCounterArrayJson;
-            for (const auto &topicCounter: topicCounters) {
-                queueCounterArrayJson.add(topicCounter.ToJsonObject());
+
+            document document;
+            if (!topicCounters.empty()) {
+                array queueCounterArrayJson;
+                for (const auto &topicCounter: topicCounters) {
+                    queueCounterArrayJson.append(topicCounter.ToDocument());
+                }
+                document.append(kvp("TopicCounters", queueCounterArrayJson));
             }
+            document.append(kvp("Total", total));
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("TopicCounters", queueCounterArrayJson);
-            rootJson.set("Total", total);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

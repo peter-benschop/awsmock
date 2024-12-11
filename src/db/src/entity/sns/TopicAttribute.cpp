@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::SNS {
         return topicAttributeDoc;
     }
 
-    void TopicAttribute::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void TopicAttribute::FromDocument(std::optional<view> mResult) {
 
         try {
 
@@ -43,49 +43,7 @@ namespace AwsMock::Database::Entity::SNS {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            throw Core::DatabaseException(exc.what());
-        }
-    }
-
-    Poco::JSON::Object TopicAttribute::ToJsonObject() const {
-
-        try {
-
-            Poco::JSON::Object jsonObject;
-            Core::JsonUtils::SetJsonValueString(jsonObject, "deliveryPolicy", deliveryPolicy);
-            Core::JsonUtils::SetJsonValueString(jsonObject, "displayName", displayName);
-            Core::JsonUtils::SetJsonValueString(jsonObject, "policy", policy);
-            Core::JsonUtils::SetJsonValueString(jsonObject, "signatureVersion", signatureVersion);
-            Core::JsonUtils::SetJsonValueString(jsonObject, "tracingConfig", tracingConfig);
-            Core::JsonUtils::SetJsonValueString(jsonObject, "kmsMasterKeyId", kmsMasterKeyId);
-            Core::JsonUtils::SetJsonValueBool(jsonObject, "fifoTopic", fifoTopic);
-            Core::JsonUtils::SetJsonValueBool(jsonObject, "contentBasedDeduplication", contentBasedDeduplication);
-            Core::JsonUtils::SetJsonValueLong(jsonObject, "availableMessages", availableMessages);
-            return jsonObject;
-
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
-        }
-    }
-
-    void TopicAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        try {
-
-            Core::JsonUtils::GetJsonValueString("deliveryPolicy", jsonObject, deliveryPolicy);
-            Core::JsonUtils::GetJsonValueString("displayName", jsonObject, displayName);
-            Core::JsonUtils::GetJsonValueBool("fifoTopic", jsonObject, fifoTopic);
-            Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
-            Core::JsonUtils::GetJsonValueString("signatureVersion", jsonObject, signatureVersion);
-            Core::JsonUtils::GetJsonValueString("tracingConfig", jsonObject, tracingConfig);
-            Core::JsonUtils::GetJsonValueString("kmsMasterKeyId", jsonObject, kmsMasterKeyId);
-            Core::JsonUtils::GetJsonValueBool("contentBasedDeduplication", jsonObject, contentBasedDeduplication);
-            Core::JsonUtils::GetJsonValueLong("availableMessages", jsonObject, availableMessages);
-
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -96,7 +54,7 @@ namespace AwsMock::Database::Entity::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const TopicAttribute &t) {
-        os << "TopicAttribute=" << bsoncxx::to_json(t.ToDocument());
+        os << "TopicAttribute=" << to_json(t.ToDocument());
         return os;
     }
 

@@ -6,29 +6,29 @@ namespace AwsMock::Dto::S3 {
     std::string ListBucketCounterResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("total", total);
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "total", total);
 
             // Contents
             if (!bucketCounters.empty()) {
 
-                Poco::JSON::Array jsonBucketArray;
-                for (auto &bucket: bucketCounters) {
-                    Poco::JSON::Object jsonObject;
-                    jsonObject.set("bucketName", bucket.bucketName);
-                    jsonObject.set("keys", bucket.keys);
-                    jsonObject.set("size", bucket.size);
-                    jsonBucketArray.add(jsonObject);
+                array jsonBucketArray;
+                for (const auto &[bucketName, keys, size]: bucketCounters) {
+                    document jsonObject;
+                    Core::Bson::BsonUtils::SetStringValue(jsonObject, "bucketName", bucketName);
+                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "keys", keys);
+                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+                    jsonBucketArray.append(jsonObject);
                 }
 
-                rootJson.set("bucketCounters", jsonBucketArray);
+                rootDocument.append(kvp("bucketCounters", jsonBucketArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

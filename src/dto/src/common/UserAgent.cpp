@@ -19,8 +19,7 @@ namespace AwsMock::Dto::Common {
         // We have a user agent, so use i
         std::string userAgentHeader = request["User-Agent"];
 
-        std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' ');
-        if (parts.empty() || parts.size() < 4) {
+        if (std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' '); parts.empty() || parts.size() < 4) {
             log_error << "Could not extract user agent DTO";
             throw Core::ServiceException("Could not extract user agent DTO");
         } else {
@@ -33,7 +32,7 @@ namespace AwsMock::Dto::Common {
                 clientOs = parts[2];
                 clientExecutableType = parts[3];
                 clientPrompt = parts[4] == "ON";
-                std::string command = Core::StringUtils::Split(parts[parts.size() - 1], '#')[1];
+                const std::string command = Core::StringUtils::Split(parts[parts.size() - 1], '#')[1];
                 clientModule = Core::StringUtils::Split(command, '.')[0];
                 clientCommand = Core::StringUtils::Split(command, '.')[1];
             }
@@ -48,21 +47,19 @@ namespace AwsMock::Dto::Common {
     std::string UserAgent::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("clientApplication", clientApplication);
-            rootJson.set("clientLanguage", clientLanguage);
-            rootJson.set("clientOs", clientOs);
-            rootJson.set("clientExecutableType", clientExecutableType);
-            rootJson.set("clientPrompt", clientPrompt);
-            rootJson.set("clientModule", clientModule);
-            rootJson.set("clientCommand", clientCommand);
-            rootJson.set("contentType", contentType);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "clientApplication", clientApplication);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientLanguage", clientApplication);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientExecutableType", clientApplication);
+            Core::Bson::BsonUtils::SetBoolValue(document, "clientPrompt", clientPrompt);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientModule", clientModule);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientCommand", clientCommand);
+            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

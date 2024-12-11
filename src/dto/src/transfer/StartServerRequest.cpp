@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Transfer {
 
     void StartServerRequest::FromJson(const std::string &body) {
 
+        // Todo:
+        /*
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(body);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -21,11 +23,13 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string StartServerRequest::ToJson() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -37,7 +41,8 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string StartServerRequest::ToString() const {

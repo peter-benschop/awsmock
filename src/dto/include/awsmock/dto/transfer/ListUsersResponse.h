@@ -6,14 +6,12 @@
 #define AWSMOCK_DTO_TRANSFER_LIST_USER_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/transfer/model/User.h>
 
 namespace AwsMock::Dto::Transfer {

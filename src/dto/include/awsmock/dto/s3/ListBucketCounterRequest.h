@@ -6,14 +6,12 @@
 #define AWSMOCK_DTO_S3_LIST_BUCKET_COUNTER_REQUEST_H
 
 // C++ Standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
@@ -31,22 +29,22 @@ namespace AwsMock::Dto::S3 {
         std::string prefix;
 
         /**
-         * MaxResults
+         * Page size
          */
-        int maxResults;
+        int pageSize;
 
         /**
          * Skip
          */
-        int skip;
+        int pageIndex;
 
         /**
-         * List of sort columns names
+         * @brief List of sort columns names
          */
         std::vector<Core::SortColumn> sortColumns;
 
         /**
-         * Parse values from a JSON stream
+         * @brief Parse values from a JSON stream
          *
          * @param body json input stream
          */

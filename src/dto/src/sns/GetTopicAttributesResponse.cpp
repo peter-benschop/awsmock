@@ -6,66 +6,54 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string GetTopicAttributesResponse::ToJson() const {
+
+        try {
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TopicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Owner", owner);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "DisplayName", displayName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "RequestId", requestId);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string GetTopicAttributesResponse::ToXml() const {
 
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("GetTopicAttributesResponse");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // CreateQueueResult
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicAttributesResult = pDoc->createElement("GetTopicAttributesResult");
-        pRoot->appendChild(pTopicAttributesResult);
+            boost::property_tree::ptree root;
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pAttributes = pDoc->createElement("Attributes");
-        pTopicAttributesResult->appendChild(pAttributes);
+            boost::property_tree::ptree attributesArray;
+            boost::property_tree::ptree attributesElement1;
+            attributesElement1.put("key", "TopicArn");
+            attributesElement1.put("value", topicArn);
+            attributesArray.push_back(std::make_pair("entry", attributesElement1));
 
-        // Topic ARN
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicArnEntry = pDoc->createElement("entry");
-        pAttributes->appendChild(pTopicArnEntry);
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicArnKey = pDoc->createElement("key");
-        pTopicArnEntry->appendChild(pTopicArnKey);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTopicArnKeyText = pDoc->createTextNode("TopicArn");
-        pTopicArnKey->appendChild(pTopicArnKeyText);
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicArnValue = pDoc->createElement("value");
-        pTopicArnEntry->appendChild(pTopicArnValue);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTopicArnValueText = pDoc->createTextNode(topicArn);
-        pTopicArnValue->appendChild(pTopicArnValueText);
+            boost::property_tree::ptree attributesElement2;
+            attributesElement2.put("key", "Owner");
+            attributesElement2.put("value", owner);
+            attributesArray.push_back(std::make_pair("entry", attributesElement2));
 
-        // Owner
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicOwnerEntry = pDoc->createElement("entry");
-        pAttributes->appendChild(pTopicOwnerEntry);
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicOwnerKey = pDoc->createElement("key");
-        pTopicOwnerEntry->appendChild(pTopicOwnerKey);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTopicOwnerKeyText = pDoc->createTextNode("Owner");
-        pTopicOwnerKey->appendChild(pTopicOwnerKeyText);
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicOwnerValue = pDoc->createElement("value");
-        pTopicOwnerEntry->appendChild(pTopicOwnerValue);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTopicOwnerValueText = pDoc->createTextNode(owner);
-        pTopicOwnerValue->appendChild(pTopicOwnerValueText);
+            boost::property_tree::ptree attributesElement3;
+            attributesElement3.put("key", "DisplayName");
+            attributesElement3.put("value", displayName);
+            attributesArray.push_back(std::make_pair("entry", attributesElement3));
 
-        // Display name
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicDisplayNameEntry = pDoc->createElement("entry");
-        pAttributes->appendChild(pTopicDisplayNameEntry);
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicDisplayNameKey = pDoc->createElement("key");
-        pTopicDisplayNameEntry->appendChild(pTopicDisplayNameKey);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTopicDisplayNameKeyText = pDoc->createTextNode("DisplayName");
-        pTopicDisplayNameKey->appendChild(pTopicDisplayNameKeyText);
-        Poco::XML::AutoPtr<Poco::XML::Element> pTopicDisplayNameValue = pDoc->createElement("value");
-        pTopicDisplayNameEntry->appendChild(pTopicDisplayNameValue);
-        Poco::XML::AutoPtr<Poco::XML::Text> pTopicDisplayNameValueText = pDoc->createTextNode(displayName);
-        pTopicDisplayNameValue->appendChild(pTopicDisplayNameValueText);
+            root.add_child("GetTopicAttributesResponse.GetTopicAttributesResult.Attributes", attributesArray);
+            root.add("GetTopicAttributesResponse.ResponseMetadata.RequestId", requestId);
 
-        // Metadata
-        Poco::XML::AutoPtr<Poco::XML::Element> pMetaData = pDoc->createElement("ResponseMetadata");
-        pRoot->appendChild(pMetaData);
+            return Core::XmlUtils::ToXmlString(root);
 
-        Poco::XML::AutoPtr<Poco::XML::Element> pRequestId = pDoc->createElement("RequestId");
-        pMetaData->appendChild(pRequestId);
-        Poco::XML::AutoPtr<Poco::XML::Text> pRequestText = pDoc->createTextNode(Poco::UUIDGenerator().createRandom().toString());
-        pRequestId->appendChild(pRequestText);
-
-        return Core::XmlUtils::ToXmlString(pDoc);
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GetTopicAttributesResponse::ToString() const {
@@ -75,7 +63,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const GetTopicAttributesResponse &r) {
-        os << "GetTopicAttributesResponse={region='" << r.region << "', topicName='" << r.topicName << "', owner='" << r.owner << "'}";
+        os << "GetTopicAttributesResponse=" << r.ToJson();
         return os;
     }
 

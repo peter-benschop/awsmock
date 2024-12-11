@@ -9,17 +9,11 @@
 #include <chrono>
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-
-
 // AwsMock include
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
@@ -86,20 +80,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
         system_clock::time_point modified = system_clock::now();
 
         /**
-         * @brief Convert to JSON value
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * @brief Convert from JSON object.
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
-
-        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
@@ -111,7 +91,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<view> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.

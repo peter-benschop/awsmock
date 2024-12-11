@@ -6,18 +6,12 @@
 #define AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Dto::SQS {
 

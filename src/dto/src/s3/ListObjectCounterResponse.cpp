@@ -6,31 +6,30 @@ namespace AwsMock::Dto::S3 {
     std::string ListObjectCounterResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("total", total);
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "total", total);
 
             // Contents
             if (!objectCounters.empty()) {
 
-                Poco::JSON::Array jsonObjectArray;
-                for (auto &object: objectCounters) {
-                    Poco::JSON::Object jsonObject;
-                    jsonObject.set("oid", object.oid);
-                    jsonObject.set("bucketName", object.bucketName);
-                    jsonObject.set("key", object.key);
-                    jsonObject.set("size", object.size);
-                    jsonObject.set("contentType", object.contentType);
-                    jsonObjectArray.add(jsonObject);
+                array jsonObjectArray;
+                for (const auto &[oid, bucketName, key, contentType, size]: objectCounters) {
+                    document jsonObject;
+                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "oid", oid);
+                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucketName", bucketName);
+                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
+                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+                    jsonObjectArray.append(jsonObject);
                 }
-
-                rootJson.set("objectCounters", jsonObjectArray);
+                rootDocument.append(kvp("objectCounters", jsonObjectArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

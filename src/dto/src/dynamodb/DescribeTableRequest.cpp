@@ -8,6 +8,8 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DescribeTableRequest::ToJson() const {
 
+        // TOdo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -19,13 +21,16 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void DescribeTableRequest::FromJson(const std::string &jsonBody) {
 
         body = jsonBody;
 
+        // TOdo:
+        /*
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonBody);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -38,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string DescribeTableRequest::ToString() const {

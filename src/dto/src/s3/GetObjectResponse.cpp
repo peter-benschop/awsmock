@@ -9,23 +9,29 @@ namespace AwsMock::Dto::S3 {
     std::string GetObjectResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("size", size);
-            rootJson.set("filename", filename);
-            rootJson.set("contentType", contentType);
-            rootJson.set("md5sum", md5sum);
-            rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "filename", filename);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5sum", md5sum);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            document metadataDocument;
+            for (const auto &[fst, snd]: metadata) {
+                Core::Bson::BsonUtils::SetStringValue(metadataDocument, fst, snd);
+            }
+            rootDocument.append(kvp("metadata", metadataDocument));
+
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

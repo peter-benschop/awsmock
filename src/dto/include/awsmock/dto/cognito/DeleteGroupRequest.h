@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_DELETE_GROUP_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -22,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteGroupRequest : public Dto::Common::BaseRequest {
+    struct DeleteGroupRequest : Common::BaseRequest {
 
         /**
          * Group name
@@ -37,9 +35,9 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Convert from a JSON object.
          *
-         * @param payload json string object
+         * @param jsonString json string object
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
 
         /**
          * Convert to a JSON string

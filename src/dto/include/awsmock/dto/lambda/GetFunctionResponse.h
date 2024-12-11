@@ -10,13 +10,10 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/lambda/model/Code.h>
 #include <awsmock/dto/lambda/model/Configuration.h>
-#include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -195,7 +192,7 @@ namespace AwsMock::Dto::Lambda {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * @brief Creates a XML string from the object.
+         * @brief Creates an XML string from the object.
          *
          * @return XML string
          */

@@ -9,37 +9,33 @@ namespace AwsMock::Dto::SNS {
     std::string ListMessagesRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("topicArn", topicArn);
-            rootJson.set("pageSize", pageSize);
-            rootJson.set("pageIndex", pageIndex);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
+            Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
+            Core::Bson::BsonUtils::SetIntValue(document, "pageIndex", pageIndex);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void ListMessagesRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
+            const value document = bsoncxx::from_json(jsonString);
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("topicArn", rootObject, topicArn);
-            Core::JsonUtils::GetJsonValueInt("pageSize", rootObject, pageSize);
-            Core::JsonUtils::GetJsonValueInt("pageIndex", rootObject, pageIndex);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            topicArn = Core::Bson::BsonUtils::GetStringValue(document, "topicArn");
+            pageSize = Core::Bson::BsonUtils::GetIntValue(document, "pageSize");
+            pageIndex = Core::Bson::BsonUtils::GetIntValue(document, "pageIndex");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

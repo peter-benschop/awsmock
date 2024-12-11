@@ -6,30 +6,13 @@
 
 namespace AwsMock::Dto::SSM {
 
-    std::string Parameter::ToJson() const {
+    view_or_value<view, value> Parameter::ToDocument() const {
 
+        /* Todo
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Name", name);
-            rootJson.set("Value", value);
-            rootJson.set("Type", ParameterTypeToString(type));
-            rootJson.set("Description", description);
-            rootJson.set("KeyId", keyId);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
-    }
-
-    Poco::JSON::Object Parameter::ToJsonObject() const {
-
-        try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("Value", value);
+            rootJson.set("Value", parameterValue);
             rootJson.set("Type", ParameterTypeToString(type));
             rootJson.set("Description", description);
             rootJson.set("KeyId", keyId);
@@ -40,16 +23,18 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
-    void Parameter::FromJsonObject(const Poco::JSON::Object::Ptr &object) {
+    void Parameter::FromDocument(const view_or_value<view, value> &document) {
 
+        /* Todo
         try {
 
             // Attributes
             Core::JsonUtils::GetJsonValueString("Name", object, name);
-            Core::JsonUtils::GetJsonValueString("Value", object, value);
+            Core::JsonUtils::GetJsonValueString("Value", object, parameterValue);
             std::string typeStr;
             Core::JsonUtils::GetJsonValueString("Type", object, typeStr);
             type = ParameterTypeFromString(typeStr);
@@ -60,7 +45,27 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+    }
+
+    std::string Parameter::ToJson() const {
+
+        /* TOdo:
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("Name", name);
+            rootJson.set("Value", parameterValue);
+            rootJson.set("Type", ParameterTypeToString(type));
+            rootJson.set("Description", description);
+            rootJson.set("KeyId", keyId);
+
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }*/
+        return {};
     }
 
     std::string Parameter::ToString() const {

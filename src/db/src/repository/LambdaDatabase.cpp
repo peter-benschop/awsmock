@@ -380,21 +380,21 @@ namespace AwsMock::Database {
         return lambdas;
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<Core::SortColumn> &sortColumns) {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<Core::SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
 
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
-                    bsoncxx::builder::basic::document sort = {};
-                    for (const auto &sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -405,7 +405,7 @@ namespace AwsMock::Database {
                     opts.limit(maxResults);
                 }
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
@@ -413,8 +413,7 @@ namespace AwsMock::Database {
                     query.append(kvp("functionName", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                auto lambdaCursor = _lambdaCollection.find(query.extract(), opts);
-                for (auto lambda: lambdaCursor) {
+                for (auto lambdaCursor = _lambdaCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
                     Entity::Lambda::Lambda result;
                     result.FromDocument(lambda);
                     lambdas.push_back(result);
@@ -430,7 +429,7 @@ namespace AwsMock::Database {
         return lambdas;
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdasWithEventSource(const std::string &eventSourceArn) {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdasWithEventSource(const std::string &eventSourceArn) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {

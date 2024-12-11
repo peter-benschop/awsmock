@@ -7,22 +7,21 @@
 namespace AwsMock::Dto::S3 {
 
     std::string ListObjectVersionsRequest::ToJson() const {
-
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("prefix", prefix);
-            rootJson.set("delimiter", prefix);
-            rootJson.set("encodingType", encodingType);
-            rootJson.set("maxKeys", maxKeys);
-            rootJson.set("versionIdMarker", versionIdMarker);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
+            Core::Bson::BsonUtils::SetStringValue(document, "delimiter", delimiter);
+            Core::Bson::BsonUtils::SetStringValue(document, "encodingType", encodingType);
+            Core::Bson::BsonUtils::SetIntValue(document, "maxKeys", maxKeys);
+            Core::Bson::BsonUtils::SetStringValue(document, "versionIdMarker", versionIdMarker);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

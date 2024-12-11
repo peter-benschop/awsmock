@@ -6,13 +6,12 @@
 #define AWSMOCK_DTO_LAMBDA_TAGS_H
 
 // C++ standard includes
+#include <map>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -44,7 +43,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON array
          */
-        [[nodiscard]] Poco::JSON::Array ToJsonObject() const;
+        [[nodiscard]] array ToDocument() const;
 
         /**
          * Convert to a JSON string
@@ -56,9 +55,9 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Convert to a JSON string
          *
-         * @param object JSON object
+         * @param document JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr object);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * Converts the DTO to a string representation.

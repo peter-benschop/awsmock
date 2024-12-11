@@ -11,15 +11,8 @@
 #include <utility>
 #include <vector>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/lambda/model/Environment.h>
-#include <awsmock/dto/lambda/model/EphemeralStorage.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::Lambda {
 

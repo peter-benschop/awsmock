@@ -6,18 +6,10 @@
 #define AWSMOCK_DTO_SECRETSMANAGER_DESCRIBE_SECRET_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMoc includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

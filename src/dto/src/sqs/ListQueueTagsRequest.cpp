@@ -8,59 +8,53 @@ namespace AwsMock::Dto::SQS {
 
     void ListQueueTagsRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
+            const value document = bsoncxx::from_json(jsonString);
 
-            // Values
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
-            Core::JsonUtils::GetJsonValueInt("PageSize", rootObject, pageSize);
-            Core::JsonUtils::GetJsonValueInt("PageIndex", rootObject, pageIndex);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
+            pageSize = Core::Bson::BsonUtils::GetIntValue(document, "PageSize");
+            pageIndex = Core::Bson::BsonUtils::GetIntValue(document, "PageIndex");
 
-            if (!rootObject->get("SortColumns").isEmpty()) {
+            // Sort columns
+            if (document.find("SortColumns") != document.end()) {
 
-                Poco::JSON::Array::Ptr sortColumnArray = rootObject->getArray("SortColumns");
-                if (sortColumnArray != nullptr) {
-                    for (int i = 0; i < sortColumnArray->size(); i++) {
-                        Core::SortColumn sortColumn;
-                        Poco::JSON::Object::Ptr jsonColumnObject = sortColumnArray->getObject(i);
-                        Core::JsonUtils::GetJsonValueString("Column", jsonColumnObject, sortColumn.column);
-                        Core::JsonUtils::GetJsonValueInt("SortDirection", jsonColumnObject, sortColumn.sortDirection);
-                        sortColumns.emplace_back(sortColumn);
-                    }
+                for (const bsoncxx::array::view arrayView{document["SortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                    Core::SortColumn sortColumn;
+                    sortColumn.FromDocument(element.get_document());
+                    sortColumns.emplace_back(sortColumn);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string ListQueueTagsRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("QueueUrl", queueUrl);
-            rootJson.set("PageSize", pageSize);
-            rootJson.set("PageIndex", pageIndex);
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
+            Core::Bson::BsonUtils::SetIntValue(document, "PageSize", pageSize);
+            Core::Bson::BsonUtils::SetIntValue(document, "PageIndex", pageIndex);
 
             if (!sortColumns.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &sortColumn: sortColumns) {
-                    jsonArray.add(sortColumn);
+                    jsonArray.append(sortColumn.ToDocument());
                 }
-                rootJson.set("SortColumns", sortColumns);
+                document.append(kvp("sortColumns", jsonArray));
             }
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

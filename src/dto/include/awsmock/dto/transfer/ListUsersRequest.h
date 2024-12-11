@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_TRANSFER_LIST_USER_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -56,9 +53,9 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Parse a JSON stream
          *
-         * @param body json input stream
+         * @param jsonString json input stream
          */
-        void FromJson(const std::string &body);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Creates a JSON string from the object.

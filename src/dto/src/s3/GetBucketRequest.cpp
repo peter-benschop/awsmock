@@ -8,38 +8,32 @@ namespace AwsMock::Dto::S3 {
 
     GetBucketRequest GetBucketRequest::FromJson(const std::string &jsonString) {
 
-        GetBucketRequest request;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
-            if (!rootObject->get("region").isEmpty()) {
-                request.region = rootObject->get("region").convert<std::string>();
-            }
-            if (!rootObject->get("bucketName").isEmpty()) {
-                request.bucketName = rootObject->get("bucketName").convert<std::string>();
-            }
+            GetBucketRequest request;
+            const value document = bsoncxx::from_json(jsonString);
+            request.region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            request.bucketName = Core::Bson::BsonUtils::GetStringValue(document, "bucketName");
             return request;
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string GetBucketRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucketName", bucketName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

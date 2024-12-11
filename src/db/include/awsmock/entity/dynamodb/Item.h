@@ -10,25 +10,12 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/dynamodb/AttributeValue.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
     using std::optional;
     using std::chrono::system_clock;
 
@@ -86,14 +73,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        Item FromDocument(optional<view> mResult);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        Item FromDocument(const optional<view> &mResult);
 
         /**
          * Converts the entity to a JSON string

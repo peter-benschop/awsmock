@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/cognito/model/User.h>
+#include <awsmock/entity/cognito/UserStatus.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -10,57 +11,45 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object User::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("region", region);
-        jsonObject.set("userName", userName);
-        jsonObject.set("userPoolId", userPoolId);
-        jsonObject.set("enabled", enabled);
-        //jsonObject.set("userStatus", Entity::Cognito::UserStatusToString(userStatus));
+    view_or_value<view, value> User::ToDocument() const {
 
-        // Attributes
-        /*if (!userAttributes.empty()) {
-            Poco::JSON::Array jsonAttributeArray;
-            for (const auto &attribute: userAttributes) {
-                Poco::JSON::Object jsonAttribute;
-                jsonAttribute.set("name", attribute.name);
-                jsonAttribute.set("value", attribute.value);
-                jsonAttributeArray.add(jsonAttribute);
-            }
-            jsonObject.set("userAttributes", jsonAttributeArray);
-        }*/
+        try {
 
-        return jsonObject;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "userName", userName);
+            Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetBoolValue(document, "enabled", enabled);
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void User::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void User::FromJsonObject(const view_or_value<view, value> &document) {
 
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("userName", jsonObject, userName);
-        Core::JsonUtils::GetJsonValueString("userPoolId", jsonObject, userPoolId);
-        Core::JsonUtils::GetJsonValueBool("enabled", jsonObject, enabled);
-        std::string userStatusStr;
-        Core::JsonUtils::GetJsonValueString("userStatus", jsonObject, userStatusStr);
-        //userStatus = UserStatusFromString(userStatusStr);
+        try {
 
-        /*if (jsonObject->has("userAttributes")) {
-            Poco::JSON::Array::Ptr jsonAttributeArray = jsonObject->getArray("userAttributes");
-            for (int i = 0; i < jsonAttributeArray->size(); i++) {
-                UserAttribute userAttribute;
-                Poco::JSON::Object::Ptr jsonAttributeObject = jsonAttributeArray->getObject(i);
-                Core::JsonUtils::GetJsonValueString("name", jsonAttributeObject, userAttribute.name);
-                Core::JsonUtils::GetJsonValueString("value", jsonAttributeObject, userAttribute.value);
-                userAttributes.emplace_back(userAttribute);
-            }
-        }*/
+            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "userName");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "userPoolId");
+            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "enabled");
+            //userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(document, "userStatus"));
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string User::ToString() const {

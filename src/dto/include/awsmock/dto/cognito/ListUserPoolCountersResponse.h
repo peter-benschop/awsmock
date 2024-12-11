@@ -6,17 +6,13 @@
 #define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_COUNTERS_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -38,21 +34,21 @@ namespace AwsMock::Dto::Cognito {
         long total;
 
         /**
-         * Convert to a JSON string.
+         * @brief Convert to a JSON string.
          *
          * @return user pools json string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

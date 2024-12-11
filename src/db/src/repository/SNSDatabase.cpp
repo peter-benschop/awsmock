@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    SNSDatabase::SNSDatabase() : _memoryDb(SNSMemoryDb::instance()), _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message") {}
+    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {}
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {
 
@@ -14,9 +14,9 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
+                const int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
                 log_trace << "Topic exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -24,11 +24,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.TopicExists(topicArn);
         }
+        return _memoryDb.TopicExists(topicArn);
     }
 
     bool SNSDatabase::TopicExists(const std::string &region, const std::string &topicName) const {
@@ -47,11 +44,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.TopicExists(region, topicName);
         }
+        return _memoryDb.TopicExists(region, topicName);
     }
 
     Entity::SNS::Topic SNSDatabase::CreateTopic(Entity::SNS::Topic &topic) const {
@@ -77,11 +71,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CreateTopic(topic);
         }
+        return _memoryDb.CreateTopic(topic);
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicById(bsoncxx::oid oid) const {
@@ -90,7 +81,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-            const std::optional<bsoncxx::document::value>
+            const std::optional<value>
                     mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult) {
 
@@ -106,16 +97,13 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SNS::Topic SNSDatabase::GetTopicById(const std::string &oid) {
+    Entity::SNS::Topic SNSDatabase::GetTopicById(const std::string &oid) const {
 
         if (HasDatabase()) {
 
             return GetTopicById(bsoncxx::oid(oid));
-
-        } else {
-
-            return _memoryDb.GetTopicById(oid);
         }
+        return _memoryDb.GetTopicById(oid);
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicByArn(const std::string &topicArn) const {
@@ -126,7 +114,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                std::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
+                const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn)));
 
                 Entity::SNS::Topic result;
                 result.FromDocument(mResult->view());
@@ -136,11 +124,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.GetTopicByArn(topicArn);
         }
+        return _memoryDb.GetTopicByArn(topicArn);
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicByName(const std::string &region, const std::string &topicName) const {
@@ -151,26 +136,21 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                std::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName)));
 
-                if (!mResult->empty()) {
+                if (const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("region", region), kvp("topicName", topicName))); !mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
                     return result;
-                } else {
-                    log_warning << "Topic not found, region: " << region << " name: " << topicName;
-                    return {};
                 }
+                log_warning << "Topic not found, region: " << region << " name: " << topicName;
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.GetTopicByName(region, topicName);
         }
+        return _memoryDb.GetTopicByName(region, topicName);
     }
 
     Entity::SNS::TopicList SNSDatabase::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const {
@@ -334,16 +314,13 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SNS::Topic SNSDatabase::CreateOrUpdateTopic(Entity::SNS::Topic &topic) {
+    Entity::SNS::Topic SNSDatabase::CreateOrUpdateTopic(Entity::SNS::Topic &topic) const {
 
         if (TopicExists(topic.region, topic.topicName)) {
 
             return UpdateTopic(topic);
-
-        } else {
-
-            return CreateTopic(topic);
         }
+        return CreateTopic(topic);
     }
 
     long SNSDatabase::CountTopics(const std::string &region, const std::string &prefix) const {
@@ -444,7 +421,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _topicCollection.delete_many({});
+                const auto result = _topicCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All topics deleted, count: " << result->deleted_count();
 
@@ -518,7 +495,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-            const std::optional<bsoncxx::document::value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+            const std::optional<value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
             Entity::SNS::Message result;
             result.FromDocument(mResult->view());
 
@@ -529,7 +506,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::SNS::Message SNSDatabase::GetMessageById(const std::string &oid) {
+    Entity::SNS::Message SNSDatabase::GetMessageById(const std::string &oid) const {
         return GetMessageById(bsoncxx::oid(oid));
     }
 
@@ -555,11 +532,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CountMessages(topicArn);
         }
+        return _memoryDb.CountMessages(topicArn);
     }
 
     long SNSDatabase::CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) const {
@@ -573,7 +547,7 @@ namespace AwsMock::Database {
                 const long count = _messageCollection.count_documents(make_document(kvp("region", region),
                                                                                     kvp("topicArn", topicArn),
                                                                                     kvp("status",
-                                                                                        Entity::SNS::MessageStatusToString(status))));
+                                                                                        MessageStatusToString(status))));
                 log_trace << "Count resources by state, region: " << region << " arn: " << topicArn
                           << " result: " << count;
                 return count;
@@ -582,11 +556,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CountMessagesByStatus(region, topicArn, status);
         }
+        return _memoryDb.CountMessagesByStatus(region, topicArn, status);
     }
 
     long SNSDatabase::CountMessagesSize(const std::string &topicArn) const {
@@ -595,8 +566,7 @@ namespace AwsMock::Database {
 
             try {
 
-                long count;
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
 
                 mongocxx::pipeline p{};
@@ -617,11 +587,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CountMessages(topicArn);
         }
+        return _memoryDb.CountMessages(topicArn);
     }
 
     Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn) const {

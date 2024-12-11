@@ -8,6 +8,7 @@ namespace AwsMock::Dto::SSM {
 
     std::string DeleteParameterRequest::ToJson() const {
 
+        /* Todo
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Name", name);
@@ -17,11 +18,13 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void DeleteParameterRequest::FromJson(const std::string &jsonString) {
 
+        /* Todo
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -34,7 +37,7 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
-        }
+        }*/
     }
 
     std::string DeleteParameterRequest::ToString() const {

@@ -6,18 +6,10 @@
 #define AWSMOCK_DTO_SECRETSMANAGER_REPLICATION_STATUS_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMoc includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -40,68 +32,68 @@ namespace AwsMock::Dto::SecretsManager {
     struct ReplicationStatus {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * ARN
-     */
+         * ARN
+         */
         std::string arn;
 
         /**
-     * KMS key ID
-     */
+         * KMS key ID
+         */
         std::string kmsKeyId;
 
         /**
-     * Last access date
-     */
+         * Last access date
+         */
         double lastAccessedDate;
 
         /**
-     * Status
-     */
+         * Status
+         */
         std::string status;
 
         /**
-     * Status message
-     */
+         * Status message
+         */
         std::string statusMessage;
 
         /**
-     * Converts the DTO to a JSON object.
-     *
-     * @return DTO as string for logging.
-     */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+         * @brief Converts the DTO to a JSON object.
+         *
+         * @return DTO as string
+         */
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
+         * @brief Converts a JSON representation to s DTO.
+         *
+         * @param document JSON object.
+         */
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * @brief Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ReplicationStatus &r);
     };
 

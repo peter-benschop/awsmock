@@ -9,15 +9,9 @@
 #include <chrono>
 #include <string>
 
-// BSON includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::DynamoDb {
 

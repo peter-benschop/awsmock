@@ -75,13 +75,12 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(
-            const Dto::Cognito::ListUserPoolRequest &request) const {
+    Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
-        log_debug << "List user pools request, maxResults: " << request.maxResults;
+        log_debug << "List user pools request, pageSize: " << request.pageSize;
 
         try {
-            long total = _database.CountUserPools(request.region);
+            const long total = _database.CountUserPools(request.region);
             std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list count: " << userPools.size();
             return Dto::Cognito::Mapper::map(request, userPools, total);
@@ -91,14 +90,13 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::ListUserPoolCountersResponse CognitoService::ListUserPoolCounters(
-            const Dto::Cognito::ListUserPoolCountersRequest &request) const {
+    Dto::Cognito::ListUserPoolCountersResponse CognitoService::ListUserPoolCounters(const Dto::Cognito::ListUserPoolCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
         log_debug << "List user pools counters request, pageSize: " << request.pageSize;
 
         try {
-            long total = _database.CountUserPools(request.region);
-            std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
+            const long total = _database.CountUserPools(request.region);
+            const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list counters, count: " << userPools.size();
             Dto::Cognito::ListUserPoolCountersResponse response;
             response.userPools = Dto::Cognito::Mapper::map(userPools);
@@ -110,8 +108,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::DescribeUserPoolResponse CognitoService::DescribeUserPool(
-            const Dto::Cognito::DescribeUserPoolRequest &request) const {
+    Dto::Cognito::DescribeUserPoolResponse CognitoService::DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool");
         log_debug << "Describe user pool request, userPoolId: " << request.userPoolId;
 
@@ -148,8 +145,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::CreateUserPoolDomainResponse CognitoService::CreateUserPoolDomain(
-            const Dto::Cognito::CreateUserPoolDomainRequest &request) const {
+    Dto::Cognito::CreateUserPoolDomainResponse CognitoService::CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_domain");
         log_debug << "Create user pool request, region:  " << request.region << " name: " << request.domain;
 
@@ -177,8 +173,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::UpdateUserPoolDomainResponse CognitoService::UpdateUserPoolDomain(
-            const Dto::Cognito::UpdateUserPoolDomainRequest &request) const {
+    Dto::Cognito::UpdateUserPoolDomainResponse CognitoService::UpdateUserPoolDomain(const Dto::Cognito::UpdateUserPoolDomainRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "update_user_pool_domain");
         log_debug << "Update user pool domain request, userPoolId: " << request.userPoolId << " domain: " << request.domain;
 
@@ -203,8 +198,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::DescribeUserPoolDomainResponse CognitoService::DescribeUserPoolDomain(
-            const Dto::Cognito::DescribeUserPoolDomainRequest &request) {
+    Dto::Cognito::DescribeUserPoolDomainResponse CognitoService::DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request) {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_domain");
         log_debug << "Describe user pool domain request, domain: " << request.domain;
 
@@ -218,8 +212,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::CreateUserPoolClientResponse CognitoService::CreateUserPoolClient(
-            const Dto::Cognito::CreateUserPoolClientRequest &request) const {
+    Dto::Cognito::CreateUserPoolClientResponse CognitoService::CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user_pool_client");
         log_debug << "Create user pool client request, clientName: " << request.clientName;
 
@@ -255,8 +248,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::ListUserPoolClientsResponse CognitoService::ListUserPoolClients(
-            const Dto::Cognito::ListUserPoolClientsRequest &request) const {
+    Dto::Cognito::ListUserPoolClientsResponse CognitoService::ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool_clients");
         log_debug << "List user pools clients request, userPoolId: " << request.userPoolId << " maxResults: " << request.maxResults;
 
@@ -270,8 +262,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::DescribeUserPoolClientResponse CognitoService::DescribeUserPoolClient(
-            const Dto::Cognito::DescribeUserPoolClientRequest &request) const {
+    Dto::Cognito::DescribeUserPoolClientResponse CognitoService::DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "describe_user_pool_client");
         log_debug << "Describe user pool client request, userPoolId: " << request.userPoolId << " clientId: " << request.clientId;
 
@@ -381,8 +372,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::AdminCreateUserResponse CognitoService::AdminCreateUser(
-            const Dto::Cognito::AdminCreateUserRequest &request) const {
+    Dto::Cognito::AdminCreateUserResponse CognitoService::AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "create_user");
         log_debug << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
@@ -419,8 +409,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Cognito::AdminGetUserResponse CognitoService::AdminGetUser(
-            const Dto::Cognito::AdminGetUserRequest &request) const {
+    Dto::Cognito::AdminGetUserResponse CognitoService::AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "admin_get_user");
         log_debug << "Admin get user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 

@@ -9,15 +9,6 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/NodeList.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/XML/XMLWriter.h>
-
 namespace AwsMock::Dto::S3 {
 
     struct MoveObjectResponse {

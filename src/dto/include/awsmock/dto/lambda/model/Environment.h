@@ -6,16 +6,11 @@
 #define AWSMOCK_DTO_LAMBDA_ENVIRONMENT_H
 
 // C++ standard includes
+#include <map>
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/lambda/model/Error.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -50,9 +45,9 @@ namespace AwsMock::Dto::Lambda {
         /**
          * @brief Convert to a JSON string
          *
-         * @param object JSON object
+         * @param document JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr object);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts the DTO to a string representation.

@@ -7,24 +7,13 @@
 
 // C++ standard includes
 #include <map>
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -53,24 +42,31 @@ namespace AwsMock::Dto::SQS {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
-         * Converts the JSON string to a DTO
+         * @brief Converts the JSON string to a DTO
+         *
+         * @return JSON string
+         */
+        std::string ToJson() const;
+
+        /**
+         * @brief Converts the JSON string to a DTO
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

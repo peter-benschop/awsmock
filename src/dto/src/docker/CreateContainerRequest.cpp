@@ -3,28 +3,73 @@
 //
 
 #include <awsmock/dto/docker/CreateContainerRequest.h>
+#include <gtest/gtest.h>
 
 namespace AwsMock::Dto::Docker {
 
     std::string CreateContainerRequest::ToJson() const {
 
-        try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Hostname", hostName);
-            rootJson.set("Domainname", domainName);
-            rootJson.set("User", user);
-            rootJson.set("Image", image);
 
-            Poco::JSON::Array envArray;
-            for (unsigned long i = 0; i < environment.size(); i++) {
-                envArray.set(i, environment[i]);
+        try {
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Hostname", hostName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Domainname", domainName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "User", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Image", image);
+
+            if (!environment.empty()) {
+                array envArray;
+                for (unsigned long i = 0; i < environment.size(); i++) {
+                    envArray.append(environment[i]);
+                }
+                rootDocument.append(kvp("Env", envArray));
             }
-            rootJson.set("Env", envArray);
 
             // Exposed ports
-            Poco::JSON::Object exposedPortsObject;
-            exposedPortsObject.set(containerPort, Poco::JSON::Object());
-            rootJson.set("ExposedPorts", exposedPortsObject);
+            document exposedPortsObject;
+            exposedPortsObject.append(kvp(containerPort, make_document()));
+            rootDocument.append(kvp("ExposedPorts", exposedPortsObject));
+
+            // Host config
+            document hostConfigObject;
+
+            // Port array
+            document hostPortObject;
+            hostPortObject.append(kvp("HostPort", hostPort));
+
+            // Host array
+            array hostArray;
+            hostArray.append(hostPortObject);
+
+            // DNS array
+            array dnsArray;
+            dnsArray.append("8.8.8.8");
+            hostConfigObject.append(kvp("Dns", dnsArray));
+
+            // Port bindings
+            document portBindingsObject;
+            portBindingsObject.append(kvp(containerPort, hostArray));
+            hostConfigObject.append(kvp("PortBindings", portBindingsObject));
+
+            // Hosts docker internal, localstack (for localstack compatibility) and awsmock are routed to the docker host
+            array extraHostsArray;
+            extraHostsArray.append("host.docker.internal:host-gateway");
+            extraHostsArray.append("awsmock:host-gateway");
+            extraHostsArray.append("localstack:host-gateway");
+
+            hostConfigObject.append(kvp("ExtraHosts", extraHostsArray));
+            hostConfigObject.append(kvp("NetworkMode", networkMode));
+            rootDocument.append(kvp("HostConfig", hostConfigObject));
+
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+
+        /*try {
 
             // Host config
             Poco::JSON::Object hostConfigObject;
@@ -37,7 +82,7 @@ namespace AwsMock::Dto::Docker {
             Poco::JSON::Array hostArray;
             hostArray.add(hostPortObject);
 
-            // Host array
+            // DNS array
             Poco::JSON::Array dnsArray;
             dnsArray.add("8.8.8.8");
             hostConfigObject.set("Dns", dnsArray);
@@ -61,7 +106,7 @@ namespace AwsMock::Dto::Docker {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string CreateContainerRequest::ToString() const {

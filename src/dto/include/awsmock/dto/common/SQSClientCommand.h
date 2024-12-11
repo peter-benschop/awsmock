@@ -6,7 +6,6 @@
 #define AWSMOCK_DTO_COMMON_SQS_CLIENT_COMMAND_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // Boost includes
@@ -16,9 +15,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
@@ -82,9 +80,9 @@ namespace AwsMock::Dto::Common {
     }
 
     [[maybe_unused]] static SqsCommandType SqsCommandTypeFromString(const std::string &commandType) {
-        for (auto &it: SqsCommandTypeNames) {
-            if (Core::StringUtils::EqualsIgnoreCase(commandType, it.second)) {
-                return it.first;
+        for (auto &[fst, snd]: SqsCommandTypeNames) {
+            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
+                return fst;
             }
         }
         return SqsCommandType::UNKNOWN;
@@ -97,7 +95,7 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SQSClientCommand : public BaseClientCommand {
+    struct SQSClientCommand : BaseClientCommand {
 
         /**
          * @brief Client command

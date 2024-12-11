@@ -8,6 +8,7 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string ListSecretsResponse::ToJson() const {
 
+        /* Todo:
         try {
 
             Poco::JSON::Object rootJson;
@@ -25,7 +26,8 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string ListSecretsResponse::ToString() const {

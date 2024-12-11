@@ -6,31 +6,26 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void CreateUserPoolRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void CreateUserPoolRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            name = Core::Bson::BsonUtils::GetStringValue(document, "PoolName");
+            domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("PoolName", rootObject, name);
-            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
-
-            if (rootObject->has("UserPoolTags")) {
-                Poco::JSON::Array::Ptr jsonTagsArray = rootObject->getArray("UserPoolTags");
-                for (int i = 0; i < jsonTagsArray->size(); i++) {
-                    Poco::JSON::Object::Ptr jsonTagObject = jsonTagsArray->getObject(i);
-                    std::string key = jsonTagObject->getNames().front();
-                    auto value = jsonTagObject->getValue<std::string>(key);
-                    tags[key] = value;
+            // Get tags
+            if (document.find("tags") != document.end()) {
+                for (const view tagsView = document["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                    std::string key = bsoncxx::string::to_string(tagElement.key());
+                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                    tags.emplace(key, value);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -38,25 +33,22 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("PoolName", name);
-            rootJson.set("Domain", domain);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
 
-            // Tags
-            Poco::JSON::Array tagsArray;
-            for (const auto &tag: tags) {
-                Poco::JSON::Object tagsObject;
-                tagsObject.set(tag.first, tag.second);
-                tagsArray.add(tagsObject);
+            if (!tags.empty()) {
+                document jsonObject;
+                for (const auto &[fst, snd]: tags) {
+                    jsonObject.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("Tags", jsonObject));
             }
-            rootJson.set("UserPollTags", tagsArray);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

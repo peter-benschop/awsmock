@@ -10,22 +10,22 @@ namespace AwsMock::Dto::SNS {
     std::string GetTopicDetailsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("topicName", topicName);
-            rootJson.set("topicUrl", topicUrl);
-            rootJson.set("topicArn", topicArn);
-            rootJson.set("messageCount", messageCount);
-            rootJson.set("size", size);
-            rootJson.set("owner", owner);
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicName", topicName);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicUrl", topicUrl);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
+            Core::Bson::BsonUtils::SetLongValue(document, "messageCount", messageCount);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetStringValue(document, owner, owner);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

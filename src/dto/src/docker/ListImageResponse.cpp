@@ -9,6 +9,18 @@ namespace AwsMock::Dto::Docker {
     void ListImageResponse::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            if (!document.view().empty()) {
+                //array jsonArray = document
+            }
+            //            topicArn = Core::Bson::BsonUtils::GetStringValue(document, "topicArn");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+        /*
+        try {
             Poco::JSON::Parser parser;
             Poco::Dynamic::Var result = parser.parse(jsonString);
             Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
@@ -23,25 +35,24 @@ namespace AwsMock::Dto::Docker {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string ListImageResponse::ToJson() const {
 
         try {
-
-            Poco::JSON::Object rootJson;
-
-            Poco::JSON::Array imageArray;
-            for (const auto &image: imageList) {
-                imageArray.add(image.ToJsonObject());
+            if (!imageList.empty()) {
+                array jsonArray;
+                for (const auto &image: imageList) {
+                    jsonArray.append(image.ToDocument());
+                }
+                return Core::Bson::BsonUtils::ToJsonString(jsonArray);
             }
+            return {};
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

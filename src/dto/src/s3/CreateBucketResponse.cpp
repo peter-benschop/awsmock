@@ -9,15 +9,15 @@ namespace AwsMock::Dto::S3 {
     std::string CreateBucketResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("location", location);
-            rootJson.set("arn", arn);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "location", location);
+            Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::ostream &operator<<(std::ostream &os, const CreateBucketResponse &r) {
-        os << "CreateBucketResponse={bucket='" + r.location + "', arn='" + r.arn + "'}";
+        os << "CreateBucketResponse=" << r.ToJson();
         return os;
     }
 

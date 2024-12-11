@@ -6,13 +6,12 @@
 #define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -22,12 +21,12 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolRequest : public Dto::Common::BaseRequest {
+    struct ListUserPoolRequest : Common::BaseRequest {
 
         /**
-         * Maximal number of results
+         * Page size
          */
-        int maxResults{};
+        int pageSize{};
 
         /**
          * Page index
@@ -37,14 +36,14 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Page index
          */
-        std::vector<std::string> sortColumns{};
+        std::vector<Core::SortColumn> sortColumns{};
 
         /**
          * Convert from a JSON object.
          *
-         * @param payload json string object
+         * @param jsonString json string object
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
 
         /**
          * Convert to a JSON string

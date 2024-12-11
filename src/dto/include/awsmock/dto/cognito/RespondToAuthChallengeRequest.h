@@ -6,14 +6,10 @@
 #define AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/AuthFlow.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/dto/cognito/model/UserContextData.h>
 #include <awsmock/dto/common/BaseRequest.h>
@@ -47,7 +43,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RespondToAuthChallengeRequest : public Dto::Common::BaseRequest {
+    struct RespondToAuthChallengeRequest : Common::BaseRequest {
 
         /**
          * The app client ID.

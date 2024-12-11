@@ -9,47 +9,47 @@ namespace AwsMock::Dto::S3 {
     std::string GetBucketResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("id", id);
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("arn", arn);
-            rootJson.set("size", size);
-            rootJson.set("keys", keys);
-            rootJson.set("versionStatus", versionStatus);
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetLongValue(document, "keys", keys);
+            Core::Bson::BsonUtils::SetStringValue(document, "versionStatus", versionStatus);
 
             if (!lambdaConfigurations.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &lambdaNotification: lambdaConfigurations) {
-                    jsonArray.add(lambdaNotification.ToJsonObject());
+                    jsonArray.append(lambdaNotification.ToDocument());
                 }
-                rootJson.set("lambdaConfigurations", jsonArray);
+                document.append(kvp("lambdaConfigurations", jsonArray));
             }
 
             if (!queueConfigurations.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &topicConfiguration: queueConfigurations) {
-                    jsonArray.add(topicConfiguration.ToJsonObject());
+                    jsonArray.append(topicConfiguration.ToDocument());
                 }
-                rootJson.set("queueConfigurations", jsonArray);
+                document.append(kvp("queueConfigurations", jsonArray));
             }
 
             if (!topicConfigurations.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &topicConfiguration: topicConfigurations) {
-                    jsonArray.add(topicConfiguration.ToJsonObject());
+                    jsonArray.append(topicConfiguration.ToDocument());
                 }
-                rootJson.set("topicConfigurations", jsonArray);
+                document.append(kvp("topicConfigurations", jsonArray));
             }
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
 
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -10,12 +10,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         try {
 
-            auto attributesDoc = bsoncxx::builder::basic::document{};
+            auto attributesDoc = document{};
             for (const auto &[fst, snd]: attributes) {
                 attributesDoc.append(kvp(fst, snd.ToDocument()));
             }
 
-            auto itemDoc = bsoncxx::builder::basic::document{};
+            auto itemDoc = document{};
             itemDoc.append(
                     kvp("region", region),
                     kvp("tableName", tableName),
@@ -31,7 +31,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    Item Item::FromDocument(optional<view> mResult) {
+    Item Item::FromDocument(const optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

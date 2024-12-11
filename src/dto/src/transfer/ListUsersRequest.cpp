@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListUsersRequest::ToJson() const {
 
+        // todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -21,11 +23,13 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void ListUsersRequest::FromJson(const std::string &body) {
-
+        // todo:
+        /*
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(body);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -41,7 +45,7 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string ListUsersRequest::ToString() const {

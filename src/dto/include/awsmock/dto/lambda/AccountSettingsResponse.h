@@ -6,18 +6,11 @@
 #define AWSMOCK_DTO_LAMBDA_ACCOUNT_SETTINGS_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/lambda/model/AccountLimit.h>
 #include <awsmock/dto/lambda/model/AccountUsage.h>
@@ -44,7 +37,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct AccountSettingsResponse : public Dto::Common::BaseRequest {
+    struct AccountSettingsResponse : Common::BaseRequest {
 
         /**
          * Account limits

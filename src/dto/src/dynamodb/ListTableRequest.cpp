@@ -10,7 +10,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "ExclusiveStartTableName", exclusiveStartTableName);
             Core::Bson::BsonUtils::SetIntValue(document, "Limit", limit);
@@ -23,23 +23,20 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    void ListTableRequest::FromJson(const std::string &jsonBody) {
+    void ListTableRequest::FromJson(const std::string &jsonString) {
 
         // Save original body
-        body = jsonBody;
-
-        Poco::JSON::Parser parser;
-        const Poco::Dynamic::Var result = parser.parse(jsonBody);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        body = jsonString;
 
         try {
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("ExclusiveStartTableName", rootObject, exclusiveStartTableName);
-            Core::JsonUtils::GetJsonValueInt("Limit", rootObject, limit);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            exclusiveStartTableName = Core::Bson::BsonUtils::GetStringValue(document, "ExclusiveStartTableName");
+            limit = Core::Bson::BsonUtils::GetIntValue(document, "Limit");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

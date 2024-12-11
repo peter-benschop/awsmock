@@ -15,7 +15,7 @@ namespace AwsMock::Dto::Common {
 
         } else {
 
-            Dto::Common::UserAgent userAgent;
+            UserAgent userAgent;
             userAgent.FromRequest(request);
         }
 
@@ -34,18 +34,17 @@ namespace AwsMock::Dto::Common {
     std::string CognitoClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("method", method);
-            rootJson.set("region", region);
-            rootJson.set("user", user);
-            rootJson.set("command", Dto::Common::CognitoCommandTypeToString(command));
-            rootJson.set("url", url);
-            rootJson.set("contentType", contentType);
-            rootJson.set("contentLength", contentLength);
-            rootJson.set("payload", payload);
-            rootJson.set("requestId", requestId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "command", CognitoCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "url", url);
+            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            Core::Bson::BsonUtils::SetIntValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetStringValue(document, "payload", payload);
+            Core::Bson::BsonUtils::SetStringValue(document, "requestId", requestId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

@@ -6,14 +6,12 @@
 #define AWSMOCK_DTO_DOCKER_LIST_CONTAINER_RESPONSE_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/docker/model/Container.h>
 
 namespace AwsMock::Dto::Docker {

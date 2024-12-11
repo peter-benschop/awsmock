@@ -6,21 +6,12 @@
 #define AWSMOCK_DTO_SSM_DESCRIBE_PARAMETERS_RESPONSE_H
 
 // C++ standard includes
-#include <map>
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/ssm/model/Parameter.h>
-#include <awsmock/dto/ssm/model/ParameterType.h>
 
 namespace AwsMock::Dto::SSM {
 
@@ -47,21 +38,21 @@ namespace AwsMock::Dto::SSM {
         std::string requestId;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

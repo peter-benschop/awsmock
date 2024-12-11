@@ -7,19 +7,8 @@
 
 // C++ includes
 #include <chrono>
-#include <sstream>
+#include <map>
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/JSON/Object.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
 
 // AwsMOck includes
 #include <awsmock/core/BsonUtils.h>
@@ -63,7 +52,7 @@ namespace AwsMock::Database::Entity::Lambda {
                 return fst;
             }
         }
-        return LambdaInstanceStatus::InstanceUnknown;
+        return InstanceUnknown;
     }
 
     /**
@@ -112,7 +101,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -124,9 +113,9 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * @brief Converts the entity to a JSON object
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument();
 
         /**
          * @brief Converts the DTO to a string representation.

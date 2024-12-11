@@ -9,19 +9,11 @@
 #include <map>
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
-// Boost includes
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/Group.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
-#include <awsmock/entity/cognito/UserStatus.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -94,7 +86,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the entity to a JSON string
@@ -106,9 +98,9 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Converts the entity to a JSON object
          *
-         * @param jsonObject JSON object.
+         * @param document JSON object.
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromJsonObject(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts the entity to a string representation.

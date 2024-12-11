@@ -8,37 +8,31 @@ namespace AwsMock::Dto::S3 {
 
     PurgeBucketRequest PurgeBucketRequest::FromJson(const std::string &jsonString) {
 
-        PurgeBucketRequest request;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-
-            Core::JsonUtils::GetJsonValueString("region", rootObject, request.region);
-            Core::JsonUtils::GetJsonValueString("bucketName", rootObject, request.bucketName);
-
+            PurgeBucketRequest request;
+            const value document = bsoncxx::from_json(jsonString);
+            request.region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            request.bucketName = Core::Bson::BsonUtils::GetStringValue(document, "bucketName");
             return request;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string PurgeBucketRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucketName", bucketName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -12,16 +12,16 @@ namespace AwsMock::Database {
 
     SecretsManagerDatabase::SecretsManagerDatabase() : _databaseName(GetDatabaseName()), _collectionName("secretsmanager_secret"), _memoryDb(SecretsManagerMemoryDb::instance()) {}
 
-    bool SecretsManagerDatabase::SecretExists(const std::string &region, const std::string &name) {
+    bool SecretsManagerDatabase::SecretExists(const std::string &region, const std::string &name) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-                int64_t count = _secretCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+                const int64_t count = _secretCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
                 log_trace << "Secret exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -29,18 +29,15 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
             }
-
-        } else {
-
-            return _memoryDb.SecretExists(region, name);
         }
+        return _memoryDb.SecretExists(region, name);
     }
 
-    bool SecretsManagerDatabase::SecretExists(const Entity::SecretsManager::Secret &secret) {
+    bool SecretsManagerDatabase::SecretExists(const Entity::SecretsManager::Secret &secret) const {
         return SecretExists(secret.region, secret.name);
     }
 
-    bool SecretsManagerDatabase::SecretExists(const std::string &secretId) {
+    bool SecretsManagerDatabase::SecretExists(const std::string &secretId) const {
 
         if (HasDatabase()) {
 
@@ -57,20 +54,16 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
             }
-
-        } else {
-
-            return _memoryDb.SecretExists(secretId);
         }
+        return _memoryDb.SecretExists(secretId);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(bsoncxx::oid oid) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(bsoncxx::oid oid) const {
 
-        auto client = ConnectionPool::instance().GetConnection();
+        const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-        std::optional<bsoncxx::document::value>
-                mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
+        const std::optional<value> mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SecretsManager::Secret result;
         result.FromDocument(mResult->view());
 
@@ -82,22 +75,17 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             return GetSecretById(bsoncxx::oid(oid));
-
-        } else {
-
-            return _memoryDb.GetSecretById(oid);
         }
+        return _memoryDb.GetSecretById(oid);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretByRegionName(const std::string &region,
-                                                                                 const std::string &name) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretByRegionName(const std::string &region, const std::string &name) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            std::optional<bsoncxx::document::value>
-                    mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+            const std::optional<value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
             if (mResult->empty()) {
                 return {};
             }
@@ -106,21 +94,17 @@ namespace AwsMock::Database {
             result.FromDocument(mResult->view());
             log_trace << "Got secret: " << result.ToString();
             return result;
-
-        } else {
-
-            return _memoryDb.GetSecretByRegionName(region, name);
         }
+        return _memoryDb.GetSecretByRegionName(region, name);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretBySecretId(const std::string &secretId) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretBySecretId(const std::string &secretId) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            std::optional<bsoncxx::document::value>
-                    mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
+            const std::optional<value> mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
             if (mResult->empty()) {
                 return {};
             }
@@ -129,25 +113,22 @@ namespace AwsMock::Database {
             result.FromDocument(mResult->view());
             log_trace << "Got secret: " << result.ToString();
             return result;
-
-        } else {
-
-            return _memoryDb.GetSecretBySecretId(secretId);
         }
+        return _memoryDb.GetSecretBySecretId(secretId);
     }
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto insert_one_result = _secretCollection.insert_one(secret.ToDocument());
+                const auto insert_one_result = _secretCollection.insert_one(secret.ToDocument());
                 session.commit_transaction();
                 log_trace << "Secret created, oid: "
                           << insert_one_result->inserted_id().get_oid().value.to_string();
@@ -159,26 +140,22 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
             }
-
-        } else {
-
-            return _memoryDb.CreateSecret(secret);
         }
+        return _memoryDb.CreateSecret(secret);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(const Entity::SecretsManager::Secret &secret) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(const Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto result =
-                        _secretCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
+                auto result = _secretCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
                 session.commit_transaction();
                 log_trace << "Bucket updated: " << secret.ToString();
 
@@ -189,11 +166,8 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.UpdateSecret(secret);
         }
+        return _memoryDb.UpdateSecret(secret);
     }
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) {
@@ -201,23 +175,19 @@ namespace AwsMock::Database {
         if (SecretExists(secret)) {
 
             return UpdateSecret(secret);
-
-        } else {
-
-            return CreateSecret(secret);
         }
+        return CreateSecret(secret);
     }
 
-    Entity::SecretsManager::SecretList SecretsManagerDatabase::ListSecrets() {
+    Entity::SecretsManager::SecretList SecretsManagerDatabase::ListSecrets() const {
 
         Entity::SecretsManager::SecretList secretList;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-            auto secretCursor = _secretCollection.find({});
-            for (auto secret: secretCursor) {
+            for (auto secretCursor = _secretCollection.find({}); auto secret: secretCursor) {
                 Entity::SecretsManager::Secret result;
                 result.FromDocument(secret);
                 secretList.push_back(result);
@@ -231,12 +201,12 @@ namespace AwsMock::Database {
         return secretList;
     }
 
-    long SecretsManagerDatabase::CountSecrets(const std::string &region) {
+    long SecretsManagerDatabase::CountSecrets(const std::string &region) const {
 
         if (HasDatabase()) {
 
             try {
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretsCollection = (*client)[_databaseName][_collectionName];
 
                 long count;
@@ -259,19 +229,18 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    void SecretsManagerDatabase::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
+    void SecretsManagerDatabase::DeleteSecret(const Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto delete_many_result =
-                        _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
+                const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
                 session.commit_transaction();
                 log_debug << "Secret deleted, count: " << delete_many_result->deleted_count();
 
@@ -287,18 +256,18 @@ namespace AwsMock::Database {
         }
     }
 
-    void SecretsManagerDatabase::DeleteAllSecrets() {
+    void SecretsManagerDatabase::DeleteAllSecrets() const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto delete_many_result = _secretCollection.delete_many({});
+                const auto delete_many_result = _secretCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "Secrets deleted, count: " << delete_many_result->deleted_count();
 

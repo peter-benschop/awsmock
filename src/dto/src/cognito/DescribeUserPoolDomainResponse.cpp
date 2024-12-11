@@ -8,7 +8,8 @@ namespace AwsMock::Dto::Cognito {
 
     std::string DescribeUserPoolDomainResponse::ToJson() const {
 
-        try {
+        // Todo: fix me
+        /*try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
@@ -23,7 +24,8 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string DescribeUserPoolDomainResponse::ToString() const {

@@ -6,36 +6,55 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Instance::FromDocument(std::optional<view> mResult) {
+    void Instance::FromDocument(const std::optional<view> &mResult) {
 
-        id = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
-        containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
-        containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
-        hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
-        status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
-        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        try {
+
+            id = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
+            containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
+            containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
+            hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
+            status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     view_or_value<view, value> Instance::ToDocument() const {
 
-        bsoncxx::builder::basic::document instanceDoc{};
+        try {
 
-        instanceDoc.append(kvp("id", id));
-        instanceDoc.append(kvp("containerId", containerId));
-        instanceDoc.append(kvp("containerName", containerName));
-        instanceDoc.append(kvp("hostPort", hostPort));
-        instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
-        instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+            document instanceDoc{};
+            instanceDoc.append(kvp("id", id));
+            instanceDoc.append(kvp("containerId", containerId));
+            instanceDoc.append(kvp("containerName", containerName));
+            instanceDoc.append(kvp("hostPort", hostPort));
+            instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
+            instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+            return instanceDoc.extract();
 
-        return instanceDoc.extract();
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    Poco::JSON::Object Instance::ToJsonObject() const {
+    view_or_value<view, value> Instance::ToDocument() {
 
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("id", id);
-        jsonObject.set("status", LambdaInstanceStatusToString(status));
-        return jsonObject;
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "status", LambdaInstanceStatusToString(status));
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     [[nodiscard]] std::string Instance::ToString() const {
@@ -45,7 +64,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const Instance &t) {
-        os << "Instance=" << bsoncxx::to_json(t.ToDocument());
+        os << "Instance=" << to_json(t.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Lambda

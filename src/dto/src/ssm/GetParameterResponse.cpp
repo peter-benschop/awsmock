@@ -8,6 +8,7 @@ namespace AwsMock::Dto::SSM {
 
     std::string GetParameterResponse::ToJson() const {
 
+        /* TOdo
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Parameter", parameter.ToJsonObject());
@@ -17,7 +18,8 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string GetParameterResponse::ToString() const {

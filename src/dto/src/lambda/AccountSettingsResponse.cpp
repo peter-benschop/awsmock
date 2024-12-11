@@ -10,17 +10,18 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("User", user);
-            rootJson.set("AccountLimit", accountLimit.ToJsonObject());
-            rootJson.set("AccountUsage", accountUsage.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "User", user);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document.append(kvp("AccountLimit", accountLimit.ToDocument()));
+            document.append(kvp("AccountUsage", accountUsage.ToDocument()));
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

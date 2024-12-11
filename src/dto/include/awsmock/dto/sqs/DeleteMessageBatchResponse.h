@@ -6,26 +6,20 @@
 #define AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
 
 namespace AwsMock::Dto::SQS {
+    struct DeleteMessageBatchResultEntry;
+    struct BatchResultErrorEntry;
 
     struct DeleteMessageBatchResponse {
 
@@ -37,7 +31,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
          * Failed

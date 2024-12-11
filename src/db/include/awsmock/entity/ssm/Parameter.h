@@ -10,28 +10,14 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SSM {
 
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
     using std::chrono::system_clock;
 
     /**
@@ -114,13 +100,6 @@ namespace AwsMock::Database::Entity::SSM {
          * @param mResult MongoDB document view.
          */
         void FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * @brief JSON representation
-         *
-         * @return parameter as JSON string
-         */
-        Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Converts the DTO to a string representation.

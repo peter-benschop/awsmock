@@ -6,8 +6,9 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    Poco::JSON::Object ReplicationStatus::ToJsonObject() const {
+    view_or_value<view, value> ReplicationStatus::ToDocument() const {
 
+        /* Todo:
         try {
 
             Poco::JSON::Object rootJson;
@@ -21,18 +22,14 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
-    std::string ReplicationStatus::ToJson() const {
 
-        std::ostringstream os;
-        ToJsonObject().stringify(os);
-        return os.str();
-    }
+    void ReplicationStatus::FromDocument(const view_or_value<view, value> &document) {
 
-    void ReplicationStatus::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
-
+        /* Todo:
         try {
 
             Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
@@ -42,6 +39,11 @@ namespace AwsMock::Dto::SecretsManager {
             std::cerr << exc.message() << std::endl;
             throw Core::ServiceException(exc.message());
         }
+        */
+    }
+
+    std::string ReplicationStatus::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string ReplicationStatus::ToString() const {

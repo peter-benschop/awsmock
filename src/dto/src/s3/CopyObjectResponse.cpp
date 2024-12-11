@@ -8,16 +8,17 @@ namespace AwsMock::Dto::S3 {
 
     std::string CopyObjectResponse::ToJson() const {
 
+
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("eTag", eTag);
-            rootJson.set("modified", lastModified);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "eTag", eTag);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -25,7 +26,7 @@ namespace AwsMock::Dto::S3 {
 
         boost::property_tree::ptree root;
         root.add("CopyObjectResult.ETag", eTag);
-        root.add("CopyObjectResult.LastModified", lastModified);
+        root.add("CopyObjectResult.LastModified", Core::DateTimeUtils::ToISO8601(modified));
         return Core::XmlUtils::ToXmlString(root);
     }
 

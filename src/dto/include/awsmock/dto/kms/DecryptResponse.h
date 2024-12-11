@@ -7,10 +7,9 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
@@ -37,7 +36,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DecryptResponse : public Dto::Common::BaseRequest {
+    struct DecryptResponse : Common::BaseRequest {
 
         /**
          * Key ID
@@ -50,7 +49,7 @@ namespace AwsMock::Dto::KMS {
         EncryptionAlgorithm encryptionAlgorithm;
 
         /**
-         * Plain text.
+         * @brief Plain text.
          *
          * <p>
          * The cipher text is Base64 encoded in case of AWS CLI, plain otherwise.
@@ -59,28 +58,28 @@ namespace AwsMock::Dto::KMS {
         std::string plaintext;
 
         /**
-         * Converts the JSON string to DTO.
+         * @brief Converts the JSON string to DTO.
          *
          * @param jsonString JSON string
         */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -130,7 +130,7 @@ namespace AwsMock::Service {
          * @param request tag resource request DTO
          * @return TagResourceResponse DTO
          */
-        Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request);
+        Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request) const;
 
         /**
          * @brief Returns the topic attributes
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
          * @see GetTopicAttributesRequest
          * @see GetTopicAttributesResponse
          */
-        Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request);
+        Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) const;
 
         /**
          * @brief Returns the topic details.
@@ -150,7 +150,7 @@ namespace AwsMock::Service {
          * @see GetTopicDetailsRequest
          * @see GetTopicDetailsResponse
          */
-        Dto::SNS::GetTopicDetailsResponse GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request);
+        Dto::SNS::GetTopicDetailsResponse GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request) const;
 
         /**
          * @brief Returns a list of subscriptions for a topic
@@ -158,7 +158,7 @@ namespace AwsMock::Service {
          * @param request list subscriptions request DTO
          * @return ListSubscriptionByTopicResponse DTO
          */
-        Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request);
+        Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request) const;
 
         /**
          * @brief Returns a list of subscription counters for a topic
@@ -166,7 +166,7 @@ namespace AwsMock::Service {
          * @param request list subscription counters request DTO
          * @return ListSubscriptionCountersResponse DTO
          */
-        Dto::SNS::ListSubscriptionCountersResponse ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request);
+        Dto::SNS::ListSubscriptionCountersResponse ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request) const;
 
         /**
          * @brief Purge a topic
@@ -194,7 +194,7 @@ namespace AwsMock::Service {
          * @see ListmessagesResponse
          * @throws ServiceException
          */
-        Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request);
+        Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request) const;
 
         /**
          * @brief Deletes a message
@@ -230,7 +230,7 @@ namespace AwsMock::Service {
          *
          * @param topic SNS topic entity
          */
-        void AdjustTopicCounters(Database::Entity::SNS::Topic &topic);
+        void AdjustTopicCounters(Database::Entity::SNS::Topic &topic) const;
 
         /**
          * SNS database connection

@@ -6,71 +6,89 @@
 
 namespace AwsMock::Dto::S3 {
 
-    void Bucket::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void Bucket::FromDocument(const view_or_value<view, value> &jsonObject) {
 
-        Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("bucketName", jsonObject, bucketName);
-        Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-        Core::JsonUtils::GetJsonValueLong("size", jsonObject, size);
-        Core::JsonUtils::GetJsonValueLong("keys", jsonObject, keys);
-        Core::JsonUtils::GetJsonValueString("versionStatus", jsonObject, versionStatus);
+        region = Core::Bson::BsonUtils::GetStringValue(jsonObject, "region");
+        bucketName = Core::Bson::BsonUtils::GetStringValue(jsonObject, "bucketName");
+        owner = Core::Bson::BsonUtils::GetStringValue(jsonObject, "owner");
+        size = Core::Bson::BsonUtils::GetLongValue(jsonObject, "size");
+        keys = Core::Bson::BsonUtils::GetLongValue(jsonObject, "keys");
+        versionStatus = Core::Bson::BsonUtils::GetStringValue(jsonObject, "versionStatus");
 
-        if (jsonObject->has("queueConfigurations")) {
-            Poco::JSON::Array::Ptr jsonQueueConfigurationArray = jsonObject->getArray("queueConfigurations");
-            for (int i = 0; i < jsonQueueConfigurationArray->size(); i++) {
-                Dto::S3::QueueConfiguration queueConfiguration;
-                queueConfiguration.FromJsonObject(jsonQueueConfigurationArray->getObject(i));
-                queueConfigurations.emplace_back(queueConfiguration);
+        // SQS queues
+        if (jsonObject.view().find("queueConfigurations") != jsonObject.view().end()) {
+            for (const bsoncxx::array::view jsonQueueConfigurationArray = jsonObject.view()["queueConfigurations"].get_array().value; const auto &configuration: jsonQueueConfigurationArray) {
+                QueueConfiguration queueConfiguration;
+                queueConfiguration.FromDocument(configuration.get_document().value);
+            }
+        }
+
+        // SNS topics
+        if (jsonObject.view().find("topicConfigurations") != jsonObject.view().end()) {
+            for (const bsoncxx::array::view jsonQueueConfigurationArray = jsonObject.view()["topicConfigurations"].get_array().value; const auto &configuration: jsonQueueConfigurationArray) {
+                TopicConfiguration topicConfiguration;
+                topicConfiguration.FromDocument(configuration.get_document().value);
+            }
+        }
+
+        // Lambdas
+        if (jsonObject.view().find("lambdaConfigurations") != jsonObject.view().end()) {
+            for (const bsoncxx::array::view jsonQueueConfigurationArray = jsonObject.view()["lambdaConfigurations"].get_array().value; const auto &configuration: jsonQueueConfigurationArray) {
+                LambdaConfiguration lambdaConfiguration;
+                lambdaConfiguration.FromDocument(configuration.get_document().value);
             }
         }
     }
 
     std::string Bucket::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    Poco::JSON::Object Bucket::ToJsonObject() const {
+    view_or_value<view, value> Bucket::ToDocument() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("name", bucketName);
-            rootJson.set("owner", owner);
-            rootJson.set("size", size);
-            rootJson.set("keys", keys);
-            rootJson.set("versionStatus", versionStatus);
 
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "name", bucketName);
+            Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetLongValue(document, "keys", keys);
+            Core::Bson::BsonUtils::SetStringValue(document, "versionStatus", versionStatus);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+
+            // SQS queues
             if (!queueConfigurations.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &queueNotification: queueConfigurations) {
-                    jsonArray.add(queueNotification.ToJsonObject());
+                    jsonArray.append(queueNotification.ToDocument());
                 }
-                rootJson.set("queueConfigurations", jsonArray);
+                document.append(kvp("queueConfigurations", jsonArray));
             }
 
+            // SNS topics
             if (!topicConfigurations.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &topicNotification: topicConfigurations) {
-                    jsonArray.add(topicNotification.ToJsonObject());
+                    jsonArray.append(topicNotification.ToDocument());
                 }
-                rootJson.set("topicConfigurations", jsonArray);
+                document.append(kvp("topicConfigurations", jsonArray));
             }
 
+            // SNS topics
             if (!lambdaConfigurations.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &lambdaNotification: lambdaConfigurations) {
-                    jsonArray.add(lambdaNotification.ToJsonObject());
+                    jsonArray.append(lambdaNotification.ToDocument());
                 }
-                rootJson.set("lambdaConfigurations", jsonArray);
+                document.append(kvp("topicConfigurations", jsonArray));
             }
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

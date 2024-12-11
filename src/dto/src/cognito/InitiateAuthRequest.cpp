@@ -18,47 +18,34 @@ namespace AwsMock::Dto::Cognito {
         return authParameters["SECRET_HASH"];
     }
 
-    void InitiateAuthRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
+    void InitiateAuthRequest::FromJson(const std::string &jsonString) {
         try {
-
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("ClientId", rootObject, clientId);
-
-            // Auth flow
-            std::string tmpAuthFlow;
-            Core::JsonUtils::GetJsonValueString("AuthFlow", rootObject, tmpAuthFlow);
-            if (!tmpAuthFlow.empty()) {
-                AuthFlowTypeFromString(tmpAuthFlow);
-            }
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            clientId = Core::Bson::BsonUtils::GetStringValue(rootDocument, "ClientId");
+            authFlow = AuthFlowTypeFromString(Core::Bson::BsonUtils::GetStringValue(rootDocument, "AuthFlow"));
 
             // Auth parameter
-            if (rootObject->has("AuthParameters")) {
-                Poco::JSON::Object::Ptr authParameterObject = rootObject->getObject("AuthParameters");
-                for (int i = 0; i < authParameterObject->getNames().size(); i++) {
-                    std::string key = authParameterObject->getNames()[i];
-                    std::string value = authParameterObject->get(key);
+            if (rootDocument.find("AuthParameters") != rootDocument.end()) {
+                for (const view authParameterObject = rootDocument.view()["AuthParameter"].get_document().value; const auto &parameter: authParameterObject) {
+                    std::string key = bsoncxx::string::to_string(parameter.key());
+                    const std::string value = bsoncxx::string::to_string(parameter[key].get_string().value);
                     authParameters[key] = value;
                 }
             }
 
-            // Client metadata
-            if (rootObject->has("ClientMetadata")) {
-                Poco::JSON::Object::Ptr clientMetadataObject = rootObject->getObject("ClientMetadata");
-                for (int i = 0; i < clientMetadataObject->getNames().size(); i++) {
-                    std::string key = clientMetadataObject->getNames()[i];
-                    std::string value = clientMetadataObject->get(key);
+            // Auth parameter
+            if (rootDocument.find("ClientMetadata") != rootDocument.end()) {
+                for (const view metadataObject = rootDocument.view()["ClientMetadata"].get_document().value; const auto &parameter: metadataObject) {
+                    std::string key = bsoncxx::string::to_string(parameter.key());
+                    const std::string value = bsoncxx::string::to_string(parameter[key].get_string().value);
                     clientMetaData[key] = value;
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -66,30 +53,34 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ClientId", clientId);
-            rootJson.set("AuthFlow", AuthFlowTypeToString(authFlow));
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ClientId", clientId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "AuthFlow", AuthFlowTypeToString(authFlow));
 
-            // Auth parameters
-            Poco::JSON::Object authParameterObject;
-            for (const auto &authParameter: authParameters) {
-                authParameterObject.set(authParameter.first, authParameter.second);
+            // Auth parameter
+            if (!authParameters.empty()) {
+                document authFlowObject;
+                for (const auto &[fst, snd]: authParameters) {
+                    authFlowObject.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("AuthParameter", authFlowObject));
             }
-            rootJson.set("AuthParameter", authParameterObject);
 
-            // Client metadata
-            Poco::JSON::Object clientMetadataObject;
-            for (const auto &clientMeta: clientMetaData) {
-                clientMetadataObject.set(clientMeta.first, clientMeta.second);
+            // Metadata
+            if (!clientMetaData.empty()) {
+                document metadataObject;
+                for (const auto &[fst, snd]: clientMetaData) {
+                    metadataObject.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("ClientMetadata", metadataObject));
             }
-            rootJson.set("ClientMetadata", clientMetadataObject);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

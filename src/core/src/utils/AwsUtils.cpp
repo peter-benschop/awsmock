@@ -300,7 +300,7 @@ namespace AwsMock::Core {
         // Get header
         for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
             if (headers.contains(header)) {
-                canonicalHeaders << Poco::toLower(header) << ":" << StringUtils::Trim(headers[header]) + '\n';
+                canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(headers[header]) + '\n';
             }
         }
         return canonicalHeaders.str();
@@ -318,33 +318,45 @@ namespace AwsMock::Core {
         authKeys.signingVersion = StringUtils::Split(authorizationHeader, ' ')[0];
 
         try {
-            Poco::RegularExpression::MatchVec posVec;
-            const Poco::RegularExpression pattern(
-                    R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
-            if (!pattern.match(authorizationHeader, 0, posVec)) {
-                log_error << "Could not extract authorization, authorization: " << authorizationHeader;
-                throw Core::UnauthorizedException(
-                        "Could not extract authorization, authorization: " + authorizationHeader);
-            }
+            const boost::regex expr(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
+            boost::smatch what;
+            boost::regex_search(authorizationHeader, what, expr);
+
+            //Poco::RegularExpression::MatchVec posVec;
+            // const Poco::RegularExpression pattern(
+            //         R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
+            // if (!pattern.match(authorizationHeader, 0, posVec)) {
+            //     log_error << "Could not extract authorization, authorization: " << authorizationHeader;
+            //     throw UnauthorizedException("Could not extract authorization, authorization: " + authorizationHeader);
+            // }
             authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
-            authKeys.dateTime = authorizationHeader.substr(posVec[2].offset, posVec[2].length);
-            authKeys.region = authorizationHeader.substr(posVec[3].offset, posVec[3].length);
-            authKeys.module = authorizationHeader.substr(posVec[4].offset, posVec[4].length);
-            authKeys.requestVersion = authorizationHeader.substr(posVec[5].offset, posVec[5].length);
-            authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
-            authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
+            authKeys.dateTime = what[2];
+            authKeys.region = what[3];
+            authKeys.module = what[4];
+            authKeys.requestVersion = what[5];
+            authKeys.signedHeaders = what[6];
+            authKeys.signature = what[7];
             authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
             authKeys.isoDateTime = HttpUtils::HasHeader(request, "x-amz-date") ? HttpUtils::GetHeaderValue(request, "x-amz-date") : GetISODateString();
+
+            // authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
+            // authKeys.dateTime = authorizationHeader.substr(posVec[2].offset, posVec[2].length);
+            // authKeys.region = authorizationHeader.substr(posVec[3].offset, posVec[3].length);
+            // authKeys.module = authorizationHeader.substr(posVec[4].offset, posVec[4].length);
+            // authKeys.requestVersion = authorizationHeader.substr(posVec[5].offset, posVec[5].length);
+            // authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
+            // authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
+            // authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
+            // authKeys.isoDateTime = HttpUtils::HasHeader(request, "x-amz-date") ? HttpUtils::GetHeaderValue(request, "x-amz-date") : GetISODateString();
             return authKeys;
 
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
+        } catch (std::exception &e) {
+            log_error << e.what();
         }
         return {};
     }
 
-    std::string AwsUtils::GetSignature(const AuthorizationHeaderKeys &authorizationHeaderKeys,
-                                       const std::string &stringToSign) {
+    std::string AwsUtils::GetSignature(const AuthorizationHeaderKeys &authorizationHeaderKeys, const std::string &stringToSign) {
         std::vector<unsigned char> digest = Crypto::GetHmacSha256FromStringRaw("AWS4" + authorizationHeaderKeys.secretAccessKey, authorizationHeaderKeys.dateTime);
         digest = Crypto::GetHmacSha256FromStringRaw(digest, authorizationHeaderKeys.region);
         digest = Crypto::GetHmacSha256FromStringRaw(digest, authorizationHeaderKeys.module);

@@ -6,16 +6,13 @@
 #define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
 

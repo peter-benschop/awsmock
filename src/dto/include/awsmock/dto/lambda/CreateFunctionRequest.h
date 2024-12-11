@@ -6,16 +6,11 @@
 #define AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_REQUEST_H
 
 // C++ standard includes
-#include <fstream>
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/lambda/model/Code.h>
 #include <awsmock/dto/lambda/model/Environment.h>
@@ -96,7 +91,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateFunctionRequest : public Dto::Common::BaseRequest {
+    struct CreateFunctionRequest : Common::BaseRequest {
 
         /**
          * Name of the function

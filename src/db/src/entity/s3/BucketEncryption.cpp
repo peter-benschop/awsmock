@@ -2,7 +2,6 @@
 // Created by vogje01 on 06/09/2023.
 //
 
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/s3/BucketEncryption.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -26,18 +25,6 @@ namespace AwsMock::Database::Entity::S3 {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-    }
-
-    Poco::JSON::Object BucketEncryption::ToJsonObject() const {
-        Poco::JSON::Object jsonObject;
-        jsonObject.set("sseAlgorithm", sseAlgorithm);
-        jsonObject.set("kmsKeyId", kmsKeyId);
-        return jsonObject;
-    }
-
-    void BucketEncryption::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-        Core::JsonUtils::GetJsonValueString("sseAlgorithm", jsonObject, sseAlgorithm);
-        Core::JsonUtils::GetJsonValueString("kmsKeyId", jsonObject, kmsKeyId);
     }
 
     std::string BucketEncryption::ToString() const {

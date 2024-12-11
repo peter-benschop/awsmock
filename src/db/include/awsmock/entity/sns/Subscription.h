@@ -9,33 +9,12 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/JSON/Object.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Database::Entity::SNS {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * SNS message attribute entity
@@ -71,21 +50,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view_or_value> mResult);
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * Converts the jsonObject to a entity
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        [[maybe_unused]] void FromDocument(const std::optional<bsoncxx::document::view_or_value> &mResult);
 
         /**
          * Converts the DTO to a string representation.

@@ -28,6 +28,7 @@ namespace AwsMock::Dto::Common {
             case http::verb::delete_:
             case http::verb::head:
                 break;
+            default:;
         }
     }
 
@@ -42,35 +43,32 @@ namespace AwsMock::Dto::Common {
     }
 
     std::string DynamoDbClientCommand::ToJson() const {
-
         try {
 
-            // General attributes
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("command", DynamoDbCommandTypeToString(command));
-            rootJson.set("user", user);
-            rootJson.set("url", url);
-            rootJson.set("method", method);
-            rootJson.set("contentType", contentType);
-            rootJson.set("contentLength", contentLength);
-            rootJson.set("payload", payload);
-            rootJson.set("requestId", requestId);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "command", DynamoDbCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "url", url);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "payload", payload);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "requestId", requestId);
 
-            // Headers
-            Poco::JSON::Array jsonHeadersArray;
-            for (const auto &header: headers) {
-                Poco::JSON::Object jsonHeaderObject;
-                jsonHeaderObject.set(header.first, header.second);
-                jsonHeadersArray.add(jsonHeaderObject);
+            if (!headers.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: headers) {
+                    document jsonHeaderObject;
+                    jsonHeaderObject.append(kvp(fst, snd));
+                    jsonArray.append(jsonHeaderObject);
+                }
             }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

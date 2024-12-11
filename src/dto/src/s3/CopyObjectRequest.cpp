@@ -9,20 +9,24 @@ namespace AwsMock::Dto::S3 {
     std::string CopyObjectRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("user", user);
-            rootJson.set("sourceBucket", sourceBucket);
-            rootJson.set("sourceKey", sourceKey);
-            rootJson.set("targetBucket", targetBucket);
-            rootJson.set("targetKey", targetKey);
-            rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "sourceBucket", sourceBucket);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "sourceKey", sourceKey);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "targetBucket", targetBucket);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "targetKey", targetKey);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "user", user);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document metadataDocument;
+            for (const auto &[fst, snd]: metadata) {
+                Core::Bson::BsonUtils::SetStringValue(metadataDocument, fst, snd);
+            }
+            rootDocument.append(kvp("metadata", metadataDocument));
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

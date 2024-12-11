@@ -8,14 +8,9 @@
 // C++ includes
 #include <map>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -68,25 +63,25 @@ namespace AwsMock::Dto::SQS {
         std::string eventSourceArn;
 
         /**
-         * @brief Converts the DTO to a JSON string.
+         * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as JSON string.
+         * @return DTO as string for logging.
          */
-        [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
-         * @brief Converts a JSON representation to s DTO.
+         * @brief Converts the DTO to a JSON string.
          *
-         * @param object JSON object.
+         * @return DTO as JSON string.
          */
-        void FromJson(const Poco::JSON::Object::Ptr &object);
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

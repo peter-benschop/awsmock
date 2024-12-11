@@ -7,18 +7,12 @@
 
 // C++ standard includes
 #include <map>
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -40,21 +34,28 @@ namespace AwsMock::Dto::SQS {
         std::map<std::string, std::string> tags;
 
         /**
-         * Converts the JSON string to a DTO
+         * @brief Converts the JSON string to a DTO
+         *
+         * @return JSON string
+         */
+        std::string ToJson() const;
+
+        /**
+         * @brief Converts the JSON string to a DTO
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

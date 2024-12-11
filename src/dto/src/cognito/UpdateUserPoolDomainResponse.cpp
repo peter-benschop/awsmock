@@ -7,8 +7,8 @@
 namespace AwsMock::Dto::Cognito {
 
     std::string UpdateUserPoolDomainResponse::ToJson() const {
-
-        try {
+        // TODO:: fix me
+        /*try {
 
             Poco::JSON::Object rootObject;
             rootObject.set("CloudFrontDomain", cloudFrontDomain);
@@ -18,7 +18,8 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string UpdateUserPoolDomainResponse::ToString() const {

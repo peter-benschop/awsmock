@@ -7,14 +7,12 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include "awsmock/dto/common/BaseRequest.h"
-#include "awsmock/dto/kms/model/EncryptionAlgorithm.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -32,9 +30,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-
-
-    struct EncryptResponse : public Dto::Common::BaseRequest {
+    struct EncryptResponse : Common::BaseRequest {
 
         /**
          * Key ID
@@ -56,28 +52,28 @@ namespace AwsMock::Dto::KMS {
         std::string ciphertext;
 
         /**
-         * Converts the JSON string to DTO.
+         * @brief Converts the JSON string to DTO.
          *
          * @param jsonString JSON string
         */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -2,46 +2,46 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/lambda/model/Code.h"
+#include <awsmock/dto/lambda/model/Code.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    void Code::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+    void Code::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("S3Bucket", jsonObject, s3Bucket);
-            Core::JsonUtils::GetJsonValueString("S3Key", jsonObject, s3Key);
-            Core::JsonUtils::GetJsonValueString("S3ObjectVersion", jsonObject, s3ObjectVersion);
-            Core::JsonUtils::GetJsonValueString("ImageUri", jsonObject, imageUri);
-            Core::JsonUtils::GetJsonValueString("ZipFile", jsonObject, zipFile);
+            s3Bucket = Core::Bson::BsonUtils::GetStringValue(document, "S3Bucket");
+            s3Key = Core::Bson::BsonUtils::GetStringValue(document, "S3Key");
+            s3ObjectVersion = Core::Bson::BsonUtils::GetStringValue(document, "S3ObjectVersion");
+            imageUri = Core::Bson::BsonUtils::GetStringValue(document, "ImageUri");
+            zipFile = Core::Bson::BsonUtils::GetStringValue(document, "ZipFile");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string Code::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    Poco::JSON::Object Code::ToJsonObject() const {
+    view_or_value<view, value> Code::ToDocument() const {
 
-        Poco::JSON::Object rootObject;
         try {
 
-            rootObject.set("ZipFile", zipFile);
-            rootObject.set("S3Bucket", s3Bucket);
-            rootObject.set("S3Key", s3Key);
-            rootObject.set("S3ObjectVersion", s3ObjectVersion);
-            rootObject.set("ImageUri", imageUri);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "ZipFile", zipFile);
+            Core::Bson::BsonUtils::SetStringValue(document, "S3Bucket", s3Bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "S3Key", s3Key);
+            Core::Bson::BsonUtils::SetStringValue(document, "S3ObjectVersion", s3ObjectVersion);
+            Core::Bson::BsonUtils::SetStringValue(document, "ImageUri", imageUri);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        return rootObject;
     }
 
     std::string Code::ToString() const {

@@ -6,18 +6,14 @@
 #define AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
+#include <map>
 #include <string>
-#include <utility>
-#include <vector>
 
 // Boost include<
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
@@ -31,7 +27,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeTableResponse : public Dto::Common::BaseRequest {
+    struct DescribeTableResponse : Common::BaseRequest {
 
         /**
          * Region

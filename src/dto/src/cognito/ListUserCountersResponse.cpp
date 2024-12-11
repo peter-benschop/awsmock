@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Cognito {
 
     std::string ListUserCountersResponse::ToJson() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Object rootObject;
@@ -34,7 +36,8 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string ListUserCountersResponse::ToString() const {

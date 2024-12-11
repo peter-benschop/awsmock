@@ -9,12 +9,11 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Mutex.h>
+// Boost includes
+#include <boost/thread/pthread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
 #include <awsmock/repository/Database.h>
@@ -104,7 +103,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return number of DynamoDB tables
          */
-        long CountTables(const std::string &region = {});
+        long CountTables(const std::string &region = {}) const;
 
         /**
          * @brief Deletes an existing DynamoDB table
@@ -137,7 +136,7 @@ namespace AwsMock::Database {
          * @param tableName table name
          * @return list of DynamoDB tables
          */
-        Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {});
+        Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
 
         /**
          * @brief Returns a item entity by primary key
@@ -212,12 +211,12 @@ namespace AwsMock::Database {
         /**
          * Table mutex
          */
-        static Poco::Mutex _tableMutex;
+        static boost::mutex _tableMutex;
 
         /**
          * Item mutex
          */
-        static Poco::Mutex _itemMutex;
+        static boost::mutex _itemMutex;
     };
 
 }// namespace AwsMock::Database

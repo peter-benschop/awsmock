@@ -8,6 +8,7 @@ namespace AwsMock::Dto::SSM {
 
     std::string DescribeParametersResponse::ToJson() const {
 
+        /* Todo
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("NextToken", nextToken);
@@ -23,7 +24,8 @@ namespace AwsMock::Dto::SSM {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string DescribeParametersResponse::ToString() const {

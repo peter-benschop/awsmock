@@ -6,15 +6,18 @@
 #define AWSMOCK_DTO_S3_COPY_OBJECT_RESPONSE_H
 
 // C++ standard includes
+#include <chrono>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
+
+    using std::chrono::system_clock;
 
     struct CopyObjectResponse {
 
@@ -26,7 +29,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Last modified
          */
-        std::string lastModified;
+        system_clock::time_point modified;
 
         /**
          * Convert to XML representation

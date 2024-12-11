@@ -17,6 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/SortColumn.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
@@ -56,20 +57,20 @@ namespace AwsMock::Database {
          * @brief Check existence of topic
          *
          * @param region AWS region
-         * @param name topic name
+         * @param topicName topic name
          * @return true if topic already exists
          * @throws DatabaseException
          */
-        bool TopicExists(const std::string &region, const std::string &name) const;
+        bool TopicExists(const std::string &region, const std::string &topicName) const;
 
         /**
          * @brief Check existence of topic
          *
-         * @param topicName topic ARN
+         * @param topicArn topic ARN
          * @return true if topic already exists
          * @throws DatabaseException
          */
-        bool TopicExists(const std::string &topicName) const;
+        bool TopicExists(const std::string &topicArn) const;
 
         /**
          * @brief Create a new topic in the SNS topic table
@@ -96,7 +97,7 @@ namespace AwsMock::Database {
          * @return topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic GetTopicById(const std::string &oid);
+        Entity::SNS::Topic GetTopicById(const std::string &oid) const;
 
         /**
          * @brief Returns a topic by is ARN
@@ -141,7 +142,7 @@ namespace AwsMock::Database {
          * @return created or updated SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic CreateOrUpdateTopic(Entity::SNS::Topic &topic);
+        Entity::SNS::Topic CreateOrUpdateTopic(Entity::SNS::Topic &topic) const;
 
         /**
          * @brief List all available topics
@@ -229,7 +230,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
+        [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid) const;
 
         /**
          * @brief Count the number of message by ARN

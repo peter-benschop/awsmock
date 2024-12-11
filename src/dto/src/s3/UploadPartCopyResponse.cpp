@@ -8,37 +8,39 @@ namespace AwsMock::Dto::S3 {
 
     std::string UploadPartCopyResponse::ToXml() const {
 
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("CopyPartResult");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // ETag
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ETag", eTag);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32", checksumCRC32);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumCRC32C", checksumCRC32C);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA1", checksumSHA1);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "ChecksumSHA256", checksumSHA256);
-        Core::XmlUtils::CreateTextNode(pDoc, pRoot, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
+            boost::property_tree::ptree root;
+            root.add("CopyPartResult.ETag", eTag);
+            root.add("CopyPartResult.ChecksumCRC32", checksumCRC32);
+            root.add("CopyPartResult.ChecksumCRC32C", checksumCRC32C);
+            root.add("CopyPartResult.ChecksumSHA1", checksumSHA1);
+            root.add("CopyPartResult.ChecksumSHA256", checksumSHA256);
+            root.add("CopyPartResult.LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
+            root.add("CopyPartResult.ETag", eTag);
+            return Core::XmlUtils::ToXmlString(root);
 
-        return Core::XmlUtils::ToXmlString(pDoc);
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string UploadPartCopyResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("ETag", eTag);
-            rootJson.set("LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
-            rootJson.set("ChecksumCRC32", checksumCRC32);
-            rootJson.set("ChecksumCRC32C", checksumCRC32C);
-            rootJson.set("ChecksumSHA1", checksumSHA1);
-            rootJson.set("ChecksumSHA256", checksumSHA256);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "ETag", eTag);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModified", lastModified);
+            Core::Bson::BsonUtils::SetStringValue(document, "ChecksumCRC32", checksumCRC32);
+            Core::Bson::BsonUtils::SetStringValue(document, "ChecksumCRC32C", checksumCRC32C);
+            Core::Bson::BsonUtils::SetStringValue(document, "ChecksumSHA1", checksumSHA1);
+            Core::Bson::BsonUtils::SetStringValue(document, "ChecksumSHA256", checksumSHA256);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -48,8 +50,8 @@ namespace AwsMock::Dto::S3 {
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const UploadPartCopyResponse &r) {
-        os << "UploadPartCopyResponse=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const UploadPartCopyResponse &p) {
+        os << "UploadPartCopyResponse=" << p.ToJson();
         return os;
     }
 

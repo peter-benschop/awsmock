@@ -6,18 +6,13 @@
 #define AWSMOCK_DTO_SSM_MODEL_PARAMETER_FILTERS_H
 
 // C++ standard includes
-#include <map>
-#include <sstream>
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
-#include <awsmock/dto/ssm/model/ParameterType.h>
 
 namespace AwsMock::Dto::SSM {
 
@@ -54,16 +49,16 @@ namespace AwsMock::Dto::SSM {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts a JSON representation to s DTO.
          *
-         * @param object JSON object.
+         * @param document JSON object.
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &object);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts the DTO to a string representation.

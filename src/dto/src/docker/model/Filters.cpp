@@ -2,7 +2,7 @@
 // Created by vogje01 on 1/20/24.
 //
 
-#include "awsmock/dto/docker/model/Filters.h"
+#include <awsmock/dto/docker/model/Filters.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -10,22 +10,21 @@ namespace AwsMock::Dto::Docker {
 
         try {
 
-            Poco::JSON::Object rootJson;
-
-            Poco::JSON::Array filterArray;
-            for (const auto &filter: filters) {
-                Poco::JSON::Object filterObject;
-                filterObject.set(filter.name, filter.value);
-                filterArray.add(filterObject);
+            document rootDocument;
+            if (filters.empty()) {
+                array jsonArray;
+                for (const auto &[name, value]: filters) {
+                    document jsonFilter;
+                    jsonFilter.append(kvp(name, value));
+                    jsonArray.append(jsonFilter);
+                }
+                rootDocument.append(kvp("reference", jsonArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            rootJson.set("reference", filterArray);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

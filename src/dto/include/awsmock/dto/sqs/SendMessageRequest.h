@@ -8,18 +8,10 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/core/exception/ServiceException.h"
-#include "awsmock/dto/sqs/model/MessageAttribute.h"
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/sqs/SqsCommonRequest.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
 

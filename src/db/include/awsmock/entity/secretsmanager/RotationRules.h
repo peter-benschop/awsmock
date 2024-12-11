@@ -6,34 +6,13 @@
 #define AWSMOCK_DB_ENTITY_SECRETSMANAGER_ROTATION_RULES_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-
 // AwsMoc includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * Rotation rules
@@ -76,7 +55,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        void FromDocument(std::optional<view> mResult);
 
         /**
          * Converts the entity to a string representation.
@@ -84,13 +63,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * @return entity as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Converts the entity to a string representation.
-         *
-         * @return entity as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
 
         /**
          * Stream provider.

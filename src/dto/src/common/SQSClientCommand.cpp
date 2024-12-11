@@ -58,29 +58,32 @@ namespace AwsMock::Dto::Common {
     std::string SQSClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("region", region);
-            rootJson.set("user", user);
-            rootJson.set("url", url);
-            rootJson.set("contentType", contentType);
-            rootJson.set("payload", payload);
-            rootJson.set("command", SqsCommandTypeToString(command));
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "url", url);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "payload", payload);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "command", SqsCommandTypeToString(command));
 
             // Headers
-            Poco::JSON::Array jsonHeaders;
-            for (const auto &header: headers) {
-                Poco::JSON::Object jsonHeader;
-                jsonHeader.set(header.first, header.second);
-                jsonHeaders.add(jsonHeader);
+            if (!headers.empty()) {
+                array jsonHeaders;
+                for (const auto &[fst, snd]: headers) {
+                    document jsonHeader;
+                    jsonHeader.append(kvp(fst, snd));
+                    jsonHeaders.append(jsonHeader);
+                }
+                rootDocument.append(kvp("headers", jsonHeaders));
             }
-            rootJson.set("headers", jsonHeaders);
 
-            return Core::JsonUtils::ToJsonString(rootJson, true);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

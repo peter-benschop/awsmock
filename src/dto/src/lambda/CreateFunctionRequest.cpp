@@ -10,82 +10,75 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("User", user);
-            rootJson.set("FunctionName", functionName);
-            rootJson.set("Runtime", runtime);
-            rootJson.set("Role", role);
-            rootJson.set("Handler", handler);
-            rootJson.set("MemorySize", memorySize);
-            rootJson.set("Code", code.ToJsonObject());
-            rootJson.set("Timeout", timeout);
-
-            // Tags
-            Poco::JSON::Array tagsArray;
-            for (const auto &[fst, snd]: tags) {
-                Poco::JSON::Object tagObject;
-                tagObject.set(fst, snd);
-                tagsArray.add(tagObject);
-            }
-            rootJson.set("Tags", tagsArray);
-
-            // Ephemeral storage
-            //rootJson.set("EphemeralStorage", ephemeralStorage.ToJsonObject());
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "User", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "FunctionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Runtime", runtime);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Role", role);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Handler", handler);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "MemorySize", memorySize);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "Timeout", timeout);
 
             // Code
-            rootJson.set("Code", code.ToJsonObject());
+            rootDocument.append(kvp("Code", code.ToDocument()));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            // Tags
+            if (!tags.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: tags) {
+                    document tagObject;
+                    tagObject.append(kvp(fst, snd));
+                    jsonArray.append(tagObject);
+                }
+                rootDocument.append(kvp("Tags", jsonArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void CreateFunctionRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        const Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-            Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
-            Core::JsonUtils::GetJsonValueString("Runtime", rootObject, runtime);
-            Core::JsonUtils::GetJsonValueString("Role", rootObject, role);
-            Core::JsonUtils::GetJsonValueString("Handler", rootObject, handler);
-            Core::JsonUtils::GetJsonValueInt("Timeout", rootObject, timeout);
-            Core::JsonUtils::GetJsonValueLong("MemorySize", rootObject, memorySize);
+            const value document = bsoncxx::from_json(jsonString);
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
+            runtime = Core::Bson::BsonUtils::GetStringValue(document, "Runtime");
+            role = Core::Bson::BsonUtils::GetStringValue(document, "Role");
+            handler = Core::Bson::BsonUtils::GetStringValue(document, "Handler");
+            timeout = Core::Bson::BsonUtils::GetIntValue(document, "Timeout");
+            memorySize = Core::Bson::BsonUtils::GetLongValue(document, "MemorySize");
 
             // Tags
-            if (rootObject->has("Tags")) {
-                Poco::JSON::Object::Ptr tagsObject = rootObject->getObject("Tags");
-                for (const auto &tag: tagsObject->getNames()) {
-                    std::string value;
-                    Core::JsonUtils::GetJsonValueString(tag, tagsObject, value);
-                    tags[tag] = value;
+            if (document.view().find("Tags") != document.view().end()) {
+                for (const bsoncxx::array::view jsonArray = document.view()["Tags"].get_array().value; const auto &tag: jsonArray) {
+                    std::string key = bsoncxx::string::to_string(tag.key());
+                    const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                    tags[key] = value;
                 }
             }
 
             // EphemeralStorage
-            if (rootObject->has("EphemeralStorage")) {
-                ephemeralStorage.FromJson(rootObject->getObject("EphemeralStorage"));
+            if (document.view().find("EphemeralStorage") != document.view().end()) {
+                ephemeralStorage.FromDocument(document.view()["EphemeralStorage"].get_document().value);
             }
 
             // Environment
-            if (rootObject->has("Environment")) {
-                environment.FromJson(rootObject->getObject("Environment"));
+            if (document.view().find("Environment") != document.view().end()) {
+                environment.FromDocument(document.view()["Environment"].get_document().value);
             }
 
             // Code
-            if (rootObject->has("Code")) {
-                code.FromJson(rootObject->getObject("Code"));
+            if (document.view().find("Code") != document.view().end()) {
+                code.FromDocument(document.view()["Code"].get_document().value);
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

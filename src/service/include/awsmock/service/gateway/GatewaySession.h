@@ -114,7 +114,7 @@ namespace AwsMock::Service {
          * @param ec error code
          * @param bytes_transferred number of bytes transferred
          */
-        void OnWrite(bool keep_alive, boost::beast::error_code ec, std::size_t bytes_transferred);
+        void OnWrite(bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred);
 
         /**
          * @brief On class callback

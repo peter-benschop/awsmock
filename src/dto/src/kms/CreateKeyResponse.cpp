@@ -8,6 +8,7 @@ namespace AwsMock::Dto::KMS {
 
     std::string CreateKeyResponse::ToJson() const {
 
+        /* Todo:
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("KeyMetadata", key.ToJsonObject());
@@ -17,7 +18,8 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string CreateKeyResponse::ToString() const {

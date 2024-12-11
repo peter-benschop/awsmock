@@ -7,12 +7,11 @@
 
 // C++ includes
 #include <chrono>
-#include <sstream>
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -73,7 +72,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Restore status
          */
-        RestoreStatus restoreStatue;
+        RestoreStatus restoreStatus;
 
         /**
          * Convert to a XML element
@@ -81,14 +80,14 @@ namespace AwsMock::Dto::S3 {
          * @param pDoc XML document
          * @return XML element
          */
-        [[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
+        //[[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
 
         /**
          * Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Convert to a JSON string

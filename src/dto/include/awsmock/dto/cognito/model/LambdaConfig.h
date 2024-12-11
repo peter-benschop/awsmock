@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_LAMBDACONFIG_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/CustomEmailSender.h>
 #include <awsmock/dto/cognito/model/CustomSmsSender.h>
 #include <awsmock/dto/cognito/model/PreTokenGenerationConfig.h>

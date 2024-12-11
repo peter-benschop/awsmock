@@ -10,38 +10,33 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("User", user);
-            rootJson.set("FunctionName", functionName);
-            rootJson.set("EventSourceArn", eventSourceArn);
-            rootJson.set("Marker", marker);
-            rootJson.set("MaxItems", maxItems);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "User", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "FunctionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "EventSourceArn", eventSourceArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "Marker", marker);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxItems", maxItems);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void ListEventSourceMappingsRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
+            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "EventSourceArn");
+            marker = Core::Bson::BsonUtils::GetStringValue(document, "Marker");
+            maxItems = Core::Bson::BsonUtils::GetIntValue(document, "MaxItems");
 
-            Core::JsonUtils::GetJsonValueString("FunctionName", rootObject, functionName);
-            Core::JsonUtils::GetJsonValueString("EventSourceArn", rootObject, eventSourceArn);
-            Core::JsonUtils::GetJsonValueString("Marker", rootObject, marker);
-            Core::JsonUtils::GetJsonValueInt("MaxItems", rootObject, maxItems);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

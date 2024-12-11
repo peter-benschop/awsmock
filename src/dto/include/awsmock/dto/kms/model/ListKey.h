@@ -8,18 +8,10 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include "KeySpec.h"
-#include "KeyState.h"
-#include "KeyUsage.h"
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/kms/model/KeyState.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -54,35 +46,35 @@ namespace AwsMock::Dto::KMS {
         KeyState keyState;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Convert from JSON representation
+         * @brief Convert from JSON representation
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

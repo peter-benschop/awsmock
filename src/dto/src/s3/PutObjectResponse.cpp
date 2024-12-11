@@ -9,24 +9,24 @@ namespace AwsMock::Dto::S3 {
     std::string PutObjectResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("md5sum", md5Sum);
-            rootJson.set("sha1sum", sha1sum);
-            rootJson.set("sha256sum", sha256sum);
-            rootJson.set("versionId", versionId);
-            rootJson.set("contentType", contentType);
-            rootJson.set("contentLength", contentLength);
-            rootJson.set("owner", owner);
-            rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "md5Sum", md5Sum);
+            Core::Bson::BsonUtils::SetStringValue(document, "sha1sum", sha1Sum);
+            Core::Bson::BsonUtils::SetStringValue(document, "sha256sum", sha256sum);
+            Core::Bson::BsonUtils::SetStringValue(document, "versionId", versionId);
+            Core::Bson::BsonUtils::SetLongValue(document, "contentLength", contentLength);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            // rootJson.set("metadata", Core::JsonUtils::GetJsonObject(metadata));
+
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

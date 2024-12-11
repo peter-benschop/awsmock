@@ -5,6 +5,8 @@ namespace AwsMock::Dto::Transfer {
 
     std::string CreateServerResponse::ToJson() const {
 
+        // Todo:
+        /*
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
@@ -16,7 +18,8 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string CreateServerResponse::ToString() const {

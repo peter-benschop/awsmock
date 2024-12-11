@@ -6,51 +6,14 @@
 #define AWSMOCK_DTO_DOCKER_VERSION_RESPONSE_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/docker/model/Platform.h>
 
 namespace AwsMock::Dto::Docker {
-
-    /**
-     * Docker platform
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    struct Platform {
-
-        /**
-         * Platform name
-         */
-        std::string name;
-
-        /**
-         * Deserialize from a JSON object
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
-
-            try {
-                Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-            } catch (Poco::Exception &exc) {
-                std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message());
-            }
-        }
-    };
 
     /**
      * Docker details
@@ -85,12 +48,13 @@ namespace AwsMock::Dto::Docker {
         std::string gitCommit;
 
         /**
-         * Deserialize from a JSON object
+         * @brief Deserialize from a JSON object
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
+            /* Todo
             try {
                 Core::JsonUtils::GetJsonValueString("ApiVersion", jsonObject, apiVersion);
                 Core::JsonUtils::GetJsonValueString("Arch", jsonObject, architecture);
@@ -101,7 +65,7 @@ namespace AwsMock::Dto::Docker {
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
                 throw Core::ServiceException(exc.message());
-            }
+            }*/
         }
     };
 
@@ -128,12 +92,13 @@ namespace AwsMock::Dto::Docker {
         Details details;
 
         /**
-         * Deserialize from a JSON object
+         * @brief Deserialize from a JSON object
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject) {
+        void FromDocument(const view_or_value<view, value> &document) {
 
+            /* Todo:
             try {
                 Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
                 Core::JsonUtils::GetJsonValueString("Version", jsonObject, version);
@@ -144,7 +109,7 @@ namespace AwsMock::Dto::Docker {
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
                 throw Core::ServiceException(exc.message());
-            }
+            }*/
         }
     };
 
@@ -172,6 +137,7 @@ namespace AwsMock::Dto::Docker {
          */
         void FromJson(const std::string &jsonString) {
 
+            /* Todo
             try {
                 Poco::JSON::Parser parser;
                 Poco::Dynamic::Var result = parser.parse(jsonString);
@@ -197,7 +163,7 @@ namespace AwsMock::Dto::Docker {
             } catch (Poco::Exception &exc) {
                 std::cerr << exc.message() << std::endl;
                 throw Core::ServiceException(exc.message());
-            }
+            }*/
         }
     };
 

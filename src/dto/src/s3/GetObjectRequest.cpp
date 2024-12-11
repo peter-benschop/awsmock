@@ -9,19 +9,18 @@ namespace AwsMock::Dto::S3 {
     std::string GetObjectRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("bucket", bucket);
-            rootJson.set("key", key);
-            rootJson.set("versionId", versionId);
-            rootJson.set("min", min);
-            rootJson.set("max", max);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "versionId", versionId);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "min", min);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "max", max);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

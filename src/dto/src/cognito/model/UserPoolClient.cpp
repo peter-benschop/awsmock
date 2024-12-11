@@ -10,32 +10,31 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object UserPoolClient::ToJsonObject() const {
+    view_or_value<view, value> UserPoolClient::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("ClientId", clientId);
-            rootJson.set("ClientName", clientName);
-            rootJson.set("ClientSecret", clientSecret);
-            rootJson.set("CreationDate", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientId", clientId);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientName", clientName);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientSecret", clientSecret);
+            Core::Bson::BsonUtils::SetDateValue(document, "CreationDate", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModified", modified);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

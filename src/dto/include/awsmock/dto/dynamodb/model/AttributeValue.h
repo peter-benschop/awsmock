@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
 
 // C++ includes
-#include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <bsoncxx/builder/stream/document.hpp>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -32,7 +29,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Value
          */
-        std::string value;
+        std::string attributeValue;
 
         /**
          * String value
@@ -65,35 +62,28 @@ namespace AwsMock::Dto::DynamoDb {
         bool nullValue = false;
 
         /**
-         * Convert to JSON value
+         * @brief Convert to JSON value
          *
          * @return JSON object
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to JSON value
+         * @brief Convert to JSON value
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Convert from JSON object.
+         * @brief Convert from JSON object.
          *
          * @param jsonObject JSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const view &jsonObject);
 
         /**
-         * Convert from JSON object.
-         *
-         * @param jsonObject JSON object
-         */
-        void FromDocument(const bsoncxx::document::view &jsonObject);
-
-        /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */

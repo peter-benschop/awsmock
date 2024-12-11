@@ -40,7 +40,7 @@ namespace AwsMock::Service {
             table = _dynamoDbDatabase.CreateTable(table);
             log_info << "DynamoDb table created, name: " << table.name;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
         }
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
             listTableResponse = {.body = body, .headers = outHeaders, .status = status};
             log_info << "DynamoDb list tables, region: " << request.region << " body: " << body;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
         }
@@ -85,7 +85,7 @@ namespace AwsMock::Service {
             describeTableResponse = {.body = body, .headers = outHeaders, .status = status};
             log_info << "DynamoDb describe table, name: " << request.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDb describe table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb describe table failed, error: " + exc.message());
         }
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
             _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
             log_info << "DynamoDb table deleted, name: " << request.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd delete table failed, error: " + exc.message());
         }
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
             _dynamoDbDatabase.DeleteAllTables();
             log_info << "DynamoDb tables deleted";
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete table failed, message: " << exc.message();
             throw Core::ServiceException("DynamoDbd delete table failed, message: " + exc.message());
         }
@@ -171,7 +171,7 @@ namespace AwsMock::Service {
             getItemResponse = {.body = body, .headers = outHeaders, .status = status};
             log_info << "DynamoDb get item, name: " << request.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd get item failed, , error: " + exc.message());
         }
@@ -203,7 +203,7 @@ namespace AwsMock::Service {
 
             log_info << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDb put item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb put item failed, error: " + exc.message());
         }
@@ -229,7 +229,7 @@ namespace AwsMock::Service {
             queryResponse = {.body = body, .headers = outHeaders, .status = status};
             log_info << "DynamoDb query item, name: " << request.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDb query failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb query failed, error: " + exc.message());
         }
@@ -255,7 +255,7 @@ namespace AwsMock::Service {
             scanResponse = {.body = body, .headers = outHeaders, .status = status};
             log_info << "DynamoDb scan item, name: " << request.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDb scan failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -284,7 +284,7 @@ namespace AwsMock::Service {
             deleteItemResponse = {.body = body, .headers = oldHeaders, .status = status};
             log_info << "DynamoDb item deleted, table: " << request.tableName;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete item failed, message: " << exc.message();
             throw Core::ServiceException("DynamoDbd delete item failed, message: " + exc.message());
         }

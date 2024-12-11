@@ -9,15 +9,15 @@ namespace AwsMock::Dto::Cognito {
     std::string UserAttribute::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("Value", value);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "Value", attributeValue);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -26,11 +26,11 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
-            value = Core::Bson::BsonUtils::GetStringValue(document, "Value");
+            attributeValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

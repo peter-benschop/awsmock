@@ -8,18 +8,15 @@ namespace AwsMock::Dto::SNS {
 
     void GetTopicDetailsRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
+            const value document = bsoncxx::from_json(jsonString);
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("topicArn", rootObject, topicArn);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+            topicArn = Core::Bson::BsonUtils::GetStringValue(document, "topicArn");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -27,14 +24,14 @@ namespace AwsMock::Dto::SNS {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("topicArn", topicArn);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

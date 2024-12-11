@@ -8,7 +8,8 @@ namespace AwsMock::Dto::Cognito {
 
     void DescribeUserPoolDomainRequest::FromJson(const std::string &payload) {
 
-        Poco::JSON::Parser parser;
+        // TODO: Fix me
+        /*Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(payload);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
@@ -20,11 +21,12 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string DescribeUserPoolDomainRequest::ToJson() const {
-
+        // TODO: Fix me
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -36,7 +38,8 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string DescribeUserPoolDomainRequest::ToString() const {

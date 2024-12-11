@@ -5,10 +5,14 @@
 #ifndef AWMOCK_SQS_SPRING_SERVER_TEST_H
 #define AWMOCK_SQS_SPRING_SERVER_TEST_H
 
+// C++ includes
+#include <string>
+
 // GTest includes
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
@@ -31,18 +35,20 @@ namespace AwsMock::Service {
         std::string receiptHandle;
 
         std::string ToJson() const {
-            Poco::JSON::Object rootObject;
+            /*Poco::JSON::Object rootObject;
             rootObject.set("testKey", testKey);
             rootObject.set("receiptHandle", receiptHandle);
-            return Core::JsonUtils::ToJsonString(rootObject);
+            return Core::JsonUtils::ToJsonString(rootObject);*/
         }
 
         void FromJson(const std::string &jsonString) {
+            /*value document = bsoncxx::from_json(jsonString);
+            Core::Bson::BsonUtils::SetStringValue(document);
             Poco::JSON::Parser parser;
             Poco::Dynamic::Var result = parser.parse(jsonString);
             const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
             Core::JsonUtils::GetJsonValueString("testKey", rootObject, testKey);
-            Core::JsonUtils::GetJsonValueString("receiptHandle", rootObject, receiptHandle);
+            Core::JsonUtils::GetJsonValueString("receiptHandle", rootObject, receiptHandle);*/
         }
     };
 
@@ -51,18 +57,19 @@ namespace AwsMock::Service {
         std::vector<TestMessage> messageList;
 
         std::string ToJson() {
-            Poco::JSON::Array rootArray;
+            /*array rootArray;
             for (const auto &message: messageList) {
-                Poco::JSON::Object messageObject;
-                messageObject.set("testKey", message.testKey);
+                document messageObject;
+                messageObject.append("testKey", message.testKey);
                 messageObject.set("receiptHandle", message.receiptHandle);
                 rootArray.add(messageObject);
             }
-            return Core::JsonUtils::ToJsonString(rootArray);
+            return Core::JsonUtils::ToJsonString(rootArray);*/
+            return {};
         }
 
         void FromJson(const std::string &jsonString) {
-            Poco::JSON::Parser parser;
+            /*Poco::JSON::Parser parser;
             Poco::Dynamic::Var result = parser.parse(jsonString);
             Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
             if (!rootArray.isNull()) {
@@ -73,7 +80,7 @@ namespace AwsMock::Service {
                     Core::JsonUtils::GetJsonValueString("receiptHandle", messageObject, receiptHandle);
                     messageList.push_back({.testKey = testKey, .receiptHandle = receiptHandle});
                 }
-            }
+            }*/
         }
     };
 

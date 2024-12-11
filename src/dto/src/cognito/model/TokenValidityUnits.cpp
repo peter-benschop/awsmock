@@ -10,39 +10,42 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object TokenValidityUnits::ToJsonObject() const {
+    view_or_value<view, value> TokenValidityUnits::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("AccessToken", ValidityUnitToString(accessToken));
-            rootJson.set("IdToken", ValidityUnitToString(idToken));
-            rootJson.set("RefreshToken", ValidityUnitToString(refreshToken));
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "AccessToken", ValidityUnitToString(accessToken));
+            Core::Bson::BsonUtils::SetStringValue(document, "IdToken", ValidityUnitToString(idToken));
+            Core::Bson::BsonUtils::SetStringValue(document, "RefreshToken", ValidityUnitToString(refreshToken));
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void TokenValidityUnits::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-        std::string tmp;
-        Core::JsonUtils::GetJsonValueString("AccessToken", jsonObject, tmp);
-        accessToken = ValidityUnitFromString(tmp);
-        Core::JsonUtils::GetJsonValueString("IdToken", jsonObject, tmp);
-        idToken = ValidityUnitFromString(tmp);
-        Core::JsonUtils::GetJsonValueString("RefreshToken", jsonObject, tmp);
-        refreshToken = ValidityUnitFromString(tmp);
+    void TokenValidityUnits::FromDocument(const view_or_value<view, value> &document) {
+
+        try {
+
+            accessToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "AccessToken"));
+            idToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "IdToken"));
+            refreshToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "RefreshToken"));
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string TokenValidityUnits::ToString() const {

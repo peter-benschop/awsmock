@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Common {
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            std::string action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+            const std::string action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
             command = MonitoringCommandTypeFromString(action);
         }
     }
@@ -30,15 +30,15 @@ namespace AwsMock::Dto::Common {
     std::string MonitoringClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("method", std::string(to_string(method)));
-            rootJson.set("region", region);
-            rootJson.set("user", user);
-            rootJson.set("command", Dto::Common::MonitoringCommandTypeToString(command));
-            rootJson.set("contentType", contentType);
-            rootJson.set("contentLength", contentLength);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "method", std::string(to_string(method)));
+            Core::Bson::BsonUtils::SetStringValue(document, "command", MonitoringCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            Core::Bson::BsonUtils::SetIntValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

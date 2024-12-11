@@ -23,8 +23,6 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
-#include <awsmock/dto/s3/RestErrorResponse.h>
-#include <awsmock/dto/sqs/RestErrorResponse.h>
 
 namespace AwsMock::Service {
 

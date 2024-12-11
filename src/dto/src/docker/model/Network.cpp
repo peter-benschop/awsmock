@@ -2,62 +2,59 @@
 // Created by JVO on 22.04.2024.
 //
 
-#include "awsmock/dto/docker/model/Network.h"
+#include <awsmock/dto/docker/model/Network.h>
 
 namespace AwsMock::Dto::Docker {
 
     void Network::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
+            const value document = bsoncxx::from_json(jsonString);
+            FromDocument(document.view());
 
-            this->FromJson(result.extract<Poco::JSON::Object::Ptr>());
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void Network::FromJson(Poco::JSON::Object::Ptr jsonObject) {
+    void Network::FromDocument(const view_or_value<view, value> &document) {
 
         try {
-            Core::JsonUtils::GetJsonValueString("Id", jsonObject, id);
-            Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-            Core::JsonUtils::GetJsonValueString("Driver", jsonObject, driver);
-            Core::JsonUtils::GetJsonValueString("Scope", jsonObject, scope);
-            Core::JsonUtils::GetJsonValueBool("EnableIPv6", jsonObject, ipv6Enabled);
-            Core::JsonUtils::GetJsonValueDate("Created", jsonObject, created);
+            id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            driver = Core::Bson::BsonUtils::GetStringValue(document, "Driver");
+            scope = Core::Bson::BsonUtils::GetStringValue(document, "Scope");
+            ipv6Enabled = Core::Bson::BsonUtils::GetBoolValue(document, "EnableIPv6");
+            created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Network::ToJsonObject() const {
+    view_or_value<view, value> Network::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Id", id);
-            rootJson.set("Name", name);
-            rootJson.set("Driver", driver);
-            rootJson.set("Scope", scope);
-            rootJson.set("EnableIPv6", ipv6Enabled);
-            rootJson.set("Created", created);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "Driver", driver);
+            Core::Bson::BsonUtils::SetStringValue(document, "Scope", scope);
+            Core::Bson::BsonUtils::SetBoolValue(document, "EnableIPv6", ipv6Enabled);
+            Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string Network::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Network::ToString() const {

@@ -6,37 +6,35 @@ namespace AwsMock::Dto::SQS {
     std::string EventNotification::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            Poco::JSON::Array recordsJsonArray;
-            for (const auto &record: records) {
-                recordsJsonArray.add(record.ToJsonObject());
+            document document;
+
+            if (!records.empty()) {
+                array jsonArray;
+                for (const auto &item: records) {
+                    jsonArray.append(item.ToDocument());
+                }
+                document.append(kvp("Records", jsonArray));
             }
-            rootJson.set("Records", recordsJsonArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     void EventNotification::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
-            Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-            Poco::JSON::Array::Ptr recordArray = rootObject->getArray("Records");
+            const value document = bsoncxx::from_json(jsonString);
 
-            if (recordArray != nullptr) {
-                for (const auto &it: *recordArray) {
+            if (document.find("Records") != document.end()) {
+                for (const bsoncxx::array::view arrayView{document["Entries"].get_array().value}; const bsoncxx::array::element &tagElement: arrayView) {
                     Record record;
-                    record.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-                    records.push_back(record);
+                    record.FromDocument(tagElement.get_document().value);
+                    records.emplace_back(record);
                 }
             }
-
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());

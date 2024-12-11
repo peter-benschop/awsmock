@@ -8,40 +8,31 @@ namespace AwsMock::Dto::SQS {
 
     void ListQueuesRequest::FromJson(const std::string &jsonString) {
 
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-            if (!rootObject->get("MaxResults").isEmpty()) {
-                maxResults = rootObject->get("MaxResults").convert<int>();
-            }
-            if (!rootObject->get("NextToken").isEmpty()) {
-                nextToken = rootObject->get("NextToken").convert<std::string>();
-            }
-            if (!rootObject->get("QueueNamePrefix").isEmpty()) {
-                queueNamePrefix = rootObject->get("QueueNamePrefix").convert<std::string>();
-            }
+            const value document = bsoncxx::from_json(jsonString);
+            maxResults = Core::Bson::BsonUtils::GetIntValue(document, "maxResults");
+            nextToken = Core::Bson::BsonUtils::GetStringValue(document, "NextToken");
+            queueNamePrefix = Core::Bson::BsonUtils::GetStringValue(document, "QueueNamePrefix");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 
     std::string ListQueuesRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("NextToken", nextToken);
-            rootJson.set("MaxResults", maxResults);
-            rootJson.set("QueueNamePrefix", queueNamePrefix);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxResults", maxResults);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueNamePrefix", queueNamePrefix);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
     }
 

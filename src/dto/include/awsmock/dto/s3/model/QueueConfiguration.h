@@ -10,8 +10,8 @@
 #include <vector>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -72,25 +72,18 @@ namespace AwsMock::Dto::S3 {
         std::vector<NotificationEventType> events;
 
         /**
-          * @brief Convert from XML representation
-          *
-          * @param rootNode XML rootNode
-          */
-        void FromXmlNode(Poco::XML::Node *rootNode);
-
-        /**
          * Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Convert from a JSON object
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Convert to a JSON string

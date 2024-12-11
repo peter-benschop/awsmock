@@ -8,13 +8,8 @@
 // C++ includes
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <bsoncxx/json.hpp>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
@@ -54,21 +49,21 @@ namespace AwsMock::Database::Entity::S3 {
         std::string lambdaArn;
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -7,7 +7,6 @@
 
 // C++ includes
 #include <map>
-#include <sstream>
 #include <string>
 
 // Poco includes
@@ -20,7 +19,7 @@
 
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Database::Entity::Lambda {
@@ -42,21 +41,21 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult database view.
          */
-        void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the JSON object to and entity
          *
          * @param jsonObject JSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        //void FromDocument(const view_or_value<view, value> &jsonObject);
 
         /**
          * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
     };
 
 }// namespace AwsMock::Database::Entity::Lambda

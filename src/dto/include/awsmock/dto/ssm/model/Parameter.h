@@ -7,15 +7,11 @@
 
 // C++ standard includes
 #include <map>
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 
 namespace AwsMock::Dto::SSM {
@@ -40,7 +36,7 @@ namespace AwsMock::Dto::SSM {
         /**
          * Parameter value
          */
-        std::string value;
+        std::string parameterValue;
 
         /**
          * Description
@@ -73,25 +69,25 @@ namespace AwsMock::Dto::SSM {
         std::map<std::string, std::string> tags;
 
         /**
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @brief Converts a JSON representation to s DTO.
+         *
+         * @param document JSON object.
+         */
+        void FromDocument(const view_or_value<view, value> &document);
+
+        /**
          * @brief Converts the DTO to a JSON string.
          *
          * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param object JSON object.
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &object);
 
         /**
          * @brief Converts the DTO to a string representation.

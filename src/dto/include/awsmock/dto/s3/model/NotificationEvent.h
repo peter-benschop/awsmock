@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -49,17 +47,19 @@ namespace AwsMock::Dto::S3 {
             {NotificationEventType::OBJECT_TAGGING, "ObjectTagging"},
     };
 
-    [[maybe_unused]] static std::string EventTypeToString(NotificationEventType eventType) {
+    [[maybe_unused]] static std::string EventTypeToString(const NotificationEventType eventType) {
         return EventTypeNames[eventType];
     }
 
     [[maybe_unused]] static NotificationEventType EventTypeFromString(const std::string &nameType) {
-        for (auto &it: EventTypeNames) {
-            if (it.second == nameType) {
-                return it.first;
+        for (auto &[fst, snd]: EventTypeNames) {
+            if (snd == nameType) {
+                return fst;
             }
         }
         return NotificationEventType::OBJECT_CREATED;
     }
+
+
 }// namespace AwsMock::Dto::S3
 #endif// AWSMOCK_DTO_S3_EVENT_H

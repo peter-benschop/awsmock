@@ -8,6 +8,8 @@ namespace AwsMock::Dto::S3 {
 
     std::string MoveObjectResponse::ToXml() const {
 
+        // Todo:
+        /*
         // Root
         Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
         Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("MoveObjectResult");
@@ -30,7 +32,8 @@ namespace AwsMock::Dto::S3 {
         writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
         writer.writeNode(output, pDoc);
 
-        return output.str();
+        return output.str();*/
+        return {};
     }
 
     std::string MoveObjectResponse::ToString() const {

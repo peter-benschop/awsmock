@@ -6,18 +6,14 @@
 #define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
 
 // C++ standard includes
+#include <map>
 #include <string>
 
 // Boost include<
 #include <boost/beast.hpp>
 
-// BSON includes
-#include <bsoncxx/builder/basic/document.hpp>
-
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 

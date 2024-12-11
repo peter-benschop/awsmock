@@ -6,17 +6,11 @@
 #define AWSMOCK_DTO_DYNAMODB_GET_ITEM_KEY_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -25,7 +19,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemKey : public Dto::Common::BaseRequest {
+    struct GetItemKey : Common::BaseRequest {
 
         /**
          * Region

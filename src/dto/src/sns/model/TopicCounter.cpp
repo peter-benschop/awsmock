@@ -10,34 +10,32 @@ namespace AwsMock::Dto::SNS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object TopicCounter::ToJsonObject() const {
+    view_or_value<view, value> TopicCounter::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("topicName", topicName);
-            rootJson.set("topicArn", topicArn);
-            rootJson.set("topicUrl", topicUrl);
-            rootJson.set("retentionPeriod", retentionPeriod);
-            rootJson.set("maxMessageSize", maxMessageSize);
-            rootJson.set("availableMessages", availableMessages);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "topicName", topicName);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "topicUrl", topicUrl);
+            Core::Bson::BsonUtils::SetLongValue(document, "retentionPeriod", retentionPeriod);
+            Core::Bson::BsonUtils::SetLongValue(document, "maxMessageSize", maxMessageSize);
+            Core::Bson::BsonUtils::SetLongValue(document, "availableMessages", availableMessages);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+            return document.extract();
 
-            rootJson.set("created", Core::DateTimeUtils::ToISO8601(created));
-            rootJson.set("modified", Core::DateTimeUtils::ToISO8601(modified));
-
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

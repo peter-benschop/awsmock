@@ -7,34 +7,13 @@
 
 // C++ includes
 #include <string>
-#include <vector>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/JSON/Parser.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
 namespace AwsMock::Database::Entity::SNS {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * SNS topic attribute entity
@@ -158,21 +137,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string for logging.
-         */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @param jsonObject JSON object
-         */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        [[maybe_unused]] void FromDocument(std::optional<view> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.

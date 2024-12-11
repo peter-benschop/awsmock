@@ -8,7 +8,7 @@ namespace AwsMock::Dto::Common {
 
     void SSMClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
-        Dto::Common::UserAgent userAgent;
+        UserAgent userAgent;
         userAgent.FromRequest(request);
 
         // Basic values
@@ -23,37 +23,37 @@ namespace AwsMock::Dto::Common {
 
         if (userAgent.clientCommand.empty()) {
 
-            this->command = Dto::Common::SSMCommandTypeFromString(GetCommandFromHeader(request));
+            this->command = SSMCommandTypeFromString(GetCommandFromHeader(request));
 
         } else {
 
-            this->command = Dto::Common::SSMCommandTypeFromString(userAgent.clientCommand);
+            this->command = SSMCommandTypeFromString(userAgent.clientCommand);
         }
     }
 
     std::string SSMClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) {
 
-        std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-        std::string cmd = Core::StringUtils::Split(headerValue, '.')[1];
+        const std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
+        const std::string cmd = Core::StringUtils::Split(headerValue, '.')[1];
         return Core::StringUtils::ToSnakeCase(cmd);
     }
 
     std::string SSMClientCommand::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("method", boost::lexical_cast<std::string>(method));
-            rootJson.set("command", SSMCommandTypeToString(command));
-            rootJson.set("user", user);
-            rootJson.set("contentType", contentType);
-            rootJson.set("payload", payload.length() > 256 ? Core::StringUtils::SubString(payload, 0, 256) : payload);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "method", boost::lexical_cast<std::string>(method));
+            Core::Bson::BsonUtils::SetStringValue(document, "command", SSMCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            Core::Bson::BsonUtils::SetStringValue(document, "payload", payload);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -10,15 +10,14 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootObject;
-            rootObject.set("Region", region);
-            rootObject.set("UserGroupClient", userGroupClient.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            document.append(kvp("UserGroupClient", userGroupClient.ToDocument()));
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootObject);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

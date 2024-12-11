@@ -6,12 +6,11 @@
 #define AWSMOCK_DTO_DOCKER_CONTAINER_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/BsonUtils.h"
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/exception/JsonException.h"
 #include "awsmock/dto/docker/model/Port.h"
@@ -87,16 +86,16 @@ namespace AwsMock::Dto::Docker {
         /**
          * @brief Convert to a JSON string
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJson(Poco::JSON::Object::Ptr jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Convert to a JSON string

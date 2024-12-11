@@ -10,63 +10,63 @@ namespace AwsMock::Dto::SQS {
 
         try {
 
-            return Core::JsonUtils::ToJsonString(ToJsonObject());
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    Poco::JSON::Object Record::ToJsonObject() const {
+    view_or_value<view, value> Record::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("awsRegion", region);
-            rootJson.set("messageId", messageId);
-            rootJson.set("receiptHandle", receiptHandle);
-            rootJson.set("body", body);
-            rootJson.set("md5OfBody", md5Sum);
-            rootJson.set("eventSource", eventSource);
-            rootJson.set("eventSourceARN", eventSourceArn);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "awsRegion", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "messageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "receiptHandle", receiptHandle);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "body", body);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5OfBody", md5Sum);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "eventSource", eventSource);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "eventSourceARN", eventSourceArn);
 
             if (!messagesAttributes.empty()) {
-                Poco::JSON::Array jsonMessageAttributeArray;
-                for (const auto &messageAttribute: messagesAttributes) {
-                    Poco::JSON::Object jsonAttribute;
-                    jsonAttribute.set(messageAttribute.first, messageAttribute.second.ToJsonObject());
-                    jsonMessageAttributeArray.add(jsonAttribute);
+                array jsonMessageAttributeArray;
+                for (const auto &[fst, snd]: messagesAttributes) {
+                    document jsonAttribute;
+                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
+                    jsonMessageAttributeArray.append(jsonAttribute);
                 }
-                rootJson.set("messageAttributes", jsonMessageAttributeArray);
+                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
             }
 
             if (!attributes.empty()) {
-                Poco::JSON::Object jsonAttributeObject;
-                for (const auto &attribute: attributes) {
-                    jsonAttributeObject.set(attribute.first, attribute.second);
+                document jsonAttributeObject;
+                for (const auto &[fst, snd]: attributes) {
+                    jsonAttributeObject.append(kvp(fst, snd));
                 }
-                rootJson.set("attributes", jsonAttributeObject);
+                rootDocument.append(kvp("attributes", jsonAttributeObject));
             }
-            return rootJson;
+            return rootDocument.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
-    void Record::FromJson(const Poco::JSON::Object::Ptr &object) {
+    void Record::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("awsRegion", object, region);
-            Core::JsonUtils::GetJsonValueString("messageId", object, messageId);
-            Core::JsonUtils::GetJsonValueString("receiptHandle", object, receiptHandle);
-            Core::JsonUtils::GetJsonValueString("body", object, body);
-            Core::JsonUtils::GetJsonValueString("md5OfBody", object, md5Sum);
-            Core::JsonUtils::GetJsonValueString("eventSource", object, eventSource);
-            Core::JsonUtils::GetJsonValueString("eventSourceArn", object, eventSourceArn);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "awsRegion");
+            messageId = Core::Bson::BsonUtils::GetStringValue(document, "messageId");
+            receiptHandle = Core::Bson::BsonUtils::GetStringValue(document, "receiptHandle");
+            body = Core::Bson::BsonUtils::GetStringValue(document, "body");
+            md5Sum = Core::Bson::BsonUtils::GetStringValue(document, "md5OfBody");
+            eventSource = Core::Bson::BsonUtils::GetStringValue(document, "eventSource");
+            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "eventSourceArn");
 
         } catch (Poco::Exception &exc) {
             log_error << exc.message();

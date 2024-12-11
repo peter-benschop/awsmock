@@ -6,17 +6,13 @@
 #define AWSMOCK_DTO_COGNITO_LIST_USERPOOL_CLIENTS_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/dto/cognito/model/UserPoolClient.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/UserPool.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -38,7 +34,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolClientsResponse : public Dto::Common::BaseRequest {
+    struct ListUserPoolClientsResponse : Common::BaseRequest {
 
         /**
          * User pool client entities

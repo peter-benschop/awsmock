@@ -8,7 +8,7 @@ namespace AwsMock::Database::Entity::SQS {
 
     view_or_value<view, value> Queue::ToDocument() const {
 
-        auto tagsDoc = bsoncxx::builder::basic::document{};
+        auto tagsDoc = document{};
         if (!tags.empty()) {
             for (const auto &t: tags) {
                 tagsDoc.append(kvp(t.first, t.second));
@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::SQS {
         return queueDoc;
     }
 
-    Entity::SQS::Queue Queue::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    Queue Queue::FromDocument(const std::optional<view> &mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -45,8 +45,7 @@ namespace AwsMock::Database::Entity::SQS {
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
                 if (mResult.value().find("tags") != mResult.value().end()) {
-                    bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-                    for (const bsoncxx::document::element &tagElement: tagsView) {
+                    for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                         std::string key = bsoncxx::string::to_string(tagElement.key());
                         std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                         tags.emplace(key, value);
@@ -56,61 +55,9 @@ namespace AwsMock::Database::Entity::SQS {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            throw Core::DatabaseException(exc.what());
+            throw Core::JsonException(exc.what());
         }
         return *this;
-    }
-
-    Poco::JSON::Object Queue::ToJsonObject() const {
-
-        using Core::JsonUtils;
-
-        try {
-            Poco::JSON::Object jsonObject;
-            JsonUtils::SetJsonValueString(jsonObject, "region", region);
-            JsonUtils::SetJsonValueString(jsonObject, "name", name);
-            JsonUtils::SetJsonValueString(jsonObject, "owner", owner);
-            JsonUtils::SetJsonValueString(jsonObject, "queueUrl", queueUrl);
-            JsonUtils::SetJsonValueString(jsonObject, "queueArn", queueArn);
-            JsonUtils::SetJsonValueDate(jsonObject, "created", created);
-            JsonUtils::SetJsonValueDate(jsonObject, "created", created);
-
-            jsonObject.set("attributes", attributes.ToJsonObject());
-
-            // Tags array
-            if (!tags.empty()) {
-                Poco::JSON::Array jsonTagArray;
-                for (const auto &tag: tags) {
-                    Poco::JSON::Object jsonTagObject;
-                    jsonTagObject.set(tag.first, tag.second);
-                    jsonTagArray.add(jsonTagObject);
-                }
-                jsonObject.set("tags", jsonTagArray);
-            }
-            return jsonObject;
-
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
-        }
-    }
-
-    void Queue::FromJsonObject(Poco::JSON::Object::Ptr jsonObject) {
-
-        try {
-
-            Core::JsonUtils::GetJsonValueString("region", jsonObject, region);
-            Core::JsonUtils::GetJsonValueString("name", jsonObject, name);
-            Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-            Core::JsonUtils::GetJsonValueString("queueUrl", jsonObject, queueUrl);
-            Core::JsonUtils::GetJsonValueString("queueArn", jsonObject, queueArn);
-            Core::JsonUtils::GetJsonValueString("owner", jsonObject, owner);
-            attributes.FromJsonObject(jsonObject->getObject("attributes"));
-
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
-        }
     }
 
     std::string Queue::ToString() const {
@@ -120,7 +67,7 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const Queue &q) {
-        os << "Queue=" << bsoncxx::to_json(q.ToDocument());
+        os << "Queue=" << to_json(q.ToDocument());
         return os;
     }
 

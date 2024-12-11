@@ -43,56 +43,7 @@ namespace AwsMock::Database::Entity::SQS {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            throw Core::DatabaseException(exc.what());
-        }
-    }
-
-    Poco::JSON::Object QueueAttribute::ToJsonObject() const {
-
-        using Core::JsonUtils;
-
-        try {
-
-            Poco::JSON::Object jsonObject;
-            JsonUtils::SetJsonValueInt(jsonObject, "delaySeconds", delaySeconds);
-            JsonUtils::SetJsonValueInt(jsonObject, "maxMessageSize", maxMessageSize);
-            JsonUtils::SetJsonValueInt(jsonObject, "messageRetentionPeriod", messageRetentionPeriod);
-            JsonUtils::SetJsonValueString(jsonObject, "policy", policy);
-            JsonUtils::SetJsonValueInt(jsonObject, "receiveMessageWaitTime", receiveMessageWaitTime);
-            JsonUtils::SetJsonValueInt(jsonObject, "visibilityTimeout", visibilityTimeout);
-            JsonUtils::SetJsonValueString(jsonObject, "redriveAllowPolicy", redriveAllowPolicy);
-            JsonUtils::SetJsonValueInt(jsonObject, "approximateNumberOfMessages", approximateNumberOfMessages);
-            JsonUtils::SetJsonValueInt(jsonObject, "approximateNumberOfMessagesDelayed", approximateNumberOfMessagesDelayed);
-            JsonUtils::SetJsonValueInt(jsonObject, "approximateNumberOfMessagesNotVisible", approximateNumberOfMessagesNotVisible);
-            jsonObject.set("redrivePolicy", redrivePolicy.ToJsonObject());
-
-            return jsonObject;
-
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
-        }
-    }
-
-    void QueueAttribute::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        try {
-
-            Core::JsonUtils::GetJsonValueInt("delaySeconds", jsonObject, delaySeconds);
-            Core::JsonUtils::GetJsonValueInt("maxMessageSize", jsonObject, maxMessageSize);
-            Core::JsonUtils::GetJsonValueInt("messageRetentionPeriod", jsonObject, messageRetentionPeriod);
-            Core::JsonUtils::GetJsonValueString("policy", jsonObject, policy);
-            Core::JsonUtils::GetJsonValueInt("receiveMessageWaitTime", jsonObject, receiveMessageWaitTime);
-            Core::JsonUtils::GetJsonValueInt("visibilityTimeout", jsonObject, visibilityTimeout);
-            Core::JsonUtils::GetJsonValueString("redriveAllowPolicy", jsonObject, redriveAllowPolicy);
-            Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessages", jsonObject, approximateNumberOfMessages);
-            Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesDelayed", jsonObject, approximateNumberOfMessagesDelayed);
-            Core::JsonUtils::GetJsonValueLong("approximateNumberOfMessagesNotVisible", jsonObject, approximateNumberOfMessagesNotVisible);
-            redrivePolicy.FromJsonObject(jsonObject->getObject("redrivePolicy"));
-
-        } catch (Poco::Exception &e) {
-            log_error << e.message();
-            throw Core::JsonException(e.message());
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -103,7 +54,7 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
-        os << "QueueAttribute=" << bsoncxx::to_json(r.ToDocument());
+        os << "QueueAttribute=" << to_json(r.ToDocument());
         return os;
     }
 

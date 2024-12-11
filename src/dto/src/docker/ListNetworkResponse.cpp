@@ -9,20 +9,17 @@ namespace AwsMock::Dto::Docker {
     void ListNetworkResponse::FromJson(const std::string &jsonString) {
 
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
-            Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-            if (rootArray != nullptr) {
-                for (const auto &it: *rootArray) {
-                    Network network;
-                    network.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-                    networkList.push_back(network);
-                }
+            const value document = bsoncxx::from_json(jsonString);
+
+            for (const auto &element: document.view()) {
+                Network network;
+                network.FromDocument(element.get_document().view());
+                networkList.push_back(network);
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -30,18 +27,18 @@ namespace AwsMock::Dto::Docker {
 
         try {
 
-            Poco::JSON::Object rootJson;
+            array document;
 
-            Poco::JSON::Array networkArray;
-            for (const auto &network: networkList) {
-                networkArray.add(network.ToJsonObject());
+            if (!networkList.empty()) {
+                for (const auto &network: networkList) {
+                    document.append(network.ToDocument());
+                }
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

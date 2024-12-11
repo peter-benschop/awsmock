@@ -7,23 +7,25 @@
 namespace AwsMock::Dto::SNS {
 
     std::string ListMessagesResponse::ToJson() const {
+
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("total", total);
+
+            document document;
 
             if (!messageList.empty()) {
-                Poco::JSON::Array jsonArray;
+                array jsonArray;
                 for (const auto &message: messageList) {
-                    jsonArray.add(message.ToJsonObject());
+                    jsonArray.append(message.ToDocument());
                 }
-                rootJson.set("messages", jsonArray);
+                document.append(kvp("messages", jsonArray));
             }
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            Core::Bson::BsonUtils::SetLongValue(document, "total", total);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -8,6 +8,7 @@ namespace AwsMock::Dto::KMS {
 
     void ListKeysResponse::FromJson(const std::string &jsonString) {
 
+        /* Todo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -30,11 +31,12 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string ListKeysResponse::ToJson() const {
 
+        /* Todo
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("NextMarker", nextMarker);
@@ -50,7 +52,8 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string ListKeysResponse::ToString() const {

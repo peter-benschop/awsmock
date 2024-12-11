@@ -3,21 +3,26 @@
 //
 
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
-#include <mongocxx/options/gridfs/bucket.hpp>
 
 namespace AwsMock::Dto::S3 {
 
     std::string DeleteObjectsResponse::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("keys", Core::JsonUtils::GetJsonStringArray(keys));
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            if (!keys.empty()) {
+                array jsonArray;
+                for (const auto &key: keys) {
+                    jsonArray.append(key);
+                }
+                document.append(kvp("keys", jsonArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

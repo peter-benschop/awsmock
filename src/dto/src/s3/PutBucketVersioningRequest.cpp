@@ -8,6 +8,8 @@ namespace AwsMock::Dto::S3 {
 
     void PutBucketVersioningRequest::FromXml(const std::string &xmlString) {
 
+        // TODO:
+        /*
         try {
             Poco::XML::DOMParser parser;
             Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
@@ -21,7 +23,7 @@ namespace AwsMock::Dto::S3 {
 
         } catch (Poco::Exception &exc) {
             std::cerr << "Exception: " << exc.message() << std::endl;
-        }
+        }*/
     }
 
     std::string PutBucketVersioningRequest::ToString() const {

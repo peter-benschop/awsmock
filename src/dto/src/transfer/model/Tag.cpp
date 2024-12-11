@@ -2,13 +2,14 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include "awsmock/dto/transfer/model/Tag.h"
+#include <awsmock/dto/transfer/model/Tag.h>
 
 namespace AwsMock::Dto::Transfer {
 
     std::string Tag::ToJson() const {
 
-        try {
+        // Todo: fix me
+        /*try {
 
             Poco::JSON::Object rootJson;
             rootJson.set("key", key);
@@ -19,7 +20,8 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string Tag::ToString() const {

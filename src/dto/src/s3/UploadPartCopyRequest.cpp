@@ -9,23 +9,22 @@ namespace AwsMock::Dto::S3 {
     std::string UploadPartCopyRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("region", region);
-            rootJson.set("uploadId", uploadId);
-            rootJson.set("partNumber", partNumber);
-            rootJson.set("region", region);
-            rootJson.set("sourceBucket", sourceBucket);
-            rootJson.set("sourceKey", sourceKey);
-            rootJson.set("targetBucket", targetBucket);
-            rootJson.set("targetKey", targetKey);
-            rootJson.set("min", min);
-            rootJson.set("max", max);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "uploadId", uploadId);
+            Core::Bson::BsonUtils::SetIntValue(document, "partNumber", partNumber);
+            Core::Bson::BsonUtils::SetStringValue(document, "sourceBucket", sourceBucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "sourceKey", sourceKey);
+            Core::Bson::BsonUtils::SetStringValue(document, "targetBucket", targetBucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "targetKey", targetKey);
+            Core::Bson::BsonUtils::SetLongValue(document, "min", min);
+            Core::Bson::BsonUtils::SetLongValue(document, "max", max);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

@@ -7,6 +7,8 @@
 namespace AwsMock::Dto::SNS {
 
     std::string SqsNotificationRequest::ToJson() const {
+
+        /* Todo:
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Type", type);
@@ -25,7 +27,8 @@ namespace AwsMock::Dto::SNS {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string SqsNotificationRequest::ToString() const {
@@ -35,8 +38,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const SqsNotificationRequest &r) {
-        os << "SqsNotificationRequest={type='" << r.type << "', topicArn='" << r.topicArn << "', message='" << r.message << "', timestamp=" << r.timestamp << ", signatureVersion='" << r.signatureVersion << "',  signature='" << r.signature
-           << "', signingCertURL='" << r.signingCertURL << "', unsubscribeURL='" << r.unsubscribeURL << "'}";
+        os << "SqsNotificationRequest=" << r.ToJson();
         return os;
     }
 

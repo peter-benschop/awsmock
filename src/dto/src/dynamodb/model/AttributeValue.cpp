@@ -6,8 +6,10 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    Poco::JSON::Object AttributeValue::ToJsonObject() const {
+    view_or_value<view, value> AttributeValue::ToDocument() const {
 
+        // Todo:
+        /*
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("S", stringValue);
@@ -38,43 +40,11 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
-    void AttributeValue::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        try {
-
-            for (size_t i = 0; i < jsonObject->getNames().size(); i++) {
-                type = jsonObject->getNames()[i];
-                if (type == "S" && jsonObject->has(type)) {
-                    stringValue = jsonObject->getValue<std::string>(type);
-                } else if (type == "SS") {
-                    Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("SS");
-                    for (const auto &nValue: *jsonNumberArray) {
-                        stringSetValue.emplace_back(nValue.convert<std::string>());
-                    }
-                } else if (type == "N") {
-                    numberValue = jsonObject->get(type).convert<std::string>();
-                } else if (type == "NS") {
-                    Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("NS");
-                    for (const auto &nValue: *jsonNumberArray) {
-                        numberSetValue.emplace_back(nValue.convert<std::string>());
-                    }
-                } else if (type == "BOOL") {
-                    boolValue = jsonObject->get(type).convert<bool>();
-                } else if (type == "NULL") {
-                    nullValue = jsonObject->get(type).convert<bool>();
-                }
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
-    }
-
-    void AttributeValue::FromDocument(const bsoncxx::document::view &jsonObject) {
+    void AttributeValue::FromDocument(const view &jsonObject) {
 
         for (bsoncxx::document::element ele: jsonObject) {
             type = ele["type"].get_string();
@@ -101,7 +71,7 @@ namespace AwsMock::Dto::DynamoDb {
     }
 
     std::string AttributeValue::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string AttributeValue::ToString() const {

@@ -6,25 +6,10 @@
 #define AWSMOCK_DTO_SQS_LIST_QUEUE_ARNS_RESPONSE_H
 
 // C++ standard includes
-#include <iostream>
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/DOM/AutoPtr.h>
-#include <Poco/DOM/DOMWriter.h>
-#include <Poco/DOM/Document.h>
-#include <Poco/DOM/Element.h>
-#include <Poco/DOM/Text.h>
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
-#include <Poco/UUID.h>
-#include <Poco/UUIDGenerator.h>
-#include <Poco/XML/XMLWriter.h>
-
 // AwsMock includes
-#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/sqs/Queue.h>
 
 namespace AwsMock::Dto::SQS {

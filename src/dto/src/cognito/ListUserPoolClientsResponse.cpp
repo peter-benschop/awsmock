@@ -10,20 +10,21 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootObject;
-            Poco::JSON::Array userPoolClientArray;
-            for (const auto &userPoolClient: userPoolsClients) {
-                Poco::JSON::Object userPoolJson = userPoolClient.ToJsonObject();
-                userPoolClientArray.add(userPoolJson);
+            document rootDocument;
+
+            if (!userPoolsClients.empty()) {
+                array userPoolClientArray;
+                for (const auto &userPoolClient: userPoolsClients) {
+                    userPoolClientArray.append(userPoolClient.ToDocument());
+                }
+                rootDocument.append(kvp("UserPoolClients", userPoolClientArray));
             }
-            rootObject.set("UserPoolClients", userPoolClientArray);
-            rootObject.set("NextToken", nextToken);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "NextToken", nextToken);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootObject);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
