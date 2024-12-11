@@ -11,8 +11,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>

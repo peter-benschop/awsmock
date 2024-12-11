@@ -90,14 +90,14 @@ namespace AwsMock::Dto::S3 {
          *
          * @param jsonObject JSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const view_or_value<view, value> &jsonObject);
 
         /**
          * @brief Convert to a JSON string
          *
          * @return JSON string
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Convert to a JSON string

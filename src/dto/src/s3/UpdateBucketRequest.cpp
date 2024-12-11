@@ -6,37 +6,32 @@
 
 namespace AwsMock::Dto::S3 {
 
-    UpdateBucketRequest UpdateBucketRequest::FromJson(const std::string &jsonString) {
-
-        UpdateBucketRequest request;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    UpdateBucketRequest UpdateBucketRequest::FromJson(const std::string &body) {
 
         try {
-            if (!rootObject->get("bucket").isEmpty()) {
-                Bucket bucket;
-                bucket.FromJsonObject(rootObject->getObject("bucket"));
+            UpdateBucketRequest request;
+            if (const value document = bsoncxx::from_json(body); document.view().find("bucket") != document.view().end()) {
+                request.bucket.FromDocument(document.view()["bucket"].get_document().value);
             }
             return request;
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string UpdateBucketRequest::ToJson() const {
 
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("bucket", bucket.ToJsonObject());
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            document.append(kvp("bucket", bucket.ToDocument()));
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

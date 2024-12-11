@@ -6,12 +6,10 @@
 #define AWSMOCK_DTO_DOCKER_PORT_H
 
 // C++ includes
-#include <sstream>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
+#include "awsmock/core/BsonUtils.h"
 #include "awsmock/core/LogStream.h"
 #include "awsmock/core/exception/JsonException.h"
 
@@ -27,7 +25,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * @brief Constructor
          */
-        explicit Port(const Poco::JSON::Object::Ptr &object);
+        explicit Port(const view_or_value<view, value> &object);
 
         /**
          * Private port, means port inside the container
@@ -49,7 +47,7 @@ namespace AwsMock::Dto::Docker {
          *
          * @param object JSON object
          */
-        void FromJson(const Poco::JSON::Object::Ptr &object);
+        void FromDocument(const view_or_value<view, value> &object);
 
         /**
          * @brief Convert to a JSON string

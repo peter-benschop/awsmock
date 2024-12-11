@@ -6,21 +6,21 @@
 
 namespace AwsMock::Dto::Docker {
 
-    Port::Port(const Poco::JSON::Object::Ptr &object) {
-        FromJson(object);
+    Port::Port(const view_or_value<view, value> &object) {
+        FromDocument(object);
     }
 
-    void Port::FromJson(const Poco::JSON::Object::Ptr &object) {
+    void Port::FromDocument(const view_or_value<view, value> &object) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueInt("PrivatePort", object, privatePort);
-            Core::JsonUtils::GetJsonValueInt("PublicPort", object, publicPort);
-            Core::JsonUtils::GetJsonValueString("Type", object, type);
+            privatePort = Core::Bson::BsonUtils::GetIntValue(object, "PrivatePort");
+            publicPort = Core::Bson::BsonUtils::GetIntValue(object, "PublicPort");
+            type = Core::Bson::BsonUtils::GetStringValue(object, "type");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -28,16 +28,15 @@ namespace AwsMock::Dto::Docker {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("privatePort", privatePort);
-            rootJson.set("publicPort", publicPort);
-            rootJson.set("type", type);
+            document document;
+            Core::Bson::BsonUtils::SetIntValue(document, "privatePort", privatePort);
+            Core::Bson::BsonUtils::SetIntValue(document, "publicPort", publicPort);
+            Core::Bson::BsonUtils::SetStringValue(document, "type", type);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
