@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_VALIDATION_DATA_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -39,38 +36,38 @@ namespace AwsMock::Dto::Cognito {
         /**
          * MessageAttribute value
          */
-        std::string value;
+        std::string attributeValue;
 
         /**
-         * Converts the JSON string to a DTO
+         * @brief Converts the JSON string to a DTO
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
-         * Convert to a JSON string.
+         * @brief Convert to a JSON string.
          *
          * @return user pools json string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to a JSON string.
+         * @brief Convert to a JSON string.
          *
          * @return user pools json string
          */
-        Poco::JSON::Object ToJsonObject() const;
+        view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

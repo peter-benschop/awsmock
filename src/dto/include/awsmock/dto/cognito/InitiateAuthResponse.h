@@ -6,13 +6,12 @@
 #define AWSMOCK_DTO_COGNITO_INITIATE_AUTH_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
+#include <map>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/AuthenticationResult.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
@@ -45,7 +44,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct InitiateAuthResponse : public Dto::Common::BaseRequest {
+    struct InitiateAuthResponse : Common::BaseRequest {
 
         /**
          * Authentication result

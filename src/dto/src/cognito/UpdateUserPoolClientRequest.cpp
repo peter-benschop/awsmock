@@ -6,29 +6,25 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void UpdateUserPoolClientRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void UpdateUserPoolClientRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            clientId = Core::Bson::BsonUtils::GetStringValue(document, "ClientId");
+            clientName = Core::Bson::BsonUtils::GetStringValue(document, "ClientName");
+            accessTokenValidity = Core::Bson::BsonUtils::GetIntValue(document, "AccessTokenValidity");
+            idTokenValidity = Core::Bson::BsonUtils::GetIntValue(document, "IdTokenValidity");
+            refreshTokenValidity = Core::Bson::BsonUtils::GetIntValue(document, "RefreshTokenValidity");
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
-            Core::JsonUtils::GetJsonValueString("ClientId", rootObject, clientId);
-            Core::JsonUtils::GetJsonValueString("ClientName", rootObject, clientName);
-            Core::JsonUtils::GetJsonValueInt("AccessTokenValidity", rootObject, accessTokenValidity);
-            Core::JsonUtils::GetJsonValueInt("IdTokenValidity", rootObject, idTokenValidity);
-            Core::JsonUtils::GetJsonValueInt("RefreshTokenValidity", rootObject, refreshTokenValidity);
-
-            if (rootObject->has("TokenValidityUnits")) {
-                tokenValidityUnits.FromJsonObject(rootObject->getObject("TokenValidityUnits"));
+            if (document.view().find("TokenValidityUnits") != document.view().end()) {
+                tokenValidityUnits.FromDocument(document.view()["TokenValidityUnits"].get_document().value);
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -36,21 +32,22 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("ClientId", clientId);
-            rootJson.set("ClientName", clientName);
-            rootJson.set("AccessTokenValidity", accessTokenValidity);
-            rootJson.set("IdTokenValidity", idTokenValidity);
-            rootJson.set("RefreshTokenValidity", refreshTokenValidity);
-            rootJson.set("TokenValidityUnits", tokenValidityUnits.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientId", clientId);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientName", clientName);
+            Core::Bson::BsonUtils::SetIntValue(document, "AccessTokenValidity", accessTokenValidity);
+            Core::Bson::BsonUtils::SetIntValue(document, "IdTokenValidity", idTokenValidity);
+            Core::Bson::BsonUtils::SetIntValue(document, "TokenValidityUnits", refreshTokenValidity);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document.append(kvp("TokenValidityUnits", tokenValidityUnits.ToDocument()));
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

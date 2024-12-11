@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListUsersResponse::ToJson() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Array usersJsonArray;
@@ -26,7 +28,8 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string ListUsersResponse::ToString() const {

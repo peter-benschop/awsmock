@@ -6,15 +6,11 @@
 #define AWSMOCK_DTO_COGNITO_SIGN_UP_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/cognito/model/UserContextData.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -36,7 +32,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SignUpResponse : public Dto::Common::BaseRequest {
+    struct SignUpResponse : Common::BaseRequest {
 
         /**
          * User substitution

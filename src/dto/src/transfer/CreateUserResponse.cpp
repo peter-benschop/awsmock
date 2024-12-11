@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Transfer {
 
     std::string CreateUserResponse::ToJson() const {
 
+        // todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -20,7 +22,9 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+
+        return {};
     }
 
     std::string CreateUserResponse::ToString() const {

@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Cognito {
 
     std::string InitiateAuthResponse::ToJson() const {
 
+        // TODO: fix me
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -28,7 +30,7 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string InitiateAuthResponse::ToString() const {

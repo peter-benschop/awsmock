@@ -6,16 +6,14 @@
 #define AWSMOCK_DTO_TRANSFER_CREATE_TRANSFER_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/dto/transfer/model/Tag.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/transfer/IdentityProviderDetails.h>
+#include <awsmock/dto/transfer/model/Tag.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -47,28 +45,28 @@ namespace AwsMock::Dto::Transfer {
         IdentityProviderDetails identityProviderDetails;
 
         /**
-         * Parse a JSON stream
+         * @brief Parse a JSON stream
          *
-         * @param body json input stream
+         * @param jsonString json input stream
          */
-        void FromJson(const std::string &body);
+        void FromJson(const std::string &jsonString);
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

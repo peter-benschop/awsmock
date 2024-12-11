@@ -8,7 +8,8 @@ namespace AwsMock::Dto::Cognito {
 
     void GlobalSignOutRequest::FromJson(const std::string &payload) {
 
-        Poco::JSON::Parser parser;
+        // Todo: fix me
+        /*Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(payload);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
@@ -20,11 +21,12 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string GlobalSignOutRequest::ToJson() const {
-
+        // Todo: fix me
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -36,7 +38,8 @@ namespace AwsMock::Dto::Cognito {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string GlobalSignOutRequest::ToString() const {

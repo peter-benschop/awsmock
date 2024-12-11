@@ -6,14 +6,12 @@
 #define AWSMOCK_DTO_TRANSFER_TAG_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Transfer {
 

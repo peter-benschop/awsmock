@@ -6,25 +6,21 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void UpdateUserPoolDomainRequest::FromJson(const std::string &payload) {
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void UpdateUserPoolDomainRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("UserPoolId", rootObject, userPoolId);
-            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
-
-            if (rootObject->has("CustomDomainConfig")) {
-                customDomainConfig.FromJsonObject(rootObject->getObject("CustomDomainConfig"));
+            if (document.find("CustomDomainConfig") != document.end()) {
+                customDomainConfig.FromDocument(document.view()["CustomDomainConfig"].get_document().value);
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -32,17 +28,18 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("Domain", domain);
-            rootJson.set("CustomDomainConfig", customDomainConfig.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document.append(kvp("CustomDomainConfig", customDomainConfig.ToDocument()));
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
