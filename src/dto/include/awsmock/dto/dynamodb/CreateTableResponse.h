@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <map>
+#include <string>
 
 // Boost include<
 #include <boost/beast.hpp>

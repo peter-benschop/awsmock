@@ -7,8 +7,8 @@
 
 // C++ standard includes
 #include <chrono>
-#include <string>
 #include <map>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
