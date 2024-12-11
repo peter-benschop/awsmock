@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_COGNITO_INITIATE_AUTH_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <map>
+#include <string>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>

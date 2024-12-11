@@ -3,12 +3,13 @@
 //
 
 #include <awsmock/dto/dynamodb/model/Key.h>
-#include <bsoncxx/builder/basic/document.hpp>
 
 namespace AwsMock::Dto::DynamoDb {
 
-    Poco::JSON::Object Key::ToJsonObject() const {
+    view_or_value<view, value> Key::ToDocument() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -18,49 +19,31 @@ namespace AwsMock::Dto::DynamoDb {
             }
             return rootJson;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }*/
+        return {};
     }
 
-    void Key::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
+    void Key::FromDocument(const view_or_value<view, value> &document) {
 
         try {
-
-            for (size_t i = 0; i < jsonObject->getNames().size(); i++) {
-                std::string name = jsonObject->getNames()[i];
-                Poco::JSON::Object::Ptr keyObject = jsonObject->getObject(name);
-                AttributeValue attributeValue;
-                attributeValue.FromJsonObject(keyObject);
-                keys[name] = attributeValue;
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }
-    }
-
-    void Key::FromDocument(const bsoncxx::document::view &document) {
-
-        try {
-            for (bsoncxx::document::element ele: document) {
+            for (bsoncxx::document::element ele: document.view()) {
 
                 std::string name(ele.key());
                 AttributeValue attributeValue;
                 attributeValue.FromDocument(ele.get_document());
                 keys[name] = attributeValue;
             }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string Key::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Key::ToString() const {

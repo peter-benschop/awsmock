@@ -7,18 +7,10 @@
 
 // C++ standard includes
 #include <map>
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMoc includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -40,43 +32,43 @@ namespace AwsMock::Dto::SecretsManager {
     struct VersionIdsToStages {
 
         /**
-     * Version/stages map
-     */
+         * Version/stages map
+         */
         std::map<std::string, std::vector<std::string>> versions;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-     * Converts the DTO to a JSON representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * @brief Converts a JSON representation to s DTO.
+         *
+         * @param jsonObject JSON object.
+         */
+        void FromDocument(const view_or_value<view, value> &jsonObject);
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts a JSON representation to s DTO.
-     *
-     * @param jsonObject JSON object.
-     */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
-
-        /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * @brief Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const VersionIdsToStages &r);
     };
 

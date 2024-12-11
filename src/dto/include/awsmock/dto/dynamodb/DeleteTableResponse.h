@@ -6,21 +6,17 @@
 #define AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 // Boost include<
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include "awsmock/dto/dynamodb/model/TableStatus.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
+#include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
 

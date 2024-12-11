@@ -32,7 +32,7 @@ namespace AwsMock::Dto::Transfer {
          * @return ListUsersResponse
          * @see ListUsersResponse
          */
-        static Dto::Transfer::ListUsersResponse map(const ListUsersRequest &request, const std::vector<Database::Entity::Transfer::User> &userList);
+        static ListUsersResponse map(const ListUsersRequest &request, const std::vector<Database::Entity::Transfer::User> &userList);
     };
 
 }// namespace AwsMock::Dto::Transfer

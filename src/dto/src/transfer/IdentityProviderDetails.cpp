@@ -8,6 +8,8 @@ namespace AwsMock::Dto::Transfer {
 
     std::string IdentityProviderDetails::ToJson() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -22,7 +24,8 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string IdentityProviderDetails::ToString() const {

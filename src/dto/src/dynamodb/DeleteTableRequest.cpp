@@ -8,6 +8,8 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DeleteTableRequest::ToJson() const {
 
+        // Todo:
+        /*
         try {
             Poco::JSON::Object rootJson;
             //rootJson.set("Region", region);
@@ -20,11 +22,14 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void DeleteTableRequest::FromJson(const std::string &jsonBody) {
 
+        // Todo:
+        /*
         body = jsonBody;
 
         Poco::JSON::Parser parser;
@@ -39,7 +44,7 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string DeleteTableRequest::ToString() const {

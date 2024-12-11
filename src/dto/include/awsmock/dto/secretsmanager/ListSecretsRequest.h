@@ -6,20 +6,12 @@
 #define AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRETS_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMoc includes
-#include "awsmock/dto/secretsmanager/Filter.h"
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/secretsmanager/Filter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -82,28 +74,28 @@ namespace AwsMock::Dto::SecretsManager {
         std::string requestId;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the JSON string to DTO.
+         * @brief Converts the JSON string to DTO.
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

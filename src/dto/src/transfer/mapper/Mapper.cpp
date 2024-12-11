@@ -6,13 +6,13 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    Dto::Transfer::ListUsersResponse Mapper::map(const ListUsersRequest &request, const std::vector<Database::Entity::Transfer::User> &users) {
+    ListUsersResponse Mapper::map(const ListUsersRequest &request, const std::vector<Database::Entity::Transfer::User> &userList) {
 
-        Dto::Transfer::ListUsersResponse response;
+        ListUsersResponse response;
         response.serverId = request.serverId;
 
-        for (const auto &u: users) {
-            Dto::Transfer::User user = {
+        for (const auto &u: userList) {
+            User user = {
                     .userName = u.userName,
                     .arn = u.arn,
                     .homeDirectory = u.homeDirectory,

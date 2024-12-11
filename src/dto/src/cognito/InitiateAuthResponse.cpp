@@ -31,6 +31,7 @@ namespace AwsMock::Dto::Cognito {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
         }*/
+        return {};
     }
 
     std::string InitiateAuthResponse::ToString() const {

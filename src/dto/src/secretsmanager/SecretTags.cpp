@@ -6,8 +6,9 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    Poco::JSON::Array SecretTags::ToJsonArray() const {
+    view_or_value<view, value> SecretTags::ToDocument() const {
 
+        /* Todo:
         try {
 
             Poco::JSON::Array rootJson;
@@ -22,17 +23,15 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string SecretTags::ToJson() const {
-
-        std::ostringstream os;
-        ToJsonArray().stringify(os);
-        return os.str();
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    void SecretTags::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+    void SecretTags::FromDocument(const view_or_value<view, value> &jsonObject) {
 
         try {
 
@@ -41,9 +40,9 @@ namespace AwsMock::Dto::SecretsManager {
             //
             // Core::JsonUtils::GetJsonValueString("ARN", jsonObject, arn);
 
-        } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

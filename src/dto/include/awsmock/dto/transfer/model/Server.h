@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_TRANSFER_SERVER_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/JsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -68,9 +66,9 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the DTO to a JSON representation.

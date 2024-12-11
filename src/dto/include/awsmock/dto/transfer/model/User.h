@@ -6,13 +6,11 @@
 #define AWSMOCK_DTO_TRANSFER_USER_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -78,24 +76,24 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts a JSON string to a user
          *
          * @param jsonObject JSON object
          */
-        void FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromJsonObject(const view_or_value<view, value> &jsonObject);
 
         /**
          * @brief Converts a JSON string to a list of users
          *
-         * @param payload JSON string
+         * @param jsonString JSON string
          * @return list of users
          */
-        static std::vector<User> FromJsonList(const std::string &payload);
+        static std::vector<User> FromJsonList(const std::string &jsonString);
 
         /**
          * @brief Converts the DTO to a JSON representation.

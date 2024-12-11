@@ -6,8 +6,9 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    Poco::JSON::Object Filter::ToJsonObject() const {
+    view_or_value<view, value> Filter::ToDocument() const {
 
+        /* Todo:
         try {
 
             Poco::JSON::Object rootJson;
@@ -22,18 +23,12 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
-    std::string Filter::ToJson() const {
-
-        std::ostringstream os;
-        ToJsonObject().stringify(os);
-        return os.str();
-    }
-
-    void Filter::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
+    void Filter::FromJsonObject(const view_or_value<view, value> &document) {
+        /* Todo:
         try {
 
             Core::JsonUtils::GetJsonValueString("Key", jsonObject, key);
@@ -44,7 +39,12 @@ namespace AwsMock::Dto::SecretsManager {
             }
         } catch (Poco::Exception &exc) {
             throw Core::JsonException(exc.message());
-        }
+        }*/
+    }
+
+    std::string Filter::ToJson() const {
+
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Filter::ToString() const {

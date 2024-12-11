@@ -2,12 +2,13 @@
 // Created by vogje01 on 4/25/24.
 //
 
-#include "awsmock/dto/kms/model/Key.h"
+#include <awsmock/dto/kms/model/Key.h>
 
 namespace AwsMock::Dto::KMS {
 
     void Key::FromJson(const std::string &jsonString) {
 
+        /* Todo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -48,11 +49,12 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
-    Poco::JSON::Object Key::ToJsonObject() const {
+    view_or_value<view, value> Key::ToDocument() const {
 
+        /* Todo:
         try {
 
             Poco::JSON::Object rootJson;
@@ -84,11 +86,12 @@ namespace AwsMock::Dto::KMS {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     std::string Key::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Key::ToString() const {

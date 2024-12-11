@@ -8,6 +8,8 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string DescribeSecretRequest::ToJson() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -19,11 +21,13 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void DescribeSecretRequest::FromJson(const std::string &jsonString) {
 
+        /* Todo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -35,7 +39,7 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string DescribeSecretRequest::ToString() const {

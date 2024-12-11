@@ -10,9 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/kms/model/ListKey.h>
 
@@ -37,7 +36,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListKeysResponse : public Dto::Common::BaseRequest {
+    struct ListKeysResponse : Common::BaseRequest {
 
         /**
          * Key
@@ -55,28 +54,28 @@ namespace AwsMock::Dto::KMS {
         bool truncated = false;
 
         /**
-         * Converts the JSON string to DTO.
+         * @brief Converts the JSON string to DTO.
          *
          * @param jsonString JSON string
-        */
+         */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

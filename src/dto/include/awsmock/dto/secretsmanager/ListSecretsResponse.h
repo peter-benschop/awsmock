@@ -6,22 +6,11 @@
 #define AWSMOCK_DTO_SECRETMANAGER_LIST_SECRETS_RESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMoc includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/secretsmanager/ReplicationStatus.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/secretsmanager/Secret.h>
-#include <awsmock/dto/secretsmanager/SecretTags.h>
-#include <awsmock/dto/secretsmanager/VersionIdsToStages.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -43,39 +32,39 @@ namespace AwsMock::Dto::SecretsManager {
     struct ListSecretsResponse {
 
         /**
-     * Region
-     */
+         * Region
+         */
         std::string region;
 
         /**
-     * Next token
-     */
+         * Next token
+         */
         std::string nextToken;
 
         /**
-     * List of secrets
-     */
+         * List of secrets
+         */
         std::vector<Secret> secretList;
 
         /**
-     * Convert to a JSON string
-     *
-     * @return JSON string
-     */
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
+         */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-     * Converts the DTO to a string representation.
-     *
-     * @return DTO as string for logging.
-     */
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
         [[nodiscard]] std::string ToString() const;
 
         /**
-     * Stream provider.
-     *
-     * @return output stream
-     */
+         * @brief Stream provider.
+         *
+         * @return output stream
+         */
         friend std::ostream &operator<<(std::ostream &os, const ListSecretsResponse &r);
     };
 

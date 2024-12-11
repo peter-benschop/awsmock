@@ -8,9 +8,11 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DeleteItemRequest::ToJson() const {
 
+        // Todo:
+        /*
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
 
@@ -19,7 +21,8 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
-        }
+        }*/
+        return {};
     }
 
     void DeleteItemRequest::FromJson(const std::string &jsonBody) {
@@ -27,6 +30,8 @@ namespace AwsMock::Dto::DynamoDb {
         // Save original body
         body = jsonBody;
 
+        // Todo:
+        /*
         document document;
         const value documentValue = bsoncxx::from_json(body);
 
@@ -39,7 +44,7 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
-        }
+        }*/
     }
 
     std::string DeleteItemRequest::ToString() const {

@@ -6,8 +6,9 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    Poco::JSON::Object RotationRules::ToJsonObject() const {
+    view_or_value<view, value> RotationRules::ToDocument() const {
 
+        /*Todo:
         try {
 
             Poco::JSON::Object rootJson;
@@ -18,18 +19,13 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
-    std::string RotationRules::ToJson() const {
+    void RotationRules::FromDocument(const view_or_value<view, value> &document) {
 
-        std::ostringstream os;
-        ToJsonObject().stringify(os);
-        return os.str();
-    }
-
-    void RotationRules::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
+        /* Todo:
         try {
 
             Core::JsonUtils::GetJsonValueLong("AutomaticallyAfterDays", jsonObject, automaticallyAfterDays);
@@ -39,7 +35,11 @@ namespace AwsMock::Dto::SecretsManager {
         } catch (Poco::Exception &exc) {
             std::cerr << exc.message() << std::endl;
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+    }
+
+    std::string RotationRules::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string RotationRules::ToString() const {

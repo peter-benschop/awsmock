@@ -7,6 +7,8 @@
 namespace AwsMock::Dto::SecretsManager {
 
     std::string RotateSecretRequest::ToJson() const {
+
+        /* Todo:
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
@@ -23,11 +25,13 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void RotateSecretRequest::FromJson(const std::string &jsonString) {
 
+        /* Todo:
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonString);
         const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -44,7 +48,7 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
     }
 
     std::string RotateSecretRequest::ToString() const {

@@ -8,6 +8,8 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string PutItemRequest::ToJson() const {
 
+        // Todo:
+        /*
         try {
             Poco::JSON::Object rootJson;
             rootJson.set("Region", region);
@@ -18,7 +20,8 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
     }
 
     void PutItemRequest::FromJson(const std::string &jsonBody) {
@@ -26,6 +29,8 @@ namespace AwsMock::Dto::DynamoDb {
         // Save original body
         body = jsonBody;
 
+        // Todo:
+        /*
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(jsonBody);
         Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -46,7 +51,7 @@ namespace AwsMock::Dto::DynamoDb {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
     std::string PutItemRequest::ToString() const {

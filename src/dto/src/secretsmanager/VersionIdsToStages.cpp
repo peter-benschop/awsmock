@@ -6,13 +6,9 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    /**
-   * Converts the DTO to a JSON representation.
-   *
-   * @return DTO as string for logging.
-   */
-    Poco::JSON::Object VersionIdsToStages::ToJsonObject() const {
+    view_or_value<view, value> VersionIdsToStages::ToDocument() const {
 
+        /* Todo:
         try {
 
             Poco::JSON::Object rootJson;
@@ -29,16 +25,13 @@ namespace AwsMock::Dto::SecretsManager {
 
         } catch (Poco::Exception &exc) {
             throw Core::ServiceException(exc.message());
-        }
+        }*/
+        return {};
     }
 
-    /**
-   * Converts a JSON representation to s DTO.
-   *
-   * @param jsonObject JSON object.
-   */
-    void VersionIdsToStages::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
+    void VersionIdsToStages::FromDocument(const view_or_value<view, value> &document) {
 
+        /* Todo:
         try {
 
             //Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
@@ -47,14 +40,11 @@ namespace AwsMock::Dto::SecretsManager {
         } catch (Poco::Exception &exc) {
             std::cerr << exc.message() << std::endl;
             throw Core::ServiceException(exc.message());
-        }
+        }*/
     }
 
     std::string VersionIdsToStages::ToJson() const {
-
-        std::ostringstream os;
-        ToJsonObject().stringify(os);
-        return os.str();
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string VersionIdsToStages::ToString() const {
@@ -63,11 +53,6 @@ namespace AwsMock::Dto::SecretsManager {
         return ss.str();
     }
 
-    /**
-   * Stream provider.
-   *
-   * @return output stream
-   */
     std::ostream &operator<<(std::ostream &os, const VersionIdsToStages &r) {
         os << "VersionIdToStages=" + r.ToJson();
         return os;

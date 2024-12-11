@@ -6,8 +6,10 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    Poco::JSON::Object User::ToJsonObject() const {
+    view_or_value<view, value> User::ToDocument() const {
 
+        // Todo:
+        /*
         try {
 
             Poco::JSON::Object rootJson;
@@ -23,15 +25,12 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
     }
 
-    std::string User::ToJson() const {
-        return Core::JsonUtils::ToJsonString(ToJsonObject());
-    }
-
-    void User::FromJsonObject(const Poco::JSON::Object::Ptr &jsonObject) {
-
+    void User::FromJsonObject(const view_or_value<view, value> &jsonObject) {
+        // Todo:
+        /*
         Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
         Core::JsonUtils::GetJsonValueString("Arn", jsonObject, arn);
         Core::JsonUtils::GetJsonValueString("Role", jsonObject, role);
@@ -39,10 +38,12 @@ namespace AwsMock::Dto::Transfer {
         Core::JsonUtils::GetJsonValueString("Password", jsonObject, password);
         Core::JsonUtils::GetJsonValueString("HomeDirectory", jsonObject, homeDirectory);
         Core::JsonUtils::GetJsonValueInt("SshPublicKeyCount", jsonObject, sshPublicKeyCount);
+        */
     }
 
     std::vector<User> User::FromJsonList(const std::string &body) {
-
+        // Todo:
+        /*
         Poco::JSON::Parser parser;
         Poco::Dynamic::Var result = parser.parse(body);
         Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
@@ -66,7 +67,12 @@ namespace AwsMock::Dto::Transfer {
         } catch (Poco::Exception &exc) {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
-        }
+        }*/
+        return {};
+    }
+
+    std::string User::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string User::ToString() const {
