@@ -83,9 +83,9 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Converts a JSON string to a user
          *
-         * @param jsonObject JSON object
+         * @param document JSON object
          */
-        void FromJsonObject(const view_or_value<view, value> &jsonObject);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts a JSON string to a list of users

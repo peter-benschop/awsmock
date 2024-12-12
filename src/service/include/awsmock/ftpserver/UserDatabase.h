@@ -15,55 +15,57 @@ namespace AwsMock::FtpServer {
     class UserDatabase {
 
       public:
+
         /**
-     * Constructor
-     */
+         * Constructor
+         */
         UserDatabase() {}
 
         /**
-     * Add a new user to the database.
-     *
-     * <p>TODO:Should be replaced by Aws User database</p>
-     *
-     * @param username name of the user
-     * @param password user password
-     * @param local_root_path  local path
-     * @param permissions permissions
-     * @return
-     */
+         * Add a new user to the database.
+         *
+         * <p>TODO:Should be replaced by Aws User database</p>
+         *
+         * @param username name of the user
+         * @param password user password
+         * @param local_root_path  local path
+         * @param permissions permissions
+         * @return
+         */
         bool addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions);
 
         /**
-     * Return a user by name
-     *
-     * @param username user name
-     * @param password user password
-     * @return FtpUser
-     */
+         * Return a user by name
+         *
+         * @param username user name
+         * @param password user password
+         * @return FtpUser
+         */
         std::shared_ptr<FtpUser> getUser(const std::string &username, const std::string &password) const;
 
       private:
+
         /**
-     * Check whether the user is the anonymous user
-     *
-     * @param username name of the user
-     * @return
-     */
+         * Check whether the user is the anonymous user
+         *
+         * @param username name of the user
+         * @return
+         */
         bool isUsernameAnonymousUser(const std::string &username) const;
 
         /**
-     * Server mutex
-     */
+         * Server mutex
+         */
         mutable std::mutex database_mutex_;
 
         /**
-     * User database
-     */
+         * User database
+         */
         std::map<std::string, std::shared_ptr<FtpUser>> database_;
 
         /**
-     * Anonymous user
-     */
+         * Anonymous user
+         */
         std::shared_ptr<FtpUser> anonymous_user_;
     };
 }// namespace AwsMock::FtpServer
