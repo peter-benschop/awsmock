@@ -59,9 +59,9 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @param body DTO as JSON string
+         * @param jsonString DTO as JSON string
          */
-        void FromJson(const std::string &body);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Converts the DTO to a JSON representation.

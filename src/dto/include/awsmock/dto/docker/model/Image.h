@@ -61,7 +61,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * Created date time
          */
-        Poco::DateTime created;
+        system_clock::time_point created;
 
         /**
          * Repo tags

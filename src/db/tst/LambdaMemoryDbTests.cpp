@@ -21,13 +21,13 @@
 
 namespace AwsMock::Database {
 
-    class LambdaMemoryDbTest : public ::testing::Test {
+    class LambdaMemoryDbTest : public testing::Test {
 
       protected:
 
         void SetUp() override {
             _region = _configuration.GetValueString("awsmock.region");
-            _accountId = _configuration.GetValueString("awsmock.account.id");
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
         }
 
         void TearDown() override {
@@ -43,11 +43,10 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaCreateTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
 
         // act
-        Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
+        const Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
 
         // assert
         EXPECT_TRUE(result.function == FUNCTION);
@@ -59,12 +58,11 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaCountTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        long result = _lambdaDatabase.LambdaCount(lambda.region);
+        const long result = _lambdaDatabase.LambdaCount(lambda.region);
 
         // assert
         EXPECT_EQ(1, result);
@@ -73,12 +71,11 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaExistsTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
+        const bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
 
         // assert
         EXPECT_TRUE(result);
@@ -87,12 +84,11 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaGetByIdTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaById(lambda.oid);
+        const Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaById(lambda.oid);
 
         // assert
         EXPECT_EQ(result.oid, lambda.oid);
@@ -101,13 +97,12 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaGetByArnTest) {
 
         // arrange
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaByArn(arn);
+        const Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaByArn(arn);
 
         // assert
         EXPECT_EQ(result.arn, lambda.arn);
@@ -116,14 +111,13 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaUpdateTest) {
 
         // arrange
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
         lambda.role = "new_role";
-        Entity::Lambda::Lambda result = _lambdaDatabase.UpdateLambda(lambda);
+        const Entity::Lambda::Lambda result = _lambdaDatabase.UpdateLambda(lambda);
 
         // assert
         EXPECT_EQ(result.role, lambda.role);
@@ -132,12 +126,11 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaListTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        std::vector<Entity::Lambda::Lambda> result = _lambdaDatabase.ListLambdas(lambda.region);
+        const std::vector<Entity::Lambda::Lambda> result = _lambdaDatabase.ListLambdas(lambda.region);
 
         // assert
         EXPECT_EQ(1, result.size());
@@ -149,14 +142,13 @@ namespace AwsMock::Database {
     TEST_F(LambdaMemoryDbTest, LambdaDeleteTest) {
 
         // arrange
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
         _lambdaDatabase.DeleteLambda(lambda.function);
-        bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
+        const bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
 
         // assert
         EXPECT_FALSE(result);

@@ -8,43 +8,32 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListServerRequest::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("MaxResults", maxResults);
-            rootJson.set("NextToken", nextToken);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxResults", maxResults);
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void ListServerRequest::FromJson(const std::string &body) {
-
-        // Todo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void ListServerRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            maxResults = Core::Bson::BsonUtils::GetIntValue(rootDocument, "MaxResults");
+            nextToken = Core::Bson::BsonUtils::GetIntValue(rootDocument, "NextToken");
 
-            // Get root values
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
-            Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListServerRequest::ToString() const {

@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <awsmock/core/ZipUtils.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
 namespace AwsMock::Service {
@@ -117,6 +118,11 @@ namespace AwsMock::Service {
 
         try {
 
+            // Write to temp file
+            std::ofstream ofs(tempDir + "/zipfile.zip");
+            ofs << decoded;
+            ofs.close();
+
             // Save zip file
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
@@ -125,30 +131,21 @@ namespace AwsMock::Service {
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress
-                std::stringstream input(decoded);
-                Poco::Zip::Decompress dec(input, Poco::Path(classesDir));
-                dec.decompressAllFiles();
-                input.clear();
-                log_debug << "ZIP file unpacked, dir: " << codeDir;
+                Core::ZipUtils::Uncompress(tempDir + "/zipfile.zip", classesDir);
 
             } else {
 
-                // Write to temp file
-                std::ofstream ofs(tempDir + "/zipfile.zip");
-                ofs << decoded;
-                ofs.close();
-
                 // Decompress
-                auto [status, output] = Core::SystemUtils::Exec("unzip -o -d " + codeDir + " " + tempDir + "/zipfile.zip");
-                log_debug << "ZIP file unpacked, dir: " << codeDir << " result: " << status;
+                std::string extractDir = Core::DirUtils::CreateTempDir("/tmp");
+                Core::ZipUtils::Uncompress(tempDir + "/zipfile.zip", extractDir);
             }
+            log_debug << "ZIP file unpacked, dir: " << codeDir;
             return codeDir;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-        return {};
     }
 
     std::vector<std::string> LambdaCreator::GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment) {

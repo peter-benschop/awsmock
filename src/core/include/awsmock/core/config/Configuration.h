@@ -295,6 +295,11 @@ namespace AwsMock::Core {
          */
         [[nodiscard]] std::string ToString() const;
 
+        /**
+         * @brief Dumps the configuration to std:cerr
+         */
+        void Dump() const;
+
       private:
 
         /**

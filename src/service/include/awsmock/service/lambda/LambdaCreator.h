@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Zip/Compress.h>
-#include <Poco/Zip/Decompress.h>
-#include <Poco/Zip/Zip.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>

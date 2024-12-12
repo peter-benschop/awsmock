@@ -377,7 +377,7 @@ namespace AwsMock::Service {
 
             for (const auto &it: topic.subscriptions) {
 
-                if (Poco::toLower(it.protocol) == SQS_PROTOCOL) {
+                if (Core::StringUtils::ToLower(it.protocol) == SQS_PROTOCOL) {
 
                     SendSQSMessage(it, request);
                     log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;

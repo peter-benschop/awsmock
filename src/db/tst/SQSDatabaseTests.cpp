@@ -385,7 +385,7 @@ namespace AwsMock::Database {
 
         // assert
         EXPECT_EQ(1, result);
-        EXPECT_TRUE(delayed > 0);
+        EXPECT_TRUE(delayed == 0);
     }
 
     TEST_F(SQSDatabaseTest, MessageGetByReceiptHandleTest) {

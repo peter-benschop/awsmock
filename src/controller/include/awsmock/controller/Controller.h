@@ -74,28 +74,28 @@ namespace AwsMock::Controller {
         /**
          * @brief List all available services
          */
-        void ListServices();
+        void ListServices() const;
 
         /**
          * @brief Start a module
          *
          * @param modules list of modules names
          */
-        void StartService(std::vector<Dto::Module::Module> &modules);
+        void StartService(std::vector<Dto::Module::Module> &modules) const;
 
         /**
          * @brief Restart a module
          *
          * @param modules list of modules names
          */
-        void RestartService(std::vector<Dto::Module::Module> &modules);
+        void RestartService(std::vector<Dto::Module::Module> &modules) const;
 
         /**
          * @brief Stops a module
          *
          * @param modules list of modules names
          */
-        void StopService(std::vector<Dto::Module::Module> &modules);
+        void StopService(std::vector<Dto::Module::Module> &modules) const;
 
 #ifdef HAS_SYSTEMD
         /**
@@ -109,12 +109,12 @@ namespace AwsMock::Controller {
          *
          * @param level log level
          */
-        void SetLogLevel(const std::string &level);
+        void SetLogLevel(const std::string &level) const;
 
         /**
          * @brief Returns the current AwsMock configuration
          */
-        void GetConfig();
+        void GetConfig() const;
 
         /**
          * @brief Dumps the current infrastructure as JSON file to stdout.
@@ -123,26 +123,26 @@ namespace AwsMock::Controller {
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false);
+        void ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false) const;
 
         /**
          * @brief Imports the current infrastructure from stdin
          */
-        void ImportInfrastructure();
+        void ImportInfrastructure() const;
 
         /**
          * @brief Cleans the current infrastructure.
          *
          * @param modules list of modules
          */
-        void CleanInfrastructure(Dto::Module::Module::ModuleList &modules);
+        void CleanInfrastructure(const Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Cleans the objects of the given modules
          *
          * @param modules list of modules
          */
-        void CleanObjects(Dto::Module::Module::ModuleList &modules);
+        void CleanObjects(Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Show FTP users.
@@ -152,12 +152,12 @@ namespace AwsMock::Controller {
          *
          * @param serverId ID of the FTP server.
          */
-        void ShowFtpUsers(const std::string &serverId);
+        void ShowFtpUsers(const std::string &serverId) const;
 
         /**
          * @brief Send a ping to the server and waits for the response
          */
-        void PingManager();
+        void PingManager() const;
 
       private:
 
@@ -167,14 +167,14 @@ namespace AwsMock::Controller {
          * @param headers headers
          * @param action action to perform
          */
-        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action);
+        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) const;
 
         /**
          * @brief Get a list of all modules.
          *
          * @return list of all modules.
          */
-        Dto::Module::Module::ModuleList GetAllModules();
+        Dto::Module::Module::ModuleList GetAllModules() const;
 
         /**
          * Commands

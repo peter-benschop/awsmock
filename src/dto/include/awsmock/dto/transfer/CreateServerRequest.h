@@ -13,7 +13,6 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/transfer/IdentityProviderDetails.h>
-#include <awsmock/dto/transfer/model/Tag.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -37,7 +36,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Tags
          */
-        TagList tags;
+        std::map<std::string, std::string> tags;
 
         /**
          * Identity provider details

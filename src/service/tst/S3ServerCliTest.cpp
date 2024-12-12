@@ -64,7 +64,7 @@ namespace AwsMock::Service {
         std::string _endpoint, _accountId, _output, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::S3Database &_database = Database::S3Database::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(S3ServerCliTest, BucketCreateTest) {

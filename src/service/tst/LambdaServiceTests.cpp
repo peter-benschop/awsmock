@@ -53,7 +53,7 @@ namespace AwsMock::Service {
             return request;
         }
 
-        void WaitForActive(const std::string &region, const std::string &functionName) {
+        void WaitForActive(const std::string &region, const std::string &functionName) const {
 
             Dto::Lambda::GetFunctionResponse response = _lambdaService.GetFunction(region, functionName);
             while (response.configuration.state != Database::Entity::Lambda::LambdaStateToString(Database::Entity::Lambda::LambdaState::Active)) {

@@ -36,7 +36,7 @@ namespace AwsMock::Service {
             _baseUrl = "/api/dynamodb/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
         }
 
         void TearDown() override {
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
         DynamoDbService _dynamoDbService;
     };
 

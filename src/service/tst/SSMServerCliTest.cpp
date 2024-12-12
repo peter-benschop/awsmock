@@ -46,7 +46,7 @@ namespace AwsMock::Service {
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SSMServerCliTest, ParameterPutTest) {
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
         // act
         auto [status, output] = Core::TestUtils::SendCliCommand("aws ssm put-parameter --name " + TEST_PARAMETER_NAME + " --value " + TEST_PARAMETER_VALUE + " --endpoint " + _endpoint);
-        Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
+        const Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
 
         // assert
         EXPECT_EQ(0, status);
@@ -71,12 +71,12 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, parameterList.size());
 
         // act
-        Core::ExecResult getResult = Core::TestUtils::SendCliCommand("aws ssm get-parameter --name " + TEST_PARAMETER_NAME + " --endpoint " + _endpoint);
+        auto [status, output] = Core::TestUtils::SendCliCommand("aws ssm get-parameter --name " + TEST_PARAMETER_NAME + " --endpoint " + _endpoint);
 
         // assert
-        EXPECT_EQ(0, getResult.status);
+        EXPECT_EQ(0, status);
         EXPECT_EQ(1, parameterList.size());
-        EXPECT_TRUE(Core::StringUtils::Contains(getResult.output, TEST_PARAMETER_NAME));
+        EXPECT_TRUE(Core::StringUtils::Contains(output, TEST_PARAMETER_NAME));
     }
 
     TEST_F(SSMServerCliTest, ParameterDescribeTest) {
@@ -87,11 +87,11 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, parameterList.size());
 
         // act
-        Core::ExecResult describeResult = Core::TestUtils::SendCliCommand("aws ssm describe-parameters --endpoint " + _endpoint);
+        auto [status, output] = Core::TestUtils::SendCliCommand("aws ssm describe-parameters --endpoint " + _endpoint);
 
         // assert
-        EXPECT_EQ(0, describeResult.status);
-        EXPECT_TRUE(Core::StringUtils::Contains(describeResult.output, TEST_PARAMETER_NAME));
+        EXPECT_EQ(0, status);
+        EXPECT_TRUE(Core::StringUtils::Contains(output, TEST_PARAMETER_NAME));
     }
 
     TEST_F(SSMServerCliTest, ParameterDeleteTest) {
@@ -102,11 +102,11 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, parameterList.size());
 
         // act
-        Core::ExecResult deleteResult = Core::TestUtils::SendCliCommand("aws ssm delete-parameter --name " + TEST_PARAMETER_NAME + " --endpoint " + _endpoint);
+        auto [status, output] = Core::TestUtils::SendCliCommand("aws ssm delete-parameter --name " + TEST_PARAMETER_NAME + " --endpoint " + _endpoint);
         parameterList = _ssmDatabase.ListParameters();
 
         // assert
-        EXPECT_EQ(0, deleteResult.status);
+        EXPECT_EQ(0, status);
         EXPECT_EQ(0, parameterList.size());
     }
 

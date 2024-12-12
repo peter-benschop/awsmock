@@ -9,15 +9,8 @@
 #include <sstream>
 #include <string>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/Net/HTTPResponse.h>
-
 // AwsMoc includes
-#include "awsmock/core/exception/ServiceException.h"
-#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -49,35 +42,35 @@ namespace AwsMock::Dto::SecretsManager {
         std::string kmsKeyId;
 
         /**
-         * Converts the DTO to a JSON object.
+         * @brief Converts the DTO to a JSON object.
          *
          * @return DTO as JSON object
          */
-        [[nodiscard]] Poco::JSON::Object ToJsonObject() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
-         * @param jsonObject JSON object.
+         * @param document JSON object.
          */
-        void FromJson(const Poco::JSON::Object::Ptr &jsonObject);
+        void FromJson(const view_or_value<view, value> &document);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

@@ -58,18 +58,6 @@ namespace AwsMock::Core {
         EXPECT_STREQ(result.c_str(), MD5_SUM1);
     }
 
-    // TODO: Removed, until AWS supported openssl3
-    /*TEST_F(CryptoTest, Md5AwsStringTest) {
-
-        // arrange
-
-        // act
-        std::string result = Crypto::AWSGetMd5FromString(TEST_STRING);
-
-        // assert
-        EXPECT_STREQ(result.c_str(), MD5_SUM);
-    }*/
-
     TEST_F(CryptoTest, Md5FileTest) {
 
         // arrange
@@ -82,27 +70,15 @@ namespace AwsMock::Core {
         EXPECT_TRUE(result == MD5_SUM);
     }
 
-    // TODO: Removed, until AWS supported openssl3
-    /*TEST_F(CryptoTest, Md5AwsFileTest) {
-        // arrange
-        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
-
-        // act
-        std::string result = Crypto::GetMd5FromFile(file);
-
-        // assert
-        EXPECT_TRUE(result == MD5_SUM);
-    }*/
-
     TEST_F(CryptoTest, Md5DoubleFileTest) {
 
         // arrange
-        std::string file1 = FileUtils::CreateTempFile("txt", TEST_STRING);
-        std::string file2 = FileUtils::CreateTempFile("txt", TEST_STRING);
+        const std::string file1 = FileUtils::CreateTempFile("txt", TEST_STRING);
+        const std::string file2 = FileUtils::CreateTempFile("txt", TEST_STRING);
 
         // act
-        std::string result1 = Crypto::GetMd5FromFile(file1);
-        std::string result2 = Crypto::GetMd5FromFile(file2);
+        const std::string result1 = Crypto::GetMd5FromFile(file1);
+        const std::string result2 = Crypto::GetMd5FromFile(file2);
 
         // assert
         EXPECT_TRUE(result1 == result2);
@@ -113,91 +89,99 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        std::string result = Crypto::GetSha1FromString(TEST_STRING);
+        const std::string result = Crypto::GetSha1FromString(TEST_STRING);
 
         // assert
         EXPECT_EQ(result, SHA1_SUM);
     }
 
     TEST_F(CryptoTest, Sha1FileTest) {
+
         // arrange
-        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
+        const std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
 
         // act
-        std::string result = Crypto::GetSha1FromFile(file);
+        const std::string result = Crypto::GetSha1FromFile(file);
 
         // assert
         EXPECT_EQ(result, SHA1_SUM);
     }
 
     TEST_F(CryptoTest, Sha256StringTest) {
+
         // arrange
 
         // act
-        std::string result = Crypto::GetSha256FromString(TEST_STRING);
+        const std::string result = Crypto::GetSha256FromString(TEST_STRING);
 
         // assert
         EXPECT_EQ(result, SHA256_SUM);
     }
 
     TEST_F(CryptoTest, Sha256EmptyStringTest) {
+
         // arrange
 
         // act
-        std::string result = Crypto::GetSha256FromString("");
+        const std::string result = Crypto::GetSha256FromString("");
 
         // assert
         EXPECT_EQ(result, SHA256_SUM_EMPTY);
     }
 
     TEST_F(CryptoTest, Sha256FileTest) {
+
         // arrange
-        std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
+        const std::string file = FileUtils::CreateTempFile("txt", TEST_STRING);
 
         // act
-        std::string result = Crypto::GetSha256FromFile(file);
+        const std::string result = Crypto::GetSha256FromFile(file);
 
         // assert
         EXPECT_EQ(result, SHA256_SUM);
     }
 
     TEST_F(CryptoTest, GetHmacSha256Test) {
+
         // arrange
 
         // act
-        std::string result = Crypto::GetHmacSha256FromString("secretKey", TEST_STRING);
+        const std::string result = Crypto::GetHmacSha256FromString("secretKey", TEST_STRING);
 
         // assert
         EXPECT_EQ(result, "6a7323506a6493e320d27b6eb5c64e722a314e15ddb753c837738e0c174cdb03");
     }
 
     TEST_F(CryptoTest, Base64EncodeTest) {
+
         // arrange
 
         // act
-        std::string result = Crypto::Base64Encode(TEST_STRING);
+        const std::string result = Crypto::Base64Encode(TEST_STRING);
 
         // assert
         EXPECT_EQ(result, BASE64_TEST_STRING);
     }
 
     TEST_F(CryptoTest, Base64DecodeTest) {
+
         // arrange
 
         // act
-        std::string result = Crypto::Base64Decode(BASE64_TEST_STRING);
+        const std::string result = Crypto::Base64Decode(BASE64_TEST_STRING);
 
         // assert
         EXPECT_EQ(result, TEST_STRING);
     }
 
     TEST_F(CryptoTest, Base64Test) {
+
         // arrange
-        std::string testText = "Base64 hashing";
+        const std::string testText = "Base64 hashing";
 
         // act
-        std::string encrypted = Crypto::Base64Encode(testText);
-        std::string decrypted = Crypto::Base64Decode(encrypted);
+        const std::string encrypted = Crypto::Base64Encode(testText);
+        const std::string decrypted = Crypto::Base64Decode(encrypted);
 
         // assert
         EXPECT_TRUE(StringUtils::Equals(testText, decrypted));
@@ -220,33 +204,32 @@ namespace AwsMock::Core {
     TEST_F(CryptoTest, Aes256EncryptionText) {
 
         // arrange
-        std::string testText = "This is a super secure text";
-        std::string key = "TestKey";
-        int len = (int) testText.length();
+        const std::string testText = "This is a super secure text";
+        const std::string key = "TestKey";
+        int len = static_cast<int>(testText.length());
 
         // act
         unsigned char *result1 = Crypto::Aes256EncryptString((unsigned char *) testText.c_str(), &len, (unsigned char *) key.c_str());
-        unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, (unsigned char *) key.c_str());
+        const unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, (unsigned char *) key.c_str());
 
         // assert
         EXPECT_STREQ(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(testText.c_str()));
     }
 
-    // TODO: use AWS reoutines for RSA
-    /*TEST_F(CryptoTest, GenerateRsaKeyTest) {
+    TEST_F(CryptoTest, GenerateRsaKeyTest) {
 
         // arrange
-        std::string testText = "This_is_a_super_secure_text";
+        const std::string testText = "This_is_a_super_secure_text";
 
         // Generate key pair and initialize
         EVP_PKEY *keyPair = Crypto::GenerateRsaKeys(4096);
 
         // act
         // encrypt
-        std::string encrypted = Crypto::RsaEncrypt(keyPair, testText);
+        const std::string encrypted = Crypto::RsaEncrypt(keyPair, testText);
 
         // decrypt
-        std::string decrypted = Crypto::RsaDecrypt(keyPair, encrypted);
+        const std::string decrypted = Crypto::RsaDecrypt(keyPair, encrypted);
 
         // assert
         EXPECT_TRUE(StringUtils::Equals(testText, decrypted));
@@ -258,15 +241,15 @@ namespace AwsMock::Core {
         EVP_PKEY *keyPair = Crypto::GenerateRsaKeys(4096);
 
         // Generate key pair and initialize
-        std::string publicKey = Crypto::GetRsaPublicKey(keyPair);
-        std::string privateKey = Crypto::GetRsaPrivateKey(keyPair);
+        const std::string publicKey = Crypto::GetRsaPublicKey(keyPair);
+        const std::string privateKey = Crypto::GetRsaPrivateKey(keyPair);
 
         // assert
         EXPECT_TRUE(!publicKey.empty());
-        EXPECT_TRUE(publicKey.length() == 800);
+        EXPECT_EQ(800, publicKey.size());
         EXPECT_TRUE(!privateKey.empty());
-        EXPECT_TRUE(privateKey.length() == 4072);
-    }*/
+        EXPECT_EQ(4072, privateKey.size());
+    }
 
     TEST_F(CryptoTest, HexEncodeDecodeTest) {
 
@@ -274,7 +257,7 @@ namespace AwsMock::Core {
         std::string testString = "This is a test string";
 
         // act
-        std::string encoded = Crypto::HexEncode(reinterpret_cast<unsigned char *>(testString.data()), testString.length());
+        const std::string encoded = Crypto::HexEncode(reinterpret_cast<unsigned char *>(testString.data()), testString.length());
         unsigned char *decoded = Crypto::HexDecode(encoded);
 
         // assert

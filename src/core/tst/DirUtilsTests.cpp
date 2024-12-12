@@ -62,7 +62,7 @@ namespace AwsMock::Core {
     TEST_F(DirUtilsTest, DeleteDirRecursiveTest) {
 
         // arrange
-        std::string dirName = DirUtils::CreateTempDir(tempDir);
+        const std::string dirName = DirUtils::CreateTempDir(tempDir);
         for (int i = 0; i < 3; i++) {
             FileUtils::CreateTempFile(dirName, "json", 100);
         }
@@ -85,6 +85,23 @@ namespace AwsMock::Core {
         // act
         long result = 0;
         EXPECT_NO_THROW({ result = DirUtils::DirectoryCountFiles(dirName); });
+
+        // assert
+        EXPECT_EQ(result, 3);
+    }
+
+    TEST_F(DirUtilsTest, DirectoryFileCountRecursivelyTest) {
+
+        // arrange
+        const std::string dirName = DirUtils::CreateTempDir(tempDir);
+        const std::string dirName2 = DirUtils::CreateTempDir(dirName);
+        for (int i = 0; i < 3; i++) {
+            FileUtils::CreateTempFile(dirName2, "json", 100);
+        }
+
+        // act
+        long result = 0;
+        EXPECT_NO_THROW({ result = DirUtils::DirectoryCountFiles(dirName, true); });
 
         // assert
         EXPECT_EQ(result, 3);

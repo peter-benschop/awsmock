@@ -135,7 +135,7 @@ namespace AwsMock::Database {
          * @param parameter parameter entity
          * @throws DatabaseException
          */
-        void DeleteParameter(const Entity::SSM::Parameter &parameter);
+        void DeleteParameter(const Entity::SSM::Parameter &parameter) const;
 
         /**
          * @brief Delete a all parameters

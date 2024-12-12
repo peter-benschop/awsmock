@@ -8,25 +8,22 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListServerResponse::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Array serversJsonArray;
-            for (const auto &server: servers) {
-                serversJsonArray.add(server.ToJsonObject());
+            document document;
+            if (servers.empty()) {
+                array jsonArray;
+                for (const auto &server: servers) {
+                    jsonArray.append(server.ToDocument());
+                }
+                document.append(kvp("Servers", jsonArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Servers", serversJsonArray);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListServerResponse::ToString() const {

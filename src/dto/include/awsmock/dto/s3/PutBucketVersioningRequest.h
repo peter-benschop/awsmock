@@ -9,6 +9,11 @@
 #include <sstream>
 #include <string>
 
+// AwsMock include
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+
 namespace AwsMock::Dto::S3 {
 
     struct PutBucketVersioningRequest {
@@ -21,7 +26,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * AWS user
          */
-        std::string user;
+        std::string owner;
 
         /**
          * Bucket name
@@ -34,21 +39,28 @@ namespace AwsMock::Dto::S3 {
         std::string status;
 
         /**
-         * Convert from XML representation
+         * @brief Convert from XML representation
          *
          * @param xmlString XML string
          */
         void FromXml(const std::string &xmlString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

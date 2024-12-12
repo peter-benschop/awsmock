@@ -69,7 +69,7 @@ namespace AwsMock::Service {
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         LambdaService _lambdaService;
         S3Service _s3Service;
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     /*TEST_F(LambdaServerCliTest, LambdaCreateTest) {

@@ -19,11 +19,10 @@ namespace AwsMock::Service {
 
             return response;
 
-        } catch (Poco::Exception &exc) {
-            log_error << "Monitoring get counters failed, message: " << exc.message();
-            throw Core::ServiceException(exc.message());
+        } catch (std::exception &exc) {
+            log_error << "Monitoring get counters failed, message: " << exc.what();
+            throw Core::ServiceException(exc.what());
         }
-        return response;
     }
 
 }// namespace AwsMock::Service

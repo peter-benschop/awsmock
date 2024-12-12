@@ -31,16 +31,15 @@ namespace AwsMock::Manager {
 
         /**
          * @brief Constructor
-         * @param timeout monitoring period
          */
-        explicit ManagerMonitoring(int timeout);
+        ManagerMonitoring(){};
 
       private:
 
         /**
          * Update the counter
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
         /**
          * Module database connection

@@ -321,7 +321,7 @@ namespace AwsMock::Service {
 
         // Update bucket
         Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(s3Request.region, s3Request.bucket);
-        bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Poco::toLower(s3Request.status));
+        bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Core::StringUtils::ToLower(s3Request.status));
 
         _database.UpdateBucket(bucket);
         log_info << "Put bucket versioning, bucket: " << s3Request.bucket << " state: " << s3Request.status;
@@ -404,7 +404,7 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const {
-        log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
+        log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region;
 
         // Get database object
         Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
@@ -446,14 +446,14 @@ namespace AwsMock::Service {
             object = _database.UpdateObject(object);
 
             // Calculate the hashes asynchronously
-            if (!request.checksumAlgorithm.empty()) {
+            /*if (!request.checksumAlgorithm.empty()) {
 
                 S3HashCreator s3HashCreator;
                 const std::vector algorithms = {request.checksumAlgorithm};
                 boost::thread t(boost::ref(s3HashCreator), algorithms, object);
                 t.detach();
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-            }
+            }*/
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(uploadDir);

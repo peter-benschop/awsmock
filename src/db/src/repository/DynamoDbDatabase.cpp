@@ -210,7 +210,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()), 500);
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
         } else {

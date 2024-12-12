@@ -8,20 +8,16 @@ namespace AwsMock::Dto::Transfer {
 
     std::string Tag::ToJson() const {
 
-        // Todo: fix me
-        /*try {
+        try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "value", value);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("key", key);
-            rootJson.set("value", value);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string Tag::ToString() const {

@@ -156,7 +156,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
             auto session = client->start_session();
 
@@ -174,11 +174,8 @@ namespace AwsMock::Database {
                 log_error << "KMS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CreateKey(key);
         }
+        return _memoryDb.CreateKey(key);
     }
 
     Entity::KMS::Key KMSDatabase::UpdateKey(const Entity::KMS::Key &key) {
@@ -200,13 +197,10 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "KMS Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), 500);
+                throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.UpdateKey(key);
         }
+        return _memoryDb.UpdateKey(key);
     }
 
     Entity::KMS::Key KMSDatabase::UpsertKey(const Entity::KMS::Key &key) {
@@ -214,14 +208,11 @@ namespace AwsMock::Database {
         if (KeyExists(key.keyId)) {
 
             return UpdateKey(key);
-
-        } else {
-
-            return CreateKey(key);
         }
+        return CreateKey(key);
     }
 
-    void KMSDatabase::DeleteKey(const Entity::KMS::Key &key) {
+    void KMSDatabase::DeleteKey(const Entity::KMS::Key &key) const {
 
         if (HasDatabase()) {
 
@@ -239,7 +230,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), 500);
+                throw Core::DatabaseException(exc.what());
             }
 
         } else {
@@ -248,7 +239,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void KMSDatabase::DeleteAllKeys() {
+    void KMSDatabase::DeleteAllKeys() const {
 
         if (HasDatabase()) {
 
@@ -266,7 +257,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), 500);
+                throw Core::DatabaseException(exc.what());
             }
 
         } else {

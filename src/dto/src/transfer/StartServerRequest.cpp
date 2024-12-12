@@ -6,43 +6,33 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    void StartServerRequest::FromJson(const std::string &body) {
-
-        // Todo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void StartServerRequest::FromJson(const std::string &jsonString) {
 
         try {
 
-            // Get root values
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            serverId = Core::Bson::BsonUtils::GetStringValue(rootDocument, "ServerId");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string StartServerRequest::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ServerId", serverId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string StartServerRequest::ToString() const {

@@ -8,9 +8,8 @@ namespace AwsMock::Service {
 
         try {
             std::string body = Core::HttpUtils::GetBodyAsString(request);
-            std::string target = GetTarget(request);
 
-            if (target == "TransferService.CreateServer") {
+            if (std::string target = GetTarget(request); target == "TransferService.CreateServer") {
 
                 Dto::Transfer::CreateServerRequest transferRequest = {.region = region};
                 transferRequest.FromJson(body);
@@ -68,8 +67,8 @@ namespace AwsMock::Service {
             }
 
 
-        } catch (Poco::Exception &exc) {
-            return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            return SendInternalServerError(request, exc.what());
         }
     }
 

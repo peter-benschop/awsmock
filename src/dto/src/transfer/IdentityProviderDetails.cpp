@@ -8,24 +8,20 @@ namespace AwsMock::Dto::Transfer {
 
     std::string IdentityProviderDetails::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("directoryId", directoryId);
-            rootJson.set("function", function);
-            rootJson.set("url", url);
-            rootJson.set("invocationRole", invocationRole);
-            rootJson.set("sftpAuthenticationMethods", sftpAuthenticationMethods);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "directoryId", directoryId);
+            Core::Bson::BsonUtils::SetStringValue(document, "function", function);
+            Core::Bson::BsonUtils::SetStringValue(document, "url", url);
+            Core::Bson::BsonUtils::SetStringValue(document, "invocationRole", invocationRole);
+            Core::Bson::BsonUtils::SetStringValue(document, "sftpAuthenticationMethods", sftpAuthenticationMethods);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string IdentityProviderDetails::ToString() const {

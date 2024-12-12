@@ -8,60 +8,51 @@ namespace AwsMock::Dto::SQS {
 
     void SendMessageBatchRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-
-            // General
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, queueUrl);
-            Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(rootDocument, "QueueUrl");
 
             // Sanitize
             queueUrl = Core::SanitizeSQSUrl(queueUrl);
 
             // Entries
-            if (rootObject->has("Entries")) {
-
-                Poco::JSON::Array::Ptr entryArray = rootObject->getArray("Entries");
-
-                if (!entryArray.isNull() && !entryArray->empty()) {
-                    for (size_t i = 0; i < entryArray->size(); i++) {
-                        MessageEntry entry;
-                        entry.FromJson(entryArray->getObject(i));
-                        entries.emplace_back(entry);
-                    }
+            if (rootDocument.find("Entries") != rootDocument.end()) {
+                for (const view entriesArray = rootDocument.view()["Entries"].get_array().value; const auto &element: entriesArray) {
+                    MessageEntry entry;
+                    entry.FromDocument(element.get_document().value);
+                    entries.emplace_back(entry);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string SendMessageBatchRequest::ToJson() const {
 
-        /* Todo
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("QueueUrl", queueUrl);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "QueueUrl", queueUrl);
 
-            Poco::JSON::Array jsonEntryArray;
-            for (const auto &entry: entries) {
-                Poco::JSON::Object jsonEntry = entry.ToJsonObject();
-                jsonEntryArray.add(entry.ToJsonObject());
+            // Entries
+            if (!entries.empty()) {
+                array jsonArray;
+                for (const auto &entry: entries) {
+                    jsonArray.append(entry.ToDocument());
+                }
+                document.append(kvp("Entries", jsonArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string SendMessageBatchRequest::ToString() {

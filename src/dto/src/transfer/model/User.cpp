@@ -2,73 +2,69 @@
 // Created by vogje01 on 12/18/23.
 //
 
+#include <Poco/JSON/Array.h>
 #include <awsmock/dto/transfer/model/User.h>
 
 namespace AwsMock::Dto::Transfer {
 
     view_or_value<view, value> User::ToDocument() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Arn", arn);
-            rootJson.set("Role", role);
-            rootJson.set("UserName", userName);
-            rootJson.set("HomeDirectory", homeDirectory);
-            rootJson.set("Password", password);
-            rootJson.set("SshPublicKeyCount", sshPublicKeyCount);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
+            Core::Bson::BsonUtils::SetStringValue(document, "Role", role);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserName", userName);
+            Core::Bson::BsonUtils::SetStringValue(document, "HomeDirectory", homeDirectory);
+            Core::Bson::BsonUtils::SetStringValue(document, "Password", password);
+            Core::Bson::BsonUtils::SetIntValue(document, "SshPublicKeyCount", sshPublicKeyCount);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void User::FromJsonObject(const view_or_value<view, value> &jsonObject) {
-        // Todo:
-        /*
-        Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
-        Core::JsonUtils::GetJsonValueString("Arn", jsonObject, arn);
-        Core::JsonUtils::GetJsonValueString("Role", jsonObject, role);
-        Core::JsonUtils::GetJsonValueString("UserName", jsonObject, userName);
-        Core::JsonUtils::GetJsonValueString("Password", jsonObject, password);
-        Core::JsonUtils::GetJsonValueString("HomeDirectory", jsonObject, homeDirectory);
-        Core::JsonUtils::GetJsonValueInt("SshPublicKeyCount", jsonObject, sshPublicKeyCount);
-        */
-    }
-
-    std::vector<User> User::FromJsonList(const std::string &body) {
-        // Todo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void User::FromDocument(const view_or_value<view, value> &document) {
 
         try {
+
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
+            role = Core::Bson::BsonUtils::GetStringValue(document, "Role");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "UserName");
+            password = Core::Bson::BsonUtils::GetStringValue(document, "Password");
+            homeDirectory = Core::Bson::BsonUtils::GetStringValue(document, "HomeDirectory");
+            sshPublicKeyCount = Core::Bson::BsonUtils::GetIntValue(document, "SshPublicKeyCount");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    std::vector<User> User::FromJsonList(const std::string &jsonString) {
+
+        try {
+
+            const value document = bsoncxx::from_json(jsonString);
 
             // Users
             UserList userList;
-            if (rootObject->has("Users")) {
-                Poco::JSON::Array::Ptr usersArray = rootObject->getArray("Users");
-                if (usersArray != nullptr) {
-                    for (int i = 0; i < usersArray->size(); i++) {
-                        User ftpUser;
-                        ftpUser.FromJsonObject(usersArray->getObject(i));
-                        userList.push_back(ftpUser);
-                    }
+            if (document.view().find("Users") != document.view().end()) {
+                for (const view usersArray = document.view()["Users"].get_array().value; const auto &user: usersArray) {
+                    User ftpUser;
+                    ftpUser.FromDocument(user.get_document().value);
+                    userList.push_back(ftpUser);
                 }
             }
             return userList;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string User::ToJson() const {

@@ -25,7 +25,7 @@
 
 namespace AwsMock::Service {
 
-    class SQSServiceTest : public ::testing::Test {
+    class SQSServiceTest : public testing::Test {
 
       protected:
 

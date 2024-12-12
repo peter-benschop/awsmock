@@ -8,8 +8,6 @@ namespace AwsMock::Core {
 
     unsigned int Crypto::_salt[] = {1214370622, 264849915};
 
-    static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
     std::string Crypto::GetMd5FromString(const std::string &content) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
@@ -18,7 +16,7 @@ namespace AwsMock::Core {
         unsigned int md_len;
 
         EVP_DigestInit_ex(context, md, nullptr);
-        EVP_DigestUpdate(context, reinterpret_cast<const unsigned char *>(content.data()), content.length());
+        EVP_DigestUpdate(context, content.data(), content.length());
         EVP_DigestFinal_ex(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
 
@@ -39,37 +37,6 @@ namespace AwsMock::Core {
 
         return HexEncode(md_value, static_cast<int>(md_len));
     }
-
-    // TODO: Removed, until AWS uses openssl 3.0
-    /*    std::string Crypto::AWSGetMd5FromString(const std::string &content) {
-
-        struct aws_allocator *defaultAllocator = aws_default_allocator();
-        Aws::Crt::ApiHandle apiHandle(defaultAllocator);
-        Aws::Crt::Crypto::Hash md5 = Aws::Crt::Crypto::Hash::CreateMD5(defaultAllocator);
-
-        Aws::Crt::ByteCursor input = aws_byte_cursor_from_c_str(content.c_str());
-
-        int8_t output[Aws::Crt::Crypto::MD5_DIGEST_SIZE] = {0};
-        Aws::Crt::ByteBuf outputBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(output), sizeof(output));
-
-        md5.Update(input);
-        md5.Digest(outputBuf);
-
-        Aws::Crt::ByteCursor outCursor = aws_byte_cursor_from_buf(&outputBuf);
-
-        int8_t hexOut[Aws::Crt::Crypto::MD5_DIGEST_SIZE * 2] = {0};
-        Aws::Crt::ByteBuf hexOutBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(hexOut), sizeof(outputBuf) * 2 + 1);
-        aws_hex_encode(&outCursor, &hexOutBuf);
-
-        aws_cal_library_clean_up();
-
-        std::string outStr((const char *) hexOutBuf.buffer, static_cast<size_t>(hexOutBuf.len));
-
-        aws_byte_buf_clean_up(&outputBuf);
-        aws_byte_buf_clean_up(&hexOutBuf);
-
-        return outStr;
-    }*/
 
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
 
@@ -96,42 +63,6 @@ namespace AwsMock::Core {
 
         return HexEncode(md_value, static_cast<int>(md_len));
     }
-
-    // TODO: Removed, until AWS uses openssl 3.0
-    /*std::string Crypto::AwsGetMd5FromFile(const std::string &fileName) {
-
-        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
-
-        struct aws_allocator *defaultAllocator = aws_default_allocator();
-        Aws::Crt::ApiHandle apiHandle(defaultAllocator);
-        Aws::Crt::Crypto::Hash md5 = Aws::Crt::Crypto::Hash::CreateMD5(defaultAllocator);
-
-        int8_t output[Aws::Crt::Crypto::MD5_DIGEST_SIZE] = {0};
-        Aws::Crt::ByteBuf outputBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(output), sizeof(output));
-
-        std::ifstream ifs(fileName, std::ios::binary);
-        while (ifs.good()) {
-            ifs.read(buffer, AWSMOCK_BUFFER_SIZE);
-            md5.Update(aws_byte_cursor_from_c_str(buffer));
-        }
-        md5.Digest(outputBuf);
-        ifs.close();
-
-        Aws::Crt::ByteCursor outCursor = aws_byte_cursor_from_buf(&outputBuf);
-
-        int8_t hexOut[Aws::Crt::Crypto::MD5_DIGEST_SIZE * 2] = {0};
-        Aws::Crt::ByteBuf hexOutBuf = Aws::Crt::ByteBufFromEmptyArray(reinterpret_cast<const uint8_t *>(hexOut), sizeof(outputBuf) * 2 + 1);
-        aws_hex_encode(&outCursor, &hexOutBuf);
-
-        aws_cal_library_clean_up();
-
-        std::string outStr((const char *) hexOutBuf.buffer, static_cast<size_t>(hexOutBuf.len));
-
-        aws_byte_buf_clean_up(&outputBuf);
-        aws_byte_buf_clean_up(&hexOutBuf);
-
-        return outStr;
-    }*/
 
     std::string Crypto::GetSha1FromString(const std::string &content) {
 
@@ -256,7 +187,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetSha256FromFile(const std::string &fileName) {
 
-        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
+        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_sha256();
@@ -290,8 +221,8 @@ namespace AwsMock::Core {
         HMAC(EVP_sha256(),
              msg.data(),
              static_cast<int>(msg.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
+             key.data(),
+             key.size(),
              hash.data(),
              &hashLen);
         return HexEncode(hash.data(), hash.size());
@@ -400,9 +331,8 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
         auto *key_data = key;
-        int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
+        if (int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256EncryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
             log_error << "Couldn't initialize AES256 cipher";
         }
 
@@ -530,126 +460,54 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Encode(const std::string &inputString) {
-        std::istringstream in(inputString);
-        std::ostringstream out;
-        Poco::Base64Encoder encoder(out);
-        Poco::StreamCopier::copyStream(in, encoder);
-        encoder.close();
-        return out.str();
+        std::stringstream os;
+        typedef boost::archive::iterators::base64_from_binary<boost::archive::iterators::transform_width<const char *, 6, 8>> base64_enc;
+        const std::string base64_padding[] = {"", "==", "="};
+        std::copy(base64_enc(inputString.c_str()), base64_enc(inputString.c_str() + inputString.size()), std::ostream_iterator<char>(os));
+        os << base64_padding[inputString.size() % 3];
+        return os.str();
     }
-
-    /*std::string Crypto::Base64Encode(unsigned char const *buf, unsigned int bufLen) {
-        std::string ret;
-        int i = 0;
-        int j = 0;
-        unsigned char char_array_3[3];
-        unsigned char char_array_4[4];
-
-        while (bufLen--) {
-            char_array_3[i++] = *(buf++);
-            if (i == 3) {
-                char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-                char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-                char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-                char_array_4[3] = char_array_3[2] & 0x3f;
-
-                for (i = 0; (i < 4); i++)
-                    ret += base64_chars[char_array_4[i]];
-                i = 0;
-            }
-        }
-
-        if (i) {
-            for (j = i; j < 3; j++)
-                char_array_3[j] = '\0';
-
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
-
-            for (j = 0; (j < i + 1); j++)
-                ret += base64_chars[char_array_4[j]];
-
-            while ((i++ < 3))
-                ret += '=';
-        }
-
-        return ret;
-    }
-
-    unsigned char *Crypto::Base64Decode(std::string const &encoded_string) {
-        int in_len = encoded_string.size();
-        int i = 0;
-        int j = 0;
-        int in_ = 0;
-        unsigned char char_array_4[4], char_array_3[3];
-        std::vector<unsigned char> ret;
-
-        while (in_len-- && (encoded_string[in_] != '=') && IsBase64(encoded_string[in_])) {
-            char_array_4[i++] = encoded_string[in_];
-            in_++;
-            if (i == 4) {
-                for (i = 0; i < 4; i++)
-                    char_array_4[i] = base64_chars.find(char_array_4[i]);
-
-                char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-                char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-                char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-                for (i = 0; (i < 3); i++)
-                    ret.push_back(char_array_3[i]);
-                i = 0;
-            }
-        }
-
-        if (i) {
-            for (j = i; j < 4; j++)
-                char_array_4[j] = 0;
-
-            for (j = 0; j < 4; j++)
-                char_array_4[j] = base64_chars.find(char_array_4[j]);
-
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-            for (j = 0; (j < i - 1); j++) ret.push_back(char_array_3[j]);
-        }
-
-        return ret.data();
-    }*/
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
-        std::istringstream in(encodedString);
-        std::ostringstream out;
-        Poco::Base64Decoder decoder(in);
-        Poco::StreamCopier::copyStream(decoder, out);
-        decoder.clear();
-        return out.str();
+        std::string output;
+        std::string input = encodedString;
+        using namespace boost::archive::iterators;
+        typedef remove_whitespace<std::string::const_iterator> StripIt;
+        typedef transform_width<binary_from_base64<std::string::const_iterator>, 8, 6> ItBinaryT;
+        try {
+            /// Trailing whitespace makes remove_whitespace barf because the iterator never == end().
+            while (!input.empty() && std::isspace(input.back())) { input.pop_back(); }
+            //inputString.swap(StripIt(inputString.begin()), StripIt(inputString.end()));
+            /// If the input isn't a multiple of 4, pad with =
+            input.append((4 - input.size() % 4) % 4, '=');
+            const size_t pad_chars(std::count(input.end() - 4, input.end(), '='));
+            std::replace(input.end() - 4, input.end(), '=', 'A');
+            output.clear();
+            output.reserve(input.size() * 1.3334);
+            output.assign(ItBinaryT(input.begin()), ItBinaryT(input.end()));
+            output.erase(output.end() - (pad_chars < 2 ? pad_chars : 2), output.end());
+        } catch (std::exception const &) {
+            output.clear();
+        }
+        return output;
     }
 
-    std::string Crypto::HexEncode(const std::string &inputString) {
-        std::stringstream ss;
-        ss.str("");
-        Poco::HexBinaryEncoder encoder(ss);
-        encoder << inputString;
-        encoder.close();
-        return ss.str();
+    std::string Crypto::HexEncode(const std::string &input) {
+        return boost::algorithm::hex(input);
     }
 
-    std::string Crypto::HexEncode(unsigned char *hash, int size) {
+    std::string Crypto::HexEncode(const unsigned char *hash, const int size) {
         std::stringstream ss;
         for (int i = 0; i < size; ++i)
             ss << std::setfill('0') << std::setw(2) << std::right << std::hex << (int) hash[i];
         return ss.str();
     }
 
-    std::string Crypto::HexEncode(const std::vector<unsigned char> &Digest) {
+    std::string Crypto::HexEncode(const std::vector<unsigned char> &digest) {
         std::string sResult;
-        sResult.reserve(Digest.size() * 2 + 1);
-        for (unsigned char it: Digest) {
-            static const char dec2hex[16 + 1] = "0123456789abcdef";
+        sResult.reserve(digest.size() * 2 + 1);
+        for (const unsigned char it: digest) {
+            static constexpr char dec2hex[16 + 1] = "0123456789abcdef";
             sResult += dec2hex[(it >> 4) & 15];
             sResult += dec2hex[it & 15];
         }
@@ -678,7 +536,7 @@ namespace AwsMock::Core {
         PEM_write_bio_PUBKEY(bp, pRSA);
 
         int size;
-        char *buf = (char *) malloc(CRYPTO_RSA_KEY_LINE_LENGTH);
+        const auto buf = static_cast<char *>(malloc(CRYPTO_RSA_KEY_LINE_LENGTH));
         std::ostringstream sstream;
         do {
             size = BIO_gets(bp, buf, CRYPTO_RSA_KEY_LINE_LENGTH);
@@ -695,7 +553,7 @@ namespace AwsMock::Core {
         PEM_write_bio_PUBKEY(bp, pRSA);
 
         int size;
-        char *buf = (char *) malloc(CRYPTO_RSA_KEY_LINE_LENGTH);
+        const auto buf = static_cast<char *>(malloc(CRYPTO_RSA_KEY_LINE_LENGTH));
         std::ostringstream sstream;
         PEM_write_bio_PrivateKey(bp, pRSA, nullptr, nullptr, 0, nullptr, nullptr);
         do {

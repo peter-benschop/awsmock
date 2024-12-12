@@ -5,21 +5,18 @@ namespace AwsMock::Dto::Transfer {
 
     std::string CreateServerResponse::ToJson() const {
 
-        // Todo:
-        /*
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ServerId", serverId);
-            rootJson.set("Arn", arn);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateServerResponse::ToString() const {

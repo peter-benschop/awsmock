@@ -2,70 +2,53 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <Poco/JSON/Array.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 
 namespace AwsMock::Dto::Transfer {
 
     std::string CreateServerRequest::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Domain", domain);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void CreateServerRequest::FromJson(const std::string &jsonString) {
 
-        // Todo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            domain = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Domain");
 
             // Protocols
-            if (rootObject->has("Protocols")) {
-                Poco::JSON::Array::Ptr protocolsArray = rootObject->getArray("Protocols");
-                if (protocolsArray != nullptr) {
-                    for (const auto &protocol: *protocolsArray) {
-                        protocols.push_back(protocol.convert<std::string>());
-                    }
+            if (rootDocument.find("Protocols") != rootDocument.end()) {
+                for (const view protocolsArray = rootDocument.view()["Protocols"].get_array().value; const auto &protocol: protocolsArray) {
+                    protocols.emplace_back(protocol.get_string().value);
                 }
             }
 
             // Tags
-            if (rootObject->has("Tags")) {
-                Poco::JSON::Object::Ptr tagsObject = rootObject->getObject("Tags");
-                for (const auto &tagName: tagsObject->getNames()) {
-                    std::string value;
-                    Core::JsonUtils::GetJsonValueString(tagName, tagsObject, value);
-                    Tag tag = {.key = tagName, .value = value};
-                    tags.emplace_back(tag);
+            if (rootDocument.find("Tags") != rootDocument.end()) {
+                for (const view tagsObject = rootDocument.view()["Tags"].get_document().value; const auto &tag: tagsObject) {
+                    std::string key = bsoncxx::string::to_string(tag.key());
+                    const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                    tags[key] = value;
                 }
             }
 
-            // Cleanup
-            rootObject->clear();
-            parser.reset();
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateServerRequest::ToString() const {

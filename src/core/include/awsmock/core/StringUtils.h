@@ -14,6 +14,7 @@
 
 // Boost includes
 #include <boost/beast/core/string.hpp>
+#include <boost/exception/info.hpp>
 #include <boost/url/decode_view.hpp>
 #include <boost/url/encode.hpp>
 #include <boost/uuid/random_generator.hpp>

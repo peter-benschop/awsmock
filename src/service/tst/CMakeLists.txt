@@ -18,8 +18,8 @@ link_directories(../../core ../../db ../../dto ${LIB_BSON_CXX} ${LIB_MONGO_CXX})
 
 add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES}
         ${SSM_SOURCES} ${MAIN_SOURCES})
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx PocoPrometheus PocoUtil PocoFoundation PocoNet
-        PocoZip boost_thread boost_filesystem boost_thread boost_url yaml-cpp gtest pthread ssl crypto z archive)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_thread boost_filesystem boost_thread boost_url yaml-cpp
+        gtest pthread ssl crypto z minizip archive prometheus-cpp-core prometheus-cpp-pull)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 add_custom_command(TARGET ${BINARY} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/data/lambda/java-basic-1.0-SNAPSHOT.jar" "/tmp")

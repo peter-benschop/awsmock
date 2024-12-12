@@ -15,8 +15,8 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
-#define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={\"Domain\":\"test.com\",\"Region\":\"eu-central-1\"}"
-#define CREATE_SERVER_REQUEST_TO_JSON "{\"Domain\":\"test.com\",\"Region\":\"eu-central-1\"}"
+#define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\" }"
+#define CREATE_SERVER_REQUEST_TO_JSON "{ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\" }"
 #define CREATE_SERVER_REQUEST_FROM_JSON "{\"Domain\":\"test.com\",\"Region\":\"eu-central-1\", \"Protocols\":[\"ftp\", \"sftp\"], \"tags\":[{\"key\":\"value\"}]}"
 
 namespace AwsMock::Dto::Transfer {
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::Transfer {
         std::string _region;
         std::vector<std::string> _protocols = {"ftp", "sftp"};
         IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethods = "sftpAuthenticationMethods", .url = "url"};
-        std::vector<Tag> _tags = {{.key = "version", .value = "1.0"}};
+        std::map<std::string, std::string> _tags = {{"version", "1.0"}};
         Core::Configuration _configuration = Core::Configuration::instance();
     };
 

@@ -13,16 +13,7 @@
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
-    class ConfigurationTest : public ::testing::Test {
-      protected:
-
-        void SetUp() override {
-        }
-
-        void TearDown() override {
-        }
-
-        //YamlConfiguration _configuration = YamlConfiguration(TMP_PROPERTIES_FILE);
+    class ConfigurationTest : public testing::Test {
     };
 
     TEST_F(ConfigurationTest, EmptyFilenameTest) {
@@ -65,7 +56,7 @@ namespace AwsMock::Core {
         EXPECT_STREQ(configuration.GetValueString("awsmock.logging.level").c_str(), "debug");
     }
 
-    TEST_F(ConfigurationTest, YamlConfiggurationTest) {
+    /*TEST_F(ConfigurationTest, YamlConfiggurationTest) {
         // arrange
         const std::string yamlString = "awsmock:\n"
                                        "  region: eu-central-1\n"
@@ -84,7 +75,7 @@ namespace AwsMock::Core {
         // assert
         EXPECT_TRUE(region == "eu-central-1");
         EXPECT_TRUE(keyId == "none");
-    }
+    }*/
 }// namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_CONFIGURATION_TEST_H

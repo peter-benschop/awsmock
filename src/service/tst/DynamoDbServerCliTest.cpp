@@ -61,7 +61,7 @@ namespace AwsMock::Service {
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(DynamoDbServerCliTest, TableCreateTest) {

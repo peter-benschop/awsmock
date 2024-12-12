@@ -1,27 +1,11 @@
 FROM alpine:latest
 
 RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers  \
-    libarchive libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev pandoc icu-libs doxygen \
-    boost-program_options boost-filesystem boost-thread curl curl-dev
+    libarchive libarchive-dev github-cli asio-dev gtest-dev pandoc icu-libs doxygen boost-program_options \
+    boost-filesystem boost-thread boost-url minizip curl curl-dev minizip-dev plog plog-dev yaml-cpp yaml-cpp-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
-
-# Install Plog logging framework
-RUN cd /usr/src && \
-    git clone https://github.com/SergiusTheBest/plog.git && \
-    cd plog && \
-    cmake . -DPLOG_BUILD_SAMPLES=OFF && \
-    cmake --build . -j 8 && \
-    cmake --install .
-
-# Install YAML
-RUN cd /usr/src && \
-    git clone https://github.com/jbeder/yaml-cpp.git && \
-    cd yaml-cpp && \
-    cmake . && \
-    cmake --build . -j 8 && \
-    cmake --install .
 
 # Install jwt-cpp
 RUN cd /usr/src && \
@@ -30,14 +14,12 @@ RUN cd /usr/src && \
     cmake . && \
     cmake --install .
 
-# Install Poco framework
+# Prometheus-CPP
 RUN cd /usr/src && \
-    git clone -b poco-1.13.3 https://github.com/pocoproject/poco.git && \
-    cd poco && \
-    cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF  \
-    -DENABLE_DATA_MYSQL=OFF -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DENABLE_JWT=OFF -DENABLE_DATA=OFF  \
-    -DENABLE_ACTIVERECORD=OFF . && \
-    cmake --build . --config Release -j 16 && \
+    git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
+    cd prometheus-cpp && \
+    cmake . && \
+    cmake --build . -j16 && \
     cmake --install .
 
 # Install mongo-cxx-driver

@@ -50,7 +50,7 @@ namespace AwsMock::Service {
 
             // Start HTTP manager
             // Start gateway server
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
             _thread = boost::thread([&]() {
                 boost::asio::io_service::work work(_ios);
                 _ios.run();
@@ -92,7 +92,7 @@ namespace AwsMock::Service {
         std::string _endpoint, _queueUrl, _accountId;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerCliTest, QueueCreateTest) {

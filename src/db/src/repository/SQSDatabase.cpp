@@ -810,7 +810,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSDatabase::ResetDelayedMessages(const std::string &queueArn, long delay) const {
+    long SQSDatabase::ResetDelayedMessages(const std::string &queueArn, const long delay) const {
 
         if (HasDatabase()) {
 
