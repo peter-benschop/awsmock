@@ -620,7 +620,7 @@ namespace AwsMock::Core {
      * @return true if this is a URL
      */
     inline bool IsSQSUrl(const std::string &queue) {
-        return Core::StringUtils::StartsWith(queue, "http");
+        return StringUtils::StartsWith(queue, "http");
     }
 
     /**

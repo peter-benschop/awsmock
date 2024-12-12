@@ -8,28 +8,27 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListUsersResponse::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Array usersJsonArray;
-            for (const auto &user: users) {
-                usersJsonArray.add(user.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+
+            // Users
+            if (users.empty()) {
+                array jsonArray;
+                for (const auto &user: users) {
+                    jsonArray.append(user.ToDocument());
+                }
+                document.append(kvp("Users", jsonArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ServerId", serverId);
-            //rootJson.set("NextToken", nextToken);
-            rootJson.set("Users", usersJsonArray);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListUsersResponse::ToString() const {

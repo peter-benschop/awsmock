@@ -5,56 +5,99 @@
 #ifndef AWSMOCK_CORE_NOT_FOUND_EXCEPTION_H
 #define AWSMOCK_CORE_NOT_FOUND_EXCEPTION_H
 
-#include <Poco/Exception.h>
-#include <Poco/Net/HTTPResponse.h>
+// Boost includes
+#include <boost/beast/http.hpp>
 
 namespace AwsMock::Core {
 
+    namespace http = boost::beast::http;
+
     /**
-     * Resource not found exception class.
+     * @brief Resource not found exception class.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class NotFoundException : public Poco::Exception {
+    class NotFoundException final : public std::exception {
 
       public:
 
         /**
-         * Constructor.
-         *
-         * @param code exception code, default: 0
-         */
-        explicit NotFoundException(int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
+       * Constructor.
+       *
+       * @param code exception code, default: 0
+       * @param resource exception resource
+       * @param requestId exception resource ID
+       */
+        explicit NotFoundException(http::status code = http::status::not_found, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
-         * Constructor.
-         *
-         * @param msg exception message
-         * @param code exception code, default: 0
-         */
-        explicit NotFoundException(const std::string &msg, int code = Poco::Net::HTTPResponse::HTTPStatus::HTTP_NOT_FOUND);
+       * Constructor.
+       *
+       * @param msg exception message
+       * @param code exception code, default: 0
+       * @param resource exception resource
+       * @param requestId exception resource ID
+       */
+        explicit NotFoundException(const std::string &msg, http::status code = http::status::not_found, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
-         * Copy constructor.
-         *
-         * @param exc parent exception.
-         */
+       * Copy constructor.
+       *
+       * @param exc parent exception.
+       */
         NotFoundException(const NotFoundException &exc);
 
         /**
-         * Destructor
-         */
+       * Destructor
+       */
         ~NotFoundException() noexcept override;
 
         /**
-         * Assigment operator.
-         */
+       * Assigment operator.
+       */
         NotFoundException &operator=(const NotFoundException &exc);
 
         /**
-         * Rethrows the exception.
-         */
-        void rethrow() const;
+       * Returns the exception message.
+       */
+        [[nodiscard]] std::string message() const noexcept;
+
+        /**
+       * Returns the exception message.
+       */
+        [[nodiscard]] http::status code() const noexcept;
+
+        /**
+       * Returns the exception resource.
+       */
+        [[nodiscard]] const char *resource() const noexcept;
+
+        /**
+       * Returns the exception request ID.
+       */
+        [[nodiscard]] const char *requestId() const noexcept;
+
+      private:
+
+        /**
+       * Code
+       */
+        const http::status _code;
+
+        /**
+       * Message
+       */
+        std::string _message;
+
+        /**
+       * Resource
+       */
+        const char *_resource;
+
+        /**
+       * Request ID
+       */
+        const char *_requestId;
     };
 
 }// namespace AwsMock::Core

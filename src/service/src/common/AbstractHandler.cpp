@@ -215,9 +215,9 @@ namespace AwsMock::Service {
             log_debug << "Range response finished, filename: " << fileName << " size: " << count << " status: " << status;
             return response;
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
         }
     }
 

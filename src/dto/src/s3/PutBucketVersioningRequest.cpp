@@ -8,24 +8,33 @@ namespace AwsMock::Dto::S3 {
 
     void PutBucketVersioningRequest::FromXml(const std::string &xmlString) {
 
-        // TODO:
-        /*
         try {
-            Poco::XML::DOMParser parser;
-            Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
-            Poco::XML::Node *node = pDoc->getNodeByPath("/VersioningConfiguration/Status");
-            if (node) {
-                status = node->innerText();
-            } else {
-                std::cerr << "Exception: Wrong versioning state" << std::endl;
-            }
+            boost::property_tree::ptree pt;
+            read_xml(xmlString, pt);
+            status = pt.get<std::string>("VersioningConfiguration.Status");
 
-        } catch (Poco::Exception &exc) {
-            std::cerr << "Exception: " << exc.message() << std::endl;
-        }*/
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
+    std::string PutBucketVersioningRequest::ToJson() const {
+
+        try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Bucket", bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "Owner", owner);
+            Core::Bson::BsonUtils::SetStringValue(document, "Status", status);
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
     std::string PutBucketVersioningRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
@@ -33,7 +42,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::ostream &operator<<(std::ostream &os, const PutBucketVersioningRequest &r) {
-        os << "PutBucketVersioningRequest={region='" << r.region << "', user='" << r.user << "', bucket='" << r.bucket << "', state='" << r.status << "'}";
+        os << "PutBucketVersioningRequest=" << r.ToJson();
         return os;
     }
 

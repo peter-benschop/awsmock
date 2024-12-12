@@ -45,7 +45,7 @@ namespace AwsMock::Service {
             secret.versionId = Core::StringUtils::CreateRandomUuid();
             secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
             secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
-            secret.createdDate = Poco::Timestamp().epochTime();
+            secret.createdDate = Core::DateTimeUtils::UnixTimestampNow();
 
             // Either string or binary data
             if (!request.secretString.empty()) {
@@ -203,7 +203,7 @@ namespace AwsMock::Service {
             secret.secretString = request.secretString;
             secret.secretBinary = request.secretBinary;
             secret.description = request.description;
-            secret.lastChangedDate = Poco::Timestamp().epochTime();
+            secret.lastChangedDate = Core::DateTimeUtils::UnixTimestampNow();
 
             secret = _database.UpdateSecret(secret);
 
@@ -268,7 +268,7 @@ namespace AwsMock::Service {
             // Delete from database
             _database.DeleteSecret(secret);
             log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
-            return {.region = request.region, .name = secret.name, .arn = secret.arn, .deletionDate = static_cast<double>(Poco::Timestamp().epochTime())};
+            return {.region = request.region, .name = secret.name, .arn = secret.arn, .deletionDate = static_cast<double>(Core::DateTimeUtils::UnixTimestampNow() - secret.lastRotatedDate)};
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SecretManager delete secret failed, message: " + exc.message();

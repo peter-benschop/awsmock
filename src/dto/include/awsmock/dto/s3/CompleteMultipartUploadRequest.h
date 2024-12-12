@@ -17,34 +17,54 @@ namespace AwsMock::Dto::S3 {
     struct CompleteMultipartUploadRequest {
 
         /**
-         * Bucket location
+         * Region
          */
         std::string region;
 
         /**
-         * Bucket name
+         * Bucket
          */
         std::string bucket;
 
         /**
-         * Bucket owner
+         * Bucket
          */
         std::string key;
 
         /**
-         * AWS user
-         */
-        std::string user;
-
-        /**
-         * AWS upload ID
+         * Upload ID
          */
         std::string uploadId;
 
         /**
-         * AWS upload ID
+         * Checksum CRC32
          */
-        std::string checksumAlgorithm;
+        std::string checksumCrc32;
+
+        /**
+         * Checksum CRC32C
+         */
+        std::string checksumCrc32c;
+
+        /**
+         * Checksum SAH1
+         */
+        std::string checksumSha1;
+
+        /**
+         * Checksum SAH256
+         */
+        std::string checksumSha256;
+
+        /**
+         * ETag
+         */
+        std::string eTag;
+
+        /**
+         * Part number
+         */
+        int partNumber;
 
         /**
          * @brief Convert to a JSON string
@@ -59,6 +79,13 @@ namespace AwsMock::Dto::S3 {
          * @param xmlString XML string
          */
         void FromXml(const std::string &xmlString);
+
+        /**
+         * @brief Convert to a XMl string
+         *
+         * @return XML string
+         */
+        [[nodiscard]] std::string ToXml() const;
 
         /**
          * @brief Converts the DTO to a string representation.

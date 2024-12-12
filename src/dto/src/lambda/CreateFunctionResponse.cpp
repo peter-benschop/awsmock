@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetLongValue(document, "CodeSize", codeSize);
             Core::Bson::BsonUtils::SetLongValue(document, "Timeout", timeout);
             Core::Bson::BsonUtils::SetStringValue(document, "CodeSha256", codeSha256);
-            Core::Bson::BsonUtils::SetStringValue(document, "LastModified", modified);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastModified", modified);
 
             // Environment
             document.append(kvp("Environment", environment.ToDocument()));

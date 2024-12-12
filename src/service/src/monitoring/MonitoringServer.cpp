@@ -9,10 +9,10 @@ namespace AwsMock::Service {
     MonitoringServer::MonitoringServer(Core::PeriodicScheduler &scheduler) : AbstractServer("monitoring") {
 
         // Initialize metric server
-        _metricService.Initialize();
+        AwsMock::Monitoring::MetricService::instance().Initialize();
 
         // Start monitoring system collector
-        _metricSystemCollector.Initialize();
+        AwsMock::Monitoring::MetricSystemCollector::instance().Initialize();
         scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.Run(); }, 60);
 
         // Start the database cleanup worker thread every day

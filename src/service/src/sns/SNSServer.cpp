@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
         // Count resources per topic
         for (const auto &topic: _snsDatabase.ListTopics()) {
-            std::string labelValue = Poco::replace(topic.topicName, "-", "_");
+            std::string labelValue = Core::StringUtils::Replace(topic.topicName.c_str(), "-", "_");
             _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT,
                                     "topic",
                                     labelValue,

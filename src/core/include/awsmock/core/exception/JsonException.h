@@ -13,7 +13,7 @@ namespace AwsMock::Core {
     namespace http = boost::beast::http;
 
     /**
-     * JSON exception class. In case of a JSON serialization/deserialization error.
+     * @brief JSON exception class. In case of a JSON serialization/deserialization error.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

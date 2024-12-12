@@ -30,9 +30,9 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Parse a JSON stream
          *
-         * @param body json input stream
+         * @param jsonString json input stream
          */
-        void FromJson(const std::string &body);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Creates a JSON string from the object.

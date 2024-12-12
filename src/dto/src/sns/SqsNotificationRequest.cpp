@@ -8,27 +8,26 @@ namespace AwsMock::Dto::SNS {
 
     std::string SqsNotificationRequest::ToJson() const {
 
-        /* Todo:
+
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Type", type);
-            rootJson.set("MessageId", messageId);
-            rootJson.set("TopicArn", topicArn);
-            rootJson.set("Message", message);
-            rootJson.set("Timestamp", timestamp);
-            rootJson.set("SignatureVersion", signatureVersion);
-            rootJson.set("Signature", signature);
-            rootJson.set("SignatureCertURL", signingCertURL);
-            rootJson.set("UnsubscribeURL", unsubscribeURL);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Type", type);
+            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(document, "TopicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
+            Core::Bson::BsonUtils::SetLongValue(document, "Timestamp", timestamp);
+            Core::Bson::BsonUtils::SetStringValue(document, "SignatureVersion", signatureVersion);
+            Core::Bson::BsonUtils::SetStringValue(document, "Signature", signature);
+            Core::Bson::BsonUtils::SetStringValue(document, "SignatureCertURL", signingCertURL);
+            Core::Bson::BsonUtils::SetStringValue(document, "UnsubscribeURL", unsubscribeURL);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string SqsNotificationRequest::ToString() const {

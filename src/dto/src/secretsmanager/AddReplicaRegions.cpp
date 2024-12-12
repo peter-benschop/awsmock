@@ -6,38 +6,36 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    Poco::JSON::Object AddReplicaRegions::ToJsonObject() const {
+    view_or_value<view,value> AddReplicaRegions::ToDocument() const {
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("KmsKeyId", kmsKeyId);
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document,"Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document,"KmsKeyId", kmsKeyId);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void AddReplicaRegions::FromJson(const view_or_value<view,value> &document) {
+
+        try {
+
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(document, "KmsKeyId");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     std::string AddReplicaRegions::ToJson() const {
-
-        std::ostringstream os;
-        ToJsonObject().stringify(os);
-        return os.str();
-    }
-
-    void AddReplicaRegions::FromJson(const Poco::JSON::Object::Ptr &jsonObject) {
-
-        try {
-
-            Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
-            Core::JsonUtils::GetJsonValueString("KmsKeyId", jsonObject, kmsKeyId);
-
-        } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message());
-        }
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string AddReplicaRegions::ToString() const {

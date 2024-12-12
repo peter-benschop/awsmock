@@ -213,9 +213,12 @@ namespace AwsMock::Service {
                 return SendBadRequestError(request, "Unknown method");
             }
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
         }
     }
 
@@ -261,6 +264,9 @@ namespace AwsMock::Service {
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
         }
     }
 

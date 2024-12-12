@@ -38,7 +38,13 @@ namespace AwsMock::Core {
         }
     }
 
-    long DirUtils::DirectoryCountFiles(const std::string &dirName) {
+    long DirUtils::DirectoryCountFiles(const std::string &dirName, bool recursive) {
+        if (recursive) {
+            return std::count_if(
+                    boost::filesystem::recursive_directory_iterator(dirName),
+                    boost::filesystem::recursive_directory_iterator(),
+                    static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+        }
         return std::count_if(
                 boost::filesystem::directory_iterator(dirName),
                 boost::filesystem::directory_iterator(),

@@ -204,9 +204,12 @@ namespace AwsMock::Service {
                 }
             }
 
-        } catch (Poco::Exception &e) {
+        } catch (Core::DatabaseException &e) {
             log_error << e.message();
-            return Core::HttpUtils::InternalServerError(request, e.message());
+            return SendInternalServerError(request, e.message());
+        } catch (Core::JsonException &e) {
+            log_error << e.message();
+            return SendInternalServerError(request, e.message());
         }
     }
 

@@ -203,9 +203,9 @@ namespace AwsMock::Dto::S3 {
                 Core::Bson::BsonUtils::SetStringValue(document, "principalId", principalId);
                 return document.extract();
 
-            } catch (Poco::Exception &exc) {
+            } catch (bsoncxx::exception &exc) {
                 log_error << exc.what();
-                throw Core::JsonException(exc.message());
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -220,9 +220,9 @@ namespace AwsMock::Dto::S3 {
 
                 principalId = Core::Bson::BsonUtils::GetStringValue(document, "principalId");
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -291,9 +291,9 @@ namespace AwsMock::Dto::S3 {
                 Core::Bson::BsonUtils::SetStringValue(document, "sequencer", sequencer);
                 return document.extract();
 
-            } catch (Poco::Exception &exc) {
+            } catch (bsoncxx::exception &exc) {
                 log_error << exc.what();
-                throw Core::JsonException(exc.message());
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -313,9 +313,9 @@ namespace AwsMock::Dto::S3 {
                 sequencer = Core::Bson::BsonUtils::GetStringValue(document, "sequencer");
                 key = Core::Bson::BsonUtils::GetStringValue(document, "key");
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -427,9 +427,9 @@ namespace AwsMock::Dto::S3 {
                     object.FromDocument(document.view()["object"].get_document().value);
                 }
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -522,9 +522,9 @@ namespace AwsMock::Dto::S3 {
 
                 return document.extract();
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -547,9 +547,9 @@ namespace AwsMock::Dto::S3 {
                     s3.FromDocument(document.view()["s3"].get_document().value);
                 }
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -611,9 +611,9 @@ namespace AwsMock::Dto::S3 {
 
                 return Core::Bson::BsonUtils::ToJsonString(document);
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 
@@ -635,9 +635,9 @@ namespace AwsMock::Dto::S3 {
                     }
                 }
 
-            } catch (Poco::Exception &exc) {
-                log_error << exc.message();
-                throw Core::JsonException(exc.message());
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
         }
 

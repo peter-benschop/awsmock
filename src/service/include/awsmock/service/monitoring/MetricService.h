@@ -9,17 +9,15 @@
 #include <chrono>
 #include <string>
 
-// Poco includes
-#include <Poco/Prometheus/Counter.h>
-#include <Poco/Prometheus/Gauge.h>
-#include <Poco/Prometheus/Histogram.h>
-#include <Poco/Prometheus/MetricsServer.h>
+// Prometheus
+#include <prometheus/counter.h>
+#include <prometheus/exposer.h>
+#include <prometheus/registry.h>
 
 // Boost include
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include <awsmock/core/LogStream.h>
 #include <awsmock/repository/MonitoringDatabase.h>
 
 namespace AwsMock::Monitoring {
@@ -27,9 +25,9 @@ namespace AwsMock::Monitoring {
     using std::chrono::high_resolution_clock;
     using std::chrono::time_point;
 
-    typedef std::map<std::string, Poco::Prometheus::Counter *> CounterMap;
-    typedef std::map<std::string, Poco::Prometheus::Gauge *> GaugeMap;
-    typedef std::map<std::string, Poco::Prometheus::Histogram *> HistogramMap;
+    typedef std::map<std::string, prometheus::Family<prometheus::Counter> *> CounterMap;
+    typedef std::map<std::string, prometheus::Family<prometheus::Gauge> *> GaugeMap;
+    typedef std::map<std::string, prometheus::Family<prometheus::Histogram> *> HistogramMap;
 
     /**
      * @brief Monitoring server
@@ -62,16 +60,6 @@ namespace AwsMock::Monitoring {
         void Initialize();
 
         /**
-         * @brief Run main loop
-         */
-        void Run();
-
-        /**
-         * @brief Gracefully shutdown
-         */
-        void Shutdown() const;
-
-        /**
          * @brief Increments a counter.
          *
          * @param name of the counter
@@ -94,7 +82,7 @@ namespace AwsMock::Monitoring {
          *
          * @param name of the counter
          */
-        void ClearCounter(const std::string &name);
+        void ClearCounter(const std::string &name) const;
 
         /**
          * @brief Clears a counter.
@@ -103,7 +91,7 @@ namespace AwsMock::Monitoring {
          * @param labelName name of the label
          * @param labelValue label value of the counter
          */
-        void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
+        void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
          * @brief Sets a double gauge value in the map.
@@ -147,7 +135,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the counter.
          * @return true if counter exists.
          */
-        bool CounterExists(const std::string &name) const;
+        [[nodiscard]] bool CounterExists(const std::string &name) const;
 
         /**
          * @brief Check whether a counter exists
@@ -157,7 +145,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the counter
          * @return true if counter exists.
          */
-        bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue);
+        bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
          * @brief Get a specific metric
@@ -165,17 +153,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the metric
          * @return metric if existing.
          */
-        Poco::Prometheus::Counter *GetCounter(const std::string &name);
-
-        /**
-         * @brief Get a specific metric by name, labelName and labelValue
-         *
-         * @param name name of the metric
-         * @param labelName name of the metric label
-         * @param labelValue value of the metric label
-         * @return metric if existing.
-         */
-        Poco::Prometheus::Counter *GetCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
+        prometheus::Family<prometheus::Counter> *GetCounter(const std::string &name) const;
 
         /**
          * @brief Adds a gauge to the map.
@@ -217,22 +195,17 @@ namespace AwsMock::Monitoring {
          * @param name name of the metric
          * @return metric if existing.
          */
-        Poco::Prometheus::Gauge *GetGauge(const std::string &name);
-
-        /**
-         * @brief Get a specific metric by name, labelName and labelValue
-         *
-         * @param name name of the metric
-         * @param labelName name of the metric label
-         * @param labelValue value of the metric label
-         * @return metric if existing.
-         */
-        Poco::Prometheus::Gauge *GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
+        prometheus::Family<prometheus::Gauge> *GetGauge(const std::string &name);
 
         /**
          * Metric manager for Prometheus
          */
-        std::shared_ptr<Poco::Prometheus::MetricsServer> _server;
+        std::shared_ptr<prometheus::Exposer> _server;
+
+        /**
+         * Metric manager for Prometheus
+         */
+        std::shared_ptr<prometheus::Registry> _registry;
 
         /**
          * Counter map

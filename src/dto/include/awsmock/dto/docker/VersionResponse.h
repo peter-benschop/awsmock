@@ -35,7 +35,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * Build time
          */
-        Poco::DateTime buildTime;
+        system_clock::time_point buildTime;
 
         /**
          * Experimental
@@ -54,18 +54,17 @@ namespace AwsMock::Dto::Docker {
          */
         void FromDocument(const view_or_value<view, value> &document) {
 
-            /* Todo
             try {
-                Core::JsonUtils::GetJsonValueString("ApiVersion", jsonObject, apiVersion);
-                Core::JsonUtils::GetJsonValueString("Arch", jsonObject, architecture);
-                Core::JsonUtils::GetJsonValueDate("BuildTime", jsonObject, buildTime);
-                Core::JsonUtils::GetJsonValueBool("Experimental", jsonObject, experimental);
-                Core::JsonUtils::GetJsonValueString("GitCommit", jsonObject, gitCommit);
+                apiVersion = Core::Bson::BsonUtils::GetStringValue(document, "ApiVersion");
+                architecture = Core::Bson::BsonUtils::GetStringValue(document, "Arch");
+                buildTime = Core::Bson::BsonUtils::GetDateValue(document, "BuildTime");
+                experimental = Core::Bson::BsonUtils::GetBoolValue(document, "Experimental");
+                gitCommit = Core::Bson::BsonUtils::GetStringValue(document, "GitCommit");
 
-            } catch (Poco::Exception &exc) {
-                std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message());
-            }*/
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::ServiceException(exc.what());
+            }
         }
     };
 

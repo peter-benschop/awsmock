@@ -1,8 +1,8 @@
 FROM alpine:latest
 
 RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers  \
-    libarchive libarchive-dev github-cli libtbb libtbb-dev asio-dev gtest-dev pandoc icu-libs doxygen \
-    boost-program_options boost-filesystem boost-thread curl curl-dev
+    libarchive libarchive-dev github-cli asio-dev gtest-dev pandoc icu-libs doxygen boost-program_options \
+    boost-filesystem boost-thread boost-url curl curl-dev minizip minizip-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -30,14 +30,21 @@ RUN cd /usr/src && \
     cmake . && \
     cmake --install .
 
-# Install Poco framework
+# Prometheus-CPP
 RUN cd /usr/src && \
-    git clone -b poco-1.13.3 https://github.com/pocoproject/poco.git && \
-    cd poco && \
-    cmake -DENABLE_PAGECOMPILER=OFF -DENABLE_DATA_SQLITE=OFF -DENABLE_REDIS=OFF -DENABLE_DATA_POSTGRESQL=OFF  \
-    -DENABLE_DATA_MYSQL=OFF -DENABLE_NETSSL=ON -DENABLE_MONGODB=OFF -DENABLE_JWT=OFF -DENABLE_DATA=OFF  \
-    -DENABLE_ACTIVERECORD=OFF . && \
-    cmake --build . --config Release -j 16 && \
+    git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
+    cd prometheus-cpp && \
+    cmake . && \
+    cmake --build . -j16 && \
+    cmake --install .
+
+# Zipper
+
+RUN cd /usr/src && \
+    git clone https://github.com/zlib-ng/minizip-ng.git && \
+    cd minizip-ng && \
+    cmake . && \
+    cmake --build . && \
     cmake --install .
 
 # Install mongo-cxx-driver

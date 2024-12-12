@@ -97,9 +97,10 @@ namespace AwsMock::Core {
          * @brief Count the number of files in the geven directory.
          *
          * @param dirName name of the directory.
+         * @param recursive recursively file counting.
          * @return total number of files.
          */
-        static long DirectoryCountFiles(const std::string &dirName);
+        static long DirectoryCountFiles(const std::string &dirName, bool recursive = true);
 
         /**
          * @brief Checks whether the directory is empty.

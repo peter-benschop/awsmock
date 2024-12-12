@@ -2,30 +2,25 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#include "awsmock/core/exception/DatabaseException.h"
+#include <awsmock/core/exception/DatabaseException.h>
 
 namespace AwsMock::Core {
 
-    DatabaseException::DatabaseException(int code) : Poco::Exception(code) {}
+    DatabaseException::DatabaseException(const http::status code, const char *resource, const char *requestId) : _code(code), _resource(resource), _requestId(requestId) {}
 
-    DatabaseException::DatabaseException(const std::string &msg, int code) : Poco::Exception(msg, code) {}
-
-    DatabaseException::DatabaseException(const std::string &msg, const std::string &arg, int code) : Poco::Exception(msg, arg, code) {}
-
-    DatabaseException::DatabaseException(const std::string &msg, const Poco::Exception &exc, int code) : Poco::Exception(msg, exc, code) {}
+    DatabaseException::DatabaseException(const std::string &msg, const http::status code, const char *resource, const char *requestId) : _message(msg), _code(code), _resource(resource), _requestId(requestId) {}
 
     DatabaseException::DatabaseException(const DatabaseException &exc) = default;
 
     DatabaseException::~DatabaseException() noexcept = default;
 
-    DatabaseException &DatabaseException::operator=(const DatabaseException &exc) = default;
+    http::status DatabaseException::code() const noexcept { return _code; }
 
-    const char *DatabaseException::name() const noexcept { return "ServiceException: "; }
+    std::string DatabaseException::message() const noexcept { return _message; }
 
-    const char *DatabaseException::className() const noexcept { return typeid(*this).name(); }
+    const char *DatabaseException::resource() const noexcept { return _resource; }
 
-    Poco::Exception *DatabaseException::clone() const { return new DatabaseException(*this); }
+    const char *DatabaseException::requestId() const noexcept { return _requestId; }
 
-    void DatabaseException::rethrow() const { throw *this; }
 
 }// namespace AwsMock::Core

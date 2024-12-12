@@ -8,44 +8,34 @@ namespace AwsMock::Dto::Transfer {
 
     std::string ListUsersRequest::ToJson() const {
 
-        // todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ServerId", serverId);
-            rootJson.set("MaxResults", maxResults);
-            rootJson.set("NextToken", nextToken);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxResults", maxResults);
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void ListUsersRequest::FromJson(const std::string &body) {
-        // todo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(body);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void ListUsersRequest::FromJson(const std::string &jsonString) {
 
         try {
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            serverId = Core::Bson::BsonUtils::GetStringValue(rootDocument, "ServerId");
+            maxResults = Core::Bson::BsonUtils::GetIntValue(rootDocument, "MaxResults");
+            nextToken = Core::Bson::BsonUtils::GetStringValue(rootDocument, "NextToken");
 
-            // Get root values
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("ServerId", rootObject, serverId);
-            Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
-            Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListUsersRequest::ToString() const {

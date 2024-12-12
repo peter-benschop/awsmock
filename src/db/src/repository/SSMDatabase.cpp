@@ -209,7 +209,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SSM database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), 500);
+                throw Core::DatabaseException(exc.what());
             }
 
         } else {
@@ -230,7 +230,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SSMDatabase::DeleteParameter(const Entity::SSM::Parameter &parameter) {
+    void SSMDatabase::DeleteParameter(const Entity::SSM::Parameter &parameter) const {
 
         if (HasDatabase()) {
 
@@ -248,7 +248,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SSM database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), 500);
+                throw Core::DatabaseException(exc.what());
             }
 
         } else {
@@ -275,7 +275,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SSM database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), 500);
+                throw Core::DatabaseException(exc.what());
             }
 
         } else {

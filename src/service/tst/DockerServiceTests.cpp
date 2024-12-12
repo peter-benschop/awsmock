@@ -24,7 +24,7 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            Dto::Docker::Image image = _service.GetImageByName("hello-world", "latest");
+            const Dto::Docker::Image image = _service.GetImageByName("hello-world", "latest");
             _service.DeleteImage(image.id);
             _service.PruneContainers();
         }
@@ -48,8 +48,8 @@ namespace AwsMock::Service {
     TEST_F(DockerServiceTest, ContainerExistsTest) {
 
         // arrange
-        std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        const std::vector<std::string> environment;
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        constexpr std::vector<std::string> environment;
         _service.CreateImage("hello-world", "latest", "hello-world");
         _service.CreateContainer("hello-world", instanceId, "latest", environment, 1025);
 

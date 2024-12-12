@@ -8,32 +8,31 @@ namespace AwsMock::Dto::S3 {
 
     std::string MoveObjectResponse::ToXml() const {
 
-        // Todo:
-        /*
-        // Root
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("MoveObjectResult");
-        pDoc->appendChild(pRoot);
+        try {
 
-        // ETag
-        Poco::XML::AutoPtr<Poco::XML::Element> pETag = pDoc->createElement("ETag");
-        pRoot->appendChild(pETag);
-        Poco::XML::AutoPtr<Poco::XML::Text> pETagText = pDoc->createTextNode(eTag);
-        pETag->appendChild(pETagText);
+            boost::property_tree::ptree root;
+            root.add("MoveObjectResult.ETag", eTag);
+            root.add("MoveObjectResult.LastModified", lastModified);
+            return Core::XmlUtils::ToXmlString(root);
 
-        // LastModified
-        Poco::XML::AutoPtr<Poco::XML::Element> pLastModified = pDoc->createElement("LastModified");
-        pRoot->appendChild(pLastModified);
-        Poco::XML::AutoPtr<Poco::XML::Text> pLastModifiedTest = pDoc->createTextNode(lastModified);
-        pLastModified->appendChild(pLastModifiedTest);
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
 
-        std::stringstream output;
-        Poco::XML::DOMWriter writer;
-        writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION);
-        writer.writeNode(output, pDoc);
+    std::string MoveObjectResponse::ToJson() const {
 
-        return output.str();*/
-        return {};
+        try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "ETag", eTag);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastModified", lastModified);
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string MoveObjectResponse::ToString() const {
@@ -43,7 +42,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::ostream &operator<<(std::ostream &os, const MoveObjectResponse &r) {
-        os << "MoveObjectResponse={eTag:'" + r.eTag + "'}";
+        os << "MoveObjectResponse=" << r.ToJson();
         return os;
     }
 

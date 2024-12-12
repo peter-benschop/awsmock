@@ -99,7 +99,7 @@ namespace AwsMock::Service {
         Core::Configuration &_configuration = Core::Configuration::instance();
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
-        std::shared_ptr<Service::GatewayServer> _gatewayServer;
+        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(S3ServerJavaTest, S3CreateBucketTest) {
@@ -107,8 +107,8 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
-        long buckets = _s3Database.BucketCount();
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const long buckets = _s3Database.BucketCount();
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);

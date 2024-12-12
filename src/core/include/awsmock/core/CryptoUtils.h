@@ -7,9 +7,7 @@
 
 // Standard C includes
 #include <fcntl.h>
-#ifndef _WIN32
 #include <sys/mman.h>
-#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -27,14 +25,6 @@
 #include <string>
 #include <string_view>
 
-// TODO: Removed, until AWS uses openssl 3.0
-// AWS cryptographic methods
-//#include <aws/cal/cal.h>
-//#include <aws/common/allocator.h>
-//#include <aws/common/encoding.h>
-//#include <aws/crt/Api.h>
-//#include <aws/crt/crypto/Hash.h>
-
 // Openssl includes
 #include <openssl/aes.h>
 #include <openssl/bio.h>
@@ -47,21 +37,23 @@
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 
+// Boost includes
+#include <boost/algorithm/hex.hpp>
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/insert_linebreaks.hpp>
+#include <boost/archive/iterators/ostream_iterator.hpp>
+#include <boost/archive/iterators/remove_whitespace.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
 
-// 64kB buffer
+// 64 kB buffer
 #define AWSMOCK_BUFFER_SIZE 4096
-
-// Poco
-#include <Poco/Base64Decoder.h>
-#include <Poco/Base64Encoder.h>
-#include <Poco/HexBinaryDecoder.h>
-#include <Poco/HexBinaryEncoder.h>
-#include <Poco/StreamCopier.h>
 
 #define CRYPTO_RSA_KEY_LEN_4096 4096
 #define CRYPTO_RSA_KEY_LEN_2048 2048
@@ -83,7 +75,7 @@ namespace AwsMock::Core {
      * @brief Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
      *
      * @par
-     * This class contains AWS cryptographic method as well as OpenSSL methods. AWS cryptographic methods a are denoted with a preceding 'AWS'.
+     * This class contains AWS cryptographic method as well as OpenSSL methods. AWS cryptographic methods are denoted with a preceding 'AWS'.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -298,16 +290,16 @@ namespace AwsMock::Core {
         static std::string HexEncode(const std::string &input);
 
         /**
-         * @brief Convert of a unsigned char* array to a hex string
+         * @brief Convert of an unsigned char* array to a hex string
          *
          * @param hash input char array
          * @param size input char length
          * @return hex encoded string
          */
-        static std::string HexEncode(unsigned char *hash, int size);
+        static std::string HexEncode(const unsigned char *hash, int size);
 
         /**
-         * @brief Convert of a unsigned char* array to a hex string
+         * @brief Convert of an unsigned char* array to a hex string
          *
          * @param digest input char array
          * @return hex encoded string
@@ -323,7 +315,7 @@ namespace AwsMock::Core {
         static unsigned char *HexDecode(const std::string &hex);
 
         /**
-         * @brief Generate a RSA key pair of the given length.
+         * @brief Generate an RSA key pair of the given length.
          *
          * @param keyLength key length
          * @return RSA key pair.

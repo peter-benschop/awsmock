@@ -243,12 +243,12 @@ namespace AwsMock::Service {
                     return SendBadRequestError(request, "Unknown method");
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
+        } catch (...) {
+            log_error << "Invalid request";
+            return SendInternalServerError(request, "Invalid request");
         }
     }
 
@@ -339,7 +339,7 @@ namespace AwsMock::Service {
                     std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
 
                     // Get the user metadata
-                    //std::map<std::string, std::string> metadata = GetMetadata(request);
+                    std::map<std::string, std::string> metadata = GetMetadata(request);
 
                     Dto::S3::MoveObjectRequest s3Request = {
                             .region = clientCommand.region,
@@ -348,8 +348,7 @@ namespace AwsMock::Service {
                             .sourceKey = sourceKey,
                             .targetBucket = clientCommand.bucket,
                             .targetKey = clientCommand.key,
-                            //        .metadata = metadata
-                    };
+                            .metadata = metadata};
 
                     Dto::S3::MoveObjectResponse s3Response = _s3Service.MoveObject(s3Request);
 
@@ -489,9 +488,6 @@ namespace AwsMock::Service {
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
@@ -523,7 +519,7 @@ namespace AwsMock::Service {
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
                     log_debug << "Finish multipart upload request, uploadId: " << uploadId;
 
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId};
                     Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;
@@ -569,7 +565,7 @@ namespace AwsMock::Service {
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId};
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;
@@ -641,12 +637,12 @@ namespace AwsMock::Service {
                     log_debug << "S3 update bucket request";
 
                     // Build request
-                    Dto::S3::UpdateBucketRequest s3Request = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+                    auto [bucket] = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
 
                     // Get object versions
                     //Dto::S3::GetBucketResponse s3Response = _s3Service.UpdateBucket(s3Request);
 
-                    log_info << "Update bucket, name: " << s3Request.bucket.bucketName;
+                    log_info << "Update bucket, name: " << bucket.bucketName;
                     return SendOkResponse(request, {});
                 }
 
@@ -684,7 +680,6 @@ namespace AwsMock::Service {
             return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            std::cerr << exc.what() << std::endl;
             return SendInternalServerError(request, exc.what());
         }
         log_error << "Unknown method";
@@ -704,7 +699,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::DELETE_BUCKET: {
 
-                    Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region = clientCommand.region, .bucket = clientCommand.bucket};
+                    const Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region = clientCommand.region, .bucket = clientCommand.bucket};
                     _s3Service.DeleteBucket(deleteBucketRequest);
 
                     log_info << "Delete bucket, bucket: " << clientCommand.bucket;
@@ -804,9 +799,6 @@ namespace AwsMock::Service {
 
             return SendOkResponse(request, {}, headers);
 
-        } catch (Poco::Exception &exc) {
-            log_warning << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());

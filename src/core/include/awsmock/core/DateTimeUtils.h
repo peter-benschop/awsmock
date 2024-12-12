@@ -7,17 +7,11 @@
 
 // C++ standard includes
 #include <chrono>
-#include <iostream>
 #include <string>
 
 // Boost includes
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/locale/date_time.hpp>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -43,21 +37,6 @@ namespace AwsMock::Core {
     class DateTimeUtils {
 
       public:
-
-        /**
-         * @brief AWS date time
-         *
-         * @param dateTime date time
-         * @return AWS date time format
-         */
-        static std::string AwsDatetime(const Poco::DateTime &dateTime);
-
-        /**
-         * @brief Current date time in AWS format
-         *
-         * @return current time in AWS date time format
-         */
-        static std::string AwsDatetimeNow();
 
         /**
          * @brief Returns the time_point in ISO8001 format

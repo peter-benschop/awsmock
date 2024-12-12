@@ -50,9 +50,9 @@ namespace AwsMock::Dto::Common {
             Core::Bson::BsonUtils::SetStringValue(document, "payload", payload.length() > 256 ? Core::StringUtils::SubString(payload, 0, 256) : payload);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

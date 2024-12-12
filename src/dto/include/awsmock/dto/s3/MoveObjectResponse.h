@@ -6,8 +6,13 @@
 #define AWSMOCK_DTO_S3_MOVEOBJECTSRESPONSE_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
+
+// AwsMock includes
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -24,21 +29,28 @@ namespace AwsMock::Dto::S3 {
         std::string lastModified;
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Convert to XML representation
+         *
+         * @return XML string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

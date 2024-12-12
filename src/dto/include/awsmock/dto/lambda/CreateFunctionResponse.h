@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct CreateFunctionResponse : public Dto::Common::BaseRequest {
+    struct CreateFunctionResponse : Common::BaseRequest {
 
         /**
          * Name of the function
@@ -129,7 +129,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Modified
          */
-        std::string modified = Core::DateTimeUtils::AwsDatetimeNow();
+        system_clock::time_point modified;
 
         /**
          * Docker image ID
