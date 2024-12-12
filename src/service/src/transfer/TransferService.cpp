@@ -105,9 +105,9 @@ namespace AwsMock::Service {
             log_trace << "Handler list outcome: " + response.ToJson();
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Handler list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Handler list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -123,9 +123,9 @@ namespace AwsMock::Service {
             log_trace << "Handler list outcome: " + response.ToJson();
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Handler list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Handler list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -147,14 +147,14 @@ namespace AwsMock::Service {
             server = _transferDatabase.UpdateTransfer(server);
             log_info << "Transfer server started, serverId: " << server.serverId;
 
-        } catch (Poco::Exception &ex) {
+        } catch (bsoncxx::exception &ex) {
 
             // Update state
             server.state = Database::Entity::Transfer::ServerState::START_FAILED;
             server = _transferDatabase.UpdateTransfer(server);
 
-            log_error << "Start transfer server request failed, serverId: " << server.serverId << " message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+            log_error << "Start transfer server request failed, serverId: " << server.serverId << " message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -175,14 +175,14 @@ namespace AwsMock::Service {
             server = _transferDatabase.UpdateTransfer(server);
             log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
-        } catch (Poco::Exception &ex) {
+        } catch (bsoncxx::exception &ex) {
 
             // Update state
             server.state = Database::Entity::Transfer::ServerState::STOP_FAILED;
             server = _transferDatabase.UpdateTransfer(server);
 
-            log_error << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+            log_error << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -207,14 +207,14 @@ namespace AwsMock::Service {
             _transferDatabase.DeleteTransfer(request.serverId);
             log_info << "Transfer manager deleted, serverId: " << server.serverId;
 
-        } catch (Poco::Exception &ex) {
+        } catch (bsoncxx::exception &ex) {
 
             // Update state
             server.state = Database::Entity::Transfer::ServerState::STOP_FAILED;
             server = _transferDatabase.UpdateTransfer(server);
 
-            log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+            log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 }// namespace AwsMock::Service

@@ -125,9 +125,9 @@ namespace AwsMock::Service {
 
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_warning << "S3 get object metadata failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get object metadata failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -147,9 +147,9 @@ namespace AwsMock::Service {
 
             return Dto::S3::Mapper::map(request, bucket);
 
-        } catch (Poco::Exception &ex) {
-            log_warning << "S3 get bucket failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -187,9 +187,9 @@ namespace AwsMock::Service {
 
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_warning << "S3 get object metadata failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get object metadata failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -243,9 +243,9 @@ namespace AwsMock::Service {
             log_info << "Object returned, bucket: " << request.bucket << " key: " << request.key;
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 get object failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 get object failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -260,9 +260,9 @@ namespace AwsMock::Service {
 
             return listAllBucketResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 Create Bucket failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 Create Bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -287,9 +287,9 @@ namespace AwsMock::Service {
 
             return listAllBucketResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 Create Bucket failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 Create Bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -304,9 +304,9 @@ namespace AwsMock::Service {
 
             return listBucketResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 list bucket failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 list bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -327,13 +327,13 @@ namespace AwsMock::Service {
         log_info << "Put bucket versioning, bucket: " << s3Request.bucket << " state: " << s3Request.status;
     }
 
-    Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const {
-        log_trace << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
+    Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &s3Request) const {
+        log_trace << "CreateMultipartUpload request, bucket: " + s3Request.bucket << " key: " << s3Request.key << " region: " << s3Request.region << " user: " << s3Request.user;
 
         // Check existence
-        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            log_error << "Bucket does not exist, region: " << request.region << " bucket: " << request.bucket;
-            throw Core::NotFoundException("Bucket does not exist, region: " + request.region + " bucket: " + request.bucket);
+        if (!_database.BucketExists({.region = s3Request.region, .name = s3Request.bucket})) {
+            log_error << "Bucket does not exist, region: " << s3Request.region << " bucket: " << s3Request.bucket;
+            throw Core::NotFoundException("Bucket does not exist, region: " + s3Request.region + " bucket: " + s3Request.bucket);
         }
 
         const std::string uploadId = Core::StringUtils::GenerateRandomString(58);
@@ -343,15 +343,15 @@ namespace AwsMock::Service {
         Core::DirUtils::EnsureDirectory(uploadDir);
 
         // Create database object
-        Database::Entity::S3::Object object = {.region = request.region,
-                                               .bucket = request.bucket,
-                                               .key = request.key,
-                                               .owner = request.user,
-                                               .metadata = request.metadata};
+        Database::Entity::S3::Object object = {.region = s3Request.region,
+                                               .bucket = s3Request.bucket,
+                                               .key = s3Request.key,
+                                               .owner = s3Request.user,
+                                               .metadata = s3Request.metadata};
         object = _database.CreateOrUpdateObject(object);
 
-        log_info << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
-        return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};
+        log_info << "Multipart upload started, bucket: " << s3Request.bucket << " key: " << s3Request.key << " uploadId: " << uploadId;
+        return {.region = s3Request.region, .bucket = s3Request.bucket, .key = s3Request.key, .uploadId = uploadId};
     }
 
     std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) {
@@ -498,9 +498,9 @@ namespace AwsMock::Service {
                 return SaveUnversionedObject(request, bucket, stream, chunkEncoding);
             }
 
-        } catch (Poco::Exception &ex) {
+        } catch (bsoncxx::exception &ex) {
             log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
-            throw Core::ServiceException(ex.message());
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -574,9 +574,9 @@ namespace AwsMock::Service {
             // Adjust bucket key counter on target bucket
             AdjustBucketCounters(request.region, request.targetBucket);
 
-        } catch (Poco::Exception &ex) {
+        } catch (bsoncxx::exception &ex) {
             log_error << "S3 copy object request failed, error: " << ex.what();
-            throw Core::ServiceException(ex.message());
+            throw Core::ServiceException(ex.what());
         }
         return {.eTag = targetObject.md5sum, .modified = system_clock::now()};
     }
@@ -648,11 +648,11 @@ namespace AwsMock::Service {
             log_info << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
                      << request.targetBucket << " targetKey: " << request.targetKey;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 copy object request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 copy object request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
-        return {.eTag = targetObject.md5sum, .lastModified = Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FRAC_FORMAT)};
+        return {.eTag = targetObject.md5sum, .lastModified = Core::DateTimeUtils::ToISO8601(system_clock::now())};
     }
 
     void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
@@ -726,9 +726,9 @@ namespace AwsMock::Service {
 
             log_info << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size();
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 delete objects failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 delete objects failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
         log_info << "DeleteObjects succeeded, bucket: " << request.bucket;
         return response;
@@ -754,9 +754,9 @@ namespace AwsMock::Service {
             }
             log_info << "PutBucketNotification succeeded, bucket: " << request.bucket;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 put bucket notification request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put bucket notification request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }*/
 
@@ -777,9 +777,9 @@ namespace AwsMock::Service {
             bucketEntity = _database.UpdateBucket(bucketEntity);
             log_info << "PutBucketEncryption succeeded, bucket: " << request.bucket;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 put bucket encryption request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put bucket encryption request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -802,9 +802,9 @@ namespace AwsMock::Service {
             const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(s3Request.region, s3Request.bucket, s3Request.prefix);
             return Dto::S3::Mapper::map(s3Request, objectList);
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 put bucket encryption request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put bucket encryption request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -834,9 +834,9 @@ namespace AwsMock::Service {
             _database.DeleteBucket(bucket);
             log_info << "Bucket deleted, bucket: " << bucket.name;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 Delete Bucket failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 Delete Bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -946,9 +946,9 @@ namespace AwsMock::Service {
 
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 put notification configurations failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put notification configurations failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -975,9 +975,9 @@ namespace AwsMock::Service {
 
             return listAllObjectResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 Create Object failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 Create Object failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 

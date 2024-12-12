@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex ModuleMemoryDb::_moduleMutex;
+    boost::mutex ModuleMemoryDb::_moduleMutex;
 
     bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
@@ -64,7 +64,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Module::Module ModuleMemoryDb::CreateModule(const Entity::Module::Module &module) {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _modules[oid] = module;
@@ -72,11 +72,11 @@ namespace AwsMock::Database {
         return GetModuleById(oid);
     }
 
-    Entity::Module::ModuleList ModuleMemoryDb::ListModules() {
+    Entity::Module::ModuleList ModuleMemoryDb::ListModules() const {
 
         Entity::Module::ModuleList moduleList;
-        for (const auto &module: _modules) {
-            moduleList.emplace_back(module.second);
+        for (const auto &val: _modules | std::views::values) {
+            moduleList.emplace_back(val);
         }
 
         log_trace << "Got module list, size: " << moduleList.size();
@@ -84,7 +84,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Module::Module ModuleMemoryDb::UpdateModule(const Entity::Module::Module &module) {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         std::string name = module.name;
         const auto it =
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Module::Module ModuleMemoryDb::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
                 std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
@@ -120,7 +120,7 @@ namespace AwsMock::Database {
     }
 
     void ModuleMemoryDb::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
                 std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
@@ -137,7 +137,7 @@ namespace AwsMock::Database {
     }
 
     void ModuleMemoryDb::SetPort(const std::string &name, int port) {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
                 std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
@@ -158,7 +158,7 @@ namespace AwsMock::Database {
     }
 
     void ModuleMemoryDb::DeleteModule(const Entity::Module::Module &module) {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         std::string name = module.name;
         const auto count = std::erase_if(_modules, [name](const auto &item) {
@@ -169,7 +169,7 @@ namespace AwsMock::Database {
     }
 
     void ModuleMemoryDb::DeleteAllModules() {
-        Poco::ScopedLock lock(_moduleMutex);
+        boost::mutex::scoped_lock lock(_moduleMutex);
 
         log_debug << "All modules deleted, count: " << _modules.size();
         _modules.clear();

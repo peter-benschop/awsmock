@@ -12,11 +12,11 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
+
+    using std::chrono::system_clock;
 
     /**
      * SecretManager secrets entity.
@@ -133,36 +133,36 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Creation date
          */
-        Poco::DateTime created = Poco::DateTime();
+        system_clock::time_point created = system_clock::now();
 
         /**
          * Last modification date
          */
-        Poco::DateTime modified = Poco::DateTime();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param m message

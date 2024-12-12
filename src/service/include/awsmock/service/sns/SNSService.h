@@ -174,7 +174,7 @@ namespace AwsMock::Service {
          * @param request purge topic request
          * @throws ServiceException
          */
-        void PurgeTopic(const Dto::SNS::PurgeTopicRequest &request);
+        void PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
 
         /**
          * @brief Delete a topic
@@ -184,7 +184,7 @@ namespace AwsMock::Service {
          * @return DeleteTopicResponse
          * @throws ServiceException
          */
-        Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn);
+        Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn) const;
 
         /**
          * @brief List messages

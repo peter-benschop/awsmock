@@ -50,6 +50,7 @@ namespace AwsMock::Dto::Transfer {
             log_error << exc.message();
             throw Core::JsonException(exc.message());
         }*/
+        return {};
     }
 
     std::string Server::ToJson() const {

@@ -6,8 +6,10 @@
 #define AWSMOCK_SERVICE_LAMBDA_SERVICE_H
 
 // C++ standard includes
-#include <boost/thread/thread.hpp>
 #include <string>
+
+// Boost includes
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -85,7 +87,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -281,7 +283,7 @@ namespace AwsMock::Service {
         /**
          * Mutex
          */
-        static Poco::Mutex _mutex;
+        static boost::mutex _mutex;
     };
 
 }// namespace AwsMock::Service

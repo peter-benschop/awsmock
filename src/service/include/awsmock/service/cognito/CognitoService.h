@@ -9,8 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricDefinition.h"
-#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
@@ -72,6 +70,8 @@
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/repository/CognitoDatabase.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricServiceTimer.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {
@@ -291,7 +291,7 @@ namespace AwsMock::Service {
          * @param request sign out request
          * @see GlobalSignOutRequest
          */
-        void GlobalSignOut(Dto::Cognito::GlobalSignOutRequest &request);
+        void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request);
 
         /**
          * @brief Create a new cognito user

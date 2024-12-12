@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex SecretsManagerMemoryDb::_secretMutex;
+    boost::mutex SecretsManagerMemoryDb::_secretMutex;
 
     bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
 
@@ -75,7 +75,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SecretsManager::Secret SecretsManagerMemoryDb::CreateSecret(const Entity::SecretsManager::Secret &secret) {
-        Poco::ScopedLock lock(_secretMutex);
+        boost::mutex::scoped_lock lock(_secretMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _secrets[oid] = secret;
@@ -85,7 +85,7 @@ namespace AwsMock::Database {
 
     Entity::SecretsManager::Secret SecretsManagerMemoryDb::UpdateSecret(const Entity::SecretsManager::Secret &secret) {
 
-        Poco::ScopedLock lock(_secretMutex);
+        boost::mutex::scoped_lock lock(_secretMutex);
 
         std::string secretId = secret.secretId;
         const auto it = std::ranges::find_if(_secrets,
@@ -114,20 +114,17 @@ namespace AwsMock::Database {
         if (region.empty()) {
 
             return static_cast<long>(_secrets.size());
-
-        } else {
-
-            for (const auto &val: _secrets | std::views::values) {
-                if (val.region == region) {
-                    count++;
-                }
+        }
+        for (const auto &val: _secrets | std::views::values) {
+            if (val.region == region) {
+                count++;
             }
         }
         return count;
     }
 
     void SecretsManagerMemoryDb::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
-        Poco::ScopedLock lock(_secretMutex);
+        boost::mutex::scoped_lock lock(_secretMutex);
 
         std::string region = secret.region;
         std::string name = secret.name;
@@ -139,7 +136,7 @@ namespace AwsMock::Database {
     }
 
     void SecretsManagerMemoryDb::DeleteAllSecrets() {
-        Poco::ScopedLock lock(_secretMutex);
+        boost::mutex::scoped_lock lock(_secretMutex);
 
         log_debug << "Secrets deleted, count: " << _secrets.size();
         _secrets.clear();

@@ -76,9 +76,9 @@ namespace AwsMock::Dto::Common {
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

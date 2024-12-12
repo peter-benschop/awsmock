@@ -50,9 +50,9 @@ namespace AwsMock::Service {
 
             return listTopicsResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS list topics request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topics request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -79,13 +79,13 @@ namespace AwsMock::Service {
             log_trace << "SNS list topic counters response: " << listTopicResponse.ToJson();
             return listTopicResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
-    void SNSService::PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) {
+    void SNSService::PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "purge_topic");
         log_trace << "Purge topic request, topicArn: " << request.topicArn;
 
@@ -105,13 +105,13 @@ namespace AwsMock::Service {
             // Adjust topic counters
             AdjustTopicCounters(topic);
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS purge topic failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS purge topic failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
-    Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) {
+    Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
         log_trace << "Delete topic request, region: " << region << " topicArn: " << topicArn;
 
@@ -127,9 +127,9 @@ namespace AwsMock::Service {
             // Update database
             _snsDatabase.DeleteTopic({.region = region, .topicArn = topicArn});
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS delete topic failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS delete topic failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
         return response;
     }
@@ -173,9 +173,9 @@ namespace AwsMock::Service {
 
             return {.messageId = message.messageId, .requestId = request.requestId};
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS create message failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS create message failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -216,9 +216,9 @@ namespace AwsMock::Service {
 
             return {.subscriptionArn = subscriptionArn};
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS subscription failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS subscription failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -252,9 +252,9 @@ namespace AwsMock::Service {
 
             return {.subscriptionArn = request.subscriptionArn};
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS subscription failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS subscription failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -280,9 +280,9 @@ namespace AwsMock::Service {
             }
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS get topic subscriptions failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get topic subscriptions failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -307,9 +307,9 @@ namespace AwsMock::Service {
             }
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS get subscription counters failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get subscription counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -330,9 +330,9 @@ namespace AwsMock::Service {
                     .topicArn = topic.topicArn,
                     .owner = topic.owner};
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS get topic attributes failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get topic attributes failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -363,9 +363,9 @@ namespace AwsMock::Service {
                     .modified = topic.modified,
             };
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS get topic attributes failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get topic attributes failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -408,9 +408,9 @@ namespace AwsMock::Service {
 
             return {};
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS tag resource failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS tag resource failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -458,9 +458,9 @@ namespace AwsMock::Service {
 
             return listMessageResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS list topics request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topics request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -484,9 +484,9 @@ namespace AwsMock::Service {
             AdjustTopicCounters(topic);
             log_trace << "SNS topci counter adjusted, topicArn: " << request.topicArn;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "SNS list topics request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topics request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 

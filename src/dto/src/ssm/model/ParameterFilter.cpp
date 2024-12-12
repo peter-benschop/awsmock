@@ -2,71 +2,60 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <Poco/JSON/Array.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
+#include <ranges>
 
 namespace AwsMock::Dto::SSM {
 
     std::string ParameterFilter::ToJson() const {
-
-        /* Todo
-        try {
-
-            Poco::JSON::Object jsonObject = ToJsonObject();
-            return Core::JsonUtils::ToJsonString(jsonObject);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     view_or_value<view, value> ParameterFilter::ToDocument() const {
 
-        /* TOdo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Key", key);
-            rootJson.set("Option", option);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Key", key);
+            Core::Bson::BsonUtils::SetStringValue(document, "Option", option);
 
             // Parameter filters
-            Poco::JSON::Array jsonParameterFilterArray;
-            for (const auto parameterFilter: parameterFilters) {
-                jsonParameterFilterArray.add(parameterFilter.ToJsonObject());
+            if (!parameterFilters.empty()) {
+                array jsonParameterFilterArray;
+                for (const auto &element: parameterFilters) {
+                    jsonParameterFilterArray.append(element.ToDocument());
+                }
+                document.append(kvp("ParameterFilters", jsonParameterFilterArray));
             }
-            rootJson.set("ParameterFilters", jsonParameterFilterArray);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void ParameterFilter::FromDocument(const view_or_value<view, value> &document) {
 
-        /* Todo
         try {
 
             // Attributes
-            Core::JsonUtils::GetJsonValueString("Key", jsonObject, key);
-            Core::JsonUtils::GetJsonValueString("Option", jsonObject, option);
-
+            key = Core::Bson::BsonUtils::GetStringValue(document, "Key");
+            option = Core::Bson::BsonUtils::GetStringValue(document, "Option");
 
             // Parameter filters
-            if (jsonObject->has("ParameterFilters")) {
-                Poco::JSON::Array::Ptr jsonParameterFilterArray = jsonObject->getArray("ParameterFilters");
-                for (int i = 0; i < jsonParameterFilterArray->size(); i++) {
+            if (document.view().find("ParameterFilters") != document.view().end()) {
+                for (const bsoncxx::array::view jsonParameterFilterArray = document.view()["ParameterFilters"].get_array().value; const auto &element: jsonParameterFilterArray) {
                     ParameterFilter parameterFilter;
-                    parameterFilter.FromJsonObject(jsonParameterFilterArray->getObject(i));
+                    parameterFilter.FromDocument(element.get_document().value);
                     parameterFilters.emplace_back(parameterFilter);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ParameterFilter::ToString() const {

@@ -6,20 +6,13 @@
 #define AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
 
 // C++ includes
-#include <chrono>
 #include <string>
-
-// Poco includes
-#include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
-#include <awsmock/repository/Database.h>
+#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 
@@ -127,7 +120,7 @@ namespace AwsMock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ListTopics(const std::string &region = {});
+        Entity::SNS::TopicList ListTopics(const std::string &region = {}) const;
 
         /**
          * @brief Counts the number of topics
@@ -135,7 +128,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return number of topics
          */
-        long CountTopics(const std::string &region = {});
+        long CountTopics(const std::string &region = {}) const;
 
         /**
          * @brief Purge a topic.
@@ -191,7 +184,7 @@ namespace AwsMock::Database {
          * @param topicArn ARN of the topic
          * @return number of available messages
          */
-        long CountMessages(const std::string &topicArn = {});
+        long CountMessages(const std::string &topicArn = {}) const;
 
         /**
          * @brief List all available resources
@@ -218,7 +211,7 @@ namespace AwsMock::Database {
          * @param topicArn ARN of the topic
          * @param status message status
          */
-        long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status);
+        long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) const;
 
         /**
          * @brief Deletes a message.
@@ -276,12 +269,12 @@ namespace AwsMock::Database {
         /**
          * Topic mutex
          */
-        static Poco::Mutex _snsTopicMutex;
+        static boost::mutex _snsTopicMutex;
 
         /**
          * Message mutex
          */
-        static Poco::Mutex _snsMessageMutex;
+        static boost::mutex _snsMessageMutex;
     };
 
 }// namespace AwsMock::Database

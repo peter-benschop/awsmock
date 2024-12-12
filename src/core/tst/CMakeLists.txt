@@ -6,8 +6,8 @@ set(SOURCES CryptoTests.cpp FileUtilsTests.cpp DirUtilsTests.cpp StringUtilsTest
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PRIVATE ../include /usr/local/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoUtil PocoFoundation PocoNet PocoJSON PocoXML PocoZip PocoPrometheus
-        boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto z archive)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} PocoUtil PocoFoundation PocoNet PocoZip PocoPrometheus boost_locale
+        boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto z archive)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 

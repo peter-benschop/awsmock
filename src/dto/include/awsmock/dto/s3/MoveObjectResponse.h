@@ -28,14 +28,14 @@ namespace AwsMock::Dto::S3 {
          *
          * @return XML string
          */
-        std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const;
 
         /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
-        std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * Stream provider.

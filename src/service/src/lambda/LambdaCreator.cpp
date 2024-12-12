@@ -144,8 +144,9 @@ namespace AwsMock::Service {
             }
             return codeDir;
 
-        } catch (Poco::Exception &exc) {
-            log_error << "Could not unzip lambda code, error: " << exc.message();
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
         return {};
     }

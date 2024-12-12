@@ -8,8 +8,8 @@
 // C++ standard includes
 #include <string>
 
-// Poco includes
-#include <Poco/Mutex.h>
+// Boost includes
+#include <boost/thread/pthread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -144,7 +144,7 @@ namespace AwsMock::Database {
          *
          * @return list of all modules
          */
-        Entity::Module::ModuleList ListModules();
+        Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Deletes module
@@ -173,7 +173,7 @@ namespace AwsMock::Database {
         /**
          * Module lock
          */
-        static Poco::Mutex _moduleMutex;
+        static boost::mutex _moduleMutex;
     };
 
 }// namespace AwsMock::Database

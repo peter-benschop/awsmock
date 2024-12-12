@@ -34,9 +34,9 @@ namespace AwsMock::Service {
 
             return listKeysResponse;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "S3 Create Bucket failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -46,7 +46,7 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            std::string keyId = Poco::UUIDGenerator().createRandom().toString();
+            std::string keyId = Core::StringUtils::CreateRandomUuid();
 
             std::string arn = Core::AwsUtils::CreateKMSKeyArn(request.region, _accountId, keyId);
             Database::Entity::KMS::Key keyEntity = {

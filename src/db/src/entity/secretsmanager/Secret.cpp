@@ -34,8 +34,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 kvp("rotationEnabled", rotationEnabled),
                 kvp("rotationLambdaARN", rotationLambdaARN),
                 kvp("rotationRules", rotationRulesDoc),
-                kvp("created", bsoncxx::types::b_date(std::chrono::milliseconds(created.timestamp().epochMicroseconds() / 1000))),
-                kvp("modified", bsoncxx::types::b_date(std::chrono::milliseconds(modified.timestamp().epochMicroseconds() / 1000))));
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return secretDoc;
     }
@@ -63,8 +63,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
             nextRotatedDate = mResult.value()["nextRotatedDate"].get_int64().value;
             rotationEnabled = mResult.value()["rotationEnabled"].get_bool().value;
             rotationLambdaARN = bsoncxx::string::to_string(mResult.value()["rotationLambdaARN"].get_string().value);
-            created = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["created"].get_date().value) / 1000));
-            modified = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["modified"].get_date().value) / 1000));
+            created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
+            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
 
             // Get rotation rules
             if (mResult.value().find("rotationRules") != mResult.value().end()) {

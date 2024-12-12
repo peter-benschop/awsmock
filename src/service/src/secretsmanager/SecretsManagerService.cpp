@@ -58,8 +58,9 @@ namespace AwsMock::Service {
             }
             secret = _database.CreateSecret(secret);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
         }
         return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
     }
@@ -86,7 +87,7 @@ namespace AwsMock::Service {
             log_debug << "Database secret described, secretId: " << request.secretId;
             return response;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -129,13 +130,13 @@ namespace AwsMock::Service {
             log_debug << "Get secret value, secretId: " << request.secretId;
 
             // Update database
-            secret.lastAccessedDate = Poco::Timestamp().epochTime();
-            _database.UpdateSecret(secret);
-            log_trace << "Secret updated, secretId: " << request.secretId;
+            secret.lastAccessedDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret = _database.UpdateSecret(secret);
+            log_trace << "Secret updated, secretId: " << secret.oid;
 
             return response;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -177,7 +178,7 @@ namespace AwsMock::Service {
             log_debug << "Database list secrets, region: " << request.region;
             return response;
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::DatabaseException &exc) {
             log_error << "List secrets failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -210,7 +211,7 @@ namespace AwsMock::Service {
             log_debug << "Database secret described, secretId: " << request.secretId;
             return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -229,7 +230,7 @@ namespace AwsMock::Service {
 
             // Get object from database
             Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
-            secret.lastRotatedDate = Poco::Timestamp().epochTime();
+            secret.lastRotatedDate = Core::DateTimeUtils::UnixTimestampNow();
 
             // Update database
             //secret.rotationRules = request.rotationRules;
@@ -243,7 +244,7 @@ namespace AwsMock::Service {
             log_debug << "Database secret described, secretId: " << request.secretId;
             return {.region = secret.region, .arn = secret.arn};
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
@@ -269,7 +270,7 @@ namespace AwsMock::Service {
             log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
             return {.region = request.region, .name = secret.name, .arn = secret.arn, .deletionDate = static_cast<double>(Poco::Timestamp().epochTime())};
 
-        } catch (Poco::Exception &exc) {
+        } catch (Core::DatabaseException &exc) {
             log_error << "SecretManager delete secret failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }

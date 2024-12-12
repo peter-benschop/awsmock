@@ -8,13 +8,12 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/Mutex.h>
+// Boost includes
+#include <boost/thread/pthread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/Database.h>
 
@@ -43,7 +42,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Check existence of key by keyId
+         * @brief Check existence of key by keyId
          *
          * @param keyId key ID
          * @return true if key already exists
@@ -52,7 +51,7 @@ namespace AwsMock::Database {
         bool KeyExists(const std::string &keyId);
 
         /**
-         * Returns a KMS key by primary key
+         * @brief Returns a KMS key by primary key
          *
          * @param oid key primary key
          * @return key entity
@@ -61,7 +60,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyById(const std::string &oid);
 
         /**
-         * Returns a KMS key by key ID
+         * @brief Returns a KMS key by key ID
          *
          * @param keyId key ID
          * @return key entity
@@ -70,13 +69,13 @@ namespace AwsMock::Database {
         Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
 
         /**
-         * List all keys
+         * @brief List all keys
          *
          * @param region AWS region
          * @return KeyList
          * @see Database::Entity::KMS::Key
          */
-        Entity::KMS::KeyList ListKeys(const std::string &region = {});
+        Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
 
         /**
          * Returns the total number of keys
@@ -87,7 +86,7 @@ namespace AwsMock::Database {
         long CountKeys() const;
 
         /**
-         * Create a new key in the KMS key table
+         * @brief Create a new key in the KMS key table
          *
          * @param key key entity
          * @return created KMS key entity
@@ -96,7 +95,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key CreateKey(const Entity::KMS::Key &key);
 
         /**
-         * Updates a key
+         * @brief Updates a key
          *
          * @param key key entity
          * @return created key entity
@@ -105,7 +104,7 @@ namespace AwsMock::Database {
         Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
 
         /**
-         * Delete a key
+         * @brief Delete a key
          *
          * @param key key entity
          * @throws DatabaseException
@@ -113,7 +112,7 @@ namespace AwsMock::Database {
         void DeleteKey(const Entity::KMS::Key &key);
 
         /**
-         * Delete a all keys
+         * @brief Delete all keys
          *
          * @throws DatabaseException
          */
@@ -129,7 +128,7 @@ namespace AwsMock::Database {
         /**
          * Key mutex
          */
-        static Poco::Mutex _keyMutex;
+        static boost::mutex _keyMutex;
     };
 
 }// namespace AwsMock::Database
