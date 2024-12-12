@@ -8,38 +8,31 @@ namespace AwsMock::Dto::KMS {
 
     void ListKeysRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Marker", rootObject, marker);
-            Core::JsonUtils::GetJsonValueLong("Limit", rootObject, limit);
+            const value document = bsoncxx::from_json(jsonString);
+            marker = Core::Bson::BsonUtils::GetStringValue(document, "Marker");
+            limit = Core::Bson::BsonUtils::GetIntValue(document, "Limit");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListKeysRequest::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Marker", marker);
-            rootJson.set("Limit", limit);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Marker", marker);
+            Core::Bson::BsonUtils::SetIntValue(document, "Limit", limit);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListKeysRequest::ToString() const {

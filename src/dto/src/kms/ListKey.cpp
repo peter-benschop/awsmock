@@ -8,43 +8,33 @@ namespace AwsMock::Dto::KMS {
 
     void ListKey::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            std::string tmpStr;
-            Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
-            Core::JsonUtils::GetJsonValueString("KeyArn", rootObject, keyArn);
-            std::string keyStateStr;
-            Core::JsonUtils::GetJsonValueString("KeyState", rootObject, keyStateStr);
-            if (!keyStateStr.empty()) {
-                keyState = KeyStateFromString(keyStateStr);
-            }
+            const value document = bsoncxx::from_json(jsonString);
+            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
+            keyArn = Core::Bson::BsonUtils::GetStringValue(document, "KeyArn");
+            keyState = KeyStateFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeyState"));
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     view_or_value<view, value> ListKey::ToDocument() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("KeyId", keyId);
-            rootJson.set("KeyArn", keyArn);
-            rootJson.set("KeyState", KeyStateToString(keyState));
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyArn", keyArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyState", KeyStateToString(keyState));
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListKey::ToJson() const {
