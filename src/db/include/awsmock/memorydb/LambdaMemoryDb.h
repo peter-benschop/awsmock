@@ -9,12 +9,7 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Mutex.h>
-
 // AwsMock includes
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -185,7 +180,7 @@ namespace AwsMock::Database {
         /**
          * Lambda mutex
          */
-        static Poco::Mutex _lambdaMutex;
+        static boost::mutex _lambdaMutex;
     };
 
 }// namespace AwsMock::Database

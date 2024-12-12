@@ -27,7 +27,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::DatabaseException(exc.what());
             }
         }
         return _memoryDb.SecretExists(region, name);
@@ -43,16 +43,16 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-                int64_t count = _secretCollection.count_documents(make_document(kvp("secretId", secretId)));
+                const int64_t count = _secretCollection.count_documents(make_document(kvp("secretId", secretId)));
                 log_trace << "Secret exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::DatabaseException(exc.what());
             }
         }
         return _memoryDb.SecretExists(secretId);
@@ -70,7 +70,7 @@ namespace AwsMock::Database {
         return result;
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(const std::string &oid) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretById(const std::string &oid) const {
 
         if (HasDatabase()) {
 
@@ -117,7 +117,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetSecretBySecretId(secretId);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
@@ -138,7 +138,7 @@ namespace AwsMock::Database {
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what(), Poco::Net::HTTPResponse::HTTPStatus::HTTP_INTERNAL_SERVER_ERROR);
+                throw Core::DatabaseException(exc.what());
             }
         }
         return _memoryDb.CreateSecret(secret);
@@ -170,7 +170,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateSecret(secret);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) const {
 
         if (SecretExists(secret)) {
 

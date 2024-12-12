@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Mutex.h>
+// Boost includes
+#include <boost/thread/pthread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -336,17 +336,17 @@ namespace AwsMock::Database {
         /**
          * Cognito user pool mutex
          */
-        static Poco::Mutex _userPoolMutex;
+        static boost::mutex _userPoolMutex;
 
         /**
          * Cognito user mutex
          */
-        static Poco::Mutex _userMutex;
+        static boost::mutex _userMutex;
 
         /**
          * Cognito group mutex
          */
-        static Poco::Mutex _groupMutex;
+        static boost::mutex _groupMutex;
     };
 
 }// namespace AwsMock::Database

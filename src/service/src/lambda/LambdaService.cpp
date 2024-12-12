@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Poco::Mutex LambdaService::_mutex;
+    boost::mutex LambdaService::_mutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "create_function");
@@ -69,9 +69,9 @@ namespace AwsMock::Service {
             log_debug << "Lambda list outcome: " << response.ToJson();
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Lambda list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -89,9 +89,9 @@ namespace AwsMock::Service {
             log_trace << "Lambda list function counters, result: " << response.ToString();
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Lambda list function counters request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -110,9 +110,9 @@ namespace AwsMock::Service {
             log_info << "Lambda function: " + response.ToJson();
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Lambda list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -145,9 +145,9 @@ namespace AwsMock::Service {
             log_info << "Lambda function: " + response.ToJson();
             return response;
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Lambda list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Lambda list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -163,9 +163,9 @@ namespace AwsMock::Service {
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_info << "Reset lambda function counters";
 
-        } catch (Poco::Exception &ex) {
-            log_error << "Reset function counters request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Reset function counters request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 

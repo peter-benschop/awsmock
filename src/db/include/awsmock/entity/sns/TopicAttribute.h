@@ -10,10 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
 namespace AwsMock::Database::Entity::SNS {
+
+    using std::chrono::system_clock;
 
     /**
      * SNS topic attribute entity
@@ -109,7 +110,7 @@ namespace AwsMock::Database::Entity::SNS {
          * is based on the configured message retention period set by the topic’s message archiving policy.
          * </p>
          */
-        Poco::DateTime beginningArchiveTime;
+        system_clock::time_point beginningArchiveTime;
 
         /**
          * @brief Content based deduplication.

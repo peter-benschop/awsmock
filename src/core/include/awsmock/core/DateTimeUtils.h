@@ -166,6 +166,7 @@ namespace AwsMock::Core {
          * @return offset in seconds to UTC.
          */
         static long UtcOffset();
+        std::string FromISO8601(system_clock::time_point now) const;
     };
 
 }// namespace AwsMock::Core

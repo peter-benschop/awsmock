@@ -26,18 +26,17 @@ namespace AwsMock::Dto::SQS {
     void EventNotification::FromJson(const std::string &jsonString) {
 
         try {
-            const value document = bsoncxx::from_json(jsonString);
 
-            if (document.find("Records") != document.end()) {
+            if (const value document = bsoncxx::from_json(jsonString); document.find("Records") != document.end()) {
                 for (const bsoncxx::array::view arrayView{document["Entries"].get_array().value}; const bsoncxx::array::element &tagElement: arrayView) {
                     Record record;
                     record.FromDocument(tagElement.get_document().value);
                     records.emplace_back(record);
                 }
             }
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

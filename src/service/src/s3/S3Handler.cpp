@@ -792,7 +792,7 @@ namespace AwsMock::Service {
             headers["ETag"] = "\"" + s3Response.md5Sum + "\"";
             headers["accept-ranges"] = "bytes";
             headers["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
-            headers["x-amz-request-userPoolId"] = Poco::UUIDGenerator().createRandom().toString();
+            headers["x-amz-request-userPoolId"] = Core::StringUtils::CreateRandomUuid();
             headers["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
             headers["x-amz-bucket-region"] = s3Response.region;
             headers["x-amz-location-name"] = s3Response.region;

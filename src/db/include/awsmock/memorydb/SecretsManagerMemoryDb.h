@@ -9,12 +9,11 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Mutex.h>
+// Boost includes
+#include <boost/thread/pthread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/repository/Database.h>
 
@@ -156,7 +155,7 @@ namespace AwsMock::Database {
         /**
          * Lambda mutex
          */
-        static Poco::Mutex _secretMutex;
+        static boost::mutex _secretMutex;
     };
 
 }// namespace AwsMock::Database

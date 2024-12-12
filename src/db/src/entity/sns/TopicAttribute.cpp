@@ -17,7 +17,7 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("tracingConfig", tracingConfig),
                 kvp("kmsMasterKeyId", kmsMasterKeyId),
                 kvp("archivePolicy", archivePolicy),
-                kvp("beginningArchiveTime", bsoncxx::types::b_date(std::chrono::milliseconds(beginningArchiveTime.timestamp().epochMicroseconds() / 1000))),
+                kvp("beginningArchiveTime", bsoncxx::types::b_date(beginningArchiveTime)),
                 kvp("contentBasedDeduplication", contentBasedDeduplication),
                 kvp("availableMessages", availableMessages));
 
@@ -36,10 +36,9 @@ namespace AwsMock::Database::Entity::SNS {
             tracingConfig = Core::Bson::BsonUtils::GetStringValue(mResult, "tracingConfig");
             kmsMasterKeyId = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsMasterKeyId");
             archivePolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "archivePolicy");
-            beginningArchiveTime = Poco::DateTime(Poco::Timestamp::fromEpochTime(bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value) / 1000));
+            beginningArchiveTime = bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value);
             contentBasedDeduplication = mResult.value()["contentBasedDeduplication"].get_bool().value;
             availableMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "availableMessages");
-
 
         } catch (std::exception &exc) {
             log_error << exc.what();

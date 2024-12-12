@@ -6,18 +6,18 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex KMSMemoryDb::_keyMutex;
+    boost::mutex KMSMemoryDb::_keyMutex;
 
     bool KMSMemoryDb::KeyExists(const std::string &keyId) {
 
-        return find_if(_keys.begin(), _keys.end(), [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
+        return std::ranges::find_if(_keys, [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
                    return topic.second.keyId == keyId;
                }) != _keys.end();
     }
 
     Entity::KMS::Key KMSMemoryDb::GetKeyById(const std::string &oid) {
 
-        auto it = find_if(_keys.begin(), _keys.end(), [oid](const std::pair<std::string, Entity::KMS::Key> &topic) {
+        const auto it = std::ranges::find_if(_keys, [oid](const std::pair<std::string, Entity::KMS::Key> &topic) {
             return topic.first == oid;
         });
 
@@ -32,7 +32,7 @@ namespace AwsMock::Database {
 
     Entity::KMS::Key KMSMemoryDb::GetKeyByKeyId(const std::string &keyId) {
 
-        auto it = find_if(_keys.begin(), _keys.end(), [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
+        const auto it = std::ranges::find_if(_keys, [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
             return topic.second.keyId == keyId;
         });
 
@@ -45,21 +45,21 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::KMS::KeyList KMSMemoryDb::ListKeys(const std::string &region) {
+    Entity::KMS::KeyList KMSMemoryDb::ListKeys(const std::string &region) const {
 
         Entity::KMS::KeyList keyList;
 
         if (region.empty()) {
 
-            for (const auto &key: _keys) {
-                keyList.emplace_back(key.second);
+            for (const auto &val: _keys | std::views::values) {
+                keyList.emplace_back(val);
             }
 
         } else {
 
-            for (const auto &key: _keys) {
-                if (key.second.region == region) {
-                    keyList.emplace_back(key.second);
+            for (const auto &val: _keys | std::views::values) {
+                if (val.region == region) {
+                    keyList.emplace_back(val);
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
     }
 
     Entity::KMS::Key KMSMemoryDb::CreateKey(const Entity::KMS::Key &topic) {
-        Poco::ScopedLock loc(_keyMutex);
+        boost::mutex::scoped_lock lock(_keyMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _keys[oid] = topic;
@@ -83,7 +83,7 @@ namespace AwsMock::Database {
     }
 
     Entity::KMS::Key KMSMemoryDb::UpdateKey(const Entity::KMS::Key &key) {
-        Poco::ScopedLock lock(_keyMutex);
+        boost::mutex::scoped_lock lock(_keyMutex);
 
         std::string keyId = key.keyId;
         const auto it = std::ranges::find_if(_keys,
@@ -99,7 +99,7 @@ namespace AwsMock::Database {
     }
 
     void KMSMemoryDb::DeleteKey(const Entity::KMS::Key &key) {
-        Poco::ScopedLock lock(_keyMutex);
+        boost::mutex::scoped_lock lock(_keyMutex);
 
         std::string keyId = key.keyId;
         const auto count = std::erase_if(_keys, [keyId](const auto &item) {
@@ -110,7 +110,7 @@ namespace AwsMock::Database {
     }
 
     void KMSMemoryDb::DeleteAllKeys() {
-        Poco::ScopedLock lock(_keyMutex);
+        boost::mutex::scoped_lock lock(_keyMutex);
         _keys.clear();
         log_debug << "All KMS keys deleted";
     }

@@ -45,7 +45,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServiceTest, QueueCreateTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
 
         // act
         Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
     TEST_F(SQSServiceTest, QueueListTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
         Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
 
@@ -72,10 +72,10 @@ namespace AwsMock::Service {
     TEST_F(SQSServiceTest, QueueListEmptyTest) {
 
         // arrange
-        Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
+        const Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
 
         // act
-        Dto::SQS::ListQueuesResponse response = _service.ListQueues(listQueuesRequest);
+        const Dto::SQS::ListQueuesResponse response = _service.ListQueues(listQueuesRequest);
 
         // assert
         EXPECT_TRUE(response.queueList.empty());
@@ -101,12 +101,12 @@ namespace AwsMock::Service {
 
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
-        queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
 
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
         Dto::SQS::DeleteQueueRequest deleteRequest = {.region = REGION, .queueUrl = queueUrl};
-        deleteRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+        deleteRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
         EXPECT_NO_THROW({ _service.DeleteQueue(deleteRequest); });
@@ -120,14 +120,14 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
         queueRequest.region = REGION;
-        queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest request = {.queueUrl = queueUrl, .body = BODY, .messageId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::SendMessageRequest request = {.queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
         request.region = REGION;
-        request.requestId = Poco::UUIDGenerator().createRandom().toString();
+        request.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
         Dto::SQS::SendMessageResponse response = _service.SendMessage(request);
@@ -144,15 +144,15 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
         queueRequest.region = REGION;
-        queueRequest.requestId = Poco::UUIDGenerator().createRandom().toString();
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest request1 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Poco::UUIDGenerator().createRandom().toString()};
-        request1.requestId = Poco::UUIDGenerator().createRandom().toString();
-        Dto::SQS::SendMessageRequest request2 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Poco::UUIDGenerator().createRandom().toString()};
-        request2.requestId = Poco::UUIDGenerator().createRandom().toString();
+        Dto::SQS::SendMessageRequest request1 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        request1.requestId = Core::StringUtils::CreateRandomUuid();
+        Dto::SQS::SendMessageRequest request2 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        request2.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
         Dto::SQS::SendMessageResponse response1 = _service.SendMessage(request1);
@@ -172,11 +172,11 @@ namespace AwsMock::Service {
     TEST_F(SQSServiceTest, MessageReceiveTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .body = BODY, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .body = BODY, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
@@ -190,11 +190,11 @@ namespace AwsMock::Service {
     TEST_F(SQSServiceTest, MessageDeleteTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .requestId = Poco::UUIDGenerator().createRandom().toString()};
+        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act

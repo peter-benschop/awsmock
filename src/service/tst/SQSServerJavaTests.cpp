@@ -39,6 +39,7 @@ namespace AwsMock::Service {
             rootObject.set("testKey", testKey);
             rootObject.set("receiptHandle", receiptHandle);
             return Core::JsonUtils::ToJsonString(rootObject);*/
+            return {};
         }
 
         void FromJson(const std::string &jsonString) {

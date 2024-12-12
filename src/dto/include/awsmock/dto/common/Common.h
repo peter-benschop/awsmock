@@ -38,7 +38,7 @@ namespace AwsMock::Dto {
         /**
          * Resource
          */
-        std::string requestId = Poco::UUIDGenerator().createRandom().toString();
+        std::string requestId = Core::StringUtils::CreateRandomUuid();
     };
 
 }// namespace AwsMock::Dto

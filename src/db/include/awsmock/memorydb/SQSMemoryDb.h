@@ -6,13 +6,10 @@
 #define AWSMOCK_REPOSITORY_SQS_MEMORYDB_H
 
 // C++ includes
-#include <chrono>
 #include <string>
 
-// Poco includes
-#include <Poco/Mutex.h>
-#include <Poco/ScopedLock.h>
-#include <Poco/UUIDGenerator.h>
+// Boost includes
+#include <boost/thread/pthread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -102,7 +99,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(const std::string &region = {});
+        Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
 
         /**
          * @brief Returns a queue by ARN
@@ -345,12 +342,12 @@ namespace AwsMock::Database {
         /**
          * Queue mutex
          */
-        static Poco::Mutex sqsQueueMutex;
+        static boost::mutex _sqsQueueMutex;
 
         /**
          * Message mutex
          */
-        static Poco::Mutex _sqsMessageMutex;
+        static boost::mutex _sqsMessageMutex;
     };
 
 }// namespace AwsMock::Database

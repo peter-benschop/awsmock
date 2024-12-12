@@ -6,11 +6,7 @@
 #define AWSMOCK_SERVICE_SECRETSMANAGER_SERVICE_H
 
 // C++ standard includes
-#include <chrono>
-#include <ctime>
-#include <map>
 #include <string>
-#include <thread>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -58,7 +54,7 @@ namespace AwsMock::Service {
          * @param request create secret request
          * @return CreateSecretResponse
          */
-        Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const;
 
         /**
          * Describes an existing secret
@@ -66,7 +62,7 @@ namespace AwsMock::Service {
          * @param request describe secret request
          * @return DescribeSecretResponse
          */
-        Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const;
 
         /**
          * Returns the secret value
@@ -74,7 +70,7 @@ namespace AwsMock::Service {
          * @param request get secret value request
          * @return GetSecretValueResponse
          */
-        Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
 
         /**
          * List existing secrets
@@ -82,7 +78,7 @@ namespace AwsMock::Service {
          * @param request list secrets request
          * @return ListSecretsResponse
          */
-        Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
 
         /**
          * Updates an existing secret
@@ -90,7 +86,7 @@ namespace AwsMock::Service {
          * @param request update secret request
          * @return UpdateSecretResponse
          */
-        Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const;
 
         /**
          * Rotates an existing secret
@@ -98,7 +94,7 @@ namespace AwsMock::Service {
          * @param request rotate secret request
          * @return RotateSecretResponse
          */
-        Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const;
 
         /**
          * Deletes an existing secret
@@ -106,7 +102,7 @@ namespace AwsMock::Service {
          * @param request delete secret request
          * @return DeleteSecretResponse
          */
-        Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
+        [[nodiscard]] Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
 
       private:
 
@@ -123,7 +119,7 @@ namespace AwsMock::Service {
         /**
          * Shutdown mutex
          */
-        Poco::Mutex _mutex;
+        boost::mutex _mutex;
 
         /**
          * Key management system key

@@ -6,38 +6,36 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex SQSMemoryDb::sqsQueueMutex;
-    Poco::Mutex SQSMemoryDb::_sqsMessageMutex;
+    boost::mutex SQSMemoryDb::_sqsQueueMutex;
+    boost::mutex SQSMemoryDb::_sqsMessageMutex;
 
     bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
-        return find_if(_queues.begin(),
-                       _queues.end(),
-                       [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                           return queue.second.region == region && queue.second.name == name;
-                       }) != _queues.end();
+        return std::ranges::find_if(_queues,
+                                    [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                                        return queue.second.region == region && queue.second.name == name;
+                                    }) != _queues.end();
     }
 
     bool SQSMemoryDb::QueueUrlExists(const std::string &region, const std::string &queueUrl) {
 
-        return find_if(_queues.begin(),
-                       _queues.end(),
-                       [region, queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                           return queue.second.region == region && queue.second.queueUrl == queueUrl;
-                       }) != _queues.end();
+        return std::ranges::find_if(_queues,
+                                    [region, queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                                        return queue.second.region == region && queue.second.queueUrl == queueUrl;
+                                    }) != _queues.end();
     }
 
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
-        return find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+        return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
                    return queue.second.queueArn == queueArn;
                }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
-        Poco::ScopedLock lock(sqsQueueMutex);
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _queues[oid] = queue;
         log_trace << "Queue created, oid: " << oid;
         return GetQueueById(oid);
@@ -45,7 +43,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSMemoryDb::GetQueueById(const std::string &oid) {
 
-        auto it = find_if(_queues.begin(), _queues.end(), [oid](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+        const auto it = std::ranges::find_if(_queues, [oid](const std::pair<std::string, Entity::SQS::Queue> &queue) {
             return queue.first == oid;
         });
 
@@ -60,8 +58,8 @@ namespace AwsMock::Database {
 
         Entity::SQS::Queue result;
 
-        auto it =
-                find_if(_queues.begin(), _queues.end(), [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+        const auto it =
+                std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
                     return queue.second.queueArn == queueArn;
                 });
 
@@ -75,8 +73,8 @@ namespace AwsMock::Database {
     Entity::SQS::Queue SQSMemoryDb::GetQueueByUrl(const std::string &queueUrl) {
 
         Entity::SQS::Queue result;
-        auto it =
-                find_if(_queues.begin(), _queues.end(), [queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+        const auto it =
+                std::ranges::find_if(_queues, [queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
                     return queue.second.queueUrl == queueUrl;
                 });
 
@@ -90,11 +88,10 @@ namespace AwsMock::Database {
     Entity::SQS::Queue SQSMemoryDb::GetQueueByName(const std::string &region, const std::string &name) {
 
         Entity::SQS::Queue result;
-        auto it = find_if(_queues.begin(),
-                          _queues.end(),
-                          [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                              return queue.second.region == region && queue.second.name == name;
-                          });
+        const auto it = std::ranges::find_if(_queues,
+                                             [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                                                 return queue.second.region == region && queue.second.name == name;
+                                             });
 
         if (it != _queues.end()) {
             it->second.oid = it->first;
@@ -103,11 +100,11 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) {
+    Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) const {
 
         Entity::SQS::QueueList queueList;
-        for (const auto &queue: _queues) {
-            queueList.emplace_back(queue.second);
+        for (const auto &val: _queues | std::views::values) {
+            queueList.emplace_back(val);
         }
 
         log_trace << "Got queue list, size: " << queueList.size();
@@ -115,7 +112,7 @@ namespace AwsMock::Database {
     }
 
     void SQSMemoryDb::PurgeQueue(const std::string &queueArn) {
-        Poco::ScopedLock lock(sqsQueueMutex);
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
         const auto count = std::erase_if(_messages, [queueArn](const auto &item) {
             auto const &[key, value] = item;
@@ -125,17 +122,16 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSMemoryDb::UpdateQueue(Entity::SQS::Queue &queue) {
-        Poco::ScopedLock lock(sqsQueueMutex);
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
         queue.modified = system_clock::now();
 
         std::string region = queue.region;
         std::string name = queue.name;
-        auto it = find_if(_queues.begin(),
-                          _queues.end(),
-                          [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                              return queue.second.region == region && queue.second.name == name;
-                          });
+        const auto it = std::ranges::find_if(_queues,
+                                             [region, name](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                                                 return queue.second.region == region && queue.second.name == name;
+                                             });
         _queues[it->first] = queue;
         return _queues[it->first];
     }
@@ -148,8 +144,8 @@ namespace AwsMock::Database {
             count = static_cast<long>(_queues.size());
         } else {
 
-            for (auto &queue: _queues) {
-                if (!region.empty() && queue.second.region == region || (!prefix.empty() && Core::StringUtils::StartsWith(queue.second.name, prefix))) {
+            for (const auto &val: _queues | std::views::values) {
+                if (!region.empty() && val.region == region || (!prefix.empty() && Core::StringUtils::StartsWith(val.name, prefix))) {
                     count++;
                 }
             }
@@ -159,7 +155,7 @@ namespace AwsMock::Database {
     }
 
     void SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
-        Poco::ScopedLock lock(sqsQueueMutex);
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
         std::string region = queue.region;
         std::string queueUrl = queue.queueUrl;
@@ -171,16 +167,16 @@ namespace AwsMock::Database {
     }
 
     void SQSMemoryDb::DeleteAllQueues() {
-        Poco::ScopedLock lock(sqsQueueMutex);
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
         log_debug << "All queues deleted, count: " << _queues.size();
         _queues.clear();
     }
 
     Entity::SQS::Message SQSMemoryDb::CreateMessage(const Entity::SQS::Message &message) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        std::string oid = Poco::UUIDGenerator().createRandom().toString();
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
         _messages[oid] = message;
         log_trace << "Message created, oid: " << oid;
 
@@ -189,17 +185,16 @@ namespace AwsMock::Database {
 
     bool SQSMemoryDb::MessageExists(const std::string &receiptHandle) {
 
-        return find_if(_messages.begin(),
-                       _messages.end(),
-                       [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
-                           return message.second.receiptHandle == receiptHandle;
-                       }) != _messages.end();
+        return std::ranges::find_if(_messages,
+                                    [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
+                                        return message.second.receiptHandle == receiptHandle;
+                                    }) != _messages.end();
     }
 
     Entity::SQS::Message SQSMemoryDb::GetMessageById(const std::string &oid) {
 
-        auto it =
-                find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
+        const auto it =
+                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
                     return message.first == oid;
                 });
 
@@ -212,12 +207,11 @@ namespace AwsMock::Database {
 
     Entity::SQS::Message SQSMemoryDb::GetMessageByReceiptHandle(const std::string &receiptHandle) {
 
-        Entity::SQS::Message result;
-        auto it = find_if(_messages.begin(),
-                          _messages.end(),
-                          [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
-                              return message.second.receiptHandle == receiptHandle;
-                          });
+        Entity::SQS::Message result = {};
+        const auto it = std::ranges::find_if(_messages,
+                                             [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
+                                                 return message.second.receiptHandle == receiptHandle;
+                                             });
 
         if (it != _messages.end()) {
             it->second.oid = it->first;
@@ -227,13 +221,13 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Message SQSMemoryDb::UpdateMessage(Entity::SQS::Message &message) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         message.modified = system_clock::now();
 
         std::string oid = message.oid;
-        auto it =
-                find_if(_messages.begin(), _messages.end(), [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
+        const auto it =
+                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SQS::Message> &message) {
                     return message.second.oid == oid;
                 });
         _messages[it->first] = message;
@@ -245,43 +239,42 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList messageList;
         if (region.empty()) {
 
-            for (const auto &message: _messages) {
-                messageList.emplace_back(message.second);
+            for (const auto &val: _messages | std::views::values) {
+                messageList.emplace_back(val);
             }
 
         } else {
 
-            for (const auto &message: _messages) {
-                if (Core::StringUtils::Contains(message.second.queueArn, region)) {
-                    messageList.emplace_back(message.second);
+            for (const auto &val: _messages | std::views::values) {
+                if (Core::StringUtils::Contains(val.queueArn, region)) {
+                    messageList.emplace_back(val);
                 }
             }
         }
-
         log_trace << "Got message list, size: " << messageList.size();
         return messageList;
     }
 
     void SQSMemoryDb::ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        auto reset = system_clock::now() + std::chrono::seconds{visibility};
+        const auto reset = system_clock::now() + std::chrono::seconds{visibility};
 
         // Get the cursor
-        for (auto message: _messages) {
+        for (auto [fst, snd]: _messages) {
 
-            if (message.second.queueArn == queueArn && message.second.status == Entity::SQS::MessageStatus::INITIAL) {
+            if (snd.queueArn == queueArn && snd.status == Entity::SQS::MessageStatus::INITIAL) {
 
-                message.second.retries++;
-                message.second.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-                messageList.push_back(message.second);
+                snd.retries++;
+                snd.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+                messageList.push_back(snd);
 
                 // Update values
-                message.second.status = Entity::SQS::MessageStatus::INVISIBLE;
-                message.second.reset = reset;
+                snd.status = Entity::SQS::MessageStatus::INVISIBLE;
+                snd.reset = reset;
 
                 // Update store
-                _messages[message.first] = message.second;
+                _messages[fst] = snd;
 
                 // Check max resources
                 if (messageList.size() >= maxResult) {
@@ -294,20 +287,20 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::ResetMessages(const std::string &queueArn, long visibility) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         long count = 0;
         auto now = system_clock::now();
-        for (auto message: _messages) {
+        for (auto [fst, snd]: _messages) {
 
-            if (message.second.queueArn == queueArn && message.second.status == Entity::SQS::MessageStatus::INVISIBLE && message.second.reset < std::chrono::system_clock::now()) {
+            if (snd.queueArn == queueArn && snd.status == Entity::SQS::MessageStatus::INVISIBLE && snd.reset < std::chrono::system_clock::now()) {
 
                 // Reset status
-                message.second.status = Entity::SQS::MessageStatus::INITIAL;
-                message.second.receiptHandle = "";
+                snd.status = Entity::SQS::MessageStatus::INITIAL;
+                snd.receiptHandle = "";
 
                 // Update store
-                _messages[message.first] = message.second;
+                _messages[fst] = snd;
                 count++;
             }
             log_trace << "Message reset, visibilityTimeout: " << visibility << " updated: " << count << " queueArn: " << queueArn;
@@ -316,17 +309,17 @@ namespace AwsMock::Database {
     }
 
     void SQSMemoryDb::RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         long count = 0;
         std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
-        for (auto message: _messages) {
+        for (auto [fst, snd]: _messages) {
 
-            if (message.second.queueArn == queueArn && message.second.status == Entity::SQS::MessageStatus::INITIAL && message.second.retries > redrivePolicy.maxReceiveCount) {
+            if (snd.queueArn == queueArn && snd.status == Entity::SQS::MessageStatus::INITIAL && snd.retries > redrivePolicy.maxReceiveCount) {
 
-                message.second.retries = 0;
-                message.second.queueArn = redrivePolicy.deadLetterTargetArn;
-                _messages[message.first] = message.second;
+                snd.retries = 0;
+                snd.queueArn = redrivePolicy.deadLetterTargetArn;
+                _messages[fst] = snd;
 
                 count++;
             }
@@ -335,17 +328,17 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::ResetDelayedMessages(const std::string &queueArn, long delay) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         long count = 0;
         auto now = std::chrono::high_resolution_clock::now();
 
-        for (auto &message: _messages) {
+        for (auto &[fst, snd]: _messages) {
 
-            if (message.second.queueArn == queueArn && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < std::chrono::system_clock::now()) {
+            if (snd.queueArn == queueArn && snd.status == Entity::SQS::MessageStatus::DELAYED && snd.reset < std::chrono::system_clock::now()) {
 
-                message.second.status = Entity::SQS::MessageStatus::INITIAL;
-                _messages[message.first] = message.second;
+                snd.status = Entity::SQS::MessageStatus::INITIAL;
+                _messages[fst] = snd;
 
                 count++;
             }
@@ -355,16 +348,16 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::MessageRetention(const std::string &queueArn, long retentionPeriod) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         long count = 0;
         auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{retentionPeriod};
 
-        for (auto &message: _messages) {
+        for (auto &val: _messages | std::views::values) {
 
-            if (message.second.queueArn == queueArn && message.second.status == Entity::SQS::MessageStatus::DELAYED && message.second.reset < std::chrono::system_clock::now()) {
+            if (val.queueArn == queueArn && val.status == Entity::SQS::MessageStatus::DELAYED && val.reset < std::chrono::system_clock::now()) {
 
-                DeleteMessage(message.second);
+                DeleteMessage(val);
                 count++;
             }
         }
@@ -381,8 +374,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            std::map<std::string, Entity::SQS::Message>::iterator it;
-            for (it = _messages.begin(); it != _messages.end(); it++) {
+            for (auto it = _messages.begin(); it != _messages.end(); ++it) {
                 if (it->second.queueArn == queueArn) {
                     count++;
                 }
@@ -396,8 +388,7 @@ namespace AwsMock::Database {
 
         long count = 0;
 
-        std::map<std::string, Entity::SQS::Message>::iterator it;
-        for (it = _messages.begin(); it != _messages.end(); it++) {
+        for (auto it = _messages.begin(); it != _messages.end(); ++it) {
             if (it->second.queueArn == queueArn && it->second.status == status) {
                 count++;
             }
@@ -409,29 +400,27 @@ namespace AwsMock::Database {
     Entity::SQS::MessageWaitTime SQSMemoryDb::GetAverageMessageWaitingTime() {
 
         Entity::SQS::MessageWaitTime waitTime{};
-        Entity::SQS::QueueList queueList = ListQueues();
-        for (const auto &queue: queueList) {
+        for (Entity::SQS::QueueList queueList = ListQueues(); const auto &queue: queueList) {
 
             // Extract map values
             std::vector<Entity::SQS::Message> filtered;
-            std::transform(_messages.begin(), _messages.end(),
-                           std::back_inserter(filtered),
-                           [queue](auto &kv) {
-                               if (kv.second.queueArn == queue.queueArn) {
-                                   return kv.second;
-                               }
-                               return (Entity::SQS::Message){};
-                           });
+            std::ranges::transform(_messages,
+                                   std::back_inserter(filtered),
+                                   [queue](auto &kv) {
+                                       if (kv.second.queueArn == queue.queueArn) {
+                                           return kv.second;
+                                       }
+                                       return (Entity::SQS::Message) {};
+                                   });
 
             if (!filtered.empty()) {
 
                 // Sort by created timestamp
-                std::sort(filtered.begin(), filtered.end(), [](auto x, auto y) { return x.created > y.created; });
+                std::ranges::sort(filtered, [](auto x, auto y) { return x.created > y.created; });
 
-                double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.front().created).count();
-                double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count();
+                const double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.front().created).count();
 
-                if (max + min > 5) {
+                if (double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count(); max + min > 5) {
                     waitTime.waitTime[queue.name] = (max + min) / 2.0;
                 } else {
                     waitTime.waitTime[queue.name] = 0.0;
@@ -444,7 +433,7 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::DeleteMessages(const std::string &queueArn) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         const auto count = std::erase_if(_messages, [queueArn](const auto &item) {
             auto const &[key, value] = item;
@@ -456,7 +445,7 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::DeleteMessage(const Entity::SQS::Message &message) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         std::string receiptHandle = message.receiptHandle;
         const auto count = std::erase_if(_messages, [receiptHandle](const auto &item) {
@@ -468,7 +457,7 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::DeleteMessage(const std::string &receiptHandle) {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         const auto count = std::erase_if(_messages, [receiptHandle](const auto &item) {
             auto const &[key, value] = item;
@@ -479,7 +468,7 @@ namespace AwsMock::Database {
     }
 
     void SQSMemoryDb::DeleteAllMessages() {
-        Poco::ScopedLock lock(_sqsMessageMutex);
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         log_debug << "All resources deleted, count: " << _messages.size();
         _messages.clear();

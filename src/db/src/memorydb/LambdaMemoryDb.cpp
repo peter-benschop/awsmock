@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex LambdaMemoryDb::_lambdaMutex;
+    boost::mutex LambdaMemoryDb::_lambdaMutex;
 
     bool LambdaMemoryDb::LambdaExists(const std::string &function) {
 
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Lambda::Lambda LambdaMemoryDb::CreateLambda(const Entity::Lambda::Lambda &lambda) {
-        Poco::ScopedLock lock(_lambdaMutex);
+        boost::mutex::scoped_lock lock(_lambdaMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _lambdas[oid] = lambda;
@@ -147,7 +147,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
-        Poco::ScopedLock lock(_lambdaMutex);
+        boost::mutex::scoped_lock lock(_lambdaMutex);
 
         std::string region = lambda.region;
         std::string function = lambda.function;
@@ -165,7 +165,7 @@ namespace AwsMock::Database {
     }
 
     void LambdaMemoryDb::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
-        Poco::ScopedLock lock(_lambdaMutex);
+        boost::mutex::scoped_lock lock(_lambdaMutex);
 
         for (auto &val: _lambdas | std::views::values) {
             for (auto &instance: val.instances) {
@@ -177,7 +177,7 @@ namespace AwsMock::Database {
     }
 
     void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
-        Poco::ScopedLock lock(_lambdaMutex);
+        boost::mutex::scoped_lock lock(_lambdaMutex);
 
         const auto count = std::erase_if(_lambdas, [functionName](const auto &item) {
             auto const &[key, value] = item;
@@ -187,7 +187,7 @@ namespace AwsMock::Database {
     }
 
     void LambdaMemoryDb::DeleteAllLambdas() {
-        Poco::ScopedLock lock(_lambdaMutex);
+        boost::mutex::scoped_lock lock(_lambdaMutex);
 
         log_debug << "All lambdas deleted, count: " << _lambdas.size();
         _lambdas.clear();

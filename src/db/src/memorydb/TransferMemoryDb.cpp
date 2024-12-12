@@ -6,16 +6,15 @@
 
 namespace AwsMock::Database {
 
-    Poco::Mutex TransferMemoryDb::_transferMutex;
-    Poco::Mutex TransferMemoryDb::_userMutex;
+    boost::mutex TransferMemoryDb::_transferMutex;
+    boost::mutex TransferMemoryDb::_userMutex;
 
     bool TransferMemoryDb::TransferExists(const std::string &region, const std::string &serverId) {
 
-        return find_if(_transfers.begin(),
-                       _transfers.end(),
-                       [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                           return transfer.second.region == region && transfer.second.serverId == serverId;
-                       }) != _transfers.end();
+        return std::ranges::find_if(_transfers,
+                                    [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                        return transfer.second.region == region && transfer.second.serverId == serverId;
+                                    }) != _transfers.end();
     }
 
     bool TransferMemoryDb::TransferExists(const Entity::Transfer::Transfer &transfer) {
@@ -25,20 +24,18 @@ namespace AwsMock::Database {
 
     bool TransferMemoryDb::TransferExists(const std::string &serverId) {
 
-        return find_if(_transfers.begin(),
-                       _transfers.end(),
-                       [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                           return transfer.second.serverId == serverId;
-                       }) != _transfers.end();
+        return std::ranges::find_if(_transfers,
+                                    [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                        return transfer.second.serverId == serverId;
+                                    }) != _transfers.end();
     }
 
     bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
 
-        return find_if(_transfers.begin(),
-                       _transfers.end(),
-                       [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                           return transfer.second.region == region && transfer.second.protocols == protocols;
-                       }) != _transfers.end();
+        return std::ranges::find_if(_transfers,
+                                    [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                        return transfer.second.region == region && transfer.second.protocols == protocols;
+                                    }) != _transfers.end();
     }
 
     std::vector<Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
@@ -46,15 +43,15 @@ namespace AwsMock::Database {
         Entity::Transfer::TransferList transferList;
         if (region.empty()) {
 
-            for (const auto &transfer: _transfers) {
-                transferList.emplace_back(transfer.second);
+            for (const auto &val: _transfers | std::views::values) {
+                transferList.emplace_back(val);
             }
 
         } else {
 
-            for (const auto &transfer: _transfers) {
-                if (transfer.second.region == region) {
-                    transferList.emplace_back(transfer.second);
+            for (const auto &val: _transfers | std::views::values) {
+                if (val.region == region) {
+                    transferList.emplace_back(val);
                 }
             }
         }
@@ -74,7 +71,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Transfer::Transfer TransferMemoryDb::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
-        Poco::ScopedLock lock(_transferMutex);
+        boost::mutex::scoped_lock lock(_transferMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _transfers[oid] = transfer;
@@ -83,7 +80,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Transfer::Transfer TransferMemoryDb::UpdateTransfer(const Entity::Transfer::Transfer &transfer) {
-        Poco::ScopedLock lock(_transferMutex);
+        boost::mutex::scoped_lock lock(_transferMutex);
 
         std::string region = transfer.region;
         std::string serverId = transfer.serverId;
@@ -170,7 +167,7 @@ namespace AwsMock::Database {
 
 
     void TransferMemoryDb::DeleteTransfer(const std::string &serverId) {
-        Poco::ScopedLock lock(_transferMutex);
+        boost::mutex::scoped_lock lock(_transferMutex);
 
         const auto count = std::erase_if(_transfers, [serverId](const auto &item) {
             auto const &[key, value] = item;
@@ -180,7 +177,7 @@ namespace AwsMock::Database {
     }
 
     void TransferMemoryDb::DeleteAllTransfers() {
-        Poco::ScopedLock lock(_transferMutex);
+        boost::mutex::scoped_lock lock(_transferMutex);
 
         log_debug << "All transfer servers deleted, count: " << _transfers.size();
         _transfers.clear();

@@ -42,9 +42,10 @@ namespace AwsMock::Service {
                     userPool.userPoolId};
             log_trace << "Create user pool outcome: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user pool request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -69,9 +70,10 @@ namespace AwsMock::Service {
 
             userPool = _database.UpdateUserPool(userPool);
             log_trace << "User pool updated, userPoolId: " << userPool.userPoolId;
-        } catch (Poco::Exception &ex) {
-            log_error << "Update user pool request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -81,12 +83,13 @@ namespace AwsMock::Service {
 
         try {
             const long total = _database.CountUserPools(request.region);
-            std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
+            const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list count: " << userPools.size();
             return Dto::Cognito::Mapper::map(request, userPools, total);
-        } catch (Poco::Exception &ex) {
-            log_error << "User pool list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -102,9 +105,9 @@ namespace AwsMock::Service {
             response.userPools = Dto::Cognito::Mapper::map(userPools);
             response.total = total;
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "User pool counters list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -121,9 +124,9 @@ namespace AwsMock::Service {
             const Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
             log_trace << "Got user pool userPoolId: " << request.userPoolId;
             return Dto::Cognito::Mapper::map(request, userPool);
-        } catch (Poco::Exception &ex) {
-            log_error << "User pool list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -139,9 +142,9 @@ namespace AwsMock::Service {
         try {
             _database.DeleteUserPool(request.userPoolId);
             log_trace << "User pool deleted, userPoolId: " + request.userPoolId;
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user pool request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -167,9 +170,9 @@ namespace AwsMock::Service {
 
             log_trace << "Create user pool domain result: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user pool request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -192,9 +195,9 @@ namespace AwsMock::Service {
             log_trace << "User pool domain updated, userPoolId: " << userPool.userPoolId << " Domain: " << request.domain;
 
             return {.cloudFrontDomain = userPool.domain.domain};
-        } catch (Poco::Exception &ex) {
-            log_error << "Update user pool domain request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -206,9 +209,9 @@ namespace AwsMock::Service {
             //Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
             //log_trace << "Got user pool userPoolId: " << request.userPoolId;
             return {};
-        } catch (Poco::Exception &ex) {
-            log_error << "User pool list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -242,9 +245,9 @@ namespace AwsMock::Service {
 
             log_trace << "Create user pool client result: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user pool client request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -256,9 +259,9 @@ namespace AwsMock::Service {
             const Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
             log_trace << "Got user pool, region: " << userPool.region << " userPoolId: " << userPool.userPoolId;
             return Dto::Cognito::Mapper::map(request, userPool.userPoolClients);
-        } catch (Poco::Exception &ex) {
-            log_error << "User pool list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -286,9 +289,9 @@ namespace AwsMock::Service {
                 return response;
             }
             return {};
-        } catch (Poco::Exception &ex) {
-            log_error << "User pool list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -337,9 +340,9 @@ namespace AwsMock::Service {
                 userPool = _database.UpdateUserPool(userPool);
                 log_trace << "User pool client updated, userPoolId: " << userPool.userPoolId << " clientId: " << request.clientId;
             }
-        } catch (Poco::Exception &ex) {
-            log_error << "Update user pool client request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -366,9 +369,9 @@ namespace AwsMock::Service {
             }
             userPool = _database.UpdateUserPool(userPool);
             log_trace << "User pool client deleted, userPoolId: " + request.userPoolId << " clients: " << userPool.userPoolClients.size();
-        } catch (Poco::Exception &ex) {
-            log_error << "Delete user pool client request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -403,9 +406,9 @@ namespace AwsMock::Service {
                     user.enabled};
             log_trace << "Create user response: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -440,9 +443,9 @@ namespace AwsMock::Service {
                     user.enabled};
             log_trace << "Get admin user response: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "Get admin user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -482,9 +485,9 @@ namespace AwsMock::Service {
                 user = _database.UpdateUser(user);
                 log_debug << "Group added to user, userName: " << user.userName << " groupName: " << group.groupName;
             }
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -528,9 +531,9 @@ namespace AwsMock::Service {
                 user = _database.UpdateUser(user);
                 log_debug << "Group added to user, userName: " << user.userName << " groupName: " << group.groupName;
             }
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -548,9 +551,9 @@ namespace AwsMock::Service {
 
             log_trace << "Users list outcome: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "User list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "User list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -560,16 +563,16 @@ namespace AwsMock::Service {
         log_debug << "List user counters request, pageSize: " << request.pageSize;
 
         try {
-            long total = _database.CountUserPools(request.region);
-            std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId);
+            const long total = _database.CountUserPools(request.region);
+            const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId);
             log_trace << "Got user list counters, count: " << users.size();
             Dto::Cognito::ListUserCountersResponse response;
             response.users = users;
             response.total = total;
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "User counters list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -596,9 +599,9 @@ namespace AwsMock::Service {
                     request.groupName);
 
             return Dto::Cognito::Mapper::map(request, users);
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -623,9 +626,9 @@ namespace AwsMock::Service {
             user.enabled = true;
             user = _database.UpdateUser(user);
             log_trace << "User enabled, userName:  " << user.userName << " userPoolId: " << user.userPoolId;
-        } catch (Poco::Exception &ex) {
-            log_error << "Enable user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
@@ -650,9 +653,9 @@ namespace AwsMock::Service {
             user.enabled = false;
             user = _database.UpdateUser(user);
             log_trace << "User disabled, userName:  " << user.userName << " userPoolId: " << user.userPoolId;
-        } catch (Poco::Exception &ex) {
-            log_error << "Disable user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Disable user request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -677,9 +680,9 @@ namespace AwsMock::Service {
 
             _database.DeleteUser(user);
             log_trace << "User deleted, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
-        } catch (Poco::Exception &ex) {
-            log_error << "Delete user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Delete user request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -700,9 +703,9 @@ namespace AwsMock::Service {
             group = _database.CreateGroup(group);
             log_trace << "Cognito group created, group: " + response.ToJson();
             return Dto::Cognito::Mapper::map(request, group);
-        } catch (Poco::Exception &ex) {
-            log_error << "Create group request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Create group request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -714,9 +717,9 @@ namespace AwsMock::Service {
             std::vector<Database::Entity::Cognito::Group> groups = _database.ListGroups(request.region);
             log_trace << "Got groups list count: " << groups.size();
             return Dto::Cognito::Mapper::map(request, groups);
-        } catch (Poco::Exception &ex) {
-            log_error << "Group list request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Group list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -733,9 +736,9 @@ namespace AwsMock::Service {
         try {
             _database.DeleteGroup(request.region, request.userPoolId, request.groupName);
             log_trace << "Cognito group deleted, group: " + request.ToJson();
-        } catch (Poco::Exception &ex) {
-            log_error << "Delete group request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Delete group request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -766,9 +769,9 @@ namespace AwsMock::Service {
                     false};
             log_trace << "Signup user response: " + response.ToJson();
             return response;
-        } catch (Poco::Exception &ex) {
-            log_error << "Create user request failed, message: " << ex.message();
-            throw Core::ServiceException(ex.message());
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Create user request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
@@ -837,8 +840,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Cognito::RespondToAuthChallengeResponse CognitoService::RespondToAuthChallenge(
-            Dto::Cognito::RespondToAuthChallengeRequest &request) const {
+    Dto::Cognito::RespondToAuthChallengeResponse CognitoService::RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "respond_to_auth_challenge");
         log_debug << "Respond to auth challenge request, region:  " << request.region << " clientId: " << request.clientId;
 
@@ -867,7 +869,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void CognitoService::GlobalSignOut(Dto::Cognito::GlobalSignOutRequest &request) {
+    void CognitoService::GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request) {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "global_sign_out");
         log_debug << "Global sign out request, region:  " << request.region << " accessToken: " << request.accessToken;
     }

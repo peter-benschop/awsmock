@@ -8,9 +8,6 @@
 // C++ includes
 #include <string>
 
-// Poco includes
-#include <Poco/Mutex.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -19,6 +16,7 @@
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/repository/Database.h>
+#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 
@@ -180,12 +178,12 @@ namespace AwsMock::Database {
         /**
          * Transfer mutex
          */
-        static Poco::Mutex _transferMutex;
+        static boost::mutex _transferMutex;
 
         /**
          * User mutex
          */
-        static Poco::Mutex _userMutex;
+        static boost::mutex _userMutex;
     };
 
 }// namespace AwsMock::Database
