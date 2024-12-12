@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SecretsManager {
          *
          * @return DTO as JSON object
          */
-        [[nodiscard]] view_or_value<view,value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the DTO to a JSON representation.
@@ -60,7 +60,7 @@ namespace AwsMock::Dto::SecretsManager {
          *
          * @param document JSON object.
          */
-        void FromJson(const view_or_value<view,value> &document);
+        void FromJson(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts the DTO to a string representation.

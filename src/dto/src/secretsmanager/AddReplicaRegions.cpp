@@ -6,13 +6,13 @@
 
 namespace AwsMock::Dto::SecretsManager {
 
-    view_or_value<view,value> AddReplicaRegions::ToDocument() const {
+    view_or_value<view, value> AddReplicaRegions::ToDocument() const {
 
         try {
 
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document,"Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document,"KmsKeyId", kmsKeyId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyId", kmsKeyId);
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SecretsManager {
         }
     }
 
-    void AddReplicaRegions::FromJson(const view_or_value<view,value> &document) {
+    void AddReplicaRegions::FromJson(const view_or_value<view, value> &document) {
 
         try {
 

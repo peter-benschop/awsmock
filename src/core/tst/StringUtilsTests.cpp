@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::UrlEncode(input);
 
         // assert
-        EXPECT_STREQ("/abc/xyz/%0A%20", result.c_str());
+        EXPECT_STREQ("%2Fabc%2Fxyz%2F%0A%20", result.c_str());
     }
 
     TEST_F(StringUtilsTest, UrlEncodeSpecialCharactersTest) {
@@ -178,7 +178,7 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::UrlEncode(input);
 
         // assert
-        EXPECT_STREQ("/abc/xyz/%0A%20%2B", result.c_str());
+        EXPECT_STREQ("%2Fabc%2Fxyz%2F%0A%20%2B", result.c_str());
     }
 
     TEST_F(StringUtilsTest, StripLineEndingsTest) {

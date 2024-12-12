@@ -167,10 +167,10 @@ namespace AwsMock::Core {
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
-    void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
-        int value = defaultValue;
+    void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue) {
+        std::string value = std::to_string(defaultValue);
         if (getenv(envProperty.c_str()) != nullptr) {
-            value = std::stoi(getenv(envProperty.c_str()));
+            value = getenv(envProperty.c_str());
             AddToEnvList(key, getenv(envProperty.c_str()));
         }
         SetValueByPath(_yamlConfig, key, value);
@@ -262,6 +262,7 @@ namespace AwsMock::Core {
     int Configuration::GetValueInt(const std::string &key) const {
         if (!HasProperty(key)) {
             log_error << "Property not found, key: " + key;
+            Dump();
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -307,6 +308,10 @@ namespace AwsMock::Core {
         std::stringstream ss;
         ss << *this;
         return ss.str();
+    }
+
+    void Configuration::Dump() const {
+        std::cerr << _yamlConfig << std::endl;
     }
 
     void Configuration::WriteFile(const std::string &filename) const {

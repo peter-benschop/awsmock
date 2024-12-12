@@ -107,17 +107,15 @@ namespace AwsMock::Core {
     std::string AwsUtils::GetS3BucketName(const http::request<http::dynamic_body> &request) {
         if (IsS3HostStyle(request)) {
             return GetS3HostStyleBucket(request);
-        } else {
-            return GetS3PathStyleBucket(request);
         }
+        return GetS3PathStyleBucket(request);
     }
 
     std::string AwsUtils::GetS3ObjectKey(const http::request<http::dynamic_body> &request) {
         if (IsS3HostStyle(request)) {
             return GetS3HostStyleObjectKey(request);
-        } else {
-            return GetS3PathStyleObjectKey(request);
         }
+        return GetS3PathStyleObjectKey(request);
     }
 
     bool AwsUtils::IsS3HostStyle(const http::request<http::dynamic_body> &request) {
@@ -137,15 +135,15 @@ namespace AwsMock::Core {
     }
 
     std::string AwsUtils::GetS3PathStyleBucket(const http::request<http::dynamic_body> &request) {
-        return Core::HttpUtils::GetPathParameter(request.target(), 0);
+        return HttpUtils::GetPathParameter(request.target(), 0);
     }
 
     std::string AwsUtils::GetS3HostStyleObjectKey(const http::request<http::dynamic_body> &request) {
-        return Core::HttpUtils::GetPathParametersFromIndex(request.target(), 0);
+        return HttpUtils::GetPathParametersFromIndex(request.target(), 0);
     }
 
     std::string AwsUtils::GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request) {
-        return Core::HttpUtils::GetPathParametersFromIndex(request.target(), 1);
+        return HttpUtils::GetPathParametersFromIndex(request.target(), 1);
     }
 
     void AwsUtils::AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
@@ -237,18 +235,18 @@ namespace AwsMock::Core {
     std::string AwsUtils::GetCanonicalRequest(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalRequest;
         canonicalRequest << request.method() << '\n';
-        canonicalRequest << Core::StringUtils::UrlEncode(request.target()) << '\n';
+        canonicalRequest << StringUtils::UrlEncode(request.target()) << '\n';
         canonicalRequest << GetCanonicalQueryParameters(request.target()) << '\n';
         canonicalRequest << GetCanonicalHeaders(request, authorizationHeaderKeys) << '\n';
         canonicalRequest << authorizationHeaderKeys.signedHeaders << '\n';
-        canonicalRequest << GetHashedPayload(Core::HttpUtils::GetBodyAsString(request));
+        canonicalRequest << GetHashedPayload(HttpUtils::GetBodyAsString(request));
         return canonicalRequest.str();
     }
 
     std::string AwsUtils::GetCanonicalRequest(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &payload, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalRequest;
         canonicalRequest << method << '\n';
-        canonicalRequest << Core::StringUtils::UrlEncode(path) << '\n';
+        canonicalRequest << StringUtils::UrlEncode(path) << '\n';
         canonicalRequest << GetCanonicalQueryParameters(path) << '\n';
         canonicalRequest << GetCanonicalHeaders(headers, authorizationHeaderKeys) << '\n';
         canonicalRequest << authorizationHeaderKeys.signedHeaders << '\n';
@@ -261,7 +259,7 @@ namespace AwsMock::Core {
         stringToSign << authorizationHeaderKeys.signingVersion << '\n';
         stringToSign << authorizationHeaderKeys.isoDateTime << '\n';
         stringToSign << authorizationHeaderKeys.scope << '\n';
-        stringToSign << Core::Crypto::GetSha256FromString(canonicalRequest);
+        stringToSign << Crypto::GetSha256FromString(canonicalRequest);
         return stringToSign.str();
     }
 
@@ -322,13 +320,6 @@ namespace AwsMock::Core {
             boost::smatch what;
             boost::regex_search(authorizationHeader, what, expr);
 
-            //Poco::RegularExpression::MatchVec posVec;
-            // const Poco::RegularExpression pattern(
-            //         R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
-            // if (!pattern.match(authorizationHeader, 0, posVec)) {
-            //     log_error << "Could not extract authorization, authorization: " << authorizationHeader;
-            //     throw UnauthorizedException("Could not extract authorization, authorization: " + authorizationHeader);
-            // }
             authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
             authKeys.dateTime = what[2];
             authKeys.region = what[3];
@@ -338,16 +329,6 @@ namespace AwsMock::Core {
             authKeys.signature = what[7];
             authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
             authKeys.isoDateTime = HttpUtils::HasHeader(request, "x-amz-date") ? HttpUtils::GetHeaderValue(request, "x-amz-date") : GetISODateString();
-
-            // authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
-            // authKeys.dateTime = authorizationHeader.substr(posVec[2].offset, posVec[2].length);
-            // authKeys.region = authorizationHeader.substr(posVec[3].offset, posVec[3].length);
-            // authKeys.module = authorizationHeader.substr(posVec[4].offset, posVec[4].length);
-            // authKeys.requestVersion = authorizationHeader.substr(posVec[5].offset, posVec[5].length);
-            // authKeys.signedHeaders = authorizationHeader.substr(posVec[6].offset, posVec[6].length);
-            // authKeys.signature = authorizationHeader.substr(posVec[7].offset, posVec[7].length);
-            // authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
-            // authKeys.isoDateTime = HttpUtils::HasHeader(request, "x-amz-date") ? HttpUtils::GetHeaderValue(request, "x-amz-date") : GetISODateString();
             return authKeys;
 
         } catch (std::exception &e) {

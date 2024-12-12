@@ -22,11 +22,13 @@ namespace AwsMock::Core {
         void SetUp() override {
             _region = Configuration::instance().GetValueString("awsmock.region");
             _accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
-            _endpoint = SystemUtils::GetHostName() + ":" + std::to_string(Configuration::instance().GetValueInt("awsmock.gateway.http.port"));
+            _port = Configuration::instance().GetValueInt("awsmock.gateway.http.port");
+            _endpoint = SystemUtils::GetHostName() + ":" + std::to_string(_port);
         }
 
       protected:
 
+        int _port = 0;
         std::string _region, _accountId, _endpoint;
     };
 

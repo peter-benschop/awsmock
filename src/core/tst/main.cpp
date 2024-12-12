@@ -6,12 +6,12 @@
 #include <string>
 
 // GTest includes
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 
-class TestEnvironment final : public ::testing::Environment {
+class TestEnvironment final : public testing::Environment {
   public:
 
     // Initialise a test configuration.

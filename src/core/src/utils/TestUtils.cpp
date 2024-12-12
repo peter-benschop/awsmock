@@ -5,7 +5,9 @@
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
-    void TestUtils::CreateTestConfigurationFile(bool withDatabase) {
+
+    void TestUtils::CreateTestConfigurationFile(const bool withDatabase) {
+
         // Logging
         if (getenv("AWSMOCK_TEST_LOG") != nullptr) {
             LogStream::Initialize();
@@ -16,9 +18,8 @@ namespace AwsMock::Core {
             LogStream::SetSeverity("none");
         }
 
-        constexpr int port = 14566;//SystemUtils::GetRandomPort();
+        constexpr int port = 14566;
         const std::string hostName = SystemUtils::GetHostName();
-        std::ofstream ofs(TMP_PROPERTIES_FILE, std::ofstream::out | std::ofstream::trunc);
 
         // General
         Configuration::instance().SetValueString("awsmock.region", "eu-central-1");
@@ -27,8 +28,8 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueString("awsmock.access.account-id", "000000000000");
         Configuration::instance().SetValueString("awsmock.access.client-id", "00000000");
         Configuration::instance().SetValueString("awsmock.access.secret-access-key", "none");
-        Configuration::instance().SetValueString("awsmock.data-dir", "/tmp/awsmock/data");
         Configuration::instance().SetValueString("awsmock.temp-dir", "/tmp/awsmock/data/tmp");
+        Configuration::instance().SetValueString("awsmock.data-dir", "/tmp/awsmock/data");
 
         // Gateway
         Configuration::instance().SetValueBool("awsmock.gateway.active", true);
