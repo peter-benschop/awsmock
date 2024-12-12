@@ -248,18 +248,16 @@ namespace AwsMock::Core {
         escaped << std::hex;
 
         for (const char c: input) {
-            // Keep alphanumeric and other accepted characters intact
-            if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            if (c == '"' || c == '\'' || c == '!' || c == '*' || c == '(' || c == ')' || c == ';' || c == ':' || c == '@' || c == '&' || c == '=' ||
+                c == '+' || c == '$' || c == ',' || c == '?' || c == '#' || c == '[' || c == ']' || c == ' ' || c == '\n') {
+                // Any other characters are percent-encoded
+                escaped << std::uppercase;
+                escaped << '%' << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));
+                escaped << std::nouppercase;
+            } else {
                 escaped << c;
-                continue;
             }
-
-            // Any other characters are percent-encoded
-            escaped << std::uppercase;
-            escaped << '%' << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));
-            escaped << std::nouppercase;
         }
-
         return escaped.str();
     }
 

@@ -61,8 +61,8 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Queue queue = {.region = request.region, .name = request.queueName, .owner = request.owner, .queueUrl = queueUrl, .queueArn = queueArn, .attributes = attributes, .tags = request.tags};
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << queue.ToString();
-
-            return {.region = queue.region, .name = queue.name, .owner = queue.owner, .queueUrl = queue.queueUrl, .queueArn = queue.queueArn};
+            Dto::SQS::CreateQueueResponse response = {.region = queue.region, .name = queue.name, .owner = queue.owner, .queueUrl = queue.queueUrl, .queueArn = queue.queueArn};
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();

@@ -27,7 +27,7 @@ namespace AwsMock::Database {
 
         void SetUp() override {
             _region = _configuration.GetValueString("awsmock.region");
-            _accountId = _configuration.GetValueString("awsmock.account.id");
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
         }
 
         void TearDown() override {

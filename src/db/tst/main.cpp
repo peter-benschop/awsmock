@@ -38,7 +38,7 @@ class TestEnvironment : public ::testing::Environment {
         const std::string user = _configuration.GetValueString("awsmock.mongodb.user");
         const std::string password = _configuration.GetValueString("awsmock.mongodb.password");
         const int _port = _configuration.GetValueInt("awsmock.mongodb.port");
-        const int poolSize = _configuration.GetValueInt("awsmock.mongodb.pool.size");
+        const int poolSize = _configuration.GetValueInt("awsmock.mongodb.pool-size");
 
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize));

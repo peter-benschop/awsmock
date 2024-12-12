@@ -81,6 +81,11 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueString("awsmock.logging.level", "debug");
         Configuration::instance().SetValueString("awsmock.logging.file", "/tmp/awsmock-test.log");
 
+        // Podman
+        Configuration::instance().SetValueBool("awsmock.podman.active", true);
+        Configuration::instance().SetValueString("awsmock.podman.network-mode", "local");
+        Configuration::instance().SetValueString("awsmock.podman.network-name", "local");
+
         // Write file
         Configuration::instance().WriteFile(TMP_PROPERTIES_FILE);
     }

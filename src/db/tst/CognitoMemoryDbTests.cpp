@@ -27,7 +27,7 @@ namespace AwsMock::Database {
 
         void SetUp() override {
             _region = _configuration.GetValueString("awsmock.region");
-            _accountId = _configuration.GetValueString("awsmock.account.id");
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
         }
 
         void TearDown() override {
@@ -48,7 +48,7 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
 
         // act
-        Entity::Cognito::UserPool result = _cognitoDatabase.CreateUserPool(userPool);
+        const Entity::Cognito::UserPool result = _cognitoDatabase.CreateUserPool(userPool);
 
         // assert
         EXPECT_TRUE(result.name == USER_POOL_NAME);
@@ -62,7 +62,7 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
-        Entity::Cognito::UserPoolList result = _cognitoDatabase.ListUserPools(_region);
+        const Entity::Cognito::UserPoolList result = _cognitoDatabase.ListUserPools(_region);
 
         // assert
         EXPECT_FALSE(result.empty());
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
-        bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL_NAME);
+        const bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL_NAME);
 
         // assert
         EXPECT_TRUE(result);
@@ -90,7 +90,7 @@ namespace AwsMock::Database {
 
         // act
         createUserPoolResult.userPoolId = std::string(USER_POOL_NAME) + "2";
-        Entity::Cognito::UserPool updateUserPoolResult = _cognitoDatabase.UpdateUserPool(createUserPoolResult);
+        const Entity::Cognito::UserPool updateUserPoolResult = _cognitoDatabase.UpdateUserPool(createUserPoolResult);
 
         // assert
         EXPECT_TRUE(updateUserPoolResult.userPoolId == std::string(USER_POOL_NAME) + "2");
@@ -105,7 +105,7 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
-        Entity::Cognito::UserPool resultUserPool = _cognitoDatabase.GetUserPoolByClientId(CLIENT_ID);
+        const Entity::Cognito::UserPool resultUserPool = _cognitoDatabase.GetUserPoolByClientId(CLIENT_ID);
 
         // assert
         EXPECT_TRUE(resultUserPool.userPoolId == USER_POOL_ID);
@@ -115,11 +115,11 @@ namespace AwsMock::Database {
 
         // arrange
         Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
-        Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+        const Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
         _cognitoDatabase.DeleteUserPool(createUserPoolResult.userPoolId);
-        bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL_NAME);
+        const bool result = _cognitoDatabase.UserPoolExists(_region, USER_POOL_NAME);
 
         // assert
         EXPECT_FALSE(result);

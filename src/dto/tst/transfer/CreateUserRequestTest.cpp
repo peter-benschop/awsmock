@@ -19,9 +19,9 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 
-#define CREATE_USER_REQUEST_TO_STRING "CreateUserRequest={\"HomeDirectory\":\"test-user\",\"Password\":\"password\",\"Region\":\"eu-central-1\",\"ServerId\":\"test-server_id\",\"UserName\":\"test-user\"}"
-#define CREATE_USER_REQUEST_TO_JSON "{\"HomeDirectory\":\"test-user\",\"Password\":\"password\",\"Region\":\"eu-central-1\",\"ServerId\":\"test-server_id\",\"UserName\":\"test-user\"}"
-#define CREATE_USER_REQUEST_FROM_JSON "{\"HomeDirectory\":\"test-user\",\"Password\":\"password\",\"Region\":\"eu-central-1\",\"ServerId\":\"test-server_id\",\"UserName\":\"test-user\"}"
+#define CREATE_USER_REQUEST_TO_STRING "CreateUserRequest={ \"Region\" : \"eu-central-1\", \"ServerId\" : \"test-server_id\", \"UserName\" : \"test-user\", \"Password\" : \"password\", \"HomeDirectory\" : \"test-user\" }"
+#define CREATE_USER_REQUEST_TO_JSON "{ \"Region\" : \"eu-central-1\", \"ServerId\" : \"test-server_id\", \"UserName\" : \"test-user\", \"Password\" : \"password\", \"HomeDirectory\" : \"test-user\" }"
+#define CREATE_USER_REQUEST_FROM_JSON "{ \"Region\" : \"eu-central-1\", \"ServerId\" : \"test-server_id\", \"UserName\" : \"test-user\", \"Password\" : \"password\", \"HomeDirectory\" : \"test-user\" }"
 
 namespace AwsMock::Dto::Transfer {
 
@@ -63,7 +63,7 @@ namespace AwsMock::Dto::Transfer {
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
-        EXPECT_STREQ(jsonRepresentation.c_str(), CREATE_USER_REQUEST_TO_JSON);
+        EXPECT_TRUE(jsonRepresentation == CREATE_USER_REQUEST_TO_JSON);
     }
 
     TEST_F(CreateUserRequestTest, FromJsonTest) {
