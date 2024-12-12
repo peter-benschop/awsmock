@@ -8,20 +8,19 @@ namespace AwsMock::Dto::KMS {
 
     std::string ScheduledKeyDeletionResponse::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("KeyId", keyId);
-            rootJson.set("KeyState", keyState);
-            rootJson.set("DeletionDate", deletionDate);
-            rootJson.set("PendingWindowInDays", pendingWindowInDays);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyState", keyState);
+            Core::Bson::BsonUtils::SetLongValue(document, "DeletionDate", deletionDate);
+            Core::Bson::BsonUtils::SetIntValue(document, "PendingWindowInDays", pendingWindowInDays);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ScheduledKeyDeletionResponse::ToString() const {
