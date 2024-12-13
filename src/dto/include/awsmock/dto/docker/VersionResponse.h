@@ -97,18 +97,19 @@ namespace AwsMock::Dto::Docker {
          */
         void FromDocument(const view_or_value<view, value> &document) {
 
-            /* Todo:
             try {
-                Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-                Core::JsonUtils::GetJsonValueString("Version", jsonObject, version);
-                if (jsonObject->has("Details")) {
-                    details.FromJson(jsonObject->getObject("Details"));
+
+                name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+                version = Core::Bson::BsonUtils::GetStringValue(document, "Version");
+
+                if (document.view().find("Details") != document.view().end()) {
+                    details.FromDocument(document.view()["Details"].get_document().value);
                 }
 
-            } catch (Poco::Exception &exc) {
-                std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message());
-            }*/
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
         }
     };
 
@@ -136,33 +137,28 @@ namespace AwsMock::Dto::Docker {
          */
         void FromJson(const std::string &jsonString) {
 
-            /* Todo
             try {
-                Poco::JSON::Parser parser;
-                Poco::Dynamic::Var result = parser.parse(jsonString);
-                Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+
+                const value document = bsoncxx::from_json(jsonString);
 
                 // Platform
-                if (rootObject->has("Platform")) {
-                    platform.FromJson(rootObject->getObject("Platform"));
+                if (document.view().find("Platform") != document.view().end()) {
+                    platform.FromDocument(document.view()["Platform"].get_document().value);
                 }
 
                 // Components
-                if (rootObject->has("Components")) {
-                    Poco::JSON::Array::Ptr componentsArray = rootObject->getArray("Components");
-                    if (componentsArray) {
-                        for (const auto &jsonComponent: *componentsArray) {
-                            Component component;
-                            component.FromJson(jsonComponent.extract<Poco::JSON::Object::Ptr>());
-                            components.push_back(component);
-                        }
+                if (document.view().find("Components") != document.view().end()) {
+                    for (const bsoncxx::array::view jsonArray = document.view()["Components"].get_array().value; const auto &jsonComponent: jsonArray) {
+                        Component component;
+                        component.FromDocument(jsonComponent.get_document().value);
+                        components.push_back(component);
                     }
                 }
 
-            } catch (Poco::Exception &exc) {
-                std::cerr << exc.message() << std::endl;
-                throw Core::ServiceException(exc.message());
-            }*/
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
         }
     };
 

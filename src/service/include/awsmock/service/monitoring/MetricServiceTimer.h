@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
 #define AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
 
-#include "MetricService.h"
+#include <awsmock/service/monitoring/MetricService.h>
 
 #define TIME_DIFF (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _start).count())
 

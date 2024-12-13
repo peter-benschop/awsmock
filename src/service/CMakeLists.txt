@@ -20,7 +20,7 @@ set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp
 set(DOCKER_SOURCES src/container/ContainerService.cpp)
 set(MODULE_SOURCES src/module/ModuleService.cpp src/module/ModuleHandler.cpp src/module/ModuleMonitoring.cpp src/module/ModuleMap.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp
-        src/monitoring/MonitoringService.cpp src/monitoring/MonitoringWorker.cpp)
+        src/monitoring/MonitoringService.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES}
         ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})

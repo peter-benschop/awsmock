@@ -31,7 +31,6 @@ namespace AwsMock::Core {
     }
 
     std::string SystemUtils::GetHomeDir() {
-#ifndef _WIN32
         std::string homeDir;
         if (getenv("HOME") != nullptr) {
             homeDir = std::string(getenv("HOME"));
@@ -39,9 +38,6 @@ namespace AwsMock::Core {
             homeDir = std::string(getpwuid(getuid())->pw_dir);
         }
         return homeDir;
-#else
-        return {};
-#endif
     }
 
     std::string SystemUtils::GetHostName() {
@@ -57,10 +53,9 @@ namespace AwsMock::Core {
     }
 
     int SystemUtils::GetNumberOfCores() {
-        FILE *file;
         char line[128];
 
-        file = fopen("/proc/cpuinfo", "r");
+        FILE *file = fopen("/proc/cpuinfo", "r");
         int numCores = 0;
         while (fgets(line, 128, file) != nullptr) {
             if (strncmp(line, "processor", 9) == 0)

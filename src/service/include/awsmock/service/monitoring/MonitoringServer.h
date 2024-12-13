@@ -5,19 +5,11 @@
 #ifndef AWSMOCK_SERVICE_MONITORING_SERVER_H
 #define AWSMOCK_SERVICE_MONITORING_SERVER_H
 
-// Boost includes
-#include <boost/asio/post.hpp>
-
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
-#include <awsmock/service/monitoring/MonitoringWorker.h>
 
 #define S3_DEFAULT_MONITORING_PERIOD 300
 #define S3_DEFAULT_WORKER_PERIOD 3600
@@ -38,22 +30,25 @@ namespace AwsMock::Service {
          */
         explicit MonitoringServer(Core::PeriodicScheduler &scheduler);
 
+        /**
+       * @brief Delete monitoring data older than the retention period.
+       *
+       * @par
+       * Delete al monitoring data oder than the retention period. Default is 3 days, which means monitoring data older than 3 days will be deleted.
+       */
+        [[maybe_unused]] void DeleteMonitoringData() const;
+
       private:
 
         /**
          * Monitoring system collector
          */
-        AwsMock::Monitoring::MetricService _metricService;
+        Monitoring::MetricSystemCollector _metricSystemCollector;
 
         /**
-         * Monitoring system collector
+         * Database connection
          */
-        AwsMock::Monitoring::MetricSystemCollector _metricSystemCollector;
-
-        /**
-         * Monitoring system collector
-         */
-        Monitoring::MonitoringWorker _monitoringWorker;
+        Database::MonitoringDatabase &_monitoringDatabase = Database::MonitoringDatabase::instance();
     };
 
 }// namespace AwsMock::Service

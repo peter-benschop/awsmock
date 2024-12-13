@@ -16,7 +16,7 @@ namespace AwsMock::Dto::Cognito {
                 for (const auto &user: users) {
                     jsonArray.append(user.ToDocument());
                 }
-                document.append(kvp("users", users));
+                document.append(kvp("users", jsonArray));
             }
             return Core::Bson::BsonUtils::ToJsonString(document);
 

@@ -8,57 +8,43 @@ namespace AwsMock::Dto::KMS {
 
     void CreateKeyRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            std::string tmpStr;
-            Core::JsonUtils::GetJsonValueBool("BypassPolicyLockoutSafetyCheck", rootObject, bypassPolicyLockoutSafetyCheck);
-            Core::JsonUtils::GetJsonValueString("KeySpec", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                keySpec = KeySpecFromString(tmpStr);
-            }
-            Core::JsonUtils::GetJsonValueString("KeyUsage", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                keyUsage = KeyUsageFromString(tmpStr);
-            }
-            Core::JsonUtils::GetJsonValueString("CustomKeyStoreId", rootObject, customKeyStoreId);
-            Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
-            Core::JsonUtils::GetJsonValueString("Origin", rootObject, origin);
-            Core::JsonUtils::GetJsonValueString("Policy", rootObject, policy);
-            Core::JsonUtils::GetJsonValueString("XksKeyId", rootObject, xksKeyId);
+            const value document = bsoncxx::from_json(jsonString);
+            bypassPolicyLockoutSafetyCheck = Core::Bson::BsonUtils::GetBoolValue(document, "BypassPolicyLockoutSafetyCheck");
+            keySpec = KeySpecFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeySpec"));
+            keyUsage = KeyUsageFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeyUsage"));
+            customKeyStoreId = Core::Bson::BsonUtils::GetStringValue(document, "CustomKeyStoreId");
+            description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
+            origin = Core::Bson::BsonUtils::GetStringValue(document, "Origin");
+            policy = Core::Bson::BsonUtils::GetStringValue(document, "Policy");
+            xksKeyId = Core::Bson::BsonUtils::GetStringValue(document, "XksKeyId");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateKeyRequest::ToJson() const {
 
-        /* Todo
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("BypassPolicyLockoutSafetyCheck", bypassPolicyLockoutSafetyCheck);
-            rootJson.set("KeySpec", KeySpecToString(keySpec));
-            rootJson.set("KeyUsage", KeyUsageToString(keyUsage));
-            rootJson.set("CustomKeyStoreId", customKeyStoreId);
-            rootJson.set("Description", description);
-            rootJson.set("Origin", origin);
-            rootJson.set("Policy", policy);
-            rootJson.set("XksKeyId", xksKeyId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetBoolValue(document, "BypassPolicyLockoutSafetyCheck", bypassPolicyLockoutSafetyCheck);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeySpec", KeySpecToString(keySpec));
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyUsage", KeyUsageToString(keyUsage));
+            Core::Bson::BsonUtils::SetStringValue(document, "CustomKeyStoreId", customKeyStoreId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetStringValue(document, "Origin", origin);
+            Core::Bson::BsonUtils::SetStringValue(document, "Policy", policy);
+            Core::Bson::BsonUtils::SetStringValue(document, "XksKeyId", xksKeyId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateKeyRequest::ToString() const {

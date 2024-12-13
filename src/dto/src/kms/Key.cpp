@@ -8,86 +8,61 @@ namespace AwsMock::Dto::KMS {
 
     void Key::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            std::string tmpStr;
-            Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
-            Core::JsonUtils::GetJsonValueString("KeySpec", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                keySpec = KeySpecFromString(tmpStr);
-            }
-            Core::JsonUtils::GetJsonValueString("KeyUsage", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                keyUsage = KeyUsageFromString(tmpStr);
-            }
-            Core::JsonUtils::GetJsonValueString("KeyState", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                keyState = KeyStateFromString(tmpStr);
-            }
-            Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
-            Core::JsonUtils::GetJsonValueString("Arn", rootObject, arn);
-            Core::JsonUtils::GetJsonValueLong("CreationDate", rootObject, creationDate);
-            Core::JsonUtils::GetJsonValueBool("MultiRegion", rootObject, multiRegion);
-            Core::JsonUtils::GetJsonValueBool("Enabled", rootObject, enabled);
-            Core::JsonUtils::GetJsonValueString("Origin", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                origin = Dto::KMS::OriginFromString(tmpStr);
-            }
+            const value document = bsoncxx::from_json(jsonString);
+            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
+            keySpec = KeySpecFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeySpec"));
+            keyUsage = KeyUsageFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeyUsage"));
+            keyState = KeyStateFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeyState"));
+            description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
+            arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
+            creationDate = Core::Bson::BsonUtils::GetLongValue(document, "CreationDate");
+            multiRegion = Core::Bson::BsonUtils::GetBoolValue(document, "MultiRegion");
+            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "Enabled");
+            origin = OriginFromString(Core::Bson::BsonUtils::GetStringValue(document, "Origin"));
 
-            if (rootObject->has("EncryptionAlgorithms")) {
-                Poco::JSON::Array::Ptr algoArray = rootObject->getArray("EncryptionAlgorithms");
-                for (int i = 0; i < algoArray->size(); i++) {
-                    encryptionAlgorithms.emplace_back(Dto::KMS::EncryptionAlgorithmsFromString(algoArray->getElement<std::string>(i)));
+            // Grant tokens
+            if (document.view().find("EncryptionAlgorithms") != document.view().end()) {
+                for (const bsoncxx::array::view jsonArray = document.view()["EncryptionAlgorithms"].get_array().value; const auto &element: jsonArray) {
+                    encryptionAlgorithms.emplace_back(EncryptionAlgorithmsFromString(std::string(element.get_string().value)));
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     view_or_value<view, value> Key::ToDocument() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("KeyId", keyId);
-            rootJson.set("KeySpec", KeySpecToString(keySpec));
-            rootJson.set("KeyUsage", KeyUsageToString(keyUsage));
-            rootJson.set("KeyState", KeyStateToString(keyState));
-            rootJson.set("Arn", arn);
-            rootJson.set("Description", description);
-            if (creationDate > 0) {
-                rootJson.set("CreationDate", creationDate);
-            }
-            if (deletionDate > 0) {
-                rootJson.set("DeletionDate", deletionDate);
-            }
-            rootJson.set("MultiRegion", multiRegion);
-            rootJson.set("Enabled", enabled);
-            rootJson.set("Origin", OriginToString(origin));
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeySpec", KeySpecToString(keySpec));
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyUsage", KeyUsageToString(keyUsage));
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyState", KeyStateToString(keyState));
+            Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
+            Core::Bson::BsonUtils::SetLongValue(document, "CreationDate", creationDate);
+            Core::Bson::BsonUtils::SetLongValue(document, "DeletionDate", deletionDate);
+            Core::Bson::BsonUtils::SetBoolValue(document, "MultiRegion", multiRegion);
+            Core::Bson::BsonUtils::SetStringValue(document, "Origin", OriginToString(origin));
 
-            // Algorithms
-            Poco::JSON::Array algoArray;
-            for (const auto &algo: encryptionAlgorithms) {
-                algoArray.add(algo);
+            if (!encryptionAlgorithms.empty()) {
+                array jsonArray;
+                for (const auto &element: encryptionAlgorithms) {
+                    jsonArray.append(EncryptionAlgorithmsToString(element));
+                }
+                document.append(kvp("EncryptionAlgorithms", jsonArray));
             }
-            rootJson.set("EncryptionAlgorithms", algoArray);
+            return document.extract();
 
-            return rootJson;
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string Key::ToJson() const {

@@ -21,8 +21,6 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
-// System counter
-
 namespace AwsMock::Monitoring {
 
     /**
@@ -39,57 +37,34 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector() = default;
-
-        /**
-         * @brief Singleton instance
-         */
-        static MetricSystemCollector &instance() {
-            static MetricSystemCollector metricSystemCollector;
-            return metricSystemCollector;
-        }
-
-        /**
-         * @brief Initialization
-         */
-        void Initialize();
-
-        /**
-         * @brief Runnable method
-         */
-        void Run();
-
-        /**
-         * @brief Shutdown
-         */
-        void Shutdown();
-
-      private:
+        explicit MetricSystemCollector();
 
         /**
          * @brief Updates the system counter
          */
         void CollectSystemCounter();
 
+      private:
+
         /**
          * Number of processors
          */
-        int numProcessors{};
+        int _numProcessors{};
 
         /**
          * Last CPU
          */
-        clock_t lastCPU{};
+        clock_t _lastCPU{};
 
         /**
          * Last system CPU
          */
-        clock_t lastSysCPU{};
+        clock_t _lastSysCPU{};
 
         /**
          * Last user CPU
          */
-        clock_t lastUserCPU{};
+        clock_t _lastUserCPU{};
 
         /**
          * Monitoring period

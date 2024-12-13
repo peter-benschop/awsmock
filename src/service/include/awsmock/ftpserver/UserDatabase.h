@@ -19,7 +19,7 @@ namespace AwsMock::FtpServer {
         /**
          * Constructor
          */
-        UserDatabase() {}
+        UserDatabase() = default;
 
         /**
          * Add a new user to the database.

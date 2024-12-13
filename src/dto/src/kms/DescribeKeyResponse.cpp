@@ -8,18 +8,16 @@ namespace AwsMock::Dto::KMS {
 
     std::string DescribeKeyResponse::ToJson() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("KeyMetadata", key.ToJsonObject());
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            document.append(kvp("KeyMetadata", key.ToDocument()));
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeKeyResponse::ToString() const {

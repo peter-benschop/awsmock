@@ -247,7 +247,12 @@ namespace AwsMock::Monitoring {
         /**
          * Mutex
          */
-        static boost::mutex _mutex;
+        static boost::mutex _gaugeMutex;
+
+        /**
+         * Mutex
+         */
+        static boost::mutex _counterMutex;
 
         /**
          * Database

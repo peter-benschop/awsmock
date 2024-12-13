@@ -8,49 +8,44 @@ namespace AwsMock::Dto::KMS {
 
     void DescribeKeyRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
+            const value document = bsoncxx::from_json(jsonString);
+            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
 
-            if (rootObject->has("GrantTokens")) {
-                Poco::JSON::Array::Ptr jsonTokenArray = rootObject->getArray("GrantTokens");
-                for (int i = 0; i < jsonTokenArray->size(); i++) {
-                    grantTokens.emplace_back(jsonTokenArray->getElement<std::string>(i));
+            // Grant tokens
+            if (document.view().find("GrantTokens") != document.view().end()) {
+                for (const bsoncxx::array::view jsonTokenArray = document.view()["GrantTokens"].get_array().value; const auto &element: jsonTokenArray) {
+                    grantTokens.emplace_back(element.get_string().value);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeKeyRequest::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("KeyId", keyId);
 
-            Poco::JSON::Array tokenArray;
-            for (const auto &token: grantTokens) {
-                tokenArray.add(token);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+
+            if (!grantTokens.empty()) {
+                array jsonArray;
+                for (const auto &element: grantTokens) {
+                    jsonArray.append(element);
+                }
+                document.append(kvp("GrantTokens", jsonArray));
             }
-            rootJson.set("GrantTokens", tokenArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 

@@ -8,63 +8,52 @@ namespace AwsMock::Dto::KMS {
 
     void DecryptRequest::FromJson(const std::string &jsonString) {
 
-        /* TOdo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            std::string tmpStr;
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
-            Core::JsonUtils::GetJsonValueBool("DryRun", rootObject, dryRun);
-            Core::JsonUtils::GetJsonValueString("CiphertextBlob", rootObject, ciphertext);
-            Core::JsonUtils::GetJsonValueString("EncryptionAlgorithm", rootObject, tmpStr);
-            if (!tmpStr.empty()) {
-                encryptionAlgorithm = Dto::KMS::EncryptionAlgorithmsFromString(tmpStr);
-            }
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
+            dryRun = Core::Bson::BsonUtils::GetBoolValue(document, "DryRun");
+            ciphertext = Core::Bson::BsonUtils::GetStringValue(document, "CiphertextBlob");
+            encryptionAlgorithm = EncryptionAlgorithmsFromString(Core::Bson::BsonUtils::GetStringValue(document, "EncryptionAlgorithm"));
 
             // Grant tokens
-            if (rootObject->has("GrantTokens")) {
-                Poco::JSON::Array::Ptr jsonTokenArray = rootObject->getArray("GrantTokens");
-                for (int i = 0; i < jsonTokenArray->size(); i++) {
-                    grantTokens.emplace_back(jsonTokenArray->getElement<std::string>(i));
+            if (document.view().find("GrantTokens") != document.view().end()) {
+                for (const bsoncxx::array::view jsonTokenArray = document.view()["GrantTokens"].get_array().value; const auto &element: jsonTokenArray) {
+                    grantTokens.emplace_back(element.get_string().value);
                 }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DecryptRequest::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("KeyId", keyId);
-            rootJson.set("DryRun", dryRun);
-            rootJson.set("CiphertextBlob", ciphertext);
-            rootJson.set("EncryptionAlgorithm", Dto::KMS::EncryptionAlgorithmsToString(encryptionAlgorithm));
 
-            // Algorithms
-            Poco::JSON::Array grantsArray;
-            for (const auto &token: grantTokens) {
-                grantsArray.add(token);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+            Core::Bson::BsonUtils::SetBoolValue(document, "DryRun", dryRun);
+            Core::Bson::BsonUtils::SetStringValue(document, "CiphertextBlob", ciphertext);
+            Core::Bson::BsonUtils::SetStringValue(document, "EncryptionAlgorithm", EncryptionAlgorithmsToString(encryptionAlgorithm));
+
+            if (!grantTokens.empty()) {
+                array jsonArray;
+                for (const auto &element: grantTokens) {
+                    jsonArray.append(element);
+                }
+                document.append(kvp("GrantTokens", jsonArray));
             }
-            rootJson.set("GrantTokens", grantsArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DecryptRequest::ToString() const {

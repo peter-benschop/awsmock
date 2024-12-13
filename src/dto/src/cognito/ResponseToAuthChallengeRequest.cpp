@@ -55,28 +55,32 @@ namespace AwsMock::Dto::Cognito {
 
         try {
 
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "ClientId", clientId);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ClientId", clientId);
 
             // Challenge responses
             if (!challengeResponses.empty()) {
                 array jsonArray;
                 for (const auto &[fst, snd]: challengeResponses) {
-                    jsonArray.append(kvp(fst, snd));
+                    document jsonObject;
+                    jsonObject.append(kvp(fst, snd));
+                    jsonArray.append(jsonObject);
                 }
-                document.append(kvp("ChallengeResponses", jsonArray));
+                rootDocument.append(kvp("ChallengeResponses", jsonArray));
             }
 
             // Challenge responses
             if (!clientMetaData.empty()) {
                 array jsonArray;
                 for (const auto &[fst, snd]: clientMetaData) {
-                    jsonArray.append(kvp(fst, snd));
+                    document jsonObject;
+                    jsonObject.append(kvp(fst, snd));
+                    jsonArray.append(jsonObject);
                 }
-                document.append(kvp("ClientMetadata", jsonArray));
+                rootDocument.append(kvp("ClientMetadata", jsonArray));
             }
-            return Core::Bson::BsonUtils::ToJsonString(document);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
