@@ -34,9 +34,9 @@ namespace AwsMock::Dto::KMS {
     }
 
     [[maybe_unused]] static EncryptionAlgorithm EncryptionAlgorithmsFromString(const std::string &encryptionAlgorithm) {
-        for (auto &it: EncryptionAlgorithmsNames) {
-            if (it.second == encryptionAlgorithm) {
-                return it.first;
+        for (auto &[fst, snd]: EncryptionAlgorithmsNames) {
+            if (snd == encryptionAlgorithm) {
+                return fst;
             }
         }
         return EncryptionAlgorithm::SYMMETRIC_DEFAULT;

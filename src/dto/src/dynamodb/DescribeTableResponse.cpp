@@ -54,50 +54,48 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            boost::property_tree::ptree root;
-            read_xml(body, root);
-            region = root.get<std::string>("Table.Region");
-            tableName = root.get<std::string>("Table.TableName");
-            tableId = root.get<std::string>("Table.TableId");
-            tableArn = root.get<std::string>("Table.TableArn");
-            tableStatus = TableStatusTypeFromString(root.get<std::string>("Table.TableStatus"));
+            try {
 
-            // TODO: FIx
-            /*// Attributes
-            if (root.find("Table.AttributeDefinitions") != root.end()) {
-                Poco::JSON::Array::Ptr jsonAttributeArray = tableObject->getArray("AttributeDefinitions");
-                for (int i = 0; i < jsonAttributeArray->size(); i++) {
-                    Poco::JSON::Object::Ptr jsonObject = jsonAttributeArray->getObject(i);
-                    std::string name, type;
-                    Core::JsonUtils::GetJsonValueString("AttributeName", jsonObject, name);
-                    Core::JsonUtils::GetJsonValueString("AttributeType", jsonObject, type);
-                    attributes[name] = type;
+                const value rootDocument = bsoncxx::from_json(body);
+                region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+                tableName = Core::Bson::BsonUtils::GetStringValue(rootDocument, "TableName");
+                tableId = Core::Bson::BsonUtils::GetBoolValue(rootDocument, "TableId");
+                tableArn = Core::Bson::BsonUtils::GetStringValue(rootDocument, "TableArn");
+
+                // Attributes
+                if (rootDocument.view().find("AttributeDefinitions") != rootDocument.view().end()) {
+                    for (const bsoncxx::array::view jsonArray = rootDocument.view()["AttributeDefinitions"].get_array().value; const auto &element: jsonArray) {
+                        view jsonObject = element.get_document().value;
+                        std::string name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "AttributeName");
+                        const std::string type = Core::Bson::BsonUtils::GetStringValue(jsonObject, "AttributeType");
+                        attributes[name] = type;
+                    }
                 }
+
+                // Key schemas
+                if (rootDocument.view().find("KeySchema") != rootDocument.view().end()) {
+                    for (const bsoncxx::array::view jsonArray = rootDocument.view()["KeySchema"].get_array().value; const auto &element: jsonArray) {
+                        view jsonObject = element.get_document().value;
+                        std::string name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "AttributeName");
+                        const std::string type = Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyType");
+                        keySchemas[name] = type;
+                    }
+                }
+
+                // Tags
+                if (rootDocument.view().find("Tags") != rootDocument.view().end()) {
+                    for (const bsoncxx::array::view jsonArray = rootDocument.view()["Tags"].get_array().value; const auto &element: jsonArray) {
+                        view jsonObject = element.get_document().value;
+                        std::string key = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Key");
+                        const std::string value = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Value");
+                        tags[key] = value;
+                    }
+                }
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
             }
-
-            // Key schemas
-            if (tableObject->has("KeySchema")) {
-                Poco::JSON::Array::Ptr jsonKeySchemaArray = tableObject->getArray("KeySchema");
-                for (int i = 0; i < jsonKeySchemaArray->size(); i++) {
-                    Poco::JSON::Object::Ptr jsonObject = jsonKeySchemaArray->getObject(i);
-                    std::string name, type;
-                    Core::JsonUtils::GetJsonValueString("AttributeName", jsonObject, name);
-                    Core::JsonUtils::GetJsonValueString("KeyType", jsonObject, type);
-                    keySchemas[name] = type;
-                }
-            }
-
-            // Key schemas
-            if (tableObject->has("Tags")) {
-                Poco::JSON::Array::Ptr jsonTagsArray = tableObject->getArray("Tags");
-                for (int i = 0; i < jsonTagsArray->size(); i++) {
-                    Poco::JSON::Object::Ptr jsonObject = jsonTagsArray->getObject(i);
-                    std::string name, type;
-                    Core::JsonUtils::GetJsonValueString("Key", jsonObject, name);
-                    Core::JsonUtils::GetJsonValueString("Value", jsonObject, type);
-                    tags[name] = type;
-                }
-            }*/
 
         } catch (std::exception &exc) {
             log_error << exc.what();

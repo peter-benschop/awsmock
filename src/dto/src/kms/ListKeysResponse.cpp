@@ -8,52 +8,52 @@ namespace AwsMock::Dto::KMS {
 
     void ListKeysResponse::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("NextMarker", rootObject, nextMarker);
-            Core::JsonUtils::GetJsonValueBool("Truncated", rootObject, truncated);
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            nextMarker = Core::Bson::BsonUtils::GetStringValue(rootDocument, "NextMarker");
+            truncated = Core::Bson::BsonUtils::GetBoolValue(rootDocument, "Truncated");
 
-            Poco::JSON::Array::Ptr jsonKeyArray = rootObject->getArray("Keys");
-            for (int i = 0; i < jsonKeyArray->size(); i++) {
-                ListKey key;
-                Poco::JSON::Object::Ptr jsonKeyObject = jsonKeyArray->getObject(i);
-                Core::JsonUtils::GetJsonValueString("KeyId", jsonKeyObject, key.keyId);
-                Core::JsonUtils::GetJsonValueString("KeyArn", jsonKeyObject, key.keyArn);
-                keys.emplace_back(key);
+            // Grant tokens
+            if (rootDocument.view().find("Keys") != rootDocument.view().end()) {
+                for (const bsoncxx::array::view jsonTokenArray = rootDocument.view()["Keys"].get_array().value; const auto &element: jsonTokenArray) {
+                    ListKey key;
+                    view jsonObject = element.get_document().value;
+                    key.keyId = Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyId");
+                    key.keyArn = Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyArn");
+                    keys.emplace_back(key);
+                }
             }
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListKeysResponse::ToJson() const {
 
-        /* Todo
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("NextMarker", nextMarker);
-            rootJson.set("Truncated", truncated);
 
-            Poco::JSON::Array keyArray;
-            for (const auto &key: keys) {
-                keyArray.add(key.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "NextMarker", nextMarker);
+            Core::Bson::BsonUtils::SetBoolValue(document, "Truncated", truncated);
+
+            if (!keys.empty()) {
+                array jsonArray;
+                for (const auto &element: keys) {
+                    jsonArray.append(element.ToDocument());
+                }
+                document.append(kvp("Keys", jsonArray));
             }
-            rootJson.set("Keys", keyArray);
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListKeysResponse::ToString() const {

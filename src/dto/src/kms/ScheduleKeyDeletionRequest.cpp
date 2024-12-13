@@ -8,40 +8,33 @@ namespace AwsMock::Dto::KMS {
 
     void ScheduleKeyDeletionRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
-            Core::JsonUtils::GetJsonValueInt("PendingWindowInDays", rootObject, pendingWindowInDays);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
+            pendingWindowInDays = Core::Bson::BsonUtils::GetIntValue(document, "PendingWindowInDays");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ScheduleKeyDeletionRequest::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("KeyId", keyId);
-            rootJson.set("PendingWindowInDays", pendingWindowInDays);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+            Core::Bson::BsonUtils::SetIntValue(document, "PendingWindowInDays", pendingWindowInDays);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ScheduleKeyDeletionRequest::ToString() const {

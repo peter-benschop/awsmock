@@ -6,7 +6,8 @@
 
 namespace AwsMock::Monitoring {
 
-    boost::mutex MetricService::_mutex;
+    boost::mutex MetricService::_gaugeMutex;
+    boost::mutex MetricService::_counterMutex;
 
     MetricService::MetricService() : _database(Database::MonitoringDatabase::instance()) {
 
@@ -23,26 +24,24 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name) {
-        boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_counterMutex);
         DoAddCounter(name);
     }
 
     void MetricService::DoAddCounter(const std::string &name) {
         try {
-            if (!CounterExists(name)) {
-                auto &counter = prometheus::BuildCounter()
-                                        .Name(name)
-                                        .Help(name)
-                                        .Register(*_registry);
-                _counterMap[name] = &counter;
-                log_trace << "Counter added, name: " << name;
-            }
+            auto &counter = prometheus::BuildCounter()
+                                    .Name(name)
+                                    .Help(name)
+                                    .Register(*_registry);
+            _counterMap[name] = &counter;
+            log_trace << "Counter added, name: " << name;
         } catch (std::exception &e) {
             log_error << e.what();
         }
     }
     void MetricService::AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_counterMutex);
         try {
             if (GetCounter(name) == nullptr) {
                 DoAddCounter(name);
@@ -71,7 +70,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::ClearCounter(const std::string &name) const {
-        boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_counterMutex);
 
         if (CounterExists(name)) {
             const auto counter = GetCounter(name);
@@ -83,7 +82,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
-        boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_counterMutex);
         if (CounterExists(name, labelName, labelValue)) {
             const auto counter = GetCounter(name);
             counter->Add({{labelName, labelValue}}).Reset();
@@ -114,17 +113,17 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddGauge(const std::string &name) {
-        boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_gaugeMutex);
         DoAddGauge(name);
     }
 
     void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_gaugeMutex);
         try {
-            if (GetGauge(name) == nullptr) {
+            if (!GaugeExists(name)) {
                 DoAddGauge(name);
             }
-            if (!GetGauge(name)->Has({{labelName, labelValue}})) {
+            if (!GaugeExists(name, labelName, labelValue)) {
                 GetGauge(name)->Add({{labelName, labelValue}});
             }
         } catch (std::exception &e) {
@@ -134,19 +133,16 @@ namespace AwsMock::Monitoring {
 
     void MetricService::DoAddGauge(const std::string &name) {
         try {
-            if (!GaugeExists(name)) {
-                auto &gauge = prometheus::BuildGauge()
-                                      .Name(name)
-                                      .Help(name)
-                                      .Register(*_registry);
-                _gaugeMap[name] = &gauge;
-                log_trace << "Gauge added, name: " << name;
-            }
+            auto &gauge = prometheus::BuildGauge()
+                                  .Name(name)
+                                  .Help(name)
+                                  .Register(*_registry);
+            _gaugeMap[name] = &gauge;
+            log_trace << "Gauge added, name: " << name;
         } catch (std::exception &e) {
             log_error << e.what();
         }
     }
-
     prometheus::Family<prometheus::Gauge> *MetricService::GetGauge(const std::string &name) {
         if (const auto it = _gaugeMap.find(name); it != _gaugeMap.end()) {
             return it->second;
