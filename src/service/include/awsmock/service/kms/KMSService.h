@@ -10,13 +10,7 @@
 #include <ctime>
 #include <string>
 
-// Poco includes
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricDefinition.h"
-#include "awsmock/service/monitoring/MetricService.h"
-#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -37,6 +31,9 @@
 #include <awsmock/dto/kms/model/ListKey.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
 

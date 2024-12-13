@@ -14,10 +14,10 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
 # Cleanup
 RUN rm -rf /usr/src
 
-# Stick to alpine 3.19 as 3.20 has not support for aws-cli (missing python3.12 compat)
+# Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread curl
+RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-program_options boost-filesystem boost-thread boost-url minizip curl plog yaml-cpp
 
 # Fix timezones
 ENV TZ=Europe/Berlin
@@ -53,22 +53,6 @@ COPY --from=build /usr/lib/libbrotlicommon.so.1 /usr/lib
 COPY --from=build /lib/libacl.so.1.1.2302 /lib/
 RUN ln -s /lib/libacl.so.1.1.2302 /lib/libacl.so.1
 
-# Install poco
-COPY --from=build /usr/local/lib/libPocoPrometheus.so.103 /usr/lib/
-COPY --from=build /usr/local/lib/libPocoNet.so.103 /usr/lib/
-COPY --from=build /usr/local/lib/libPocoJSON.so.103 /usr/lib/
-COPY --from=build /usr/local/lib/libPocoXML.so.103 /usr/lib/
-COPY --from=build /usr/local/lib/libPocoZip.so.103 /usr/lib/
-COPY --from=build /usr/local/lib/libPocoUtil.so.103 /usr/lib/
-COPY --from=build /usr/local/lib/libPocoFoundation.so.103 /usr/lib/
-RUN ln -s /usr/lib/libPocoPrometheus.so.103 /usr/lib/libPocoPrometheus.so
-RUN ln -s /usr/lib/libPocoNet.so.103 /usr/lib/libPocoNet.so
-RUN ln -s /usr/lib/libPocoJSON.so.103 /usr/lib/libPocoJSON.so
-RUN ln -s /usr/lib/libPocoXML.so.103 /usr/lib/libPocoXML.so
-RUN ln -s /usr/lib/libPocoZip.so.103 /usr/lib/libPocoZip.so
-RUN ln -s /usr/lib/libPocoUtil.so.103 /usr/lib/libPocoUtil.so
-RUN ln -s /usr/lib/libPocoFoundation.so.103 /usr/lib/libPocoFoundation.so
-
 # Install Mongo C/C++ driver
 COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0
@@ -81,14 +65,6 @@ RUN ln -s /usr/lib/libmongocxx.so.4.1.0-pre /usr/lib/libmongocxx.so._noabi
 COPY --from=build /usr/local/lib/libbsoncxx.so.4.1.0-pre /usr/lib/
 RUN ln -s /usr/lib/libbsoncxx.so.4.1.0-pre /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
-
-# Install boost
-COPY --from=build /usr/lib/libboost_program_options.so.1.84.0 /usr/lib/
-COPY --from=build /usr/lib/libboost_thread.so.1.84.0 /usr/lib/
-COPY --from=build /usr/lib/libboost_filesystem.so.1.84.0 /usr/lib/
-RUN ln -s /usr/lib/libboost_program_options.so.1.84.0 /usr/lib/libboost_program_options.so
-RUN ln -s /usr/lib/libboost_thread.so.1.84.0 /usr/lib/libboost_thread.so
-RUN ln -s /usr/lib/libboost_filesystem.so.1.84.0 /usr/lib/libboost_filesystem.so
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/

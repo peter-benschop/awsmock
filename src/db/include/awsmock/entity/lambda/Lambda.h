@@ -16,10 +16,6 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/json.hpp>
 
-
-// Poco includes
-#include <Poco/JSON/Object.h>
-
 // AwsMock includes
 #include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
