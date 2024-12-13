@@ -6,17 +6,9 @@
 #define AWSMOCK_SERVICE_SSM_SERVICE_H
 
 // C++ standard includes
-#include <chrono>
-#include <ctime>
 #include <string>
 
-// Poco includes
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricDefinition.h"
-#include "awsmock/service/monitoring/MetricService.h"
-#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -30,6 +22,9 @@
 #include <awsmock/dto/ssm/PutParameterResponse.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/SSMDatabase.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 #define DEFAULT_SSM_ACCOUNT_ID "000000000000"
 

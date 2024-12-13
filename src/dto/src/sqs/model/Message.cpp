@@ -2,7 +2,6 @@
 // Created by vogje01 on 7/6/24.
 //
 
-#include <Poco/JSON/Object.h>
 #include <awsmock/dto/sqs/model/Message.h>
 
 namespace AwsMock::Dto::SQS {

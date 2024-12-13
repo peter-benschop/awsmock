@@ -2,7 +2,6 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include <Poco/JSON/Array.h>
 #include <awsmock/dto/transfer/model/User.h>
 
 namespace AwsMock::Dto::Transfer {
