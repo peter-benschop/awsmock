@@ -7,21 +7,12 @@
 
 // C++ includes
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
-
-// Poco includes
-#include <Poco/DateTime.h>
-#include <Poco/DateTimeFormat.h>
-#include <Poco/DateTimeFormatter.h>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -38,9 +29,9 @@ namespace AwsMock::Database::Entity::SQS {
         BINARY
     };
     static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
-            {MessageAttributeType::STRING, "String"},
-            {MessageAttributeType::NUMBER, "Number"},
-            {MessageAttributeType::BINARY, "Binary"},
+            {STRING, "String"},
+            {NUMBER, "Number"},
+            {BINARY, "Binary"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeTypeToString(MessageAttributeType messageAttributeType) {
@@ -48,9 +39,9 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     [[maybe_unused]] static MessageAttributeType MessageAttributeTypeFromString(const std::string &messageAttributeType) {
-        for (auto &it: MessageAttributeTypeNames) {
-            if (it.second == messageAttributeType) {
-                return it.first;
+        for (auto &[fst, snd]: MessageAttributeTypeNames) {
+            if (snd == messageAttributeType) {
+                return fst;
             }
         }
         return MessageAttributeType::STRING;
