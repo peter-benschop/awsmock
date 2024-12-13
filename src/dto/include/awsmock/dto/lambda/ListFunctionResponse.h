@@ -9,11 +9,6 @@
 #include <string>
 #include <vector>
 
-// Poco includes
-#include <Poco/Dynamic/Var.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Parser.h>
-
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/lambda/model/Environment.h>
