@@ -34,7 +34,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringHandler() = default;
+        explicit MonitoringHandler() : AbstractHandler("monitoring-handler") {};
 
         /**
          * @brief HTTP POST request.

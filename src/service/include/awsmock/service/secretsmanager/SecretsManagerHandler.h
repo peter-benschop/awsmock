@@ -21,7 +21,7 @@ namespace AwsMock::Service {
     namespace ip = boost::asio::ip;
 
     /**
-     * AWS secrets manager mock handler.
+     * @brief AWS secrets manager mock handler.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SecretsManagerHandler() = default;
+        explicit SecretsManagerHandler() : AbstractHandler("secretsmanager-handler") {}
 
         /**
          * HTTP POST request.

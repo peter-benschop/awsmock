@@ -44,7 +44,7 @@ namespace AwsMock::Service {
     }
 
     void GatewayListener::DoAccept() {
-        _acceptor.async_accept(boost::asio::make_strand(_ioc), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
+        _acceptor.async_accept(make_strand(_ioc), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
     }
 
     void GatewayListener::OnAccept(const boost::beast::error_code &ec, ip::tcp::socket socket) {

@@ -12,8 +12,8 @@ namespace AwsMock::Dto::Docker {
             return;
         }
 
-
         try {
+
             const value document = bsoncxx::from_json(jsonString);
             id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
             warning = Core::Bson::BsonUtils::GetStringValue(document, "Warning");
@@ -25,6 +25,7 @@ namespace AwsMock::Dto::Docker {
     }
 
     std::string CreateNetworkResponse::ToJson() const {
+
         try {
 
             document document;

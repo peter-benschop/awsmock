@@ -41,7 +41,9 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_mutex);
+        if (_mutex.try_lock()) {
+            boost::mutex::scoped_lock lock(_mutex);
+        }
         try {
             if (GetCounter(name) == nullptr) {
                 AddCounter(name);
@@ -70,7 +72,9 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::ClearCounter(const std::string &name) const {
-        boost::mutex::scoped_lock lock(_mutex);
+        if (_mutex.try_lock()) {
+            boost::mutex::scoped_lock lock(_mutex);
+        }
         if (CounterExists(name)) {
             const auto counter = GetCounter(name);
             counter->Add({{}}).Reset();
@@ -81,7 +85,9 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
-        boost::mutex::scoped_lock lock(_mutex);
+        if (_mutex.try_lock()) {
+            boost::mutex::scoped_lock lock(_mutex);
+        }
         if (CounterExists(name, labelName, labelValue)) {
             const auto counter = GetCounter(name);
             counter->Add({{labelName, labelValue}}).Reset();
@@ -130,13 +136,15 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_mutex);
+        if (_mutex.try_lock()) {
+            boost::mutex::scoped_lock lock(_mutex);
+        }
         try {
-            if (GetCounter(name) == nullptr) {
-                AddCounter(name);
+            if (GetGauge(name) == nullptr) {
+                AddGauge(name);
             }
-            if (!GetCounter(name)->Has({{labelName, labelValue}})) {
-                GetCounter(name)->Add({{labelName, labelValue}});
+            if (!GetGauge(name)->Has({{labelName, labelValue}})) {
+                GetGauge(name)->Add({{labelName, labelValue}});
             }
         } catch (std::exception &e) {
             log_error << e.what();

@@ -42,7 +42,7 @@ namespace AwsMock::Service {
         /**
          * @brief Manager HTTP server
          */
-        explicit ModuleHandler() = default;
+        explicit ModuleHandler(): AbstractHandler("module-handler") {}
 
         /**
          * @brief Handler HTTP GET requests.

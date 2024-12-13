@@ -38,12 +38,20 @@ namespace AwsMock::Service {
 
       public:
 
-        virtual ~AbstractHandler() = default;
-
         /**
          * @brief Default User-defined Constructor
          */
         AbstractHandler() = default;
+
+        /**
+         * @brief Default User-defined Constructor
+         */
+        explicit AbstractHandler(const std::string &name) : _name(name) {};
+
+        /**
+         * Destructor
+         */
+        virtual ~AbstractHandler() = default;
 
         /**
          * @brief Handles the HTTP method GET.
@@ -146,7 +154,7 @@ namespace AwsMock::Service {
         static http::response<http::dynamic_body> SendBadRequestError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
         /**
-         * Send a OK response (HTTP state code 200) with an part of an output.
+         * Send an OK response (HTTP state code 200) with an part of an output.
          *
          * @param request HTTP request
          * @param fileName file to send
@@ -159,6 +167,18 @@ namespace AwsMock::Service {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers = {});
+
+        /**
+         * Get the name
+         */
+        std::string name() { return _name; }
+
+      private:
+
+        /**
+         * Handler name
+         */
+        std::string _name;
     };
 
 }// namespace AwsMock::Service
