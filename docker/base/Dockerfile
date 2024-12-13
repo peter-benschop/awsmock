@@ -1,11 +1,25 @@
-FROM alpine:latest
+FROM ubuntu:latest
 
-RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers zlib zlib-dev \
-    libarchive libarchive-dev github-cli asio-dev gtest-dev pandoc icu-libs doxygen boost-program_options \
-    boost-filesystem boost-thread boost-url minizip minizip-dev curl curl-dev plog plog-dev yaml-cpp yaml-cpp-dev
+RUN apt update && apt install -y groff g++ make cmake ccache git python3 zlib1g zlib1g-dev libarchive-dev libasio-dev libgtest-dev libgmock-dev pandoc doxygen  \
+    libboost-program-options-dev libboost-filesystem-dev libminizip-dev libcurl4-openssl-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
+
+# Install Plog logging framework
+RUN cd /usr/src && \
+    git clone https://github.com/SergiusTheBest/plog.git && \
+    cd plog && \
+    cmake . && \
+    cmake --install .
+
+# Install jwt-cpp
+RUN cd /usr/src && \
+    git clone https://github.com/jbeder/yaml-cpp && \
+    cd yaml-cpp && \
+    cmake . && \
+    cmake --build . -j16 && \
+    cmake --install .
 
 # Install jwt-cpp
 RUN cd /usr/src && \
@@ -24,7 +38,7 @@ RUN cd /usr/src && \
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
-    git clone https://github.com/mongodb/mongo-cxx-driver.git && \
+    git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
