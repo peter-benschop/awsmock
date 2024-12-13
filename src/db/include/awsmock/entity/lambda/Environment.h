@@ -9,18 +9,12 @@
 #include <map>
 #include <string>
 
-// Poco includes
-#include <Poco/JSON/Object.h>
-
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Database::Entity::Lambda {
 
