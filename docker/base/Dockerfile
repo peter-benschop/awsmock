@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers  \
+RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers zlib zlib-dev \
     libarchive libarchive-dev github-cli asio-dev gtest-dev pandoc icu-libs doxygen boost-program_options \
     boost-filesystem boost-thread boost-url minizip minizip-dev curl curl-dev plog plog-dev yaml-cpp yaml-cpp-dev
 
