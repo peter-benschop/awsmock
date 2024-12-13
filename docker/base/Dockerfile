@@ -1,25 +1,11 @@
-FROM ubuntu:latest
+FROM alpine:latest
 
-RUN apt update && apt install -y groff g++ make cmake ccache git python3 zlib1g zlib1g-dev libarchive-dev libasio-dev libgtest-dev libgmock-dev pandoc doxygen  \
-    libboost-program-options-dev libboost-filesystem-dev libboost-locale-dev libboost-url-dev libminizip-dev libcurl4-openssl-dev
+RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli linux-headers  \
+    libarchive libarchive-dev github-cli asio-dev gtest-dev pandoc icu-libs doxygen boost-program_options \
+    boost-filesystem boost-thread boost-url curl curl-dev plog plog-dev yaml-cpp yaml-cpp-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
-
-# Install Plog logging framework
-RUN cd /usr/src && \
-    git clone https://github.com/SergiusTheBest/plog.git && \
-    cd plog && \
-    cmake . && \
-    cmake --install .
-
-# Install jwt-cpp
-RUN cd /usr/src && \
-    git clone https://github.com/jbeder/yaml-cpp && \
-    cd yaml-cpp && \
-    cmake . && \
-    cmake --build . -j16 && \
-    cmake --install .
 
 # Install jwt-cpp
 RUN cd /usr/src && \
