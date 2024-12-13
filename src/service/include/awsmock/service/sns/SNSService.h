@@ -6,15 +6,9 @@
 #define AWSMOCK_SERVICE_SNS_SERVICE_H
 
 // C++ standard includes
-#include <chrono>
-#include <ctime>
 #include <string>
 
-// Poco includes
-#include <Poco/UUIDGenerator.h>
-
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricDefinition.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -50,6 +44,7 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
 
 #define SQS_PROTOCOL "sqs"
@@ -69,7 +64,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
          * @brief Creates a new topic

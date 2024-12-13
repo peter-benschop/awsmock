@@ -4,8 +4,6 @@
 
 #include <awsmock/entity/sqs/MessageAttribute.h>
 
-#include <utility>
-
 namespace AwsMock::Database::Entity::SQS {
 
     view_or_value<view, value> MessageAttribute::ToDocument() const {
