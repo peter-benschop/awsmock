@@ -5,23 +5,8 @@
 #ifndef AWS_MOCK_CORE_CRYPTO_UTILS_H
 #define AWS_MOCK_CORE_CRYPTO_UTILS_H
 
-// Standard C includes
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
 // Standard C++ includes
 #include <array>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <span>
-#include <sstream>
 #include <string>
 #include <string_view>
 

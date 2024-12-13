@@ -6,15 +6,15 @@
 #define AWSMOCK_CORE_CRYPTO_UTILS_TEST_H
 
 // GTest includes
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 // Boost includes
 #include <boost/locale.hpp>
 #include <boost/spirit/home/support/utf8.hpp>
 
 // Local includes
-#include "awsmock/core/CryptoUtils.h"
-#include "awsmock/core/FileUtils.h"
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/FileUtils.h>
 
 #define TEST_STRING "The quick brown fox jumps over the lazy dog"
 #define BASE64_TEST_STRING "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="
