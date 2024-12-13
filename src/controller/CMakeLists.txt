@@ -19,7 +19,7 @@ if (SYSTEMD)
 else ()
     # systemd not available
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_program_options boost_filesystem boost_thread boost_url yaml-cpp
-            pthread crypto ssl z archive)
+            pthread crypto ssl z minizip archive)
 endif ()
 
 add_library(${BINARY}_lib STATIC ${SOURCES})
