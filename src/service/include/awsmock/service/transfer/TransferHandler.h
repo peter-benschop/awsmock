@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferHandler() = default;
+        explicit TransferHandler() : AbstractHandler("transfer-handler") {}
 
         /**
          * @brief HTTP POST request.

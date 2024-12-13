@@ -344,7 +344,7 @@ namespace AwsMock::Service {
 
         Dto::Docker::ListContainerResponse response(body);
         if (response.containerList.empty()) {
-            log_warning << "Docker container not found, name: " << name << ":" << tag;
+            log_info << "Docker container not found, name: " << name << ":" << tag;
             return {};
         }
         log_debug << "Docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
@@ -443,6 +443,7 @@ namespace AwsMock::Service {
 
         Dto::Docker::CreateNetworkResponse response;
         if (_isDocker) {
+
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/networks/create", request.ToJson());
             if (statusCode == http::status::ok) {
                 log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
@@ -450,7 +451,9 @@ namespace AwsMock::Service {
                 log_error << "Docker network create failed, httpStatus: " << statusCode;
             }
             response.FromJson(body);
+
         } else {
+
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/networks/create", request.ToJson());
             if (statusCode == http::status::ok) {
                 log_debug << "Podman network created, name: " << request.name << " driver: " << request.driver;

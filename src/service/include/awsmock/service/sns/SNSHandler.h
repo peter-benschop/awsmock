@@ -25,14 +25,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSHandler : public AbstractHandler {
+    class SNSHandler final : public AbstractHandler {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SNSHandler() = default;
+        explicit SNSHandler() : AbstractHandler("sqs-handler") {}
 
         /**
          * @brief HTTP POST request.

@@ -35,6 +35,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoRead() {
+
         // Construct a new parser for each message
         _parser.emplace();
 
@@ -46,10 +47,7 @@ namespace AwsMock::Service {
         _stream.expires_after(std::chrono::seconds(_timeout));
 
         // Read a request using the parser-oriented interface
-        http::async_read(_stream,
-                         _buffer,
-                         *_parser,
-                         boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
+        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
     void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
@@ -76,6 +74,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
+
         // Allocate and store the work
         _response_queue.push(std::move(response));
         //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, static_cast<double>(response_queue_.size()));
@@ -90,8 +89,8 @@ namespace AwsMock::Service {
     // The concrete type of the response message (which depends on the
     // request), is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(
-            http::request<Body, http::basic_fields<Allocator>> &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -122,9 +121,13 @@ namespace AwsMock::Service {
         std::shared_ptr<AbstractHandler> handler;
         std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
+
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
             handler = _routingTable[target];
+            log_trace << "Handler found, name: " << handler->name();
+
         } else {
+
             // Verify AWS signature
             if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
                 log_warning << "AWS signature could not be verified";
@@ -136,6 +139,7 @@ namespace AwsMock::Service {
 
             region = authKey.region;
             handler = _routingTable[authKey.module];
+            log_trace << "Handler found, name: " << handler->name();
         }
 
         if (handler) {
@@ -165,13 +169,13 @@ namespace AwsMock::Service {
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
                     return handler->HandleHeadRequest(request, region, "none");
                 }
+                default:;
             }
         }
         return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
     }
 
-    // Called to start/continue the write-loop. Should not be called when
-    // write_loop is already active.
+    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
     void GatewaySession::DoWrite() {
         if (!_response_queue.empty()) {
             bool keep_alive = _response_queue.front().keep_alive();
@@ -207,24 +211,17 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoShutdown() {
+
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
-        if (ec) {
-            //log_error << "Could not shutdown socket, message: " << ec.message();
-        }
-
+        _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
         // At this point the connection is closed gracefully
     }
 
     void GatewaySession::DoClose() {
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = _stream.socket().close(ec);
-        if (ec) {
-            //log_error << "Could not shutdown socket, message: " << ec.message();
-        }
-
+        _stream.socket().close(ec);
         // At this point the connection is closed gracefully
     }
 

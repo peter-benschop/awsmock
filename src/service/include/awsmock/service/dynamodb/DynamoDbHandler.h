@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler() = default;
+        explicit DynamoDbHandler() : AbstractHandler("dynamodb-handler") {}
 
         /**
          * @brief HTTP POST request.

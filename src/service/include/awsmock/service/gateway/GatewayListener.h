@@ -9,13 +9,13 @@
 #include <memory>
 
 // Boost includes
-#include "awsmock/core/LogStream.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
@@ -36,7 +36,7 @@ namespace AwsMock::Service {
          * @param ioc Boost IO context
          * @param endpoint HTTP endpoint
          */
-        GatewayListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint);
+        GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint);
 
         /**
          * @brief Start accepting incoming connections

@@ -56,7 +56,7 @@ namespace AwsMock::Service {
         /**
          * @brief Delete instances from database, which are not running
          */
-        void CleanupInstances();
+        void CleanupInstances() const;
 
         /**
          * @brief Creates a local network.
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
          * @par
          * The lambda functions need to connect to a local bridged network, otherwise they cannot communicate with the awsmock manager.
          */
-        void CreateLocalNetwork();
+        void CreateLocalNetwork() const;
 
         /**
          * @brief Remove expired lambda functions
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
          * @par
          * Loops over all lambda functions and removes the lambda container, when the lambdas are expired.
          */
-        void RemoveExpiredLambdas();
+        void RemoveExpiredLambdas() const;
 
         /**
          * Update counters

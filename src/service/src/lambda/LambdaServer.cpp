@@ -5,11 +5,10 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"),
-                                                                     _lambdaDatabase(
-                                                                             Database::LambdaDatabase::instance()) {
+    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.lambda.monitoring.period");
         _counterPeriod = configuration.GetValueInt("awsmock.modules.lambda.counter.period");
         _removePeriod = configuration.GetValueInt("awsmock.modules.lambda.remove.period");
@@ -47,17 +46,17 @@ namespace AwsMock::Service {
 
     void LambdaServer::Shutdown() {
         log_debug << "Lambda server shutdown, region: " << _region;
-        std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
-        for (auto &lambda: lambdas) {
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
+
             // Cleanup instances
             for (const auto &instance: lambda.instances) {
-                Service::ContainerService::instance().StopContainer(instance.containerId);
-                Service::ContainerService::instance().DeleteContainer(instance.containerId);
+                ContainerService::instance().StopContainer(instance.containerId);
+                ContainerService::instance().DeleteContainer(instance.containerId);
                 log_debug << "Lambda instances cleaned up, id: " << instance.containerId;
             }
             lambda.instances.clear();
-            _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_debug << "Lambda cleaned up, name: " << lambda.function;
         }
         log_debug << "All lambda instances cleaned up";
@@ -68,26 +67,23 @@ namespace AwsMock::Service {
         log_debug << "Docker containers cleaned up";
     }
 
-    void LambdaServer::CleanupInstances() {
+    void LambdaServer::CleanupInstances() const {
         log_debug << "Cleanup lambdas";
-        std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region);
 
-        for (auto &lambda: lambdas) {
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
             log_debug << "Get containers";
-            std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(
-                    lambda.function,
-                    "latest");
+            std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest");
             for (const auto &container: containers) {
-                Service::ContainerService::instance().StopContainer(container.id);
-                Service::ContainerService::instance().DeleteContainer(container.id);
+                ContainerService::instance().StopContainer(container.id);
+                ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
-            _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
         }
         log_debug << "Lambda instances cleaned up";
     }
 
-    void LambdaServer::CreateLocalNetwork() {
+    void LambdaServer::CreateLocalNetwork() const {
         log_debug << "Create networks, name: local";
 
         if (!_dockerService.NetworkExists("local")) {
@@ -95,14 +91,15 @@ namespace AwsMock::Service {
             request.name = "local";
             request.driver = "bridge";
 
-            _dockerService.CreateNetwork(request);
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+            auto [id, warning] = _dockerService.CreateNetwork(request);
+            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << id;
         } else {
             log_debug << "Docker network exists already, name: local";
         }
     }
 
-    void LambdaServer::RemoveExpiredLambdas() {
+    void LambdaServer::RemoveExpiredLambdas() const {
+
         // Get lambda list
         Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
         if (lambdaList.empty()) {

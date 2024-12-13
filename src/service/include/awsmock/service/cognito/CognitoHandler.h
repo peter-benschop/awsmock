@@ -33,7 +33,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        CognitoHandler() = default;
+        CognitoHandler() : AbstractHandler("cognito-handler") {}
 
         /**
          * @brief HTTP POST request.

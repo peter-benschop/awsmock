@@ -24,14 +24,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaHandler : public AbstractHandler {
+    class LambdaHandler final : public AbstractHandler {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler() : AbstractHandler() {}
+        explicit LambdaHandler() : AbstractHandler("lambda-handler") {}
 
         /**
          * @brief HTTP GET request.

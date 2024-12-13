@@ -36,14 +36,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSHandler : public AbstractHandler {
+    class SQSHandler final : public AbstractHandler {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SQSHandler() = default;
+        explicit SQSHandler() : AbstractHandler("sqs-handler") {}
 
         /**
          * @brief HTTP POST request.
