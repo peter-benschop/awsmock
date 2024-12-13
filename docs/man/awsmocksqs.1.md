@@ -28,9 +28,6 @@ corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
 
-```awslocal lambda create-function --function-name <function-name>```    
-&nbsp;&nbsp;&nbsp;&nbsp;creates a new lambda function
-
 ```awslocal sqs list-queues```  
 &nbsp;&nbsp;&nbsp;&nbsp;lists all available queues
 
@@ -161,4 +158,5 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```,
+```awsmockssm(1)```

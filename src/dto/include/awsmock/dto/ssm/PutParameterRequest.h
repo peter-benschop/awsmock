@@ -31,7 +31,7 @@ namespace AwsMock::Dto::SSM {
         /**
          * Parameter value
          */
-        std::string value;
+        std::string parameterValue;
 
         /**
          * Description

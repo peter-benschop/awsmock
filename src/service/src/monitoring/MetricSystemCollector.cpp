@@ -7,7 +7,7 @@
 namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::Initialize() {
-        struct tms timeSample {};
+        tms timeSample{};
 
         lastCPU = times(&timeSample);
         lastSysCPU = timeSample.tms_stime;
@@ -50,32 +50,33 @@ namespace AwsMock::Monitoring {
         ifs.close();
 
         clock_t now;
-        struct tms timeSample {};
+        tms timeSample{};
         now = times(&timeSample);
-        double totalPercent, userPercent, systemPercent;
 
         log_trace << "Now: " << now << "/" << lastCPU << "/" << lastSysCPU << "/" << lastUserCPU;
         if (now <= lastCPU || timeSample.tms_stime < lastSysCPU || timeSample.tms_utime < lastUserCPU) {
             // Overflow detection. Just skip this value.
-            totalPercent = -1.0;
             log_debug << "Invalid CPU values, skipping";
         } else {
-            totalPercent = (double) ((timeSample.tms_stime - lastSysCPU) + (timeSample.tms_utime - lastUserCPU));
-            totalPercent /= (double) (now - lastCPU);
+            double totalPercent;
+            double systemPercent;
+            double userPercent;
+            totalPercent = static_cast<double>(timeSample.tms_stime - lastSysCPU + (timeSample.tms_utime - lastUserCPU));
+            totalPercent /= static_cast<double>(now - lastCPU);
             totalPercent /= numProcessors;
             totalPercent *= 100;
             MetricService::instance().SetGauge(TOTAL_CPU, totalPercent);
             log_trace << "Total CPU: " << totalPercent;
 
-            userPercent = (double) (timeSample.tms_utime - lastUserCPU);
-            userPercent /= (double) (now - lastCPU);
+            userPercent = static_cast<double>(timeSample.tms_utime - lastUserCPU);
+            userPercent /= static_cast<double>(now - lastCPU);
             userPercent /= numProcessors;
             userPercent *= 100;
             MetricService::instance().SetGauge(USER_CPU, userPercent);
             log_trace << "User CPU: " << userPercent;
 
-            systemPercent = (double) (timeSample.tms_stime - lastSysCPU);
-            systemPercent /= (double) (now - lastCPU);
+            systemPercent = static_cast<double>(timeSample.tms_stime - lastSysCPU);
+            systemPercent /= static_cast<double>(now - lastCPU);
             systemPercent /= numProcessors;
             systemPercent *= 100;
             MetricService::instance().SetGauge(SYSTEM_CPU, systemPercent);

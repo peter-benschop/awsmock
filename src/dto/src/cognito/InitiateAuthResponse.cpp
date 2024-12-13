@@ -8,30 +8,28 @@ namespace AwsMock::Dto::Cognito {
 
     std::string InitiateAuthResponse::ToJson() const {
 
-        // TODO: fix me
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Session", session);
-            rootJson.set("AuthenticationResult", authenticationResult.ToJsonObject());
-            rootJson.set("ChallengeName", challengeName);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Session", session);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ChallengeName", challengeName);
 
-            // Challenge parameters
-            Poco::JSON::Object challengeParameterObject;
-            for (const auto &challengeParameter: challengeParameters) {
-                challengeParameterObject.set(challengeParameter.first, challengeParameter.second);
+            rootDocument.append(kvp("AuthenticationResult", authenticationResult.ToDocument()));
+
+            if (!challengeParameters.empty()) {
+                document jsonObject;
+                for (const auto &[fst, snd]: challengeParameters) {
+                    jsonObject.append(kvp(fst, snd));
+                }
+                rootDocument.append(kvp("ChallengeParameters", jsonObject));
             }
-            rootJson.set("ChallengeParameters", challengeParameterObject);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string InitiateAuthResponse::ToString() const {

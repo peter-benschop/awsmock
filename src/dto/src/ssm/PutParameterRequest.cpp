@@ -8,46 +8,37 @@ namespace AwsMock::Dto::SSM {
 
     std::string PutParameterRequest::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("Value", value);
-            rootJson.set("Type", ParameterTypeToString(type));
-            rootJson.set("Description", description);
-            rootJson.set("KeyId", keyId);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "Value", parameterValue);
+            Core::Bson::BsonUtils::SetStringValue(document, "Type", ParameterTypeToString(type));
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void PutParameterRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
-            Core::JsonUtils::GetJsonValueString("Value", rootObject, value);
-            std::string typeStr;
-            Core::JsonUtils::GetJsonValueString("Type", rootObject, typeStr);
-            type = ParameterTypeFromString(typeStr);
-            Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
-            Core::JsonUtils::GetJsonValueString("KeyId", rootObject, keyId);
+            const value document = bsoncxx::from_json(jsonString);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            parameterValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
+            type = ParameterTypeFromString(Core::Bson::BsonUtils::GetStringValue(document, "Type"));
+            description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
+            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string PutParameterRequest::ToString() const {

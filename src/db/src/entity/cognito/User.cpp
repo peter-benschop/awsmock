@@ -6,23 +6,23 @@
 
 namespace AwsMock::Database::Entity::Cognito {
 
-    bool User::HasGroup(const std::string &userPoolIdIn, const std::string &groupNameIn) {
+    bool User::HasGroup(const std::string &userPoolId, const std::string &groupName) {
 
-        return std::find_if(groups.begin(), groups.end(), [&userPoolIdIn, &groupNameIn](const Group &g) {
-                   return g.userPoolId == userPoolIdIn && g.groupName == groupNameIn;
+        return std::ranges::find_if(groups, [&userPoolId, &groupName](const Group &g) {
+                   return g.userPoolId == userPoolId && g.groupName == groupName;
                }) != groups.end();
     }
 
     view_or_value<view, value> User::ToDocument() const {
 
         // Attributes
-        auto userAttributesDoc = bsoncxx::builder::basic::array{};
-        for (const auto &attribute: userAttributes) {
-            userAttributesDoc.append(make_document(kvp(attribute.name, attribute.value)));
+        auto userAttributesDoc = array{};
+        for (const auto &[name, value]: userAttributes) {
+            userAttributesDoc.append(make_document(kvp(name, value)));
         }
 
         // Groups
-        auto groupsDoc = bsoncxx::builder::basic::array{};
+        auto groupsDoc = array{};
         for (const auto &group: groups) {
             groupsDoc.append(group.ToDocument());
         }
@@ -41,14 +41,14 @@ namespace AwsMock::Database::Entity::Cognito {
         return userDocument;
     }
 
-    void User::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void User::FromDocument(const std::optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
         userName = Core::Bson::BsonUtils::GetStringValue(mResult, "userName");
         userPoolId = Core::Bson::BsonUtils::GetStringValue(mResult, "userPoolId");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
-        userStatus = Entity::Cognito::UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "userStatus"));
+        userStatus = UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "userStatus"));
         confirmationCode = Core::Bson::BsonUtils::GetStringValue(mResult, "confirmationCode");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
@@ -64,8 +64,7 @@ namespace AwsMock::Database::Entity::Cognito {
         }
         // Groups
         if (mResult.value().find("groups") != mResult.value().end()) {
-            bsoncxx::array::view groupsView{mResult.value()["groups"].get_array().value};
-            for (const bsoncxx::array::element &groupElement: groupsView) {
+            for (const bsoncxx::array::view groupsView{mResult.value()["groups"].get_array().value}; const bsoncxx::array::element &groupElement: groupsView) {
                 Group group;
                 group.FromDocument(groupElement.get_document().view());
                 groups.push_back(group);
@@ -80,7 +79,7 @@ namespace AwsMock::Database::Entity::Cognito {
     }
 
     std::ostream &operator<<(std::ostream &os, const User &u) {
-        os << "User=" << bsoncxx::to_json(u.ToDocument());
+        os << "User=" << to_json(u.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Cognito

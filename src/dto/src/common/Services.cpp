@@ -12,38 +12,37 @@ namespace AwsMock::Dto::Common {
             return true;
         }
 
-        return find_if(serviceNames.begin(), serviceNames.end(), [service](const std::string &t) {
+        return std::ranges::find_if(serviceNames, [service](const std::string &t) {
                    return t == service;
                }) != serviceNames.end();
     }
 
     bool Services::Contains(const std::string &service) const {
 
-        return find_if(serviceNames.begin(), serviceNames.end(), [service](const std::string &t) {
+        return std::ranges::find_if(serviceNames, [service](const std::string &t) {
                    return Core::StringUtils::EqualsIgnoreCase(t, service);
                }) != serviceNames.end();
     }
 
-    std::string Services::ToJson() {
+    std::string Services::ToJson() const {
 
-        /* Todo
         try {
-            Poco::JSON::Object jsonServices;
-            Poco::JSON::Array jsonServiceArray;
-            for (const auto &service: serviceNames) {
-                jsonServiceArray.add(service);
+
+            document document;
+
+            if (!serviceNames.empty()) {
+                array jsonArray;
+                for (const auto &service: serviceNames) {
+                    jsonArray.append(service);
+                }
+                document.append(kvp("services", jsonArray));
             }
-            jsonServices.set("services", jsonServiceArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            std::ostringstream os;
-            jsonServices.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        */
-        return {};
     }
 
     void Services::FromJson(const std::string &jsonString) {
@@ -53,21 +52,30 @@ namespace AwsMock::Dto::Common {
             return;
         }
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        auto rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Services
-            Poco::JSON::Array::Ptr jsonArray = rootObject->getArray("services");
-            for (const auto &service: *jsonArray) {
-                serviceNames.emplace_back(service.extract<std::string>());
+            if (const value document = bsoncxx::from_json(jsonString); document.view().find("services") != document.view().end()) {
+                for (const view jsonArray = document["services"].get_array().value; const auto &service: jsonArray) {
+                    serviceNames.emplace_back(service.get_string().value);
+                }
+                serviceNames.emplace_back("all");
             }
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
+
+    std::string Services::ToString() const {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
+    std::ostream &operator<<(std::ostream &os, const Services &r) {
+        os << "Services=" << r.ToJson();
+        return os;
+    }
+
 }// namespace AwsMock::Dto::Common

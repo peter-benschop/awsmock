@@ -20,33 +20,30 @@ namespace AwsMock::Dto::Cognito {
 
     void ValidationData::FromDocument(const view_or_value<view, value> &document) {
 
-        // TODO: fix me
-        /*try {
+        try {
 
-            Core::JsonUtils::GetJsonValueString("Name", jsonObject, name);
-            Core::JsonUtils::GetJsonValueString("Value", jsonObject, value);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            attributeValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     view_or_value<view, value> ValidationData::ToDocument() const {
 
-        // TODO: fix me
-        /*try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("Value", value);
+        try {
 
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "Value", attributeValue);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ValidationData::ToString() const {

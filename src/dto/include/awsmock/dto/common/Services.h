@@ -10,8 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/entity/cognito/UserPool.h>
-#include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Dto::Common {
 
@@ -28,7 +27,7 @@ namespace AwsMock::Dto::Common {
         std::vector<std::string> serviceNames;
 
         /**
-         * Check existence of given service name
+         * @brief Check existence of given service name
          *
          * @param service name of the service
          * @return true in case the service exists
@@ -36,7 +35,7 @@ namespace AwsMock::Dto::Common {
         [[nodiscard]] bool HasService(const std::string &service) const;
 
         /**
-         * Check existence of given service name
+         * @brief Check existence of given service name
          *
          * @param service name of the service
          * @return true in case the service exists
@@ -44,18 +43,32 @@ namespace AwsMock::Dto::Common {
         [[nodiscard]] bool Contains(const std::string &service) const;
 
         /**
-         * JSON representation
+         * @brief JSON representation
          *
          * @return Infrastructure as JSON string
          */
-        std::string ToJson();
+        std::string ToJson() const;
 
         /**
-         * JSON representation
+         * @brief JSON representation
          *
-         * @param payload HTTP request body
+         * @param jsonString HTTP request body
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
+
+        /**
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] std::string ToString() const;
+
+        /**
+         * @brief Stream provider.
+         *
+         * @return output stream
+         */
+        friend std::ostream &operator<<(std::ostream &os, const Services &i);
     };
 
 }// namespace AwsMock::Dto::Common

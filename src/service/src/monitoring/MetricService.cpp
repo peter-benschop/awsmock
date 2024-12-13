@@ -23,9 +23,11 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name) {
-        if (_mutex.try_lock()) {
-            boost::mutex::scoped_lock lock(_mutex);
-        }
+        boost::mutex::scoped_lock lock(_mutex);
+        DoAddCounter(name);
+    }
+
+    void MetricService::DoAddCounter(const std::string &name) {
         try {
             if (!CounterExists(name)) {
                 auto &counter = prometheus::BuildCounter()
@@ -39,14 +41,11 @@ namespace AwsMock::Monitoring {
             log_error << e.what();
         }
     }
-
     void MetricService::AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        if (_mutex.try_lock()) {
-            boost::mutex::scoped_lock lock(_mutex);
-        }
+        boost::mutex::scoped_lock lock(_mutex);
         try {
             if (GetCounter(name) == nullptr) {
-                AddCounter(name);
+                DoAddCounter(name);
             }
             if (!GetCounter(name)->Has({{labelName, labelValue}})) {
                 GetCounter(name)->Add({{labelName, labelValue}});
@@ -72,9 +71,8 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::ClearCounter(const std::string &name) const {
-        if (_mutex.try_lock()) {
-            boost::mutex::scoped_lock lock(_mutex);
-        }
+        boost::mutex::scoped_lock lock(_mutex);
+
         if (CounterExists(name)) {
             const auto counter = GetCounter(name);
             counter->Add({{}}).Reset();
@@ -85,9 +83,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
-        if (_mutex.try_lock()) {
-            boost::mutex::scoped_lock lock(_mutex);
-        }
+        boost::mutex::scoped_lock lock(_mutex);
         if (CounterExists(name, labelName, labelValue)) {
             const auto counter = GetCounter(name);
             counter->Add({{labelName, labelValue}}).Reset();
@@ -118,9 +114,25 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddGauge(const std::string &name) {
-        if (_mutex.try_lock()) {
-            boost::mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_mutex);
+        DoAddGauge(name);
+    }
+
+    void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        boost::mutex::scoped_lock lock(_mutex);
+        try {
+            if (GetGauge(name) == nullptr) {
+                DoAddGauge(name);
+            }
+            if (!GetGauge(name)->Has({{labelName, labelValue}})) {
+                GetGauge(name)->Add({{labelName, labelValue}});
+            }
+        } catch (std::exception &e) {
+            log_error << e.what();
         }
+    }
+
+    void MetricService::DoAddGauge(const std::string &name) {
         try {
             if (!GaugeExists(name)) {
                 auto &gauge = prometheus::BuildGauge()
@@ -129,22 +141,6 @@ namespace AwsMock::Monitoring {
                                       .Register(*_registry);
                 _gaugeMap[name] = &gauge;
                 log_trace << "Gauge added, name: " << name;
-            }
-        } catch (std::exception &e) {
-            log_error << e.what();
-        }
-    }
-
-    void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        if (_mutex.try_lock()) {
-            boost::mutex::scoped_lock lock(_mutex);
-        }
-        try {
-            if (GetGauge(name) == nullptr) {
-                AddGauge(name);
-            }
-            if (!GetGauge(name)->Has({{labelName, labelValue}})) {
-                GetGauge(name)->Add({{labelName, labelValue}});
             }
         } catch (std::exception &e) {
             log_error << e.what();

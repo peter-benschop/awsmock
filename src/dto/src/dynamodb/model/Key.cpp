@@ -8,22 +8,20 @@ namespace AwsMock::Dto::DynamoDb {
 
     view_or_value<view, value> Key::ToDocument() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-
-            for (const auto &[fst, snd]: keys) {
-                rootJson.set(fst, snd.ToJsonObject());
+            document document;
+            if (!keys.empty()) {
+                for (const auto &[fst, snd]: keys) {
+                    document.append(kvp(fst, snd.ToDocument()));
+                }
             }
-            return rootJson;
+            return document.extract();
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
-        }*/
-        return {};
+        }
     }
 
     void Key::FromDocument(const view_or_value<view, value> &document) {

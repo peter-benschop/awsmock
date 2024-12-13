@@ -8,30 +8,28 @@ namespace AwsMock::Dto::Cognito {
 
     std::string RespondToAuthChallengeResponse::ToJson() const {
 
-        // Todo:: fix me
-        /*try {
+        try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Session", session);
-            rootJson.set("ChallengeName", ChallengeNameToString(challengeName));
-            rootJson.set("AuthenticationResult", authenticationResult.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Session", session);
+            Core::Bson::BsonUtils::SetStringValue(document, "ChallengeName", ChallengeNameToString(challengeName));
+
+            document.append(kvp("AuthenticationResult", authenticationResult.ToDocument()));
 
             if (!challengeParameters.empty()) {
-                Poco::JSON::Object::Ptr challengeParametersObject;
-                for (const auto &challengeParameter: challengeParameters) {
-                    challengeParametersObject->set(challengeParameter.first, challengeParameter.second);
+                array jsonArray;
+                for (const auto &[fst, snd]: challengeParameters) {
+                    jsonArray.append(fst, snd);
                 }
-                rootJson.set("ChallengeParameters", challengeParametersObject);
+                document.append(kvp("ChallengeParameters", jsonArray));
             }
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string RespondToAuthChallengeResponse::ToString() const {

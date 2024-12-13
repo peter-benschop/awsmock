@@ -130,6 +130,13 @@ namespace AwsMock::Monitoring {
         void AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
+         * @brief Adds a counter to the map.
+         *
+         * @param name name of the counter
+         */
+        void DoAddCounter(const std::string &name);
+
+        /**
          * @brief Check whether a counter exists
          *
          * @param name name of the counter.
@@ -145,7 +152,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the counter
          * @return true if counter exists.
          */
-        bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
+        [[nodiscard]] bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
          * @brief Get a specific metric
@@ -153,7 +160,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the metric
          * @return metric if existing.
          */
-        prometheus::Family<prometheus::Counter> *GetCounter(const std::string &name) const;
+        [[nodiscard]] prometheus::Family<prometheus::Counter> *GetCounter(const std::string &name) const;
 
         /**
          * @brief Adds a gauge to the map.
@@ -170,6 +177,16 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the counter
          */
         void AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
+
+
+        /**
+         * @brief Adds a gauge to the map.
+         *
+         * @param name name of the gauge
+         * @param labelName name of the label
+         * @param labelValue label value of the counter
+         */
+        void DoAddGauge(const std::string &name);
 
         /**
          * @brief Check whether a gauge exists

@@ -8,24 +8,24 @@ namespace AwsMock::Dto::SSM {
 
     std::string DescribeParametersResponse::ToJson() const {
 
-        /* Todo
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("NextToken", nextToken);
 
-            Poco::JSON::Array parameterArray;
-            for (const auto &parameter: parameters) {
-                parameterArray.add(parameter.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+
+            if (!parameters.empty()) {
+                array jsonArray;
+                for (const auto &parameter: parameters) {
+                    jsonArray.append(parameter.ToDocument());
+                }
+                document.append(kvp("Parameters", jsonArray));
             }
-            rootJson.set("Parameters", parameterArray);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeParametersResponse::ToString() const {
