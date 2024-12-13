@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_TRANSFER_CREATE_TRANSFER_REQUEST_H
 
 // C++ standard includes
+#include <map>
 #include <string>
-#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>

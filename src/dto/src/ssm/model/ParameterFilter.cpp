@@ -2,7 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <Poco/JSON/Array.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
 #include <ranges>
 

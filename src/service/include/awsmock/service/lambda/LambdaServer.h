@@ -14,7 +14,6 @@
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
-#include <awsmock/dto/lambda/model/InvocationNotification.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
@@ -33,17 +32,17 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaServer : public AbstractServer {
+    class LambdaServer final : public AbstractServer {
 
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit LambdaServer(Core::PeriodicScheduler &scheduler);
 
         /**
-         * Shutdown server
+         * @brief Shutdown server
          */
         void Shutdown() override;
 
@@ -88,7 +87,7 @@ namespace AwsMock::Service {
         /**
          * Docker module
          */
-        Service::ContainerService _dockerService;
+        ContainerService _dockerService;
 
         /**
          * Metric service

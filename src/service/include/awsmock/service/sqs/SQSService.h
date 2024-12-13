@@ -6,20 +6,9 @@
 #define AWSMOCK_SERVICE_SQS_SERVICE_H
 
 // C++ standard includes
-#include <chrono>
-#include <map>
 #include <string>
 
-// Poco includes
-#include <Poco/Condition.h>
-#include <Poco/Latin1Encoding.h>
-#include <Poco/TextConverter.h>
-#include <Poco/UTF8Encoding.h>
-
 // AwsMock includes
-#include "awsmock/service/monitoring/MetricDefinition.h"
-#include "awsmock/service/monitoring/MetricService.h"
-#include "awsmock/service/monitoring/MetricServiceTimer.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -69,6 +58,9 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
 
@@ -86,7 +78,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.

@@ -8,8 +8,7 @@
 // GTest includes
 #include "gtest/gtest.h"
 
-// Poco includes
-#include <Poco/Path.h>
+// Boost includes
 #include <boost/locale.hpp>
 #include <boost/spirit/home/support/utf8.hpp>
 

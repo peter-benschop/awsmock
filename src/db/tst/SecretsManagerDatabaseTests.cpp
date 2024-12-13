@@ -8,9 +8,6 @@
 // GTest includes
 #include <gtest/gtest.h>
 
-// Poco includes
-#include <Poco/Path.h>
-
 // Local includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
