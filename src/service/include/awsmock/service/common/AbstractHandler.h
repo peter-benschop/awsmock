@@ -46,7 +46,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        explicit AbstractHandler(const std::string &name) : _name(name) {};
+        explicit AbstractHandler(const std::string &name) : _name(name){};
 
         /**
          * Destructor
