@@ -10,6 +10,6 @@ add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_program_options boost_filesystem boost_thread boost_url
-        pthread crypto ssl minizip z archive yaml-cpp prometheus-cpp-core prometheus-cpp-pull)
+        pthread crypto ssl archive z yaml-cpp prometheus-cpp-core prometheus-cpp-pull)
 
 install(TARGETS ${BINARY} DESTINATION bin)

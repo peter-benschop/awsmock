@@ -19,6 +19,6 @@ add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SO
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_thread boost_filesystem boost_url yaml-cpp gtest pthread ssl
-        crypto z minizip archive)
+        crypto archive z)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

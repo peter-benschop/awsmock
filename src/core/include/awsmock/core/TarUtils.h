@@ -43,6 +43,14 @@ namespace AwsMock::Core {
          */
         static void TarDirectory(const std::string &tarFile, const std::string &directory);
 
+        /**
+         * @brief Unzip file to directory
+         *
+         * @param zipFile name of the tar file
+         * @param directory directory name
+         */
+        static void Unzip(const std::string &zipFile, const std::string &directory);
+
       private:
 
         /**
@@ -63,6 +71,8 @@ namespace AwsMock::Core {
          * @return target path.
          */
         static std::string Readsymlink(const std::string &path);
+
+        static int CopyData(archive *ar, archive *aw);
     };
 
 }// namespace AwsMock::Core
