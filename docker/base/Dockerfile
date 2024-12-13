@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 RUN apt update && apt install -y groff g++ make cmake ccache git python3 zlib1g zlib1g-dev libarchive-dev libasio-dev libgtest-dev libgmock-dev pandoc doxygen  \
-    libboost-program-options-dev libboost-filesystem-dev libminizip-dev libcurl4-openssl-dev
+    libboost-program-options-dev libboost-filesystem-dev libboost-locale-dev libboost-url-dev libminizip-dev libcurl4-openssl-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
