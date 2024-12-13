@@ -2,7 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/core/ZipUtils.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
 namespace AwsMock::Service {
@@ -131,13 +130,13 @@ namespace AwsMock::Service {
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress
-                Core::ZipUtils::Uncompress(tempDir + "/zipfile.zip", classesDir);
+                Core::TarUtils::Unzip(tempDir + "/zipfile.zip", classesDir);
 
             } else {
 
                 // Decompress
                 std::string extractDir = Core::DirUtils::CreateTempDir("/tmp");
-                Core::ZipUtils::Uncompress(tempDir + "/zipfile.zip", extractDir);
+                Core::TarUtils::Unzip(tempDir + "/zipfile.zip", extractDir);
             }
             log_debug << "ZIP file unpacked, dir: " << codeDir;
             return codeDir;

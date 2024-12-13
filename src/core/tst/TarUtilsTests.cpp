@@ -11,13 +11,13 @@
 
 // Local includes
 #include <awsmock/core/DirUtils.h>
-#include <awsmock/core/ZipUtils.h>
+#include <awsmock/core/TarUtils.h>
 
 #define FILE_SIZE (100 * 1024)
 
 namespace AwsMock::Core {
 
-    class ZipUtilsTest : public ::testing::Test {
+    class TarUtilsTest : public ::testing::Test {
 
       protected:
 
@@ -33,13 +33,13 @@ namespace AwsMock::Core {
         std::string tempDir;
     };
 
-    TEST_F(ZipUtilsTest, UncompressTest) {
+    TEST_F(TarUtilsTest, UncompressTest) {
 
         // arrange
         const std::string zipFileName = "/tmp/java-basic-1.0-SNAPSHOT.jar";
 
         // act
-        EXPECT_NO_THROW({ ZipUtils::Uncompress(zipFileName, tempDir); });
+        EXPECT_NO_THROW({ TarUtils::Unzip(zipFileName, tempDir); });
         const long count = DirUtils::DirectoryCountFiles(tempDir);
 
         // assert
