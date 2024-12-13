@@ -8,11 +8,13 @@
 // C++ includes
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -44,7 +46,7 @@ namespace AwsMock::Database::Entity::SQS {
                 return fst;
             }
         }
-        return MessageAttributeType::STRING;
+        return STRING;
     }
 
     /**
@@ -98,7 +100,7 @@ namespace AwsMock::Database::Entity::SQS {
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
     };
 
-    typedef struct MessageAttribute MessageAttribute;
+    typedef MessageAttribute MessageAttribute;
     typedef std::vector<MessageAttribute> MessageAttributeList;
 
 }// namespace AwsMock::Database::Entity::SQS
