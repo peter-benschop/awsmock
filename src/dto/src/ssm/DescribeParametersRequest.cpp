@@ -8,44 +8,39 @@ namespace AwsMock::Dto::SSM {
 
     std::string DescribeParametersRequest::ToJson() const {
 
-        /* todo
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("NextToken", nextToken);
-            rootJson.set("MaxResults", maxResults);
 
-            // Parameter filters
-            Poco::JSON::Array jsonParameterFilterArray;
-            for (const auto parameterFilter: parameterFilters) {
-                jsonParameterFilterArray.add(parameterFilter.ToJsonObject());
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxResults", maxResults);
+
+            if (!parameterFilters.empty()) {
+                array jsonArray;
+                for (const auto &filter: parameterFilters) {
+                    jsonArray.append(filter.ToDocument());
+                }
+                document.append(kvp("ParameterFilters", jsonArray));
             }
-            rootJson.set("ParameterFilters", jsonParameterFilterArray);
-            return Core::JsonUtils::ToJsonString(rootJson);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void DescribeParametersRequest::FromJson(const std::string &jsonString) {
 
-        /* todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
-            Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
+            const value document = bsoncxx::from_json(jsonString);
+            nextToken = Core::Bson::BsonUtils::GetStringValue(document, "NextToken");
+            maxResults = Core::Bson::BsonUtils::GetIntValue(document, "MaxResults");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeParametersRequest::ToString() const {

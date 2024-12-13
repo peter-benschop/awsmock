@@ -57,7 +57,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool ParameterExists(const std::string &name);
+        bool ParameterExists(const std::string &name) const;
 
         /**
          * @brief Returns an SSM parameter by primary key
@@ -66,7 +66,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterById(const std::string &oid);
+        Entity::SSM::Parameter GetParameterById(const std::string &oid) const;
 
         /**
          * @brief Returns a parameter by primary key
@@ -75,7 +75,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterById(bsoncxx::oid oid);
+        Entity::SSM::Parameter GetParameterById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a parameter by name
@@ -84,7 +84,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterByName(const std::string &name);
+        Entity::SSM::Parameter GetParameterByName(const std::string &name) const;
 
         /**
          * @brief List all parameters
@@ -92,7 +92,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return ParameterList
          */
-        Entity::SSM::ParameterList ListParameters(const std::string &region = {});
+        Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
 
         /**
          * @brief Returns the total number of parameters
@@ -100,7 +100,7 @@ namespace AwsMock::Database {
          * @return total number of parameters
          * @throws DatabaseException
          */
-        long CountParameters();
+        long CountParameters() const;
 
         /**
          * @brief Create a new parameter in the ssm parameter table
@@ -109,7 +109,7 @@ namespace AwsMock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter CreateParameter(Entity::SSM::Parameter &parameter);
+        Entity::SSM::Parameter CreateParameter(Entity::SSM::Parameter &parameter) const;
 
         /**
          * @brief Updates a parameter
@@ -118,7 +118,7 @@ namespace AwsMock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter UpdateParameter(Entity::SSM::Parameter &parameter);
+        Entity::SSM::Parameter UpdateParameter(Entity::SSM::Parameter &parameter) const;
 
         /**
          * @brief Inserts or updates a parameter
@@ -127,7 +127,7 @@ namespace AwsMock::Database {
          * @return inserted or updated parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter UpsertParameter(Entity::SSM::Parameter &parameter);
+        Entity::SSM::Parameter UpsertParameter(Entity::SSM::Parameter &parameter) const;
 
         /**
          * @brief Deletes a parameter
@@ -142,7 +142,7 @@ namespace AwsMock::Database {
          *
          * @throws DatabaseException
          */
-        void DeleteAllParameters();
+        void DeleteAllParameters() const;
 
       private:
 

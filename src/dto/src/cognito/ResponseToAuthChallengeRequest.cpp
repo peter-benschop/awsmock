@@ -18,81 +18,70 @@ namespace AwsMock::Dto::Cognito {
         return challengeResponses["PASSWORD_CLAIM_SIGNATURE"];
     }
 
-    void RespondToAuthChallengeRequest::FromJson(const std::string &payload) {
-
-        // Todo: fix me
-        /*Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void RespondToAuthChallengeRequest::FromJson(const std::string &jsonString) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("ClientId", rootObject, clientId);
-            Core::JsonUtils::GetJsonValueString("Session", rootObject, session);
-
-            // Challenge name ENUM
-            std::string tmpChallengeName;
-            Core::JsonUtils::GetJsonValueString("ChallengeName", rootObject, tmpChallengeName);
-            if (!tmpChallengeName.empty()) {
-                challengeName = ChallengeNameFromString(tmpChallengeName);
-            }
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            clientId = Core::Bson::BsonUtils::GetStringValue(rootDocument, "ClientId");
+            session = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Session");
+            challengeName = ChallengeNameFromString(Core::Bson::BsonUtils::GetStringValue(rootDocument, "ChallengeName"));
 
             // Challenge responses
-            if (rootObject->has("ChallengeResponses")) {
-                Poco::JSON::Object::Ptr authParameterObject = rootObject->getObject("ChallengeResponses");
-                for (int i = 0; i < authParameterObject->getNames().size(); i++) {
-                    std::string key = authParameterObject->getNames()[i];
-                    std::string value = authParameterObject->get(key);
+            if (rootDocument.view().find("ChallengeResponses") != rootDocument.view().end()) {
+                for (const view jsonObject = rootDocument.view()["ChallengeResponses"].get_document().value; const auto &element: jsonObject) {
+                    std::string key = bsoncxx::string::to_string(element.key());
+                    const std::string value = bsoncxx::string::to_string(element[key].get_string().value);
                     challengeResponses[key] = value;
                 }
             }
 
             // Client metadata
-            if (rootObject->has("ClientMetadata")) {
-                Poco::JSON::Object::Ptr clientMetadataObject = rootObject->getObject("ClientMetadata");
-                for (int i = 0; i < clientMetadataObject->getNames().size(); i++) {
-                    std::string key = clientMetadataObject->getNames()[i];
-                    std::string value = clientMetadataObject->get(key);
+            if (rootDocument.view().find("ClientMetadata") != rootDocument.view().end()) {
+                for (const view jsonObject = rootDocument.view()["ClientMetadata"].get_document().value; const auto &element: jsonObject) {
+                    std::string key = bsoncxx::string::to_string(element.key());
+                    const std::string value = bsoncxx::string::to_string(element[key].get_string().value);
                     clientMetaData[key] = value;
                 }
             }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string RespondToAuthChallengeRequest::ToJson() const {
-        // Todo: fix me
-        /* try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ClientId", clientId);
+        try {
 
-            // Auth parameters
-            Poco::JSON::Object challengeResponsesObject;
-            for (const auto &challengeResponse: challengeResponses) {
-                challengeResponsesObject.set(challengeResponse.first, challengeResponse.second);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientId", clientId);
+
+            // Challenge responses
+            if (!challengeResponses.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: challengeResponses) {
+                    jsonArray.append(kvp(fst, snd));
+                }
+                document.append(kvp("ChallengeResponses", jsonArray));
             }
-            rootJson.set("ChallengeResponses", challengeResponsesObject);
 
-            // Client metadata
-            Poco::JSON::Object clientMetadataObject;
-            for (const auto &clientMeta: clientMetaData) {
-                clientMetadataObject.set(clientMeta.first, clientMeta.second);
+            // Challenge responses
+            if (!clientMetaData.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: clientMetaData) {
+                    jsonArray.append(kvp(fst, snd));
+                }
+                document.append(kvp("ClientMetadata", jsonArray));
             }
-            rootJson.set("ClientMetadata", clientMetadataObject);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string RespondToAuthChallengeRequest::ToString() const {

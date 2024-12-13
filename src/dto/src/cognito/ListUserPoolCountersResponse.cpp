@@ -8,34 +8,24 @@ namespace AwsMock::Dto::Cognito {
 
     std::string ListUserPoolCountersResponse::ToJson() const {
 
-        /* Todo
         try {
 
-            Poco::JSON::Object rootObject;
+            document document;
+            Core::Bson::BsonUtils::SetLongValue(document, "total", total);
 
             if (!userPools.empty()) {
-                Poco::JSON::Array userPoolArray;
+                array jsonArray;
                 for (const auto &userPool: userPools) {
-                    Poco::JSON::Object userPoolJson;
-                    userPoolJson.set("id", userPool.id);
-                    userPoolJson.set("userPoolId", userPool.userPoolId);
-                    userPoolJson.set("name", userPool.name);
-                    userPoolJson.set("region", userPool.region);
-                    userPoolJson.set("userCount", userPool.userCount);
-                    userPoolJson.set("created", Core::DateTimeUtils::ToISO8601(userPool.created));
-                    userPoolJson.set("modified", Core::DateTimeUtils::ToISO8601(userPool.modified));
-                    userPoolArray.add(userPoolJson);
+                    jsonArray.append(userPool.ToDocument());
                 }
-                rootObject.set("userPools", userPoolArray);
+                document.append(kvp("userPools", jsonArray));
             }
-            rootObject.set("total", total);
-            return Core::JsonUtils::ToJsonString(rootObject);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListUserPoolCountersResponse::ToString() const {

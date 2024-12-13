@@ -6,40 +6,33 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void DescribeUserPoolDomainRequest::FromJson(const std::string &payload) {
-
-        // TODO: Fix me
-        /*Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void DescribeUserPoolDomainRequest::FromJson(const std::string &jsonString) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("Domain", rootObject, domain);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeUserPoolDomainRequest::ToJson() const {
-        // TODO: Fix me
-        /*
+
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Domain", domain);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeUserPoolDomainRequest::ToString() const {

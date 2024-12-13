@@ -108,7 +108,7 @@ namespace AwsMock::Service {
         void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode) const;
 
         /**
-         * @brief Checks whether a image exists.
+         * @brief Checks whether an image exists.
          *
          * @param name image name
          * @param tag image tags

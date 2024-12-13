@@ -8,38 +8,30 @@ namespace AwsMock::Dto::SSM {
 
     std::string PutParameterResponse::ToJson() const {
 
-        /* Todo
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Tier", tier);
-            rootJson.set("Version", version);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Tier", tier);
+            Core::Bson::BsonUtils::SetIntValue(document, "Version", version);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void PutParameterResponse::FromJson(const std::string &jsonString) {
-
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Tier", rootObject, tier);
-            Core::JsonUtils::GetJsonValueInt("Version", rootObject, version);
+            const value document = bsoncxx::from_json(jsonString);
+            tier = Core::Bson::BsonUtils::GetStringValue(document, "Tier");
+            version = Core::Bson::BsonUtils::GetIntValue(document, "Version");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string PutParameterResponse::ToString() const {

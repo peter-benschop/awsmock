@@ -6,42 +6,35 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void SignUpResponse::FromJson(const std::string &payload) {
-
-        // Todo: fix me
-        /*Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void SignUpResponse::FromJson(const std::string &jsonString) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueBool("UserConfirmed", rootObject, userConfirmed);
-            Core::JsonUtils::GetJsonValueString("UserSub", rootObject, userSub);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "NextToken");
+            userConfirmed = Core::Bson::BsonUtils::GetBoolValue(document, "UserConfirmed");
+            userSub = Core::Bson::BsonUtils::GetStringValue(document, "UserSub");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string SignUpResponse::ToJson() const {
 
-        // Todo: fix me
-        /*try {
+        try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserConfirmed", userConfirmed);
-            rootJson.set("UserSub", userSub);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetBoolValue(document, "UserConfirmed", userConfirmed);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserSub", userSub);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string SignUpResponse::ToString() const {

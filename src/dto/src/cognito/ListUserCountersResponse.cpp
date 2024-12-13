@@ -8,36 +8,22 @@ namespace AwsMock::Dto::Cognito {
 
     std::string ListUserCountersResponse::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootObject;
-
+            document document;
             if (!users.empty()) {
-                Poco::JSON::Array userArray;
+                array jsonArray;
                 for (const auto &user: users) {
-                    Poco::JSON::Object userJson;
-                    userJson.set("id", user.oid);
-                    userJson.set("userPoolId", user.userPoolId);
-                    userJson.set("userName", user.userName);
-                    userJson.set("region", user.region);
-                    userJson.set("status", UserStatusToString(user.userStatus));
-                    userJson.set("enabled", user.enabled);
-                    userJson.set("created", Core::DateTimeUtils::ToISO8601(user.created));
-                    userJson.set("modified", Core::DateTimeUtils::ToISO8601(user.modified));
-                    userArray.add(userJson);
+                    jsonArray.append(user.ToDocument());
                 }
-                rootObject.set("users", userArray);
+                document.append(kvp("users", users));
             }
-            rootObject.set("total", total);
-            return Core::JsonUtils::ToJsonString(rootObject);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListUserCountersResponse::ToString() const {

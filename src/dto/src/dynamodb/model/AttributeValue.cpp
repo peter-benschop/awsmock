@@ -8,65 +8,62 @@ namespace AwsMock::Dto::DynamoDb {
 
     view_or_value<view, value> AttributeValue::ToDocument() const {
 
-        // Todo:
-        /*
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("S", stringValue);
-            rootJson.set("N", numberValue);
-            rootJson.set("BOOL", boolValue);
-            rootJson.set("NULL", nullValue);
 
-            // String array
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "S", stringValue);
+            Core::Bson::BsonUtils::SetStringValue(document, "N", numberValue);
+
             if (!stringSetValue.empty()) {
-                Poco::JSON::Array jsonStringArray;
-                for (const auto &sValue: stringSetValue) {
-                    jsonStringArray.add(sValue);
+                array jsonArray;
+                for (const auto &value: stringSetValue) {
+                    jsonArray.append(value);
                 }
-                rootJson.set("SS", jsonStringArray);
+                document.append(kvp("SS", jsonArray));
             }
 
-            // Number array
             if (!numberSetValue.empty()) {
-                Poco::JSON::Array jsonNumberArray;
-                for (const auto &nValue: numberSetValue) {
-                    jsonNumberArray.add(nValue);
+                array jsonArray;
+                for (const auto &value: numberSetValue) {
+                    jsonArray.append(value);
                 }
-                rootJson.set("NS", jsonNumberArray);
+                document.append(kvp("NS", jsonArray));
             }
 
-            return rootJson;
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void AttributeValue::FromDocument(const view &jsonObject) {
 
-        for (bsoncxx::document::element ele: jsonObject) {
-            type = ele["type"].get_string();
-            if (type == "S") {
-                stringValue = ele["S"].get_string();
-            } else if (type == "SS") {
-                /*Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("SS");
-                for (const auto &nValue: *jsonNumberArray) {
-                    stringSetValue.emplace_back(nValue.convert<std::string>());
-                }*/
-            } else if (type == "N") {
-                numberValue = ele["S"].get_int64();
-            } else if (type == "NS") {
-                /*Poco::JSON::Array::Ptr jsonNumberArray = jsonObject->getArray("NS");
-                for (const auto &nValue: *jsonNumberArray) {
-                    numberSetValue.emplace_back(nValue.convert<std::string>());
-                }*/
-            } else if (type == "BOOL") {
-                boolValue = ele["S"].get_bool();
-            } else if (type == "NULL") {
-                nullValue = true;
+        try {
+            for (bsoncxx::document::element ele: jsonObject) {
+                type = ele["type"].get_string();
+                if (type == "S") {
+                    stringValue = ele["S"].get_string();
+                } else if (type == "SS") {
+                    for (bsoncxx::array::view jsonArray = ele["SS"].get_array().value; const auto &value: jsonArray) {
+                        stringSetValue.emplace_back(value.get_string().value);
+                    }
+                } else if (type == "N") {
+                    numberValue = ele["S"].get_int64();
+                } else if (type == "NS") {
+                    for (bsoncxx::array::view jsonArray = ele["NS"].get_array().value; const auto &value: jsonArray) {
+                        numberSetValue.emplace_back(value.get_string().value);
+                    }
+                } else if (type == "BOOL") {
+                    boolValue = ele["S"].get_bool();
+                } else if (type == "NULL") {
+                    nullValue = true;
+                }
             }
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 

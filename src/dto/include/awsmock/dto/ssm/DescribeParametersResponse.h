@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/ssm/model/Parameter.h>
 
 namespace AwsMock::Dto::SSM {

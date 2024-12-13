@@ -82,7 +82,6 @@ namespace AwsMock::Core {
         return static_cast<long>(copied);
     }
 
-    // TODO: Calculate correct checksum: https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity.html
     long FileUtils::AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
 
         long copied = 0;

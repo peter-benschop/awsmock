@@ -6,40 +6,33 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    void GlobalSignOutRequest::FromJson(const std::string &payload) {
-
-        // Todo: fix me
-        /*Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(payload);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+    void GlobalSignOutRequest::FromJson(const std::string &jsonString) {
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("AccessToken", rootObject, accessToken);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            accessToken = Core::Bson::BsonUtils::GetStringValue(document, "AccessToken");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GlobalSignOutRequest::ToJson() const {
-        // Todo: fix me
-        /*
+
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("AccessToken", accessToken);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "AccessToken", accessToken);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GlobalSignOutRequest::ToString() const {

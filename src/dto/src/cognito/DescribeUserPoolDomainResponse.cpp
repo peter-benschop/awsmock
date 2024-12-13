@@ -8,24 +8,21 @@ namespace AwsMock::Dto::Cognito {
 
     std::string DescribeUserPoolDomainResponse::ToJson() const {
 
-        // Todo: fix me
-        /*try {
+        try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("UserPoolId", userPoolId);
-            rootJson.set("Domain", domain);
-            rootJson.set("Status", status);
-            rootJson.set("S3Bucket", s3Bucket);
-            rootJson.set("Version", version);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
+            Core::Bson::BsonUtils::SetStringValue(document, "Status", status);
+            Core::Bson::BsonUtils::SetStringValue(document, "S3Bucket", s3Bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "Version", version);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeUserPoolDomainResponse::ToString() const {

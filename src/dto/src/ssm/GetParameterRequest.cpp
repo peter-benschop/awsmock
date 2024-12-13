@@ -8,38 +8,31 @@ namespace AwsMock::Dto::SSM {
 
     std::string GetParameterRequest::ToJson() const {
 
-        /* Todo:
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("WithDescription", withDescription);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetBoolValue(document, "WithDescription", withDescription);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void GetParameterRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
-            Core::JsonUtils::GetJsonValueBool("WithDescription", rootObject, withDescription);
+            const value document = bsoncxx::from_json(jsonString);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            withDescription = Core::Bson::BsonUtils::GetBoolValue(document, "WithDescription");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GetParameterRequest::ToString() const {

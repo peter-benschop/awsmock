@@ -81,7 +81,7 @@ namespace AwsMock::Dto::Cognito {
         UserContextData userContextData;
 
         /**
-         * @brief Returns the user name
+         * @brief Returns the username
          *
          * @return user ID
          */
@@ -104,9 +104,9 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Convert from a JSON object.
          *
-         * @param payload json string object
+         * @param jsonString json string object
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Convert to a JSON string
@@ -123,7 +123,7 @@ namespace AwsMock::Dto::Cognito {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Returns the user name
+         * @brief Returns the username
          *
          * @return user ID
          */

@@ -27,7 +27,7 @@ namespace AwsMock::Service {
             Database::Entity::SSM::Parameter parameterEntity = {
                     .region = request.region,
                     .parameterName = request.name,
-                    .parameterValue = request.value,
+                    .parameterValue = request.parameterValue,
                     .description = request.description,
                     .type = Dto::SSM::ParameterTypeToString(request.type),
                     .version = 1,
@@ -75,7 +75,7 @@ namespace AwsMock::Service {
 
         try {
             // Get from database
-            Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region);
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region);
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
             return Dto::SSM::Mapper::map(request, parameterEntities);

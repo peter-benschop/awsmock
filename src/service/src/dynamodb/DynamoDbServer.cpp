@@ -6,8 +6,9 @@
 
 namespace AwsMock::Service {
     DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
+
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _workerPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.worker.period");
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.monitoring.period");
         _containerName = configuration.GetValueString("awsmock.modules.dynamodb.container.name");
