@@ -55,8 +55,7 @@ namespace AwsMock::Service {
         }
 
         // Start docker container, in case it is not already running.
-        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(_imageName, _imageTag);
-            container.state != "running") {
+        if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); container.state != "running") {
             _containerService.StartDockerContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
@@ -74,7 +73,7 @@ namespace AwsMock::Service {
         }
 
         // Check container image
-        if (!_containerService.ContainerExists(_imageName, _imageTag)) {
+        if (!_containerService.ContainerExistsByName(_containerName)) {
             log_error << "Container " << _imageName << " does not exist";
             throw Core::ServiceException("Container does not exist");
         }

@@ -16,7 +16,7 @@ namespace AwsMock::Service {
         CreateInstance(instanceId, lambdaEntity, functionCode);
 
         // Update database
-        lambdaEntity.lastStarted = std::chrono::system_clock::now();
+        lambdaEntity.lastStarted = system_clock::now();
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
         lambdaEntity.stateReason = "Activated";
         lambdaEntity = Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
@@ -37,7 +37,7 @@ namespace AwsMock::Service {
 
         // Create the container, if not existing. If existing get the current port from the docker container
         std::string containerName = lambdaEntity.function + "-" + instanceId;
-        if (!ContainerService::instance().ContainerExists(containerName, dockerTag)) {
+        if (!ContainerService::instance().ContainerExistsByName(containerName)) {
             Database::Entity::Lambda::Instance instance;
             instance.hostPort = CreateRandomHostPort();
             instance.id = instanceId;
