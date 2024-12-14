@@ -122,7 +122,12 @@ namespace AwsMock::Service {
         std::ofstream ofs(fileName);
         ofs << dockerFile;
         ofs.close();
-        std::string imageFile = BuildImageFile(codeDir, name);
+
+        // Create TAR file name
+        std::string tarFileName = name;
+        Core::StringUtils::Replace(tarFileName, "/", "-");
+        Core::StringUtils::Replace(tarFileName, ".", "-");
+        std::string imageFile = BuildImageFile(codeDir, tarFileName);
 
         if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "http://localhost/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, httpStatus: " << statusCode << " body: " << body;
@@ -597,8 +602,8 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
-    std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &functionName) {
-        std::string tarFileName = codeDir + Core::FileUtils::separator() + functionName + ".tgz";
+    std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) {
+        std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
         Core::TarUtils::TarDirectory(tarFileName, codeDir + "/");
         log_debug << "Zipped TAR file written: " << tarFileName;
 

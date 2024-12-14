@@ -19,7 +19,7 @@ awsmock:
     signature:
       verify: false
   docker:
-    active: false
+    active: true
     network-mode: local
     network-name: local
     defaults:
@@ -29,7 +29,7 @@ awsmock:
       port: 8080
     socket: /var/run/docker.sock
   podman:
-    active: true
+    active: false
     network-mode: podman
     network-name: podman
     defaults:
@@ -110,7 +110,7 @@ awsmock:
         host: localhost
         port: 8000
         name: dynamodb-local                                          # Container name, default: dynamodb-local
-        image-name: docker.io/library/dynamodb-local                  # AWS dynamodb image name, default: docker.io/library/dynamodb-local
+        image-name: amazon/dynamodb-local                             # AWS dynamodb image name, default: docker.io/library/dynamodb-local
         image-tag: latest                                             # AWS dynamodb image tag, default: latest
     cognito:
       active: true
