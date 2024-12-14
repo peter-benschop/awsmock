@@ -71,19 +71,12 @@ namespace AwsMock::Core {
         static std::string RelativePath(const std::string &dir);
 
         /**
-         * @brief Creates an empty temporary directory
-         *
-         * @return name of the directory
-         */
-        static std::string CreateTempDir();
-
-        /**
          * @brief Creates an empty temporary directory within the given parent directory
          *
          * @param parent parent directory for the temporary directory
          * @return thread safe temp directory name
          */
-        static std::string CreateTempDir(const std::string &parent);
+        static std::string CreateTempDir(const std::string &parent = {});
 
         /**
          * @brief Checks the existence of a directory

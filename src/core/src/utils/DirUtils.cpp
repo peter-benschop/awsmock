@@ -17,13 +17,12 @@ namespace AwsMock::Core {
         return uuid;
     }
 
-    std::string DirUtils::CreateTempDir() {
-        const boost::filesystem::path temp = boost::filesystem::unique_path();
-        return boost::filesystem::temp_directory_path().string() + "/" + temp.c_str();
-    }
-
     std::string DirUtils::CreateTempDir(const std::string &parent) {
-        auto tempDir = parent + FileUtils::separator() + GetTempDir();
+        std::string localParent = parent;
+        if (localParent.empty()) {
+            localParent = boost::filesystem::temp_directory_path().string();
+        }
+        auto tempDir = localParent + FileUtils::separator() + boost::filesystem::unique_path().string();
         MakeDirectory(tempDir, true);
         return tempDir;
     }
@@ -38,7 +37,7 @@ namespace AwsMock::Core {
         }
     }
 
-    long DirUtils::DirectoryCountFiles(const std::string &dirName, bool recursive) {
+    long DirUtils::DirectoryCountFiles(const std::string &dirName, const bool recursive) {
         if (recursive) {
             return std::count_if(
                     boost::filesystem::recursive_directory_iterator(dirName),
