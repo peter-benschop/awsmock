@@ -51,6 +51,10 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
+    void ListTableResponse::ScanResponse() {
+        FromJson(body, headers);
+    }
+
     std::string ListTableResponse::ToString() const {
         std::stringstream ss;
         ss << *this;

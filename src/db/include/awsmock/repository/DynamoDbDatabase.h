@@ -58,12 +58,12 @@ namespace AwsMock::Database {
         Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table) const;
 
         /**
-         * @brief Updates a new DynamoDb table
+         * @brief Updates a DynamoDb table
          *
          * @param table DynamoDb table
          * @return updated DynamoDb table.
          */
-        Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table) const;
+        Entity::DynamoDb::Table UpdateTable(Entity::DynamoDb::Table &table) const;
 
         /**
          * @brief Create a new DynamoDb table or update an existing one
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return created or updated DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateOrUpdateTable(const Entity::DynamoDb::Table &table) const;
+        Entity::DynamoDb::Table CreateOrUpdateTable(Entity::DynamoDb::Table &table) const;
 
         /**
          * @brief Returns a table entity by primary key

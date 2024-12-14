@@ -33,19 +33,19 @@ namespace AwsMock::Core {
         return std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::system_clock::from_time_t(mktime(&t))};
     }
 
-    system_clock::time_point DateTimeUtils::FromUnixtimestamp(long timestamp) {
-        std::chrono::system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
+    system_clock::time_point DateTimeUtils::FromUnixtimestamp(const long timestamp) {
+        const system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
         return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::hours(2)};
     }
 
-    std::string DateTimeUtils::HttpFormat() {
+    std::string DateTimeUtils::HttpFormatNow() {
         return HttpFormat(system_clock::now());
     }
 
     std::string DateTimeUtils::HttpFormat(const system_clock::time_point &timePoint) {
         char buf[256];
-        time_t timeT = system_clock::to_time_t(timePoint);
-        struct tm tm = *gmtime(&timeT);
+        const time_t timeT = system_clock::to_time_t(timePoint);
+        const tm tm = *gmtime(&timeT);
         strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S GMT", &tm);
         return {buf};
     }
@@ -74,8 +74,8 @@ namespace AwsMock::Core {
         using namespace std;
         using namespace std::chrono;
 
-        auto now = system_clock::now();
-        auto today = floor<days>(now);
+        const auto now = system_clock::now();
+        const auto today = floor<days>(now);
         return 24 * 2600 - static_cast<int>(duration_cast<seconds>(now - today).count());
     }
 

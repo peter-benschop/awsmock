@@ -8,40 +8,33 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string PutItemResponse::ToJson() const {
 
-        /* Todo
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void PutItemResponse::FromJson(const std::string &jsonString) {
 
         body = jsonString;
 
-        /* Todo
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            //Poco::JSON::Object::Ptr jsonTableDescription = rootObject->getObject("TableDescription");
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(document, "TableName");
 
-            //Core::JsonUtils::GetJsonValueString("TableName", jsonTableDescription, tableName);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string PutItemResponse::ToString() const {

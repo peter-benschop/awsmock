@@ -8,42 +8,44 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string DescribeTableRequest::ToJson() const {
 
-        // TOdo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void DescribeTableRequest::FromJson(const std::string &jsonBody) {
+    void DescribeTableRequest::FromJson(const std::string &jsonString) {
 
-        body = jsonBody;
-
-        // TOdo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonBody);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        body = jsonString;
 
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(document, "TableName");
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void DescribeTableRequest::PrepareRequest() {
+        body = ToJson();
+        headers["Accept-Encoding"] = "identity";
+        headers["Content-Type"] = "application/x-amz-json-1.0";
+        headers["User-Agent"] = "aws-cli/2.22.16 md/awscrt#0.23.4 ua/2.0 os/linux#6.8.0-49-generic md/arch#x86_64 lang/python#3.12.6 md/pyimpl#CPython cfg/retry-mode#standard md/installer#exe md/distrib#ubuntu.24 md/prompt#off md/command#dynamodb.describe-table";
+        headers["X-Amz-Target"] = "DynamoDB_20120810.DescribeTable";
+        headers["X-Amz-Date"] = Core::DateTimeUtils::HttpFormatNow();
+        headers["X-Amz-Security-Token"] = "none";
+        headers["Content-Length"] = std::to_string(body.size());
     }
 
     std::string DescribeTableRequest::ToString() const {

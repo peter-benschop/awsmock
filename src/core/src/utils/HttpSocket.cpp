@@ -10,7 +10,6 @@ namespace AwsMock::Core {
 
         log_debug << "Sending JSON to host, endpoint: " << host << ":" << port << " path: " << path;
 
-        boost::system::error_code ec;
         boost::asio::io_context ctx;
 
         boost::asio::ip::tcp::resolver resolver(ctx);
@@ -18,6 +17,7 @@ namespace AwsMock::Core {
 
         // Resolve host/port
         try {
+            boost::system::error_code ec;
             auto const results = resolver.resolve(host, std::to_string(port));
 
             // Connect
@@ -57,7 +57,7 @@ namespace AwsMock::Core {
         } catch (const boost::system::system_error &exc) {
             log_error << "Error sending JSON message, error: " << exc.what();
         }
-        return {.statusCode = boost::beast::http::status::internal_server_error};
+        return {.statusCode = http::status::internal_server_error};
     }
 
     HttpSocketResponse HttpSocket::SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers, const std::string &body) {
@@ -144,7 +144,7 @@ namespace AwsMock::Core {
         return PrepareResult(response);
     }
 
-    http::request<http::string_body> HttpSocket::PrepareJsonMessage(http::verb method, const std::string &host, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
+    http::request<http::string_body> HttpSocket::PrepareJsonMessage(const http::verb method, const std::string &host, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         http::request<http::string_body> request;
 
@@ -154,17 +154,16 @@ namespace AwsMock::Core {
         request.target(path);
         request.body() = body;
         request.prepare_payload();
-        request.base().set("Host", "localhost");
 
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                request.base().set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                request.base().set(fst, snd);
             }
         }
         return request;
     }
 
-    http::request<http::file_body> HttpSocket::PrepareBinaryMessage(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
+    http::request<http::file_body> HttpSocket::PrepareBinaryMessage(const http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
 
         boost::system::error_code ec;
         http::request<http::file_body> request;

@@ -35,9 +35,9 @@ namespace AwsMock::Dto::DynamoDb {
         std::string exclusiveStartTableName;
 
         /**
-         * Limit
+         * Limit, default is 100
          */
-        int limit = 0;
+        int limit = 100;
 
         /**
          * Original HTTP request body
@@ -55,6 +55,11 @@ namespace AwsMock::Dto::DynamoDb {
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Prepares the request to be sent to the DynamoDB container
+         */
+        void PrepareRequest();
 
         /**
          * @brief Parse a JSON stream

@@ -51,11 +51,16 @@ namespace AwsMock::Dto::DynamoDb {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * @brief Parse a JSON stream
+         * @brief Parse a JSON string
          *
-         * @param jsonBody JSON string
+         * @param jsonString JSON string
          */
-        void FromJson(const std::string &jsonBody);
+        void FromJson(const std::string &jsonString);
+
+        /**
+         * @brief Prepares the request to be sent to the DynamoDB container
+         */
+        void PrepareRequest();
 
         /**
          * @brief Converts the DTO to a string representation.

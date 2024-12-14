@@ -27,7 +27,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteTableResponse : public Dto::Common::BaseRequest {
+    struct DeleteTableResponse : Common::BaseRequest {
 
         /**
          * Region
@@ -50,21 +50,6 @@ namespace AwsMock::Dto::DynamoDb {
         std::string tableArn;
 
         /**
-         * Key schema
-         */
-        std::map<std::string, std::string> keySchemas;
-
-        /**
-         * Tags
-         */
-        std::map<std::string, std::string> tags;
-
-        /**
-         * Attribute definitions
-         */
-        std::map<std::string, std::string> attributes;
-
-        /**
          * Provisioned throughput
          */
         ProvisionedThroughput provisionedThroughput;
@@ -73,6 +58,16 @@ namespace AwsMock::Dto::DynamoDb {
          * Table status
          */
         TableStatusType tableStatus;
+
+        /**
+         * Item count
+         */
+        long itemCount;
+
+        /**
+         * Table size in bytes
+         */
+        long size;
 
         /**
          * HTTP response body

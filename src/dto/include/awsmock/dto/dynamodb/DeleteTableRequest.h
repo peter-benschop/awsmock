@@ -45,6 +45,11 @@ namespace AwsMock::Dto::DynamoDb {
         std::map<std::string, std::string> headers;
 
         /**
+         * @brief Prepares the request to be sent to the DynamoDB container
+         */
+        void PrepareRequest();
+
+        /**
          * Creates a JSON string from the object.
          *
          * @return JSON string

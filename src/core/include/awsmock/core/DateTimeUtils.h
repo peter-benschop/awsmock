@@ -81,7 +81,7 @@ namespace AwsMock::Core {
          *
          * @return current time in HTTP format
          */
-        static std::string HttpFormat();
+        static std::string HttpFormatNow();
 
         /**
          * @brief Returns the time_point in HTTP format

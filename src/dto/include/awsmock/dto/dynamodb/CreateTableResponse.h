@@ -135,6 +135,19 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
+         * @brief Scans the response and fills in the attributes
+         */
+        void ScanResponse();
+
+        /**
+         * @brief Parse a JSON string
+         *
+         * @param body JSON string
+         * @param headers map of headers
+         */
+        void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
+
+        /**
          * Creates a JSON string from the object.
          *
          * @return JSON string

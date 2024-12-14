@@ -8,57 +8,43 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string GetItemRequest::ToJson() const {
 
-        // Todo:
-        /*
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
-            return Core::JsonUtils::ToJsonString(rootJson);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void GetItemRequest::FromJson(const std::string &jsonBody) {
+    void GetItemRequest::FromJson(const std::string &jsonString) {
 
-        // Todo:
-        /*
         // Save original body
-        body = jsonBody;
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonBody);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        body = jsonString;
 
         try {
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(rootDocument, "TableName");
 
-            // Tags
-            Poco::JSON::Object::Ptr jsonKeyObject = rootObject->getObject("Key");
-            if (!jsonKeyObject.isNull()) {
-                for (size_t i = 0; i < jsonKeyObject->getNames().size(); i++) {
-                    Poco::JSON::Object::Ptr jsonGetKeyObject = jsonKeyObject->getObject(jsonKeyObject->getNames()[i]);
-                    GetItemKey getItemKey;
-                    for (size_t j = 0; j < jsonGetKeyObject->getNames().size(); j++) {
-                        getItemKey.type = jsonGetKeyObject->getNames()[j];
-                        if (getItemKey.type == "S") {
-                            getItemKey.value = jsonGetKeyObject->getValue<std::string>(getItemKey.type);
-                        } else if (getItemKey.type == "N") {
-                            getItemKey.value = std::to_string(jsonGetKeyObject->getValue<int>(getItemKey.type));
-                        }
-                    }
-                    //keys[jsonKeyObject->getNames()[i]] = getItemKey;
+            if (rootDocument.view().find("Keys") != rootDocument.view().end()) {
+                const view keyDocument = rootDocument.view()["Key"].get_document().value;
+                GetItemKey getItemKey;
+                for (const auto &element: keyDocument) {
+                    std::string key = bsoncxx::string::to_string(element.key());
+                    std::string value = bsoncxx::string::to_string(element[key].get_string().value);
+                    getItemKey.type = key;
+                    getItemKey.type = Core::Bson::BsonUtils::GetStringValue(element);
                 }
             }
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GetItemRequest::ToString() const {

@@ -27,20 +27,15 @@ namespace AwsMock::Dto::DynamoDb {
 
         body = jsonString;
 
-        /* Todo
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            Poco::JSON::Object::Ptr jsonItemObject = rootObject->getObject("Item");
+            if (const value document = bsoncxx::from_json(jsonString); document.view().find("Item") != document.view().end()) {
+            }
 
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GetItemResponse::ToString() const {

@@ -73,6 +73,11 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
+         * @brief Scans the response and fills in the attributes
+         */
+        void ScanResponse();
+
+        /**
          * Creates a JSON string from the object.
          *
          * @return JSON string
