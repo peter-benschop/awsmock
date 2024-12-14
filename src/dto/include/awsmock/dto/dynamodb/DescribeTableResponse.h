@@ -40,9 +40,14 @@ namespace AwsMock::Dto::DynamoDb {
         std::string tableName;
 
         /**
-         * Table ID
+         * Table size
          */
-        std::string tableId;
+        long tableSize;
+
+        /**
+         * Item count
+         */
+        long itemCount;
 
         /**
          * Table ARN
@@ -95,14 +100,19 @@ namespace AwsMock::Dto::DynamoDb {
         system_clock::time_point createdDateTime;
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Scans the response and fills in the attributes
+         */
+        void ScanResponse();
+
+        /**
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Parse a JSON stream
+         * @brief Parse a JSON stream
          *
          * @param body JSON string
          * @param headers map of headers
@@ -110,14 +120,14 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

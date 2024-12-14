@@ -2,7 +2,6 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/core/BsonUtils.h"
 #include <awsmock/entity/s3/Bucket.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -108,25 +107,25 @@ namespace AwsMock::Database::Entity::S3 {
     view_or_value<view, value> Bucket::ToDocument() const {
 
         // Bucket notification are deprecated, should be removed at a certain point
-        auto notificationsDoc = bsoncxx::builder::basic::array{};
+        auto notificationsDoc = array{};
         for (const auto &notification: notifications) {
             notificationsDoc.append(notification.ToDocument());
         }
 
         // Queue notifications
-        auto queueNotificationsDoc = bsoncxx::builder::basic::array{};
+        auto queueNotificationsDoc = array{};
         for (const auto &notification: queueNotifications) {
             queueNotificationsDoc.append(notification.ToDocument());
         }
 
         // Topic notifications
-        auto topicNotificationsDoc = bsoncxx::builder::basic::array{};
+        auto topicNotificationsDoc = array{};
         for (const auto &notification: topicNotifications) {
             topicNotificationsDoc.append(notification.ToDocument());
         }
 
         // Lambda notifications
-        auto lambdaNotificationsDoc = bsoncxx::builder::basic::array{};
+        auto lambdaNotificationsDoc = array{};
         for (const auto &notification: lambdaNotifications) {
             lambdaNotificationsDoc.append(notification.ToDocument());
         }

@@ -26,19 +26,26 @@ namespace AwsMock::Database::Entity::DynamoDb {
             return itemDoc.extract();
 
         } catch (const std::exception &exc) {
-            log_error << "Database exception " << exc.what();
-            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
     }
 
     Item Item::FromDocument(const optional<view> &mResult) {
 
-        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
-        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
-        tableName = Core::Bson::BsonUtils::GetStringValue(mResult, "tableName");
-        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
-        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
-        return *this;
+        try {
+
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(mResult, "tableName");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
+            return *this;
+
+        } catch (const std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string Item::ToJson() const {

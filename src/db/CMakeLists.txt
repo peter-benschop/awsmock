@@ -19,7 +19,7 @@ set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/Use
         src/memorydb/TransferMemoryDb.cpp)
 set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp src/entity/cognito/Group.cpp
         src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
-set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
+set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp src/entity/dynamodb/ProvisionedThroughput.cpp
         src/repository/DynamoDbDatabase.cpp src/memorydb/DynamoDbMemoryDb.cpp)
 set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
         src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)

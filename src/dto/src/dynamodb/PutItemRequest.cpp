@@ -8,50 +8,34 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string PutItemRequest::ToJson() const {
 
-        // Todo:
-        /*
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
 
-            return Core::JsonUtils::ToJsonString(rootJson);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void PutItemRequest::FromJson(const std::string &jsonBody) {
+    void PutItemRequest::FromJson(const std::string &jsonString) {
 
         // Save original body
-        body = jsonBody;
-
-        // Todo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonBody);
-        Poco::JSON::Object::Ptr rootObject = result.extract<Poco::JSON::Object::Ptr>();
+        body = jsonString;
 
         try {
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("TableName", rootObject, tableName);
 
-            // Tags
-            Poco::JSON::Object::Ptr jsonKeyObject = rootObject->getObject("Item");
-            if (!jsonKeyObject.isNull()) {
-                for (size_t i = 0; i < jsonKeyObject->getNames().size(); i++) {
-                    AttributeValue attributeValue;
-                    attributeValue.FromJsonObject(jsonKeyObject->getObject(jsonKeyObject->getNames()[i]));
-                    attributes[jsonKeyObject->getNames()[i]] = attributeValue;
-                }
-            }
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(document, "TableName");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string PutItemRequest::ToString() const {

@@ -269,7 +269,7 @@ namespace AwsMock::Service {
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::allow, "*/*");
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "*");

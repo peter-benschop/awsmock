@@ -16,6 +16,7 @@ namespace AwsMock::Service {
         _containerPort = configuration.GetValueInt("awsmock.modules.dynamodb.container.port");
         _imageName = configuration.GetValueString("awsmock.modules.dynamodb.container.image-name");
         _imageTag = configuration.GetValueString("awsmock.modules.dynamodb.container.image-tag");
+        _region = configuration.GetValueString("awsmock.region");
         log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
         // Check module active
@@ -91,25 +92,24 @@ namespace AwsMock::Service {
     void DynamoDbServer::SynchronizeTables() const {
 
         try {
-            // Get the list of tables from DynamoDB
-            auto [status, output] = Core::SystemUtils::Exec("aws dynamodb list-tables --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
-            Dto::DynamoDb::ListTableResponse listTableResponse;
-            listTableResponse.FromJson(output, {});
 
-            if (!listTableResponse.tableNames.empty()) {
+            // Get the list of tables from DynamoDB
+            Dto::DynamoDb::ListTableRequest request;
+            request.region = _region;
+            request.PrepareRequest();
+            if (Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 
                 for (const auto &tableName: listTableResponse.tableNames) {
 
-                    auto [status, output] = Core::SystemUtils::Exec("aws dynamodb describe-table --table-name " + tableName + " --endpoint http://" + _containerHost + ":" + std::to_string(_containerPort));
-                    Dto::DynamoDb::DescribeTableResponse describeTableResponse;
-                    describeTableResponse.FromJson(output, {});
+                    Dto::DynamoDb::DescribeTableRequest describeTableRequest;
+                    describeTableRequest.region = _region;
+                    describeTableRequest.tableName = tableName;
+                    describeTableRequest.PrepareRequest();
+                    Dto::DynamoDb::DescribeTableResponse describeTableResponse = _dynamoDbService.DescribeTable(describeTableRequest);
+                    describeTableResponse.region = _region;
+                    describeTableResponse.ScanResponse();
 
-                    Database::Entity::DynamoDb::Table table = {
-                            .region = describeTableResponse.region,
-                            .name = describeTableResponse.tableName,
-                            .status = TableStatusTypeToString(describeTableResponse.tableStatus),
-                            .attributes = describeTableResponse.attributes,
-                            .keySchemas = describeTableResponse.keySchemas};
+                    Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
                     table = _dynamoDbDatabase.CreateOrUpdateTable(table);
                     log_debug << "Table synchronized, table: " << table.name;
                 }

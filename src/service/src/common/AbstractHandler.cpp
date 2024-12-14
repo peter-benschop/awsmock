@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, "0");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
@@ -69,7 +69,7 @@ namespace AwsMock::Service {
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(contentLength));
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
         response.result(http::status::internal_server_error);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
@@ -152,7 +152,7 @@ namespace AwsMock::Service {
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
@@ -188,7 +188,7 @@ namespace AwsMock::Service {
             response.set(http::field::accept_ranges, "bytes");
             response.set(http::field::content_range, "bytes " + std::to_string(min) + "-" + std::to_string(max) + "/" + std::to_string(totalSize));
             response.set(http::field::content_length, std::to_string(size));
-            response.set(http::field::date, Core::DateTimeUtils::HttpFormat());
+            response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
             response.set(http::field::access_control_allow_origin, "*");
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
             response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");

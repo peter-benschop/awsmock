@@ -1,58 +1,7 @@
 
 #include <awsmock/core/StringUtils.h>
-#include <boost/bind/bind.hpp>
-#include <jwt-cpp/base.h>
 
 namespace AwsMock::Core {
-
-    /* Converts a hex character to its integer value */
-    char from_hex(const char ch) {
-        return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
-    }
-
-    /* Converts an integer value to its hex character*/
-    char to_hex(const char code) {
-        static char hex[] = "0123456789abcdef";
-        return hex[code & 15];
-    }
-
-    /* Returns a url-encoded version of str */
-    /* IMPORTANT: be sure to free() the returned string after use */
-    char *url_encode(char *str) {
-        char *pstr = str, *buf = static_cast<char *>(malloc(strlen(str) * 3 + 1)), *pbuf = buf;
-        while (*pstr) {
-            if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
-                *pbuf++ = *pstr;
-            else if (*pstr == ' ')
-                *pbuf++ = '+';
-            else
-                *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
-            pstr++;
-        }
-        *pbuf = '\0';
-        return buf;
-    }
-
-    /* Returns a url-decoded version of str */
-    /* IMPORTANT: be sure to free() the returned string after use */
-    char *url_decode(char *str) {
-        char *pstr = str, *buf = static_cast<char *>(malloc(strlen(str) + 1)), *pbuf = buf;
-        while (*pstr) {
-            if (*pstr == '%') {
-                if (pstr[1] && pstr[2]) {
-                    *pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
-                    pstr += 2;
-                }
-            } else if (*pstr == '+') {
-                *pbuf++ = ' ';
-            } else {
-                *pbuf++ = *pstr;
-            }
-            pstr++;
-        }
-        *pbuf = '\0';
-        return buf;
-    }
 
     template<typename T = std::mt19937>
     auto RandomGenerator() -> T {
@@ -261,45 +210,8 @@ namespace AwsMock::Core {
         return escaped.str();
     }
 
-    char *StringUtils::Replace(const char *original, char const *const pattern, char const *const replacement) {
-        size_t const replen = strlen(replacement);
-        size_t const patlen = strlen(pattern);
-        size_t const orilen = strlen(original);
-
-        size_t patcnt = 0;
-        const char *oriptr;
-
-        // find how many times the pattern occurs in the original string
-        const char *patloc = strstr(original, pattern);
-        for (oriptr = original; patloc; oriptr = patloc + patlen) {
-            patcnt++;
-            patloc = strstr(oriptr, pattern);
-        }
-        {
-            // allocate memory for the new string
-            size_t const retlen = orilen + patcnt * (replen - patlen);
-            const auto returned = static_cast<char *>(malloc(sizeof(char) * (retlen + 1)));
-
-            if (returned != nullptr) {
-
-                // copy the original string,
-                // replacing all the instances of the pattern
-                char *retptr = returned;
-                for (oriptr = original; patloc = strstr(oriptr, pattern); oriptr = patloc + patlen) {
-
-                    size_t const skplen = patloc - oriptr;
-                    // copy the section until the occurrence of the pattern
-                    strncpy(retptr, oriptr, skplen);
-                    retptr += skplen;
-                    // copy the replacement
-                    strncpy(retptr, replacement, replen);
-                    retptr += replen;
-                }
-                // copy the rest of the string.
-                strcpy(retptr, oriptr);
-            }
-            return returned;
-        }
+    void StringUtils::Replace(std::string &target, const std::string &pattern, const std::string &replacement) {
+        boost::replace_all(target, pattern, replacement);
     }
 
     std::string StringUtils::UrlDecode(const std::string &input) {

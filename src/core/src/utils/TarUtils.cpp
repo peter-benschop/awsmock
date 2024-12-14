@@ -84,7 +84,8 @@ namespace AwsMock::Core {
         struct stat st{};
         char buff[8192];
 
-        const std::string entryName = StringUtils::Replace(fileName.c_str(), removeDir.c_str(), "");
+        std::string entryName = fileName;
+        StringUtils::Replace(entryName, removeDir, "");
         log_trace << "Removed directory, name: " << entryName;
 
         stat(fileName.c_str(), &st);

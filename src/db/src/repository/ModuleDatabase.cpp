@@ -214,7 +214,7 @@ namespace AwsMock::Database {
                 mongocxx::options::find_one_and_update opts{};
                 opts.return_document(mongocxx::options::return_document::k_after);
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
                 log_trace << "Module updated: " << module.ToString();

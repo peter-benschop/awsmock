@@ -34,8 +34,9 @@ namespace AwsMock::Service {
         _metricService.SetGauge(COGNITO_USERPOOL_COUNT, userPools);
 
         // Count users per user pool
-        for (const auto &userPool: _cognitoDatabase.ListUserPools()) {
-            std::string labelValue = Core::StringUtils::Replace(userPool.name.c_str(), "-", "_");
+        for (auto &userPool: _cognitoDatabase.ListUserPools()) {
+            std::string labelValue = userPool.name;
+            Core::StringUtils::Replace(labelValue, "-", "_");
             const long usersPerUserPool = _cognitoDatabase.CountUsers(userPool.region, userPool.userPoolId);
             _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", labelValue, usersPerUserPool);
         }

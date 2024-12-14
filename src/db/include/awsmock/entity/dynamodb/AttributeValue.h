@@ -12,20 +12,9 @@
 // AwsMock include
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
-
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB attribute value entity

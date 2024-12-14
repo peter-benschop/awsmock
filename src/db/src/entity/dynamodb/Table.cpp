@@ -10,53 +10,62 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         try {
 
-            bsoncxx::builder::basic::document tableDoc;
+            document tableDoc;
             tableDoc.append(
                     kvp("region", region),
                     kvp("name", name),
                     kvp("status", status),
+                    kvp("size", size),
+                    kvp("itemCount", itemCount),
                     kvp("created", bsoncxx::types::b_date(created)),
                     kvp("modified", bsoncxx::types::b_date(modified)));
 
             // Tags
             if (!tags.empty()) {
-                auto tagsDoc = bsoncxx::builder::basic::document{};
-                for (const auto &t: tags) {
-                    tagsDoc.append(kvp(t.first, t.second));
+                auto tagsDoc = document{};
+                for (const auto &[fst, snd]: tags) {
+                    tagsDoc.append(kvp(fst, snd));
                 }
                 tableDoc.append(kvp("tags", tagsDoc));
             }
 
             // Attributes
             if (!attributes.empty()) {
-                auto attributesDoc = bsoncxx::builder::basic::document{};
-                for (const auto &t: attributes) {
-                    attributesDoc.append(kvp(t.first, t.second));
+                auto attributesDoc = document{};
+                for (const auto &[fst, snd]: attributes) {
+                    attributesDoc.append(kvp(fst, snd));
                 }
                 tableDoc.append(kvp("attributes", attributesDoc));
             }
 
             // Key schemas
             if (!keySchemas.empty()) {
-                auto keySchemaDoc = bsoncxx::builder::basic::document{};
-                for (const auto &t: keySchemas) {
-                    keySchemaDoc.append(kvp(t.first, t.second));
+                auto keySchemaDoc = document{};
+                for (const auto &[fst, snd]: keySchemas) {
+                    keySchemaDoc.append(kvp(fst, snd));
                 }
                 tableDoc.append(kvp("keySchemas", keySchemaDoc));
             }
+
+            // Provisioned throughput
+            tableDoc.append(kvp("provisionedThroughput", provisionedThroughput.ToDocument()));
+
             return tableDoc.extract();
 
         } catch (std::exception &e) {
             log_error << e.what();
-            throw Core::DatabaseException(e.what());
+            throw Core::JsonException(e.what());
         }
     }
 
-    void Table::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Table::FromDocument(const std::optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
+        size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+        itemCount = Core::Bson::BsonUtils::GetLongValue(mResult, "itemCount");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
@@ -87,6 +96,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
                 keySchemas.emplace(key, value);
             }
         }
+
+        // Provisioned throughput
+        if (mResult.value().find("provisionedThroughput") != mResult.value().end()) {
+            provisionedThroughput.FromDocument(mResult.value()["provisionedThroughput"].get_document().value);
+        }
     }
 
     std::string Table::ToJson() const {
@@ -99,8 +113,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const Table &t) {
-        os << "Table=" << bsoncxx::to_json(t.ToDocument());
+    std::ostream &operator<<(std::ostream &os, const Table &d) {
+        os << "Table=" << d.ToJson();
         return os;
     }
 }// namespace AwsMock::Database::Entity::DynamoDb

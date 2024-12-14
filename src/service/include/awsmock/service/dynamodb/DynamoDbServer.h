@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "DynamoDbService.h"
+
+
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
@@ -84,6 +87,11 @@ namespace AwsMock::Service {
         ContainerService &_containerService;
 
         /**
+         * DynamoDB service
+         */
+        DynamoDbService _dynamoDbService;
+
+        /**
          * Database connection
          */
         Database::DynamoDbDatabase &_dynamoDbDatabase;
@@ -127,6 +135,11 @@ namespace AwsMock::Service {
          * Dynamo DB image tag
          */
         std::string _imageTag;
+
+        /**
+         * AWS region
+         */
+        std::string _region;
     };
 
 }// namespace AwsMock::Service

@@ -13,15 +13,18 @@
 #include <vector>
 
 // Boost includes
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/beast/core/string.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/exception/info.hpp>
 #include <boost/url/decode_view.hpp>
 #include <boost/url/encode.hpp>
 #include <boost/uuid/random_generator.hpp>
-
-// Boost includes
-#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/uuid/uuid_io.hpp>
+
+// JWT includes
+#include <jwt-cpp/base.h>
 
 namespace AwsMock::Core {
 
@@ -150,7 +153,7 @@ namespace AwsMock::Core {
         static bool Equals(const std::string &s1, const std::string &s2);
 
         /**
-         * @brief Return true if s1 and s2 are not case sensitive equal.
+         * @brief Return true if s1 and s2 are not case-sensitive equal.
          *
          * @param s1 first input string
          * @param s2 second input string
@@ -244,12 +247,12 @@ namespace AwsMock::Core {
         /**
          * @brief Replace in C-string.
          *
-         * @param original original
+         * @param target original
          * @param pattern pattern
          * @param replacement replacement string
          * @return
          */
-        static char *Replace(char const *original, char const *pattern, char const *replacement);
+        static void Replace(std::string &target, const std::string &pattern, const std::string &replacement);
 
         /**
          * @brief Left trim a string.

@@ -29,6 +29,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             createTableResponse = {.body = body, .headers = outHeaders, .status = status};
+            createTableResponse.ScanResponse();
 
             // Update database
             Database::Entity::DynamoDb::Table table = {
@@ -52,21 +53,20 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_tables");
         log_debug << "Starting list table request, region: " << request.region;
 
-        Dto::DynamoDb::ListTableResponse listTableResponse;
         try {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            listTableResponse = {.body = body, .headers = outHeaders, .status = status};
-            log_info << "DynamoDb list tables, region: " << request.region << " body: " << body;
+            Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status};
+            listTableResponse.ScanResponse();
+            log_debug << "DynamoDb list tables, region: " << request.region << " body: " << body;
+            return listTableResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
         }
-
-        return listTableResponse;
     }
 
     Dto::DynamoDb::DescribeTableResponse DynamoDbService::DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const {
@@ -75,22 +75,20 @@ namespace AwsMock::Service {
 
         Dto::DynamoDb::DescribeTableResponse describeTableResponse;
         describeTableResponse.region = request.region;
-        describeTableResponse.tableName = request.tableName;
-        describeTableResponse.body = {};
 
         try {
             // Send request to docker container
             std::map<std::string, std::string> headers = request.headers;
-            auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, headers);
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             describeTableResponse = {.body = body, .headers = outHeaders, .status = status};
+            describeTableResponse.ScanResponse();
             log_info << "DynamoDb describe table, name: " << request.tableName;
+            return describeTableResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb describe table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb describe table failed, error: " + exc.message());
         }
-
-        return describeTableResponse;
     }
 
     Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const {
@@ -106,9 +104,8 @@ namespace AwsMock::Service {
         try {
 
             // Send request to DynamoDB docker container
-            std::map<std::string, std::string> headers = request.headers;
-            auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, headers);
-            deleteTableResponse = {.body = body, .headers = headers, .status = status};
+            auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, request.headers);
+            deleteTableResponse = {.body = body, .headers = outHeaders, .status = status};
 
             // Delete table in database
             _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
@@ -297,8 +294,8 @@ namespace AwsMock::Service {
 
         auto [statusCode, outBody, outHeaders] = Core::HttpSocket::SendJson(http::verb::post, _containerHost, _containerPort, "/", body, headers);
         if (statusCode != http::status::ok) {
-            log_error << "HTTP error, status: " << statusCode << " body: " << body;
-            throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(statusCode) + " reason: " + body);
+            log_error << "HTTP error, status: " << statusCode << " body: " << outBody;
+            throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(statusCode) + " reason: " + outBody);
         }
         return {.body = outBody, .headers = outHeaders, .status = statusCode};
     }

@@ -43,7 +43,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            std::optional<bsoncxx::document::value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
+            const std::optional<value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Table not found ";
                 throw Core::DatabaseException("Database exception, Table not found ");
@@ -127,10 +127,10 @@ namespace AwsMock::Database {
 
     std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) const {
 
-        Entity::DynamoDb::TableList tables;
         if (HasDatabase()) {
 
             try {
+                Entity::DynamoDb::TableList tables;
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
@@ -145,18 +145,15 @@ namespace AwsMock::Database {
                     tables.push_back(result);
                 }
 
+                log_trace << "Got DynamoDb table list, size:" << tables.size();
+                return tables;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            tables = _memoryDb.ListTables(region);
         }
-
-        log_trace << "Got DynamoDb table list, size:" << tables.size();
-        return tables;
+        return _memoryDb.ListTables(region);
     }
 
     long DynamoDbDatabase::CountTables(const std::string &region) const {
@@ -182,7 +179,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountTables(region);
     }
 
-    Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(const Entity::DynamoDb::Table &table) const {
+    Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(Entity::DynamoDb::Table &table) const {
 
         if (TableExists(table.region, table.name)) {
 
@@ -191,7 +188,7 @@ namespace AwsMock::Database {
         return CreateTable(table);
     }
 
-    Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(const Entity::DynamoDb::Table &table) const {
+    Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(Entity::DynamoDb::Table &table) const {
 
         if (HasDatabase()) {
 
@@ -201,22 +198,31 @@ namespace AwsMock::Database {
 
             try {
 
+                mongocxx::options::find_one_and_update opts{};
+                opts.return_document(mongocxx::options::return_document::k_after);
+
+                document query = {};
+                query.append(kvp("region", table.region));
+                query.append(kvp("name", table.name));
+
                 session.start_transaction();
-                auto result = _tableCollection.replace_one(make_document(kvp("region", table.region), kvp("name", table.name)), table.ToDocument());
+                const auto mResult = _tableCollection.find_one_and_update(query.extract(), table.ToDocument(), opts);
                 session.commit_transaction();
-                log_trace << "DynamoDB table updated: " << table.ToString();
-                return GetTableByRegionName(table.region, table.name);
+
+                if (mResult) {
+                    table.FromDocument(mResult->view());
+                    log_trace << "DynamoDB table updated: " << table.name;
+                    return table;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            return _memoryDb.UpdateTable(table);
         }
+        return _memoryDb.UpdateTable(table);
     }
 
     void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) const {
@@ -421,7 +427,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                log_info << bsoncxx::to_json(item.ToDocument());
+                log_info << to_json(item.ToDocument());
                 const auto result = _itemCollection.insert_one(item.ToDocument());
                 session.commit_transaction();
                 log_trace << "DynamoDb item created, oid: " << result->inserted_id().get_oid().value.to_string();

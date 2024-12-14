@@ -14,14 +14,14 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
     using std::chrono::system_clock;
 
     /**
-     * DynamoDB table entity
+     * @brief DynamoDB table entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -63,6 +63,21 @@ namespace AwsMock::Database::Entity::DynamoDb {
         std::map<std::string, std::string> keySchemas;
 
         /**
+         * Item count
+         */
+        long itemCount;
+
+        /**
+         * Size in bytes
+         */
+        long size;
+
+        /**
+         * Provisioned throughput
+         */
+        ProvisionedThroughput provisionedThroughput;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -84,7 +99,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a JSON string
