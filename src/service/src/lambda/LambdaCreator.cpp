@@ -63,10 +63,11 @@ namespace AwsMock::Service {
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
+        log_debug << "Code directory created, codeDir: " << codeDir;
 
         // Write base64 encoded zip file
-        const std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag, dataDir);
+        const std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag);
+        log_debug << "Create Base64 string, length: " << encodedFile.size();
 
         // Unzip provided zip-file into a temporary directory
         codeDir = UnpackZipFile(codeDir, encodedFile, lambdaEntity.runtime);
