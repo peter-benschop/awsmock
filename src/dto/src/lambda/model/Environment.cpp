@@ -36,9 +36,9 @@ namespace AwsMock::Dto::Lambda {
 
         try {
             if (document.view().find("Variables") != document.view().end()) {
-                for (const bsoncxx::array::view jsonArray = document.view()["Variables"].get_array().value; const auto &element: jsonArray) {
+                for (const view jsonObject = document.view()["Variables"].get_document().value; const auto &element: jsonObject) {
                     std::string key = bsoncxx::string::to_string(element.key());
-                    const std::string value = bsoncxx::string::to_string(element[key].get_string().value);
+                    const std::string value = bsoncxx::string::to_string(jsonObject[key].get_string().value);
                     variables[key] = value;
                 }
             }

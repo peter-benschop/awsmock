@@ -192,7 +192,7 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
             Dto::SQS::ListQueueTagsResponse listQueueTagsResponse;
             listQueueTagsResponse.total = queue.tags.size();

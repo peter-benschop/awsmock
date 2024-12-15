@@ -12,51 +12,53 @@ namespace AwsMock::Dto::SQS {
 
             document rootDocument;
 
-            array messageArray;
-            for (const auto &message: messageList) {
+            if (!messageList.empty()) {
 
-                document messageDocument;
-                Core::Bson::BsonUtils::SetStringValue(messageDocument, "Body", message.body);
-                Core::Bson::BsonUtils::SetStringValue(messageDocument, "ReceiptHandle", message.receiptHandle);
-                Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfBody", message.md5Body);
-                Core::Bson::BsonUtils::SetStringValue(messageDocument, "MessageId", message.messageId);
+                array messageArray;
+                for (const auto &message: messageList) {
 
-                // Message attributes
-                document messageAttributeDocument;
-                MessageAttributeList messageAttributeListDto;
-                for (const auto &at: message.messageAttributes) {
+                    document messageDocument;
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "Body", message.body);
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "ReceiptHandle", message.receiptHandle);
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfBody", message.md5Body);
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MessageId", message.messageId);
 
-                    MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
+                    // Message attributes
+                    document messageAttributesDocument;
+                    MessageAttributeList messageAttributeListDto;
+                    for (const auto &at: message.messageAttributes) {
 
-                    if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
-                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "DataType", "String");
-                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "StringValue", at.attributeValue);
-                        messageAttributeDto.type = STRING;
-                    } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
-                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "DataType", "Number");
-                        Core::Bson::BsonUtils::SetStringValue(messageDocument, "StringValue", at.attributeValue);
-                        messageAttributeDto.type = NUMBER;
+                        MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
+
+                        if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
+                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "String");
+                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", at.attributeValue);
+                            messageAttributeDto.type = STRING;
+                        } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
+                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "Number");
+                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", at.attributeValue);
+                            messageAttributeDto.type = NUMBER;
+                        }
+                        messageAttributeListDto[at.attributeName] = messageAttributeDto;
+                        messageAttributesDocument.append(kvp(at.attributeName, messageAttributesDocument.extract()));
                     }
-                    messageAttributeListDto[at.attributeName] = messageAttributeDto;
-                    messageAttributeDocument.append(kvp(at.attributeName, messageAttributeDocument));
-                }
-                messageDocument.append(kvp("MessageAttributes", messageAttributeDocument));
+                    messageDocument.append(kvp("MessageAttributes", messageAttributesDocument.extract()));
 
-                // Attributes
-                document attributeDocument;
-                for (const auto &[fst, snd]: message.attributes) {
-                    attributeDocument.append(kvp(fst, snd));
-                }
-                messageDocument.append(kvp("Attributes", attributeDocument));
+                    // Attributes
+                    document attributeDocument;
+                    for (const auto &[fst, snd]: message.attributes) {
+                        attributeDocument.append(kvp(fst, snd));
+                    }
+                    messageDocument.append(kvp("Attributes", attributeDocument));
 
-                // MD5 of message attributes
-                messageDocument.append(kvp("MD5OfMessageAttributes", MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto)));
-                messageArray.append(messageDocument);
+                    // MD5 of message attributes
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto));
+                    messageArray.append(messageDocument);
+                }
+
+                // Add message array
+                rootDocument.append(kvp("Messages", messageArray));
             }
-
-            // Add message array
-            rootDocument.append(kvp("Messages", messageArray));
-
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {

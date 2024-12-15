@@ -53,6 +53,7 @@ namespace AwsMock::Core {
     }
 
     void FileUtils::CopyTo(const std::string &sourceFileName, const std::string &targetFileName, const bool createDir) {
+
         if (createDir) {
             create_directories(boost::filesystem::path(GetParentPath(targetFileName)));
         }
@@ -66,12 +67,7 @@ namespace AwsMock::Core {
         size_t copied = 0;
         for (auto &it: files) {
 
-            std::string inFile = inDir;
-            inFile.append("/");
-            inFile.append(it);
-            const int source = open(inFile.c_str(), O_RDONLY, 0);
-
-            // struct required, rationale: function stat() exists also
+            const int source = open(it.c_str(), O_RDONLY, 0);
             struct stat stat_source {};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
@@ -87,10 +83,7 @@ namespace AwsMock::Core {
         long copied = 0;
         std::ofstream ofs(outFile, std::ios::out | std::ios::trunc);
         for (auto &it: files) {
-            std::string inFile = inDir;
-            inFile.append("/");
-            inFile.append(it);
-            std::ifstream ifs(inFile, std::ios::in);
+            std::ifstream ifs(it, std::ios::in);
             copied = boost::iostreams::copy(ifs, ofs);
             ofs.flush();
             ifs.close();
@@ -144,8 +137,9 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
+
         struct stat info {};
-        stat(fileName.c_str(), &info);// Error check omitted
+        stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
         }
@@ -176,6 +170,7 @@ namespace AwsMock::Core {
     }
 
     void FileUtils::StripChunkSignature(const std::string &path) {
+
         std::string line;
         std::ifstream fin;
         std::string tempFile = GetTempFile("bin");
@@ -188,8 +183,9 @@ namespace AwsMock::Core {
 
         // Write all lines to temp other than the line marked for erasing
         while (getline(fin, line)) {
-            if (!StringUtils::ContainsIgnoreCase(line, "chunk-signature"))
+            if (!StringUtils::ContainsIgnoreCase(line, "chunk-signature")) {
                 temp << line;
+            }
         }
 
         temp.close();

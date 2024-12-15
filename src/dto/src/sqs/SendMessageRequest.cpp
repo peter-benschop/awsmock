@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SQS {
 
             // Attributes
             if (document.view().find("MessageAttributes") != document.view().end()) {
-                for (const bsoncxx::array::view attributesView{document.view()["MessageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+                for (const view attributesView = document.view()["MessageAttributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
                     attribute.FromDocument(attributeElement.get_document().value);
@@ -29,10 +29,9 @@ namespace AwsMock::Dto::SQS {
 
             // System attributes
             if (document.view().find("MessageSystemAttributes") != document.view().end()) {
-
-                for (const bsoncxx::array::view attributesView{document.view()["MessageSystemAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+                for (const view attributesView = document.view()["MessageSystemAttributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
-                    const std::string value = bsoncxx::string::to_string(attributeElement.get_string().value);
+                    const std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);
                     attributes[key] = value;
                 }
             }

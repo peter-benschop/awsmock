@@ -140,7 +140,7 @@ namespace AwsMock::Database {
          * @param maxKeys maximal number of return elements
          * @return list of S3 objects
          */
-        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) const;
 
         /**
          * @brief Counts objects in a bucket.
@@ -185,7 +185,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief Create a new S3 object in the S3 object table
@@ -230,10 +230,10 @@ namespace AwsMock::Database {
          * @return true if existing otherwise false
          * @throws DatabaseException
          */
-        bool ObjectExists(const std::string &filename) const;
+        bool ObjectExistsInternalName(const std::string &filename) const;
 
         /**
-         * @brief Gets an object from an bucket
+         * @brief Gets an object from a bucket
          *
          * @param region AWS S3 region name
          * @param bucket object bucket

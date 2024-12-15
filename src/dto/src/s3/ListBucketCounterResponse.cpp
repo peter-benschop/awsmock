@@ -17,8 +17,8 @@ namespace AwsMock::Dto::S3 {
                 for (const auto &[bucketName, keys, size]: bucketCounters) {
                     document jsonObject;
                     Core::Bson::BsonUtils::SetStringValue(jsonObject, "bucketName", bucketName);
-                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "keys", keys);
-                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+                    Core::Bson::BsonUtils::SetLongValue(jsonObject, "keys", keys);
+                    Core::Bson::BsonUtils::SetLongValue(jsonObject, "size", size);
                     jsonBucketArray.append(jsonObject);
                 }
 

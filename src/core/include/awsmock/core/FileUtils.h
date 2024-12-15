@@ -239,15 +239,11 @@ namespace AwsMock::Core {
          *
          * @return file path separator
          */
-        static char separator();
+        static std::string separator();
     };
 
-    inline char FileUtils::separator() {
-#if _WIN32
-        return '\\';
-#else
-        return '/';
-#endif
+    inline std::string FileUtils::separator() {
+        return "/";
     }
 
 }// namespace AwsMock::Core

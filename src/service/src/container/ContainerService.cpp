@@ -79,7 +79,7 @@ namespace AwsMock::Service {
     Dto::Docker::Image ContainerService::GetImageByName(const std::string &name, const std::string &tag, bool locked) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
+        const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
         if (statusCode != http::status::ok) {
             log_error << "Get image by name failed, httpStatus: " << statusCode;

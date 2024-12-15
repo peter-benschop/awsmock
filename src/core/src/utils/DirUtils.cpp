@@ -88,8 +88,8 @@ namespace AwsMock::Core {
 
         std::vector<std::string> fileNames;
         for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
-            if (is_regular_file(entry) && StringUtils::StartsWith(entry.path().c_str(), prefix)) {
-                fileNames.emplace_back(entry.path().c_str());
+            if (is_regular_file(entry) && StringUtils::StartsWith(entry.path().string(), dirName + FileUtils::separator() + prefix)) {
+                fileNames.emplace_back(entry.path().string());
             }
         }
 

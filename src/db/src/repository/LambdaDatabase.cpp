@@ -179,9 +179,9 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
-                std::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
+                const std::optional<value> mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
                     throw Core::DatabaseException("Database exception, Lambda not found ");
@@ -202,15 +202,15 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::GetLambdaByName(const std::string &region, const std::string &name) {
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaByName(const std::string &region, const std::string &name) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
-                std::optional<bsoncxx::document::value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
+                const std::optional<value> mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
                     throw Core::DatabaseException("Database exception, Lambda not found ");

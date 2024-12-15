@@ -124,7 +124,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the DTO to a string representation.

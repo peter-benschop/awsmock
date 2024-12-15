@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Docker {
             containers = Core::Bson::BsonUtils::GetIntValue(document, "Containers");
 
             if (document.view().find("RepoTags") != document.view().end()) {
-                for (const bsoncxx::array::view repoTagsArray = document.view()["ReproTags"].get_array().value; const auto &tag: repoTagsArray) {
+                for (const bsoncxx::array::view repoTagsArray = document.view()["RepoTags"].get_array().value; const auto &tag: repoTagsArray) {
                     repoTags.emplace_back(tag.get_string().value);
                 }
             }

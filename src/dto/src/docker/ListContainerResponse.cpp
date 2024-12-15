@@ -13,8 +13,7 @@ namespace AwsMock::Dto::Docker {
     void ListContainerResponse::FromJson(const std::string &body) {
 
         try {
-            const value document = bsoncxx::from_json(body);
-            for (const auto &element: document.view()) {
+            for (const value document = bsoncxx::from_json(body); const auto &element: document.view()) {
                 Container container;
                 container.FromDocument(element.get_document().value);
                 containerList.push_back(container);

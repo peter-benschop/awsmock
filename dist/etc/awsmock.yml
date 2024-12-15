@@ -140,6 +140,7 @@ awsmock:
         pasv-min: 6000
         pasv-max: 6100
   monitoring:
+    active: true
     port: 9091
     period: 60
     prometheus: true

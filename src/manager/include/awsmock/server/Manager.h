@@ -8,7 +8,6 @@
 
 // AwsMock includes
 #include <awsmock/service/gateway/GatewayServer.h>
-#include <awsmock/service/module/ModuleMap.h>
 #include <awsmock/service/monitoring/MonitoringServer.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
@@ -44,12 +43,12 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialization
          */
-        void Initialize();
+        static void Initialize();
 
         /**
          * @brief Stops all currently running modules.
          */
-        void StopModules();
+        static void StopModules();
 
         /**
          * @brief Main processing loop.
@@ -62,6 +61,21 @@ namespace AwsMock::Manager {
          * @brief Initialize database
          */
         static void InitializeDatabase();
+
+        /**
+         * @brief Load the modules from the configuration file.
+         *
+         * @par
+         * Gateway and monitoring are a bit special, as they are not modules, but they still exists in the module database.
+         */
+        static void LoadModulesFromConfiguration();
+
+        /**
+         * @brief Ensures that the modules exists
+         *
+         * @param key module key
+         */
+        static void EnsureModuleExisting(const std::string &key);
 
         /**
          * Thread group

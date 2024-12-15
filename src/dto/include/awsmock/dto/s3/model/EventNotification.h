@@ -389,15 +389,12 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
             try {
+
                 document document;
                 Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
                 Core::Bson::BsonUtils::SetStringValue(document, "configurationId", configurationId);
-                Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
-                Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
-
                 document.append(kvp("bucket", bucket.ToDocument()));
                 document.append(kvp("object", object.ToDocument()));
-
                 return document.extract();
 
             } catch (bsoncxx::exception &exc) {
@@ -419,11 +416,9 @@ namespace AwsMock::Dto::S3 {
                 configurationId = Core::Bson::BsonUtils::GetStringValue(document, "configurationId");
 
                 if (document.view().find("bucket") != document.view().end()) {
-
                     bucket.FromDocument(document.view()["bucket"].get_document().value);
                 }
                 if (document.view().find("object") != document.view().end()) {
-
                     object.FromDocument(document.view()["object"].get_document().value);
                 }
 

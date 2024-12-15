@@ -183,7 +183,7 @@ namespace AwsMock::Service {
                     .modified = object.modified};
 
             log_trace << "S3 get object metadata response: " + response.ToString();
-            log_info << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
+            log_info << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
 
             return response;
 
@@ -375,11 +375,10 @@ namespace AwsMock::Service {
     Dto::S3::UploadPartCopyResponse S3Service::UploadPartCopy(const Dto::S3::UploadPartCopyRequest &request) const {
         log_trace << "UploadPart copy request, part: " << request.partNumber << " updateId: " << request.uploadId;
 
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data.dir");
-        const std::string s3DataDir = dataDir + "/s3/";
+        const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
-        const std::string sourceFile = s3DataDir + sourceObject.internalName;
+        const std::string sourceFile = s3DataDir + Core::FileUtils::separator() + sourceObject.internalName;
         const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
         log_trace << "Using uploadDir: " << uploadDir;
 
@@ -610,8 +609,8 @@ namespace AwsMock::Service {
             }
 
             // Get the source object from the database
-            Database::Entity::S3::Bucket targetBucket = _database.GetBucketByRegionName(request.region, request.targetBucket);
-            Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
+            const Database::Entity::S3::Bucket targetBucket = _database.GetBucketByRegionName(request.region, request.targetBucket);
+            const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
             // Copy physical file
             const std::string targetFile = Core::AwsUtils::CreateS3FileName();
@@ -1013,8 +1012,7 @@ namespace AwsMock::Service {
     }
 
     std::string S3Service::GetMultipartUploadDirectory(const std::string &uploadId) {
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string tempDir = dataDir + Core::FileUtils::separator() + "tmp";
+        const std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
         Core::DirUtils::EnsureDirectory(tempDir);
         return tempDir + Core::FileUtils::separator() + uploadId;
     }
@@ -1047,7 +1045,7 @@ namespace AwsMock::Service {
         const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
         const std::string user = Core::Configuration::instance().GetValueString("awsmock.user");
 
-        std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
+        const std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
@@ -1104,7 +1102,7 @@ namespace AwsMock::Service {
         log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
         if (!request.checksumAlgorithm.empty()) {
             S3HashCreator s3HashCreator;
-            std::vector<std::string> algorithms = {request.checksumAlgorithm};
+            std::vector algorithms = {request.checksumAlgorithm};
             boost::thread t(boost::ref(s3HashCreator), algorithms, object);
             t.detach();
             //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));

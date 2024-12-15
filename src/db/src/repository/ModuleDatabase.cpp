@@ -17,23 +17,19 @@ namespace AwsMock::Database {
             {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
 
-    //    ,
-    //            {"gateway", {.name = "gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-    //            {"monitoring", {.name = "monitoring", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}
-
     void ModuleDatabase::Initialize() {
 
-        for (auto &module: _existingModules) {
+        for (auto &[fst, snd]: _existingModules) {
             if (HasDatabase()) {
 
-                if (!ModuleExists(module.first)) {
-                    CreateModule(module.second);
+                if (!ModuleExists(fst)) {
+                    CreateModule(snd);
                 }
 
             } else {
 
-                if (!_memoryDb.ModuleExists(module.first)) {
-                    _memoryDb.CreateModule(module.second);
+                if (!_memoryDb.ModuleExists(fst)) {
+                    _memoryDb.CreateModule(snd);
                 }
             }
         }

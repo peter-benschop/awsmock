@@ -193,7 +193,7 @@ namespace AwsMock::Database {
         return _memoryDb.HasObjects(bucket);
     }
 
-    std::vector<Entity::S3::Object> S3Database::GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) {
+    std::vector<Entity::S3::Object> S3Database::GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) const {
 
         if (HasDatabase()) {
             std::vector<Entity::S3::Object> objectList;
@@ -269,7 +269,7 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
             auto session = client->start_session();
 
@@ -277,7 +277,7 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 bucket.modified = system_clock::now();
-                auto mResult = _bucketCollection.find_one_and_update(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument(), opts);
+                const auto mResult = _bucketCollection.find_one_and_update(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument(), opts);
                 log_trace << "Bucket updated: " << bucket.ToString();
                 session.commit_transaction();
 
@@ -296,7 +296,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateBucket(bucket);
     }
 
-    Entity::S3::Bucket S3Database::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const {
 
         if (BucketExists(bucket)) {
             return UpdateBucket(bucket);
@@ -434,13 +434,19 @@ namespace AwsMock::Database {
         return _memoryDb.ObjectExists(object);
     }
 
-    bool S3Database::ObjectExists(const std::string &filename) const {
+    bool S3Database::ObjectExistsInternalName(const std::string &filename) const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            const int64_t count = _objectCollection.count_documents(make_document(kvp("internalName", filename)));
+
+            document query;
+            if (!filename.empty()) {
+                query.append(kvp("internalName", filename));
+            }
+
+            const int64_t count = _objectCollection.count_documents(query.extract());
             log_trace << "Object exists: " << std::boolalpha << count;
             return count > 0;
         }
