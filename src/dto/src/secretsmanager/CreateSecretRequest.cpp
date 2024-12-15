@@ -7,55 +7,51 @@
 namespace AwsMock::Dto::SecretsManager {
 
     std::string CreateSecretRequest::ToJson() const {
-        /* Todo:
+
 
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("Name", name);
-            rootJson.set("ClientRequestToken", clientRequestToken);
-            rootJson.set("Description", description);
-            rootJson.set("SecretString", secretString);
-            rootJson.set("SecretBinary", secretBinary);
-            rootJson.set("ForceOverwriteReplicaSecret", forceOverwriteReplicaSecret);
-            rootJson.set("KmsKeyId", kmsKeyId);
-            rootJson.set("Tags", tags.ToJsonArray());
-            rootJson.set("RequestId", requestId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "ClientRequestToken", clientRequestToken);
+            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            Core::Bson::BsonUtils::SetStringValue(document, "SecretString", secretString);
+            Core::Bson::BsonUtils::SetStringValue(document, "SecretBinary", secretBinary);
+            Core::Bson::BsonUtils::SetBoolValue(document, "ForceOverwriteReplicaSecret", forceOverwriteReplicaSecret);
+            Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyId", kmsKeyId);
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", requestId);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            // Tags
+            document.append(kvp("Tags", tags.ToDocument()));
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        */
-        return {};
     }
 
     void CreateSecretRequest::FromJson(const std::string &jsonString) {
-        /* Todo:
-
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
 
         try {
+            const value document = bsoncxx::from_json(jsonString);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
+            clientRequestToken = Core::Bson::BsonUtils::GetStringValue(document, "ClientRequestToken");
+            description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
+            secretString = Core::Bson::BsonUtils::GetStringValue(document, "SecretString");
+            secretBinary = Core::Bson::BsonUtils::GetStringValue(document, "SecretBinary");
+            forceOverwriteReplicaSecret = Core::Bson::BsonUtils::GetBoolValue(document, "ForceOverwriteReplicaSecret");
+            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(document, "KmsKeyId");
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
-            Core::JsonUtils::GetJsonValueString("ClientRequestToken", rootObject, clientRequestToken);
-            Core::JsonUtils::GetJsonValueString("Description", rootObject, description);
-            Core::JsonUtils::GetJsonValueString("SecretString", rootObject, secretString);
-            Core::JsonUtils::GetJsonValueString("SecretBinary", rootObject, secretBinary);
-            Core::JsonUtils::GetJsonValueBool("ForceOverwriteReplicaSecret", rootObject, forceOverwriteReplicaSecret);
-            Core::JsonUtils::GetJsonValueString("KmsKeyId", rootObject, kmsKeyId);
-            tags.FromJson(rootObject->getObject("Tags"));
-
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
+            // Tags
+            if (document.view().find("Tags") != document.view().end()) {
+                tags.FromDocument(document.view()["Tags"].get_document().value);
+            }
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateSecretRequest::ToString() const {
