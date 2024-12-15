@@ -204,7 +204,7 @@ namespace AwsMock::FtpServer {
         log_info << "Get directory content, path: " << path;
 
         DIR *dp = opendir(path.c_str());
-        struct dirent *dirp = nullptr;
+        dirent *dirp = nullptr;
         if (dp == nullptr) {
             log_error << "Error opening directory: " << strerror(errno) << ", returning empty dir";
             return content;
@@ -219,7 +219,7 @@ namespace AwsMock::FtpServer {
         return content;
     }
 
-    std::string cleanPath(const std::string &path, bool windows_path, const char output_separator) {
+    std::string cleanPath(const std::string &path, const bool windows_path, const char output_separator) {
         if (path.empty()) {
             return ".";
         }
