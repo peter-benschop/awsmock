@@ -7,8 +7,6 @@
 namespace AwsMock::Service {
 
     http::response<http::dynamic_body> ModuleHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-
-        Core::Configuration &configuration = Core::Configuration::instance();
         Monitoring::MetricServiceTimer measure(MODULE_HTTP_TIMER, "method", "GET");
         Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
 
@@ -20,6 +18,7 @@ namespace AwsMock::Service {
         try {
             if (action == "get-config") {
 
+                Core::Configuration &configuration = Core::Configuration::instance();
                 std::string host = configuration.GetValueString("awsmock.gateway.http.host");
                 std::string address = configuration.GetValueString("awsmock.gateway.http.address");
                 int port = configuration.GetValueInt("awsmock.gateway.http.port");
@@ -44,6 +43,11 @@ namespace AwsMock::Service {
                 Database::Entity::Module::ModuleList modules = _moduleService.ListModules();
                 std::string body = Dto::Module::Module::ToJson(modules);
                 return SendOkResponse(request, body);
+            }
+            if (action == "list-module-names") {
+
+                Dto::Module::ListModuleNamesResponse modulesResponse = _moduleService.ListModuleNames();
+                return SendOkResponse(request, modulesResponse.ToJson());
             }
             if (action == "show-ftp-users") {
 

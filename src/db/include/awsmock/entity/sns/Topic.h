@@ -104,6 +104,13 @@ namespace AwsMock::Database::Entity::SNS {
         void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
 
         /**
+         * @brief Converts the DTO to a JSON string representation.
+         *
+         * @return DTO as JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
          * Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.

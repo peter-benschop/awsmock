@@ -3,6 +3,8 @@
 //
 
 #include <awsmock/controller/Controller.h>
+#include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/ListModuleNamesResponse.h>
 
 namespace AwsMock::Controller {
 
@@ -20,7 +22,7 @@ namespace AwsMock::Controller {
         _region = configuration.GetValueString("awsmock.region");
     }
 
-    void AwsMockCtl::Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands) {
+    void AwsMockCtl::Initialize(const boost::program_options::variables_map &vm, const std::vector<std::string> &commands) {
         _commands = commands;
         _vm = vm;
     }
@@ -111,18 +113,15 @@ namespace AwsMock::Controller {
 
         } else if (std::ranges::find(_commands, "export") != _commands.end()) {
 
-            std::vector<Dto::Module::Module> modules;
+            std::vector<std::string> modules;
             for (const auto &command: _commands) {
                 if (command != "export" && command != "all") {
-                    Dto::Module::Module module;
-                    module.name = command;
-                    module.status = Database::Entity::Module::ModuleState::STOPPED;
-                    modules.emplace_back(module);
+                    modules.emplace_back(command);
                 }
             }
 
             if (modules.empty()) {
-                modules = GetAllModules();
+                modules = GetAllModuleNames();
             }
 
             bool pretty = _vm.contains("pretty");
@@ -188,8 +187,7 @@ namespace AwsMock::Controller {
         std::cout << "Modules:" << std::endl;
         for (auto const &module: modules) {
             std::string sport = module.port > 0 ? std::to_string(module.port) : "";
-            std::cout << "  " << std::setw(16) << std::left << module.name << std::setw(9) << Database::Entity::Module::ModuleStateToString(module.status)
-                      << std::setw(9) << " " << std::setw(10) << std::left << sport << std::endl;
+            std::cout << "  " << std::setw(16) << std::left << module.name << std::endl;
         }
     }
 
@@ -331,13 +329,13 @@ namespace AwsMock::Controller {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "get-config");
-        Core::HttpSocketResponse response = AwsMock::Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not set configuration, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
-        Dto::Module::GatewayConfig gatewayConfig = Dto::Module::GatewayConfig::FromJson(response.body);
+        const Dto::Module::GatewayConfig gatewayConfig = Dto::Module::GatewayConfig::FromJson(response.body);
         std::cout << "Config: " << std::endl;
         std::cout << "  " << std::setw(16) << std::left << "Version: " << std::setw(32) << gatewayConfig.version << std::endl;
         std::cout << "  " << std::setw(16) << std::left << "Endpoint: " << std::setw(32) << gatewayConfig.endpoint << std::endl;
@@ -356,16 +354,17 @@ namespace AwsMock::Controller {
         }
     }
 
-    void AwsMockCtl::ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, const bool pretty, const bool includeObjects) const {
+    void AwsMockCtl::ExportInfrastructure(const std::vector<std::string> &modules, const bool pretty, const bool includeObjects) const {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "export");
 
-        // Options headers
-        headers["pretty"] = pretty ? "1" : "0";
-        headers["onlyObjects"] = includeObjects ? "1" : "0";
+        Dto::Module::ExportInfrastructureRequest moduleRequest;
+        moduleRequest.modules = modules;
+        moduleRequest.includeObjects = includeObjects;
+        moduleRequest.prettyPrint = pretty;
 
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", moduleRequest.ToJson(), headers);
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not export objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
@@ -458,4 +457,17 @@ namespace AwsMock::Controller {
         return Dto::Module::Module::FromJsonList(response.body);
     }
 
+    std::vector<std::string> AwsMockCtl::GetAllModuleNames() const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "list-module-names");
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Could not get modules list, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            return {};
+        }
+        Dto::Module::ListModuleNamesResponse moduleResponse;
+        moduleResponse.FromJson(response.body);
+        return moduleResponse.moduleNames;
+    }
 }// namespace AwsMock::Controller

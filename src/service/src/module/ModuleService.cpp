@@ -6,14 +6,25 @@
 
 namespace AwsMock::Service {
 
-    Database::Entity::Module::ModuleList ModuleService::ListModules() {
+    Database::Entity::Module::ModuleList ModuleService::ListModules() const {
 
         Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
         log_debug << "Module list, count: " << modules.size();
         return modules;
     }
 
-    Dto::Module::Module::ModuleList ModuleService::StartModules(Dto::Module::Module::ModuleList &modules) {
+    Dto::Module::ListModuleNamesResponse ModuleService::ListModuleNames() const {
+
+        Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
+        log_debug << "Module list, count: " << modules.size();
+        Dto::Module::ListModuleNamesResponse moduleNamesResponse;
+        for (const auto &module: modules) {
+            moduleNamesResponse.moduleNames.emplace_back(module.name);
+        }
+        return moduleNamesResponse;
+    }
+
+    Dto::Module::Module::ModuleList ModuleService::StartModules(Dto::Module::Module::ModuleList &modules) const {
 
         ModuleMap moduleMap = ModuleMap::instance();
         for (auto const &m: modules) {
@@ -36,23 +47,23 @@ namespace AwsMock::Service {
         return Dto::Module::Mapper::map(_moduleDatabase.ListModules());
     }
 
-    Dto::Module::Module::ModuleList ModuleService::StopModules(Dto::Module::Module::ModuleList &modules) {
+    Dto::Module::Module::ModuleList ModuleService::StopModules(Dto::Module::Module::ModuleList &modules) const {
 
         for (auto const &m: modules) {
 
             // Set state
-            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name);
-            if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
+            if (Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
                 module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::STOPPED);
+                log_info << "Module " << module.name << " topped";
 
                 // Stop module
                 if (m.name == "database") {
                     _moduleDatabase.StopDatabase();
                 } else {
-                    for (const auto &server: ModuleMap::instance().GetModuleMap()) {
-                        if (m.name == server.first) {
+                    for (const auto &[fst, snd]: ModuleMap::instance().GetModuleMap()) {
+                        if (m.name == fst) {
                             //server.second->Stop();
                         }
                     }
@@ -66,7 +77,7 @@ namespace AwsMock::Service {
 
     Dto::Module::ExportInfrastructureResponse ModuleService::ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request) {
 
-        Dto::Module::Infrastructure infrastructure;
+        Dto::Module::Infrastructure infrastructure = {};
 
         for (const auto &module: request.modules) {
 
@@ -135,8 +146,7 @@ namespace AwsMock::Service {
                 infrastructure.ssmParameters = _ssmDatabase.ListParameters();
             }
         }
-        Dto::Module::ExportInfrastructureResponse response{.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
-        return response;
+        return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
     }
 
     void ModuleService::ImportInfrastructure(const std::string &jsonString) {
@@ -226,7 +236,7 @@ namespace AwsMock::Service {
 
         // DynamoDB
         if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-            Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
+            const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
             if (!infrastructure.dynamoDbTables.empty()) {
                 for (auto &table: infrastructure.dynamoDbTables) {
                     _dynamoDatabase.CreateOrUpdateTable(table);
@@ -243,7 +253,7 @@ namespace AwsMock::Service {
 
         // SecretsManager
         if (!infrastructure.secrets.empty()) {
-            Database::SecretsManagerDatabase &_secretsDatabase = Database::SecretsManagerDatabase::instance();
+            const Database::SecretsManagerDatabase &_secretsDatabase = Database::SecretsManagerDatabase::instance();
             for (auto &secret: infrastructure.secrets) {
                 _secretsDatabase.CreateOrUpdateSecret(secret);
             }

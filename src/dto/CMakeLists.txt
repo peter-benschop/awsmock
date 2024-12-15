@@ -92,7 +92,7 @@ set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ss
         src/ssm/GetParameterResponse.cpp src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
         src/ssm/DescribeParametersResponse.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp src/module/ExportInfraStructureRequest.cpp
-        src/module/ExportInfrastructureResponse.cpp src/module/CleanInfraStructureRequest.cpp)
+        src/module/ExportInfrastructureResponse.cpp src/module/CleanInfraStructureRequest.cpp src/module/ListModuleNamesResponse.cpp)
 set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES}
@@ -104,8 +104,7 @@ add_subdirectory(tst)
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 
-add_library(${LIBRARY} SHARED ${SOURCES}
-        include/awsmock/dto/docker/model/Platform.h)
+add_library(${LIBRARY} SHARED ${SOURCES})
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})

@@ -14,7 +14,6 @@ namespace AwsMock::Dto::Module {
             document.append(kvp("onlyObjects", includeObjects));
             document.append(kvp("prettyPrint", prettyPrint));
             document.append(kvp("infrastructure", infrastructure.ToDocument()));
-
             return bsoncxx::to_json(document);
 
         } catch (bsoncxx::exception &exc) {

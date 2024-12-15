@@ -105,7 +105,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static void SetDateValue(document &document, const std::string &name, const system_clock::time_point &value) {
-            document.append(kvp(name, DateTimeUtils::ToISO8601(value)));
+            SetStringValue(document, name, DateTimeUtils::ToISO8601(value));
         }
 
         static std::string GetOidValue(const std::optional<view> &view, const std::string &name) {

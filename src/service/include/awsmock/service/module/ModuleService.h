@@ -15,6 +15,7 @@
 #include <awsmock/dto/module/CleanInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
+#include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
 #include <awsmock/dto/module/model/Module.h>
@@ -48,14 +49,14 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()){};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
          * @brief Return all list of all modules
          *
          * @return list of all modules
          */
-        Database::Entity::Module::ModuleList ListModules();
+        Database::Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Starts a module
@@ -63,7 +64,7 @@ namespace AwsMock::Service {
          * @param modules list of modules
          * @return updated module list
          */
-        Dto::Module::Module::ModuleList StartModules(Dto::Module::Module::ModuleList &modules);
+        Dto::Module::Module::ModuleList StartModules(Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Stops one or several modules
@@ -71,15 +72,22 @@ namespace AwsMock::Service {
          * @param modules module list
          * @return updated module list
          */
-        Dto::Module::Module::ModuleList StopModules(Dto::Module::Module::ModuleList &modules);
+        Dto::Module::Module::ModuleList StopModules(Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Exports the current infrastructure
          *
-         * @param request export infrstructure request
+         * @param request export infrastructure request
          * @return JSON string
          */
         Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request);
+
+        /**
+         * @brief List module names
+         *
+         * @return JSON string
+         */
+        Dto::Module::ListModuleNamesResponse ListModuleNames() const;
 
         /**
          * @brief Import the infrastructure

@@ -15,11 +15,6 @@
 
 namespace AwsMock::Dto::Module {
 
-    using bsoncxx::builder::basic::array;
-    using bsoncxx::builder::basic::document;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::document::value;
-
     /**
      * @brief Export infrastructure request
      *

@@ -72,6 +72,10 @@ namespace AwsMock::Database::Entity::Cognito {
         }
     }
 
+    std::string User::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string User::ToString() const {
         std::stringstream ss;
         ss << *this;

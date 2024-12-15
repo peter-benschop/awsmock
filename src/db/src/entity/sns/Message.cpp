@@ -75,6 +75,10 @@ namespace AwsMock::Database::Entity::SNS {
         }
     }
 
+    std::string Message::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Message::ToString() const {
         std::stringstream ss;
         ss << *this;

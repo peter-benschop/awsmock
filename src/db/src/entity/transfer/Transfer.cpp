@@ -92,6 +92,10 @@ namespace AwsMock::Database::Entity::Transfer {
         }
     }
 
+    std::string Transfer::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Transfer::ToString() const {
         std::stringstream ss;
         ss << *this;

@@ -64,7 +64,7 @@ namespace AwsMock::Controller {
          * @param vm vector of command line options
          * @param commands vector of commands
          */
-        void Initialize(boost::program_options::variables_map vm, const std::vector<std::string> &commands);
+        void Initialize(const boost::program_options::variables_map &vm, const std::vector<std::string> &commands);
 
         /**
          * @brief Main method
@@ -123,7 +123,7 @@ namespace AwsMock::Controller {
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(const Dto::Module::Module::ModuleList &modules, bool pretty = true, bool includeObjects = false) const;
+        void ExportInfrastructure(const std::vector<std::string> &modules, bool pretty = true, bool includeObjects = false) const;
 
         /**
          * @brief Imports the current infrastructure from stdin
@@ -175,6 +175,13 @@ namespace AwsMock::Controller {
          * @return list of all modules.
          */
         Dto::Module::Module::ModuleList GetAllModules() const;
+
+        /**
+         * @brief Get a list of all module names.
+         *
+         * @return list of all module names.
+         */
+        std::vector<std::string> GetAllModuleNames() const;
 
         /**
          * Commands

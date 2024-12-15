@@ -79,6 +79,10 @@ namespace AwsMock::Database::Entity::SecretsManager {
         }
     }
 
+    std::string Secret::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Secret::ToString() const {
         std::stringstream ss;
         ss << *this;

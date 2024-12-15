@@ -169,6 +169,10 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
+    std::string Lambda::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Lambda::ToString() const {
         std::stringstream ss;
         ss << *this;

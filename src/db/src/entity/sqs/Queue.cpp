@@ -60,6 +60,10 @@ namespace AwsMock::Database::Entity::SQS {
         return *this;
     }
 
+    std::string Queue::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Queue::ToString() const {
         std::stringstream ss;
         ss << *this;

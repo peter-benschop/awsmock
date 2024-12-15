@@ -9,14 +9,12 @@ namespace AwsMock::Dto::Module {
     std::string Module::ToJson() const {
 
         try {
+
             document rootDocument;
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "executable", executable);
-            Core::Bson::BsonUtils::SetIntValue(rootDocument, "port", port);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "state", ModuleStateToString(status));
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
-
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (std::exception &exc) {
@@ -29,20 +27,20 @@ namespace AwsMock::Dto::Module {
 
         try {
 
-            array jsonArray;
-            if (moduleList.empty()) {
+            document rootDocument;
+            if (!moduleList.empty()) {
+                array jsonArray;
                 for (const auto &service: moduleList) {
                     document jsonElement;
                     Core::Bson::BsonUtils::SetStringValue(jsonElement, "name", service.name);
-                    Core::Bson::BsonUtils::SetIntValue(jsonElement, "port", service.port);
                     Core::Bson::BsonUtils::SetStringValue(jsonElement, "state", ModuleStateToString(service.state));
                     Core::Bson::BsonUtils::SetDateValue(jsonElement, "created", service.created);
                     Core::Bson::BsonUtils::SetDateValue(jsonElement, "modified", service.modified);
-                    jsonArray.append(jsonElement);
+                    jsonArray.append(jsonElement.extract());
                 }
+                rootDocument.append(kvp("modules", jsonArray));
             }
-
-            return Core::Bson::BsonUtils::ToJsonString(jsonArray);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (std::exception &exc) {
             log_error << exc.what();
@@ -54,8 +52,9 @@ namespace AwsMock::Dto::Module {
 
         try {
 
-            array jsonArray;
-            if (moduleList.empty()) {
+            document rootDocument;
+            if (!moduleList.empty()) {
+                array jsonArray;
                 for (const auto &service: moduleList) {
                     document jsonElement;
                     Core::Bson::BsonUtils::SetStringValue(jsonElement, "name", service.name);
@@ -65,9 +64,10 @@ namespace AwsMock::Dto::Module {
                     Core::Bson::BsonUtils::SetDateValue(jsonElement, "modified", service.modified);
                     jsonArray.append(jsonElement);
                 }
+                rootDocument.append(kvp("modules", jsonArray));
             }
 
-            return Core::Bson::BsonUtils::ToJsonString(jsonArray);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (std::exception &exc) {
             log_error << exc.what();
@@ -122,8 +122,13 @@ namespace AwsMock::Dto::Module {
         std::vector<Module> modules;
 
         try {
-            const value documentValue = bsoncxx::from_json(payload);
-            Core::Bson::FromBsonArray<Module>(documentValue, "modules", &modules);
+            if (const value document = bsoncxx::from_json(payload); document.view().find("modules") != document.view().end()) {
+                for (const auto &m: document.view()["modules"].get_array().value) {
+                    Module module;
+                    module = module.FromDocument(m.get_document().value);
+                    modules.emplace_back(module);
+                }
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
