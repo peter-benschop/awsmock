@@ -58,6 +58,10 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
+    std::string Object::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Object::ToString() const {
         std::stringstream ss;
         ss << *this;

@@ -108,6 +108,13 @@ namespace AwsMock::Database::Entity::Cognito {
         void FromDocument(const std::optional<view> &mResult);
 
         /**
+         * @brief Converts the DTO to a JSON string representation.
+         *
+         * @return DTO as JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
          * @brief Converts the entity to a string representation.
          *
          * @return entity as string for logging.

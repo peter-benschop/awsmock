@@ -358,27 +358,23 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::Module::ModuleList ModuleDatabase::ListModules() {
+    Entity::Module::ModuleList ModuleDatabase::ListModules() const {
 
-        Entity::Module::ModuleList modulesList;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-            auto serviceCursor = _moduleCollection.find({});
-            for (auto service: serviceCursor) {
+
+            Entity::Module::ModuleList modulesList;
+            for (auto serviceCursor = _moduleCollection.find({}); auto service: serviceCursor) {
                 Entity::Module::Module result;
                 result.FromDocument(service);
                 modulesList.push_back(result);
             }
-
-        } else {
-
-            modulesList = _memoryDb.ListModules();
+            log_trace << "Got module list, size:" << modulesList.size();
+            return modulesList;
         }
-
-        log_trace << "Got module list, size:" << modulesList.size();
-        return modulesList;
+        return _memoryDb.ListModules();
     }
 
     void ModuleDatabase::DeleteModule(const Entity::Module::Module &module) {
@@ -386,10 +382,10 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             try {
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
-                auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
+                const auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
                 log_info << "Service deleted, count: " << result->deleted_count();
 
             } catch (mongocxx::exception::system_error &e) {
@@ -407,10 +403,10 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             try {
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
-                auto result = _moduleCollection.delete_many(make_document());
+                const auto result = _moduleCollection.delete_many(make_document());
                 log_info << "All module deleted, count: " << result->deleted_count();
 
             } catch (mongocxx::exception::system_error &e) {

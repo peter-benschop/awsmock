@@ -91,6 +91,10 @@ namespace AwsMock::Database::Entity::KMS {
         }
     }
 
+    std::string Key::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Key::ToString() const {
         std::stringstream ss;
         ss << *this;

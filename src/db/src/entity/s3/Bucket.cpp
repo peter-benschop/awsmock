@@ -54,13 +54,13 @@ namespace AwsMock::Database::Entity::S3 {
 
     bool Bucket::HasQueueNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(queueNotifications, [event](const QueueNotification &notification) {
-                   return std::find(notification.events.begin(), notification.events.end(), event) != notification.events.end();
+                   return std::ranges::find(notification.events, event) != notification.events.end();
                }) != queueNotifications.end();
     }
 
     bool Bucket::HasTopicNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(topicNotifications, [event](const TopicNotification &notification) {
-                   return std::find(notification.events.begin(), notification.events.end(), event) != notification.events.end();
+                   return std::ranges::find(notification.events, event) != notification.events.end();
                }) != topicNotifications.end();
     }
 
@@ -185,6 +185,10 @@ namespace AwsMock::Database::Entity::S3 {
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
+    }
+
+    std::string Bucket::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string Bucket::ToString() const {

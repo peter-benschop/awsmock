@@ -54,6 +54,10 @@ namespace AwsMock::Database::Entity::SSM {
         }
     }
 
+    std::string Parameter::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+    }
+
     std::string Parameter::ToString() const {
         std::stringstream ss;
         ss << *this;
