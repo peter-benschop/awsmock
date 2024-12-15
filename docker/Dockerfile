@@ -26,10 +26,12 @@ RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Make dirctories
 RUN mkdir -p /home/awsmock/data/s3 && \
+    mkdir -p /home/awsmock/data/sqs && \
+    mkdir -p /home/awsmock/data/sns && \
     mkdir -p /home/awsmock/data/lambda && \
     mkdir -p /home/awsmock/data/transfer && \
     mkdir -p /home/awsmock/data/dynamodb && \
-    mkdir -p /home/awsmock/data/tmp
+    mkdir -p /home/awsmock/data/tmp \
 
 # Install Mongo C/C++ driver
 COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/

@@ -7,6 +7,7 @@
 namespace AwsMock::Dto::S3 {
 
     std::string CompleteMultipartUploadResult::ToJson() const {
+
         try {
 
             document document;

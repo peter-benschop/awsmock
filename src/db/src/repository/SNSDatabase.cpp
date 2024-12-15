@@ -81,9 +81,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-            const std::optional<value>
-                    mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
-            if (mResult) {
+            if (const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)))) {
 
                 Entity::SNS::Topic result;
                 result.FromDocument(mResult->view());
@@ -220,7 +218,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
 
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
