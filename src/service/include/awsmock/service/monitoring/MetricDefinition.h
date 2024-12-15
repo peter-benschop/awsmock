@@ -24,12 +24,14 @@
 
 // SNS counter, timer
 #define SNS_TOPIC_COUNT "sns_topic_counter"
+#define SNS_TOPIC_SIZE "sns_topic_size"
 #define SNS_MESSAGE_COUNT "sns_message_counter"
 #define SNS_MESSAGE_BY_TOPIC_COUNT "sns_message_by_topic_counter"
 #define SNS_SERVICE_TIMER "sns_service_timer"
 
 // SQS counter, timer
 #define SQS_QUEUE_COUNT "sqs_queue_counter"
+#define SQS_QUEUE_SIZE "sqs_queue_size"
 #define SQS_MESSAGE_COUNT "sqs_message_counter"
 #define SQS_MESSAGE_BY_QUEUE_COUNT "sqs_message_by_queue_counter"
 #define SQS_SERVICE_TIMER "sqs_service_timer"

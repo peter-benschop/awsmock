@@ -353,16 +353,13 @@ namespace AwsMock::Database {
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
                     return t["totalSize"].get_int64().value;
                 }
+                return 0;
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.GetBucketSize(region, bucket);
         }
-        return 0;
+        return _memoryDb.GetBucketSize(region, bucket);
     }
 
     void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) const {

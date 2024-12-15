@@ -161,6 +161,18 @@ namespace AwsMock::Database {
         log_debug << "Topic purged, count: " << count;
     }
 
+    long SNSMemoryDb::GetTopicSize(const std::string &topicArn) const {
+
+        long sum = 0;
+        std::for_each(_messages.rbegin(), _messages.rend(), [&](const std::pair<std::string, Entity::SNS::Message> &m) {
+            if (m.second.topicArn == topicArn) {
+                sum += m.second.size;
+            }
+        });
+        log_trace << "Sum size, arn: " << topicArn << " sum: " << sum;
+        return sum;
+    }
+
     void SNSMemoryDb::DeleteTopic(const Entity::SNS::Topic &topic) {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 

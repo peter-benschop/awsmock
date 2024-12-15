@@ -154,6 +154,18 @@ namespace AwsMock::Database {
         return count;
     }
 
+    long SQSMemoryDb::GetQueueSize(const std::string &queueArn) const {
+
+        long sum = 0;
+        std::for_each(_messages.rbegin(), _messages.rend(), [&](const std::pair<std::string, Entity::SQS::Message> &m) {
+            if (m.second.queueArn == queueArn) {
+                sum += m.second.size;
+            }
+        });
+        log_trace << "Sum size, arn: " << queueArn << " sum: " << sum;
+        return sum;
+    }
+
     void SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
