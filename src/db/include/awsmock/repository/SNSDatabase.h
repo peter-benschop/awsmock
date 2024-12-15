@@ -184,6 +184,14 @@ namespace AwsMock::Database {
         void PurgeTopic(const Entity::SNS::Topic &topic) const;
 
         /**
+         * @brief Calculates the total size of all messages in the topic
+         *
+         * @param topicArn AWS topic ARN
+         * @return total size of the topic
+         */
+        long GetTopicSize(const std::string &topicArn) const;
+
+        /**
          * @brief Deletes a topic.
          *
          * @param topic topic entity
@@ -295,7 +303,7 @@ namespace AwsMock::Database {
          * @return created or updated SNS message entity
          * @throws DatabaseException
          */
-        Entity::SNS::Message CreateOrUpdateMessage(Entity::SNS::Message &message);
+        Entity::SNS::Message CreateOrUpdateMessage(Entity::SNS::Message &message) const;
 
         /**
          * @brief Deletes a message.

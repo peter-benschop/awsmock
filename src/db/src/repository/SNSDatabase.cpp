@@ -381,6 +381,33 @@ namespace AwsMock::Database {
         }
     }
 
+    long SNSDatabase::GetTopicSize(const std::string &topicArn) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_messageCollectionName];
+
+            try {
+                mongocxx::pipeline p{};
+                p.match(make_document(kvp("topicArn", topicArn)));
+                p.group(make_document(kvp("_id", ""),
+                                      kvp("totalSize",
+                                          make_document(kvp("$sum", "$size")))));
+                p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
+                auto totalSizeCursor = _objectCollection.aggregate(p);
+                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                    return t["totalSize"].get_int64().value;
+                }
+                return 0;
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.GetTopicSize(topicArn);
+    }
+
     void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) const {
 
         if (HasDatabase()) {
@@ -451,11 +478,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.MessageExists(messageId);
         }
+        return _memoryDb.MessageExists(messageId);
     }
 
     Entity::SNS::Message SNSDatabase::CreateMessage(Entity::SNS::Message &message) const {
@@ -481,11 +505,8 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CreateMessage(message);
         }
+        return _memoryDb.CreateMessage(message);
     }
 
     Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) const {
@@ -622,8 +643,8 @@ namespace AwsMock::Database {
 
     Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex) const {
 
-        Entity::SNS::MessageList messageList;
         if (HasDatabase()) {
+            Entity::SNS::MessageList messageList;
 
             auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -648,13 +669,10 @@ namespace AwsMock::Database {
                 result.FromDocument(message);
                 messageList.push_back(result);
             }
-
-        } else {
-
-            messageList = _memoryDb.ListMessages(region, topicArn);
+            log_trace << "Got message list, size: " << messageList.size();
+            return messageList;
         }
-        log_trace << "Got message list, size: " << messageList.size();
-        return messageList;
+        return _memoryDb.ListMessages(region, topicArn);
     }
 
     Entity::SNS::Message SNSDatabase::UpdateMessage(Entity::SNS::Message &message) const {
@@ -688,23 +706,17 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.UpdateMessage(message);
         }
+        return _memoryDb.UpdateMessage(message);
     }
 
-    Entity::SNS::Message SNSDatabase::CreateOrUpdateMessage(Entity::SNS::Message &message) {
+    Entity::SNS::Message SNSDatabase::CreateOrUpdateMessage(Entity::SNS::Message &message) const {
 
         if (MessageExists(message.messageId)) {
 
             return UpdateMessage(message);
-
-        } else {
-
-            return CreateMessage(message);
         }
+        return CreateMessage(message);
     }
 
     void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) const {
@@ -754,7 +766,7 @@ namespace AwsMock::Database {
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
 
-            bsoncxx::builder::basic::array array{};
+            array array{};
             for (const auto &receipt: receipts) {
                 array.append(receipt);
             }

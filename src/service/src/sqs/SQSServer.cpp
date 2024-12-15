@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
     SQSServer::SQSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sqs") {
-        // HTTP manager configuration
+
         _monitoringPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.sqs.monitoring.period");
         _resetPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.sqs.reset.period");
         _counterPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.sqs.counter.period");
@@ -62,8 +62,8 @@ namespace AwsMock::Service {
 
         // Loop over queues and do some maintenance work
         for (auto &queue: queueList) {
-            long messageCount = _sqsDatabase.CountMessages(queue.queueArn);
-            if (messageCount > 0) {
+            if (const long messageCount = _sqsDatabase.CountMessages(queue.queueArn); messageCount > 0) {
+
                 // Check retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
                     queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(
@@ -97,8 +97,8 @@ namespace AwsMock::Service {
         log_trace << "SQS counter update starting";
 
         // Get total counts
-        long queues = _sqsDatabase.CountQueues();
-        long messages = _sqsDatabase.CountMessages();
+        const long queues = _sqsDatabase.CountQueues();
+        const long messages = _sqsDatabase.CountMessages();
         _metricService.SetGauge(SQS_QUEUE_COUNT, static_cast<double>(queues));
         _metricService.SetGauge(SQS_MESSAGE_COUNT, static_cast<double>(messages));
 
@@ -111,6 +111,11 @@ namespace AwsMock::Service {
                                     "queue",
                                     labelValue,
                                     static_cast<double>(messagesPerQueue));
+            const long queueSize = _sqsDatabase.GetQueueSize(queue.queueArn);
+            _metricService.SetGauge(SQS_QUEUE_SIZE,
+                                    "queue",
+                                    labelValue,
+                                    static_cast<double>(queueSize));
         }
         log_trace << "SQS counter update finished";
     }
@@ -118,12 +123,12 @@ namespace AwsMock::Service {
     void SQSServer::CollectWaitingTimeStatistics() const {
         log_trace << "SQS message wait time starting";
 
-        Database::Entity::SQS::MessageWaitTime waitingTime = _sqsDatabase.GetAverageMessageWaitingTime();
-        log_trace << "SQS worker starting, count: " << waitingTime.waitTime.size();
+        auto [waitTime] = _sqsDatabase.GetAverageMessageWaitingTime();
+        log_trace << "SQS worker starting, count: " << waitTime.size();
 
-        if (!waitingTime.waitTime.empty()) {
-            for (auto &w: waitingTime.waitTime) {
-                _metricService.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", w.first, w.second);
+        if (!waitTime.empty()) {
+            for (auto &[fst, snd]: waitTime) {
+                _metricService.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
             }
         }
         log_trace << "SQS wait time update finished";

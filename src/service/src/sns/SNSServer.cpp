@@ -61,6 +61,11 @@ namespace AwsMock::Service {
                                     "topic",
                                     labelValue,
                                     static_cast<double>(topic.topicAttribute.availableMessages));
+            const long topicSize = _snsDatabase.GetTopicSize(topic.topicArn);
+            _metricService.SetGauge(SNS_TOPIC_SIZE,
+                                    "queue",
+                                    labelValue,
+                                    static_cast<double>(topicSize));
         }
         log_trace << "SNS monitoring finished";
     }

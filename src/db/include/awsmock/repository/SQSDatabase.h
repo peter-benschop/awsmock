@@ -194,6 +194,14 @@ namespace AwsMock::Database {
         long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
 
         /**
+         * @brief Calculates the total size of all messages in the queue
+         *
+         * @param queueArn AWS queue ARN
+         * @return total size of the queue
+         */
+        long GetQueueSize(const std::string &queueArn) const;
+
+        /**
          * @brief Deletes a queue.
          *
          * @param queue queue entity
@@ -435,7 +443,7 @@ namespace AwsMock::Database {
         /**
          * Queue collection name
          */
-        std::string _collectionNameQueue;
+        std::string _queueCollectionName;
 
         /**
          * Message collection name
