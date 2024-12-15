@@ -12,6 +12,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
@@ -145,10 +146,9 @@ namespace AwsMock::Service {
          * @param zipFile base64 encoded code from AWS CLI
          * @param lambda lambda entity
          * @param dockerTag docker tag to use
-         * @param dataDir data directory
          * @return base64 string
          */
-        static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir);
+        static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag);
     };
 
 }// namespace AwsMock::Service

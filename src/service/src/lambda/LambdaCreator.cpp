@@ -2,7 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
 namespace AwsMock::Service {
@@ -183,7 +182,7 @@ namespace AwsMock::Service {
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir) {
+    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag) {
 
         std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
