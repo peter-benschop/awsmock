@@ -63,10 +63,11 @@ namespace AwsMock::Service {
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
+        log_debug << "Code directory created, codeDir: " << codeDir;
 
         // Write base64 encoded zip file
-        const std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag, dataDir);
+        const std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag);
+        log_debug << "Create Base64 string, length: " << encodedFile.size();
 
         // Unzip provided zip-file into a temporary directory
         codeDir = UnpackZipFile(codeDir, encodedFile, lambdaEntity.runtime);
@@ -182,14 +183,14 @@ namespace AwsMock::Service {
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir) {
+    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag) {
 
-        std::string s3DataDir = dataDir + Core::FileUtils::separator() + "s3";
-        std::string lambdaDir = dataDir + Core::FileUtils::separator() + "lambda";
+        std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
 
-        std::string base64Path = lambdaDir + Core::FileUtils::separator();
         std::string base64File = lambda.function + "-" + dockerTag + ".zip";
-        std::string base64FullFile = base64Path + base64File;
+        std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
+        log_debug << "Using Base64File: " << base64FullFile;
 
         std::string base64EncodedCodeString = zipFile;
 
