@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
 namespace AwsMock::Service {
@@ -184,12 +185,12 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir) {
 
-        std::string s3DataDir = dataDir + Core::FileUtils::separator() + "s3";
-        std::string lambdaDir = dataDir + Core::FileUtils::separator() + "lambda";
+        std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
 
-        std::string base64Path = lambdaDir + Core::FileUtils::separator();
         std::string base64File = lambda.function + "-" + dockerTag + ".zip";
-        std::string base64FullFile = base64Path + base64File;
+        std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
+        log_debug << "Using Base64File: " << base64FullFile;
 
         std::string base64EncodedCodeString = zipFile;
 
