@@ -22,6 +22,7 @@ namespace AwsMock::Manager {
 
         // Get database variables
         if (const Core::Configuration &configuration = Core::Configuration::instance();
+
             configuration.GetValueBool("awsmock.mongodb.active")) {
             const std::string name = configuration.GetValueString("awsmock.mongodb.name");
             const std::string host = configuration.GetValueString("awsmock.mongodb.host");
@@ -46,6 +47,7 @@ namespace AwsMock::Manager {
             // Create database indexes in a background thread
             boost::thread t{CreateIndexes};
             t.detach();
+
         } else {
             log_info << "In-memory database initialized";
         }
@@ -68,46 +70,60 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::Run() {
-        Core::Configuration &configuration = Core::Configuration::instance();
-        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
-            if (!moduleDatabase.ModuleExists(key)) {
-                Database::Entity::Module::Module m = {
-                        .name = key,
-                        .state = Database::Entity::Module::ModuleState::STOPPED,
-                        .status = Database::Entity::Module::ModuleStatus::ACTIVE};
-                moduleDatabase.CreateModule(m);
-            }
-            if (configuration.GetValueBool("awsmock.modules." + key + ".active")) {
-                moduleDatabase.SetStatus(key, Database::Entity::Module::ModuleStatus::ACTIVE);
-            }
-        }
-        Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules();
+    void Manager::LoadModulesFromConfiguration() {
 
-        // Define thread pool size
-        const int numberOfCores = Core::SystemUtils::GetNumberOfCores();
-        boost::asio::thread_pool pool(numberOfCores);
+        using Database::Entity::Module::ModuleStatus;
+
+        const Core::Configuration &configuration = Core::Configuration::instance();
+        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+
+        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
+            EnsureModuleExisting(key);
+            configuration.GetValueBool("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
+        }
+
+        // Gateway
+        EnsureModuleExisting("gateway");
+        moduleDatabase.SetStatus("gateway", configuration.GetValueBool("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+
+        // Monitoring
+        EnsureModuleExisting("monitoring");
+        moduleDatabase.SetStatus("monitoring", configuration.GetValueBool("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+    }
+
+    void Manager::EnsureModuleExisting(const std::string &key) {
+
+        using Database::Entity::Module::ModuleState;
+        using Database::Entity::Module::ModuleStatus;
+
+        if (!Database::ModuleDatabase::instance().ModuleExists(key)) {
+            Database::Entity::Module::Module m = {.name = key, .state = ModuleState::STOPPED, .status = ModuleStatus::ACTIVE};
+            Database::ModuleDatabase::instance().CreateModule(m);
+        }
+    }
+
+    void Manager::Run() {
+
+        // Load available modules from configuration file
+        LoadModulesFromConfiguration();
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_service ios;
-
-        Core::PeriodicScheduler scheduler(ios);
-        auto monitoringServer =
-                std::make_shared<Service::MonitoringServer>(scheduler);
-
         boost::asio::signal_set signals(ios, SIGINT, SIGTERM);
         signals.async_wait([&](boost::beast::error_code const &, int) {
             // Stop the `io_context`. This will cause `run()` to return immediately,
             // eventually destroying the `io_context` and all the sockets in it.
             log_info << "Manager stopped on signal";
             StopModules();
-            pool.stop();
             ios.stop();
         });
 
+        Core::PeriodicScheduler scheduler(ios);
+        auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
-        for (const auto &module: modules) {
+        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+        for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -133,7 +149,8 @@ namespace AwsMock::Manager {
             }
         }
 
-        for (auto i = 0; i < numberOfCores; i++) {
+        // Start listener threads
+        for (auto i = 0; i < Core::SystemUtils::GetNumberOfCores(); i++) {
             _threadGroup.create_thread([ObjectPtr = &ios] { return ObjectPtr->run(); });
         }
         ios.run();

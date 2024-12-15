@@ -5,9 +5,11 @@
 #include <awsmock/service/s3/S3Server.h>
 
 namespace AwsMock::Service {
+
     S3Server::S3Server(Core::PeriodicScheduler &scheduler) : AbstractServer("s3") {
+
         // Get HTTP configuration values
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.s3.monitoring.period");
         _syncPeriod = configuration.GetValueInt("awsmock.modules.s3.sync.object.period");
         _sizePeriod = configuration.GetValueInt("awsmock.modules.s3.sync.bucket.period");
@@ -31,6 +33,7 @@ namespace AwsMock::Service {
     }
 
     void S3Server::SyncObjects() const {
+
         const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
         const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
 
@@ -46,7 +49,7 @@ namespace AwsMock::Service {
         for (auto &bucket: buckets) {
             // Get objects and delete object, where the file is not existing anymore
             for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object: objects) {
-                if (!Core::FileUtils::FileExists(s3DataDir + object.internalName)) {
+                if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
                     _s3Database.DeleteObject(object);
                     log_debug << "Object deleted, internalName: " << object.internalName;
                     objectsDeleted++;
@@ -54,16 +57,18 @@ namespace AwsMock::Service {
             }
         }
 
+        // Loop over files and check database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
-                if (!_s3Database.ObjectExists(Core::FileUtils::GetBasename(entry.path().string()))) {
+                Core::FileUtils::GetBasename(entry.path().string());
+                if (!_s3Database.ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::DeleteFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
                     filesDeleted++;
                 }
             }
         }
-        log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
+        log_info << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
     }
 
     void S3Server::SyncBuckets() const {

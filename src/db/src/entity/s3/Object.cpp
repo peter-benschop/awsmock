@@ -8,7 +8,7 @@ namespace AwsMock::Database::Entity::S3 {
 
     view_or_value<view, value> Object::ToDocument() const {
 
-        auto metadataDoc = bsoncxx::builder::basic::document{};
+        auto metadataDoc = document{};
         for (const auto &[fst, snd]: metadata) {
             metadataDoc.append(kvp(fst, snd));
         }
@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::S3 {
         return objectDoc;
     }
 
-    void Object::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Object::FromDocument(const std::optional<view> &mResult) {
         oid = Core::Bson::BsonUtils::GetOidValue(mResult.value()["_id"]);
         region = Core::Bson::BsonUtils::GetStringValue(mResult.value()["region"]);
         bucket = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucket"]);

@@ -24,9 +24,6 @@ namespace AwsMock::Dto::SQS {
             // Encoded name
             UpdateLengthAndBytes(context, fst);
 
-            // Encoded data type
-            //UpdateLengthAndBytes(context, Dto::SQS::MessageAttributeDataTypeToString(a.second));
-
             // Encoded value
             if (!snd.empty()) {
                 bytes[0] = 1;
@@ -56,21 +53,20 @@ namespace AwsMock::Dto::SQS {
         auto *bytes = new unsigned char[1];
 
         EVP_DigestInit(context, md);
-        for (const auto &a: attributes) {
-            //if (!a.second.systemAttribute) {
+        for (const auto &[fst, snd]: attributes) {
+
             // Encoded name
-            UpdateLengthAndBytes(context, a.first);
+            UpdateLengthAndBytes(context, fst);
 
             // Encoded data type
-            UpdateLengthAndBytes(context, Dto::SQS::MessageAttributeDataTypeToString(a.second.type));
+            UpdateLengthAndBytes(context, MessageAttributeDataTypeToString(snd.type));
 
             // Encoded value
-            if (!a.second.stringValue.empty()) {
+            if (!snd.stringValue.empty()) {
                 bytes[0] = 1;
                 EVP_DigestUpdate(context, bytes, 1);
-                UpdateLengthAndBytes(context, a.second.stringValue);
+                UpdateLengthAndBytes(context, snd.stringValue);
             }
-            //}
         }
         EVP_DigestFinal(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
@@ -119,7 +115,7 @@ namespace AwsMock::Dto::SQS {
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
             Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
-            Core::Bson::BsonUtils::SetIntValue(document, "NumberValue", numberValue);
+            Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
             Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
             return document.extract();
 

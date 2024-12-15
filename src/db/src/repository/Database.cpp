@@ -24,6 +24,7 @@ namespace AwsMock::Database {
             {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}}},
             // S3 objects
             {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}}},
+            {"s3_object_idx2", {"s3_object", {{"internalName", 1}}}},
             // Modules
             {"module_idx1", {"module", {{"name", 1}, {"state", 1}}}},
             // KMS

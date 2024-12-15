@@ -43,8 +43,8 @@ namespace AwsMock::Dto::S3 {
 
         boost::property_tree::ptree root;
         root.add("InitiateMultipartUploadResult.Bucket", bucket);
-        root.add("CreateBucketResult.Key", key);
-        root.add("CreateBucketResult.UploadId", uploadId);
+        root.add("InitiateMultipartUploadResult.Key", key);
+        root.add("InitiateMultipartUploadResult.UploadId", uploadId);
         return Core::XmlUtils::ToXmlString(root);
     }
 

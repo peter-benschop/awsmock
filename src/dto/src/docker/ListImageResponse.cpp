@@ -9,33 +9,20 @@ namespace AwsMock::Dto::Docker {
     void ListImageResponse::FromJson(const std::string &jsonString) {
 
         try {
+
             const value document = bsoncxx::from_json(jsonString);
-            if (!document.view().empty()) {
-                //array jsonArray = document
+            if (const view jsonArray = document.view(); !jsonArray.empty()) {
+                for (const auto &item: jsonArray) {
+                    Image image;
+                    image.FromDocument(item.get_document().value);
+                    imageList.emplace_back(image);
+                }
             }
-            //            topicArn = Core::Bson::BsonUtils::GetStringValue(document, "topicArn");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-        /*
-        try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
-            Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-            if (rootArray != nullptr) {
-                for (const auto &it: *rootArray) {
-                    Image image;
-                    image.FromJson(it.extract<Poco::JSON::Object::Ptr>());
-                    imageList.push_back(image);
-                }
-            }
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
     }
 
     std::string ListImageResponse::ToJson() const {

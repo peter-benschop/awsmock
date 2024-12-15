@@ -111,11 +111,8 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             return GetQueueById(bsoncxx::oid(oid));
-
-        } else {
-
-            return _memoryDb.GetQueueById(oid);
         }
+        return _memoryDb.GetQueueById(oid);
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) const {
@@ -133,12 +130,8 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
             }
             return result.FromDocument(mResult->view());
-
-
-        } else {
-
-            return _memoryDb.GetQueueByArn(queueArn);
         }
+        return _memoryDb.GetQueueByArn(queueArn);
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &region, const std::string &queueUrl) const {
@@ -148,46 +141,54 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            if (const auto mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("queueUrl", queueUrl))); !mResult) {
-
+            document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!queueUrl.empty()) {
+                query.append(kvp("queueUrl", queueUrl));
+            }
+            if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
                 log_error << "Queue not found, region: " << region << " queueUrl: " << queueUrl;
                 throw Core::DatabaseException("Queue not found, region: " + region + " queueUrl: " + queueUrl);
-
             } else {
                 Entity::SQS::Queue result;
-
                 return result.FromDocument(mResult->view());
             }
-
-        } else {
-
-            return _memoryDb.GetQueueByUrl(queueUrl);
         }
+        return _memoryDb.GetQueueByUrl(queueUrl);
     }
 
-    Entity::SQS::Queue SQSDatabase::GetQueueByName(const std::string &region, const std::string &name) const {
+    Entity::SQS::Queue SQSDatabase::GetQueueByName(const std::string &region, const std::string &queueName) const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = (*client)[_databaseName][_collectionNameQueue];
 
-            if (const std::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("region", region), kvp("name", name))); !mResult) {
-                Entity::SQS::Queue result;
+            document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!queueName.empty()) {
+                query.append(kvp("queueName", queueName));
+            }
 
-                log_info << "GetQueueByName succeeded, region: " << region << " name: " << name;
-                return result.FromDocument(mResult->view());
+            if (const std::optional<value> mResult = _queueCollection.find_one(query.extract()); !mResult) {
+
+                log_warning << "GetQueueByName failed, region: " << region << " name: " << queueName;
+                throw Core::DatabaseException("Queue not found, region: " + region + " name: " + queueName);
 
             } else {
-
-                log_warning << "GetQueueByName failed, region: " << region << " name: " << name;
-                throw Core::DatabaseException("Queue not found, region: " + region + " name: " + name);
+                Entity::SQS::Queue result;
+                log_info << "GetQueueByName succeeded, region: " << region << " name: " << queueName;
+                return result.FromDocument(mResult->view());
             }
 
 
         } else {
 
-            return _memoryDb.GetQueueByName(region, name);
+            return _memoryDb.GetQueueByName(region, queueName);
         }
     }
 
@@ -638,9 +639,9 @@ namespace AwsMock::Database {
 
     void SQSDatabase::ReceiveMessages(const std::string &queueArn, const int visibility, const int maxResult, const std::string &dlQueueArn, const int maxRetries, Entity::SQS::MessageList &messageList) const {
 
-        // First rest resources
-        //const long resetCount = ResetMessages(queueArn, visibility);
-        //log_trace << "Messages reset, count " << resetCount;
+        // First reset resources
+        const long resetCount = ResetMessages(queueArn, visibility);
+        log_trace << "Messages reset, count " << resetCount;
 
         const auto reset = system_clock::now() + std::chrono::seconds(visibility);
 

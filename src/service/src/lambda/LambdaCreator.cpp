@@ -182,13 +182,13 @@ namespace AwsMock::Service {
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag, const std::string &dataDir) {
+    std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag, const std::string &dataDir) {
 
         std::string s3DataDir = dataDir + Core::FileUtils::separator() + "s3";
         std::string lambdaDir = dataDir + Core::FileUtils::separator() + "lambda";
 
         std::string base64Path = lambdaDir + Core::FileUtils::separator();
-        std::string base64File = lambdaEntity.function + "-" + dockerTag + ".zip";
+        std::string base64File = lambda.function + "-" + dockerTag + ".zip";
         std::string base64FullFile = base64Path + base64File;
 
         std::string base64EncodedCodeString = zipFile;
@@ -197,7 +197,7 @@ namespace AwsMock::Service {
         if (zipFile.empty()) {
 
             // Get internal name of S3 object
-            Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambdaEntity.region, lambdaEntity.code.s3Bucket, lambdaEntity.code.s3Key);
+            Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
             std::string s3CodeFile = s3DataDir + Core::FileUtils::separator() + s3Object.internalName;
 
             // Load file
@@ -231,7 +231,7 @@ namespace AwsMock::Service {
             }
         }
 
-        lambdaEntity.code.zipFile = base64File;
+        lambda.code.zipFile = base64File;
         return base64FullFile;
     }
 }// namespace AwsMock::Service

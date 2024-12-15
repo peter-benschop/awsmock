@@ -66,13 +66,8 @@ namespace AwsMock::Core {
         size_t copied = 0;
         for (auto &it: files) {
 
-            std::string inFile = inDir;
-            inFile.append("/");
-            inFile.append(it);
-            const int source = open(inFile.c_str(), O_RDONLY, 0);
-
-            // struct required, rationale: function stat() exists also
-            struct stat stat_source {};
+            const int source = open(it.c_str(), O_RDONLY, 0);
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -87,10 +82,7 @@ namespace AwsMock::Core {
         long copied = 0;
         std::ofstream ofs(outFile, std::ios::out | std::ios::trunc);
         for (auto &it: files) {
-            std::string inFile = inDir;
-            inFile.append("/");
-            inFile.append(it);
-            std::ifstream ifs(inFile, std::ios::in);
+            std::ifstream ifs(it, std::ios::in);
             copied = boost::iostreams::copy(ifs, ofs);
             ofs.flush();
             ifs.close();
@@ -144,7 +136,7 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);// Error check omitted
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;

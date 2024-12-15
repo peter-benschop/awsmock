@@ -150,7 +150,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name);
+        Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Sets the status of an lambda instance

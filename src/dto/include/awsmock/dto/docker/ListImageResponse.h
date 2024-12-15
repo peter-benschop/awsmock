@@ -19,6 +19,24 @@ namespace AwsMock::Dto::Docker {
 
     /**
      * @brief List images response
+     * 
+     * @code{.json}
+     * [
+     *  {
+     *    "Containers" : -1,
+     *    "Created" : 1734203923,
+     *    "Id" : "sha256:cda5cba92d2463d73daaac5451a0e151d06ca8df8853eed5c260d2cb1be77fd4",
+     *    "Labels" : {
+     *      "com.amazonaws.lambda.platform.kernel" : "k510ga"
+     *     },
+     *    "ParentId" : "sha256:97592e3290eeb74fc5106edb4a4d6a2df8b5ef7c1fa5f0caea806fbfbf2ca007",
+     *    "RepoDigests" : [ ],
+     *    "RepoTags" : [ "ftp-file-copy:latest" ],
+     *    "SharedSize" : -1,
+     *    "Size" : 448836289
+     *   }
+     * ]
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */

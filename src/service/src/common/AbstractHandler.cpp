@@ -52,9 +52,8 @@ namespace AwsMock::Service {
         // Body
         if (!body.empty()) {
             ostream(response.body()).write(body.c_str(), body.length());
-            response.set(http::field::content_length, std::to_string(body.length()));
+            response.prepare_payload();
         }
-        response.prepare_payload();
 
         // Send the response to the client
         return response;
@@ -221,4 +220,29 @@ namespace AwsMock::Service {
         }
     }
 
+    http::response<http::dynamic_body> AbstractHandler::SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers) {
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, std::to_string(contentLength));
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
+            }
+        }
+        Core::HttpUtils::DumpHeaders(response);
+
+        // Send the response to the client
+        return response;
+    }
 }// namespace AwsMock::Service

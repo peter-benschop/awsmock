@@ -54,9 +54,9 @@ namespace AwsMock::Dto::Lambda {
 
             // Tags
             if (document.view().find("Tags") != document.view().end()) {
-                for (const bsoncxx::array::view jsonArray = document.view()["Tags"].get_array().value; const auto &tag: jsonArray) {
+                for (const view jsonObject = document.view()["Tags"].get_document().value; const auto &tag: jsonObject) {
                     std::string key = bsoncxx::string::to_string(tag.key());
-                    const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                    const std::string value = bsoncxx::string::to_string(jsonObject[key].get_string().value);
                     tags[key] = value;
                 }
             }

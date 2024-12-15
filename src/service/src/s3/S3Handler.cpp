@@ -104,12 +104,9 @@ namespace AwsMock::Service {
 
                         log_info << "Multi-part download progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
                         return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
-
-                    } else {
-
-                        log_info << "Get object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                        return SendOkResponse(request, s3Response.filename, s3Response.size, headerMap);
                     }
+                    log_info << "Get object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    return SendOkResponse(request, s3Response.filename, s3Response.size, headerMap);
                 }
 
                 case Dto::Common::S3CommandType::GET_OBJECT_RANGE: {
@@ -783,8 +780,7 @@ namespace AwsMock::Service {
             headers["Handler"] = "awsmock";
             headers["Content-Type"] = "application/json";
             headers["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
-            headers["Content-Length"] = std::to_string(s3Response.size);
-            headers["ETag"] = "\"" + s3Response.md5Sum + "\"";
+            headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
             headers["accept-ranges"] = "bytes";
             headers["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
             headers["x-amz-request-userPoolId"] = Core::StringUtils::CreateRandomUuid();
@@ -796,8 +792,7 @@ namespace AwsMock::Service {
             for (const auto &[fst, snd]: s3Response.metadata) {
                 headers["x-amz-meta-" + fst] = snd;
             }
-
-            return SendOkResponse(request, {}, headers);
+            return SendHeadResponse(request, s3Response.size, headers);
 
         } catch (std::exception &exc) {
             log_error << exc.what();
