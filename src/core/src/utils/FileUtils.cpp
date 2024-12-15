@@ -53,6 +53,7 @@ namespace AwsMock::Core {
     }
 
     void FileUtils::CopyTo(const std::string &sourceFileName, const std::string &targetFileName, const bool createDir) {
+
         if (createDir) {
             create_directories(boost::filesystem::path(GetParentPath(targetFileName)));
         }
@@ -138,7 +139,7 @@ namespace AwsMock::Core {
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
         struct stat info{};
-        stat(fileName.c_str(), &info);// Error check omitted
+        stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
         }
@@ -182,8 +183,9 @@ namespace AwsMock::Core {
 
         // Write all lines to temp other than the line marked for erasing
         while (getline(fin, line)) {
-            if (!StringUtils::ContainsIgnoreCase(line, "chunk-signature"))
+            if (!StringUtils::ContainsIgnoreCase(line, "chunk-signature")) {
                 temp << line;
+            }
         }
 
         temp.close();
