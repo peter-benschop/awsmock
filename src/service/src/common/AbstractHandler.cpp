@@ -240,7 +240,6 @@ namespace AwsMock::Service {
                 response.set(fst, snd);
             }
         }
-        Core::HttpUtils::DumpHeaders(response);
 
         // Send the response to the client
         return response;

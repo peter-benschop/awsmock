@@ -1119,7 +1119,7 @@ namespace AwsMock::Service {
 
         // Check notification
         CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-        log_info << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+        log_info << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
 
         return {
                 .bucket = request.bucket,

@@ -1016,28 +1016,25 @@ namespace AwsMock::FtpServer {
 
         const std::string local_path = toLocalPath(path2dst);
         log_debug << "Local path: " << local_path;
-        auto dir_status = FileStatus(local_path);
 
-        if (dir_status.isOk()) {
+        if (const auto dir_status = FileStatus(local_path); dir_status.isOk()) {
             if (dir_status.type() == FileType::Dir) {
                 if (dir_status.canOpenDir()) {
                     sendFtpMessage(FtpReplyCode::FILE_STATUS_OK_OPENING_DATA_CONNECTION, "Sending directory listing");
                     sendDirectoryListing(dirContent(local_path));
-                    return;
+                    log_debug << "Directory listing sent";
                 } else {
+                    log_error << "Permission denied";
                     sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
-                    return;
                 }
             } else {
                 // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
                 log_error << "Not a directory, directory: " << local_path;
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
-                return;
             }
         } else {
             log_error << "Path does not exist, directory: " << local_path;
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path does not exist");
-            return;
         }
     }
 
