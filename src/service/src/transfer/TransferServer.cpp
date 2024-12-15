@@ -70,26 +70,23 @@ namespace AwsMock::Service {
 
         // Update database
         server.state = Database::Entity::Transfer::ServerState::ONLINE;
-
-        log_debug << "Transfer server started, serverId: " << server.serverId;
+        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << " port: " << server.port;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
         // Create transfer manager thread
-        std::shared_ptr<FtpServer::FtpServer> ftpserver = _transferServerList[server.serverId];
-        ftpserver->stop();
+        std::shared_ptr<FtpServer::FtpServer> ftpServer = _transferServerList[server.serverId];
+        ftpServer->stop();
 
         // Update database
         server.state = Database::Entity::Transfer::ServerState::OFFLINE;
-
-        log_debug << "Transfer server " << server.serverId << " stopped ";
+        log_info << "Transfer server " << server.serverId << " stopped, address = " << server.listenAddress << " port: " << server.port;
     }
 
     void TransferServer::StartTransferServers() {
-        log_debug << "Starting transfer servers";
-        std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
+        log_info << "Starting transfer servers, count: " << _transferDatabase.CountServers(_region);
 
-        for (auto &transfer: transfers) {
+        for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region); auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 StartTransferServer(transfer);
             }
@@ -98,9 +95,8 @@ namespace AwsMock::Service {
 
     void TransferServer::CheckTransferServers() {
         log_trace << "Checking transfer servers";
-        std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region);
 
-        for (auto &transfer: transfers) {
+        for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region); auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 if (auto it = _transferServerList.find(transfer.serverId); it == _transferServerList.end()) {
                     StartTransferServer(transfer);

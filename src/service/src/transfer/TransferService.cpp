@@ -36,6 +36,7 @@ namespace AwsMock::Service {
 
         // Create response
         Dto::Transfer::CreateServerResponse response{.region = transferEntity.region, .serverId = serverId, .arn = transferArn};
+        log_error << "Transfer manager created, address: " << listenAddress << " port: " << ftpPort;
 
         return response;
     }
