@@ -69,13 +69,14 @@ namespace AwsMock::Core {
 
         // Transfer server
         DefineBoolProperty("awsmock.modules.transfer.active", "AWSMOCK_MODULES_TRANSFER_ACTIVE", true);
-        DefineIntProperty("awsmock.modules.transfer.ftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 21);
         DefineStringProperty("awsmock.modules.transfer.bucket", "AWSMOCK_MODULES_TRANSFER_BUCKET", "transfer-server");
-        DefineStringProperty("awsmock.modules.transfer.base.dir", "AWSMOCK_MODULES_TRANSFER_BASE_DIR", "/tmp/awsmock/data/transfer");
+        DefineStringProperty("awsmock.modules.transfer.data-dir", "AWSMOCK_MODULES_TRANSFER_DATA_DIR", "/tmp/awsmock/data/transfer");
         DefineIntProperty("awsmock.modules.transfer.monitoring.period", "AWSMOCK_MODULES_TRANSFER_MONITORING_PERIOD", 300);
         DefineIntProperty("awsmock.modules.transfer.worker.period", "AWSMOCK_MODULES_TRANSFER_WORKER_PERIOD", 300);
         DefineIntProperty("awsmock.modules.transfer.ftp.pasv-min", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MIN", 6000);
         DefineIntProperty("awsmock.modules.transfer.ftp.pasv-max", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MAX", 6100);
+        DefineIntProperty("awsmock.modules.transfer.ftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 21);
+        DefineStringProperty("awsmock.modules.transfer.ftp.address", "AWSMOCK_MODULES_TRANSFER_FTP_ADDRESS", "0.0.0.0");
 
         // Cognito
         DefineBoolProperty("awsmock.modules.cognito.active", "AWSMOCK_MODULES_COGNITO_ACTIVE", true);
@@ -117,15 +118,6 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.podman.default.temp-size", "AWSMOCK_PODMAN_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.podman.socket", "AWSMOCK_PODMAN_SOCKET", "/run/podman/podman.sock");
-
-        // FTP server
-        DefineIntProperty("awsmock.modules.ftp.port", "AWSMOCK_MODULES_FTP_ACTIVE", 21);
-        DefineStringProperty("awsmock.modules.ftp.host", "AWSMOCK_MODULES_FTP_HOST", "localhost");
-        DefineIntProperty("awsmock.modules.ftp.max.thread", "AWSMOCK_MODULES_FTP_MAX_THREADS", 4);
-        DefineStringProperty("awsmock.modules.ftp.base.dir", "AWSMOCK_MODULES_FTP_BASE_DIR", "/home/awsmock/data/transfer");
-        DefineIntProperty("awsmock.modules.ftp.pasv.min", "AWSMOCK_MODULES_FTP_PASV_MIN", 6000);
-        DefineIntProperty("awsmock.modules.ftp.pasv.max", "AWSMOCK_MODULES_FTP_PASV_MAX", 6010);
-        DefineStringProperty("awsmock.modules.ftp.address", "AWSMOCK_MODULES_FTP_ADDRESS", "::");
 
         // Monitoring
         DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_MONITORING_PORT", 9091);
