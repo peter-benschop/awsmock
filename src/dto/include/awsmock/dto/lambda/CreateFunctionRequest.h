@@ -144,32 +144,28 @@ namespace AwsMock::Dto::Lambda {
         int timeout = 15 * 60;
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Parse a JSON stream.
-         *
-         * @code{.json}
-         *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
-         * @endcode
+         * @brief Parse a JSON string.
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

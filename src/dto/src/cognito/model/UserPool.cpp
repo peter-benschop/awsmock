@@ -23,13 +23,13 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
-            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
-            Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
-            Core::Bson::BsonUtils::SetDateValue(document, "CreationDate", created);
-            Core::Bson::BsonUtils::SetDateValue(document, "LastModifiedDate", modified);
+            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {
@@ -44,8 +44,8 @@ namespace AwsMock::Dto::Cognito {
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const UserPool &o) {
-        os << "UserPool=" << o.ToJson();
+    std::ostream &operator<<(std::ostream &os, const UserPool &r) {
+        os << "UserPool=" << r.ToJson();
         return os;
     }
 

@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Lambda {
          * Description
          */
         std::string description = {};
-        // TODO: Environment, EpheremalStorage, FileSystemConfig
+        // TODO: Environment, EphemeralStorage, FileSystemConfig
 
         /**
          * Function ARN
@@ -83,7 +83,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Last update state
          */
-        std::string lastUpdateStatus = {};
+        std::string lastUpdateStatus = "Successful";
 
         /**
          * Last update state reason

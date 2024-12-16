@@ -207,7 +207,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+        Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
         /**
          * @brief Creates a new queue

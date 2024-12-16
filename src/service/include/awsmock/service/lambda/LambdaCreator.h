@@ -81,11 +81,11 @@ namespace AwsMock::Service {
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder
          *
-         * @param zipFile Base64 encoded ZIP file
+         * @param functionCode Base64 encoded ZIP file
          * @param lambdaEntity lambda entity
          * @param dockerTag docker tag to use
          */
-        static void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+        static void CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
          * @brief Creates an new docker container, in case the container does not exists inside the docker daemon.
@@ -110,11 +110,11 @@ namespace AwsMock::Service {
          * <p>Needed only when the lambda function is provided as zipped request body.</p>
          *
          * @param codeDir temporary data directory
-         * @param zipFile Base64 encoded zip file.
+         * @param functionCode Base64 encoded zip file.
          * @param runtime AWS lambda runtime name
          * @return code directory
          */
-        static std::string UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime);
+        static std::string UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime);
 
         /**
          * @brief Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.

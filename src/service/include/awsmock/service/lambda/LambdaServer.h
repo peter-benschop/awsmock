@@ -67,6 +67,14 @@ namespace AwsMock::Service {
         void CreateLocalNetwork() const;
 
         /**
+         * @brief Creates the lambda docker/podman containers
+         *
+         * @par
+         * For each lambda function the container will be created, if not existing already
+         */
+        void CreateContainers() const;
+
+        /**
          * @brief Remove expired lambda functions
          *
          * @par
@@ -80,7 +88,7 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
-         * lambda database
+         * Lambda database
          */
         Database::LambdaDatabase &_lambdaDatabase;
 
@@ -88,6 +96,11 @@ namespace AwsMock::Service {
          * Docker module
          */
         ContainerService _dockerService;
+
+        /**
+         * Lambda service module
+         */
+        LambdaService _lambdaService;
 
         /**
          * Metric service

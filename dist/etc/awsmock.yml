@@ -138,6 +138,7 @@ awsmock:
         period: 3600
       ftp:
         port: 21
+        address: 0.0.0.0
         pasv-min: 6000
         pasv-max: 6100
   monitoring:

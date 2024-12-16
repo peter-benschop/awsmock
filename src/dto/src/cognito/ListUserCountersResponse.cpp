@@ -11,6 +11,8 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             document document;
+            Core::Bson::BsonUtils::SetLongValue(document, "total", total);
+
             if (!users.empty()) {
                 array jsonArray;
                 for (const auto &user: users) {

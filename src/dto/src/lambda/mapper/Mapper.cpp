@@ -6,9 +6,9 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    Dto::Lambda::CreateFunctionResponse Mapper::map(const Dto::Lambda::CreateFunctionRequest &request, const Database::Entity::Lambda::Lambda &lambdaEntity) {
+    CreateFunctionResponse Mapper::map(const CreateFunctionRequest &request, const Database::Entity::Lambda::Lambda &lambdaEntity) {
 
-        Dto::Lambda::CreateFunctionResponse response;
+        CreateFunctionResponse response;
         response.region = request.region;
         response.user = request.user;
         response.functionArn = lambdaEntity.arn;
@@ -30,16 +30,16 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
-    Dto::Lambda::CreateFunctionRequest Mapper::map(const Database::Entity::Lambda::Lambda &lambdaEntity) {
+    CreateFunctionRequest Mapper::map(const Database::Entity::Lambda::Lambda &lambdaEntity) {
 
-        Dto::Lambda::CreateFunctionRequest request;
+        CreateFunctionRequest request;
         request.region = lambdaEntity.region;
         request.user = lambdaEntity.user;
         request.functionName = lambdaEntity.function;
         request.runtime = lambdaEntity.runtime;
         request.role = lambdaEntity.role;
         request.handler = lambdaEntity.handler;
-        request.memorySize = request.memorySize;
+        request.memorySize = lambdaEntity.memorySize;
         request.timeout = lambdaEntity.timeout;
 
         // Environment
@@ -57,7 +57,7 @@ namespace AwsMock::Dto::Lambda {
         return request;
     }
 
-    Database::Entity::Lambda::Lambda Mapper::map(const Dto::Lambda::CreateFunctionRequest &request) {
+    Database::Entity::Lambda::Lambda Mapper::map(const CreateFunctionRequest &request) {
         Database::Entity::Lambda::Lambda lambda;
         lambda.region = request.region;
         lambda.user = request.user;
@@ -73,7 +73,7 @@ namespace AwsMock::Dto::Lambda {
         return lambda;
     }
 
-    Database::Entity::Lambda::EventSourceMapping Mapper::map(const Dto::Lambda::CreateEventSourceMappingsRequest &request) {
+    Database::Entity::Lambda::EventSourceMapping Mapper::map(const CreateEventSourceMappingsRequest &request) {
         Database::Entity::Lambda::EventSourceMapping eventSourceMapping;
         eventSourceMapping.eventSourceArn = request.eventSourceArn;
         eventSourceMapping.batchSize = request.batchSize;
@@ -82,10 +82,10 @@ namespace AwsMock::Dto::Lambda {
         return eventSourceMapping;
     }
 
-    Dto::Lambda::ListEventSourceMappingsResponse Mapper::map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings) {
-        Dto::Lambda::ListEventSourceMappingsResponse response;
+    ListEventSourceMappingsResponse Mapper::map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings) {
+        ListEventSourceMappingsResponse response;
         for (auto &eventSourceMapping: eventSourceMappings) {
-            Dto::Lambda::EventSourceMapping eventSourceMappingDto;
+            EventSourceMapping eventSourceMappingDto;
             eventSourceMappingDto.functionArn = functionArn;
             eventSourceMappingDto.eventSourceArn = eventSourceMapping.eventSourceArn;
             eventSourceMappingDto.batchSize = eventSourceMapping.batchSize;
@@ -96,10 +96,10 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
-    Dto::Lambda::ListFunctionCountersResponse Mapper::map(const Dto::Lambda::ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
-        Dto::Lambda::ListFunctionCountersResponse response;
+    ListFunctionCountersResponse Mapper::map(const Dto::Lambda::ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
+        ListFunctionCountersResponse response;
         for (auto &lambdaEntity: lambdaEntities) {
-            Dto::Lambda::FunctionCounter counter;
+            FunctionCounter counter;
             counter.functionName = lambdaEntity.function;
             counter.invocations = lambdaEntity.invocations;
             counter.runtime = lambdaEntity.runtime;

@@ -60,17 +60,17 @@ namespace AwsMock::Service {
         lambdaEntity.containerSize = container.sizeRootFs;
     }
 
-    void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
+    void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
         log_debug << "Code directory created, codeDir: " << codeDir;
 
         // Write base64 encoded zip file
-        const std::string encodedFile = WriteBase64File(zipFile, lambdaEntity, dockerTag);
+        const std::string encodedFile = WriteBase64File(functionCode, lambdaEntity, dockerTag);
         log_debug << "Create Base64 string, length: " << encodedFile.size();
 
         // Unzip provided zip-file into a temporary directory
-        codeDir = UnpackZipFile(codeDir, encodedFile, lambdaEntity.runtime);
+        codeDir = UnpackZipFile(codeDir, functionCode, lambdaEntity.runtime);
         log_debug << "Lambda file unzipped, codeDir: " << codeDir;
 
         // Build the docker image using the docker module
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
 
         // Get the image struct
         const Dto::Docker::Image image = ContainerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
-        lambdaEntity.codeSize = static_cast<long>(zipFile.size());
+        lambdaEntity.codeSize = static_cast<long>(functionCode.size());
         lambdaEntity.imageId = image.id;
         lambdaEntity.imageSize = image.size;
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
@@ -103,23 +103,18 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &zipFile, const std::string &runtime) {
+    std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) {
 
         std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        std::string tempDir = dataDir + Core::FileUtils::separator() + "tmp";
+        std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
 
         // Decode Base64 file
-        std::stringstream stringStream;
-        std::ifstream ifs(zipFile);
-        stringStream << ifs.rdbuf();
-        ifs.close();
-
-        std::string decoded = Core::Crypto::Base64Decode(stringStream.str());
-
+        std::string decoded = Core::Crypto::Base64Decode(functionCode);
+        std::string zipFile = tempDir + "/zipfile.zip";
         try {
 
             // Write to temp file
-            std::ofstream ofs(tempDir + "/zipfile.zip");
+            std::ofstream ofs(zipFile);
             ofs << decoded;
             ofs.close();
 
@@ -130,14 +125,14 @@ namespace AwsMock::Service {
                 std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
                 Core::DirUtils::EnsureDirectory(classesDir);
 
-                // Decompress
-                Core::TarUtils::Unzip(tempDir + "/zipfile.zip", classesDir);
+                // Decompress, the Java JAR file to a classes' directory.
+                Core::TarUtils::Unzip(zipFile, classesDir);
 
             } else {
 
-                // Decompress
-                std::string extractDir = Core::DirUtils::CreateTempDir("/tmp");
-                Core::TarUtils::Unzip(tempDir + "/zipfile.zip", extractDir);
+                // Decompress the Python/C/go code
+                //std::string extractDir = Core::DirUtils::CreateTempDir("/tmp");
+                Core::TarUtils::Unzip(zipFile, codeDir);
             }
             log_debug << "ZIP file unpacked, dir: " << codeDir;
             return codeDir;
@@ -188,14 +183,14 @@ namespace AwsMock::Service {
         std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
 
-        std::string base64File = lambda.function + "-" + dockerTag + ".zip";
+        std::string base64File = lambda.function + "-" + dockerTag + ".b64";
         std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
         log_debug << "Using Base64File: " << base64FullFile;
 
         std::string base64EncodedCodeString = zipFile;
 
         // Write base64 string, either from S3 bucket/key or from supplied string
-        if (zipFile.empty()) {
+        if (zipFile.empty() && !lambda.code.s3Bucket.empty() && !lambda.code.s3Key.empty()) {
 
             // Get internal name of S3 object
             Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);

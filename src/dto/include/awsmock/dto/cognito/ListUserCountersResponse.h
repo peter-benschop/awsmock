@@ -11,8 +11,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/cognito/model/User.h>
 #include <awsmock/dto/common/BaseRequest.h>
-#include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -26,7 +26,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * User entities
          */
-        Database::Entity::Cognito::UserList users;
+        std::vector<User> users;
 
         /**
          * User entities

@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetStringValue(document, "Handler", handler);
             Core::Bson::BsonUtils::SetStringValue(document, "Runtime", runtime);
             Core::Bson::BsonUtils::SetDateValue(document, "LastModified", lastModified);
-            Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatus", lastUpdateStatusReason);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatus", lastUpdateStatus);
             Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatusCode", lastUpdateStatusReasonCode);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
             Core::Bson::BsonUtils::SetStringValue(document, "StateReasonCode", stateReasonCode);

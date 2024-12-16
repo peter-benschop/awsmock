@@ -21,6 +21,7 @@ namespace AwsMock::Dto::Lambda {
             // Code
             rootDocument.append(kvp("Code", code.ToDocument()));
 
+            // Tags
             if (!tags.empty()) {
                 document jsonObject;
                 for (const auto &[fst, snd]: tags) {
@@ -44,7 +45,8 @@ namespace AwsMock::Dto::Lambda {
         root.add("GetFunctionResponse.Configuration.FunctionName", configuration.functionName);
         root.add("GetFunctionResponse.Configuration.FunctionArn", configuration.functionArn);
         root.add("GetFunctionResponse.Configuration.State", configuration.state);
-
+        root.add("GetFunctionResponse.Configuration.LastUpdateStatus", configuration.lastUpdateStatus);
+        log_info << "DEBUG: " << Core::XmlUtils::ToXmlString(root);
         return Core::XmlUtils::ToXmlString(root);
     }
 

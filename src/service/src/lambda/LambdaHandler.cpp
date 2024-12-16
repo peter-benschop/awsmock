@@ -29,7 +29,7 @@ namespace AwsMock::Service {
                     std::map<std::string, std::string> headers;
                     headers["Content-Length"] = std::to_string(lambdaResponse.ToXml().length());
                     headers["Content-Type"] = "application/xml";
-                    return SendOkResponse(request, lambdaResponse.ToXml(), headers);
+                    return SendOkResponse(request, lambdaResponse.ToJson(), headers);
                 }
 
                 case Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS: {
@@ -75,13 +75,10 @@ namespace AwsMock::Service {
                     Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
                     log_trace << "Lambda function region: " << region << " name: " << functionName;
                     return SendOkResponse(request, lambdaResponse.ToJson());
-
-                } else {
-
-                    Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
-                    log_trace << "Lambda function list: " << lambdaResponse.ToJson();
-                    return SendOkResponse(request, lambdaResponse.ToJson());
                 }
+                Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
+                log_trace << "Lambda function list: " << lambdaResponse.ToJson();
+                return SendOkResponse(request, lambdaResponse.ToJson());
             }
             if (action == "tags") {
 
@@ -138,21 +135,18 @@ namespace AwsMock::Service {
                         //  response.set("X-Amz-Log-Result", output);
                     }
                     return SendOkResponse(request);
-
-                } else {
-
-                    Dto::Lambda::CreateFunctionRequest lambdaRequest;
-                    lambdaRequest.FromJson(body);
-                    lambdaRequest.region = region;
-                    lambdaRequest.user = user;
-
-                    Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
-                    log_info << "Lambda function created, name: " << lambdaResponse.functionName;
-
-                    return SendOkResponse(request, lambdaResponse.ToJson());
                 }
+                Dto::Lambda::CreateFunctionRequest lambdaRequest;
+                lambdaRequest.FromJson(body);
+                lambdaRequest.region = region;
+                lambdaRequest.user = user;
 
-            } else if (action == "tags") {
+                Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
+                log_info << "Lambda function created, name: " << lambdaResponse.functionName;
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+            if (action == "tags") {
 
                 std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
@@ -165,8 +159,8 @@ namespace AwsMock::Service {
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
                 return SendNoContentResponse(request);
-
-            } else if (action == "event-source-mappings") {
+            }
+            if (action == "event-source-mappings") {
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
                 Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest;
@@ -178,8 +172,8 @@ namespace AwsMock::Service {
                 log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
-
-            } else if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
+            }
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
 
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
 
@@ -187,8 +181,8 @@ namespace AwsMock::Service {
                 log_trace << "Lambda function counters list,, count: " << lambdaResponse.functionCounters.size();
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
-
-            } else if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
+            }
+            if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::GetFunctionCountersRequest lambdaRequest;
                 lambdaRequest.FromJson(clientCommand.payload);
@@ -197,8 +191,8 @@ namespace AwsMock::Service {
                 log_trace << "Lambda function counters list";
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
-
-            } else if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
+            }
+            if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::ResetFunctionCountersRequest lambdaRequest;
                 lambdaRequest.FromJson(clientCommand.payload);
@@ -207,11 +201,9 @@ namespace AwsMock::Service {
                 log_trace << "Reset function counters list";
 
                 return SendOkResponse(request);
-
-            } else {
-                log_error << "Unknown method";
-                return SendBadRequestError(request, "Unknown method");
             }
+            log_error << "Unknown method";
+            return SendBadRequestError(request, "Unknown method");
 
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
