@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/dto/cognito/model/User.h>
-#include <awsmock/entity/cognito/UserStatus.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -27,7 +26,10 @@ namespace AwsMock::Dto::Cognito {
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "userName", userName);
             Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "userStatus", Database::Entity::Cognito::UserStatusToString(userStatus));
             Core::Bson::BsonUtils::SetBoolValue(document, "enabled", enabled);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {
@@ -36,7 +38,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    void User::FromJsonObject(const view_or_value<view, value> &document) {
+    void User::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 

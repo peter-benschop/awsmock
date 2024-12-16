@@ -6,7 +6,6 @@
 #define AWSMOCK_DTO_COGNITO_USER_H
 
 // C++ includes
-#include <map>
 #include <string>
 
 // AwsMock includes
@@ -14,6 +13,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/Group.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
+#include <awsmock/entity/cognito/UserStatus.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -59,7 +59,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Status
          */
-        //UserStatus userStatus;
+        Database::Entity::Cognito::UserStatus userStatus;
 
         /**
          * Password
@@ -93,14 +93,14 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return DTO as string.
          */
-        std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @param document JSON object.
          */
-        void FromJsonObject(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document);
 
         /**
          * @brief Converts the entity to a string representation.

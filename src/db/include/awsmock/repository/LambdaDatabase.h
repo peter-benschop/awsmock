@@ -177,7 +177,7 @@ namespace AwsMock::Database {
          * @param millis lambda invocation runtime
          * @throws DatabaseException
          */
-        void SetAverageRuntime(const std::string &oid, long millis);
+        void SetAverageRuntime(const std::string &oid, long millis) const;
 
         /**
          * @brief Returns a list of lambda functions.
@@ -213,14 +213,14 @@ namespace AwsMock::Database {
          * @param functionName lambda function name
          * @throws DatabaseException
          */
-        void DeleteLambda(const std::string &functionName);
+        void DeleteLambda(const std::string &functionName) const;
 
         /**
          * @brief Deletes all existing lambda functions
          *
          * @throws DatabaseException
          */
-        void DeleteAllLambdas();
+        void DeleteAllLambdas() const;
 
       private:
 

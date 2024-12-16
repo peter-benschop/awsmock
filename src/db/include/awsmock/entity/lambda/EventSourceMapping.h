@@ -10,19 +10,8 @@
 
 // MongoDB includes
 #include <awsmock/core/BsonUtils.h>
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-
 
 namespace AwsMock::Database::Entity::Lambda {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * @brief Lambda event source mapping
@@ -61,7 +50,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document

@@ -238,7 +238,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * lambda state
          */
-        LambdaState state = LambdaState::Pending;
+        LambdaState state = Pending;
 
         /**
          * State reason
@@ -319,10 +319,10 @@ namespace AwsMock::Database::Entity::Lambda {
         void RemoveInstance(const Instance &instance);
 
         /**
-         * @brief Checks whether a event source with the given ARN exists already.
+         * @brief Checks whether an event source with the given ARN exists already.
          *
          * @param eventSourceArn event source ARN
-         * @return true if a event source with the given ARN exists.
+         * @return true if an event source with the given ARN exists.
          */
         [[nodiscard]] bool HasEventSource(const std::string &eventSourceArn) const;
 

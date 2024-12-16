@@ -903,8 +903,8 @@ namespace AwsMock::Service {
 
                 // Lambda notification
                 SendLambdaInvocationRequest(eventNotification, notification);
-                log_trace << "lambda function invoked, eventNotification: " + eventNotification.ToString();
-                log_debug << "lambda function invoked, lambdaArn:" << notification.lambdaArn;
+                log_trace << "Lambda function invoked, eventNotification: " + eventNotification.ToString();
+                log_debug << "Lambda function invoked, lambdaArn:" << notification.lambdaArn;
             }
         }
     }

@@ -103,8 +103,7 @@ namespace AwsMock::Service {
 
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
 
-
-            const Dto::Lambda::Configuration configuration = {.functionName = lambda.function, .handler = lambda.handler, .runtime = lambda.runtime, .state = LambdaStateToString(lambda.state), .stateReason = lambda.stateReason, .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
+            const Dto::Lambda::Configuration configuration = {.functionName = lambda.function, .handler = lambda.handler, .runtime = lambda.runtime, .lastUpdateStatus = "Successful", .state = LambdaStateToString(lambda.state), .stateReason = lambda.stateReason, .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
             Dto::Lambda::GetFunctionResponse response = {.region = lambda.region, .configuration = configuration, .tags = lambda.tags};
 
             log_info << "Lambda function: " + response.ToJson();
@@ -122,7 +121,7 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
             Dto::Lambda::GetFunctionCountersResponse response;
             response.region = lambda.region;
@@ -336,7 +335,7 @@ namespace AwsMock::Service {
         }
 
         // Get the existing entity
-        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+        const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
         return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
     }

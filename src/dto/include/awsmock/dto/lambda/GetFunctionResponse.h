@@ -185,6 +185,11 @@ namespace AwsMock::Dto::Lambda {
         std::string stateReasonCode;
 
         /**
+         * Last update status
+         */
+        std::string lastUpdateStatus = "Successful";
+
+        /**
          * @brief Creates a JSON string from the object.
          *
          * @return JSON string

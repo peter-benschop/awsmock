@@ -33,10 +33,10 @@ namespace AwsMock::Dto::Lambda {
         try {
             const value document = bsoncxx::from_json(jsonString);
             functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
-            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
-            batchSize = Core::Bson::BsonUtils::GetIntValue(document, "FunctionName");
-            maximumBatchingWindowInSeconds = Core::Bson::BsonUtils::GetIntValue(document, "FunctionName");
-            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "FunctionName");
+            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "EventSourceArn");
+            batchSize = Core::Bson::BsonUtils::GetIntValue(document, "BatchSize");
+            maximumBatchingWindowInSeconds = Core::Bson::BsonUtils::GetIntValue(document, "MaximumBatchingWindowInSeconds");
+            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "Enabled");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

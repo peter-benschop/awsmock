@@ -471,7 +471,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
+    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message");
         log_trace << "Send message request, queueUrl: " << request.queueUrl;
 
@@ -530,9 +530,8 @@ namespace AwsMock::Service {
             // Find Lambdas with this as event source
             const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
             const std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, accountId, queue.name);
-            std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn);
-            if (!lambdas.empty()) {
-                log_info << "Found notification events, count: " << lambdas.size();
+            if (std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
+                log_info << "Found lambda notification events, count: " << lambdas.size();
                 for (const auto &lambda: lambdas) {
                     SendLambdaInvocationRequest(lambda, message, queueArn);
                 }

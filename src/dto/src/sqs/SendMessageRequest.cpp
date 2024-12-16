@@ -10,7 +10,6 @@ namespace AwsMock::Dto::SQS {
 
         try {
             const value document = bsoncxx::from_json(jsonString);
-            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
             queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
             body = Core::Bson::BsonUtils::GetStringValue(document, "MessageBody");
 
