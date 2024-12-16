@@ -15,11 +15,11 @@ if (SYSTEMD)
     # systemd available
     add_definitions(-DHAS_SYSTEMD)
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_program_options boost_thread boost_filesystem boost_url yaml-cpp
-            pthread crypto ssl z archive systemd)
+            pthread crypto ssl z archive systemd magic)
 else ()
     # systemd not available
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_program_options boost_filesystem boost_thread boost_url yaml-cpp
-            pthread crypto ssl z archive)
+            pthread crypto ssl z archive magic)
 endif ()
 
 add_library(${BINARY}_lib STATIC ${SOURCES})
