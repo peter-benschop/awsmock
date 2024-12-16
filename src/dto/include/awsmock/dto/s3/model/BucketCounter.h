@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -33,21 +32,38 @@ namespace AwsMock::Dto::S3 {
         long size;
 
         /**
-         * Convert to a JSON string
+         * Create timestamp
+         */
+        system_clock::time_point created;
+
+        /**
+         * Create timestamp
+         */
+        system_clock::time_point modified;
+
+        /**
+         * @brief Convert to a BSON document
+         *
+         * @return BSON document
+         */
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

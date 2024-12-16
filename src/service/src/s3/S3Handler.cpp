@@ -274,6 +274,7 @@ namespace AwsMock::Service {
 
                     // Get the user metadata
                     std::map<std::string, std::string> metadata = GetMetadata(request);
+                    std::string contentType = Core::HttpUtils::HasHeader(request, "Content-Type") ? std::string(request["Content-Type"]) : Core::FileUtils::GetContentType(clientCommand.key);
 
                     if (clientCommand.copyRequest) {
 
@@ -295,36 +296,33 @@ namespace AwsMock::Service {
 
                         return SendOkResponse(request, s3Response.ToXml());
                         log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-
-                    } else {
-
-                        // Checksum
-                        std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
-                        bool chunckedEncoding = Core::StringUtils::ContainsIgnoreCase(Core::HttpUtils::GetHeaderValue(request, "Content-Encoding"), "aws-chunked");
-
-                        // S3 put object request
-                        Dto::S3::PutObjectRequest putObjectRequest = {
-                                .region = clientCommand.region,
-                                .bucket = clientCommand.bucket,
-                                .key = clientCommand.key,
-                                .owner = clientCommand.user,
-                                .md5Sum = request["Content-MD5"],
-                                .contentType = request["Content-Type"],
-                                .checksumAlgorithm = checksumAlgorithm,
-                                .metadata = metadata};
-
-                        boost::beast::net::streambuf sb;
-                        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
-                        std::istream stream(&sb);
-
-                        log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
-
-                        Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream, chunckedEncoding);
-                        stream.clear();
-
-                        log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
-                        return SendOkResponse(request);
                     }
+                    // Checksum
+                    std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
+                    bool chunckedEncoding = Core::StringUtils::ContainsIgnoreCase(Core::HttpUtils::GetHeaderValue(request, "Content-Encoding"), "aws-chunked");
+
+                    // S3 put object request
+                    Dto::S3::PutObjectRequest putObjectRequest = {
+                            .region = clientCommand.region,
+                            .bucket = clientCommand.bucket,
+                            .key = clientCommand.key,
+                            .owner = clientCommand.user,
+                            .md5Sum = request["Content-MD5"],
+                            .contentType = contentType,
+                            .checksumAlgorithm = checksumAlgorithm,
+                            .metadata = metadata};
+
+                    boost::beast::net::streambuf sb;
+                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+                    std::istream stream(&sb);
+
+                    log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
+
+                    Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream, chunckedEncoding);
+                    stream.clear();
+
+                    log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::S3CommandType::MOVE_OBJECT: {
@@ -560,9 +558,10 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
 
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    std::string contentType = Core::HttpUtils::HasHeader(request, "Content-Type") ? std::string(request["Content-Type"]) : Core::FileUtils::GetContentType(clientCommand.key);
 
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId, .contentType = contentType};
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;

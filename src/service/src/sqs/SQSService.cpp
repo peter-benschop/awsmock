@@ -402,9 +402,9 @@ namespace AwsMock::Service {
             log_trace << "Got message: " << message.ToString();
 
             // Reset all userAttributes
-            Database::Entity::SQS::MessageAttribute messageAttribute = {.attributeName = "VisibilityTimeout", .attributeValue = std::to_string(request.visibilityTimeout), .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER};
+            const Database::Entity::SQS::MessageAttribute messageAttribute = {.attributeName = "VisibilityTimeout", .attributeValue = std::to_string(request.visibilityTimeout), .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER};
             message.messageAttributes.push_back(messageAttribute);
-            message.reset = std::chrono::system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
+            message.reset = system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
@@ -545,7 +545,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) {
+    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message_batch");
         log_trace << "Send message batch request, queueUrl: " << request.queueUrl;
 

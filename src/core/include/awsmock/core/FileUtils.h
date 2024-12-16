@@ -6,6 +6,7 @@
 #define AWS_MOCK_CORE_FILE_UTILS_H
 
 // Standard C includes
+#include <magic.h>
 #include <sys/sendfile.h>
 
 // Standard C++ includes
@@ -23,6 +24,7 @@
 #include <boost/iostreams/copy.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DirUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 
@@ -107,7 +109,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &extension, const std::string &content);
 
         /**
-         * @brief Creates an temporary file containing a numBytes long random string
+         * @brief Creates a temporary file containing a numBytes long random string
          *
          * @param extension file name extension
          * @param numBytes length of the file
@@ -116,7 +118,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &extension, int numBytes);
 
         /**
-         * @brief Creates an temporary file containing a numBytes long random string in the given directory.
+         * @brief Creates a temporary file containing a numBytes long random string in the given directory.
          *
          * @param dirName name of the directory
          * @param extension file name extension
@@ -235,11 +237,29 @@ namespace AwsMock::Core {
         static void StripChunkSignature(const std::string &path);
 
         /**
+         * @brief Get the Mime type using libmagic
+         *
+         * @param path absolute file path
+         * @return content type, as mime type
+         */
+        static std::string GetContentTypeMagic(const std::string &path);
+
+        /**
+         * @brief Get the Mime type by extension
+         *
+         * @param path absolute file path
+         * @return content type, as mime type
+         */
+        static std::string GetContentType(const std::string &path);
+
+        /**
          * @brief File path separator
          *
          * @return file path separator
          */
         static std::string separator();
+
+        const static std::map<std::string, std::string> MimeTypes;
     };
 
     inline std::string FileUtils::separator() {

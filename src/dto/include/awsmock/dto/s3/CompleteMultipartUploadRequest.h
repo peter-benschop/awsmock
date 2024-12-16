@@ -67,6 +67,11 @@ namespace AwsMock::Dto::S3 {
         int partNumber;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string
