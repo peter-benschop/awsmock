@@ -12,7 +12,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/sns/Subscription.h>
 #include <awsmock/entity/sns/TopicAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
@@ -72,6 +71,11 @@ namespace AwsMock::Database::Entity::SNS {
         std::map<std::string, std::string> tags;
 
         /**
+         * Total size of all messages in bytes
+         */
+        long size = 0;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -82,7 +86,7 @@ namespace AwsMock::Database::Entity::SNS {
         system_clock::time_point modified;
 
         /**
-         * Checks whether a subscription with the given protocol/endpoint exists already.
+         * @brief Checks whether a subscription with the given protocol/endpoint exists already.
          *
          * @param subscription name of the event
          * @return true if notification with the given event name exists.
@@ -90,14 +94,14 @@ namespace AwsMock::Database::Entity::SNS {
         bool HasSubscription(const Subscription &subscription);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document view.
          */
@@ -111,14 +115,14 @@ namespace AwsMock::Database::Entity::SNS {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

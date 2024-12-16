@@ -116,7 +116,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListTopicCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const {
+    Dto::SQS::ListQueueCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_queue_counters");
         log_trace << "List all queues counters request";
 
@@ -124,9 +124,10 @@ namespace AwsMock::Service {
 
             Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, request.sortColumns, request.region);
 
-            Dto::SQS::ListTopicCountersResponse listQueueResponse;
+            Dto::SQS::ListQueueCountersResponse listQueueResponse;
             listQueueResponse.total = _sqsDatabase.CountQueues(request.prefix, request.region);
             for (const auto &queue: queueList) {
+                const long size = _sqsDatabase.GetQueueSize(queue.queueArn);
                 Dto::SQS::QueueCounter counter;
                 counter.queueName = queue.name;
                 counter.queueArn = queue.queueArn;
@@ -137,6 +138,7 @@ namespace AwsMock::Service {
                 counter.visibilityTimeout = queue.attributes.visibilityTimeout;
                 counter.maxMessageSize = queue.attributes.maxMessageSize;
                 counter.retentionPeriod = queue.attributes.messageRetentionPeriod;
+                counter.size = size;
                 counter.created = queue.created;
                 counter.modified = queue.modified;
                 listQueueResponse.queueCounters.emplace_back(counter);

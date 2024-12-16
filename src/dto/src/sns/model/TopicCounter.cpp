@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/11/2023.
 //
 
-#include "awsmock/dto/sns/model/TopicCounter.h"
+#include <awsmock/dto/sns/model/TopicCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -29,6 +29,7 @@ namespace AwsMock::Dto::SNS {
             Core::Bson::BsonUtils::SetLongValue(document, "retentionPeriod", retentionPeriod);
             Core::Bson::BsonUtils::SetLongValue(document, "maxMessageSize", maxMessageSize);
             Core::Bson::BsonUtils::SetLongValue(document, "availableMessages", availableMessages);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
             Core::Bson::BsonUtils::SetDateValue(document, "created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
             return document.extract();

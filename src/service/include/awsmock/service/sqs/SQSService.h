@@ -78,7 +78,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Creates a new queue.
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        Dto::SQS::ListTopicCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
+        Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags

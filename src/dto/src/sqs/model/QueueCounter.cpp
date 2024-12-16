@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/11/2023.
 //
 
-#include "awsmock/dto/sqs/model/QueueCounter.h"
+#include <awsmock/dto/sqs/model/QueueCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -33,6 +33,7 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetIntValue(document, "delay", delay);
             Core::Bson::BsonUtils::SetLongValue(document, "retentionPeriod", retentionPeriod);
             Core::Bson::BsonUtils::SetLongValue(document, "maxMessageSize", maxMessageSize);
+            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
             Core::Bson::BsonUtils::SetDateValue(document, "created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
             return document.extract();

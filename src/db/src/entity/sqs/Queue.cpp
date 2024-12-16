@@ -23,6 +23,7 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("queueArn", queueArn),
                 kvp("attributes", attributes.ToDocument()),
                 kvp("tags", tagsDoc),
+                kvp("size", size),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -39,6 +40,7 @@ namespace AwsMock::Database::Entity::SQS {
             queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
             queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
+            size = mResult.value()["size"].get_int64().value;
             created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
             modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
 

@@ -40,6 +40,7 @@ namespace AwsMock::Service {
     void SNSServer::SynchronizeCounters() const {
         for (auto &topic: _snsDatabase.ListTopics()) {
             topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
+            topic.size = _snsDatabase.GetTopicSize(topic.topicArn);
             _snsDatabase.UpdateTopic(topic);
         }
     }
