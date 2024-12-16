@@ -281,6 +281,8 @@ namespace AwsMock::Service {
                 bucketCounter.bucketName = bucket.name;
                 bucketCounter.keys = bucket.keys;
                 bucketCounter.size = bucket.size;
+                bucketCounter.created = bucket.created;
+                bucketCounter.modified = bucket.modified;
                 listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
             }
             log_debug << "Count all buckets, size: " << bucketList.size();
@@ -442,6 +444,7 @@ namespace AwsMock::Service {
             object.size = fileSize;
             object.md5sum = md5sum;
             object.internalName = filename;
+            object.contentType = request.contentType;
             object = _database.UpdateObject(object);
 
             // Calculate the hashes asynchronously
@@ -968,6 +971,8 @@ namespace AwsMock::Service {
                 objectCounter.key = object.key;
                 objectCounter.size = object.size;
                 objectCounter.contentType = object.contentType;
+                objectCounter.created = object.created;
+                objectCounter.modified = object.modified;
                 listAllObjectResponse.objectCounters.emplace_back(objectCounter);
             }
             log_debug << "Count all objects, size: " << objectList.size();

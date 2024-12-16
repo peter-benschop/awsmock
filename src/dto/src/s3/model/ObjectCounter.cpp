@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-    std::string ObjectCounter::ToJson() const {
+    view_or_value<view, value> ObjectCounter::ToDocument() const {
 
         try {
 
@@ -16,7 +16,21 @@ namespace AwsMock::Dto::S3 {
             Core::Bson::BsonUtils::SetStringValue(document, "key", key);
             Core::Bson::BsonUtils::SetLongValue(document, "size", size);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
-            return Core::Bson::BsonUtils::ToJsonString(document);
+            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+            return document.extract();
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    std::string ObjectCounter::ToJson() const {
+
+        try {
+
+            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

@@ -216,7 +216,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request);
+        Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
 
         /**
          * @brief Receive a list of resources

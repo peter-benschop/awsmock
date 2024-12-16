@@ -14,14 +14,8 @@ namespace AwsMock::Dto::S3 {
             if (!objectCounters.empty()) {
 
                 array jsonObjectArray;
-                for (const auto &[oid, bucketName, key, contentType, size]: objectCounters) {
-                    document jsonObject;
-                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "oid", oid);
-                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucketName", bucketName);
-                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
-                    Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
-                    Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
-                    jsonObjectArray.append(jsonObject);
+                for (const auto &objectCounter: objectCounters) {
+                    jsonObjectArray.append(objectCounter.ToDocument());
                 }
                 rootDocument.append(kvp("objectCounters", jsonObjectArray));
             }

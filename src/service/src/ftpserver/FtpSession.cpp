@@ -1478,16 +1478,21 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::SendCreateObjectRequest(const std::string &user, const std::string &fileName) const {
+
         std::string key = GetKey(fileName);
         std::map<std::string, std::string> metadata;
         metadata["user-agent"] = _serverName;
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
+
+        // Get content type
+        std::string contentType = Core::FileUtils::GetContentType(fileName);
 
         Dto::S3::PutObjectRequest request = {
                 .region = _region,
                 .bucket = _bucket,
                 .key = key,
                 .owner = user,
+                .contentType = contentType,
                 .metadata = metadata};
 
         std::ifstream ifs(fileName, std::ios::binary);

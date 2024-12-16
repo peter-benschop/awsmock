@@ -1,7 +1,46 @@
-#include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
+#include <boost/filesystem/convenience.hpp>
 
 namespace AwsMock::Core {
+
+    const std::map<std::string, std::string> FileUtils::MimeTypes = {
+            {".aac", "audio/aac"},
+            {".abw", "application/x-abiword"},
+            {".apng", "application/apng"},
+            // TODO: Some are missing: https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types/Common_types
+            {".bin", "application/octet-stream"},
+            {".bmp", "application/bmp"},
+            {".bz", "application/x-bzip"},
+            {".bz2", "application/x-bzip"},
+            {".css", "text/css"},
+            {".csv", "text/csv"},
+            {".doc", "application/ms-word"},
+            {".gz", "application/gzip"},
+            {".gif", "image/gif"},
+            {".htm", "test/html"},
+            {".html", "test/html"},
+            {".jar", "application/java-archive"},
+            {".jpg", "image/jpeg"},
+            {".jpeg", "image/jpeg"},
+            {".js", "application/javascript"},
+            {".json", "application/json"},
+            {".mp3", "audio/mpeg"},
+            {".mp4", "video/mp4"},
+            {".mpeg", "video/mpeg"},
+            {".png", "image/png"},
+            {".ppt", "application/vnd.ms-powerpoint"},
+            {".sh", "application/x-sh"},
+            {".svg", "image/svg+xml"},
+            {".tar", "application/x-tar"},
+            {".tif", "image/tiff"},
+            {".tiff", "image/tiff"},
+            {".webp", "image/webp"},
+            {".xhtml", "application/xhtml+xml"},
+            {".xls", "application/vnd.ms-excel"},
+            {".xml", "application/xml"},
+            {".zip", "application/zip"},
+            {".7z", "application/x-7z-compressed"},
+    };
 
     std::string FileUtils::GetBasename(const std::string &fileName) {
         const std::filesystem::path path(fileName);
@@ -68,7 +107,7 @@ namespace AwsMock::Core {
         for (auto &it: files) {
 
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -138,7 +177,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -167,6 +206,52 @@ namespace AwsMock::Core {
         }
         close(fd);
         return true;
+    }
+
+    std::string FileUtils::GetContentType(const std::string &path) {
+        if (const std::string extension = boost::filesystem::path(path).extension().string(); MimeTypes.contains(extension)) {
+            return MimeTypes.at(extension);
+        }
+        return GetContentTypeMagic(path);
+    }
+
+
+    std::string FileUtils::GetContentTypeMagic(const std::string &path) {
+
+        if (!FileExists(path)) {
+            return "application/octet-stream";
+        }
+
+        // allocate magic cookie
+        const magic_t magic = magic_open(MAGIC_MIME_TYPE);
+        if (magic == nullptr) {
+            log_error << "Could not open libmagic";
+        }
+
+        // load the default magic database (indicated by nullptr)
+        if (magic_load(magic, nullptr) != 0) {
+            log_error << "Could not load libmagic";
+        }
+
+        // compile the default magic database (indicated by nullptr)
+        if (magic_compile(magic, nullptr) != 0) {
+            log_error << "Could not compile libmagic";
+        }
+
+        // get description of the filename argument
+        const char *mime = magic_file(magic, path.c_str());
+        if (mime == nullptr) {
+            log_error << "Could not get mime type";
+            mime = "application/octet-stream";
+        } else {
+            log_debug << "Found content-type: " << mime;
+        }
+        std::string result = {mime};
+
+        // Free magic cookie and mime
+        magic_close(magic);
+
+        return result;
     }
 
     void FileUtils::StripChunkSignature(const std::string &path) {
