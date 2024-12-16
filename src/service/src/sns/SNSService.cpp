@@ -72,6 +72,7 @@ namespace AwsMock::Service {
                 counter.topicArn = topic.topicArn;
                 counter.topicUrl = topic.topicUrl;
                 counter.availableMessages = topic.topicAttribute.availableMessages;
+                counter.size = topic.size;
                 counter.created = topic.created;
                 counter.modified = topic.modified;
                 listTopicResponse.topicCounters.emplace_back(counter);

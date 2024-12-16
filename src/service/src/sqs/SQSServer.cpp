@@ -62,6 +62,7 @@ namespace AwsMock::Service {
 
         // Loop over queues and do some maintenance work
         for (auto &queue: queueList) {
+
             if (const long messageCount = _sqsDatabase.CountMessages(queue.queueArn); messageCount > 0) {
 
                 // Check retention period

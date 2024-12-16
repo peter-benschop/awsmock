@@ -15,7 +15,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListTopicCountersResponse {
+    struct ListQueueCountersResponse {
 
         /**
          * List of queues ARNs
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListQueueCountersResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS

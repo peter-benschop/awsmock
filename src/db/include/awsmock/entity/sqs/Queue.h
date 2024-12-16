@@ -85,17 +85,22 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Pagination score
          */
-        double score;
+        double score = 0.0;
 
         /**
-         * Converts the entity to a MongoDB document
+         * Queue size in bytes
+         */
+        long size = 0;
+
+        /**
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
@@ -109,14 +114,14 @@ namespace AwsMock::Database::Entity::SQS {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

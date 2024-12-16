@@ -303,11 +303,14 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
             auto session = client->start_session();
 
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
             try {
 
                 session.start_transaction();
                 queue.modified = system_clock::now();
-                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("region", queue.region), kvp("name", queue.name)), queue.ToDocument());
+                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Queue updated: " << queue.ToString();
 

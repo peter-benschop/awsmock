@@ -12,11 +12,11 @@ namespace AwsMock::Dto::SNS {
 
             document document;
             if (!topicCounters.empty()) {
-                array queueCounterArrayJson;
+                array topicCounterArrayJson;
                 for (const auto &topicCounter: topicCounters) {
-                    queueCounterArrayJson.append(topicCounter.ToDocument());
+                    topicCounterArrayJson.append(topicCounter.ToDocument());
                 }
-                document.append(kvp("TopicCounters", queueCounterArrayJson));
+                document.append(kvp("TopicCounters", topicCounterArrayJson));
             }
             document.append(kvp("Total", total));
 
