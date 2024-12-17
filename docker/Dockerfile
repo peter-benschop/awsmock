@@ -11,6 +11,15 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cmake --build . --config Release -j 16 && \
     cmake --install .
 
+# Install aws-mock-ui
+WORKDIR /usr/src
+RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
+    cd /usr/src/awsmock-ui && \
+    npm install -g @angular/cli && \
+    npm install && \
+    npm run build --prod && \
+    cp -R dist/awsmock-ui/browser/ /tmp/frontend
+
 # Cleanup
 RUN rm -rf /usr/src
 
@@ -31,7 +40,8 @@ RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/data/lambda && \
     mkdir -p /home/awsmock/data/transfer && \
     mkdir -p /home/awsmock/data/dynamodb && \
-    mkdir -p /home/awsmock/data/tmp
+    mkdir -p /home/awsmock/data/tmp && \
+    mkdir -p /home/awsmock/frontend
 
 # Install Mongo C/C++ driver
 COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
@@ -53,6 +63,10 @@ COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
 COPY --from=build /etc/awsmock.yml /etc/
 COPY --from=build /usr/local/bin/awslocal /usr/bin/
+COPY --from=build /tmp/frontend/* /home/awsmock/frontend
+
+# Install frontend
+COPY frontend/* /home/awsmock/frontend/
 
 # Configure awslocal
 RUN aws configure set aws_access_key_id none && \
