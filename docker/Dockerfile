@@ -31,7 +31,8 @@ RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/data/lambda && \
     mkdir -p /home/awsmock/data/transfer && \
     mkdir -p /home/awsmock/data/dynamodb && \
-    mkdir -p /home/awsmock/data/tmp
+    mkdir -p /home/awsmock/data/tmp && \
+    mkdir -p /home/awsmock/frontend
 
 # Install Mongo C/C++ driver
 COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
@@ -53,6 +54,9 @@ COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
 COPY --from=build /etc/awsmock.yml /etc/
 COPY --from=build /usr/local/bin/awslocal /usr/bin/
+
+# Install frontend
+COPY frontend/* /home/awsmock/frontend/
 
 # Configure awslocal
 RUN aws configure set aws_access_key_id none && \

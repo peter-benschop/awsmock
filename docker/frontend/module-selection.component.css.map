@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/infrastructure/selection/module-selection.component.scss"],
+  "sourcesContent": [".container {\n  display: grid;\n  grid-template-columns: repeat(2, 3fr);\n  gap: 1rem;\n  width: 30ch;\n}\n\n.item {\n  padding: 1rem;\n  //box-sizing: border-box;\n  //border: 1px solid black;\n}"],
+  "mappings": ";AAAA,CAAA;AACE,WAAA;AACA,yBAAA,OAAA,CAAA,EAAA;AACA,OAAA;AACA,SAAA;;AAGF,CAAA;AACE,WAAA;;",
+  "names": []
+}

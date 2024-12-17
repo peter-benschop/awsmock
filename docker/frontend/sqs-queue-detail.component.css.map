@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/sqs/queue-detail/sqs-queue-detail.component.scss"],
+  "sourcesContent": [".head-buttons {\n  display: flex;\n  flex-direction: row;\n  align-items: end;\n  box-sizing: border-box;\n  min-height: 52px;\n  padding: 8px;\n  justify-content: flex-end;\n}\n\n.fill-remaining-space {\n  flex: 1 1 auto;\n}\n\n.footer {\n  display: flex;\n  width: 50%;\n  font-size: x-small;\n  color: black;\n  padding-left: 15px;\n}"],
+  "mappings": ";AAAA,CAAA;AACE,WAAA;AACA,kBAAA;AACA,eAAA;AACA,cAAA;AACA,cAAA;AACA,WAAA;AACA,mBAAA;;AAGF,CAAA;AACE,QAAA,EAAA,EAAA;;AAGF,CAAA;AACE,WAAA;AACA,SAAA;AACA,aAAA;AACA,SAAA;AACA,gBAAA;;",
+  "names": []
+}

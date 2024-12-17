@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/cognito/user-list/user-list.component.scss"],
+  "sourcesContent": [".fill-remaining-space {\n  flex: 1 1 auto;\n}\n\n.table-container {\n  max-height: calc(100vh - 10px); // or height:calc(100vh - 155px); depending on your need  change\n  max-width: calc(100vw - 15px); // or height:calc(100vh - 155px); depending on your need  change\n  overflow: hidden;\n}\n\n.footer {\n  display: flex;\n  width: 50%;\n  font-size: x-small;\n  color: black;\n  padding-top: 15px;\n  padding-left: 15px;\n}\n"],
+  "mappings": ";AAAA,CAAA;AACE,QAAA,EAAA,EAAA;;AAGF,CAAA;AACE,cAAA,KAAA,MAAA,EAAA;AACA,aAAA,KAAA,MAAA,EAAA;AACA,YAAA;;AAGF,CAAA;AACE,WAAA;AACA,SAAA;AACA,aAAA;AACA,SAAA;AACA,eAAA;AACA,gBAAA;;",
+  "names": []
+}

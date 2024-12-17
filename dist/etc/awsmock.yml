@@ -23,7 +23,7 @@ awsmock:
     port: 4567
     workers: 20
     timeout: 900
-    doc-root: /var/www/html/awsmockui
+    doc-root: /home/awsmock/frontend
   docker:
     active: true
     network-mode: local

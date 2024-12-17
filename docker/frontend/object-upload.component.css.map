@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/modules/s3/object-upload/object-upload.component.scss"],
+  "sourcesContent": ["\n.footer-buttons {\n  display: flex;\n  flex-direction: row;\n  align-items: end;\n  box-sizing: border-box;\n  min-height: 52px;\n  padding: 8px;\n  width: 50%;\n  justify-content: flex-end;\n}\n\n.footer {\n  display: flex;\n  width: 50%;\n  font-size: x-small;\n  color: black;\n}\n\n.file-upload-wrapper {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  flex-direction: column;\n  border: 2px dashed #ccc;\n  padding: 1rem;\n  margin-bottom: 1rem;\n  border-radius: 10px;\n  cursor: pointer;\n}\n\n.file-upload-wrapper.success {\n  border-color: green;\n}\n\n.file-upload-wrapper.error {\n  border-color: red;\n}\n\n.file-dropper {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n}\n"],
+  "mappings": ";AACA,CAAA;AACE,WAAA;AACA,kBAAA;AACA,eAAA;AACA,cAAA;AACA,cAAA;AACA,WAAA;AACA,SAAA;AACA,mBAAA;;AAGF,CAAA;AACE,WAAA;AACA,SAAA;AACA,aAAA;AACA,SAAA;;AAGF,CAAA;AACE,WAAA;AACA,mBAAA;AACA,eAAA;AACA,kBAAA;AACA,UAAA,IAAA,OAAA;AACA,WAAA;AACA,iBAAA;AACA,iBAAA;AACA,UAAA;;AAGF,CAZA,mBAYA,CAAA;AACE,gBAAA;;AAGF,CAhBA,mBAgBA,CAAA;AACE,gBAAA;;AAGF,CAAA;AACE,WAAA;AACA,kBAAA;AACA,eAAA;;",
+  "names": []
+}
