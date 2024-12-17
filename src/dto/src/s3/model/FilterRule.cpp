@@ -21,10 +21,6 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string FilterRule::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
     void FilterRule::FromDocument(const view_or_value<view, value> &document) {
 
         try {
@@ -36,6 +32,21 @@ namespace AwsMock::Dto::S3 {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
+    }
+
+    void FilterRule::FromXml(const boost::property_tree::ptree &pt) {
+        Core::XmlUtils::PrintTree(pt, 0);
+
+        if (pt.get_optional<std::string>("Name")) {
+            name = NameTypeFromString(pt.get<std::string>("Name"));
+        }
+        if (pt.get_optional<std::string>("Value")) {
+            filterValue = pt.get<std::string>("Value");
+        }
+    }
+
+    std::string FilterRule::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string FilterRule::ToString() const {

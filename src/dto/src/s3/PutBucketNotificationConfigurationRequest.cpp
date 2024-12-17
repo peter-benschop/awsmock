@@ -9,38 +9,33 @@ namespace AwsMock::Dto::S3 {
     void PutBucketNotificationConfigurationRequest::FromXml(const std::string &xmlString) {
 
         try {
-            log_debug << "FromXML: " << xmlString;
+
             boost::property_tree::ptree pt;
-            read_xml(xmlString, pt);
+            Core::XmlUtils::ReadXml(xmlString, &pt);
 
-            for (const auto &notification: pt.get_child("NotificationConfiguration.QueueConfiguration")) {
+            boost::property_tree::ptree notificationTree = pt.get_child("NotificationConfiguration");
+
+            // SQS queues
+            if (notificationTree.find("NotificationConfiguration.QueueConfiguration") != notificationTree.not_found()) {
+                QueueConfiguration queueConfiguration;
+                queueConfiguration.FromXml(notificationTree.get_child("QueueConfiguration"));
+                queueConfigurations.emplace_back(queueConfiguration);
             }
-            /*
-            Poco::XML::DOMParser parser;
-            Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
 
-            Poco::XML::Node *rootNode = pDoc->getNodeByPath("/NotificationConfiguration");
-            if (rootNode) {
-                Poco::XML::NodeList *childNodes = rootNode->childNodes();
-                if (childNodes) {
-                    for (int i = 0; i < childNodes->length(); i++) {
-                        Poco::XML::Node *childNode = childNodes->item(i);
-                        if (childNode->nodeName() == "QueueConfiguration") {
-                            QueueConfiguration queueConfiguration;
-                            queueConfiguration.FromXmlNode(childNode);
-                            queueConfigurations.emplace_back(queueConfiguration);
-                        } else if (childNode->nodeName() == "TopicConfiguration") {
-                            TopicConfiguration topicConfiguration;
-                            topicConfiguration.FromXmlNode(childNode);
-                            topicConfigurations.emplace_back(topicConfiguration);
-                        } else if (childNode->nodeName() == "CloudFunctionConfiguration") {
-                            LambdaConfiguration lambdaConfiguration;
-                            lambdaConfiguration.FromXmlNode(childNode);
-                            lambdaConfigurations.emplace_back(lambdaConfiguration);
-                        }
-                    }
-                }
-            }*/
+            // SNS topics
+            if (notificationTree.find("NotificationConfiguration.TopicConfiguration") != notificationTree.not_found()) {
+                TopicConfiguration topicConfiguration;
+                topicConfiguration.FromXml(pt.get_child("TopicConfiguration"));
+                topicConfigurations.emplace_back(topicConfiguration);
+            }
+
+            // Lambdas
+            if (notificationTree.find("CloudFunctionConfiguration") != notificationTree.not_found()) {
+                LambdaConfiguration lambdaConfiguration;
+                lambdaConfiguration.FromXml(notificationTree.get_child("CloudFunctionConfiguration"));
+                lambdaConfigurations.emplace_back(lambdaConfiguration);
+            }
+
         } catch (std::exception &e) {
             log_error << e.what();
             throw Core::JsonException(e.what());
@@ -48,7 +43,43 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::string PutBucketNotificationConfigurationRequest::ToJson() const {
-        return {};
+
+        try {
+
+            document rootDocument;
+
+            // SQS queues
+            if (!queueConfigurations.empty()) {
+                array queueConfigurationsArray;
+                for (const auto &queueConfiguration: queueConfigurations) {
+                    queueConfigurationsArray.append(queueConfiguration.ToDocument());
+                }
+                rootDocument.append(kvp("QueueConfiguration", queueConfigurationsArray));
+            }
+
+            // SQS topics
+            if (!topicConfigurations.empty()) {
+                array topicConfigurationsArray;
+                for (const auto &topicConfiguration: topicConfigurations) {
+                    topicConfigurationsArray.append(topicConfiguration.ToDocument());
+                }
+                rootDocument.append(kvp("TopicConfiguration", topicConfigurationsArray));
+            }
+
+            // Lambdas
+            if (!lambdaConfigurations.empty()) {
+                array lambdaConfigurationsArray;
+                for (const auto &lambdaConfiguration: lambdaConfigurations) {
+                    lambdaConfigurationsArray.append(lambdaConfiguration.ToDocument());
+                }
+                rootDocument.append(kvp("CloudFunctionConfiguration", lambdaConfigurationsArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string PutBucketNotificationConfigurationRequest::ToString() const {

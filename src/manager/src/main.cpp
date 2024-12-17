@@ -32,6 +32,7 @@
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/server/Manager.h>
+#include <awsmock/service/frontend/HttpServer.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.yml"
 
@@ -99,6 +100,11 @@ int main(int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.filename", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }
+
+    // Start HTTP frontend server
+    AwsMock::Service::Frontend::HttpServer server;
+    boost::thread t{boost::ref(server)};
+    t.detach();
 
     // Start manager
     AwsMock::Manager::Manager awsMockManager;

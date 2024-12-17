@@ -11,9 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/s3/model/FilterRule.h>
 #include <awsmock/dto/s3/model/NotificationEvent.h>
 
@@ -83,6 +81,13 @@ namespace AwsMock::Dto::S3 {
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @brief Convert from an XML string
+         *
+         * @return XML string
+         */
+        void FromXml(const boost::property_tree::ptree &pt);
 
         /**
          * @brief Convert to a JSON string

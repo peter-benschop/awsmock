@@ -86,6 +86,13 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
+         * @brief Convert from an XML string
+         *
+         * @return XML string
+         */
+        void FromXml(const boost::property_tree::ptree &pt);
+
+        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string

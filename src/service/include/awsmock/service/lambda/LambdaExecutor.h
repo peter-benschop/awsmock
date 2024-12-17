@@ -41,7 +41,6 @@ namespace AwsMock::Service {
          */
         explicit LambdaExecutor() = default;
 
-
         /**
          * @brief Executes a lambda function
          *

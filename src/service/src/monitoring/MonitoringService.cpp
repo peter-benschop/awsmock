@@ -9,8 +9,8 @@ namespace AwsMock::Service {
     Dto::Monitoring::GetCountersResponse MonitoringService::GetCounters(const Dto::Monitoring::GetCountersRequest &request) const {
         log_trace << "Get counters request, request: " << request.ToString();
 
-        Dto::Monitoring::GetCountersResponse response;
         try {
+            Dto::Monitoring::GetCountersResponse response;
 
             // Get counters from database
             response.counters = _database.GetRollingMean(request.name, request.start, request.end, request.step);

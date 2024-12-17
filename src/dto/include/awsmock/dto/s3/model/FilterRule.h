@@ -69,18 +69,25 @@ namespace AwsMock::Dto::S3 {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a JSON string.
-         *
-         * @return DTO as string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * Converts a JSON representation to s DTO.
          *
          * @param document JSON object.
          */
         void FromDocument(const view_or_value<view, value> &document);
+
+        /**
+         * @brief Convert from an XML string
+         *
+         * @return XML string
+         */
+        void FromXml(const boost::property_tree::ptree &pt);
+
+        /**
+         * Converts the DTO to a JSON string.
+         *
+         * @return DTO as string.
+         */
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Converts the DTO to a string representation.

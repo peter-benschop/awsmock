@@ -59,6 +59,24 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
+    void LambdaConfiguration::FromXml(const boost::property_tree::ptree &pt) {
+
+        if (pt.get_optional<std::string>("Id")) {
+            id = pt.get<std::string>("Id");
+        }
+        if (pt.get_optional<std::string>("CloudFunction")) {
+            lambdaArn = pt.get<std::string>("CloudFunction");
+        }
+        if (pt.get_optional<std::string>("Filter")) {
+            FilterRule filter;
+            filter.FromXml(pt.get_child("Filter"));
+            filterRules.emplace_back(filter);
+        }
+        if (pt.get_optional<std::string>("Event")) {
+            events.emplace_back(EventTypeFromString(pt.get<std::string>("Event")));
+        }
+    }
+
     std::string LambdaConfiguration::ToJson() const {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
