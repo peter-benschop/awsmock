@@ -1,5 +1,7 @@
 
 #include <awsmock/dto/sqs/model/EventNotification.h>
+#include <boost/regex/v5/regex.hpp>
+#include <boost/regex/v5/regex_fwd.hpp>
 
 namespace AwsMock::Dto::SQS {
 
@@ -15,6 +17,14 @@ namespace AwsMock::Dto::SQS {
                 }
                 document.append(kvp("Records", jsonArray));
             }
+
+            // AWS SDK C++ bug: "SentTimestamp": "1734439925" need ',' at the end
+            const std::string repairJson = Core::Bson::BsonUtils::ToJsonString(document);
+            const boost::regex regex(R"(("VisibilityTimeout" : "\d+"))");
+            if (boost::smatch what; boost::regex_search(repairJson, what, regex)) {
+                return boost::regex_replace(repairJson, regex, what[1] + ",");
+            }
+
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

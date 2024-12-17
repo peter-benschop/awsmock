@@ -216,7 +216,7 @@ namespace AwsMock::Service {
             std::ofstream ofs(base64FullFile);
             ofs << base64EncodedCodeString;
             ofs.close();
-
+            log_debug << "New Base64 file written: " << base64FullFile;
         } else {
 
             std::string md5sumFile = Core::Crypto::GetMd5FromFile(base64FullFile);
@@ -224,6 +224,9 @@ namespace AwsMock::Service {
                 std::ofstream ofs(base64FullFile);
                 ofs << base64EncodedCodeString;
                 ofs.close();
+                log_debug << "Updated Base64 file written: " << base64FullFile;
+            } else {
+                log_debug << "New and original are equal: " << base64FullFile;
             }
         }
 

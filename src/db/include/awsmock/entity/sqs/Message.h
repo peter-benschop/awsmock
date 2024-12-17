@@ -121,7 +121,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * List of message attributes.
          *
-         * This are the user contributed message attributes.
+         * These are the user contributed message attributes.
          */
         MessageAttributeList messageAttributes;
 
@@ -155,6 +155,14 @@ namespace AwsMock::Database::Entity::SQS {
          * @return true if attribute with the given key exists
          */
         int GetIntAttribute(const std::string &key);
+
+        /**
+         * @brief Removes an attribute
+         *
+         * @param key attribute key
+         * @return number of attributes removed
+         */
+        int RemoveAttribute(const std::string &key);
 
         /**
          * @brief Converts the entity to a MongoDB document

@@ -293,11 +293,11 @@ namespace AwsMock::Database {
         }
     }
 
-    void LambdaDatabase::SetLastInvocation(const std::string &oid, const system_clock::time_point &lastInvocation) {
+    void LambdaDatabase::SetLastInvocation(const std::string &oid, const system_clock::time_point &lastInvocation) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
@@ -315,7 +315,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void LambdaDatabase::SetAverageRuntime(const std::string &oid, long millis) const {
+    void LambdaDatabase::SetAverageRuntime(const std::string &oid, const long millis) const {
 
         if (HasDatabase()) {
 

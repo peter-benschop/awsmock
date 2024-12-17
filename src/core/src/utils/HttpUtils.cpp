@@ -109,11 +109,11 @@ namespace AwsMock::Core {
 
     std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
 
-        if (!Core::StringUtils::Contains(uri, "?")) {
+        if (!StringUtils::Contains(uri, "?")) {
             return {};
         }
 
-        std::string queryString = GetQueryString(uri);
+        const std::string queryString = GetQueryString(uri);
         std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
 
         std::map<std::string, std::string> queryParameters;
@@ -126,10 +126,9 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetQueryParameterValueByName(const std::string &uri, const std::string &name) {
 
-        std::string queryString = GetQueryString(uri);
-        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+        const std::string queryString = GetQueryString(uri);
 
-        for (const auto &it: parameters) {
+        for (std::vector<std::string> parameters = StringUtils::Split(queryString, '&'); const auto &it: parameters) {
             if (GetQueryParameterName(it) == name) {
                 return GetQueryParameterValue(it);
             }
@@ -142,7 +141,7 @@ namespace AwsMock::Core {
         std::vector<std::string> parameters = GetQueryParametersByPrefix(uri, prefix);
 
         if (index > parameters.size()) {
-            throw Core::ServiceException("Invalid path parameter index");
+            throw ServiceException("Invalid path parameter index");
         }
         log_trace << "Query parameter found, prefix: " << prefix << " index: " << index;
         return parameters[index - 1];
@@ -150,8 +149,7 @@ namespace AwsMock::Core {
 
     int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
         int value = def;
-        std::string parameterValue = GetQueryParameterValueByName(body, name);
-        if (!parameterValue.empty()) {
+        if (const std::string parameterValue = GetQueryParameterValueByName(body, name); !parameterValue.empty()) {
             value = std::stoi(parameterValue);
             value = value > min && value < max ? value : def;
         }
@@ -160,9 +158,8 @@ namespace AwsMock::Core {
     }
 
     bool HttpUtils::HasQueryParameter(const std::string &uri, const std::string &name) {
-        std::string queryString = GetQueryString(uri);
-        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
-        for (const auto &it: parameters) {
+        const std::string queryString = GetQueryString(uri);
+        for (std::vector<std::string> parameters = StringUtils::Split(queryString, '&'); const auto &it: parameters) {
             if (GetQueryParameterName(it) == name) {
                 return true;
             }
@@ -256,6 +253,20 @@ namespace AwsMock::Core {
         log_info << SEPARATOR;
     }
 
+    void HttpUtils::DumpRequest(const http::request<http::dynamic_body> &request) {
+        log_info << SEPARATOR;
+        DumpHeaders(request);
+        log_info << GetBodyAsString(request);
+        log_info << SEPARATOR;
+    }
+
+    void HttpUtils::DumpRequest(const http::request<http::string_body> &request) {
+        log_info << SEPARATOR;
+        DumpHeaders(request);
+        log_info << GetBodyAsString(request);
+        log_info << SEPARATOR;
+    }
+
     void HttpUtils::DumpHeaders(const http::response<http::string_body> &response) {
         log_info << SEPARATOR;
         for (const auto &header: response.base()) {
@@ -266,7 +277,7 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
 
-        return Core::StringUtils::ContainsIgnoreCase(request.base()[http::field::content_type], "json") ? "json" : "xml";
+        return StringUtils::ContainsIgnoreCase(request.base()[http::field::content_type], "json") ? "json" : "xml";
     }
 
     long HttpUtils::GetContentLength(const http::request<http::dynamic_body> &request) {
@@ -286,8 +297,7 @@ namespace AwsMock::Core {
     }
 
     void HttpUtils::GetVersionAction(const std::string &uri, std::string &version, std::string &action) {
-        std::vector<std::string> parameters = GetPathParameters(uri);
-        if (!parameters.empty()) {
+        if (const std::vector<std::string> parameters = GetPathParameters(uri); !parameters.empty()) {
             version = GetPathParameters(uri)[0];
             action = GetPathParameters(uri)[1];
         }

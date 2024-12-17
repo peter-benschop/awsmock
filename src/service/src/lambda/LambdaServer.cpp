@@ -73,13 +73,13 @@ namespace AwsMock::Service {
         log_debug << "Cleanup lambdas";
 
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
-            log_debug << "Get containers";
-            for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest"); const auto &container: containers) {
-                ContainerService::instance().StopContainer(container.id);
-                ContainerService::instance().DeleteContainer(container.id);
+            log_debug << "Get containers, lambda: " << lambda.function;
+            for (const auto &instance: lambda.instances) {
+                ContainerService::instance().StopContainer(instance.containerId);
             }
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_debug << "Containers stopped, lambda: " << lambda.function;
         }
         log_debug << "Lambda instances cleaned up";
     }
@@ -119,13 +119,22 @@ namespace AwsMock::Service {
                 continue;
             }
 
-            std::erase_if(lambda.instances,
-                          [expired](const Database::Entity::Lambda::Instance &instance) {
-                              return instance.status == Database::Entity::Lambda::InstanceIdle && instance.created < expired;
-                          });
-
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_debug << "Lambda updated, function" << lambda.function;
+            std::vector<Database::Entity::Lambda::Instance> toBeRemoved;
+            for (const auto &instance: lambda.instances) {
+                if (instance.status == Database::Entity::Lambda::InstanceIdle && instance.created < expired) {
+                    log_info << "Lambda instance expired, function: " << lambda.function << " containerId: " << instance.containerId;
+                    _dockerService.StopContainer({.id = instance.containerId});
+                    toBeRemoved.emplace_back(instance);
+                }
+            }
+            if (!toBeRemoved.empty()) {
+                for (const auto &instance: toBeRemoved) {
+                    lambda.RemoveInstance(instance);
+                }
+                lambda = _lambdaDatabase.UpdateLambda(lambda);
+                log_debug << "Lambda updated, function" << lambda.function << " removed: " << toBeRemoved.size();
+                _dockerService.PruneContainers();
+            }
         }
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
     }
