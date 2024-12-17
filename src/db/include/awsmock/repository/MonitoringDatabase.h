@@ -59,7 +59,7 @@ namespace AwsMock::Database {
          * @param labelValue metric label name
          * @param value metric value
          */
-        void IncCounter(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {});
+        void IncCounter(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Sets a metric gauge
@@ -69,7 +69,7 @@ namespace AwsMock::Database {
          * @param labelValue metric label name
          * @param value metric value
          */
-        void SetGauge(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {});
+        void SetGauge(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Returns the rolling mean
@@ -82,7 +82,7 @@ namespace AwsMock::Database {
          * @param labelValue labelValue
          * @return list of counter values
          */
-        std::vector<Database::Entity::Monitoring::Counter> GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {});
+        std::vector<Database::Entity::Monitoring::Counter> GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Deletes old monitoring data
@@ -90,7 +90,7 @@ namespace AwsMock::Database {
          * @param retentionPeriod retention period in days
          * @return number of deleted data rows
          */
-        long DeleteOldMonitoringData(int retentionPeriod);
+        long DeleteOldMonitoringData(int retentionPeriod) const;
 
       private:
 

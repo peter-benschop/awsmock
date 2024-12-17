@@ -4,7 +4,6 @@
 //
 
 #include <awsmock/repository/MonitoringDatabase.h>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace AwsMock::Database {
 
@@ -12,18 +11,18 @@ namespace AwsMock::Database {
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring") {}
 
-    void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
+    void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
         log_trace << "Set counter value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
 
-                bsoncxx::builder::basic::document searchDocument;
+                document searchDocument;
                 searchDocument.append(kvp("name", name));
 
                 if (!labelName.empty()) {
@@ -33,14 +32,13 @@ namespace AwsMock::Database {
                     searchDocument.append(kvp("labelValue", labelValue));
                 }
 
-                auto mResult = _monitoringCollection.find_one(searchDocument.extract());
-                if (mResult) {
+                if (const auto mResult = _monitoringCollection.find_one(searchDocument.extract())) {
                     value += mResult.value()["value"].get_double().value;
                 }
 
                 session.start_transaction();
 
-                bsoncxx::builder::basic::document document;
+                document document;
                 document.append(kvp("name", name));
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
@@ -64,22 +62,22 @@ namespace AwsMock::Database {
         }
     }
 
-    void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) {
+    void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
         log_trace << "Set gauge value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
 
-                system_clock::time_point now = Core::DateTimeUtils::LocalDateTimeNow();
-                system_clock::time_point end = Core::ceilTimePoint(now, std::chrono::seconds(300));
-                system_clock::time_point middle = end - std::chrono::seconds(150);
+                const system_clock::time_point now = Core::DateTimeUtils::LocalDateTimeNow();
+                const system_clock::time_point end = Core::ceilTimePoint(now, std::chrono::seconds(300));
+                const system_clock::time_point middle = end - std::chrono::seconds(150);
 
-                bsoncxx::builder::basic::document document;
+                document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", bsoncxx::types::b_date(middle)));
                 if (!labelName.empty()) {
@@ -93,8 +91,7 @@ namespace AwsMock::Database {
                     log_error << "Missing name";
                 }
                 session.start_transaction();
-                auto mResult = _monitoringCollection.find_one(document.extract());
-                if (mResult) {
+                if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
 
                     double currentValue = mResult.value()["value"].get_double().value;
                     int currentCount = mResult.value()["count"].get_int32().value;
@@ -131,23 +128,23 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Database::Entity::Monitoring::Counter> MonitoringDatabase::GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName, const std::string &labelValue) {
+    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetRollingMean(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue) const {
         log_trace << "Get rolling mean, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
 
-        long offset = Core::DateTimeUtils::UtcOffset();
+        const long offset = Core::DateTimeUtils::UtcOffset();
 
-        std::vector<Database::Entity::Monitoring::Counter> result;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
 
             try {
+                std::vector<Entity::Monitoring::Counter> result;
 
                 mongocxx::options::find opts;
                 opts.sort(make_document(kvp("created", 1)));
 
-                bsoncxx::builder::basic::document document;
+                document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end)))));
                 if (!labelName.empty()) {
@@ -158,38 +155,38 @@ namespace AwsMock::Database {
                 }
 
                 // Find and accumulate
-                auto cursor = _monitoringCollection.find(document.extract(), opts);
-                for (auto it: cursor) {
-                    system_clock::time_point t = bsoncxx::types::b_date(it["created"].get_date().value);
-                    Database::Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::seconds(offset))};
+                Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
+                for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
+                    acc(it["value"].get_double().value);
+                    Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::seconds(offset))};
                     result.emplace_back(counter);
                 }
                 log_debug << "Counters, name: " << name << " count: " << result.size();
                 return result;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else {
-            log_info << "Performance counter not available if you running the memory DB";
         }
+        log_info << "Performance counter not available if you running the memory DB";
         return {};
     }
 
-    long MonitoringDatabase::DeleteOldMonitoringData(int retentionPeriod) {
+    long MonitoringDatabase::DeleteOldMonitoringData(const int retentionPeriod) const {
         log_trace << "Deleting old monitoring data, retention:: " << retentionPeriod;
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
                 // Find and delete counters
                 session.start_transaction();
-                auto retention = system_clock::now() - std::chrono::hours(retentionPeriod * 24);
-                auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
+                const auto retention = system_clock::now() - std::chrono::hours(retentionPeriod * 24);
+                const auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
                 log_debug << "Counters deleted, count: " << mResult.value().deleted_count();
                 session.commit_transaction();
                 return mResult.value().deleted_count();

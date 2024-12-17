@@ -12,6 +12,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+// AwsMOck includes
+#include <awsmock/core/LogStream.h>
+
 namespace AwsMock::Core {
 
     /**
@@ -30,6 +33,31 @@ namespace AwsMock::Core {
          * @return XML string
          */
         static std::string ToXmlString(const boost::property_tree::ptree &rootTree);
+
+        /**
+         * @brief Reads an XML string into a boost property tree
+         *
+         * @param xmlString XML string
+         * @param rootTree boost property tree
+         */
+        static void ReadXml(const std::string &xmlString, boost::property_tree::ptree *rootTree);
+
+        /**
+         * @brief Reads an XML string into a boost property tree
+         *
+         * @param rootTree boost property tree
+         * @param level indentation spaces
+         */
+        static void PrintTree(const boost::property_tree::ptree &rootTree, int level = 2);
+
+      private:
+
+        /**
+         * @brief Indentation
+         *
+         * @param level indentation spaces
+         */
+        static std::string Indent(int level = 2);
     };
 
 }// namespace AwsMock::Core
