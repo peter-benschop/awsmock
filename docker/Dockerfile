@@ -11,6 +11,15 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cmake --build . --config Release -j 16 && \
     cmake --install .
 
+# Install aws-mock-ui
+WORKDIR /usr/src
+RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
+    cd /usr/src/awsmock-ui && \
+    npm install -g @angular/cli && \
+    npm install && \
+    npm run build --prod && \
+    cp -R dist/awsmock-ui/browser/ /tmp/frontend
+
 # Cleanup
 RUN rm -rf /usr/src
 
@@ -54,6 +63,7 @@ COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
 COPY --from=build /etc/awsmock.yml /etc/
 COPY --from=build /usr/local/bin/awslocal /usr/bin/
+COPY --from=build /tmp/frontend/* /home/awsmock/frontend
 
 # Install frontend
 COPY frontend/* /home/awsmock/frontend/
