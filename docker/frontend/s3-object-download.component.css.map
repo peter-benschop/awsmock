@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/modules/s3/object-list/download/s3-object-download.component.scss"],
-  "sourcesContent": [".queue-table {\n  width: 100%;\n  height: 100%;\n}\n\n:host {\n  position: relative;\n  width: 100%;\n  height: 30%;\n  margin-top: 0;\n  padding-bottom: 33%;\n}\n\n.head-buttons {\n  display: flex;\n  flex-direction: row;\n  align-items: end;\n  box-sizing: border-box;\n  min-height: 52px;\n  padding: 8px;\n  justify-content: flex-end;\n}\n\n.footer-buttons {\n  display: flex;\n  flex-direction: row;\n  align-items: end;\n  box-sizing: border-box;\n  min-height: 52px;\n  padding: 8px;\n  width: 50%;\n  justify-content: flex-end;\n}\n\n.footer {\n  display: flex;\n  width: 50%;\n  font-size: x-small;\n  color: black;\n}\n"],
-  "mappings": ";AAAA,CAAA;AACE,SAAA;AACA,UAAA;;AAGF;AACE,YAAA;AACA,SAAA;AACA,UAAA;AACA,cAAA;AACA,kBAAA;;AAGF,CAAA;AACE,WAAA;AACA,kBAAA;AACA,eAAA;AACA,cAAA;AACA,cAAA;AACA,WAAA;AACA,mBAAA;;AAGF,CAAA;AACE,WAAA;AACA,kBAAA;AACA,eAAA;AACA,cAAA;AACA,cAAA;AACA,WAAA;AACA,SAAA;AACA,mBAAA;;AAGF,CAAA;AACE,WAAA;AACA,SAAA;AACA,aAAA;AACA,SAAA;;",
-  "names": []
-}

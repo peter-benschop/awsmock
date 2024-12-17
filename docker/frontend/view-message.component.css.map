@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/modules/sqs/message-list/view-message/view-message.component.scss"],
-  "sourcesContent": ["\n.full-screen-modal .mat-dialog-container {\n  padding: 1em;\n  width: 90%;\n  height: 80%;\n  resize: both;\n  overflow: auto;\n  max-width: unset !important;\n  max-height: unset !important;\n  position: absolute !important;\n}\n\n"],
-  "mappings": ";AACA,CAAA,kBAAA,CAAA;AACE,WAAA;AACA,SAAA;AACA,UAAA;AACA,UAAA;AACA,YAAA;AACA,aAAA;AACA,cAAA;AACA,YAAA;;",
-  "names": []
-}
