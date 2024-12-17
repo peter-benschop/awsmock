@@ -273,10 +273,10 @@ namespace AwsMock::Service {
          * @param message SQS message.
          * @param eventSourceArn event source ARN
          */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
 
         /**
-         * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
+         * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
          *
          * @param attributes vector of attributes.
          * @param value value to check for.

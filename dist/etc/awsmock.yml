@@ -86,7 +86,7 @@ awsmock:
         period: 30
     lambda:
       active: true
-      lifetime: 3600
+      lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       data-dir: /home/awsmock/data/lambda
       monitoring:
         period: 300

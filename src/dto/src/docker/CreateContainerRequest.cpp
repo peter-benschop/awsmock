@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/dto/docker/CreateContainerRequest.h>
-#include <gtest/gtest.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -20,8 +19,8 @@ namespace AwsMock::Dto::Docker {
 
             if (!environment.empty()) {
                 array envArray;
-                for (unsigned long i = 0; i < environment.size(); i++) {
-                    envArray.append(environment[i]);
+                for (const auto &env: environment) {
+                    envArray.append(env);
                 }
                 rootDocument.append(kvp("Env", envArray));
             }
@@ -43,9 +42,9 @@ namespace AwsMock::Dto::Docker {
             hostArray.append(hostPortObject);
 
             // DNS array
-            array dnsArray;
+            /*array dnsArray;
             dnsArray.append("8.8.8.8");
-            hostConfigObject.append(kvp("Dns", dnsArray));
+            hostConfigObject.append(kvp("Dns", dnsArray));*/
 
             // Port bindings
             document portBindingsObject;
@@ -68,45 +67,6 @@ namespace AwsMock::Dto::Docker {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-
-        /*try {
-
-            // Host config
-            Poco::JSON::Object hostConfigObject;
-
-            // Post array
-            Poco::JSON::Object hostPortObject;
-            hostPortObject.set("HostPort", hostPort);
-
-            // Host array
-            Poco::JSON::Array hostArray;
-            hostArray.add(hostPortObject);
-
-            // DNS array
-            Poco::JSON::Array dnsArray;
-            dnsArray.add("8.8.8.8");
-            hostConfigObject.set("Dns", dnsArray);
-
-            Poco::JSON::Object portBindingsObject;
-            portBindingsObject.set(containerPort, hostArray);
-            hostConfigObject.set("PortBindings", portBindingsObject);
-
-            // Hosts docker internal, localstack (for localstack compatibility) and awsmock are routed to the docker host
-            Poco::JSON::Array extraHostsArray;
-            extraHostsArray.add("host.docker.internal:host-gateway");
-            extraHostsArray.add("awsmock:host-gateway");
-            extraHostsArray.add("localstack:host-gateway");
-
-            hostConfigObject.set("ExtraHosts", extraHostsArray);
-            hostConfigObject.set("NetworkMode", networkMode);
-            rootJson.set("HostConfig", hostConfigObject);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
     }
 
     std::string CreateContainerRequest::ToString() const {

@@ -168,7 +168,7 @@ namespace AwsMock::Database {
          * @param timestamp last update timestamp
          * @throws DatabaseException
          */
-        void SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp);
+        void SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp) const;
 
         /**
          * @brief Sets the average runtime of a lambda instance

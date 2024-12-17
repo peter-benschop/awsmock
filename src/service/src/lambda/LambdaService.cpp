@@ -206,13 +206,11 @@ namespace AwsMock::Service {
         if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
 
             // Synchronous execution
-            // TODO: Fix host port, is now part of the instance
-            //output = InvokeLambdaSynchronously("localhost", lambda.hostPort, payload);
+            output = InvokeLambdaSynchronously(hostName, port, payload);
 
         } else {
-
             LambdaExecutor lambdaExecutor;
-            boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload);
+            boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload, lambda.function);
             t.detach();
         }
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
@@ -234,8 +232,8 @@ namespace AwsMock::Service {
 
         // Get the existing entity
         Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(request.arn);
-        for (const auto &it: request.tags) {
-            lambdaEntity.tags.emplace(it.first, it.second);
+        for (const auto &[fst, snd]: request.tags) {
+            lambdaEntity.tags.emplace(fst, snd);
         }
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Create tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();

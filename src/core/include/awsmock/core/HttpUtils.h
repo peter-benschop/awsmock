@@ -321,6 +321,20 @@ namespace AwsMock::Core {
         static void DumpHeaders(const http::response<http::string_body> &response);
 
         /**
+         * @brief Dumps the whole request
+         *
+         * @param request HTTP request
+         */
+        static void DumpRequest(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param request HTTP request
+         */
+        static void DumpRequest(const http::request<http::string_body> &request);
+
+        /**
          * @brief Returns the content type
          *
          * @param request HTTP request

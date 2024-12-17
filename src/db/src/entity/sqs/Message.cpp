@@ -23,6 +23,15 @@ namespace AwsMock::Database::Entity::SQS {
         return -1;
     }
 
+    int Message::RemoveAttribute(const std::string &key) {
+        if (HasAttribute(key)) {
+            return erase_if(attributes, [key](const std::pair<std::string, std::string> &attribute) {
+                return attribute.first == key;
+            });
+        }
+        return -1;
+    }
+
     view_or_value<view, value> Message::ToDocument() const {
 
         auto messageAttributesDoc = array{};

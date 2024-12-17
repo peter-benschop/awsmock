@@ -539,6 +539,7 @@ namespace AwsMock::Service {
         std::string dockerFilename = codeDir + boost::filesystem::path::preferred_separator + "Dockerfile";
 
         std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
+        log_debug << "Using supported runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
@@ -550,16 +551,17 @@ namespace AwsMock::Service {
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            //for (const auto &[fst, snd]: environment) {
+            //                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+            //          }
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
-            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
+            ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
             ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
             ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
-            ofs << "RUN chmod 755 ${LAMBDA_TASK_ROOT}/lib/ld-linux-x86-64.so.2" << std::endl;
+            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/lib" << std::endl;
+            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/bin" << std::endl;
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
             ofs << "FROM " << supportedRuntime << std::endl;
