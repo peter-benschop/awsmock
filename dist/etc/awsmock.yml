@@ -4,8 +4,7 @@
 awsmock:
   region: eu-central-1                        # AWS region
   user: none                                  # AWS user
-  # AWS access definition
-  access:
+  access: # AWS access definition
     key-id: none                              # AWS access key ID
     secret-access-key: none                   # AWS access secret
     account-id: 000000000000                  # AWS account ID
@@ -18,12 +17,12 @@ awsmock:
   aws:
     signature:
       verify: false
-  frontend:
-    address: 0.0.0.0
-    port: 4567
-    workers: 20
-    timeout: 900
-    doc-root: /home/awsmock/frontend
+  frontend: # Frontend HTTP server
+    address: 0.0.0.0                          # Listen address
+    port: 4567                                # Port number
+    workers: 20                               # Number of worker threads
+    timeout: 900                              # HTTP timeout
+    doc-root: /home/awsmock/frontend          # Document root directory
   docker:
     active: true
     network-mode: local
