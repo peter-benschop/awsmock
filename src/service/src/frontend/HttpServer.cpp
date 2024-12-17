@@ -24,6 +24,7 @@ namespace AwsMock::Service::Frontend {
                 workers.emplace_back(acceptor, doc_root);
                 workers.back().Start();
             }
+            log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
             ioc.run();
 
         } catch (const std::exception &e) {

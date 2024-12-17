@@ -63,10 +63,7 @@ COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
 COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
 COPY --from=build /etc/awsmock.yml /etc/
 COPY --from=build /usr/local/bin/awslocal /usr/bin/
-COPY --from=build /tmp/frontend/* /home/awsmock/frontend
-
-# Install frontend
-COPY frontend/* /home/awsmock/frontend/
+COPY --from=build /tmp/frontend/* /home/awsmock/frontend/
 
 # Configure awslocal
 RUN aws configure set aws_access_key_id none && \
