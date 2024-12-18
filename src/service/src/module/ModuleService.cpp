@@ -30,8 +30,7 @@ namespace AwsMock::Service {
         for (auto const &m: modules) {
 
             // Set state
-            Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name);
-            if (module.state != Database::Entity::Module::ModuleState::RUNNING) {
+            if (Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name); module.state != Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
                 module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::RUNNING);
@@ -171,7 +170,7 @@ namespace AwsMock::Service {
             }
         }
         if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
-            Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+            const Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
                     _sqsDatabase.CreateOrUpdateQueue(queue);
@@ -188,7 +187,7 @@ namespace AwsMock::Service {
             }
         }
         if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
-            Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+            const Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
             if (!infrastructure.snsTopics.empty()) {
                 for (auto &topic: infrastructure.snsTopics) {
                     _snsDatabase.CreateOrUpdateTopic(topic);
@@ -271,7 +270,7 @@ namespace AwsMock::Service {
 
         // SSM
         if (!infrastructure.ssmParameters.empty()) {
-            Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+            const Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
             for (auto &parameter: infrastructure.ssmParameters) {
                 _ssmDatabase.UpsertParameter(parameter);
             }
@@ -297,8 +296,8 @@ namespace AwsMock::Service {
             } else if (m == "sns") {
                 Database::SNSDatabase::instance().DeleteAllTopics();
             } else if (m == "dynamodb") {
-                Service::DynamoDbService _dynamoDbService;
-                _dynamoDbService.DeleteAllTables();
+                //Service::DynamoDbService _dynamoDbService;
+                //_dynamoDbService.DeleteAllTables();
             } else if (m == "transfer") {
                 Database::TransferDatabase::instance().DeleteAllTransfers();
             }

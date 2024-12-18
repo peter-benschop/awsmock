@@ -13,6 +13,7 @@ namespace AwsMock::Service {
         // Make local copy
         Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(functionId);
 
+        // Create a new instance
         CreateInstance(instanceId, lambdaEntity, functionCode);
 
         // Update database
@@ -27,12 +28,12 @@ namespace AwsMock::Service {
     void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, std::string &functionCode) {
 
         // Docker tag
-        std::string dockerTag = GetDockerTag(lambdaEntity);
-        log_debug << "Using docker tag: " << dockerTag;
+        lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
+        log_debug << "Using docker tag: " << lambdaEntity.dockerTag;
 
         // Build the docker image, if not existing
-        if (!ContainerService::instance().ImageExists(lambdaEntity.function, dockerTag)) {
-            CreateDockerImage(functionCode, lambdaEntity, dockerTag);
+        if (!ContainerService::instance().ImageExists(lambdaEntity.function, lambdaEntity.dockerTag)) {
+            CreateDockerImage(functionCode, lambdaEntity, lambdaEntity.dockerTag);
         }
 
         // Create the container, if not existing. If existing get the current port from the docker container
@@ -43,7 +44,7 @@ namespace AwsMock::Service {
             instance.id = instanceId;
             instance.containerName = containerName;
             instance.status = Database::Entity::Lambda::InstanceIdle;
-            CreateDockerContainer(lambdaEntity, instance, dockerTag);
+            CreateDockerContainer(lambdaEntity, instance, lambdaEntity.dockerTag);
             lambdaEntity.instances.emplace_back(instance);
         }
 

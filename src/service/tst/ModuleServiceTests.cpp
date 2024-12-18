@@ -2,6 +2,7 @@
 // Created by vogje01 on 02/06/2023.
 //
 
+#include <awsmock/service/sqs/SQSServer.h>
 #ifndef AWMOCK_SERVICE_MODULE_SERVICE_TEST_H
 #define AWMOCK_SERVICE_MODULE_SERVICE_TEST_H
 
@@ -11,7 +12,6 @@
 // AwsMock includes
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/module/ModuleService.h>
-
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"

@@ -73,13 +73,12 @@ namespace AwsMock::Service {
         log_debug << "Cleanup lambdas";
 
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
-            log_debug << "Get containers, lambda: " << lambda.function;
-            for (const auto &instance: lambda.instances) {
-                ContainerService::instance().StopContainer(instance.containerId);
+            log_debug << "Get containers";
+            for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest"); const auto &container: containers) {
+                ContainerService::instance().StopContainer(container.id);
             }
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_debug << "Containers stopped, lambda: " << lambda.function;
         }
         log_debug << "Lambda instances cleaned up";
     }

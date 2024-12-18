@@ -10,6 +10,9 @@
 #include <ctime>
 #include <string>
 
+// Boost includes
+#include <boost/thread.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>

@@ -3,13 +3,14 @@
 //
 
 #include <awsmock/service/kms/KMSService.h>
+#include <thread>
 
 namespace AwsMock::Service {
 
     template<typename K>
     void CallAsyncCreateKey(K &&k) {
-        KMSCreator creator;
-        std::thread(&KMSCreator::CreateKmsKey, k).detach();
+        boost::thread t(&KMSCreator::CreateKmsKey, k);
+        t.detach();
     }
 
     KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
@@ -87,8 +88,7 @@ namespace AwsMock::Service {
         int i = 0;
         while (true) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId);
-            if (!key.rsaPrivateKey.empty() || i > maxSeconds * 2) {
+            if (Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId); !key.rsaPrivateKey.empty() || i > maxSeconds * 2) {
                 break;
             }
             i++;
@@ -100,8 +100,7 @@ namespace AwsMock::Service {
         int i = 0;
         while (true) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId);
-            if (!key.aes256Key.empty() || i > maxSeconds * 2) {
+            if (Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId); !key.aes256Key.empty() || i > maxSeconds * 2) {
                 break;
             }
             i++;

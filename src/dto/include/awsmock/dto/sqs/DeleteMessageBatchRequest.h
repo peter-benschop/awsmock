@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 
 namespace AwsMock::Dto::SQS {

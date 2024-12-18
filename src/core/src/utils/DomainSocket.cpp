@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/DomainSocket.h>
+#include <boost/asio/local/stream_protocol.hpp>
 
 namespace AwsMock::Core {
 
@@ -38,7 +39,7 @@ namespace AwsMock::Core {
         return PrepareResult(response);
     }
 
-    DomainSocketResult DomainSocket::SendBinary(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) const {
+    DomainSocketResult DomainSocket::SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) const {
 
         boost::system::error_code ec;
 
@@ -52,7 +53,7 @@ namespace AwsMock::Core {
         }
 
         // Prepare message
-        http::request<http::file_body> request = PrepareBinaryMessage(method, path, filename, headers);
+        http::request<http::file_body> request = PrepareBinaryMessage(method, path, fileName, headers);
 
         // Write to unix socket
         http::write(socket, request);

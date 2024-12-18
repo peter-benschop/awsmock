@@ -3,11 +3,11 @@
 //
 
 // AwsMock includes
-#include <awsmock/service/frontend/HttpServer.h>
+#include <awsmock/service/frontend/FrontendServer.h>
 
 namespace AwsMock::Service::Frontend {
 
-    void HttpServer::operator()() const {
+    void FrontendServer::operator()() const {
 
         try {
 
@@ -19,7 +19,7 @@ namespace AwsMock::Service::Frontend {
             boost::asio::io_context ioc{1};
             boost::asio::ip::tcp::acceptor acceptor{ioc, {address, port}};
 
-            std::list<HttpWorker> workers;
+            std::list<FrontendWorker> workers;
             for (int i = 0; i < num_workers; ++i) {
                 workers.emplace_back(acceptor, doc_root);
                 workers.back().Start();

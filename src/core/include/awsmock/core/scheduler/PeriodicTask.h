@@ -8,11 +8,9 @@
 // C++ includes
 #include <functional>
 #include <string>
-#include <utility>
 
 // Boost includes
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/chrono/duration.hpp>
 #include <boost/noncopyable.hpp>
 

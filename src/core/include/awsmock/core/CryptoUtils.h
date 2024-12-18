@@ -215,7 +215,7 @@ namespace AwsMock::Core {
          * @param key encryption key
          * @return decrypted string
          */
-        static unsigned char *Aes256DecryptString(unsigned char *ciphertext, int *len, unsigned char *key);
+        static unsigned char *Aes256DecryptString(const unsigned char *ciphertext, int *len, unsigned char *key);
 
         /**
          * @brief AES256 encryption of a file

@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/sqs/SQSService.h>
+#include <thread>
 
 namespace AwsMock::Service {
 

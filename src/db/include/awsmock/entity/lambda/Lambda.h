@@ -261,6 +261,11 @@ namespace AwsMock::Database::Entity::Lambda {
         Code code;
 
         /**
+         * Docker tag
+         */
+        std::string dockerTag;
+
+        /**
          * Last function StartServer
          */
         system_clock::time_point lastStarted;

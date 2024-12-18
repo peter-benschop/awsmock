@@ -12,15 +12,18 @@
 // Boost includes
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core/flat_static_buffer.hpp>
+#include <boost/beast/http/file_body.hpp>
 #include <boost/beast/http/parser.hpp>
 #include <boost/beast/http/read.hpp>
+#include <boost/beast/http/serializer.hpp>
 #include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/write.hpp>
+#include <boost/numeric/ublas/fwd.hpp>
 
 // AwsMock includes
-#include <awsmock/service/frontend/FieldAlloc.h>
-#include <boost/beast/http/file_body.hpp>
-#include <boost/beast/http/serializer.hpp>
+#include <awsmock/core/FieldAlloc.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;    // from <boost/beast/http.hpp>
@@ -29,42 +32,9 @@ using tcp = boost::asio::ip::tcp;// from <boost/asio/ip/tcp.hpp>
 
 #define DEFAULT_PAGE std::string("/index.html")
 
-// Return a reasonable mime type based on the extension of a file.
-inline beast::string_view mime_type(beast::string_view path) {
-    using beast::iequals;
-    auto const ext = [&path] {
-        auto const pos = path.rfind(".");
-        if (pos == beast::string_view::npos)
-            return beast::string_view{};
-        return path.substr(pos);
-    }();
-    if (iequals(ext, ".htm")) return "text/html";
-    if (iequals(ext, ".html")) return "text/html";
-    if (iequals(ext, ".php")) return "text/html";
-    if (iequals(ext, ".css")) return "text/css";
-    if (iequals(ext, ".txt")) return "text/plain";
-    if (iequals(ext, ".js")) return "application/javascript";
-    if (iequals(ext, ".json")) return "application/json";
-    if (iequals(ext, ".xml")) return "application/xml";
-    if (iequals(ext, ".swf")) return "application/x-shockwave-flash";
-    if (iequals(ext, ".flv")) return "video/x-flv";
-    if (iequals(ext, ".png")) return "image/png";
-    if (iequals(ext, ".jpe")) return "image/jpeg";
-    if (iequals(ext, ".jpeg")) return "image/jpeg";
-    if (iequals(ext, ".jpg")) return "image/jpeg";
-    if (iequals(ext, ".gif")) return "image/gif";
-    if (iequals(ext, ".bmp")) return "image/bmp";
-    if (iequals(ext, ".ico")) return "image/vnd.microsoft.icon";
-    if (iequals(ext, ".tiff")) return "image/tiff";
-    if (iequals(ext, ".tif")) return "image/tiff";
-    if (iequals(ext, ".svg")) return "image/svg+xml";
-    if (iequals(ext, ".svgz")) return "image/svg+xml";
-    return "text/html";
-}
-
 namespace AwsMock::Service::Frontend {
 
-    class HttpWorker {
+    class FrontendWorker {
 
       public:
 
@@ -74,14 +44,14 @@ namespace AwsMock::Service::Frontend {
          * @param acceptor request acceptor
          * @param docRoot document root directory
          */
-        HttpWorker(boost::asio::ip::tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {}
+        FrontendWorker(boost::asio::ip::tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {}
 
         /**
          * @brief Copy constructor
          *
          * @param worker worker to copy from
          */
-        HttpWorker(HttpWorker const &worker) = delete;
+        FrontendWorker(FrontendWorker const &worker) = delete;
 
         /**
          * @brief Assignment constructor
@@ -89,7 +59,7 @@ namespace AwsMock::Service::Frontend {
          * @param worker worker to assign from
          * @return assigned worker
          */
-        HttpWorker &operator=(HttpWorker const &worker) = delete;
+        FrontendWorker &operator=(FrontendWorker const &worker) = delete;
 
         /**
          * @brief Start the server

@@ -5,13 +5,6 @@
 #ifndef AWSMOCK_SERVICE_MODULE_HANDLER_H
 #define AWSMOCK_SERVICE_MODULE_HANDLER_H
 
-// C++ includes
-#include <iostream>
-
-// Boost includes
-#include <boost/asio.hpp>
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>

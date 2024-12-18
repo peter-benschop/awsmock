@@ -232,7 +232,32 @@ namespace AwsMock::Core {
         return true;
     }
 
+    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
+
+        const AuthorizationHeaderKeys authorizationHeaderKeys = GetAuthorizationKeys(request, secretAccessKey);
+
+        const std::string canonicalRequest = GetCanonicalRequest(request, authorizationHeaderKeys);
+        const std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
+
+        if (const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign); !StringUtils::Equals(signature, authorizationHeaderKeys.signature)) {
+            log_error << "Calculated: " << signature << " provided: " << authorizationHeaderKeys.signature;
+            return false;
+        }
+        return true;
+    }
+
     std::string AwsUtils::GetCanonicalRequest(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+        std::stringstream canonicalRequest;
+        canonicalRequest << request.method() << '\n';
+        canonicalRequest << StringUtils::UrlEncode(request.target()) << '\n';
+        canonicalRequest << GetCanonicalQueryParameters(request.target()) << '\n';
+        canonicalRequest << GetCanonicalHeaders(request, authorizationHeaderKeys) << '\n';
+        canonicalRequest << authorizationHeaderKeys.signedHeaders << '\n';
+        canonicalRequest << GetHashedPayload(HttpUtils::GetBodyAsString(request));
+        return canonicalRequest.str();
+    }
+
+    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalRequest;
         canonicalRequest << request.method() << '\n';
         canonicalRequest << StringUtils::UrlEncode(request.target()) << '\n';
@@ -292,6 +317,18 @@ namespace AwsMock::Core {
         return canonicalHeaders.str();
     }
 
+    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+        std::stringstream canonicalHeaders;
+
+        // Get header
+        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
+            if (HttpUtils::HasHeader(request, header)) {
+                canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(HttpUtils::GetHeaderValue(request, header)) + '\n';
+            }
+        }
+        return canonicalHeaders.str();
+    }
+
     std::string AwsUtils::GetCanonicalHeaders(std::map<std::string, std::string> &headers, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalHeaders;
 
@@ -309,6 +346,35 @@ namespace AwsMock::Core {
     }
 
     AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {
+        const std::string authorizationHeader = request["Authorization"];
+
+        // Get signing version
+        AuthorizationHeaderKeys authKeys;
+        authKeys.signingVersion = StringUtils::Split(authorizationHeader, ' ')[0];
+
+        try {
+            const boost::regex expr(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
+            boost::smatch what;
+            boost::regex_search(authorizationHeader, what, expr);
+
+            authKeys.secretAccessKey = secretAccessKey.empty() ? "none" : secretAccessKey;
+            authKeys.dateTime = what[2];
+            authKeys.region = what[3];
+            authKeys.module = what[4];
+            authKeys.requestVersion = what[5];
+            authKeys.signedHeaders = what[6];
+            authKeys.signature = what[7];
+            authKeys.scope = authKeys.dateTime + "/" + authKeys.region + "/" + authKeys.module + "/" + authKeys.requestVersion;
+            authKeys.isoDateTime = HttpUtils::HasHeader(request, "x-amz-date") ? HttpUtils::GetHeaderValue(request, "x-amz-date") : GetISODateString();
+            return authKeys;
+
+        } catch (std::exception &e) {
+            log_error << e.what();
+        }
+        return {};
+    }
+
+    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
         const std::string authorizationHeader = request["Authorization"];
 
         // Get signing version

@@ -24,6 +24,8 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("attributes", attributes.ToDocument()),
                 kvp("tags", tagsDoc),
                 kvp("size", size),
+                kvp("isDlq", isDlq),
+                kvp("mainQueue", mainQueue),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -34,15 +36,17 @@ namespace AwsMock::Database::Entity::SQS {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
-            region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-            name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-            owner = bsoncxx::string::to_string(mResult.value()["owner"].get_string().value);
-            queueUrl = bsoncxx::string::to_string(mResult.value()["queueUrl"].get_string().value);
-            queueArn = bsoncxx::string::to_string(mResult.value()["queueArn"].get_string().value);
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+            owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
+            queueUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "queueUrl");
+            queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
-            size = mResult.value()["size"].get_int64().value;
-            created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+            size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+            isDlq = Core::Bson::BsonUtils::GetBoolValue(mResult, "isDlq");
+            mainQueue = Core::Bson::BsonUtils::GetBoolValue(mResult, "mainQueue");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {

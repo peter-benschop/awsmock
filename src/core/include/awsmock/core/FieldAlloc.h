@@ -10,10 +10,48 @@
 #ifndef BOOST_BEAST_EXAMPLE_FIELDS_ALLOC_HPP
 #define BOOST_BEAST_EXAMPLE_FIELDS_ALLOC_HPP
 
-#include <boost/throw_exception.hpp>
+// C++ standard includes
 #include <cstdlib>
 #include <memory>
 #include <stdexcept>
+
+// Boost includes
+#include <boost/beast/core/string.hpp>
+#include <boost/beast/core/string_type.hpp>
+#include <boost/throw_exception.hpp>
+
+// Return a reasonable mime type based on the extension of a file.
+inline boost::beast::string_view mime_type(boost::beast::string_view path) {
+    using boost::beast::iequals;
+    auto const ext = [&path] {
+        auto const pos = path.rfind(".");
+        if (pos == boost::beast::string_view::npos)
+            return boost::beast::string_view{};
+        return path.substr(pos);
+    }();
+    if (iequals(ext, ".htm")) return "text/html";
+    if (iequals(ext, ".html")) return "text/html";
+    if (iequals(ext, ".php")) return "text/html";
+    if (iequals(ext, ".css")) return "text/css";
+    if (iequals(ext, ".txt")) return "text/plain";
+    if (iequals(ext, ".js")) return "application/javascript";
+    if (iequals(ext, ".json")) return "application/json";
+    if (iequals(ext, ".xml")) return "application/xml";
+    if (iequals(ext, ".swf")) return "application/x-shockwave-flash";
+    if (iequals(ext, ".flv")) return "video/x-flv";
+    if (iequals(ext, ".png")) return "image/png";
+    if (iequals(ext, ".jpe")) return "image/jpeg";
+    if (iequals(ext, ".jpeg")) return "image/jpeg";
+    if (iequals(ext, ".jpg")) return "image/jpeg";
+    if (iequals(ext, ".gif")) return "image/gif";
+    if (iequals(ext, ".bmp")) return "image/bmp";
+    if (iequals(ext, ".ico")) return "image/vnd.microsoft.icon";
+    if (iequals(ext, ".tiff")) return "image/tiff";
+    if (iequals(ext, ".tif")) return "image/tiff";
+    if (iequals(ext, ".svg")) return "image/svg+xml";
+    if (iequals(ext, ".svgz")) return "image/svg+xml";
+    return "text/html";
+}
 
 namespace detail {
 
@@ -28,14 +66,12 @@ namespace detail {
             return reinterpret_cast<char *>(this + 1) + size_;
         }
 
-        explicit static_pool(std::size_t size)
+        explicit static_pool(const std::size_t size)
             : size_(size), p_(reinterpret_cast<char *>(this + 1)) {
         }
 
-      public:
-
         static static_pool &
-        construct(std::size_t size) {
+        construct(const std::size_t size) {
             auto p = new char[sizeof(static_pool) + size];
             return *(::new (p) static_pool{size});
         }
@@ -133,7 +169,7 @@ struct fields_alloc {
     }
 
     value_type *
-    allocate(size_type n) {
+    allocate(const size_type n) {
         return static_cast<value_type *>(pool_->alloc(n * sizeof(T)));
     }
 

@@ -11,7 +11,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 

@@ -2,19 +2,16 @@
 // Created by vogje01 on 12/17/24.
 //
 
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/service/frontend/HttpWorker.h>
-#include <boost/numeric/ublas/fwd.hpp>
+#include <awsmock/service/frontend/FrontendWorker.h>
 
 namespace AwsMock::Service::Frontend {
 
-    void HttpWorker::Start() {
+    void FrontendWorker::Start() {
         Accept();
         CheckDeadline();
     }
 
-    void HttpWorker::Accept() {
+    void FrontendWorker::Accept() {
 
         int timeout = Core::Configuration::instance().GetValueInt("awsmock.frontend.timeout");
 
@@ -37,7 +34,7 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void HttpWorker::ReadRequest() {
+    void FrontendWorker::ReadRequest() {
         // On each read the parser needs to be destroyed and recreated. We store it in a boost::optional to achieve that.
         //
         // Arguments passed to the parser constructor are forwarded to the message object. A single argument is forwarded
@@ -58,7 +55,7 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void HttpWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
+    void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
         switch (req.method()) {
 
             case http::verb::get:
@@ -72,7 +69,7 @@ namespace AwsMock::Service::Frontend {
         }
     }
 
-    void HttpWorker::SendBadResponse(const http::status status, std::string const &error) {
+    void FrontendWorker::SendBadResponse(const http::status status, std::string const &error) {
 
         _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _stringResponse->result(status);
@@ -94,7 +91,7 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void HttpWorker::SendFile(beast::string_view target) {
+    void FrontendWorker::SendFile(beast::string_view target) {
 
         // Request path must be absolute and not contain "..".
         if (target.empty() || target[0] != '/' || target.find("..") != std::string::npos) {
@@ -140,14 +137,14 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void HttpWorker::CheckDeadline() {
+    void FrontendWorker::CheckDeadline() {
         // The deadline may have moved, so check it has really passed.
         if (_requestDeadline.expiry() <= std::chrono::steady_clock::now()) {
             // Close socket to cancel any outstanding operation.
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {

@@ -11,10 +11,10 @@
 #include <vector>
 
 // Boost includes
-#include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
+#include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
@@ -26,6 +26,9 @@ constexpr char SEPARATOR[] = "==================================================
 namespace AwsMock::Core {
 
     namespace http = boost::beast::http;
+    using alloc_t = fields_alloc<char>;
+
+    using request_body_t = http::string_body;
 
     /**
      * @brief HTTP utilities.
@@ -229,6 +232,7 @@ namespace AwsMock::Core {
          * @return HTTP body as string
          */
         static std::string GetBodyAsString(const http::request<http::string_body> &request);
+        static std::string GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
 
         /**
          * @brief Gets the body as string from a boost dynamic_body
@@ -246,6 +250,7 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &key);
+        static bool HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name);
 
         /**
          * @brief Checks whether a header exists.
@@ -269,6 +274,7 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
+        static std::string GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
          * @brief Returns a header value by key.
@@ -382,6 +388,8 @@ namespace AwsMock::Core {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> BadRequest(const http::request<http::dynamic_body> &request, const std::string &reason);
+
+        static http::response<http::dynamic_body> BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &reason);
 
         /**
          * @brief Return a bad request response (400)
