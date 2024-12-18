@@ -7,12 +7,13 @@
 namespace AwsMock::Core {
 
     ExecResult SystemUtils::Exec(const std::string &command) {
+
         // set up file redirection
         std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
         std::string cmd = command + " > " + redirection.string() + " 2>&1";
 
         // execute command
-        auto status = std::system(cmd.c_str());
+        auto status = WEXITSTATUS(std::system(cmd.c_str()));
         log_trace << "Exec status: " << status;
 
         // read redirection file and remove the file

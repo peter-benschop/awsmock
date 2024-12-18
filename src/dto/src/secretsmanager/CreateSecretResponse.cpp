@@ -8,39 +8,35 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string CreateSecretResponse::ToJson() const {
 
-        // TOdo:
-        /*
         try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("ARN", arn);
-            rootJson.set("VersionId", versionId);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
+            Core::Bson::BsonUtils::SetStringValue(document, "VersionId", versionId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void CreateSecretResponse::FromJson(const std::string &jsonString) {
 
-        // TOdo:
-        /*
         try {
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
 
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
+            // Queue
+            const value document = bsoncxx::from_json(jsonString);
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
+            versionId = Core::Bson::BsonUtils::GetStringValue(document, "VersionId");
 
-        } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string CreateSecretResponse::ToString() const {

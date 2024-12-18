@@ -34,6 +34,11 @@ namespace AwsMock::Dto::SecretsManager {
     struct GetSecretValueResponse {
 
         /*+
+         * Region
+         */
+        std::string region;
+
+        /*+
          * Name
          */
         std::string name;

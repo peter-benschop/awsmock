@@ -36,7 +36,6 @@ namespace AwsMock::Dto::SQS {
 
             // Queue
             const value document = bsoncxx::from_json(jsonString);
-
             queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
 
             // Entries

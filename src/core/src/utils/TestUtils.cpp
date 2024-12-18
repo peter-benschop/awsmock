@@ -81,6 +81,9 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueString("awsmock.logging.level", "debug");
         Configuration::instance().SetValueString("awsmock.logging.file", "/tmp/awsmock-test.log");
 
+        // Monitoring
+        Configuration::instance().SetValueInt("awsmock.monitoring.port", 19091);
+
         // Podman
         Configuration::instance().SetValueBool("awsmock.podman.active", true);
         Configuration::instance().SetValueString("awsmock.podman.network-mode", "local");
@@ -94,7 +97,7 @@ namespace AwsMock::Core {
         return TMP_PROPERTIES_FILE;
     }
 
-    Configuration &TestUtils::GetTestConfiguration(bool withDatabase) {
+    Configuration &TestUtils::GetTestConfiguration(const bool withDatabase) {
         CreateTestConfigurationFile(withDatabase);
         Configuration &configuration = Configuration::instance();
         configuration.SetFilename(GetTestConfigurationFilename());

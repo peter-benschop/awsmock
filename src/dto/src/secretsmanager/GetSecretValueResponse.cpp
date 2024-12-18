@@ -8,51 +8,39 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string GetSecretValueResponse::ToJson() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Name", name);
-            rootJson.set("ARN", arn);
-            rootJson.set("versionId", versionId);
-            if (!secretString.empty()) {
-                rootJson.set("SecretString", secretString);
-            } else {
-                rootJson.set("SecretBinary", secretBinary);
-            }
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
+            Core::Bson::BsonUtils::SetStringValue(document, "VersionId", versionId);
+            Core::Bson::BsonUtils::SetStringValue(document, "SecretString", secretString);
+            Core::Bson::BsonUtils::SetStringValue(document, "SecretBinary", secretBinary);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            // Stages
-            Poco::JSON::Array stagesArray;
-            for (const auto &s: versionStages) {
-                stagesArray.add(s);
-            }
-            rootJson.set("VersionStages", versionStages);
-
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void GetSecretValueResponse::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("Name", rootObject, name);
+            // Queue
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+            arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
+            versionId = Core::Bson::BsonUtils::GetStringValue(document, "VersionId");
+            secretString = Core::Bson::BsonUtils::GetStringValue(document, "SecretString");
+            secretBinary = Core::Bson::BsonUtils::GetStringValue(document, "SecretBinary");
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GetSecretValueResponse::ToString() const {

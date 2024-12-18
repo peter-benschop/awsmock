@@ -11,6 +11,7 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/utils/TestUtils.h>
 
 #define TEST_IMAGE_NAME std::string("jensvogt/awsmock-test")
@@ -46,6 +47,9 @@ class TestEnvironment : public ::testing::Environment {
         } else {
             log_info << "Test docker container already running";
         }
+
+        // Initialize monitoring
+        AwsMock::Monitoring::MetricService::instance().Initialize();
     }
 
   private:

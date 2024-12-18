@@ -54,7 +54,7 @@ namespace AwsMock::Dto::SecretsManager {
          *
          * @param jsonObject JSON object
          */
-        void FromJsonObject(const view_or_value<view, value> &jsonObject);
+        void FromDocument(const view_or_value<view, value> &jsonObject);
 
         /**
          * @brief Converts the DTO to a JSON representation.

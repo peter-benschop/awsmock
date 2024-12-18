@@ -9,6 +9,9 @@
 // C++ standard includes
 #include <string>
 
+// Boost includes
+#include <boost/algorithm/string/find.hpp>
+
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/secretsmanager/RotationRules.h>

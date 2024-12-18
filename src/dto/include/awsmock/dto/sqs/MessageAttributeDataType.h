@@ -14,9 +14,9 @@ namespace AwsMock::Dto::SQS {
     };
 
     static std::map<MessageAttributeDataType, std::string> MessageAttributeDataTypeNames{
-            {MessageAttributeDataType::STRING, "String"},
-            {MessageAttributeDataType::NUMBER, "Number"},
-            {MessageAttributeDataType::BINARY, "Binary"},
+            {STRING, "String"},
+            {NUMBER, "Number"},
+            {BINARY, "Binary"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeDataTypeToString(MessageAttributeDataType messageAttributeDataType) {
@@ -24,12 +24,12 @@ namespace AwsMock::Dto::SQS {
     }
 
     [[maybe_unused]] static MessageAttributeDataType MessageAttributeDataTypeFromString(const std::string &messageAttributeDataType) {
-        for (auto &it: MessageAttributeDataTypeNames) {
-            if (it.second == messageAttributeDataType) {
-                return it.first;
+        for (auto &[fst, snd]: MessageAttributeDataTypeNames) {
+            if (snd == messageAttributeDataType) {
+                return fst;
             }
         }
-        return MessageAttributeDataType::STRING;
+        return STRING;
     }
 
 }// namespace AwsMock::Dto::SQS
