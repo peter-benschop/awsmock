@@ -53,9 +53,9 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Converts the DTO from a JSON representation.
          *
-         * @param payload HTTP message body.
+         * @param jsonString HTTP message body.
          */
-        void FromJson(const std::string &payload);
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Converts the DTO to a string representation.

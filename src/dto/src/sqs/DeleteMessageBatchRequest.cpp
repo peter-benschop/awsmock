@@ -44,7 +44,7 @@ namespace AwsMock::Dto::SQS {
                 for (const bsoncxx::array::view arrayView{document["Entries"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
                     DeleteMessageBatchEntry entry;
                     entry.id = Core::Bson::BsonUtils::GetStringValue(element.get_document(), "Id");
-                    entry.receiptHandle = Core::Bson::BsonUtils::GetStringValue(element.get_document(), "Value");
+                    entry.receiptHandle = Core::Bson::BsonUtils::GetStringValue(element.get_document(), "ReceiptHandle");
                     deleteMessageBatchEntries.emplace_back(entry);
                 }
             }
