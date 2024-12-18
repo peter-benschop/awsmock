@@ -8,41 +8,35 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string GetSecretValueRequest::ToJson() const {
 
-        // TOdo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("SecretId", secretId);
-            rootJson.set("VersionId", versionId);
-            rootJson.set("VersionStage", versionStage);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "SecretId", secretId);
+            Core::Bson::BsonUtils::SetStringValue(document, "VersionId", versionId);
+            Core::Bson::BsonUtils::SetStringValue(document, "VersionStage", versionStage);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void GetSecretValueRequest::FromJson(const std::string &jsonString) {
 
-        // TOdo:
-        /*
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("SecretId", rootObject, secretId);
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            secretId = Core::Bson::BsonUtils::GetStringValue(document, "SecretId");
+            versionId = Core::Bson::BsonUtils::GetStringValue(document, "VersionId");
+            versionStage = Core::Bson::BsonUtils::GetStringValue(document, "VersionStage");
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string GetSecretValueRequest::ToString() const {
