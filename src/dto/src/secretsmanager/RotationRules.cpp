@@ -8,34 +8,32 @@ namespace AwsMock::Dto::SecretsManager {
 
     view_or_value<view, value> RotationRules::ToDocument() const {
 
-        /*Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("AutomaticallyAfterDays", automaticallyAfterDays);
-            rootJson.set("Duration", duration);
-            rootJson.set("ScheduleExpression", scheduleExpression);
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetIntValue(document, "AutomaticallyAfterDays", automaticallyAfterDays);
+            Core::Bson::BsonUtils::SetStringValue(document, "Duration", duration);
+            Core::Bson::BsonUtils::SetStringValue(document, "ScheduleExpression", scheduleExpression);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void RotationRules::FromDocument(const view_or_value<view, value> &document) {
 
-        /* Todo:
         try {
 
-            Core::JsonUtils::GetJsonValueLong("AutomaticallyAfterDays", jsonObject, automaticallyAfterDays);
-            Core::JsonUtils::GetJsonValueString("Duration", jsonObject, duration);
-            Core::JsonUtils::GetJsonValueString("ScheduleExpression", jsonObject, scheduleExpression);
+            automaticallyAfterDays = Core::Bson::BsonUtils::GetIntValue(document, "Duration");
+            duration = Core::Bson::BsonUtils::GetStringValue(document, "Duration");
+            scheduleExpression = Core::Bson::BsonUtils::GetStringValue(document, "scheduleExpression");
 
-        } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string RotationRules::ToJson() const {
