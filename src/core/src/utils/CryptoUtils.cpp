@@ -498,7 +498,7 @@ namespace AwsMock::Core {
     std::string Crypto::HexEncode(const unsigned char *hash, const int size) {
         std::stringstream ss;
         for (int i = 0; i < size; ++i)
-            ss << std::setfill('0') << std::setw(2) << std::right << std::hex << (int) hash[i];
+            ss << std::setfill('0') << std::setw(2) << std::right << std::hex << static_cast<int>(hash[i]);
         return ss.str();
     }
 

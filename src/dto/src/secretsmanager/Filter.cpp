@@ -8,38 +8,44 @@ namespace AwsMock::Dto::SecretsManager {
 
     view_or_value<view, value> Filter::ToDocument() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Key", key);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Key", key);
 
-            Poco::JSON::Array valueArray;
-            for (const auto &v: values) {
-                valueArray.add(v);
+            // Values
+            if (!values.empty()) {
+                array valuesArray;
+                for (const auto &e: values) {
+                    valuesArray.append(e);
+                }
+                document.append(kvp("Values", valuesArray));
             }
-            rootJson.set("Values", valueArray);
-            return rootJson;
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    void Filter::FromJsonObject(const view_or_value<view, value> &document) {
-        /* Todo:
+    void Filter::FromDocument(const view_or_value<view, value> &document) {
+
         try {
 
-            Core::JsonUtils::GetJsonValueString("Key", jsonObject, key);
-            Poco::JSON::Array::Ptr jsonValueArray = jsonObject->getArray("Values");
-            for (std::size_t i = 0; i < jsonValueArray->size(); i++) {
-                std::string value = jsonValueArray->getElement<std::string>(i);
-                values.emplace_back(value);
+            key = Core::Bson::BsonUtils::GetStringValue(document, "Key");
+
+            // Values
+            if (document.view().find("Values") != document.view().end()) {
+                for (const bsoncxx::array::view arrayView{document.view()["Values"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                    values.emplace_back(element.get_string().value);
+                }
             }
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string Filter::ToJson() const {

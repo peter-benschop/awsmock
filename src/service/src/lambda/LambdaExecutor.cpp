@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
         Database::LambdaDatabase::instance().SetAverageRuntime(oid, std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count());
         log_debug << "Lambda invocation finished, function: " << functionName << " httpStatus: " << response.statusCode;
-        log_info << "Lambda output: " << response.body;
+        log_info << "Lambda invocation finished, lambda: " << functionName << " output: " << response.body;
     }
 
 }// namespace AwsMock::Service

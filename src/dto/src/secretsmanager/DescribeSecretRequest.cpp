@@ -8,38 +8,31 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string DescribeSecretRequest::ToJson() const {
 
-        // Todo:
-        /*
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("SecretId", secretId);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "SecretId", secretId);
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
-
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void DescribeSecretRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            // Attributes
-            Core::JsonUtils::GetJsonValueString("SecretId", rootObject, secretId);
+            // Queue
+            const value document = bsoncxx::from_json(jsonString);
+            secretId = Core::Bson::BsonUtils::GetStringValue(document, "SecretId");
 
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string DescribeSecretRequest::ToString() const {
