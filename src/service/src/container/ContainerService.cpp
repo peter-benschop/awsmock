@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/container/ContainerService.h>
+#include <thread>
 
 namespace AwsMock::Service {
     std::map<std::string, std::string> ContainerService::_supportedRuntimes = {

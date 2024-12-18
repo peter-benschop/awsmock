@@ -16,10 +16,10 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetPathParameter(const std::string &uri, int index) {
 
-        std::string basePath = GetBasePath(uri);
+        const std::string basePath = GetBasePath(uri);
 
         std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        if (index >= (int) parameters.size()) {
+        if (index >= static_cast<int>(parameters.size())) {
             return {};
         }
         if (IsUrlEncoded(parameters[index])) {
@@ -37,13 +37,13 @@ namespace AwsMock::Core {
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
 
-        std::string basePath = GetBasePath(uri);
+        const std::string basePath = GetBasePath(uri);
         return StringUtils::Split(basePath, '/');
     }
 
     bool HttpUtils::HasPathParameters(const std::string &uri, int index) {
 
-        std::string basePath = GetBasePath(uri);
+        const std::string basePath = GetBasePath(uri);
         std::vector<std::string> pathVector = StringUtils::Split(basePath, '/');
         return index < pathVector.size();
     }
@@ -199,6 +199,10 @@ namespace AwsMock::Core {
         return request.base().find(name) != request.end();
     }
 
+    bool HttpUtils::HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name) {
+        return request.base().find(name) != request.end();
+    }
+
     std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &defaultValue) {
         if (request.base().find(name) == request.end()) {
             if (!defaultValue.empty()) {
@@ -210,6 +214,15 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name, const std::string &defaultValue) {
         if (!HasHeader(request, name)) {
+            if (!defaultValue.empty()) {
+                return defaultValue;
+            }
+        }
+        return request.base()[name];
+    }
+
+    std::string HttpUtils::GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name, const std::string &defaultValue) {
+        if (request.base().find(name) == request.end()) {
             if (!defaultValue.empty()) {
                 return defaultValue;
             }
@@ -316,6 +329,11 @@ namespace AwsMock::Core {
         return request.body();
     }
 
+    std::string HttpUtils::GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
+
+        return request.body();
+    }
+
     http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
 
         http::response<http::dynamic_body> response{http::status::ok, request.version()};
@@ -353,6 +371,22 @@ namespace AwsMock::Core {
         response.prepare_payload();
         return response;
     }
+
+    http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &reason) {
+
+        http::response<http::dynamic_body> response{http::status::bad_request, request.version()};
+        response.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        response.set(http::field::content_type, "text/html");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+
+        boost::beast::ostream(response.body()) << reason;
+        response.prepare_payload();
+        return response;
+    }
+
+    //
 
     http::response<http::string_body> HttpUtils::BadRequest(const http::request<http::string_body> &request, const std::string &reason) {
 

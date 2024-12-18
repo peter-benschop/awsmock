@@ -95,6 +95,7 @@ namespace AwsMock::Database::Entity::Lambda {
                 kvp("instances", instancesDoc),
                 kvp("invocations", invocations),
                 kvp("averageRuntime", averageRuntime),
+                kvp("dockerTag", dockerTag),
                 kvp("eventSources", eventSourcesDoc),
                 kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
                 kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
@@ -130,6 +131,7 @@ namespace AwsMock::Database::Entity::Lambda {
         lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
         invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
+        dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

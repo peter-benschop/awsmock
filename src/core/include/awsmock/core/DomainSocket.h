@@ -11,7 +11,6 @@
 #include <string>
 
 // Boost includes
-#include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
@@ -46,7 +45,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(http::verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}) const;
+        DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}) const;
 
         /**
          * @brief Send binary data

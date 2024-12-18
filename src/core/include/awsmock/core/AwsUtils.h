@@ -365,6 +365,7 @@ namespace AwsMock::Core {
          * @return true if signature could be verified
          */
         static bool VerifySignature(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
+        static bool VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey);
 
         /**
          * @brief Returns the bucket name from the request.
@@ -437,6 +438,7 @@ namespace AwsMock::Core {
          * @return
          */
         static std::string GetCanonicalRequest(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the canonical request.
@@ -479,6 +481,7 @@ namespace AwsMock::Core {
          * @return canonical header string
          */
         static std::string GetCanonicalHeaders(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+        static std::string GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
          * @brief Returns the canonical header string.
@@ -507,6 +510,7 @@ namespace AwsMock::Core {
          * @return AuthorizationHeaderKeys
          */
         static AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
+        static AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey);
 
         /**
          * @brief Returns the signature for the request

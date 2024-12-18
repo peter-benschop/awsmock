@@ -6,16 +6,11 @@
 #define AWSMOCK_CORE_HTTP_SOCKET_H
 
 // C++ includes
-#include <cstring>
-#include <iostream>
 #include <map>
 #include <regex>
-#include <sstream>
 #include <string>
-#include <utility>
 
 // Boost includes
-#include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
@@ -37,7 +32,7 @@ namespace AwsMock::Core {
         explicit HttpSocket() = default;
 
         /**
-         * @brief Send a JSON string to a HTTP endpoint
+         * @brief Send a JSON string to an HTTP endpoint
          *
          * @param method HTTP method
          * @param host HTTP host
@@ -50,7 +45,7 @@ namespace AwsMock::Core {
         static HttpSocketResponse SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
         /**
-         * @brief Send a JSON string to a HTTP endpoint
+         * @brief Send a JSON string to an HTTP endpoint
          *
          * @param method HTTP method
          * @param module HTTP method
@@ -65,7 +60,7 @@ namespace AwsMock::Core {
         static HttpSocketResponse SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers, const std::string &body = {});
 
         /**
-         * @brief Send a binary to a HTTP endpoint
+         * @brief Send a binary to an HTTP endpoint
          *
          * This is usually a file to send ay application/octet-stream.
          *

@@ -7,7 +7,6 @@
 
 // Boost includes
 #include <boost/beast.hpp>
-#include <boost/beast/http/impl/message.hpp>
 
 // AwsMock includes
 #include <awsmock/dto/common/SNSClientCommand.h>

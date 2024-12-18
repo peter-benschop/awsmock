@@ -93,6 +93,16 @@ namespace AwsMock::Database::Entity::SQS {
         long size = 0;
 
         /**
+         * DLQ flag
+         */
+        bool isDlq = false;
+
+        /**
+         * Main queue for this DLQ
+         */
+        std::string mainQueue;
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

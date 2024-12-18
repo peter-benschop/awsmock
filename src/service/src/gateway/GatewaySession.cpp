@@ -7,6 +7,7 @@
 namespace AwsMock::Service {
 
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
+
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValueInt("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
@@ -189,10 +190,10 @@ namespace AwsMock::Service {
 
     void GatewaySession::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
-        if (ec) {
-            log_error << ec.message();
+
+        // This means they closed the connection
+        if (ec == http::error::end_of_stream)
             return DoShutdown();
-        }
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.

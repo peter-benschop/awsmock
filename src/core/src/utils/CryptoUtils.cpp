@@ -40,7 +40,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
 
-        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
+        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -82,7 +82,7 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetSha1FromFile(const std::string &fileName) {
 
-        char *buffer = new char[AWSMOCK_BUFFER_SIZE];
+        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_sha1();
@@ -240,7 +240,9 @@ namespace AwsMock::Core {
              static_cast<int>(msg.size()),
              hash,
              &hashLen);
-        return {hash, hash + hashLen};
+        std::vector<unsigned char> result = {hash, hash + hashLen};
+        free(hash);
+        return result;
     }
 
     std::vector<unsigned char> Crypto::GetHmacSha256FromStringRaw(const std::vector<unsigned char> &key, const std::string &msg) {
@@ -255,7 +257,9 @@ namespace AwsMock::Core {
              static_cast<int>(msg.size()),
              hash,
              &hashLen);
-        return {hash, hash + hashLen};
+        std::vector<unsigned char> result = {hash, hash + hashLen};
+        free(hash);
+        return result;
     }
 
     void Crypto::CreateAes256Key(unsigned char *key, unsigned char *iv) {
@@ -296,21 +300,21 @@ namespace AwsMock::Core {
         return ciphertext;
     }
 
-    unsigned char *Crypto::Aes256DecryptString(unsigned char *ciphertext, int *len, unsigned char *key) {
+    unsigned char *Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, unsigned char *key) {
 
         // Opaque encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
         auto *key_data = key;
-        int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
+        if (const int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256DecryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
             log_error << "Couldn't initialize AES cipher";
             return {};
         }
 
+        const int c_len = *len;
         // Max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
-        int c_len = *len, f_len = 0, p_len = 0;
+        int f_len = 0, p_len = 0;
         auto *plaintext = static_cast<unsigned char *>(malloc(c_len));
 
         EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
@@ -342,32 +346,31 @@ namespace AwsMock::Core {
         int outFileLen = 0;
 
         // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
-        char *in_buf = new char[AWSMOCK_BUFFER_SIZE];
-        char *out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
+        auto in_buf = new char[AWSMOCK_BUFFER_SIZE];
+        auto out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
 
         // Allows reusing of 'ctx' for multiple encryption cycles
         EVP_EncryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
 
-        int count = 0;
         while (!input_file.eof()) {
             input_file.read(in_buf, AWSMOCK_BUFFER_SIZE);
-            std::streamsize dataSize = input_file.gcount();
-            if (1 == EVP_EncryptUpdate(ctx, (unsigned char *) out_buf, &outFileLen, (const unsigned char *) in_buf, (int) dataSize)) {
+            if (std::streamsize dataSize = input_file.gcount(); 1 == EVP_EncryptUpdate(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen, reinterpret_cast<const unsigned char *>(in_buf), (int) dataSize)) {
                 output_file.write(out_buf, outFileLen);
                 log_trace << "AES256 encryption of file, written: " << outFileLen;
             } else {
+                int count = 0;
                 log_error << "Encryption failed after " << count << " chunk";
                 break;
             }
         }
-        EVP_EncryptFinal_ex(ctx, (unsigned char *) out_buf, &outFileLen);
+        EVP_EncryptFinal_ex(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen);
         EVP_CIPHER_CTX_free(ctx);
         input_file.close();
         output_file.close();
         free(in_buf);
         free(out_buf);
 
-        Core::FileUtils::MoveTo(outFilename, filename);
+        FileUtils::MoveTo(outFilename, filename);
     }
 
     void Crypto::Aes256DecryptFile(const std::string &filename, std::string &outFilename, unsigned char *key) {
@@ -376,9 +379,8 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
         auto *key_data = key;
-        int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256DecryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
+        if (int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256DecryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
             log_error << "Couldn't initialize AES256 cipher";
         }
 
@@ -388,25 +390,24 @@ namespace AwsMock::Core {
         int outFileLen = 0;
 
         // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
-        char *in_buf = new char[AWSMOCK_BUFFER_SIZE];
-        char *out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
+        auto in_buf = new char[AWSMOCK_BUFFER_SIZE];
+        auto out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
 
         // Allows reusing of 'ctx' for multiple encryption cycles
         EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
 
-        int count = 0;
         while (!input_file.eof()) {
             input_file.read(in_buf, AWSMOCK_BUFFER_SIZE);
-            std::streamsize dataSize = input_file.gcount();
-            if (1 == EVP_DecryptUpdate(ctx, (unsigned char *) out_buf, &outFileLen, (const unsigned char *) in_buf, (int) dataSize)) {
+            if (std::streamsize dataSize = input_file.gcount(); 1 == EVP_DecryptUpdate(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen, reinterpret_cast<const unsigned char *>(in_buf), static_cast<int>(dataSize))) {
                 output_file.write(out_buf, outFileLen);
                 log_trace << "AES256 decryption of file, written: " << outFileLen;
             } else {
+                int count = 0;
                 log_error << "Decryption failed after " << count << " chunk";
                 break;
             }
         }
-        EVP_DecryptFinal_ex(ctx, (unsigned char *) out_buf, &outFileLen);
+        EVP_DecryptFinal_ex(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen);
         EVP_CIPHER_CTX_free(ctx);
         input_file.close();
         output_file.close();
@@ -416,13 +417,12 @@ namespace AwsMock::Core {
 
     int Crypto::Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
 
-        int i, nrounds = 5;
+        int nrounds = 5;
         unsigned char key[CRYPTO_AES256_KEY_SIZE], iv[CRYPTO_AES256_BLOCK_SIZE];
 
         // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times
         // we hash the material. More rounds are more secure but slower.
-        i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
-        if (i != 32) {
+        if (const int i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv); i != 32) {
             log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
         }
@@ -435,13 +435,12 @@ namespace AwsMock::Core {
 
     int Crypto::Aes256DecryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
 
-        int i, nrounds = 5;
+        int nrounds = 5;
         unsigned char key[CRYPTO_AES256_KEY_SIZE], iv[CRYPTO_AES256_BLOCK_SIZE];
 
         // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times,
         // we hash the material. More rounds are more secure but slower.
-        i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
-        if (i != 32) {
+        if (const int i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv); i != 32) {
             log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
         }
@@ -591,8 +590,8 @@ namespace AwsMock::Core {
     std::string Crypto::RsaEncrypt(EVP_PKEY *keyPair, const std::string &in) {
 
         size_t outLen;
-        auto inLen = static_cast<size_t>(in.length());
-        auto bytes = reinterpret_cast<const unsigned char *>(in.c_str());
+        const auto inLen = static_cast<size_t>(in.length());
+        const auto bytes = reinterpret_cast<const unsigned char *>(in.c_str());
 
         EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(keyPair, nullptr);
         EVP_PKEY_encrypt_init(ctx);
@@ -603,19 +602,19 @@ namespace AwsMock::Core {
             log_error << "Could not get length of encrypted string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         };
 
-        auto *encrypt = (unsigned char *) OPENSSL_malloc(outLen);
+        auto *encrypt = static_cast<unsigned char *>(OPENSSL_malloc(outLen));
         if (EVP_PKEY_encrypt(ctx, encrypt, &outLen, bytes, inLen) <= 0) {
             log_error << "Could not encrypt string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         }
         EVP_PKEY_CTX_free(ctx);
-        return {reinterpret_cast<const char *>(encrypt), static_cast<size_t>(outLen)};
+        return {reinterpret_cast<const char *>(encrypt), outLen};
     }
 
     std::string Crypto::RsaDecrypt(EVP_PKEY *keyPair, const std::string &in) {
 
         size_t outLen;
-        int inLen = static_cast<int>(in.length());
-        auto *bytes = (unsigned char *) in.c_str();
+        const int inLen = static_cast<int>(in.length());
+        const auto *bytes = (unsigned char *) in.c_str();
 
         EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(keyPair, nullptr);
         EVP_PKEY_decrypt_init(ctx);
@@ -626,12 +625,12 @@ namespace AwsMock::Core {
             log_error << "Could not get length of encrypted string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         };
 
-        auto *decrypt = (unsigned char *) OPENSSL_malloc(outLen);
+        auto *decrypt = static_cast<unsigned char *>(OPENSSL_malloc(outLen));
         if (EVP_PKEY_decrypt(ctx, decrypt, &outLen, bytes, inLen) <= 0) {
             log_error << "Could not decrypt string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         }
         EVP_PKEY_CTX_free(ctx);
-        return {(char *) decrypt, outLen};
+        return {reinterpret_cast<char *>(decrypt), outLen};
     }
 
 }// namespace AwsMock::Core

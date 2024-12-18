@@ -8,7 +8,7 @@ set(CMAKE_BUILD_PARALLEL_LEVEL 30)
 
 # ignore BOOST deprecated headers
 #add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
-add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+#add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
 
 # Doxygen
 option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " ON)

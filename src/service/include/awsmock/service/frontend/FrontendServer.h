@@ -15,22 +15,22 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/service/frontend/HttpWorker.h>
+#include <awsmock/service/frontend/FrontendWorker.h>
 
 namespace AwsMock::Service::Frontend {
 
-    class HttpServer {
+    class FrontendServer {
 
       public:
 
         /**
          * Constructor
          */
-        HttpServer() = default;
+        FrontendServer() = default;
 
         /**
-       * @brief Executes a lambda function
-       */
+         * @brief HTTP request worker
+         */
         void operator()() const;
     };
 

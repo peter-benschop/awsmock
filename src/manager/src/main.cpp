@@ -32,7 +32,8 @@
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/server/Manager.h>
-#include <awsmock/service/frontend/HttpServer.h>
+#include <awsmock/service/frontend/FrontendServer.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 #define DEFAULT_CONFIG_FILE "/etc/awsmock.yml"
 
@@ -102,7 +103,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Start HTTP frontend server
-    AwsMock::Service::Frontend::HttpServer server;
+    AwsMock::Service::Frontend::FrontendServer server;
     boost::thread t{boost::ref(server)};
     t.detach();
 

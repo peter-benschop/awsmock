@@ -1,5 +1,6 @@
 
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <boost/bind/bind.hpp>
 
 namespace AwsMock::Core {
 

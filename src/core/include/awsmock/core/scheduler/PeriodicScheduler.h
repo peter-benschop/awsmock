@@ -7,20 +7,17 @@
 
 // C++ includes
 #include <chrono>
-#include <functional>
+#include <map>
 #include <string>
-#include <utility>
 
 // Boost includes
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/system/error_code.hpp>
 
 // AwsMOck includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
-#include <map>
 
 namespace AwsMock::Core {
 

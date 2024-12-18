@@ -234,8 +234,8 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.region = region, .functionName = functionName, .qualifier = qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
                 return SendNoContentResponse(request);
-
-            } else if (action == "tags") {
+            }
+            if (action == "tags") {
 
                 std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
                 log_debug << "Found lambda arn, arn: " << arn;
@@ -247,11 +247,9 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteTagsRequest lambdaRequest(arn, tagKeys);
                 _lambdaService.DeleteTags(lambdaRequest);
                 return SendNoContentResponse(request);
-
-            } else {
-                log_error << "Unknown method";
-                return SendBadRequestError(request, "Unknown method");
             }
+            log_error << "Unknown method";
+            return SendBadRequestError(request, "Unknown method");
 
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();

@@ -12,18 +12,18 @@ awsmock:
   temp-dir: /home/awsmock/data/tmp            # General temp directory
   data-dir: /home/awsmock/data                # General data directory
   dockerized: false                           # dockerized flag
-  json:
-    pretty: true
-  aws:
-    signature:
-      verify: false
+  json: # JSON settings                       # JSON settings
+    pretty: true                              # JSON pretty print
+  aws: # AWS settings
+    signature: # AWS signature settings
+      verify: false                           # Verify AWS signature
   frontend: # Frontend HTTP server
     address: 0.0.0.0                          # Listen address
     port: 4567                                # Port number
     workers: 20                               # Number of worker threads
     timeout: 900                              # HTTP timeout
     doc-root: /home/awsmock/frontend          # Document root directory
-  docker:
+  docker: # Docker settings
     active: true
     network-mode: local
     network-name: local

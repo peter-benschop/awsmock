@@ -7,8 +7,18 @@
 
 
 // AwsMock includes
+#include <awsmock/service/cognito/CognitoServer.h>
+#include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>
+#include <awsmock/service/kms/KMSServer.h>
+#include <awsmock/service/lambda/LambdaServer.h>
 #include <awsmock/service/monitoring/MonitoringServer.h>
+#include <awsmock/service/s3/S3Server.h>
+#include <awsmock/service/secretsmanager/SecretsManagerServer.h>
+#include <awsmock/service/sns/SNSServer.h>
+#include <awsmock/service/sqs/SQSServer.h>
+#include <awsmock/service/ssm/SSMServer.h>
+#include <awsmock/service/transfer/TransferServer.h>
 
 #define DEFAULT_MONGO_DBNAME "awsmock"
 #define DEFAULT_MONGO_DBUSER "root"
@@ -30,6 +40,7 @@ namespace AwsMock::Manager {
      *   - General initializations
      *   - Start the activated services are background threads
      *   - Start the API gateway on port 4566 by default (can be changed in the configuration file)
+     *   - Start the frontend server on port 4567 by default (can be changed in the configuration file)
      *   - Wait for a termination signal
      *
      * @author jens.vogt@opitz-consulting.com
