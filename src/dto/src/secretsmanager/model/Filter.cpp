@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#include <awsmock/dto/secretsmanager/Filter.h>
+#include <awsmock/dto/secretsmanager/model/Filter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/secretsmanager/RotationRules.h>
+#include <awsmock/dto/secretsmanager/model/RotationRules.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#include <awsmock/dto/secretsmanager/VersionIdsToStages.h>
+#include <awsmock/dto/secretsmanager/model/VersionIdsToStages.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

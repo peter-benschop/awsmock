@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#include <awsmock/dto/secretsmanager/RotationRules.h>
+#include <awsmock/dto/secretsmanager/model/RotationRules.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

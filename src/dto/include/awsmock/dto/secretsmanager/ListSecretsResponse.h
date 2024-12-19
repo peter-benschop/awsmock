@@ -10,7 +10,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/secretsmanager/Secret.h>
+#include <awsmock/dto/secretsmanager/model/Secret.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
