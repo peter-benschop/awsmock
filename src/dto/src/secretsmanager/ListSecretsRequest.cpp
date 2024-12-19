@@ -8,60 +8,56 @@ namespace AwsMock::Dto::SecretsManager {
 
     std::string ListSecretsRequest::ToJson() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("SortOrder", sortOrder);
-            rootJson.set("NextToken", nextToken);
-            rootJson.set("MaxResults", maxResults);
-            rootJson.set("IncludePlannedDeletion", includePlannedDeletion);
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "SortOrder", sortOrder);
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
+            Core::Bson::BsonUtils::SetIntValue(document, "MaxResults", maxResults);
+            Core::Bson::BsonUtils::SetBoolValue(document, "IncludePlannedDeletion", includePlannedDeletion);
 
             // Filters
-            Poco::JSON::Array jsonFiltersArray;
-            for (const auto &f: filters) {
-                jsonFiltersArray.add(f.ToJsonObject());
+            if (!filters.empty()) {
+                array jsonFilters;
+                for (const auto &filter: filters) {
+                    jsonFilters.append(filter.ToDocument());
+                }
+                document.append(kvp("Filters", jsonFilters));
             }
-            rootJson.set("Filters", jsonFiltersArray);
 
-            std::ostringstream os;
-            rootJson.stringify(os);
-            return os.str();
+            return Core::Bson::BsonUtils::ToJsonString(document);
 
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void ListSecretsRequest::FromJson(const std::string &jsonString) {
 
-        /* Todo:
-        Poco::JSON::Parser parser;
-        Poco::Dynamic::Var result = parser.parse(jsonString);
-        const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", rootObject, region);
-            Core::JsonUtils::GetJsonValueString("SortOrder", rootObject, sortOrder);
-            Core::JsonUtils::GetJsonValueString("NextToken", rootObject, nextToken);
-            Core::JsonUtils::GetJsonValueInt("MaxResults", rootObject, maxResults);
-            Core::JsonUtils::GetJsonValueBool("IncludePlannedDeletion", rootObject, includePlannedDeletion);
+            // Queue
+            const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            sortOrder = Core::Bson::BsonUtils::GetStringValue(document, "SortOrder");
+            nextToken = Core::Bson::BsonUtils::GetStringValue(document, "NextToken");
+            maxResults = Core::Bson::BsonUtils::GetIntValue(document, "MaxResults");
+            includePlannedDeletion = Core::Bson::BsonUtils::GetBoolValue(document, "IncludePlannedDeletion");
 
-            if (rootObject->has("Filters")) {
-                Poco::JSON::Array::Ptr jsonTagsArray = rootObject->getArray("Filters");
-                for (int i = 0; i < jsonTagsArray->size(); i++) {
+            // Filters
+            if (document.find("Filters") != document.end()) {
+                for (const bsoncxx::array::view arrayView{document["Filters"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
                     Filter filter;
-                    filter.FromJsonObject(jsonTagsArray->getObject(i));
+                    filter.FromDocument(element.get_document().value);
                     filters.emplace_back(filter);
                 }
             }
-
-        } catch (Poco::Exception &exc) {
-            throw Core::JsonException(exc.message());
-        }*/
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string ListSecretsRequest::ToString() const {

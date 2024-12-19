@@ -8,38 +8,39 @@ namespace AwsMock::Dto::SecretsManager {
 
     view_or_value<view, value> ReplicationStatus::ToDocument() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("ARN", arn);
-            rootJson.set("KmsKeyId", kmsKeyId);
-            rootJson.set("LastAccessedDate", lastAccessedDate);
-            rootJson.set("Status", status);
-            rootJson.set("StatusMessage", statusMessage);
-            return rootJson;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
+            Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyId", kmsKeyId);
+            Core::Bson::BsonUtils::SetLongValue(document, "LastAccessedDate", lastAccessedDate);
+            Core::Bson::BsonUtils::SetStringValue(document, "Status", status);
+            Core::Bson::BsonUtils::SetStringValue(document, "StatusMessage", statusMessage);
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 
     void ReplicationStatus::FromDocument(const view_or_value<view, value> &document) {
 
-        /* Todo:
         try {
 
-            Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
-            Core::JsonUtils::GetJsonValueString("ARN", jsonObject, arn);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
+            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(document, "KmsKeyId");
+            lastAccessedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastAccessedDate");
+            status = Core::Bson::BsonUtils::GetStringValue(document, "Status");
+            statusMessage = Core::Bson::BsonUtils::GetStringValue(document, "StatusMessage");
 
-        } catch (Poco::Exception &exc) {
-            std::cerr << exc.message() << std::endl;
-            throw Core::ServiceException(exc.message());
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-        */
     }
 
     std::string ReplicationStatus::ToJson() const {

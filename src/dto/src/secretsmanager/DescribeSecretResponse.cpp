@@ -10,24 +10,24 @@ namespace AwsMock::Dto::SecretsManager {
 
         try {
 
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
-            Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
-            Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ARN", arn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Description", description);
 
             // Tags
-            if (!tags.tags.empty()) {
-                array jsonArray;
-                for (auto tag: tags) {
-                    jsonArray.append(tag.ToDocument());
+            if (!tags.empty()) {
+                document tagsDoc;
+                for (const auto &[fst, snd]: tags) {
+                    tagsDoc.append(kvp(fst, snd));
                 }
-                document.append(kvp("Tags", jsonArray));
+                rootDocument.append(kvp("Tags", tagsDoc));
             }
 
-            document.append(kvp("ReplicationsStatus", replicationStatus.ToDocument()));
-            document.append(kvp("VersionIdsToStages", versionIdsToStages.ToDocument()));
-            return Core::Bson::BsonUtils::ToJsonString(document);
+            rootDocument.append(kvp("ReplicationsStatus", replicationStatus.ToDocument()));
+            rootDocument.append(kvp("VersionIdsToStages", versionIdsToStages.ToDocument()));
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

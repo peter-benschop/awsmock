@@ -8,37 +8,42 @@ namespace AwsMock::Dto::SecretsManager {
 
     view_or_value<view, value> SecretTags::ToDocument() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Array rootJson;
+            document document;
 
-            for (const auto &t: tags) {
-                Poco::JSON::Object tagJsonObject;
-                tagJsonObject.set("Key", t.first);
-                tagJsonObject.set("Value", t.second);
-                rootJson.add(tagJsonObject);
+            // Entries
+            if (!tags.empty()) {
+                array entriesArray;
+                for (const auto &e: tags) {
+                    entriesArray.append(e);
+                }
+                document.append(kvp("Tags", entriesArray));
             }
-            return rootJson;
+            return document.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string SecretTags::ToJson() const {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    void SecretTags::FromDocument(const view_or_value<view, value> &jsonObject) {
+    void SecretTags::FromDocument(const view_or_value<view, value> &document) {
 
         try {
 
-            //Core::JsonUtils::GetJsonValueString("Region", jsonObject, region);
-            //
-            //
-            // Core::JsonUtils::GetJsonValueString("ARN", jsonObject, arn);
+            // Tags
+            if (document.view().find("Tags") != document.view().end()) {
+                for (const bsoncxx::array::view arrayView{document.view()["Tags"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                    /*SecretTags sTtag;
+                    sTtag.FromDocument(element.get_document().value);
+                    tags.emplace_back(sTtag);*/
+                }
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

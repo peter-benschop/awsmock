@@ -8,25 +8,25 @@ namespace AwsMock::Dto::SecretsManager {
 
     view_or_value<view, value> VersionIdsToStages::ToDocument() const {
 
-        /* Todo:
         try {
 
-            Poco::JSON::Object rootJson;
-            for (const auto &version: versions) {
-
-                Poco::JSON::Object versionObject;
-                Poco::JSON::Array stagesArray;
-                for (const auto &stage: version.second) {
-                    stagesArray.add(stage);
+            document rootDocument;
+            if (!versions.empty()) {
+                for (const auto &[fst, snd]: versions) {
+                    array stagesArray;
+                    document versionDocument;
+                    for (const auto &stage: snd) {
+                        stagesArray.append(stage);
+                    }
+                    versionDocument.append(kvp(fst, stagesArray));
                 }
-                rootJson.set(version.first, stagesArray);
             }
-            return rootJson;
+            return rootDocument.extract();
 
-        } catch (Poco::Exception &exc) {
-            throw Core::ServiceException(exc.message());
-        }*/
-        return {};
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     void VersionIdsToStages::FromDocument(const view_or_value<view, value> &document) {
