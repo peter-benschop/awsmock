@@ -74,9 +74,9 @@ namespace AwsMock::Dto::SecretsManager {
         VersionIdsToStages versionIdsToStages;
 
         /**
-         * Version IDs to stages
+         * Map of Tags
          */
-        SecretTags tags;
+        std::map<std::string, std::string> tags;
 
         /**
          * @brief Convert to a JSON string
