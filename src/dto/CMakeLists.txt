@@ -80,10 +80,10 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
         src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
-        src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/ReplicationStatus.cpp
-        src/secretsmanager/VersionIdsToStages.cpp src/secretsmanager/UpdateSecretRequest.cpp src/secretsmanager/UpdateSecretResponse.cpp src/secretsmanager/SecretTags.cpp
-        src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/Filter.cpp src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/RotationRules.cpp
-        src/secretsmanager/Secret.cpp src/secretsmanager/ListSecretsRequest.cpp src/secretsmanager/ListSecretsResponse.cpp)
+        src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp
+        src/secretsmanager/model/VersionIdsToStages.cpp src/secretsmanager/UpdateSecretRequest.cpp src/secretsmanager/UpdateSecretResponse.cpp src/secretsmanager/model/SecretTags.cpp
+        src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/model/Filter.cpp src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/model/RotationRules.cpp
+        src/secretsmanager/model/Secret.cpp src/secretsmanager/ListSecretsRequest.cpp src/secretsmanager/ListSecretsResponse.cpp)
 set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/kms/Key.cpp src/kms/ListKey.cpp src/kms/ScheduleKeyDeletionRequest.cpp
         src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp

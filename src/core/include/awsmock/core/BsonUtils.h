@@ -7,6 +7,7 @@
 
 // C++ includes
 #include <chrono>
+#include <map>
 
 // Bson includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -29,6 +30,10 @@ using bsoncxx::document::view;
 using std::chrono::system_clock;
 
 namespace AwsMock::Core::Bson {
+
+    inline bool FindBsonObject(const view &value, const std::string &name) {
+        return value.find(name) != value.end();
+    }
 
     template<class Element>
     void ToBsonArray(document &d, const std::string &name, std::vector<Element> a) {
@@ -82,6 +87,27 @@ namespace AwsMock::Core::Bson {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
+    }
+
+    template<class Object>
+    Object FromBsonObject(const value &value, const std::string &name, Object *object) {
+        if (FindBsonObject(value, name)) {
+            return object->FromDocument(value[name].get_document().view());
+        }
+        return {};
+    }
+
+    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument, const std::string &name) {
+        if (FindBsonObject(viewDocument.value(), name)) {
+            std::map<std::string, std::string> valueMap;
+            for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                std::string key = bsoncxx::string::to_string(tagElement.key());
+                std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                valueMap.emplace(key, value);
+            }
+            return valueMap;
+        }
+        return {};
     }
 
     struct BsonUtils {

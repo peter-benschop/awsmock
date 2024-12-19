@@ -10,9 +10,9 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/secretsmanager/ReplicationStatus.h>
-#include <awsmock/dto/secretsmanager/SecretTags.h>
-#include <awsmock/dto/secretsmanager/VersionIdsToStages.h>
+#include <awsmock/dto/secretsmanager/model/ReplicationStatus.h>
+#include <awsmock/dto/secretsmanager/model/SecretTags.h>
+#include <awsmock/dto/secretsmanager/model/VersionIdsToStages.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

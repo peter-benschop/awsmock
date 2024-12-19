@@ -43,12 +43,12 @@ namespace AwsMock::Dto::SecretsManager {
             const value document = bsoncxx::from_json(jsonString);
             name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
 
-            // Tags
+            // Get tags
             if (document.find("Tags") != document.end()) {
-                for (const bsoncxx::array::view arrayView{document["Tags"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
-                    SecretTags tag;
-                    tag.FromDocument(element.get_document().value);
-                    //tags.tags[tag].emplace_back(tag);
+                for (const view tagsView = document["Tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                    std::string key = bsoncxx::string::to_string(tagElement.key());
+                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                    tags.emplace(key, value);
                 }
             }
 

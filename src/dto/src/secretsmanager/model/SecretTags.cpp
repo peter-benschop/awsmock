@@ -2,7 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#include <awsmock/dto/secretsmanager/SecretTags.h>
+#include <awsmock/dto/secretsmanager/model/SecretTags.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -10,17 +10,17 @@ namespace AwsMock::Dto::SecretsManager {
 
         try {
 
-            document document;
+            document rootDocument;
 
             // Entries
             if (!tags.empty()) {
-                array entriesArray;
-                for (const auto &e: tags) {
-                    entriesArray.append(e);
+                document entriesArray;
+                for (const auto &[fst, snd]: tags) {
+                    entriesArray.append(kvp(fst, snd));
                 }
-                document.append(kvp("Tags", entriesArray));
+                rootDocument.append(kvp("Tags", entriesArray));
             }
-            return document.extract();
+            return rootDocument.extract();
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

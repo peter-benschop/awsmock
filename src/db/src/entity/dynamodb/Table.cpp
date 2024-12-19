@@ -71,13 +71,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get tags
-        if (mResult.value().find("tags") != mResult.value().end()) {
+        tags = Core::Bson::MapFromBsonObject(mResult, "Tags");
+        /*        if (mResult.value().find("tags") != mResult.value().end()) {
             for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
             }
-        }
+        }*/
 
         // Get attributes
         if (mResult.value().find("attributes") != mResult.value().end()) {

@@ -11,7 +11,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/secretsmanager/Filter.h>
+#include <awsmock/dto/secretsmanager/model/Filter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 

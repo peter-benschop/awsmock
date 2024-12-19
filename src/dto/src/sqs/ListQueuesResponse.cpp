@@ -36,7 +36,7 @@ namespace AwsMock::Dto::SQS {
                 document.append(kvp("QueueUrls", jsonArray));
             }
             Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
-            Core::Bson::BsonUtils::SetIntValue(document, "Total", total);
+            Core::Bson::BsonUtils::SetLongValue(document, "Total", total);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {
