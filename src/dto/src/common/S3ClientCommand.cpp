@@ -8,7 +8,7 @@ namespace AwsMock::Dto::Common {
 
     void S3ClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
-        Dto::Common::UserAgent userAgent;
+        UserAgent userAgent;
         userAgent.FromRequest(request);
 
         // Basic values
@@ -44,7 +44,7 @@ namespace AwsMock::Dto::Common {
 
         } else if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
-            std::string action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+            const std::string action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
             command = S3CommandTypeFromString(action);
 
         } else {

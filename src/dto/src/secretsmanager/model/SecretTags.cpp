@@ -37,13 +37,7 @@ namespace AwsMock::Dto::SecretsManager {
         try {
 
             // Tags
-            if (document.view().find("Tags") != document.view().end()) {
-                for (const bsoncxx::array::view arrayView{document.view()["Tags"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
-                    /*SecretTags sTtag;
-                    sTtag.FromDocument(element.get_document().value);
-                    tags.emplace_back(sTtag);*/
-                }
-            }
+            tags = Core::Bson::MapFromBsonObject(document, "Tags");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

@@ -51,7 +51,7 @@ namespace AwsMock::Service {
 
         // Body
         if (!body.empty()) {
-            ostream(response.body()).write(body.c_str(), body.length());
+            ostream(response.body()).write(body.c_str(), body.length()).flush();
             response.prepare_payload();
         }
 

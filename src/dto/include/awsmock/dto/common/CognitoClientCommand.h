@@ -65,44 +65,44 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<CognitoCommandType, std::string> CognitoCommandTypeNames{
-            {CognitoCommandType::CREATE_USER_POOL, "CreateUserPool"},
-            {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "CreateUserPoolDomain"},
-            {CognitoCommandType::UPDATE_USER_POOL, "UpdateUserPool"},
-            {CognitoCommandType::UPDATE_USER_POOL_DOMAIN, "UpdateUserPoolDomain"},
-            {CognitoCommandType::UPDATE_USER_POOL_DOMAIN, "UpdateUserPoolClient"},
-            {CognitoCommandType::DESCRIBE_USER_POOL, "DescribeUserPool"},
-            {CognitoCommandType::LIST_USER_POOLS, "ListUserPools"},
-            {CognitoCommandType::LIST_USER_POOL_CLIENTS, "ListUserPoolClients"},
+            {CognitoCommandType::CREATE_USER_POOL, "create-user-pool"},
+            {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "create-user-pool-domain"},
+            {CognitoCommandType::CREATE_USER_POOL_CLIENT, "create-user-pool-client"},
+            {CognitoCommandType::UPDATE_USER_POOL, "update-user-pool"},
+            {CognitoCommandType::UPDATE_USER_POOL_DOMAIN, "update-user-pool-domain"},
+            {CognitoCommandType::UPDATE_USER_POOL_CLIENT, "update-user-pool-client"},
+            {CognitoCommandType::DESCRIBE_USER_POOL, "describe-user-pool"},
+            {CognitoCommandType::LIST_USER_POOLS, "list-user-pools"},
+            {CognitoCommandType::LIST_USER_POOL_CLIENTS, "list-user-pool-clients"},
             {CognitoCommandType::LIST_USER_POOL_COUNTERS, "ListUserPoolCounters"},
-            {CognitoCommandType::LIST_USERS, "ListUsers"},
+            {CognitoCommandType::LIST_USERS, "list-users"},
             {CognitoCommandType::LIST_USER_COUNTERS, "ListUserCounters"},
-            {CognitoCommandType::DESCRIBE_USER_POOL, "DescribeUserPool"},
-            {CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS, "DescribeUserPoolClients"},
-            {CognitoCommandType::DELETE_USER_POOL, "DeleteUserPool"},
-            {CognitoCommandType::DELETE_USER_POOL_CLIENT, "DeleteUserPoolClient"},
-            {CognitoCommandType::CREATE_USER, "CreateUser"},
-            {CognitoCommandType::ENABLE_USER, "EnableUser"},
-            {CognitoCommandType::DISABLE_USER, "DisableUser"},
-            {CognitoCommandType::DELETE_USER, "DeleteUser"},
-            {CognitoCommandType::CREATE_GROUP, "CreateGroup"},
-            {CognitoCommandType::LIST_GROUPS, "ListGroups"},
-            {CognitoCommandType::DELETE_GROUP, "DeleteGroup"},
-            {CognitoCommandType::ADD_USER_TO_GROUP, "AdminAddUserToGroup"},
-            {CognitoCommandType::LIST_USERS_IN_GROUP, "ListUsersInGroup"},
-            {CognitoCommandType::REMOVE_USER_FROM_GROUP, "AdminRemoveUserFromGroup"},
-            {CognitoCommandType::CREATE_USER_POOL_CLIENT, "CreateUserPoolClient"},
-            {CognitoCommandType::INITIATE_AUTH, "InitiateAuth"},
-            {CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE, "RespondToAuthChallenge"},
-            {CognitoCommandType::SIGN_UP, "SignUp"},
-            {CognitoCommandType::ADMIN_CREATE_USER, "AdminCreateUser"},
-            {CognitoCommandType::ADMIN_GET_USER, "AdminGetUser"},
-            {CognitoCommandType::ADMIN_ENABLE_USER, "AdminEnableUser"},
-            {CognitoCommandType::ADMIN_DISABLE_USER, "AdminDisableUser"},
-            {CognitoCommandType::ADMIN_DELETE_USER, "AdminDeleteUser"},
-            {CognitoCommandType::ADMIN_CONFIRM_SIGN_UP, "AdminConfirmSignUp"},
-            {CognitoCommandType::GLOBAL_SIGN_OUT, "GlobalSignOut"},
-            {CognitoCommandType::ADMIN_ADD_USER_TO_GROUP, "AdminAddUserToGroup"},
-            {CognitoCommandType::ADMIN_REMOVE_USER_FROM_GROUP, "AdminRemoveUserFromGroup"}};
+            {CognitoCommandType::DESCRIBE_USER_POOL, "describe-user-pool"},
+            {CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS, "describe-user-pool-clients"},
+            {CognitoCommandType::DELETE_USER_POOL, "delete-user-pool"},
+            {CognitoCommandType::DELETE_USER_POOL_CLIENT, "delete-user-pool-client"},
+            {CognitoCommandType::CREATE_USER, "create-user"},
+            {CognitoCommandType::ENABLE_USER, "enable-user"},
+            {CognitoCommandType::DISABLE_USER, "disable-user"},
+            {CognitoCommandType::DELETE_USER, "delete-user"},
+            {CognitoCommandType::CREATE_GROUP, "create-group"},
+            {CognitoCommandType::LIST_GROUPS, "list-groups"},
+            {CognitoCommandType::DELETE_GROUP, "delete-group"},
+            {CognitoCommandType::ADD_USER_TO_GROUP, "admin-add-user-to-group"},
+            {CognitoCommandType::LIST_USERS_IN_GROUP, "list-users-in-group"},
+            {CognitoCommandType::REMOVE_USER_FROM_GROUP, "admin-remove-user-from-group"},
+            {CognitoCommandType::INITIATE_AUTH, "initiate-auth"},
+            {CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE, "respond-to-auth-challenge"},
+            {CognitoCommandType::SIGN_UP, "sign-up"},
+            {CognitoCommandType::ADMIN_CREATE_USER, "admin-create-user"},
+            {CognitoCommandType::ADMIN_GET_USER, "admin-get-user"},
+            {CognitoCommandType::ADMIN_ENABLE_USER, "admin-enable-user"},
+            {CognitoCommandType::ADMIN_DISABLE_USER, "admin-disable-user"},
+            {CognitoCommandType::ADMIN_DELETE_USER, "admin-delete-user"},
+            {CognitoCommandType::ADMIN_CONFIRM_SIGN_UP, "admin-confirm-sign-up"},
+            {CognitoCommandType::GLOBAL_SIGN_OUT, "global-sign-out"},
+            {CognitoCommandType::ADMIN_ADD_USER_TO_GROUP, "admin-add-user-to-group"},
+            {CognitoCommandType::ADMIN_REMOVE_USER_FROM_GROUP, "admin-remove-user-from-group"}};
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(const CognitoCommandType commandType) {
         return CognitoCommandTypeNames[commandType];
@@ -110,7 +110,7 @@ namespace AwsMock::Dto::Common {
 
     [[maybe_unused]] static CognitoCommandType CognitoCommandTypeFromString(const std::string &commandType) {
         for (auto &[fst, snd]: CognitoCommandTypeNames) {
-            if (Core::StringUtils::StartsWith(commandType, snd)) {
+            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
                 return fst;
             }
         }

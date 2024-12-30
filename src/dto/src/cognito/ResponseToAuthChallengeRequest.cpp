@@ -18,6 +18,19 @@ namespace AwsMock::Dto::Cognito {
         return challengeResponses["PASSWORD_CLAIM_SIGNATURE"];
     }
 
+
+    /*{
+    "ChallengeName" : "PASSWORD_VERIFIER",
+    "ClientId" : "9Oax8ZaPb34CI3byoybhwH2qeo",
+    "ChallengeResponses" : {
+    "USERNAME" : "jensvogt47@gmail.com",
+    "PASSWORD_CLAIM_SECRET_BLOCK" : "AA6WJfsc0ADuUZBFhCfwp4j38e9p7RlxBPWOYP1D",
+    "TIMESTAMP" : "Mon Dec 30 13:55:03 UTC 2024",
+    "PASSWORD_CLAIM_SIGNATURE" : "zlK9enx6JQuri+EtOvi4OQi2ev8Cb/iAdZwiiydV7Zs="
+    },
+    "Session" : "f098ee20-4af4-432a-a9fb-9f6550090188",
+    "ClientMetadata" : { }
+    }*/
     void RespondToAuthChallengeRequest::FromJson(const std::string &jsonString) {
 
         try {
@@ -32,7 +45,7 @@ namespace AwsMock::Dto::Cognito {
             if (rootDocument.view().find("ChallengeResponses") != rootDocument.view().end()) {
                 for (const view jsonObject = rootDocument.view()["ChallengeResponses"].get_document().value; const auto &element: jsonObject) {
                     std::string key = bsoncxx::string::to_string(element.key());
-                    const std::string value = bsoncxx::string::to_string(element[key].get_string().value);
+                    const std::string value = bsoncxx::string::to_string(jsonObject[key].get_string().value);
                     challengeResponses[key] = value;
                 }
             }
@@ -41,7 +54,7 @@ namespace AwsMock::Dto::Cognito {
             if (rootDocument.view().find("ClientMetadata") != rootDocument.view().end()) {
                 for (const view jsonObject = rootDocument.view()["ClientMetadata"].get_document().value; const auto &element: jsonObject) {
                     std::string key = bsoncxx::string::to_string(element.key());
-                    const std::string value = bsoncxx::string::to_string(element[key].get_string().value);
+                    const std::string value = bsoncxx::string::to_string(jsonObject[key].get_string().value);
                     clientMetaData[key] = value;
                 }
             }

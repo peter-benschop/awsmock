@@ -14,9 +14,11 @@ namespace AwsMock::Dto::Cognito {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Session", session);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "ChallengeName", challengeName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "ClientId", clientId);
 
-            rootDocument.append(kvp("AuthenticationResult", authenticationResult.ToDocument()));
+            //rootDocument.append(kvp("AuthenticationResult", authenticationResult.ToDocument()));
 
+            // Challenge parameter
             if (!challengeParameters.empty()) {
                 document jsonObject;
                 for (const auto &[fst, snd]: challengeParameters) {
@@ -24,6 +26,16 @@ namespace AwsMock::Dto::Cognito {
                 }
                 rootDocument.append(kvp("ChallengeParameters", jsonObject));
             }
+
+            // Available challenges
+            if (!availableChallenges.empty()) {
+                array availableChallengesJson;
+                for (const auto &challenge: availableChallenges) {
+                    availableChallengesJson.append(challenge);
+                }
+                rootDocument.append(kvp("AvailableChallenges", availableChallengesJson));
+            }
+
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {

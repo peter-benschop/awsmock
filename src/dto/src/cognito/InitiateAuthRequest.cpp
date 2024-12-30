@@ -21,26 +21,18 @@ namespace AwsMock::Dto::Cognito {
     void InitiateAuthRequest::FromJson(const std::string &jsonString) {
         try {
             const value rootDocument = bsoncxx::from_json(jsonString);
-            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "region");
             clientId = Core::Bson::BsonUtils::GetStringValue(rootDocument, "ClientId");
             authFlow = AuthFlowTypeFromString(Core::Bson::BsonUtils::GetStringValue(rootDocument, "AuthFlow"));
 
             // Auth parameter
-            if (rootDocument.find("AuthParameters") != rootDocument.end()) {
-                for (const view authParameterObject = rootDocument.view()["AuthParameter"].get_document().value; const auto &parameter: authParameterObject) {
-                    std::string key = bsoncxx::string::to_string(parameter.key());
-                    const std::string value = bsoncxx::string::to_string(parameter[key].get_string().value);
-                    authParameters[key] = value;
-                }
+            if (Core::Bson::FindBsonObject(rootDocument, "AuthParameters")) {
+                authParameters = Core::Bson::MapFromBsonObject(rootDocument, "AuthParameters");
             }
 
             // Auth parameter
-            if (rootDocument.find("ClientMetadata") != rootDocument.end()) {
-                for (const view metadataObject = rootDocument.view()["ClientMetadata"].get_document().value; const auto &parameter: metadataObject) {
-                    std::string key = bsoncxx::string::to_string(parameter.key());
-                    const std::string value = bsoncxx::string::to_string(parameter[key].get_string().value);
-                    clientMetaData[key] = value;
-                }
+            if (Core::Bson::FindBsonObject(rootDocument, "ClientMetadata")) {
+                clientMetaData = Core::Bson::MapFromBsonObject(rootDocument, "ClientMetadata");
             }
 
         } catch (bsoncxx::exception &exc) {

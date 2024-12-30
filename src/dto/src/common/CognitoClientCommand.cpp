@@ -6,22 +6,30 @@
 
 namespace AwsMock::Dto::Common {
 
-    void CognitoClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
+    void CognitoClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         // From AwsMock UI
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "cognito-idp") {
 
             this->command = CognitoCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
 
+        } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
+
+            const std::string rawCommand = Core::StringUtils::Split(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), '.')[1];
+            this->command = CognitoCommandTypeFromString(Core::StringUtils::ToSnakeCase(rawCommand));
+
         } else {
 
+            Core::HttpUtils::DumpHeaders(request);
             UserAgent userAgent;
             userAgent.FromRequest(request);
+            std::string tmp = Core::StringUtils::ToSnakeCase(userAgent.clientCommand);
+            this->command = CognitoCommandTypeFromString(Core::StringUtils::ToSnakeCase(userAgent.clientCommand));
         }
 
         // Basic values
-        this->region = awsRegion;
-        this->user = awsUser;
+        this->region = region;
+        this->user = user;
         this->method = request.method();
         this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
@@ -41,7 +49,7 @@ namespace AwsMock::Dto::Common {
             Core::Bson::BsonUtils::SetStringValue(document, "command", CognitoCommandTypeToString(command));
             Core::Bson::BsonUtils::SetStringValue(document, "url", url);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
-            Core::Bson::BsonUtils::SetIntValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetLongValue(document, "contentLength", contentLength);
             Core::Bson::BsonUtils::SetStringValue(document, "payload", payload);
             Core::Bson::BsonUtils::SetStringValue(document, "requestId", requestId);
             return Core::Bson::BsonUtils::ToJsonString(document);

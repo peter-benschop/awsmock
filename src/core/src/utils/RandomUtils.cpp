@@ -15,19 +15,19 @@ namespace AwsMock::Core {
         return T{seed_seq};
     }
 
-    int RandomUtils::NextInt(int min, int max) {
+    int RandomUtils::NextInt(const int min, const int max) {
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{min, max};
         return dist(rng);
     }
 
-    unsigned int RandomUtils::NextUInt(unsigned int min, unsigned int max) {
+    unsigned int RandomUtils::NextUInt(const unsigned int min, const unsigned int max) {
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{min, max};
         return dist(rng);
     }
 
-    std::vector<int> RandomUtils::IntArray(int size, int min, int max) {
+    std::vector<int> RandomUtils::IntArray(const int size, const int min, const int max) {
         std::vector<int> result;
         result.reserve(size);
         for (int i = 0; i < size; i++) {
@@ -36,13 +36,13 @@ namespace AwsMock::Core {
         return result;
     }
 
-    double RandomUtils::NextDouble(double min, double max) {
+    double RandomUtils::NextDouble(const double min, const double max) {
         thread_local auto rng = RandomGenerator<>();
         std::uniform_real_distribution<double> dist(min, max);
-        return (double) dist(rng) * (1.0 / std::numeric_limits<std::uint32_t>::max());
+        return dist(rng) * (1.0 / std::numeric_limits<std::uint32_t>::max());
     }
 
-    std::vector<double> RandomUtils::DoubleArray(int size, double min, double max) {
+    std::vector<double> RandomUtils::DoubleArray(const int size, const double min, const double max) {
         std::vector<double> result;
         result.reserve(size);
         for (int i = 0; i < size; i++) {
