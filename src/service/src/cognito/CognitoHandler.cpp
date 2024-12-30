@@ -472,7 +472,9 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
-                    InitiaiteAuth default : return SendBadRequestError(request, "Unknown action");
+
+                default:
+                    return SendBadRequestError(request, "Unknown action");
             }
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
