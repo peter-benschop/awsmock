@@ -52,9 +52,19 @@ namespace AwsMock::Dto::Cognito {
         AuthenticationResult authenticationResult;
 
         /**
+         * Available challenges
+         */
+        std::vector<std::string> availableChallenges;
+
+        /**
          * Session
          */
         std::string session;
+
+        /**
+         * Client ID
+         */
+        std::string clientId;
 
         /**
          * Challenge name

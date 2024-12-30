@@ -13,7 +13,7 @@ namespace AwsMock::Service {
 
         try {
 
-            switch (GetActionFromHeader(request)) {
+            switch (clientCommand.command) {
                 case Dto::Common::CognitoCommandType::CREATE_USER_POOL: {
 
                     Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
@@ -29,6 +29,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::CREATE_USER_POOL_DOMAIN: {
                     Dto::Cognito::CreateUserPoolDomainRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -43,6 +44,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::UPDATE_USER_POOL_DOMAIN: {
                     Dto::Cognito::UpdateUserPoolDomainRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -57,6 +59,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::CREATE_USER_POOL_CLIENT: {
                     Dto::Cognito::CreateUserPoolClientRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -71,6 +74,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_USER_POOLS: {
 
                     Dto::Cognito::ListUserPoolRequest cognitoRequest{};
@@ -86,6 +90,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_USER_POOL_COUNTERS: {
                     Dto::Cognito::ListUserPoolCountersRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -100,6 +105,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::UPDATE_USER_POOL: {
                     Dto::Cognito::UpdateUserPoolRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -114,6 +120,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_USER_POOL_CLIENTS: {
                     Dto::Cognito::ListUserPoolClientsRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -128,6 +135,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS: {
                     Dto::Cognito::DescribeUserPoolClientRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -142,6 +150,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::UPDATE_USER_POOL_CLIENT: {
                     Dto::Cognito::UpdateUserPoolClientRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -156,6 +165,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::DELETE_USER_POOL_CLIENT: {
                     Dto::Cognito::DeleteUserPoolClientRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -170,6 +180,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::DESCRIBE_USER_POOL: {
                     Dto::Cognito::DescribeUserPoolRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -184,6 +195,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::DELETE_USER_POOL: {
                     Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -197,6 +209,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_USERS: {
                     Dto::Cognito::ListUsersRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -210,6 +223,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_USER_COUNTERS: {
                     Dto::Cognito::ListUserCountersRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -223,6 +237,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::CREATE_GROUP: {
                     Dto::Cognito::CreateGroupRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -237,6 +252,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_GROUPS: {
                     Dto::Cognito::ListGroupsRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -251,6 +267,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::LIST_USERS_IN_GROUP: {
                     Dto::Cognito::ListUsersInGroupRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -265,6 +282,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_REMOVE_USER_FROM_GROUP: {
                     Dto::Cognito::AdminRemoveUserFromGroupRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -279,6 +297,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::DELETE_GROUP: {
                     Dto::Cognito::DeleteGroupRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -293,6 +312,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::SIGN_UP: {
                     Dto::Cognito::SignUpRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -307,6 +327,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_CONFIRM_SIGN_UP: {
                     Dto::Cognito::AdminConfirmUserRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -321,6 +342,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::INITIATE_AUTH: {
                     Dto::Cognito::InitiateAuthRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -332,9 +354,10 @@ namespace AwsMock::Service {
 
                     Dto::Cognito::InitiateAuthResponse cognitoResponse = _cognitoService.InitiateAuth(cognitoRequest);
                     log_info << "User authorization initiated, userName: " << cognitoRequest.GetUserId();
-
+                    std::string tmp = cognitoResponse.ToJson();
                     return SendOkResponse(request, cognitoResponse.ToJson(), headers);
                 }
+
                 case Dto::Common::CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE: {
                     Dto::Cognito::RespondToAuthChallengeRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -349,6 +372,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson(), headers);
                 }
+
                 case Dto::Common::CognitoCommandType::GLOBAL_SIGN_OUT: {
                     Dto::Cognito::GlobalSignOutRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -363,6 +387,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, {}, headers);
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_CREATE_USER: {
                     Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -376,6 +401,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_GET_USER: {
                     Dto::Cognito::AdminGetUserRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -389,6 +415,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_ENABLE_USER: {
                     Dto::Cognito::AdminEnableUserRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -402,6 +429,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_DISABLE_USER: {
                     Dto::Cognito::AdminDisableUserRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -415,6 +443,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_DELETE_USER: {
                     Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -428,6 +457,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
+
                 case Dto::Common::CognitoCommandType::ADMIN_ADD_USER_TO_GROUP: {
                     Dto::Cognito::AdminAddUserToGroupRequest cognitoRequest{};
                     cognitoRequest.FromJson(clientCommand.payload);
@@ -442,8 +472,7 @@ namespace AwsMock::Service {
 
                     return SendOkResponse(request);
                 }
-                default:
-                    return SendBadRequestError(request, "Unknown action");
+                    InitiaiteAuth default : return SendBadRequestError(request, "Unknown action");
             }
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
@@ -452,6 +481,9 @@ namespace AwsMock::Service {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
         } catch (Core::BadRequestException &exc) {
+            log_error << exc.what();
+            return SendInternalServerError(request, exc.what());
+        } catch (Core::NotFoundException &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         }

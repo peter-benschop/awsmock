@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_COGNITO_SERVICE_H
 
 // C++ standard includes
+#include <openssl/bn.h>
 #include <string>
 
 // AwsMock includes
@@ -13,6 +14,7 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SrpUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/cognito/AdminAddUserToGroupRequest.h>
@@ -262,6 +264,11 @@ namespace AwsMock::Service {
 
         /**
          * @brief Initiate authentication
+         *
+         * @par
+         * AWS Cognito challenges page: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-authentication-flow-methods.html#amazon-cognito-user-pools-authentication-flow-methods-password
+         * @par
+         * For USER_SRP see: https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol
          *
          * @param request confirm user request
          * @return InitiateAuthResponse DTO

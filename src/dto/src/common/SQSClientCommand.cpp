@@ -8,7 +8,7 @@ namespace AwsMock::Dto::Common {
 
     void SQSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
-        Dto::Common::UserAgent userAgent;
+        UserAgent userAgent;
         userAgent.FromRequest(request);
 
         // Basic values
@@ -24,11 +24,11 @@ namespace AwsMock::Dto::Common {
 
         if (userAgent.clientCommand.empty()) {
 
-            this->command = Dto::Common::SqsCommandTypeFromString(GetCommandFromHeader(request));
+            this->command = SqsCommandTypeFromString(GetCommandFromHeader(request));
 
         } else {
 
-            this->command = Dto::Common::SqsCommandTypeFromString(userAgent.clientCommand);
+            this->command = SqsCommandTypeFromString(userAgent.clientCommand);
         }
     }
 
