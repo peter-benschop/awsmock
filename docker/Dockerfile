@@ -2,6 +2,7 @@ FROM jensvogt/awsmock-base:latest AS build
 
 # Create build environment
 RUN mkdir -p /usr/src
+RUN git config --global http.postBuffer 157286400
 
 # Install aws-mock
 WORKDIR /usr/src
