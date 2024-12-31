@@ -7,14 +7,10 @@
 
 // C++ standard includes
 #include <chrono>
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
@@ -27,7 +23,22 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminGetUserResponse : public Dto::Common::BaseRequest {
+    struct AdminGetUserResponse {
+
+        /**
+         * ID user
+         */
+        std::string id;
+
+        /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
+         * User pool ID
+         */
+        std::string userPoolId;
 
         /**
          * Name of the user
@@ -35,9 +46,19 @@ namespace AwsMock::Dto::Cognito {
         std::string userName;
 
         /**
+         * Password of the user
+         */
+        std::string password;
+
+        /**
          * Enabled flag
          */
         bool enabled = false;
+
+        /**
+         * User status
+         */
+        Database::Entity::Cognito::UserStatus userStatus;
 
         /**
          * User userAttributes list
@@ -52,31 +73,31 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Modified
          */
-        system_clock::time_point modfified = system_clock::now();
+        system_clock::time_point modified = system_clock::now();
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @param payload json string object
          */
         void FromJson(const std::string &payload);
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @return JSON representation of the object
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

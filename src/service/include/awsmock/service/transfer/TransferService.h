@@ -21,6 +21,8 @@
 #include <awsmock/dto/transfer/CreateUserRequest.h>
 #include <awsmock/dto/transfer/CreateUserResponse.h>
 #include <awsmock/dto/transfer/DeleteServerRequest.h>
+#include <awsmock/dto/transfer/ListServerCountersRequest.h>
+#include <awsmock/dto/transfer/ListServerCountersResponse.h>
 #include <awsmock/dto/transfer/ListServerRequest.h>
 #include <awsmock/dto/transfer/ListServerResponse.h>
 #include <awsmock/dto/transfer/ListUsersRequest.h>
@@ -76,6 +78,15 @@ namespace AwsMock::Service {
          * @see Dto::Transfer::ListServerResponse
          */
         Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request) const;
+
+        /**
+         * @brief Returns a list of available server counters
+         *
+         * @param request list server counters request
+         * @return ListServerCountersResponse
+         * @see Dto::Transfer::ListServerCountersResponse
+         */
+        Dto::Transfer::ListServerCountersResponse ListServerCounters(const Dto::Transfer::ListServerCountersRequest &request) const;
 
         /**
          * @brief Returns a list of available servers
