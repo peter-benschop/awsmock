@@ -33,9 +33,10 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("userPoolId", userPoolId),
                 kvp("enabled", enabled),
                 kvp("groups", groupsDoc),
-                kvp("userStatus", Entity::Cognito::UserStatusToString(userStatus)),
+                kvp("userStatus", UserStatusToString(userStatus)),
                 kvp("userAttributes", userAttributesDoc),
                 kvp("confirmationCode", confirmationCode),
+                kvp("password", password),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userDocument;
@@ -50,18 +51,18 @@ namespace AwsMock::Database::Entity::Cognito {
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
         userStatus = UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "userStatus"));
         confirmationCode = Core::Bson::BsonUtils::GetStringValue(mResult, "confirmationCode");
+        password = Core::Bson::BsonUtils::GetStringValue(mResult, "password");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Attributes
         if (mResult.value().find("userAttributes") != mResult.value().end()) {
             for (const bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
-                UserAttribute attribute{
-                        .name = bsoncxx::string::to_string(attributeElement["name"].get_string().value),
-                        .value = bsoncxx::string::to_string(attributeElement["value"].get_string().value)};
-                userAttributes.push_back(attribute);
+                userAttributes.push_back({.name = Core::Bson::BsonUtils::GetStringValue(attributeElement, "name"),
+                                          .value = Core::Bson::BsonUtils::GetStringValue(attributeElement, "value")});
             }
         }
+
         // Groups
         if (mResult.value().find("groups") != mResult.value().end()) {
             for (const bsoncxx::array::view groupsView{mResult.value()["groups"].get_array().value}; const bsoncxx::array::element &groupElement: groupsView) {
