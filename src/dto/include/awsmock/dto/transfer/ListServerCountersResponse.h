@@ -49,6 +49,6 @@ namespace AwsMock::Dto::Transfer {
         friend std::ostream &operator<<(std::ostream &os, const ListServerCountersResponse &r);
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_LIST_SERVER_COUNTERS_RESPONSE_H
