@@ -392,6 +392,7 @@ namespace AwsMock::Service {
                     .userPoolId = request.userPoolId,
                     .userName = request.userName,
                     .enabled = true,
+                    .password = Core::StringUtils::GenerateRandomPassword(12),
                     .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
                     .created = system_clock::now(),
                     .modified = system_clock::now(),
@@ -408,7 +409,7 @@ namespace AwsMock::Service {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
+    }// namespace AwsMock::Service
 
     Dto::Cognito::AdminGetUserResponse CognitoService::AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "admin_get_user");

@@ -257,6 +257,10 @@ namespace AwsMock::Core::Bson {
             return {};
         }
 
+        static std::string GetStringValue(const bsoncxx::array::element &element, const std::string &name) {
+            return GetStringValue(element[name]);
+        }
+
         static bool GetBoolValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetBoolValue(view.value()[name]);
