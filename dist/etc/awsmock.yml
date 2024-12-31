@@ -155,4 +155,4 @@ awsmock:
     retention: 3
   logging:
     level: info                                                        # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
-    filename:
+    filename:                                                          # Log file name, if empty use stdout
