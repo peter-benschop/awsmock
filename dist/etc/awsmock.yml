@@ -154,5 +154,5 @@ awsmock:
     intern: true
     retention: 3
   logging:
-    level: debug
+    level: info                                                        # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
     filename:
