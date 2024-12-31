@@ -36,6 +36,8 @@ namespace AwsMock::Dto::Transfer {
             Core::Bson::BsonUtils::SetStringValue(document, "LoggingRole", loggingRole);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
             Core::Bson::BsonUtils::SetIntValue(document, "UserCount", userCount);
+            Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {

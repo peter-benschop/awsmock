@@ -418,29 +418,17 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("User pool does not exists, userPoolId: " + request.userPoolId);
         }
 
-        if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
-            throw Core::BadRequestException(
-                    "User exists exists already, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+        if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            throw Core::BadRequestException("User does not exists, userPoolId: " + request.userPoolId + " userName: " + request.userName);
         }
 
         try {
-            Database::Entity::Cognito::User user = {
-                    .region = request.region,
-                    .userPoolId = request.userPoolId,
-                    .userName = request.userName,
-                    .enabled = true,
-                    .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
-                    .created = system_clock::now(),
-                    .modified = system_clock::now(),
-            };
 
-            user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
-            Dto::Cognito::AdminGetUserResponse response = {
-                    {.region = user.region},
-                    user.userName,
-                    user.enabled};
+            Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
+            Dto::Cognito::AdminGetUserResponse response = {.id = user.oid, .region = user.region, .userPoolId = user.userPoolId, .userName = user.userName, .password = user.password, .enabled = user.enabled, .userStatus = user.userStatus, .created = user.created, .modified = user.modified};
             log_trace << "Get admin user response: " + response.ToJson();
             return response;
+
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -556,11 +544,11 @@ namespace AwsMock::Service {
     }
 
     Dto::Cognito::ListUserCountersResponse CognitoService::ListUserCounters(const Dto::Cognito::ListUserCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_pool");
+        Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "method", "list_user_counters");
         log_debug << "List user counters request, pageSize: " << request.pageSize;
 
         try {
-            const long total = _database.CountUserPools(request.region);
+            const long total = _database.CountUsers(request.region, request.userPoolId);
             const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId);
             log_trace << "Got user list counters, count: " << users.size();
             Dto::Cognito::ListUserCountersResponse response;

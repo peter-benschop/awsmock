@@ -103,11 +103,40 @@ namespace AwsMock::Service {
                 response.servers.emplace_back(server);
             }
 
-            log_trace << "Handler list outcome: " + response.ToJson();
+            log_trace << "Transfer server list outcome: " + response.ToJson();
             return response;
 
         } catch (bsoncxx::exception &ex) {
-            log_error << "Handler list request failed, message: " << ex.what();
+            log_error << "Transfer server list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::Transfer::ListServerCountersResponse TransferService::ListServerCounters(const Dto::Transfer::ListServerCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server_counters");
+
+        try {
+            std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
+
+            auto response = Dto::Transfer::ListServerCountersResponse();
+            response.total = _transferDatabase.CountServers(request.region);
+            for (const auto &s: servers) {
+                Dto::Transfer::Server server = {
+                        .arn = s.arn,
+                        .serverId = s.serverId,
+                        .state = ServerStateToString(s.state),
+                        .userCount = static_cast<int>(s.users.size()),
+                        .created = s.created,
+                        .modified = s.modified,
+                };
+                response.transferServers.emplace_back(server);
+            }
+
+            log_trace << "Transfer server list outcome: " + response.ToJson();
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Transfer server list request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

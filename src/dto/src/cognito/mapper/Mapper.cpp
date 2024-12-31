@@ -6,24 +6,24 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    Dto::Cognito::ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, long total) {
+    ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, const long total) {
 
-        Dto::Cognito::ListUserPoolResponse response;
+        ListUserPoolResponse response;
         response.total = total;
         for (const auto &userPool: userPoolList) {
-            response.userPools.emplace_back(Mapper::map(userPool));
+            response.userPools.emplace_back(map(userPool));
         }
         return response;
     }
 
-    Database::Entity::Cognito::UserPoolDomain Mapper::map(const Dto::Cognito::CreateUserPoolDomainRequest &request) {
+    Database::Entity::Cognito::UserPoolDomain Mapper::map(const CreateUserPoolDomainRequest &request) {
 
         Database::Entity::Cognito::UserPoolDomain userPoolDomain;
         userPoolDomain.domain = request.domain;
         return userPoolDomain;
     }
 
-    Database::Entity::Cognito::UserPoolClient Mapper::map(const Dto::Cognito::CreateUserPoolClientRequest &request) {
+    Database::Entity::Cognito::UserPoolClient Mapper::map(const CreateUserPoolClientRequest &request) {
 
         Database::Entity::Cognito::UserPoolClient userPoolClient;
         userPoolClient.userPoolId = request.userPoolId;
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::Cognito {
         return userPoolClient;
     }
 
-    Database::Entity::Cognito::Group Mapper::map(const Dto::Cognito::CreateGroupRequest &request) {
+    Database::Entity::Cognito::Group Mapper::map(const CreateGroupRequest &request) {
         Database::Entity::Cognito::Group group = {
                 .region = request.region,
                 .userPoolId = request.userPoolId,
@@ -47,38 +47,38 @@ namespace AwsMock::Dto::Cognito {
         return group;
     }
 
-    Dto::Cognito::CreateGroupResponse Mapper::map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group) {
-        Dto::Cognito::CreateGroupResponse response = {{.requestId = request.requestId, .region = group.region, .user = request.user}, Mapper::map(group)};
+    CreateGroupResponse Mapper::map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group) {
+        CreateGroupResponse response = {{.requestId = request.requestId, .region = group.region, .user = request.user}, map(group)};
         return response;
     }
 
-    Dto::Cognito::ListGroupsResponse Mapper::map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList) {
+    ListGroupsResponse Mapper::map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList) {
 
-        Dto::Cognito::ListGroupsResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
+        ListGroupsResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
 
         for (const auto &group: groupList) {
-            response.groups.emplace_back(Mapper::map(group));
+            response.groups.emplace_back(map(group));
         }
         return response;
     }
 
-    Dto::Cognito::ListUsersInGroupResponse Mapper::map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList) {
+    ListUsersInGroupResponse Mapper::map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList) {
 
-        Dto::Cognito::ListUsersInGroupResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
+        ListUsersInGroupResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
 
         for (const auto &user: userList) {
-            response.users.emplace_back(Mapper::map(user));
+            response.users.emplace_back(map(user));
         }
         return response;
     }
 
-    Dto::Cognito::DescribeUserPoolResponse Mapper::map(const Dto::Cognito::DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool) {
+    DescribeUserPoolResponse Mapper::map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool) {
         DescribeUserPoolResponse response = {{request.requestId, request.region, request.user}};
-        response.userPool = Mapper::map(userPool);
+        response.userPool = map(userPool);
         return response;
     }
 
-    Dto::Cognito::UserPool Mapper::map(const Database::Entity::Cognito::UserPool &userPoolEntity) {
+    UserPool Mapper::map(const Database::Entity::Cognito::UserPool &userPoolEntity) {
         UserPool userPoolDto = {
                 .id = userPoolEntity.userPoolId,
                 .region = userPoolEntity.region,
@@ -91,8 +91,8 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDto;
     }
 
-    std::vector<Dto::Cognito::UserPool> Mapper::map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities) {
-        std::vector<Dto::Cognito::UserPool> userPoolDtos;
+    std::vector<UserPool> Mapper::map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities) {
+        std::vector<UserPool> userPoolDtos;
         for (const auto &userPoolEntity: userPoolEntities) {
             UserPool userPoolDto = {
                     .id = userPoolEntity.userPoolId,
@@ -108,7 +108,7 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDtos;
     }
 
-    Dto::Cognito::User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
+    User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
         User userDto = {
                 .region = userEntity.region,
                 .userPoolId = userEntity.userPoolId,
@@ -119,33 +119,34 @@ namespace AwsMock::Dto::Cognito {
         };
 
         for (const auto &group: userEntity.groups) {
-            userDto.groups.emplace_back(Mapper::map(group));
+            userDto.groups.emplace_back(map(group));
         }
 
         return userDto;
     }
 
-    std::vector<Dto::Cognito::User> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
-        std::vector<Dto::Cognito::User> userDtos;
+    std::vector<User> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
+        std::vector<User> userDtos;
         for (const auto &userEntity: userEntities) {
             User userDto = {
                     .region = userEntity.region,
                     .userPoolId = userEntity.userPoolId,
                     .userName = userEntity.userName,
                     .enabled = userEntity.enabled,
+                    .userStatus = userEntity.userStatus,
+                    .password = userEntity.password,
                     .created = userEntity.created,
-                    .modified = userEntity.modified,
-            };
+                    .modified = userEntity.modified};
 
             for (const auto &group: userEntity.groups) {
-                userDto.groups.emplace_back(Mapper::map(group));
+                userDto.groups.emplace_back(map(group));
             }
             userDtos.emplace_back(userDto);
         }
         return userDtos;
     }
 
-    Dto::Cognito::Group Mapper::map(const Database::Entity::Cognito::Group &groupEntity) {
+    Group Mapper::map(const Database::Entity::Cognito::Group &groupEntity) {
         Group groupDto = {
                 .region = groupEntity.region,
                 .groupName = groupEntity.groupName,
@@ -156,7 +157,7 @@ namespace AwsMock::Dto::Cognito {
         return groupDto;
     }
 
-    Dto::Cognito::UserPoolClient Mapper::map(const Database::Entity::Cognito::UserPoolClient &clientEntity) {
+    UserPoolClient Mapper::map(const Database::Entity::Cognito::UserPoolClient &clientEntity) {
         TokenValidityUnits tokenValidityUnits;
         tokenValidityUnits.accessToken = GetMaxTokenUnits(clientEntity.accessTokenValidity);
         tokenValidityUnits.refreshToken = GetMaxTokenUnits(clientEntity.refreshTokenValidity);
@@ -175,25 +176,25 @@ namespace AwsMock::Dto::Cognito {
         return userPoolClient;
     }
 
-    Dto::Cognito::ListUserPoolClientsResponse Mapper::map(const ListUserPoolClientsRequest &request, const std::vector<Database::Entity::Cognito::UserPoolClient> &userPoolClients) {
+    ListUserPoolClientsResponse Mapper::map(const ListUserPoolClientsRequest &request, const std::vector<Database::Entity::Cognito::UserPoolClient> &userPoolClients) {
 
-        Dto::Cognito::ListUserPoolClientsResponse response;
+        ListUserPoolClientsResponse response;
 
         for (const auto &userPoolClient: userPoolClients) {
-            response.userPoolsClients.emplace_back(Mapper::map(userPoolClient));
+            response.userPoolsClients.emplace_back(map(userPoolClient));
         }
         return response;
     }
 
-    long Mapper::GetValidityInSeconds(long validity, ValidityUnits units) {
-        switch (units) {
-            case ValidityUnits::seconds:
+    long Mapper::GetValidityInSeconds(const long validity, const ValidityUnits validityUnits) {
+        switch (validityUnits) {
+            case seconds:
                 return validity;
-            case ValidityUnits::minutes:
+            case minutes:
                 return validity * 60;
-            case ValidityUnits::hours:
+            case hours:
                 return validity * 3600;
-            case ValidityUnits::days:
+            case days:
                 return validity * 3600 * 24;
             default:
                 return validity * 3600 * 8;
@@ -202,25 +203,26 @@ namespace AwsMock::Dto::Cognito {
 
     ValidityUnits Mapper::GetMaxTokenUnits(long validity) {
         if (validity > 3600 * 24) {
-            return ValidityUnits::days;
-        } else if (validity > 3600) {
-            return ValidityUnits::hours;
-        } else if (validity > 60) {
-            return ValidityUnits::minutes;
-        } else {
-            return ValidityUnits::seconds;
+            return days;
         }
+        if (validity > 3600) {
+            return hours;
+        }
+        if (validity > 60) {
+            return minutes;
+        }
+        return seconds;
     }
 
-    long Mapper::GetMaxValidityToken(long validity, ValidityUnits validityUnits) {
+    long Mapper::GetMaxValidityToken(const long validity, const ValidityUnits validityUnits) {
         switch (validityUnits) {
-            case ValidityUnits::seconds:
+            case seconds:
                 return validity;
-            case ValidityUnits::minutes:
+            case minutes:
                 return validity / 60;
-            case ValidityUnits::hours:
+            case hours:
                 return validity / 3600;
-            case ValidityUnits::days:
+            case days:
                 return validity / (3600 * 24);
             default:
                 return validity;

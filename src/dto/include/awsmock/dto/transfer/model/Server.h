@@ -57,6 +57,16 @@ namespace AwsMock::Dto::Transfer {
         int userCount;
 
         /**
+         * Created timestamp
+         */
+        system_clock::time_point created;
+
+        /**
+         * Modified timestamp
+         */
+        system_clock::time_point modified;
+
+        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @param jsonString DTO as JSON string
