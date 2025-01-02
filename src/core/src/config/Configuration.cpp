@@ -41,7 +41,7 @@ namespace AwsMock::Core {
 
         // S3
         DefineBoolProperty("awsmock.modules.s3.active", "AWSMOCK_MODULES_S3_ACTIVE", true);
-        DefineStringProperty("awsmock.modules.s3.data-dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data/s3");
+        DefineStringProperty("awsmock.modules.s3.data-dir", "AWSMOCK_MODULES_S3_DATA_DIR", "/tmp/awsmock/data/s3");
         DefineIntProperty("awsmock.modules.s3.monitoring.period", "AWSMOCK_MODULES_S3_MONITORING_PERIOD", 900);
         DefineIntProperty("awsmock.modules.s3.sync.object.period", "AWSMOCK_MODULES_S3_SYNC_OBJECT_PERIOD", 3600);
         DefineIntProperty("awsmock.modules.s3.sync.bucket.period", "AWSMOCK_MODULES_S3_SYNC_BUCKET_PERIOD", 300);
