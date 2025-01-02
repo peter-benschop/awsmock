@@ -11,7 +11,7 @@ namespace AwsMock::Controller {
     AwsMockCtl::AwsMockCtl() {
 
         // Initialize database
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _host = configuration.GetValueString("awsmock.gateway.http.host");
         _port = configuration.GetValueInt("awsmock.gateway.http.port");
         _baseUrl = "http://" + _host + ":" + std::to_string(_port);

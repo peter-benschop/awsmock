@@ -395,7 +395,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueSize(queueArn);
     }
 
-    void SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) const {
+    long SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) const {
 
         if (HasDatabase()) {
 
@@ -409,20 +409,18 @@ namespace AwsMock::Database {
                 const auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
                 session.commit_transaction();
                 log_debug << "Queue deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteQueue(queue);
         }
+        return _memoryDb.DeleteQueue(queue);
     }
 
-    void SQSDatabase::DeleteAllQueues() const {
+    long SQSDatabase::DeleteAllQueues() const {
 
         if (HasDatabase()) {
 
@@ -436,17 +434,15 @@ namespace AwsMock::Database {
                 const auto result = _queueCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All queues deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteAllQueues();
         }
+        return _memoryDb.DeleteAllQueues();
     }
 
     Entity::SQS::Message SQSDatabase::CreateMessage(Entity::SQS::Message &message) const {

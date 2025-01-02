@@ -166,7 +166,7 @@ namespace AwsMock::Database {
         return sum;
     }
 
-    void SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
+    long SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
         std::string region = queue.region;
@@ -175,14 +175,17 @@ namespace AwsMock::Database {
             auto const &[key, value] = item;
             return value.region == region && value.queueUrl == queueUrl;
         });
-        log_debug << "Queue deleted, count: " << count;
+        log_debug << "Queues deleted, count: " << count;
+        return count;
     }
 
-    void SQSMemoryDb::DeleteAllQueues() {
+    long SQSMemoryDb::DeleteAllQueues() {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
+        const long deleted = _queues.size();
         log_debug << "All queues deleted, count: " << _queues.size();
         _queues.clear();
+        return deleted;
     }
 
     Entity::SQS::Message SQSMemoryDb::CreateMessage(const Entity::SQS::Message &message) {

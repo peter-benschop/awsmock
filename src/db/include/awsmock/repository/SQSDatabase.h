@@ -205,14 +205,17 @@ namespace AwsMock::Database {
          * @brief Deletes a queue.
          *
          * @param queue queue entity
+         * @return number of deleted queues
          * @throws DatabaseException
          */
-        void DeleteQueue(const Entity::SQS::Queue &queue) const;
+        long DeleteQueue(const Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Deletes all queues
+         *
+         * @return number of deleted queues
          */
-        void DeleteAllQueues() const;
+        long DeleteAllQueues() const;
 
         /**
          * @brief Creates a new message in the SQS message table
