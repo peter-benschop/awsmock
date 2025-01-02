@@ -715,20 +715,24 @@ namespace AwsMock::Service {
         }
 
         Dto::S3::DeleteObjectsResponse response;
+        response.keys = request.keys;
         try {
 
             // Delete file system objects
             for (const auto &key: request.keys) {
 
-                // Delete from database
-                Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, key);
-                log_debug << "Database object deleted, count: " << request.keys.size();
+                if (!key.empty()) {
 
-                DeleteObject(object.bucket, object.key, object.internalName);
-                log_debug << "File system object deleted: " << key;
+                    // Delete from database
+                    Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, key);
+                    log_debug << "Database object deleted, count: " << request.keys.size();
 
-                // Check notifications
-                CheckNotifications(request.region, request.bucket, key, 0, "ObjectRemoved");
+                    DeleteObject(object.bucket, object.key, object.internalName);
+                    log_debug << "File system object deleted: " << key;
+
+                    // Check notifications
+                    CheckNotifications(request.region, request.bucket, key, 0, "ObjectRemoved");
+                }
             }
 
             // Delete from database
@@ -1005,14 +1009,16 @@ namespace AwsMock::Service {
         Core::DirUtils::EnsureDirectory(dataS3Dir);
         Core::DirUtils::EnsureDirectory(transferDir);
 
-        std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
-        Core::FileUtils::DeleteFile(filename);
-        log_debug << "File system object deleted, filename: " << filename;
-
-        if (const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket"); bucket == transferBucket) {
-            filename = transferDir + Core::FileUtils::separator() + key;
+        if (!internalName.empty()) {
+            std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
             Core::FileUtils::DeleteFile(filename);
-            log_debug << "Transfer file system object deleted, filename: " << filename;
+            log_debug << "File system object deleted, filename: " << filename;
+
+            if (const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket"); bucket == transferBucket) {
+                filename = transferDir + Core::FileUtils::separator() + key;
+                Core::FileUtils::DeleteFile(filename);
+                log_debug << "Transfer file system object deleted, filename: " << filename;
+            }
         }
     }
 

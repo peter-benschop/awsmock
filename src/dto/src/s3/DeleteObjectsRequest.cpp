@@ -32,11 +32,16 @@ namespace AwsMock::Dto::S3 {
 
         try {
             boost::property_tree::ptree pt;
-            read_xml(xmlString, pt);
-            for (const auto &key: pt.get_child("Delete").data()) {
-                keys.emplace_back(&key);
+            Core::XmlUtils::ReadXml(xmlString, &pt);
+            for (auto &parent = pt.get_child("Delete"); const auto &key: parent) {
+                if (key.first != "<xmlattr>") {
+                    keys.emplace_back(key.second.get_child("Key").data());
+                }
             }
         } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }

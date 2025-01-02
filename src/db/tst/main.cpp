@@ -17,7 +17,7 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/utils/ConnectionPool.h>
 
-class TestEnvironment : public ::testing::Environment {
+class TestEnvironment final : public ::testing::Environment {
   public:
 
     // Initialise a test configuration.
