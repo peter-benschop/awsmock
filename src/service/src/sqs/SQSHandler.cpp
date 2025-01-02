@@ -108,7 +108,7 @@ namespace AwsMock::Service {
                     Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
                     log_info << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request, sqsResponse.ToJson());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::ListQueueArnsResponse sqsResponse = _sqsService.ListQueueArns();
                     log_info << "List queue ARNs";
-                    return SendOkResponse(request, sqsResponse.ToJson());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {

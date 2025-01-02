@@ -10,6 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/entity/sqs/Queue.h>
 
 namespace AwsMock::Dto::SQS {
@@ -22,21 +24,28 @@ namespace AwsMock::Dto::SQS {
         std::vector<std::string> queueArns;
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToXml() const;
+
+        /**
+         * @brief Convert to JSON representation
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
