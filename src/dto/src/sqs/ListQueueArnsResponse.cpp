@@ -6,6 +6,24 @@
 
 namespace AwsMock::Dto::SQS {
 
+    std::string ListQueueArnsResponse::ToXml() const {
+
+        try {
+            boost::property_tree::ptree root;
+            if (!queueArns.empty()) {
+                for (const auto &queueArn: queueArns) {
+                    root.add("GetQueueUrlResponse.GetQueueUrlResult.QueueArn", queueArn);
+                }
+            }
+            root.add("GetQueueUrlResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::XmlUtils::ToXmlString(root);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string ListQueueArnsResponse::ToJson() const {
 
         try {
@@ -13,11 +31,11 @@ namespace AwsMock::Dto::SQS {
             document document;
 
             if (!queueArns.empty()) {
-                array queueArnsArrayJson;
+                array arnsArrayJson;
                 for (const auto &queueArn: queueArns) {
-                    queueArnsArrayJson.append(queueArn);
+                    arnsArrayJson.append(queueArn);
                 }
-                document.append(kvp("QueueArns", queueArnsArrayJson));
+                document.append(kvp("QueueArns", arnsArrayJson));
             }
             return Core::Bson::BsonUtils::ToJsonString(document);
 
