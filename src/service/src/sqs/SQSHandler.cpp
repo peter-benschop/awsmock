@@ -37,7 +37,7 @@ namespace AwsMock::Service {
                     Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                     log_info << "Create queue, queueName: " << sqsRequest.queueName;
 
-                    return SendOkResponse(request, sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsRequest.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
