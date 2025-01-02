@@ -169,6 +169,9 @@ namespace AwsMock::Core::Bson {
 
         static long GetLongValue(const bsoncxx::document::element &element) {
 
+            if (!element) {
+                return 0;
+            }
             switch (element.type()) {
                 case bsoncxx::type::k_int32:
                     return element.get_int32().value;
@@ -198,6 +201,9 @@ namespace AwsMock::Core::Bson {
 
         static int GetIntValue(const bsoncxx::document::element &element) {
 
+            if (!element) {
+                return 0;
+            }
             switch (element.type()) {
                 case bsoncxx::type::k_int32:
                     return element.get_int32().value;
@@ -220,6 +226,9 @@ namespace AwsMock::Core::Bson {
 
         static double GetDoubleValue(const bsoncxx::document::element &element) {
 
+            if (!element) {
+                return 0;
+            }
             switch (element.type()) {
                 case bsoncxx::type::k_null:
                     return 0.0;
@@ -246,6 +255,11 @@ namespace AwsMock::Core::Bson {
         }
 
         static std::string GetStringValue(const bsoncxx::document::element &element) {
+
+            if (!element) {
+                return {};
+            }
+
             switch (element.type()) {
                 case bsoncxx::type::k_null:
                     return {};
@@ -269,6 +283,11 @@ namespace AwsMock::Core::Bson {
         }
 
         static bool GetBoolValue(const bsoncxx::document::element &element) {
+
+            if (!element) {
+                return false;
+            }
+
             switch (element.type()) {
                 case bsoncxx::type::k_null:
                     return false;
@@ -288,6 +307,11 @@ namespace AwsMock::Core::Bson {
         }
 
         static system_clock::time_point GetDateValue(const bsoncxx::document::element &element) {
+
+            if (!element) {
+                return {};
+            }
+
             switch (element.type()) {
                 case bsoncxx::type::k_null:
                     return system_clock::now();

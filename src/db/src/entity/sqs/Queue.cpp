@@ -44,7 +44,7 @@ namespace AwsMock::Database::Entity::SQS {
             attributes.FromDocument(mResult.value()["attributes"].get_document().value);
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             isDlq = Core::Bson::BsonUtils::GetBoolValue(mResult, "isDlq");
-            mainQueue = Core::Bson::BsonUtils::GetBoolValue(mResult, "mainQueue");
+            mainQueue = Core::Bson::BsonUtils::GetStringValue(mResult, "mainQueue");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

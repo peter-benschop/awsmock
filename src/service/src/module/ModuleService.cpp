@@ -155,7 +155,7 @@ namespace AwsMock::Service {
         infrastructure.FromJson(jsonString);
 
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
-            std::shared_ptr<Database::S3Database> _s3Database = std::make_shared<Database::S3Database>();
+            const auto _s3Database = std::make_shared<Database::S3Database>();
             if (!infrastructure.s3Buckets.empty()) {
                 for (auto &bucket: infrastructure.s3Buckets) {
                     _s3Database->CreateOrUpdateBucket(bucket);

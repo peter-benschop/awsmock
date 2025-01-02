@@ -53,7 +53,7 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    void Infrastructure::FromDocument(const bsoncxx::document::view &document) {
+    void Infrastructure::FromDocument(const view &document) {
 
         // S3
         Core::Bson::FromBsonArray(document, "s3-buckets", &s3Buckets);
