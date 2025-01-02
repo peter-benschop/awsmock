@@ -458,11 +458,12 @@ namespace AwsMock::Service {
         try {
 
             // Delete all resources in queue
-            const long deleted = _sqsDatabase.DeleteMessages(request.queueUrl);
-            log_debug << "Queue deleted: " << deleted;
+            long deleted = _sqsDatabase.DeleteMessages(request.queueUrl);
+            log_debug << "Messages deleted, queue: " << request.queueUrl << " count:" << deleted;
 
             // Update database
-            _sqsDatabase.DeleteQueue({.region = request.region, .queueUrl = request.queueUrl});
+            deleted = _sqsDatabase.DeleteQueue({.region = request.region, .queueUrl = request.queueUrl});
+            log_debug << "Queue deleted, queue: " << request.queueUrl << " count:" << deleted;
 
             return {.region = request.region, .queueUrl = request.queueUrl, .requestId = request.requestId};
 

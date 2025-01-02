@@ -57,8 +57,10 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+
         } else {
-            log_debug << "Performance counter not available if you running the memory DB";
+
+            log_trace << "Performance counter not available if you running the memory DB";
         }
     }
 
@@ -126,7 +128,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            log_debug << "Performance counter not available if you running the memory DB";
+            log_trace << "Performance counter not available if you running the memory DB";
         }
     }
 
@@ -171,7 +173,7 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException(exc.what());
             }
         }
-        log_debug << "Performance counter not available if you running the memory DB";
+        log_trace << "Performance counter not available if you running the memory DB";
         return {};
     }
 
@@ -199,7 +201,7 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException(exc.what());
             }
         }
-        log_debug << "Performance counter not available if you running the memory DB";
+        log_trace << "Performance counter not available if you running the memory DB";
         return 0;
     }
 }// namespace AwsMock::Database
