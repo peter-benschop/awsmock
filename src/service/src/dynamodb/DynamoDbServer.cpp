@@ -112,7 +112,9 @@ namespace AwsMock::Service {
                     table = _dynamoDbDatabase.CreateOrUpdateTable(table);
                     log_debug << "Table synchronized, table: " << table.name;
                 }
+
             } else {
+
                 log_debug << "Empty table list";
                 _dynamoDbDatabase.DeleteAllTables();
             }

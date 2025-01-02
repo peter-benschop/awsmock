@@ -9,8 +9,12 @@ namespace AwsMock::Service::Frontend {
 
     void FrontendServer::operator()() const {
 
-        try {
+        if (!Core::Configuration::instance().GetValueBool("awsmock.frontend.active")) {
+            log_info << "Frontend server inactive";
+            return;
+        }
 
+        try {
             auto const address = net::ip::make_address(Core::Configuration::instance().GetValueString("awsmock.frontend.address"));
             unsigned short port = Core::Configuration::instance().GetValueInt("awsmock.frontend.port");
             std::string doc_root = Core::Configuration::instance().GetValueString("awsmock.frontend.doc-root");
