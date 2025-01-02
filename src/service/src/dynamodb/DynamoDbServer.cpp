@@ -122,6 +122,8 @@ namespace AwsMock::Service {
             log_error << exc.what();
         } catch (Core::DatabaseException &exc) {
             log_error << exc.what();
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.what();
         }
     }
 
