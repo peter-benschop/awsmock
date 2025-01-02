@@ -201,7 +201,7 @@ namespace AwsMock::FtpServer {
 
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
-        log_info << "Get directory content, path: " << path;
+        log_debug << "Get directory content, path: " << path;
 
         DIR *dp = opendir(path.c_str());
         dirent *dirp = nullptr;
@@ -212,10 +212,10 @@ namespace AwsMock::FtpServer {
 
         while ((dirp = readdir(dp)) != nullptr) {
             content.emplace(std::string(dirp->d_name), FileStatus(path + "/" + std::string(dirp->d_name)));
-            log_info << "Adding file, path: " << path << "/" << std::string(dirp->d_name);
+            log_debug << "Adding file, path: " << path << "/" << std::string(dirp->d_name);
         }
         closedir(dp);
-        log_info << "Found directory content, path: " << path << " count: " << content.size();
+        log_debug << "Found directory content, path: " << path << " count: " << content.size();
         return content;
     }
 

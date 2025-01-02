@@ -122,7 +122,7 @@ namespace AwsMock::Manager {
         auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
-        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+        const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));

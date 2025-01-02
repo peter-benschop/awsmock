@@ -330,8 +330,9 @@ namespace AwsMock::Core {
          * @brief Dumps the whole request
          *
          * @param request HTTP request
+         * @param limit maximum number of bytes to print
          */
-        static void DumpRequest(const http::request<http::dynamic_body> &request);
+        static void DumpRequest(const http::request<http::dynamic_body> &request, int limit = 0);
 
         /**
          * @brief Dumps the headers to the logger as info messages

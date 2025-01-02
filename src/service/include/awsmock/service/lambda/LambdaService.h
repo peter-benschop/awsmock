@@ -55,6 +55,8 @@
 
 namespace AwsMock::Service {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief Lambda service module. Handles all lambda related requests:
      *
@@ -87,7 +89,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Create lambda function
@@ -274,6 +276,17 @@ namespace AwsMock::Service {
          * @return containerId of the idle instance
          */
         static int GetContainerPort(const Database::Entity::Lambda::Instance &instance);
+
+        /**
+         * @brief Waits in a  loop for an idle lambda instance
+         *
+         * @par
+         * This is a blocking call, the calling function will be blocked until an idle instance is available. The maximal waiting
+         * time is limited by the total timeout period of the lambda (i.e. 900sec.)
+         *
+         * @param lambda lambda entity to check
+         */
+        static void WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * lambda database connection

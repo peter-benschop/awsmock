@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing get the current port from the docker container
-        std::string containerName = lambdaEntity.function + "-" + instanceId;
+        const std::string containerName = lambdaEntity.function + "-" + instanceId;
         if (!ContainerService::instance().ContainerExistsByName(containerName)) {
             Database::Entity::Lambda::Instance instance;
             instance.hostPort = CreateRandomHostPort();
@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = ContainerService::instance().GetContainerByName(containerName);
+        const Dto::Docker::Container container = ContainerService::instance().GetContainerByName(containerName);
 
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
         try {
 
             const std::string containerName = lambdaEntity.function + "-" + instance.id;
-            const std::vector<std::string> environment = GetEnvironment(lambdaEntity.environment);
+            const std::vector<std::string> environment = GetEnvironment(lambdaEntity);
             const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, instance.hostPort);
             instance.containerId = containerCreateResponse.id;
             log_debug << "Lambda container created, hostPort: " << instance.hostPort << " containerId: " << instance.containerId;
@@ -144,13 +144,14 @@ namespace AwsMock::Service {
         }
     }
 
-    std::vector<std::string> LambdaCreator::GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment) {
+    std::vector<std::string> LambdaCreator::GetEnvironment(const Database::Entity::Lambda::Lambda &lambda) {
 
         std::vector<std::string> environment;
-        environment.reserve(lambdaEnvironment.variables.size());
-        for (const auto &[fst, snd]: lambdaEnvironment.variables) {
+        environment.reserve(lambda.environment.variables.size() + 1);
+        for (const auto &[fst, snd]: lambda.environment.variables) {
             environment.emplace_back(fst + "=" + snd);
         }
+        environment.emplace_back("AWS_LAMBDA_FUNCTION_TIMEOUT=" + std::to_string(lambda.timeout));
         log_debug << "lambda runtime environment converted, size: " << environment.size();
         return environment;
     }
@@ -218,15 +219,19 @@ namespace AwsMock::Service {
             ofs << base64EncodedCodeString;
             ofs.close();
             log_debug << "New Base64 file written: " << base64FullFile;
+
         } else {
 
             std::string md5sumFile = Core::Crypto::GetMd5FromFile(base64FullFile);
             if (std::string md5sumString = Core::Crypto::GetMd5FromString(base64EncodedCodeString); md5sumFile != md5sumString) {
+
                 std::ofstream ofs(base64FullFile);
                 ofs << base64EncodedCodeString;
                 ofs.close();
                 log_debug << "Updated Base64 file written: " << base64FullFile;
+
             } else {
+
                 log_debug << "New and original are equal: " << base64FullFile;
             }
         }

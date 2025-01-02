@@ -22,6 +22,7 @@
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 #include <awsmock/entity/lambda/EventSourceMapping.h>
 #include <awsmock/entity/lambda/Instance.h>
+#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database::Entity::Lambda {
@@ -64,7 +65,7 @@ namespace AwsMock::Database::Entity::Lambda {
                 return fst;
             }
         }
-        return LambdaState::Inactive;
+        return Inactive;
     }
 
     enum LambdaStateReasonCode {
@@ -121,7 +122,7 @@ namespace AwsMock::Database::Entity::Lambda {
             {FunctionError, "FunctionError"},
     };
 
-    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(LambdaStateReasonCode lambdaStateReasonCode) {
+    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode lambdaStateReasonCode) {
         return LambdaStateReasonCodeNames[lambdaStateReasonCode];
     }
 
@@ -324,6 +325,13 @@ namespace AwsMock::Database::Entity::Lambda {
         void RemoveInstance(const Instance &instance);
 
         /**
+         * @brief CHecks for any lambda instance with state 'inactive'.
+         *
+         * @return true if any idle instance has been found.
+         */
+        bool HasIdleInstance();
+
+        /**
          * @brief Checks whether an event source with the given ARN exists already.
          *
          * @param eventSourceArn event source ARN
@@ -386,6 +394,12 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     typedef std::vector<Lambda> LambdaList;
+
+    inline bool Lambda::HasIdleInstance() {
+        return std::ranges::find_if(instances, [](const Instance &i) {
+                   return i.status == InstanceIdle;
+               }) != instances.end();
+    }
 
 }// namespace AwsMock::Database::Entity::Lambda
 

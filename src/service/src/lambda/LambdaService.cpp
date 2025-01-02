@@ -4,6 +4,7 @@
 // C++ Test JSON image-transformation:
 //{ "Records" : [ { "awsRegion" : "eu-central-1", "messageId" : "642154cc-7ac4-4d0f-8c6d-ad05f4b1e3fe", "receiptHandle" : "fJBf02J5dcn1cdYFJeks52bDpVIsUslIb1El6GPigH6sXD3HG6eBeVY4jTSR8HhuozLQEwKoJGdnd3jfi8R1zRk34oCwLxiQZRWcAYEO8QW6x56Ng2neeBzKEekx4Zzqhi2kXR991CUM4h31mvsrLLG7i3IPdZvJsdpyGusvrD51YPGfGZR9tzjhct2r5niEshOPjgR0t50Wb5uIFNgM7uFABHpT9Vyrd3fuRXBcDbp7yYi4pEdww761c1ylPRbSz2TihlcYvfLooJ5T20NFy6KcnwLruuv4LCKmo9N6YGCYHgAl9HhOCisCFS2UVn6l1sHTJAqKkCPKyp6oZsN0VY8ykl74iph4HIyAW74feuGnvecyzq8McDVVygGoMeERlutOifxMcJSOzjicXAiBmMEYu9JEHiqQxnP4CF1G4IVyVxJNXn3uR6NzDLCdRKOGr11KdKLlhLQFJ7vXKx4DMTR8fIXGbbmaeYLGn6ARUxjqvpR2TQN1jLgtMdtQ3DPs", "body" : "{\"lieferantenId\":\"ftpuser1\",\"dateinameOriginal\":\"97815662_16122024063817059.jpg\",\"eingangsverzeichnis\":\"ftpuser1/97815662_16122024063817059.jpg\",\"eingangsdatum\":\"2024-12-16T06:38:17.0\",\"dateinameS3\":\"ftpuser1/97815662_16122024063817059.jpg\",\"ablageortS3\":\"file-delivery\",\"fileType\":null}", "md5OfBody" : "76af3472e032f1106f1e8356daf17db3", "eventSource" : "aws:sqs", "eventSourceARN" : "arn:aws:sqs:eu-central-1:000000000000:ftp-file-distribution-image-queue", "attributes" : { "ApproximateFirstReceivedTimestamp" : "1734327509", "ApproximateReceivedCount" : "0", "SenderId" : "none", "SentTimestamp" : "1734327509", "VisibilityTimeout" : "90" } } ] }
 #include <awsmock/service/lambda/LambdaService.h>
+#include <thread>
 
 namespace AwsMock::Service {
 
@@ -185,14 +186,21 @@ namespace AwsMock::Service {
         std::string instanceId = FindIdleInstance(lambda);
         if (instanceId.empty()) {
 
-            // Create instance
-            instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            LambdaCreator lambdaCreator;
-            boost::thread t(boost::ref(lambdaCreator), lambda.code.zipFile, lambda.oid, instanceId);
-            t.join();
+            // Check max concurrency
+            if (lambda.instances.size() < lambda.concurrency) {
 
-            // Replace lambda
-            lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+                // Create instance
+                instanceId = Core::StringUtils::GenerateRandomHexString(8);
+                LambdaCreator lambdaCreator;
+                boost::thread t(boost::ref(lambdaCreator), lambda.code.zipFile, lambda.oid, instanceId);
+                t.join();
+
+                // Replace lambda
+                lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+                log_info << "New lambda instance created, totalSize: " << lambda.instances.size();
+            } else {
+                WaitForIdleInstance(lambda);
+            }
         }
 
         Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
@@ -385,14 +393,15 @@ namespace AwsMock::Service {
         // Get the existing entity
         Dto::Lambda::ListTagsResponse response;
         Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(request.arn);
-        for (const auto &it: request.tags) {
-            if (lambdaEntity.HasTag(it)) {
-                auto key = lambdaEntity.tags.find(it);
-                lambdaEntity.tags.erase(it);
-            }
+        int count = 0;
+        for (const auto &tag: request.tags) {
+            count += std::erase_if(lambdaEntity.tags, [tag](const auto &item) {
+                auto const &[k, v] = item;
+                return k == tag;
+            });
         }
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
-        log_debug << "Delete tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
+        log_debug << "Delete tag request succeeded, arn: " + request.arn << " deleted: " << count;
     }
 
     std::string LambdaService::InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload) {
@@ -431,4 +440,10 @@ namespace AwsMock::Service {
         return Core::Configuration::instance().GetValueBool("awsmock.dockerized") ? 8080 : instance.hostPort;
     }
 
+    void LambdaService::WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) {
+        const system_clock::time_point deadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
+        while (!lambda.HasIdleInstance() && system_clock::now() < deadline) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
 }// namespace AwsMock::Service

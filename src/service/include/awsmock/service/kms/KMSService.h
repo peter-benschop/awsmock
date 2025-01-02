@@ -9,6 +9,7 @@
 #include <chrono>
 #include <ctime>
 #include <string>
+#include <thread>
 
 // Boost includes
 #include <boost/thread.hpp>

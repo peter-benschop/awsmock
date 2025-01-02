@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         static void CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
-         * @brief Creates an new docker container, in case the container does not exists inside the docker daemon.
+         * @brief Creates a new docker container, in case the container does not exists inside the docker daemon.
          *
          * @param lambdaEntity lambda entity.
          * @param instance lambda entity instance.
@@ -99,10 +99,13 @@ namespace AwsMock::Service {
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API
          *
-         * @param lambdaEnvironment lambda environment
-         * @return vector of strings containing the runtime environment
+         * @par
+         * Additionally the AWS_LAMBDA_FUNCTION_TIMEOUT variable will be added. This restricts the AWS Lambda RIE for the given timeout.
+         *
+         * @param lambda lambda entity
+         * @return vector of strings containing the runtime environment as key=value pairs
          */
-        static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Environment &lambdaEnvironment);
+        static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Unpack the provided ZIP file.

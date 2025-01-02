@@ -355,6 +355,7 @@ namespace AwsMock::Service {
 
                     std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    bool chuncked = Core::StringUtils::ContainsIgnoreCase(Core::HttpUtils::GetHeaderValue(request, "Content-Encoding"), "aws-chunked");
                     std::string contentLength = request.base()[http::field::content_length];
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
@@ -362,7 +363,7 @@ namespace AwsMock::Service {
                     sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
                     std::istream stream(&sb);
 
-                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId);
+                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId, chuncked);
                     stream.clear();
 
                     std::map<std::string, std::string> headerMap;

@@ -38,13 +38,6 @@ namespace AwsMock::Database::Entity::Lambda {
         void FromDocument(const std::optional<view> &mResult);
 
         /**
-         * @brief Converts the JSON object to and entity
-         *
-         * @param jsonObject JSON object
-         */
-        //void FromDocument(const view_or_value<view, value> &jsonObject);
-
-        /**
          * @brief Converts the entity to a JSON object
          *
          * @return DTO as string for logging.
