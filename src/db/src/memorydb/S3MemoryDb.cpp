@@ -62,7 +62,7 @@ namespace AwsMock::Database {
     Entity::S3::BucketList S3MemoryDb::ListBuckets() {
 
         Entity::S3::BucketList bucketList;
-        for (const auto &bucket: std::views::keys(_buckets)) {
+        for (const auto &bucket: std::views::values(_buckets)) {
             bucketList.emplace_back(bucket);
         }
 
