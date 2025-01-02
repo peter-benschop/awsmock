@@ -18,6 +18,7 @@ awsmock:
     signature: # AWS signature settings
       verify: false                                                   # Verify AWS signature
   frontend: # Frontend HTTP server
+    active: true                                                      # Frontend activation flag
     address: 0.0.0.0                                                  # Listen address
     port: 4567                                                        # Port number
     workers: 20                                                       # Number of worker threads

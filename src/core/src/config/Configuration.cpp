@@ -144,6 +144,14 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.podman.socket", "AWSMOCK_PODMAN_SOCKET", "/var/run/podman/podman.sock");
 
+        // Frontend
+        DefineBoolProperty("awsmock.frontend.active", "AWSMOCK_FRONTEND_ACTIVE", true);
+        DefineStringProperty("awsmock.frontend.address", "AWSMOCK_FRONTEND_ADDRESS", "0.0.0.0");
+        DefineIntProperty("awsmock.frontend.port", "AWSMOCK_FRONTEND_PORT", 4567);
+        DefineIntProperty("awsmock.frontend.workers", "AWSMOCK_FRONTEND_WORKERS", 10);
+        DefineIntProperty("awsmock.frontend.timeout", "AWSMOCK_FRONTEND_TIMEOUT", 900);
+        DefineStringProperty("awsmock.frontend.doc-root", "AWSMOCK_FRONTEND_DOC_ROOT", "/home/awsmock/frontend");
+
         // Logging
         DefineStringProperty("awsmock.logging.level", "AWSMOCK_LOG_LEVEL", "info");
         DefineStringProperty("awsmock.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");

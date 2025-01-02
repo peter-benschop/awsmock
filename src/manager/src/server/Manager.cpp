@@ -5,6 +5,7 @@
 #include <awsmock/server/Manager.h>
 
 namespace AwsMock::Manager {
+
     void CreateIndexes() {
         Database::ModuleDatabase::instance().CreateIndexes();
         log_debug << "Database indexes created";
@@ -21,9 +22,7 @@ namespace AwsMock::Manager {
     void Manager::InitializeDatabase() {
 
         // Get database variables
-        if (const Core::Configuration &configuration = Core::Configuration::instance();
-
-            configuration.GetValueBool("awsmock.mongodb.active")) {
+        if (const Core::Configuration &configuration = Core::Configuration::instance(); configuration.GetValueBool("awsmock.mongodb.active")) {
             const std::string name = configuration.GetValueString("awsmock.mongodb.name");
             const std::string host = configuration.GetValueString("awsmock.mongodb.host");
             const std::string user = configuration.GetValueString("awsmock.mongodb.user");
