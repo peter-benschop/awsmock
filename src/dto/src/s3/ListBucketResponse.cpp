@@ -90,7 +90,7 @@ namespace AwsMock::Dto::S3 {
             for (auto &it: contents) {
                 boost::property_tree::ptree xmlContent;
                 xmlContent.add("Key", it.key);
-                xmlContent.add("LastModified", it.modified);
+                xmlContent.add("LastModified", Core::DateTimeUtils::ToISO8601(it.modified));
                 xmlContent.add("ETag", it.etag);
                 xmlContent.add("Size", it.size);
                 xmlContent.add("StorageClass", it.storageClass);

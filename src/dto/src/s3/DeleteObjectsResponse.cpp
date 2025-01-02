@@ -29,8 +29,10 @@ namespace AwsMock::Dto::S3 {
     std::string DeleteObjectsResponse::ToXml() const {
 
         boost::property_tree::ptree root;
+        boost::property_tree::ptree parent = root.add("DeleteResult", "");
         for (const auto &key: keys) {
-            root.add("DeleteResult.Key", key);
+            parent.add("Deleted.Key", key);
+            parent.add("Deleted.VersionId", "");
         }
         return Core::XmlUtils::ToXmlString(root);
     }
