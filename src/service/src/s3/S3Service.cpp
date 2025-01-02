@@ -356,7 +356,7 @@ namespace AwsMock::Service {
         return {.region = s3Request.region, .bucket = s3Request.bucket, .key = s3Request.key, .uploadId = uploadId};
     }
 
-    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) {
+    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, bool chunkEncoding) const {
         log_trace << "UploadPart request, part: " << part << " updateId: " << updateId;
 
         std::string uploadDir = GetMultipartUploadDirectory(updateId);
@@ -364,7 +364,19 @@ namespace AwsMock::Service {
 
         std::string fileName = uploadDir + Core::FileUtils::separator() + updateId + "-" + std::to_string(part);
         std::ofstream ofs(fileName, std::ios::binary);
-        std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
+
+        if (chunkEncoding) {
+
+            std::string firstLine;
+            getline(stream, firstLine);
+            int size = Core::NumberUtils::HexToInt(Core::StringUtils::StripLineEndings(firstLine));
+            log_debug << "File size=" << size;
+            std::copy_n(std::istreambuf_iterator(stream), size, std::ostreambuf_iterator(ofs));
+
+        } else {
+
+            std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
+        }
         ofs.close();
         log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 

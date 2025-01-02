@@ -23,16 +23,16 @@ namespace AwsMock::Core {
             return {};
         }
         if (IsUrlEncoded(parameters[index])) {
-            return Core::StringUtils::UrlDecode(parameters[index]);
+            return StringUtils::UrlDecode(parameters[index]);
         }
         return parameters[index];
     }
 
     std::string HttpUtils::GetPathParametersFromIndex(const std::string &uri, int index) {
 
-        std::string basePath = GetBasePath(uri);
-        std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        return Core::StringUtils::UrlDecode(Core::StringUtils::Join(parameters, index));
+        const std::string basePath = GetBasePath(uri);
+        const std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
+        return StringUtils::UrlDecode(StringUtils::Join(parameters, index));
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
@@ -44,7 +44,7 @@ namespace AwsMock::Core {
     bool HttpUtils::HasPathParameters(const std::string &uri, int index) {
 
         const std::string basePath = GetBasePath(uri);
-        std::vector<std::string> pathVector = StringUtils::Split(basePath, '/');
+        const std::vector<std::string> pathVector = StringUtils::Split(basePath, '/');
         return index < pathVector.size();
     }
 
@@ -56,15 +56,15 @@ namespace AwsMock::Core {
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
-        std::string queryString = GetQueryString(uri);
-        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
-        return (int) parameters.size();
+        const std::string queryString = GetQueryString(uri);
+        const std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+        return static_cast<int>(parameters.size());
     }
 
     int HttpUtils::CountQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
 
-        std::string queryString = GetQueryString(uri);
-        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+        const std::string queryString = GetQueryString(uri);
+        const std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
 
         int count = 0;
         for (auto &it: parameters) {
@@ -80,8 +80,7 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetQueryParameterValue(const std::string &parameter) {
-        std::vector<std::string> parts = StringUtils::Split(parameter, '=');
-        if (parts.size() > 1) {
+        if (const std::vector<std::string> parts = StringUtils::Split(parameter, '='); parts.size() > 1) {
             std::string value = parts[1];
             if (IsUrlEncoded(value)) {
                 return StringUtils::UrlDecode(value);
@@ -93,7 +92,7 @@ namespace AwsMock::Core {
 
     std::vector<std::string> HttpUtils::GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
 
-        std::string queryString = GetQueryString(uri);
+        const std::string queryString = GetQueryString(uri);
         std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
 
         std::vector<std::string> namedParameters;
@@ -266,10 +265,15 @@ namespace AwsMock::Core {
         log_info << SEPARATOR;
     }
 
-    void HttpUtils::DumpRequest(const http::request<http::dynamic_body> &request) {
+    void HttpUtils::DumpRequest(const http::request<http::dynamic_body> &request, const int limit) {
         log_info << SEPARATOR;
         DumpHeaders(request);
-        log_info << GetBodyAsString(request);
+        if (limit > 0) {
+            const std::string tmp = GetBodyAsString(request);
+            log_info << tmp.substr(0, limit);
+        } else {
+            log_info << GetBodyAsString(request);
+        }
         log_info << SEPARATOR;
     }
 

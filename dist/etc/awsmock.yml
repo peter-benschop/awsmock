@@ -2,27 +2,27 @@
 # Configuration file for the AWS cloud simulation
 #
 awsmock:
-  region: eu-central-1                        # AWS region
-  user: none                                  # AWS user
+  region: eu-central-1                                                # AWS region
+  user: none                                                          # AWS user
   access: # AWS access definition
-    key-id: none                              # AWS access key ID
-    secret-access-key: none                   # AWS access secret
-    account-id: 000000000000                  # AWS account ID
-    client-id: 00000000                       # AWS client ID
-  temp-dir: /home/awsmock/data/tmp            # General temp directory
-  data-dir: /home/awsmock/data                # General data directory
-  dockerized: false                           # dockerized flag
-  json: # JSON settings                       # JSON settings
-    pretty: true                              # JSON pretty print
+    key-id: none                                                      # AWS access key ID
+    secret-access-key: none                                           # AWS access secret
+    account-id: 000000000000                                          # AWS account ID
+    client-id: 00000000                                               # AWS client ID
+  temp-dir: /home/awsmock/data/tmp                                    # General temp directory
+  data-dir: /home/awsmock/data                                        # General data directory
+  dockerized: false                                                   # Dockerized flag
+  json: # JSON settings                                               # JSON settings
+    pretty: true                                                      # JSON pretty print
   aws: # AWS settings
     signature: # AWS signature settings
-      verify: false                           # Verify AWS signature
+      verify: false                                                   # Verify AWS signature
   frontend: # Frontend HTTP server
-    address: 0.0.0.0                          # Listen address
-    port: 4567                                # Port number
-    workers: 20                               # Number of worker threads
-    timeout: 900                              # HTTP timeout
-    doc-root: /home/awsmock/frontend          # Document root directory
+    address: 0.0.0.0                                                  # Listen address
+    port: 4567                                                        # Port number
+    workers: 20                                                       # Number of worker threads
+    timeout: 900                                                      # HTTP timeout
+    doc-root: /home/awsmock/frontend                                  # Document root directory
   docker: # Docker settings
     active: true
     network-mode: local
@@ -58,7 +58,7 @@ awsmock:
       address: 0.0.0.0
       port: 4566
       max-queue: 10
-      max-threads: 50
+      max-threads: 200
       max-body: 104857600
       timeout: 900
   modules:
@@ -133,26 +133,26 @@ awsmock:
         period: 300
       worker:
         period: 3600
-    transfer:
-      active: true
-      bucket: transfer-server
-      data-dir: /home/awsmock/data/transfer
-      monitoring:
-        period: 300
-      worker:
-        period: 3600
-      ftp:
-        port: 21
-        address: 0.0.0.0
-        pasv-min: 6000
-        pasv-max: 6100
-  monitoring:
-    active: true
-    port: 9091
-    period: 60
-    prometheus: true
-    intern: true
-    retention: 3
+    transfer: # AWS transfer server
+      active: true                                                      # Activation flag
+      bucket: transfer-server                                           # Transfer server S3 bucket
+      data-dir: /home/awsmock/data/transfer                             # FTP data directory
+      monitoring: # Transfer server monitoring
+        period: 300                                                     # Monitoring interval
+      worker: # Background worker
+        period: 3600                                                    # Monitoring interval
+      ftp: # FTP server
+        port: 21                                                        # FTP port
+        address: 0.0.0.0                                                # FTP listening address
+        pasv-min: 6000                                                  # Passive mode minimum port
+        pasv-max: 6100                                                  # Passive mode maximal port
+  monitoring: # Monitoring
+    active: true                                                        # Activation flag
+    port: 9091                                                          # Prometheus port
+    period: 60                                                          # Monitoring interval
+    prometheus: true                                                    # Use Prometheus as monitoring collector
+    intern: true                                                        # Use internal monitoring
+    retention: 3                                                        # Retention of monitoring data in days
   logging:
-    level: info                                                        # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
-    filename:                                                          # Log file name, if empty use stdout
+    level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
+    filename:                                                           # Log file name, if empty use stdout

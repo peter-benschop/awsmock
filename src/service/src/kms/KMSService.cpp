@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/kms/KMSService.h>
-#include <thread>
 
 namespace AwsMock::Service {
 
