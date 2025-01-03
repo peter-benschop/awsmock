@@ -32,12 +32,26 @@ namespace AwsMock::Dto::Cognito {
     std::string AdminCreateUserResponse::ToJson() const {
 
         try {
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
-            Core::Bson::BsonUtils::SetBoolValue(document, "Enabled", enabled);
+            document userDocument;
+            Core::Bson::BsonUtils::SetStringValue(userDocument, "Username", userName);
+            Core::Bson::BsonUtils::SetBoolValue(userDocument, "Enabled", enabled);
 
-            return Core::Bson ::BsonUtils::ToJsonString(document);
+            // User attributes
+            if (!userAttributes.empty()) {
+                array attributesJsonArray;
+                for (const auto &[name, attributeValue]: userAttributes) {
+                    document attributeObject;
+                    attributeObject.append(kvp("Name", name));
+                    attributeObject.append(kvp("Value", attributeValue));
+                    attributesJsonArray.append(attributeObject);
+                }
+                userDocument.append(kvp("Attributes", attributesJsonArray));
+            }
+
+            document rootDocument;
+            rootDocument.append(kvp("User", userDocument));
+
+            return Core::Bson ::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
