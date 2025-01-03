@@ -72,7 +72,7 @@ namespace AwsMock::Database {
 
         // assert
         EXPECT_EQ(1, result);
-        EXPECT_FALSE(bucket.arn.empty());
+        EXPECT_FALSE(bucket.name.empty());
     }
 
     TEST_F(S3DatabaseTest, BucketExistsTest) {

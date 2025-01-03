@@ -185,10 +185,10 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            const Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
-            std::string cipherText = EncryptPlaintext(keyEntity, request.plainText);
+            const std::string cipherText = EncryptPlaintext(keyEntity, request.plainText);
 
             Dto::KMS::EncryptResponse response = {{.region = request.region}, keyEntity.keyId, request.encryptionAlgorithm, cipherText};
             return response;
@@ -237,7 +237,7 @@ namespace AwsMock::Service {
 
                 // Encryption
                 unsigned char *rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, rawKey);
-                log_debug << "Encrypted plaintext, length: " << rawPlaintext;
+                log_debug << "Encrypted plaintext, length: " << plaintextLen;
                 return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawCiphertext), static_cast<size_t>(plaintextLen)});
             }
 
