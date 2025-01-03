@@ -13,8 +13,8 @@ namespace AwsMock::Dto::KMS {
             const value document = bsoncxx::from_json(jsonString);
             region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
             keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
-            dryRun = Core::Bson::BsonUtils::GetBoolValue(document, "Plaintext");
-            plainText = Core::Bson::BsonUtils::GetStringValue(document, "CiphertextBlob");
+            dryRun = Core::Bson::BsonUtils::GetBoolValue(document, "DryRun");
+            plainText = Core::Bson::BsonUtils::GetStringValue(document, "Plaintext");
             encryptionAlgorithm = EncryptionAlgorithmsFromString(Core::Bson::BsonUtils::GetStringValue(document, "EncryptionAlgorithm"));
 
             // Grant tokens
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::KMS {
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
             Core::Bson::BsonUtils::SetBoolValue(document, "DryRun", dryRun);
-            Core::Bson::BsonUtils::SetStringValue(document, "PlainText", plainText);
+            Core::Bson::BsonUtils::SetStringValue(document, "Plaintext", plainText);
             Core::Bson::BsonUtils::SetStringValue(document, "EncryptionAlgorithm", EncryptionAlgorithmsToString(encryptionAlgorithm));
 
             if (!grantTokens.empty()) {

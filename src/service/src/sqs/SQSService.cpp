@@ -23,6 +23,9 @@ namespace AwsMock::Service {
 
         try {
 
+            // Get queue URL
+            const std::string queueUrl = Core::CreateSQSQueueUrl(request.queueName);
+
             Database::Entity::SQS::QueueAttribute attributes;
             for (const auto &[attributeName, attributeValue]: request.attributes) {
                 if (attributeName == "DelaySeconds") {
@@ -56,7 +59,7 @@ namespace AwsMock::Service {
             attributes.queueArn = queueArn;
 
             // Update database
-            Database::Entity::SQS::Queue queue = {.region = request.region, .name = request.queueName, .owner = request.owner, .queueUrl = request.queueUrl, .queueArn = queueArn, .attributes = attributes, .tags = request.tags};
+            Database::Entity::SQS::Queue queue = {.region = request.region, .name = request.queueName, .owner = request.owner, .queueUrl = queueUrl, .queueArn = queueArn, .attributes = attributes, .tags = request.tags};
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << queue.ToString();
             Dto::SQS::CreateQueueResponse response = {.region = queue.region, .name = queue.name, .owner = queue.owner, .queueUrl = queue.queueUrl, .queueArn = queue.queueArn};
