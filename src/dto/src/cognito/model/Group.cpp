@@ -27,8 +27,8 @@ namespace AwsMock::Dto::Cognito {
             Core::Bson::BsonUtils::SetStringValue(document, "GroupName", userPoolId);
             Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
             Core::Bson::BsonUtils::SetIntValue(document, "Precedence", precedence);
-            Core::Bson::BsonUtils::SetDateValue(document, "CreationDate", created);
-            Core::Bson::BsonUtils::SetDateValue(document, "LastModifiedDate", modified);
+            Core::Bson::BsonUtils::SetLongValue(document, "CreationDate", Core::DateTimeUtils::UnixTimestamp(created));
+            Core::Bson::BsonUtils::SetLongValue(document, "LastModifiedDate", Core::DateTimeUtils::UnixTimestamp(modified));
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {

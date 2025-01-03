@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Cognito {
     }
 
     std::ostream &operator<<(std::ostream &os, const CreateGroupResponse &r) {
-        os << "CreateUserPoolResponse=" << r.ToJson();
+        os << "CreateGroupResponse=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Cognito
