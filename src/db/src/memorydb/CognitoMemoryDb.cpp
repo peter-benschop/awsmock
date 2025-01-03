@@ -12,33 +12,31 @@ namespace AwsMock::Database {
 
     bool CognitoMemoryDb::UserPoolExists(const std::string &region, const std::string &name) {
 
-        return find_if(_userPools.begin(),
-                       _userPools.end(),
-                       [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                           return userPool.second.region == region && userPool.second.name == name;
-                       }) != _userPools.end();
+        return std::ranges::find_if(_userPools,
+                                    [region, name](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                                        return userPool.second.region == region && userPool.second.name == name;
+                                    }) != _userPools.end();
     }
 
     bool CognitoMemoryDb::UserPoolExists(const std::string &userPoolId) {
 
-        return find_if(_userPools.begin(),
-                       _userPools.end(),
-                       [userPoolId](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
-                           return userPool.second.userPoolId == userPoolId;
-                       }) != _userPools.end();
+        return std::ranges::find_if(_userPools,
+                                    [userPoolId](const std::pair<std::string, Entity::Cognito::UserPool> &userPool) {
+                                        return userPool.second.userPoolId == userPoolId;
+                                    }) != _userPools.end();
     }
 
     Entity::Cognito::UserPoolList CognitoMemoryDb::ListUserPools(const std::string &region) {
 
         Entity::Cognito::UserPoolList userPoolList;
         if (region.empty()) {
-            for (const auto &userPool: _userPools) {
-                userPoolList.emplace_back(userPool.second);
+            for (const auto &val: _userPools | std::views::values) {
+                userPoolList.emplace_back(val);
             }
         } else {
-            for (const auto &userPool: _userPools) {
-                if (userPool.second.region == region) {
-                    userPoolList.emplace_back(userPool.second);
+            for (const auto &val: _userPools | std::views::values) {
+                if (val.region == region) {
+                    userPoolList.emplace_back(val);
                 }
             }
         }
