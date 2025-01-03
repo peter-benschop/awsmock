@@ -14,7 +14,7 @@ namespace AwsMock::Dto::Cognito {
             region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
             userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
 
-            // Message action
+            // User attributes
             if (document.find("UserAttributes") != document.end()) {
                 array array;
                 for (const auto &element: document["UserAttributes"].get_array().value) {
