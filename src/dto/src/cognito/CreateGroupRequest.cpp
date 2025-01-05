@@ -28,12 +28,12 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
             Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
             Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
             Core::Bson::BsonUtils::SetIntValue(document, "Precedence", precedence);
             Core::Bson::BsonUtils::SetStringValue(document, "RoleArn", roleArn);
-            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
-            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

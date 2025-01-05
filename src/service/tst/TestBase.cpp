@@ -35,6 +35,30 @@ namespace AwsMock::Service {
     }
 
 
+    Core::HttpSocketResponse TestBase::SendGetCommand(const std::string &url, const std::string &payload, const int port) {
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::get, "localhost", port, url, payload);
+        log_debug << "Status: " << response.statusCode << " body: " << response.body;
+        return response;
+    }
+
+    Core::HttpSocketResponse TestBase::SendPutCommand(const std::string &url, const std::string &payload, const int port) {
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, "localhost", port, url, payload);
+        log_debug << "Status: " << response.statusCode << " body: " << response.body;
+        return response;
+    }
+
+    Core::HttpSocketResponse TestBase::SendPostCommand(const std::string &url, const std::string &payload, const int port) {
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, "localhost", port, url, payload);
+        log_debug << "Status: " << response.statusCode << " body: " << response.body;
+        return response;
+    }
+
+    Core::HttpSocketResponse TestBase::SendDeleteCommand(const std::string &url, const std::string &payload, const int port) {
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::delete_, "localhost", port, url, payload);
+        log_debug << "Status: " << response.statusCode << " body: " << response.body;
+        return response;
+    }
+
     void TestBase::StopGateway() {
         _ios.stop();
     }

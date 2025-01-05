@@ -122,7 +122,7 @@ namespace AwsMock::Core {
         http::request<http::file_body> request = PrepareBinaryMessage(method, path, filename, headers);
 
         // Write to socket
-        boost::beast::http::write(stream, request);
+        http::write(stream, request);
         if (ec) {
             log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
             return {.statusCode = http::status::internal_server_error, .body = ec.message()};
@@ -151,6 +151,7 @@ namespace AwsMock::Core {
         request.method(method);
         request.set(http::field::host, host);
         request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+        request.set(http::field::content_type, "application/json");
         request.target(path);
         request.body() = body;
         request.prepare_payload();
@@ -171,6 +172,7 @@ namespace AwsMock::Core {
         request.target(path);
         request.base().set("Host", "localhost");
         request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+        request.set(http::field::content_type, "application/octet-stream");
         request.body().open(filename.c_str(), boost::beast::file_mode::scan, ec);
         request.prepare_payload();
 
