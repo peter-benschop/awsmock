@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/CognitoDatabase.h>
@@ -25,28 +26,27 @@
 
 namespace AwsMock::Service {
 
-    class CognitoServerJavaTest : public ::testing::Test {
+    /**
+     * @brief Tests the aws-sdk-java interface to the AwsMock system.
+     *
+     * @par
+     * The awsmock-test docker image will be started. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs an existing SQS queue.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    class CognitoServerJavaTest : public testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
-
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+            StartGateway(TEST_PORT);
+            _region = GetRegion();
+            _endpoint = GetEndpoint();
 
             // Base URL
             _baseUrl = "/api/cognito/";
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
-            _thread = boost::thread([&]() {
-                boost::asio::io_service::work work(_ios);
-                _ios.run();
-            });
         }
 
         void TearDown() override {
@@ -55,36 +55,8 @@ namespace AwsMock::Service {
             _database.DeleteAllUserPools();
         }
 
-        static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {
-            std::map<std::string, std::string> headers;
-            headers[to_string(http::field::content_type)] = "application/json";
-            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::get, "localhost", TEST_PORT, url, payload, headers);
-            log_debug << "Status: " << response.statusCode << " body: " << response.body;
-            return response;
-        }
-
-        static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
-            std::map<std::string, std::string> headers;
-            headers[to_string(http::field::content_type)] = "application/json";
-            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, "localhost", TEST_PORT, url, payload, headers);
-            log_debug << "Status: " << response.statusCode << " body: " << response.body;
-            return response;
-        }
-
-        static Core::HttpSocketResponse SendDeleteCommand(const std::string &url, const std::string &payload) {
-            std::map<std::string, std::string> headers;
-            headers[to_string(http::field::content_type)] = "application/json";
-            Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::delete_, "localhost", TEST_PORT, url, payload, headers);
-            log_debug << "Status: " << response.statusCode << " body: " << response.body;
-            return response;
-        }
-
-        boost::thread _thread;
         std::string _endpoint, _baseUrl, _region;
-        boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
         Database::CognitoDatabase _database = Database::CognitoDatabase();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(CognitoServerJavaTest, UserPoolCreateTest) {
@@ -92,7 +64,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
 
         // assert
@@ -103,13 +75,13 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserPoolListTest) {
 
         // arrange
-        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
 
         // act
-        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listUserPools?maxResults=10", {});
+        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listUserPools?maxResults=10", {}, TEST_PORT);
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -118,14 +90,14 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserPoolDescribeTest) {
 
         // arrange
-        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         const std::string userPoolId = userPoolList.front().userPoolId;
 
         // act
-        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "describeUserPools?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId), {});
+        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "describeUserPools?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId), {}, TEST_PORT);
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -134,14 +106,14 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserPoolCreateClientTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
-        std::string userPoolId = userPoolList.front().userPoolId;
+        const std::string userPoolId = userPoolList.front().userPoolId;
 
         // act
-        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
+        const Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {}, TEST_PORT);
         EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
         userPoolList = _database.ListUserPools();
 
@@ -153,14 +125,14 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserPoolCreateDomainTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
-        std::string userPoolId = userPoolList.front().userPoolId;
+        const std::string userPoolId = userPoolList.front().userPoolId;
 
         // act
-        Core::HttpSocketResponse createDomainResult = SendGetCommand(_baseUrl + "createUserPoolDomain?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&domainName=" + Core::StringUtils::UrlEncode(TEST_DOMAIN), {});
+        const Core::HttpSocketResponse createDomainResult = SendGetCommand(_baseUrl + "createUserPoolDomain?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&domainName=" + Core::StringUtils::UrlEncode(TEST_DOMAIN), {}, TEST_PORT);
         EXPECT_TRUE(createDomainResult.statusCode == http::status::ok);
         userPoolList = _database.ListUserPools();
 
@@ -172,15 +144,15 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserPoolDeleteTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
-        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
-        std::string userPoolId = userPoolList.front().userPoolId;
+        const std::string userPoolId = userPoolList.front().userPoolId;
 
         // act
-        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteUserPool?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId), {});
-        long count = _database.CountUserPools();
+        const Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteUserPool?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId), {}, TEST_PORT);
+        const long count = _database.CountUserPools();
 
         // assert
         EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
@@ -190,15 +162,15 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserCreateTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
-        std::string userPoolId = userPoolList.front().userPoolId;
+        const std::string userPoolId = userPoolList.front().userPoolId;
 
         // act
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
-        Database::Entity::Cognito::UserList userList = _database.ListUsers();
+        const Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
+        const Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
         EXPECT_TRUE(userCreateResult.statusCode == http::status::ok);
@@ -208,16 +180,16 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserEnableTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         EXPECT_TRUE(userCreateResult.statusCode == http::status::ok);
 
         // act
-        Core::HttpSocketResponse userEnableResult = SendPostCommand(_baseUrl + "enableUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userEnableResult = SendPostCommand(_baseUrl + "enableUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -228,16 +200,16 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserDisableTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         EXPECT_TRUE(userCreateResult.statusCode == http::status::ok);
 
         // act
-        Core::HttpSocketResponse userDisableResult = SendPostCommand(_baseUrl + "disableUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userDisableResult = SendPostCommand(_baseUrl + "disableUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -248,19 +220,19 @@ namespace AwsMock::Service {
     /*TEST_F(CognitoServerJavaTest, UserSignupTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL),{}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
+        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT),{}, TEST_PORT);
         EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
         userPoolList = _database.ListUserPools();
         std::string clientId = userPoolList.front().userPoolClients.front().clientId;
         std::string password = Core::StringUtils::GenerateRandomPassword(8);
 
         // act
-        Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password), {});
+        Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password),{}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -272,20 +244,20 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserConfirmTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL),{}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT), {});
+        Core::HttpSocketResponse createClientResult = SendGetCommand(_baseUrl + "createUserPoolClient?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&clientName=" + Core::StringUtils::UrlEncode(TEST_CLIENT),{}, TEST_PORT);
         EXPECT_TRUE(createClientResult.statusCode == http::status::ok);
         userPoolList = _database.ListUserPools();
         std::string clientId = userPoolList.front().userPoolClients.front().clientId;
         std::string password = Core::StringUtils::GenerateRandomPassword(8);
-        Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password), {});
+        Core::HttpSocketResponse userSignupResult = SendPostCommand(_baseUrl + "signupUser?userName=" + Core::StringUtils::UrlEncode(TEST_USER) + "&clientId=" + Core::StringUtils::UrlEncode(clientId) + "&password=" + Core::StringUtils::UrlEncode(password),{}, TEST_PORT);
 
         // act
-        Core::HttpSocketResponse confirmUserResult = SendPostCommand(_baseUrl + "adminConfirmSignUp?userPoolId=" + userPoolId + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse confirmUserResult = SendPostCommand(_baseUrl + "adminConfirmSignUp?userPoolId=" + userPoolId + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER),{}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -297,17 +269,17 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, UserDeleteTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
 
         // act
-        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         long count = _database.CountUsers();
 
         // assert
@@ -318,35 +290,36 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, GroupCreateTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
-        Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
+        const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
-        std::string userPoolId = userPoolList.front().userPoolId;
+        const std::string userPoolId = userPoolList.front().userPoolId;
 
         // act
-        Core::HttpSocketResponse groupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
-        Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
+        const Core::HttpSocketResponse groupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
+        const Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
 
         // assert
         EXPECT_TRUE(groupCreateResult.statusCode == http::status::ok);
         EXPECT_EQ(1, groupList.size());
+        EXPECT_TRUE(groupList.front().groupName == TEST_GROUP);
     }
 
     TEST_F(CognitoServerJavaTest, GroupListTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse groupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse groupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
         EXPECT_EQ(1, groupList.size());
 
         // act
-        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listUserPools?maxResults=10", {});
+        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listUserPools?maxResults=10", {}, TEST_PORT);
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -355,21 +328,21 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, AddUserToGroupTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
-        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         EXPECT_TRUE(userGroupCreateResult.statusCode == http::status::ok);
         Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
         EXPECT_EQ(1, groupList.size());
 
         // act
-        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         userList = _database.ListUsers();
 
         // assert
@@ -382,23 +355,23 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, ListUsersInGroupTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
-        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         EXPECT_TRUE(userGroupCreateResult.statusCode == http::status::ok);
         Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
         EXPECT_EQ(1, groupList.size());
-        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         EXPECT_TRUE(addUserToCreateResult.statusCode == http::status::ok);
 
         // act
-        Core::HttpSocketResponse listUsersInGroupResult = SendGetCommand(_baseUrl + "listUsersInGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse listUsersInGroupResult = SendGetCommand(_baseUrl + "listUsersInGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         int count = std::stoi(listUsersInGroupResult.body);
 
         // assert
@@ -409,25 +382,25 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, RemoveUserFromGroupTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUser?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
-        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse userGroupCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         EXPECT_TRUE(userGroupCreateResult.statusCode == http::status::ok);
         Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
         EXPECT_EQ(1, groupList.size());
-        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse addUserToCreateResult = SendPostCommand(_baseUrl + "addUserToGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         EXPECT_TRUE(addUserToCreateResult.statusCode == http::status::ok);
         userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
 
         // act
-        Core::HttpSocketResponse removeUserFromCreateResult = SendPostCommand(_baseUrl + "removeUserFromGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {});
+        Core::HttpSocketResponse removeUserFromCreateResult = SendPostCommand(_baseUrl + "removeUserFromGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP) + "&userName=" + Core::StringUtils::UrlEncode(TEST_USER), {}, TEST_PORT);
         userList = _database.ListUsers();
 
         // assert
@@ -439,17 +412,17 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerJavaTest, GroupDeleteTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {});
+        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createUserPool?name=" + Core::StringUtils::UrlEncode(TEST_USER_POOL), {}, TEST_PORT);
         EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         EXPECT_EQ(1, userPoolList.size());
         std::string userPoolId = userPoolList.front().userPoolId;
-        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse userCreateResult = SendPostCommand(_baseUrl + "createUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         Database::Entity::Cognito::GroupList userGroupList = _database.ListGroups();
         EXPECT_EQ(1, userGroupList.size());
 
         // act
-        Core::HttpSocketResponse deleteDeleteResult = SendDeleteCommand(_baseUrl + "deleteUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {});
+        Core::HttpSocketResponse deleteDeleteResult = SendDeleteCommand(_baseUrl + "deleteUserGroup?userPoolId=" + Core::StringUtils::UrlEncode(userPoolId) + "&groupName=" + Core::StringUtils::UrlEncode(TEST_GROUP), {}, TEST_PORT);
         userGroupList = _database.ListGroups();
 
         // assert

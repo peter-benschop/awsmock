@@ -159,7 +159,7 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
             const long size = _sqsDatabase.CountMessageSize(request.queueArn);
 
             Dto::SQS::GetQueueDetailsResponse sqsResponse;

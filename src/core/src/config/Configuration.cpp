@@ -180,7 +180,7 @@ namespace AwsMock::Core {
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
-    void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue) {
+    void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
         std::string value = std::to_string(defaultValue);
         if (getenv(envProperty.c_str()) != nullptr) {
             value = getenv(envProperty.c_str());
