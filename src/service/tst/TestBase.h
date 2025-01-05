@@ -20,6 +20,18 @@ namespace AwsMock::Service {
         void StartGateway();
 
         /**
+         * @brief Starts the gateway server on a given port
+         *
+         * @param port gateway port
+         */
+        void StartGateway(int port);
+
+        /**
+         * @brief Stops the gateway server
+         */
+        void StopGateway();
+
+        /**
          * @brief Returns the current region.
          *
          * @return current region

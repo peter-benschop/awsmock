@@ -22,6 +22,7 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 // Test includes
+#include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
@@ -31,29 +32,21 @@
 
 namespace AwsMock::Service {
 
-    class SQSServerCliTest : public ::testing::Test {
+    /**
+     * @brief Test the SQS command line interface of AwsMock.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    class SQSServerCliTest : public testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
-
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            const std::string _port = _configuration.GetValueString("awsmock.gateway.http.port");
-            const std::string _host = _configuration.GetValueString("awsmock.gateway.http.host");
-            const std::string _address = _configuration.GetValueString("awsmock.gateway.http.address");
-
-            // Set test config
-            _endpoint = "http://" + _host + ":" + _port;
-
-            // Start gateway server
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
-            _thread = boost::thread([&]() {
-                boost::asio::io_service::work work(_ios);
-                _ios.run();
-            });
+            StartGateway();
+            _region = GetRegion();
+            _endpoint = GetEndpoint();
         }
 
         void TearDown() override {
@@ -73,12 +66,8 @@ namespace AwsMock::Service {
             return {};
         }
 
-        boost::thread _thread;
-        boost::asio::io_service _ios{10};
-        std::string _endpoint, _queueUrl, _accountId, _region;
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        std::string _endpoint, _queueUrl, _region;
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerCliTest, QueueCreateTest) {

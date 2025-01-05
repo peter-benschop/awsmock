@@ -2,6 +2,7 @@
 // Created by vogje01 on 21/10/2023.
 //
 
+#include "TestBase.h"
 #ifndef AWMOCK_S3_SPRING_SERVER_TEST_H
 #define AWMOCK_S3_SPRING_SERVER_TEST_H
 
@@ -25,35 +26,28 @@
 
 namespace AwsMock::Service {
 
-    namespace http = beast::http;
-
     /**
-     * Tests the aws-sdk-java interface to the AwsMock system.
+     * @brief Tests the aws-sdk-java interface to the AwsMock system.
      *
-     * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
+     * @par
+     * The awsmock-test docker image will be started during startup.
+     *
+     * @author jens.vogt\@opitz-consulting.com
      */
-    class S3ServerJavaTest : public ::testing::Test {
+    class S3ServerJavaTest : public testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
-            // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
+            // Start gateway server
+            StartGateway(TEST_PORT);
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+            // General configuration
+            _region = GetRegion();
 
             // Base URL
             _baseUrl = "/api/s3/";
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
-            _thread = boost::thread([&]() {
-                boost::asio::io_service::work work(_ios);
-                _ios.run();
-            });
         }
 
         void TearDown() override {
@@ -93,13 +87,8 @@ namespace AwsMock::Service {
             return response;
         }
 
-        boost::thread _thread;
         std::string _region, _baseUrl;
-        boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(S3ServerJavaTest, S3CreateBucketTest) {

@@ -25,6 +25,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * @brief Test the SQS service layer
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class SQSServiceTest : public testing::Test {
 
       protected:
@@ -79,22 +84,6 @@ namespace AwsMock::Service {
         // assert
         EXPECT_TRUE(response.queueList.empty());
     }
-
-    /*TEST_F(SQSServiceTest, QueueCreateAttributeTest) {
-
-      // arrange
-      Dto::SQS::CreateQueueRequest request = {.region=REGION, .name=QUEUE, .queueUrl=QUEUE_URL, .owner=OWNER};
-
-      // act
-      Dto::SQS::CreateQueueResponse response = _lambdaService.CreateQueue(request);
-      Database::Entity::SQS::QueueAttribute userAttributes = _database.GetQueueAttributesByQueueUrl(response.queueUrl);
-
-      // assert
-      EXPECT_TRUE(response.name == QUEUE);
-      EXPECT_TRUE(response.region == REGION);
-      EXPECT_EQ(userAttributes.maxMessageSize, 262144);
-      EXPECT_EQ(userAttributes.visibilityTimeout, 30);
-  }*/
 
     TEST_F(SQSServiceTest, QueueDeleteTest) {
 
@@ -213,12 +202,12 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.StringValue=application/json
         // MessageAttribute.1.Value.DataType=String
         //
-        Dto::SQS::MessageAttribute messageAttribute = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
+        const Dto::SQS::MessageAttribute messageAttribute = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         messageAttributes[messageAttribute.name] = messageAttribute;
 
         // act
-        std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes);
+        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -235,14 +224,14 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.StringValue=42
         // MessageAttribute.2.Value.DataType=Number
         //
-        Dto::SQS::MessageAttribute messageAttribute1 = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
-        Dto::SQS::MessageAttribute messageAttribute2 = {.name = "contentLength", .stringValue = "42", .type = Dto::SQS::MessageAttributeDataType::NUMBER, .systemAttribute = false};
+        const Dto::SQS::MessageAttribute messageAttribute1 = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
+        const Dto::SQS::MessageAttribute messageAttribute2 = {.name = "contentLength", .stringValue = "42", .type = Dto::SQS::MessageAttributeDataType::NUMBER, .systemAttribute = false};
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         messageAttributes[messageAttribute1.name] = messageAttribute1;
         messageAttributes[messageAttribute2.name] = messageAttribute2;
 
         // act
-        std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes);
+        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

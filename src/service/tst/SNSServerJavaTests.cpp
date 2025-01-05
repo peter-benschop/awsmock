@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
@@ -23,34 +24,28 @@
 namespace AwsMock::Service {
 
     /**
-     * Tests the aws-sdk-java interface to the AwsMock system.
+     * @brief Tests the aws-sdk-java interface to the AwsMock system.
      *
-     * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs a existing SQS queue.</p>
+     * @par
+     * The awsmock-test docker image will be started. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs an existing SQS queue.
      *
+     * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSServerJavaTest : public ::testing::Test {
+    class SNSServerJavaTest : public ::testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
-            // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
+            // Start gateway server
+            StartGateway(TEST_PORT);
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+            // General configuration
+            _region = GetRegion();
 
             // Base URL
             _snsBaseUrl = "/api/sns/";
             _sqsBaseUrl = "/api/sqs/";
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
-            _thread = boost::thread([&]() {
-                boost::asio::io_service::work work(_ios);
-                _ios.run();
-            });
         }
 
         void TearDown() override {

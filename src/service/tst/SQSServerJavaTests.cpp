@@ -19,6 +19,7 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 // Test includes
+#include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
 
 #define TEST_QUEUE std::string("test-queue")
@@ -26,8 +27,6 @@
 #define TEST_PORT 10100
 
 namespace AwsMock::Service {
-
-    namespace http = beast::http;
 
     struct TestMessage {
 
@@ -81,33 +80,27 @@ namespace AwsMock::Service {
     };
 
     /**
-     * Tests the aws-sdk-java interface to the AwsMock system.
+     * @brief Tests the aws-sdk-java interface to the AwsMock system.
      *
-     * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
+     * @par
+     * The awsmock-test docker image will be started. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs an existing SQS queue.
      *
+     * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSServerJavaTest : public ::testing::Test {
+    class SQSServerJavaTest : public ::testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
-            // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
+            // Start gateway server
+            StartGateway(TEST_PORT);
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+            // General configuration
+            _region = GetRegion();
 
             // Base URL
             _baseUrl = "/api/sqs/";
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
-            _thread = boost::thread([&]() {
-                boost::asio::io_service::work work(_ios);
-                _ios.run();
-            });
         }
 
         void TearDown() override {
@@ -139,13 +132,8 @@ namespace AwsMock::Service {
             return response;
         }
 
-        boost::thread _thread;
         std::string _region, _baseUrl;
-        boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerJavaTest, SQSCreateQueueTest) {
