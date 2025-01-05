@@ -173,8 +173,8 @@ namespace AwsMock::Service {
             const Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
-                    // Fix URL
                     queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
+                    _sqsDatabase.CreateOrUpdateQueue(queue);
                     log_debug << "SQS queues imported, url: " << queue.queueUrl;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
