@@ -10,10 +10,10 @@ namespace AwsMock::Dto::Cognito {
 
         try {
             const value document = bsoncxx::from_json(jsonString);
-            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "userPoolId");
-            groupName = Core::Bson::BsonUtils::GetStringValue(document, "groupName");
-            limit = Core::Bson::BsonUtils::GetIntValue(document, "limit");
-            nextToken = Core::Bson::BsonUtils::GetStringValue(document, "nextToken");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            groupName = Core::Bson::BsonUtils::GetStringValue(document, "GroupName");
+            limit = Core::Bson::BsonUtils::GetIntValue(document, "Limit");
+            nextToken = Core::Bson::BsonUtils::GetStringValue(document, "NextToken");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -25,10 +25,10 @@ namespace AwsMock::Dto::Cognito {
         try {
 
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
-            Core::Bson::BsonUtils::SetStringValue(document, "groupName", groupName);
-            Core::Bson::BsonUtils::SetIntValue(document, "limit", limit);
-            Core::Bson::BsonUtils::SetStringValue(document, "nextToken", nextToken);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "GroupName", groupName);
+            Core::Bson::BsonUtils::SetIntValue(document, "Limit", limit);
+            Core::Bson::BsonUtils::SetStringValue(document, "NextToken", nextToken);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {
@@ -43,8 +43,8 @@ namespace AwsMock::Dto::Cognito {
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListUsersInGroupRequest &r) {
-        os << "ListUsersInGroupRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListUsersInGroupRequest &i) {
+        os << "ListUsersInGroupRequest=" << i.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Cognito

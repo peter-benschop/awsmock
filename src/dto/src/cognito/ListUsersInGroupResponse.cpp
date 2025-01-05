@@ -12,7 +12,7 @@ namespace AwsMock::Dto::Cognito {
 
             document rootDocument;
 
-            if (users.empty()) {
+            if (!users.empty()) {
                 array jsonArray;
                 for (const auto &user: users) {
                     jsonArray.append(user.ToDocument());

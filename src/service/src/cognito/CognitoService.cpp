@@ -512,8 +512,8 @@ namespace AwsMock::Service {
             if (user.HasGroup(request.userPoolId, request.groupName)) {
                 std::string groupName = group.groupName;
                 std::erase_if(user.groups,
-                              [&groupName](const Database::Entity::Cognito::Group &group) {
-                                  return groupName == group.groupName;
+                              [&groupName](const Database::Entity::Cognito::Group &g) {
+                                  return groupName == g.groupName;
                               });
                 user = _database.UpdateUser(user);
                 log_debug << "Group added to user, userName: " << user.userName << " groupName: " << group.groupName;
@@ -694,7 +694,7 @@ namespace AwsMock::Service {
         log_debug << "List groups request, userPoolId: " << request.userPoolId << " maxResults: " << request.limit;
 
         try {
-            std::vector<Database::Entity::Cognito::Group> groups = _database.ListGroups(request.region);
+            const std::vector<Database::Entity::Cognito::Group> groups = _database.ListGroups(request.region);
             log_trace << "Got groups list count: " << groups.size();
             return Dto::Cognito::Mapper::map(request, groups);
         } catch (bsoncxx::exception &ex) {

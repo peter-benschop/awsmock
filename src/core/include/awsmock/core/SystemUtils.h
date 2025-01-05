@@ -40,7 +40,7 @@ namespace AwsMock::Core {
         int status = -1;
         std::string output;
     };
-    typedef struct ExecResult ExecResult;
+    typedef ExecResult ExecResult;
 
     /**
      * @brief System utils for command line execution and other system routines.
@@ -58,6 +58,14 @@ namespace AwsMock::Core {
          * @return command output.
          */
         static ExecResult Exec(const std::string &command);
+
+        /**
+         * @brief Execute system command and capture the stdout output result.
+         *
+         * @param command command string
+         * @return command output.
+         */
+        static ExecResult Exec2(const std::string &command);
 
         /**
          * @brief Returns the current working directory.

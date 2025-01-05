@@ -12,6 +12,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -25,22 +26,21 @@
 
 namespace AwsMock::Service {
 
-    class SNSServerCliTest : public ::testing::Test {
+    /**
+     * @brief Test the SNS command line interface of AwsMock.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    class SNSServerCliTest : public ::testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            const std::string _port = _configuration.GetValueString("awsmock.modules.sqs.http.port");
-            const std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
-
-            // Set test config
-            _configuration.SetValueString("awsmock.service.gateway.http.port", _port);
-            _endpoint = "http://" + _host + ":" + _port;
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
+            // General configuration
+            StartGateway();
+            _region = GetRegion();
+            _endpoint = GetEndpoint();
         }
 
         void TearDown() override {
@@ -52,91 +52,46 @@ namespace AwsMock::Service {
 
         static std::string GetTopicArn(const std::string &jsonString) {
 
-            /*
-            std::string topicArn;
-            Poco::JSON::Parser parser;
-            const Poco::Dynamic::Var result = parser.parse(jsonString);
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-            try {
-
-                if (Poco::JSON::Array::Ptr topicsArray = rootObject->getArray("Topics"); topicsArray != nullptr) {
-                    for (const auto &it: *topicsArray) {
-                        const auto &object = it.extract<Poco::JSON::Object::Ptr>();
-                        Core::JsonUtils::GetJsonValueString("TopicArn", object, topicArn);
-                    }
+            if (const value document = bsoncxx::from_json(jsonString); document.find("Topics") != document.end()) {
+                std::string topicArn;
+                for (const bsoncxx::array::view arrayView{document["Topics"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                    topicArn = Core::Bson::BsonUtils::GetStringValue(element, "TopicArn");
                 }
-
-            } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message());
+                return topicArn;
             }
-            return topicArn;*/
             return {};
         }
 
         static std::string GetMessageId(const std::string &jsonString) {
 
-            /*
-            std::string messageId;
-            Poco::JSON::Parser parser;
-            const Poco::Dynamic::Var result = parser.parse(jsonString);
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-            try {
-
-                Core::JsonUtils::GetJsonValueString("MessageId", rootObject, messageId);
-
-            } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message());
+            if (const value document = bsoncxx::from_json(jsonString); document.find("MessageId") != document.end()) {
+                std::string messageId = Core::Bson::BsonUtils::GetStringValue(document, "MessageId");
+                return messageId;
             }
-            return messageId;*/
             return {};
         }
 
         static std::string GetQueueUrl(const std::string &jsonString) {
 
-            /*
-            std::string queueUrl;
-            Poco::JSON::Parser parser;
-            const Poco::Dynamic::Var result = parser.parse(jsonString);
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-            try {
-
-                Core::JsonUtils::GetJsonValueString("QueueUrl", rootObject, queueUrl);
-
-            } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message());
+            if (const value document = bsoncxx::from_json(jsonString); document.find("QueueUrl") != document.end()) {
+                std::string queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
+                return queueUrl;
             }
-            return queueUrl;*/
             return {};
         }
 
         static std::string GetSubscriptionArn(const std::string &jsonString) {
 
-            /*
-            std::string subscriptionArn;
-            Poco::JSON::Parser parser;
-            const Poco::Dynamic::Var result = parser.parse(jsonString);
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-
-            try {
-
-                Core::JsonUtils::GetJsonValueString("SubscriptionArn", rootObject, subscriptionArn);
-
-            } catch (Poco::Exception &exc) {
-                throw Core::ServiceException(exc.message());
+            if (const value document = bsoncxx::from_json(jsonString); document.find("SubscriptionArn") != document.end()) {
+                std::string subscriptionArn = Core::Bson::BsonUtils::GetStringValue(document, "SubscriptionArn");
+                return subscriptionArn;
             }
-            return subscriptionArn;*/
             return {};
         }
 
-        std::string _endpoint;
-        boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        std::string _endpoint, _region;
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SNSServerCliTest, TopicCreateTest) {

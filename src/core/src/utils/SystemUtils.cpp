@@ -21,7 +21,23 @@ namespace AwsMock::Core {
         std::string output((std::istreambuf_iterator(output_file)), std::istreambuf_iterator<char>());
         std::filesystem::remove(redirection);
 
-        return ExecResult{status, output};
+        return ExecResult{status - 120, output};
+    }
+
+    ExecResult SystemUtils::Exec2(const std::string &command) {
+        std::array<char, 128> buffer{};
+        std::string result;
+        const std::unique_ptr<FILE, void (*)(FILE *)> pipe(popen(command.c_str(), "r"),
+                                                           [](FILE *f) -> void {
+                                                               std::ignore = pclose(f);
+                                                           });
+        if (!pipe) {
+            throw std::runtime_error("popen() failed!");
+        }
+        while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+            result += buffer.data();
+        }
+        return ExecResult{0, result};
     }
 
     std::string SystemUtils::GetCurrentWorkingDir() {

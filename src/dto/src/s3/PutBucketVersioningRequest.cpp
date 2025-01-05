@@ -11,7 +11,7 @@ namespace AwsMock::Dto::S3 {
         try {
 
             boost::property_tree::ptree pt;
-            read_xml(xmlString, pt);
+            Core::XmlUtils::ReadXml(xmlString, &pt);
             status = pt.get<std::string>("VersioningConfiguration.Status");
 
         } catch (std::exception &exc) {

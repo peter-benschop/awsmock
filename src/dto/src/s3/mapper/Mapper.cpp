@@ -6,9 +6,9 @@
 
 namespace AwsMock::Dto::S3 {
 
-    Dto::S3::ListObjectVersionsResponse Mapper::map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList) {
+    ListObjectVersionsResponse Mapper::map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList) {
 
-        Dto::S3::ListObjectVersionsResponse response;
+        ListObjectVersionsResponse response;
         response.region = request.region;
         response.name = request.bucket;
         response.maxKeys = request.maxKeys;
@@ -29,8 +29,8 @@ namespace AwsMock::Dto::S3 {
         return response;
     }
 
-    Dto::S3::GetBucketResponse Mapper::map(const Dto::S3::GetBucketRequest &request, Database::Entity::S3::Bucket &bucket) {
-        Dto::S3::GetBucketResponse response = {
+    GetBucketResponse Mapper::map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket) {
+        GetBucketResponse response = {
                 .id = bucket.oid,
                 .region = bucket.region,
                 .bucket = bucket.name,
@@ -61,10 +61,10 @@ namespace AwsMock::Dto::S3 {
         return bucket;
     }
 
-    std::vector<Dto::S3::LambdaConfiguration> Mapper::map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaNotifications) {
+    auto Mapper::map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaNotifications) -> std::vector<Dto::S3::LambdaConfiguration> {
         std::vector<LambdaConfiguration> lambdaConfigurations;
         for (const auto &lambdaNotification: lambdaNotifications) {
-            Dto::S3::LambdaConfiguration lambdaConfiguration;
+            LambdaConfiguration lambdaConfiguration;
             lambdaConfiguration.id = lambdaNotification.id;
             lambdaConfiguration.lambdaArn = lambdaNotification.lambdaArn;
             lambdaConfiguration.events = map(lambdaNotification.events);
@@ -85,10 +85,10 @@ namespace AwsMock::Dto::S3 {
         return lambdaNotifications;
     }
 
-    std::vector<Dto::S3::QueueConfiguration> Mapper::map(const std::vector<Database::Entity::S3::QueueNotification> &queueNotifications) {
+    std::vector<QueueConfiguration> Mapper::map(const std::vector<Database::Entity::S3::QueueNotification> &queueNotifications) {
         std::vector<QueueConfiguration> queueConfigurations;
         for (const auto &queueNotification: queueNotifications) {
-            Dto::S3::QueueConfiguration queueConfiguration;
+            QueueConfiguration queueConfiguration;
             queueConfiguration.id = queueNotification.id;
             queueConfiguration.queueArn = queueNotification.queueArn;
             queueConfiguration.events = map(queueNotification.events);
@@ -109,10 +109,10 @@ namespace AwsMock::Dto::S3 {
         return topicConfigurations;
     }
 
-    std::vector<Dto::S3::NotificationEventType> Mapper::map(const std::vector<std::string> &eventStrs) {
+    std::vector<NotificationEventType> Mapper::map(const std::vector<std::string> &eventStrs) {
         std::vector<NotificationEventType> events;
         for (const auto &event: eventStrs) {
-            events.emplace_back(Dto::S3::EventTypeFromString(event));
+            events.emplace_back(EventTypeFromString(event));
         }
         return events;
     }

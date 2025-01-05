@@ -26,6 +26,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * @brief Test the SNS service layer
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class SNSServiceTest : public testing::Test {
 
       protected:

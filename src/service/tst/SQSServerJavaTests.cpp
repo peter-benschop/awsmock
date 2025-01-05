@@ -19,6 +19,7 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 // Test includes
+#include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
 
 #define TEST_QUEUE std::string("test-queue")
@@ -27,29 +28,24 @@
 
 namespace AwsMock::Service {
 
-    namespace http = boost::beast::http;
-
     struct TestMessage {
 
         std::string testKey;
         std::string receiptHandle;
 
         std::string ToJson() const {
-            /*Poco::JSON::Object rootObject;
-            rootObject.set("testKey", testKey);
-            rootObject.set("receiptHandle", receiptHandle);
-            return Core::JsonUtils::ToJsonString(rootObject);*/
-            return {};
+
+            document rootDocument;
+            rootDocument.append(kvp("testKey", testKey));
+            rootDocument.append(kvp("receiptHandle", receiptHandle));
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
         }
 
         void FromJson(const std::string &jsonString) {
-            /*value document = bsoncxx::from_json(jsonString);
-            Core::Bson::BsonUtils::SetStringValue(document);
-            Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
-            const auto &rootObject = result.extract<Poco::JSON::Object::Ptr>();
-            Core::JsonUtils::GetJsonValueString("testKey", rootObject, testKey);
-            Core::JsonUtils::GetJsonValueString("receiptHandle", rootObject, receiptHandle);*/
+
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            testKey = Core::Bson::BsonUtils::GetStringValue(rootDocument, "testKey");
+            receiptHandle = Core::Bson::BsonUtils::GetStringValue(rootDocument, "receiptHandle");
         }
     };
 
@@ -58,57 +54,53 @@ namespace AwsMock::Service {
         std::vector<TestMessage> messageList;
 
         std::string ToJson() {
-            /*array rootArray;
-            for (const auto &message: messageList) {
-                document messageObject;
-                messageObject.append("testKey", message.testKey);
-                messageObject.set("receiptHandle", message.receiptHandle);
-                rootArray.add(messageObject);
+            array rootArray;
+            for (const auto &[testKey, receiptHandle]: messageList) {
+                document elementDocument;
+                elementDocument.append(kvp("testKey", testKey));
+                elementDocument.append(kvp("receiptHandle", receiptHandle));
+                rootArray.append(elementDocument);
             }
-            return Core::JsonUtils::ToJsonString(rootArray);*/
-            return {};
+            return Core::Bson::BsonUtils::ToJsonString(rootArray);
         }
 
         void FromJson(const std::string &jsonString) {
-            /*Poco::JSON::Parser parser;
-            Poco::Dynamic::Var result = parser.parse(jsonString);
-            Poco::JSON::Array::Ptr rootArray = result.extract<Poco::JSON::Array::Ptr>();
-            if (!rootArray.isNull()) {
-                for (size_t i = 0; i < rootArray->size(); i++) {
-                    std::string testKey, receiptHandle;
-                    Poco::JSON::Object::Ptr messageObject = rootArray->getObject(i);
-                    Core::JsonUtils::GetJsonValueString("testKey", messageObject, testKey);
-                    Core::JsonUtils::GetJsonValueString("receiptHandle", messageObject, receiptHandle);
-                    messageList.push_back({.testKey = testKey, .receiptHandle = receiptHandle});
+
+            if (const value rootDocument = bsoncxx::from_json(jsonString); rootDocument.view().find("Messages") != rootDocument.view().end()) {
+                messageList = std::vector<TestMessage>();
+                array array;
+                for (const auto &element: rootDocument["Messages"].get_array().value) {
+                    TestMessage testMessage;
+                    testMessage.testKey = Core::Bson::BsonUtils::GetStringValue(element.get_document().value, "testKey");
+                    testMessage.receiptHandle = Core::Bson::BsonUtils::GetStringValue(element.get_document().value, "receiptHandle");
+                    messageList.emplace_back(testMessage);
                 }
-            }*/
+            }
         }
     };
 
     /**
-     * Tests the aws-sdk-java interface to the AwsMock system.
+     * @brief Tests the aws-sdk-java interface to the AwsMock system.
      *
-     * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>.</p>
+     * @par
+     * The awsmock-test docker image will be started. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs an existing SQS queue.
      *
+     * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSServerJavaTest : public ::testing::Test {
+    class SQSServerJavaTest : public ::testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
-            // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
+            // Start gateway server
+            StartGateway(TEST_PORT);
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueBool("awsmock.service.gateway.http.host", "localhost");
+            // General configuration
+            _region = GetRegion();
 
             // Base URL
             _baseUrl = "/api/sqs/";
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
         }
 
         void TearDown() override {
@@ -141,11 +133,7 @@ namespace AwsMock::Service {
         }
 
         std::string _region, _baseUrl;
-        boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SQSServerJavaTest, SQSCreateQueueTest) {
@@ -245,14 +233,14 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSSendMessageTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
+        const std::string queueUrl = result.body;
 
         // act
-        TestMessage testMessage = {.testKey = "testKey"};
+        const TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
@@ -263,16 +251,18 @@ namespace AwsMock::Service {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         std::string queueUrl = result.body;
 
         // act
         TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessageAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        EXPECT_EQ(http::status::ok, sendResult.statusCode);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
+
         Core::HttpSocketResponse receiveResult = SendGetCommand(_baseUrl + "receiveMessages?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&maxMessages=10&maxWaitTime=5", {});
-        EXPECT_EQ(http::status::ok, receiveResult.statusCode);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+
         EXPECT_EQ(1, messageList.size());
         Database::Entity::SQS::Message message = messageList.front();
 
@@ -286,7 +276,7 @@ namespace AwsMock::Service {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        EXPECT_TRUE(result.statusCode == http::status::ok);
         std::string queueUrl = result.body;
         TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());

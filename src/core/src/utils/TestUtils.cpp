@@ -74,8 +74,9 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueInt("awsmock.modules.dynamodb.container.port", 8000);
 
         // Docker
+        Configuration::instance().SetValueBool("awsmock.docker.active", true);
         Configuration::instance().SetValueString("awsmock.docker.network-mode", "bridge");
-        Configuration::instance().SetValueString("awsmock.docker.network-name", "default");
+        Configuration::instance().SetValueString("awsmock.docker.network-name", "local");
 
         // Logging
         Configuration::instance().SetValueString("awsmock.logging.level", "debug");
@@ -85,7 +86,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueInt("awsmock.monitoring.port", 19091);
 
         // Podman
-        Configuration::instance().SetValueBool("awsmock.podman.active", true);
+        Configuration::instance().SetValueBool("awsmock.podman.active", false);
         Configuration::instance().SetValueString("awsmock.podman.network-mode", "local");
         Configuration::instance().SetValueString("awsmock.podman.network-name", "local");
 
@@ -105,6 +106,7 @@ namespace AwsMock::Core {
     }
 
     ExecResult TestUtils::SendCliCommand(const std::string &command) {
-        return SystemUtils::Exec(command);
+        return SystemUtils::Exec2(command);
     }
+
 }// namespace AwsMock::Core

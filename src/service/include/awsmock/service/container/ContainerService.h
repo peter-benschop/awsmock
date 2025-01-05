@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <string>
+#include <thread>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
@@ -28,6 +29,7 @@
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
 #include <awsmock/dto/docker/CreateNetworkResponse.h>
+#include <awsmock/dto/docker/InspectContainerResponse.h>
 #include <awsmock/dto/docker/ListContainerResponse.h>
 #include <awsmock/dto/docker/ListImageResponse.h>
 #include <awsmock/dto/docker/ListNetworkResponse.h>
@@ -124,7 +126,7 @@ namespace AwsMock::Service {
          * @param locked if true is already locked
          * @return Image
          */
-        Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
+        [[nodiscard]] Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
 
         /**
          * @brief Build a docker image for a lambda
@@ -137,7 +139,7 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return file size in bytes
          */
-        std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+        [[nodiscard]] std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Build a docker image from a docker file
@@ -147,7 +149,7 @@ namespace AwsMock::Service {
          * @param dockerFile docker file
          * @return file size in bytes
          */
-        std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
+        [[nodiscard]] std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
 
         /**
          * @brief Delete an image by name/tags.
@@ -163,7 +165,7 @@ namespace AwsMock::Service {
          * @param tag container tags
          * @return true if container exists, otherwise false
          */
-        bool ContainerExists(const std::string &name, const std::string &tag) const;
+        [[nodiscard]] bool ContainerExists(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Checks whether a container exists by ID.
@@ -171,7 +173,7 @@ namespace AwsMock::Service {
          * @param id container ID
          * @return true if container exists, otherwise false
          */
-        bool ContainerExists(const std::string &id) const;
+        [[nodiscard]] bool ContainerExists(const std::string &id) const;
 
         /**
          * @brief Checks whether a container exists by name.
@@ -179,7 +181,26 @@ namespace AwsMock::Service {
          * @param containerName container name
          * @return true if container exists, otherwise false
          */
-        bool ContainerExistsByName(const std::string &containerName) const;
+        [[nodiscard]] bool ContainerExistsByName(const std::string &containerName) const;
+
+        /**
+         * @brief Checks whether a container is in running state
+         *
+         * @par
+         * Sends an inspect container request to the docker daemon REST api.
+         *
+         * @param containerId container ID
+         * @return true if container is running, otherwise false
+         */
+        [[nodiscard]] bool IsContainerRunning(const std::string &containerId) const;
+
+        /**
+         * @brief Waits until a container is in running state
+         *
+         * @param containerId container ID
+         * @param maxTime maximal waiting time in seconds
+         */
+        void WaitForContainer(const std::string &containerId, int maxTime = 10) const;
 
         /**
          * @brief List all docker images, with the given name and different tags.
@@ -187,7 +208,7 @@ namespace AwsMock::Service {
          * @param name name of the image
          * @return ListImageResponse
          */
-        Dto::Docker::ListImageResponse ListImages(const std::string &name) const;
+        [[nodiscard]] Dto::Docker::ListImageResponse ListImages(const std::string &name) const;
 
         /**
          * @brief Creates a container

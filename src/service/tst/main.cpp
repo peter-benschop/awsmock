@@ -11,14 +11,17 @@
 // Test includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/utils/TestUtils.h>
+#include <boost/asio/io_service.hpp>
+#include <boost/thread/detail/thread.hpp>
 
 #define TEST_IMAGE_NAME std::string("jensvogt/awsmock-test")
 #define TEST_CONTAINER_VERSION std::string("latest")
 #define TEST_CONTAINER_NAME std::string("awsmock-test")
 
-class TestEnvironment : public ::testing::Environment {
+class TestEnvironment final : public ::testing::Environment {
 
   public:
 
@@ -35,7 +38,7 @@ class TestEnvironment : public ::testing::Environment {
 
         // Check container
         if (!dockerService.ContainerExists(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION)) {
-            AwsMock::Dto::Docker::CreateContainerResponse response = dockerService.CreateContainer(TEST_CONTAINER_NAME, TEST_CONTAINER_VERSION, TEST_CONTAINER_NAME, 10100, 10100);
+            AwsMock::Dto::Docker::CreateContainerResponse response = dockerService.CreateContainer(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION, TEST_CONTAINER_NAME, 10100, 10100);
         }
 
         // Get docker container
@@ -54,6 +57,9 @@ class TestEnvironment : public ::testing::Environment {
 
   private:
 
+    /**
+     * Docker service
+     */
     AwsMock::Service::ContainerService dockerService = AwsMock::Service::ContainerService::instance();
 };
 

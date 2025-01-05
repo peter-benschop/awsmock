@@ -821,7 +821,7 @@ namespace AwsMock::Service {
             return Dto::S3::Mapper::map(s3Request, objectList);
 
         } catch (bsoncxx::exception &ex) {
-            log_error << "S3 put bucket encryption request failed, message: " << ex.what();
+            log_error << "S3 list object versions request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

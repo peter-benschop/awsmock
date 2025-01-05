@@ -54,6 +54,7 @@ namespace AwsMock::Service {
         // Start docker container, in case it is not already running.
         if (container.state != "running") {
             ContainerService::instance().StartDockerContainer(container.id);
+            ContainerService::instance().WaitForContainer(container.id);
             log_debug << "Lambda docker container started, containerId: " << container.id;
         }
 

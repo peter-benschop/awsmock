@@ -26,6 +26,11 @@
 
 namespace AwsMock::Service {
 
+    /**
+     * @brief Test the S3 services of AwsMock.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class S3ServiceTest : public ::testing::Test {
 
       protected:

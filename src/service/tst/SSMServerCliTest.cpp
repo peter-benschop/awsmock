@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SSMDatabase.h>
@@ -20,33 +21,24 @@
 
 namespace AwsMock::Service {
 
-    class SSMServerCliTest : public ::testing::Test {
+    class SSMServerCliTest : public ::testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            const std::string _port = _configuration.GetValueString("awsmock.modules.ssm.http.port");
-            const std::string _host = _configuration.GetValueString("awsmock.modules.ssm.http.host");
-
-            // Set test config
-            _configuration.SetValueString("awsmock.gateway.http.port", _port);
-            _endpoint = "http://" + _host + ":" + _port;
-
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            // General configuration
+            StartGateway();
+            _region = GetRegion();
+            _endpoint = GetEndpoint();
         }
 
         void TearDown() override {
             _ssmDatabase.DeleteAllParameters();
         }
 
-        std::string _endpoint;
-        boost::asio::io_service _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        std::string _endpoint, _region;
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
-        std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
     TEST_F(SSMServerCliTest, ParameterPutTest) {
