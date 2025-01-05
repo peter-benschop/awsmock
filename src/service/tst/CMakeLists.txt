@@ -10,14 +10,15 @@ set(COGNITO_SOURCES CognitoServiceTests.cpp CognitoServerCliTest.cpp CognitoServ
 set(DYNAMODB_SOURCES DynamodbServerJavaTests.cpp DynamoDbServerCliTest.cpp)
 set(KMS_SOURCES KmsServiceTests.cpp)
 set(SSM_SOURCES SSMServerCliTest.cpp)
-set(MAIN_SOURCES main.cpp ModuleServiceTests.cpp)
+set(TRANSFER_SOURCES TransferServerCliTest.cpp)
+set(MAIN_SOURCES main.cpp ModuleServiceTests.cpp TestBase.cpp)
 
 # Includes
 include_directories(../include ../../core/include ../../db/include ../../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 link_directories(../../core ../../db ../../dto ${LIB_BSON_CXX} ${LIB_MONGO_CXX})
 
 add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES}
-        ${SSM_SOURCES} ${MAIN_SOURCES})
+        ${SSM_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_thread boost_filesystem boost_thread boost_url yaml-cpp
         gtest pthread ssl crypto archive z prometheus-cpp-core prometheus-cpp-pull magic)
 

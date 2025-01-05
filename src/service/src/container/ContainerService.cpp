@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/container/ContainerService.h>
-#include <thread>
 
 namespace AwsMock::Service {
     std::map<std::string, std::string> ContainerService::_supportedRuntimes = {
@@ -29,7 +28,7 @@ namespace AwsMock::Service {
         const Core::Configuration &_configuration = Core::Configuration::instance();
         _networkName = _configuration.GetValueString("awsmock.docker.network-name");
         _containerPort = _configuration.GetValueString("awsmock.docker.container.port");
-        _isDocker = _configuration.GetValueBool("awsmock.docker.active");
+        _isDocker = true;//_configuration.GetValueBool("awsmock.docker.active");
         _containerSocketPath = _isDocker ? _configuration.GetValueString("awsmock.docker.socket") : _containerSocketPath = _configuration.GetValueString("awsmock.podman.socket");
         _domainSocket = std::make_shared<Core::DomainSocket>(_containerSocketPath);
     }
@@ -39,8 +38,7 @@ namespace AwsMock::Service {
 
         if (_isDocker) {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
-                statusCode == http::status::ok) {
+            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
                 Dto::Docker::ListImageResponse response;
                 response.FromJson(body);
                 if (response.imageList.empty()) {
@@ -77,8 +75,9 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Docker::Image ContainerService::GetImageByName(const std::string &name, const std::string &tag, bool locked) const {
-        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+    Dto::Docker::Image ContainerService::GetImageByName(const std::string &name, const std::string &tag, const bool locked) const {
+        if (!locked)
+            boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
@@ -363,7 +362,7 @@ namespace AwsMock::Service {
         // Create the request
         const Dto::Docker::CreateContainerRequest request = {
                 .hostName = instanceName,
-                .user = "root",
+                //.user = "root",
                 .image = imageName + ":" + tag,
                 .networkMode = GetNetworkName(),
                 .environment = environment,
@@ -392,7 +391,7 @@ namespace AwsMock::Service {
         // Create the request
         const Dto::Docker::CreateContainerRequest request = {
                 .hostName = imageName,
-                .user = "root",
+                //.user = "root",
                 .image = imageName + ":" + tag,
                 .networkMode = GetNetworkName(),
                 .containerPort = std::to_string(containerPort),
@@ -479,6 +478,26 @@ namespace AwsMock::Service {
             return;
         }
         log_debug << "Docker container started, id: " << id;
+    }
+
+    bool ContainerService::IsContainerRunning(const std::string &containerId) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/" + containerId + "/json"); statusCode == http::status::ok) {
+            log_debug << "Container running, httpStatus: " << statusCode;
+            Dto::Docker::InspectContainerResponse response;
+            response.FromJson(body);
+            log_debug << "Docker container state, id: " << containerId << " state: " << response.state;
+            return response.state.running;
+        }
+        log_error << "Is docker container running failed, id: " << containerId;
+        return false;
+    }
+
+    void ContainerService::WaitForContainer(const std::string &containerId, const int maxTime) const {
+        const auto deadline = system_clock::now() + std::chrono::seconds{maxTime};
+        while (!IsContainerRunning(containerId) && system_clock::now() < deadline) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
     }
 
     void ContainerService::RestartContainer(const Dto::Docker::Container &container) const {

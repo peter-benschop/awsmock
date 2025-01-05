@@ -2,86 +2,71 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_CONTAINER_H
-#define AWSMOCK_DTO_DOCKER_CONTAINER_H
+#ifndef AWSMOCK_DTO_DOCKER_STATE_H
+#define AWSMOCK_DTO_DOCKER_STATE_H
 
 // C++ includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include "awsmock/core/BsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/dto/docker/model/Port.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/LogStream.h>
 
 #define LAMBDA_INTERNAL_PORT 8080
 
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Docker container
+     * @brief Docker container state
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Container {
+    struct State {
 
         /**
-         * Image ID
+         * Error
          */
-        std::string id;
+        std::string error;
 
         /**
-         * Container names
+         * Error code
          */
-        std::vector<std::string> names;
+        int errorCode;
 
         /**
-         * Image
+         * PID
          */
-        std::string image;
+        int pid;
 
         /**
-         * Image ID
+         * Running state
          */
-        std::string imageId;
+        bool running;
 
         /**
-         * Command
+         * Dead state
          */
-        std::string command;
+        bool dead;
 
         /**
-         * The state of this container (e.g. Exited)
+         * Paused state
          */
-        std::string state;
+        bool paused;
 
         /**
-         * Additional human-readable status of this container (e.g. Exit 0)
+         * Restarting state
+         */
+        bool restarting;
+
+        /**
+         * OOM killed state
+         */
+        bool oomKilled;
+
+        /**
+         * State
          */
         std::string status;
-
-        /**
-         * The ports exposed by this container
-         */
-        std::vector<Port> ports;
-
-        /**
-         * The size of files that have been created or changed by this container
-         */
-        long sizeRw = 0;
-
-        /**
-         * The total size of all the files in this container
-         */
-        long sizeRootFs = 0;
-
-        /**
-         * @brief Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
-         *
-         * @return lambda public port, or -1 if port does not exist.
-         */
-        int GetLambdaPort();
 
         /**
          * @brief Convert to a JSON string
@@ -123,9 +108,9 @@ namespace AwsMock::Dto::Docker {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const Container &c);
+        friend std::ostream &operator<<(std::ostream &os, const State &c);
     };
 
 }// namespace AwsMock::Dto::Docker
 
-#endif// AWSMOCK_DTO_DOCKER_CONTAINER_H
+#endif// AWSMOCK_DTO_DOCKER_STATE_H

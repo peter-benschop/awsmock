@@ -85,17 +85,19 @@ namespace AwsMock::Dto::S3 {
         try {
 
             boost::property_tree::ptree root;
-            root.add("ListVersionsResult.Region", region);
-            root.add("ListVersionsResult.Name", region);
-            root.add("ListVersionsResult.Prefix", region);
-            root.add("ListVersionsResult.Delimiter", region);
-            root.add("ListVersionsResult.EncodingType", region);
-            root.add("ListVersionsResult.MaxKeys", region);
-            root.add("ListVersionsResult.IsTruncated", region);
-            root.add("ListVersionsResult.KeyMarker", region);
-            root.add("ListVersionsResult.VersionIdMarker", region);
-            root.add("ListVersionsResult.NextKeyMarker", region);
-            root.add("ListVersionsResult.NextVersionIdMarker", region);
+            boost::property_tree::ptree listVersionResult;
+
+            listVersionResult.add("Region", region);
+            listVersionResult.add("Name", name);
+            listVersionResult.add("Prefix", prefix);
+            listVersionResult.add("Delimiter", delimiter);
+            listVersionResult.add("EncodingType", encodingType);
+            listVersionResult.add("MaxKeys", maxKeys);
+            listVersionResult.add("IsTruncated", isTruncated);
+            listVersionResult.add("KeyMarker", keyMarker);
+            listVersionResult.add("VersionIdMarker", versionIdMarker);
+            listVersionResult.add("NextKeyMarker", nextKeyMarker);
+            listVersionResult.add("NextVersionIdMarker", nextVersionIdMarker);
 
             // Prefixes
             if (!commonPrefixes.empty()) {
@@ -103,14 +105,12 @@ namespace AwsMock::Dto::S3 {
                 for (const auto &p: commonPrefixes) {
                     prefixArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", p)));
                 }
-                root.add_child("CommonPrefixes", prefixArray);
+                listVersionResult.add_child("CommonPrefixes", prefixArray);
             }
 
             // Versions
             if (!versions.empty()) {
-                boost::property_tree::ptree jsonVersionArray;
                 for (const auto &v: versions) {
-
                     boost::property_tree::ptree jsonVersionObject;
                     jsonVersionObject.add("Key", v.key);
                     jsonVersionObject.add("ETag", v.eTag);
@@ -119,25 +119,24 @@ namespace AwsMock::Dto::S3 {
                     jsonVersionObject.add("IsLatest", v.isLatest);
                     jsonVersionObject.add("Size", v.size);
                     jsonVersionObject.add("LastModified", Core::DateTimeUtils::ToISO8601(v.lastModified));
-                    jsonVersionArray.push_back(std::make_pair("", jsonVersionObject));
+                    listVersionResult.add_child("Version", jsonVersionObject);
                 }
-                root.add_child("Versions", jsonVersionArray);
             }
 
-            // Versions
+            // Delete markers
             if (!deleteMarkers.empty()) {
-                boost::property_tree::ptree jsonDeleteArray;
                 for (const auto &m: deleteMarkers) {
                     boost::property_tree::ptree jsonDeleteObject;
                     jsonDeleteObject.add("Key", m.key);
                     jsonDeleteObject.add("IsLatest", m.isLatest);
                     jsonDeleteObject.add("VersionId", m.versionId);
                     jsonDeleteObject.add("LastModified", Core::DateTimeUtils::ToISO8601(m.lastModified));
-                    jsonDeleteArray.push_back(std::make_pair("", jsonDeleteObject));
+                    listVersionResult.add_child("DeleteMarker", jsonDeleteObject);
                 }
-                root.add_child("DeleteMarkers", jsonDeleteArray);
             }
+            root.add_child("ListVersionResult", listVersionResult);
 
+            std::string tmp = Core::XmlUtils::ToXmlString(root);
             return Core::XmlUtils::ToXmlString(root);
 
         } catch (std::exception &exc) {

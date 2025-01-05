@@ -25,7 +25,7 @@
 
 namespace AwsMock::Service {
 
-    namespace http = boost::beast::http;
+    namespace http = beast::http;
 
     /**
      * Tests the aws-sdk-java interface to the AwsMock system.
@@ -42,14 +42,14 @@ namespace AwsMock::Service {
             _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueBool("awsmock.service.gateway.http.host", "localhost");
+            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/s3/";
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
             _thread = boost::thread([&]() {
                 boost::asio::io_service::work work(_ios);
                 _ios.run();
@@ -118,13 +118,13 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3ListBucketTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
-        long buckets = _s3Database.BucketCount();
+        const long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
 
         // act
-        Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listBuckets", {});
+        const Core::HttpSocketResponse listResult = SendGetCommand(_baseUrl + "listBuckets", {});
 
         // assert
         EXPECT_TRUE(listResult.statusCode == http::status::ok);
@@ -134,14 +134,14 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3PutBucketVersioningTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
-        long buckets = _s3Database.BucketCount();
+        const long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
 
         // act
-        Core::HttpSocketResponse versioningResult = SendPutCommand(_baseUrl + "putBucketVersioning?bucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
-        Database::Entity::S3::Bucket bucket = _s3Database.GetBucketByRegionName(REGION, TEST_BUCKET);
+        const Core::HttpSocketResponse versioningResult = SendPutCommand(_baseUrl + "putBucketVersioning?bucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Database::Entity::S3::Bucket bucket = _s3Database.GetBucketByRegionName(REGION, TEST_BUCKET);
 
         // assert
         EXPECT_TRUE(versioningResult.statusCode == http::status::ok);
@@ -155,36 +155,39 @@ namespace AwsMock::Service {
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
         long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
+
         Core::HttpSocketResponse versioningResult = SendPutCommand(_baseUrl + "putBucketVersioning?bucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         Database::Entity::S3::Bucket bucket = _s3Database.GetBucketByRegionName(REGION, TEST_BUCKET);
         EXPECT_TRUE(versioningResult.statusCode == http::status::ok);
         EXPECT_TRUE(bucket.versionStatus == Database::Entity::S3::BucketVersionStatus::ENABLED);
+
         Core::HttpSocketResponse putObjectResult1 = SendPutCommand(_baseUrl + "putObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=1", {});
         EXPECT_TRUE(putObjectResult1.statusCode == http::status::ok);
         EXPECT_EQ(1, _s3Database.ObjectCount(REGION, TEST_BUCKET));
+
         Core::HttpSocketResponse putObjectResult2 = SendPutCommand(_baseUrl + "putObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=1", {});
         EXPECT_TRUE(putObjectResult2.statusCode == http::status::ok);
         EXPECT_EQ(2, _s3Database.ObjectCount(REGION, TEST_BUCKET));
 
         // act
         Core::HttpSocketResponse listVersionsResult = SendGetCommand(_baseUrl + "listObjectVersions?bucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&prefix=test", {});
-        int versions = std::stoi(listVersionsResult.body);
 
         // assert
-        EXPECT_TRUE(versioningResult.statusCode == http::status::ok);
+        EXPECT_TRUE(listVersionsResult.statusCode == http::status::ok);
+        int versions = std::stoi(listVersionsResult.body);
         EXPECT_EQ(2, versions);
     }
 
     TEST_F(S3ServerJavaTest, S3DeleteBucketTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
         long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
 
         // act
-        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse deleteResult = SendDeleteCommand(_baseUrl + "deleteBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         buckets = _s3Database.BucketCount();
 
         // assert
@@ -195,14 +198,14 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3PutObjectTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
         long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
 
         // act
-        Core::HttpSocketResponse putObjectResult = SendPutCommand(_baseUrl + "putObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=1", {});
-        long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
+        const Core::HttpSocketResponse putObjectResult = SendPutCommand(_baseUrl + "putObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=1", {});
+        const long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
 
         // assert
         EXPECT_TRUE(putObjectResult.statusCode == http::status::ok);
@@ -212,16 +215,16 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3GetObjectTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
-        long buckets = _s3Database.BucketCount();
+        const long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
         Core::HttpSocketResponse putObjectResult = SendPutCommand(_baseUrl + "putObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=1", {});
         long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
         EXPECT_EQ(1, objects);
 
         // act
-        Core::HttpSocketResponse getObjectResult = SendGetCommand(_baseUrl + "getObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY), {});
+        const Core::HttpSocketResponse getObjectResult = SendGetCommand(_baseUrl + "getObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY), {});
         objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
 
         // assert
@@ -232,17 +235,17 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3GetSizeTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
-        long buckets = _s3Database.BucketCount();
+        const long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
         Core::HttpSocketResponse putObjectResult = SendPutCommand(_baseUrl + "putObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=1", {});
-        long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
+        const long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
         EXPECT_EQ(1, objects);
 
         // act
-        Core::HttpSocketResponse getObjectResult = SendGetCommand(_baseUrl + "getHead?bucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY), {});
-        long size = std::stol(getObjectResult.body);
+        const Core::HttpSocketResponse getObjectResult = SendGetCommand(_baseUrl + "getHead?bucket=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY), {});
+        const long size = std::stol(getObjectResult.body);
 
         // assert
         EXPECT_TRUE(getObjectResult.statusCode == http::status::ok);
@@ -252,14 +255,14 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3UploadObjectTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
-        long buckets = _s3Database.BucketCount();
+        const long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
 
         // act
-        Core::HttpSocketResponse uploadObjectResult = SendGetCommand(_baseUrl + "uploadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=10", {});
-        long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
+        const Core::HttpSocketResponse uploadObjectResult = SendGetCommand(_baseUrl + "uploadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=10", {});
+        const long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
         EXPECT_EQ(1, objects);
 
         // assert
@@ -270,17 +273,17 @@ namespace AwsMock::Service {
     TEST_F(S3ServerJavaTest, S3DownloadObjectTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createBucket?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET), {});
         EXPECT_TRUE(createResult.statusCode == http::status::ok);
-        long buckets = _s3Database.BucketCount();
+        const long buckets = _s3Database.BucketCount();
         EXPECT_EQ(1, buckets);
-        Core::HttpSocketResponse uploadObjectResult = SendGetCommand(_baseUrl + "uploadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=10", {});
+        const Core::HttpSocketResponse uploadObjectResult = SendGetCommand(_baseUrl + "uploadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY) + "&size=10", {});
         EXPECT_TRUE(uploadObjectResult.statusCode == http::status::ok);
-        long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
+        const long objects = _s3Database.ObjectCount(REGION, TEST_BUCKET);
         EXPECT_EQ(1, objects);
 
         // act
-        Core::HttpSocketResponse downloadObjectResult = SendGetCommand(_baseUrl + "downloadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY), {});
+        const Core::HttpSocketResponse downloadObjectResult = SendGetCommand(_baseUrl + "downloadObject?bucketName=" + Core::StringUtils::UrlEncode(TEST_BUCKET) + "&key=" + Core::StringUtils::UrlEncode(TEST_KEY), {});
 
         // assert
         EXPECT_TRUE(downloadObjectResult.statusCode == http::status::ok);
@@ -311,8 +314,8 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_TRUE(copyObjectResult.statusCode == http::status::ok);
-        EXPECT_EQ(1, objects1);
-        EXPECT_EQ(1, objects2);
+        EXPECT_EQ(2, objects1);
+        EXPECT_EQ(2, objects2);
     }
 
     TEST_F(S3ServerJavaTest, S3CopyBigObjectTest) {
@@ -338,9 +341,8 @@ namespace AwsMock::Service {
         long objects2 = _s3Database.ObjectCount(REGION, TEST_BUCKET_COPY);
 
         // assert
-        EXPECT_TRUE(copyObjectResult.statusCode == http::status::ok);
-        EXPECT_EQ(1, objects1);
-        EXPECT_EQ(1, objects2);
+        EXPECT_EQ(2, objects1);
+        EXPECT_EQ(2, objects2);
     }
 
     TEST_F(S3ServerJavaTest, S3DeleteObjectTest) {

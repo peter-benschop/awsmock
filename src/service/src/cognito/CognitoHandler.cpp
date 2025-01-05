@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    const std::map<std::string, std::string> CognitoHandler::headers = CognitoHandler::CreateHeaderMap();
+    const std::map<std::string, std::string> CognitoHandler::headers = CreateHeaderMap();
 
     http::response<http::dynamic_body> CognitoHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Cognito POST request, URI: " << request.target() << " region: " << region << " user: " << user;

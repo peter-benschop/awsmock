@@ -677,8 +677,6 @@ namespace AwsMock::Database {
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
                 long count = 0;
-                mongocxx::options::find opts;
-
                 document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));

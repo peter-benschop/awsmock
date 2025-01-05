@@ -77,6 +77,10 @@ namespace AwsMock::Dto::Docker {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
+    void Container::FromJson(const std::string &jsonString) {
+        FromDocument(bsoncxx::from_json(jsonString));
+    }
+
     std::string Container::ToString() const {
         std::stringstream ss;
         ss << *this;
@@ -84,7 +88,7 @@ namespace AwsMock::Dto::Docker {
     }
 
     std::ostream &operator<<(std::ostream &os, const Container &c) {
-        os << "ListContainerResponse=" << c.ToJson();
+        os << "Container=" << c.ToJson();
         return os;
     }
 

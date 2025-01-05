@@ -23,27 +23,34 @@
 namespace AwsMock::Service {
 
     /**
-   * Tests the aws-sdk-java interface to the AwsMock system.
-   *
-   * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs a existing SQS queue.</p>
-   *
-   */
+     * Tests the aws-sdk-java interface to the AwsMock system.
+     *
+     * <p>The aws-mock-java-test.jar file should be installed in <pre>/usr/local/lib</pre>. The SNS server as well as the SQS server are started. This is needed as the SNS topic subscribe command needs a existing SQS queue.</p>
+     *
+     */
     class SNSServerJavaTest : public ::testing::Test {
 
       protected:
 
         void SetUp() override {
 
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.service.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueBool("awsmock.service.gateway.http.host", "localhost");
+            // General configuration
+            _region = _configuration.GetValueString("awsmock.region");
 
-            // Set base URLs
+            // Define endpoint. This is the endpoint of the SQS server, not the gateway
+            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+
+            // Base URL
             _snsBaseUrl = "/api/sns/";
             _sqsBaseUrl = "/api/sqs/";
 
             // Start HTTP manager
             _gatewayServer = std::make_shared<GatewayServer>(_ios);
+            _thread = boost::thread([&]() {
+                boost::asio::io_service::work work(_ios);
+                _ios.run();
+            });
         }
 
         void TearDown() override {
@@ -77,6 +84,7 @@ namespace AwsMock::Service {
             return response;
         }
 
+        boost::thread _thread;
         std::string _snsBaseUrl, _sqsBaseUrl, _region;
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
@@ -156,13 +164,13 @@ namespace AwsMock::Service {
     TEST_F(SNSServerJavaTest, TopicDeleteTest) {
 
         // arrange
-        Core::HttpSocketResponse createTopicResult = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        const Core::HttpSocketResponse createTopicResult = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
         EXPECT_TRUE(createTopicResult.statusCode == http::status::ok);
-        std::string topicArn = createTopicResult.body;
+        const std::string topicArn = createTopicResult.body;
 
         // act
-        Core::HttpSocketResponse deleteResult = SendDeleteCommand(_snsBaseUrl + "deleteTopic?topicArn=" + Core::StringUtils::UrlEncode(topicArn), {});
-        Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
+        const Core::HttpSocketResponse deleteResult = SendDeleteCommand(_snsBaseUrl + "deleteTopic?topicArn=" + Core::StringUtils::UrlEncode(topicArn), {});
+        const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
         EXPECT_TRUE(deleteResult.statusCode == http::status::ok);

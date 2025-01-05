@@ -20,8 +20,8 @@ namespace AwsMock::Dto::Cognito {
                     userPoolJson.append(kvp("Id", userPool.userPoolId));
                     userPoolJson.append(kvp("Name", userPool.name));
                     userPoolJson.append(kvp("Region", userPool.region));
-                    userPoolJson.append(kvp("LastModifiedDate", std::chrono::duration_cast<std::chrono::seconds>(userPool.modified.time_since_epoch()).count()));
-                    userPoolJson.append(kvp("CreationDate", std::chrono::duration_cast<std::chrono::seconds>(userPool.created.time_since_epoch()).count()));
+                    userPoolJson.append(kvp("LastModifiedDate", Core::DateTimeUtils::UnixTimestamp(userPool.modified)));
+                    userPoolJson.append(kvp("CreationDate", Core::DateTimeUtils::UnixTimestamp(userPool.created)));
                     userPoolArray.append(userPoolJson);
                 }
                 rootDocument.append(kvp("UserPools", userPoolArray));

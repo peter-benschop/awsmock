@@ -26,23 +26,31 @@ namespace AwsMock::Service {
 
         void SetUp() override {
 
+            // General configuration
+            _region = _configuration.GetValueString("awsmock.region");
+
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            const std::string _port = _configuration.GetValueString("awsmock.modules.ssm.http.port");
-            const std::string _host = _configuration.GetValueString("awsmock.modules.ssm.http.host");
+            const std::string _port = _configuration.GetValueString("awsmock.gateway.http.port");
+            const std::string _host = _configuration.GetValueString("awsmock.gateway.http.host");
+            const std::string _address = _configuration.GetValueString("awsmock.gateway.http.address");
 
             // Set test config
-            _configuration.SetValueString("awsmock.gateway.http.port", _port);
             _endpoint = "http://" + _host + ":" + _port;
 
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            // Start gateway server
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
+            _thread = boost::thread([&]() {
+                boost::asio::io_service::work work(_ios);
+                _ios.run();
+            });
         }
 
         void TearDown() override {
             _ssmDatabase.DeleteAllParameters();
         }
 
-        std::string _endpoint;
+        boost::thread _thread;
+        std::string _endpoint, _region;
         boost::asio::io_service _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();

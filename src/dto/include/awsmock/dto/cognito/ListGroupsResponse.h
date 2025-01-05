@@ -26,7 +26,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Group entities
          */
-        std::vector<Dto::Cognito::Group> groups{};
+        std::vector<Group> groups{};
 
         /**
          * @brief Convert to a JSON string.

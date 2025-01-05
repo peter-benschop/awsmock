@@ -23,7 +23,6 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class TestUtils {
-
       public:
 
         /**
@@ -56,7 +55,6 @@ namespace AwsMock::Core {
          */
         static ExecResult SendCliCommand(const std::string &command);
     };
-
 }// namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_TEST_UTILS_H

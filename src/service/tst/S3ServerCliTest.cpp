@@ -35,17 +35,15 @@ namespace AwsMock::Service {
             _region = _configuration.GetValueString("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            std::string _port = _configuration.GetValueString("awsmock.modules.sqs.http.port");
-            std::string _host = _configuration.GetValueString("awsmock.modules.sqs.http.host");
+            const std::string _port = _configuration.GetValueString("awsmock.gateway.http.port");
+            const std::string _host = _configuration.GetValueString("awsmock.gateway.http.host");
+            const std::string _address = _configuration.GetValueString("awsmock.gateway.http.address");
 
             // Set test config
-            std::string p = std::to_string(Core::RandomUtils::NextInt(32678, 65480));
-            _configuration.SetValueString("awsmock.service.gateway.http.host", p);
-            _endpoint = "http://localhost:" + p;
-            std::cout << "port: " << p << std::endl;
+            _endpoint = "http://" + _host + ":" + _port;
 
             // Start gateway server
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
             _thread = boost::thread([&]() {
                 boost::asio::io_service::work work(_ios);
                 _ios.run();
