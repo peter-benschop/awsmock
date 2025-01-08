@@ -35,13 +35,16 @@ namespace AwsMock::Dto::S3 {
     }
 
     void FilterRule::FromXml(const boost::property_tree::ptree &pt) {
-        Core::XmlUtils::PrintTree(pt, 0);
-
-        if (pt.get_optional<std::string>("Name")) {
-            name = NameTypeFromString(pt.get<std::string>("Name"));
-        }
-        if (pt.get_optional<std::string>("Value")) {
-            filterValue = pt.get<std::string>("Value");
+        if (pt.get_child_optional("S3Key")) {
+            if (const boost::property_tree::ptree s3KeyNode = pt.get_child("S3Key"); s3KeyNode.get_child_optional("FilterRule")) {
+                const boost::property_tree::ptree filterRuleNode = s3KeyNode.get_child("FilterRule");
+                if (filterRuleNode.get_optional<std::string>("Name")) {
+                    name = NameTypeFromString(filterRuleNode.get<std::string>("Name"));
+                }
+                if (filterRuleNode.get_optional<std::string>("Value")) {
+                    filterValue = filterRuleNode.get<std::string>("Value");
+                }
+            }
         }
     }
 
