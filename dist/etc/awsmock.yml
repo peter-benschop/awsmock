@@ -33,6 +33,8 @@ awsmock:
       temp-size: 10240
     container:
       port: 8080
+      maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
+      checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
     socket: /var/run/docker.sock
   podman:
     active: false

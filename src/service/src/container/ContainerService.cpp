@@ -489,14 +489,16 @@ namespace AwsMock::Service {
             log_debug << "Docker container state, id: " << containerId << " state: " << response.state;
             return response.state.running;
         }
-        log_error << "Is docker container running failed, id: " << containerId;
+        log_debug << "Is docker container running failed, id: " << containerId;
         return false;
     }
 
-    void ContainerService::WaitForContainer(const std::string &containerId, const int maxTime) const {
-        const auto deadline = system_clock::now() + std::chrono::seconds{maxTime};
+    void ContainerService::WaitForContainer(const std::string &containerId) const {
+        const int checkTime = Core::Configuration::instance().GetValueInt("awsmock.docker.container.checkTime");
+        const int maxWaitTime = Core::Configuration::instance().GetValueInt("awsmock.docker.container.maxWaitTime");
+        const auto deadline = system_clock::now() + std::chrono::seconds{maxWaitTime};
         while (!IsContainerRunning(containerId) && system_clock::now() < deadline) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(checkTime));
         }
     }
 

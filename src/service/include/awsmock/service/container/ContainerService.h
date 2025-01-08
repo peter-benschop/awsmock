@@ -197,10 +197,12 @@ namespace AwsMock::Service {
         /**
          * @brief Waits until a container is in running state
          *
+         * @par
+         * The maximal waiting time can  be configured in the configuration file. Configuration key: 'awsmock.docker.container.maxWaitTime'.
+         *
          * @param containerId container ID
-         * @param maxTime maximal waiting time in seconds
          */
-        void WaitForContainer(const std::string &containerId, int maxTime = 10) const;
+        void WaitForContainer(const std::string &containerId) const;
 
         /**
          * @brief List all docker images, with the given name and different tags.

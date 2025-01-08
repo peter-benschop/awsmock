@@ -110,6 +110,8 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.docker.default.temp-size", "AWSMOCK_DOCKER_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.docker.container.port", "AWSMOCK_DOCKER_CONTAINER_PORT", 8080);
         DefineStringProperty("awsmock.docker.socket", "AWSMOCK_DOCKER_SOCKET", "/var/run/docker.sock");
+        DefineIntProperty("awsmock.docker.container.maxWaitTime", "AWSMOCK_DOCKER_CONTAINER_MAX_WAIT_TIME", 5);
+        DefineIntProperty("awsmock.docker.container.checkTime", "AWSMOCK_DOCKER_CONTAINER_CHECK_TIME", 500);
 
         // Podman
         DefineBoolProperty("awsmock.podman.active", "AWSMOCK_PODMAN_ACTIVE", true);
@@ -134,15 +136,6 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.mongodb.user", "AWSMOCK_MONGODB_USER", "root");
         DefineStringProperty("awsmock.mongodb.password", "AWSMOCK_MONGODB_PASSWORD", "secret");
         DefineIntProperty("awsmock.mongodb.pool-size", "AWSMOCK_MONGODB_POOL_SIZE", 256);
-
-        // Podman
-        DefineBoolProperty("awsmock.podman.active", "AWSMOCK_PODMAN_ACTIVE", true);
-        DefineStringProperty("awsmock.podman.network-mode", "AWSMOCK_PODMAN_NETWORK_NAME", "local");
-        DefineStringProperty("awsmock.podman.network-name", "AWSMOCK_PODMAN_NETWORK_NAME", "local");
-        DefineIntProperty("awsmock.podman.defaults.memory-size", "AWSMOCK_PODMAN_MEMORY_SIZE", 512);
-        DefineIntProperty("awsmock.podman.defaults.temp-size", "AWSMOCK_PODMAN_TEMP_SIZE", 10240);
-        DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);
-        DefineStringProperty("awsmock.podman.socket", "AWSMOCK_PODMAN_SOCKET", "/var/run/podman/podman.sock");
 
         // Frontend
         DefineBoolProperty("awsmock.frontend.active", "AWSMOCK_FRONTEND_ACTIVE", true);
