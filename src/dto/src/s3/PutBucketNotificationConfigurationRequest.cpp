@@ -16,14 +16,14 @@ namespace AwsMock::Dto::S3 {
             boost::property_tree::ptree notificationTree = pt.get_child("NotificationConfiguration");
 
             // SQS queues
-            if (notificationTree.find("NotificationConfiguration.QueueConfiguration") != notificationTree.not_found()) {
+            if (notificationTree.find("QueueConfiguration") != notificationTree.not_found()) {
                 QueueConfiguration queueConfiguration;
                 queueConfiguration.FromXml(notificationTree.get_child("QueueConfiguration"));
                 queueConfigurations.emplace_back(queueConfiguration);
             }
 
             // SNS topics
-            if (notificationTree.find("NotificationConfiguration.TopicConfiguration") != notificationTree.not_found()) {
+            if (notificationTree.find("TopicConfiguration") != notificationTree.not_found()) {
                 TopicConfiguration topicConfiguration;
                 topicConfiguration.FromXml(pt.get_child("TopicConfiguration"));
                 topicConfigurations.emplace_back(topicConfiguration);
