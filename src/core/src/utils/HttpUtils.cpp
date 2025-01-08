@@ -371,7 +371,7 @@ namespace AwsMock::Core {
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
-        boost::beast::ostream(response.body()) << reason;
+        ostream(response.body()) << reason;
         response.prepare_payload();
         return response;
     }
@@ -385,7 +385,7 @@ namespace AwsMock::Core {
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
-        boost::beast::ostream(response.body()) << reason;
+        ostream(response.body()) << reason;
         response.prepare_payload();
         return response;
     }

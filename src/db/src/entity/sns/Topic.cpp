@@ -36,6 +36,7 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("attributes", topicAttribute.ToDocument()),
                 kvp("tags", tagsDoc),
                 kvp("size", size),
+                kvp("messages", messages),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -52,11 +53,10 @@ namespace AwsMock::Database::Entity::SNS {
             owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
             topicUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "topicUrl");
             topicArn = Core::Bson::BsonUtils::GetStringValue(mResult, "topicArn");
-            if (mResult->find("size") != mResult->end()) {
-                size = mResult.value()["size"].get_int64().value;
-            }
-            created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+            size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+            messages = Core::Bson::BsonUtils::GetLongValue(mResult, "messages");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Attributes
             topicAttribute.FromDocument(mResult.value()["attributes"].get_document().view());

@@ -45,7 +45,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()){};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
          * @brief Return all list of all modules
@@ -73,6 +73,9 @@ namespace AwsMock::Service {
         /**
          * @brief Exports the current infrastructure
          *
+         * @par
+         * The export file will be in BSON format, as provided by the MongoDB BSON implementation.
+         *
          * @param request export infrastructure request
          * @return JSON string
          */
@@ -88,6 +91,9 @@ namespace AwsMock::Service {
         /**
          * @brief Import the infrastructure
          *
+         * @par
+         * The import file should be in MongoDB BSON format. Add SQS queue URLs will be adjusted according to the localhost/port coming from the configuration file.
+         *
          * @param jsonString infrastructure JSON string
          */
         static void ImportInfrastructure(const std::string &jsonString);
@@ -95,7 +101,8 @@ namespace AwsMock::Service {
         /**
          * @brief Cleans the current infrastructure.
          *
-         * <p>All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.</p>
+         * @par
+         * All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.
          *
          * @param request clean infrastructure request
          */
@@ -104,7 +111,8 @@ namespace AwsMock::Service {
         /**
          * @brief Cleans the objects from the infrastructure.
          *
-         * <p>Cleans all objects from the infrastructure. This means all SQS resources, SNS resources, S3 object keys, etc. will be deleted.</p>
+         * @par
+         * Cleans all objects from the infrastructure. This means all SQS resources, SNS resources, S3 object keys, etc. will be deleted.
          *
          * @param request clean infrastructure request
          */

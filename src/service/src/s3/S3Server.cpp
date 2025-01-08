@@ -68,7 +68,7 @@ namespace AwsMock::Service {
                 }
             }
         }
-        log_info << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
+        log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
     }
 
     void S3Server::SyncBuckets() const {
