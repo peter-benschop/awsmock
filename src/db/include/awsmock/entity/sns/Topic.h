@@ -76,6 +76,11 @@ namespace AwsMock::Database::Entity::SNS {
         long size = 0;
 
         /**
+         * Total number of all messages
+         */
+        long messages = 0;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
