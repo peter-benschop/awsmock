@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Common {
 
         switch (method) {
             case http::verb::post:
-                command = GetClientCommandFromHeader(request);
+                command = DynamoDbCommandTypeFromString(GetClientCommandFromHeader(request));
                 break;
             case http::verb::get:
             case http::verb::put:
@@ -32,14 +32,17 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-    DynamoDbCommandType DynamoDbClientCommand::GetClientCommandFromHeader(const http::request<http::dynamic_body> &request) {
+    std::string DynamoDbClientCommand::GetClientCommandFromHeader(const http::request<http::dynamic_body> &request) {
 
         if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
-            std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-            std::string action = Core::StringUtils::Split(headerValue, '.')[1];
-            return DynamoDbCommandTypeFromString(action);
+            const std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
+            const std::string action = Core::StringUtils::Split(headerValue, '.')[1];
+            return Core::StringUtils::ToSnakeCase(action);
         }
-        return DynamoDbCommandType::UNKNOWN;
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "dynamodb") {
+            return Core::StringUtils::ToSnakeCase(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
+        }
+        return "unknown";
     }
 
     std::string DynamoDbClientCommand::ToJson() const {
