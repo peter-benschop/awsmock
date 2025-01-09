@@ -170,7 +170,7 @@ namespace AwsMock::Core {
         static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl);
 
         /**
-         *@brief  Create SNS topic ARN
+         * @brief  Create SNS topic ARN
          *
          * @param region AWS region
          * @param accountId AWS account ID
@@ -365,6 +365,19 @@ namespace AwsMock::Core {
          * @return true if signature could be verified
          */
         static bool VerifySignature(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
+
+        /**
+         * @brief Verify the request signature
+         *
+         * Examples:
+         * https://github.com/aws-samples/sigv4-signing-examples
+         * https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html#code-signing-examples
+         * https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+         *
+         * @param request HTTP request
+         * @param secretAccessKey AWS secret access key
+         * @return true if signature could be verified
+         */
         static bool VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey);
 
         /**
@@ -438,6 +451,14 @@ namespace AwsMock::Core {
          * @return
          */
         static std::string GetCanonicalRequest(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        /**
+         * @brief Returns the canonical request.
+         *
+         * @param request HTTP request
+         * @param authorizationHeaderKeys
+         * @return
+         */
         static std::string GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
@@ -481,6 +502,14 @@ namespace AwsMock::Core {
          * @return canonical header string
          */
         static std::string GetCanonicalHeaders(const http::request<http::dynamic_body> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
+
+        /**
+         * @brief Returns the canonical headers.
+         *
+         * @param request
+         * @param authorizationHeaderKeys
+         * @return list of canonical headers
+         */
         static std::string GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys);
 
         /**
@@ -510,6 +539,14 @@ namespace AwsMock::Core {
          * @return AuthorizationHeaderKeys
          */
         static AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey);
+
+        /**
+         * @brief Splits the authorization header into pieces and stores the result into a struct.
+         *
+         * @param request HTTP request
+         * @param secretAccessKey AWS secret access key
+         * @return AuthorizationHeaderKeys
+         */
         static AuthorizationHeaderKeys GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey);
 
         /**
@@ -634,7 +671,7 @@ namespace AwsMock::Core {
      * @return true if this is a URL
      */
     inline bool IsSQSArn(const std::string &queue) {
-        return Core::StringUtils::ContainsIgnoreCase(queue, "arn");
+        return StringUtils::ContainsIgnoreCase(queue, "arn");
     }
 
     /**

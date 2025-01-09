@@ -2,27 +2,26 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
+#ifndef AWSMOCK_DTO_DYNAMODB_LIST_TABLE_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/dto/common/BaseRequest.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * @brief DynamoDB list table request
+     * @brief DynamoDB list table counters request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableRequest : Common::BaseRequest {
+    struct ListTableCountersRequest : Common::BaseRequest {
 
         /**
          * AWS region
@@ -30,25 +29,24 @@ namespace AwsMock::Dto::DynamoDb {
         std::string region;
 
         /**
-         * The first table name that this operation will evaluate. Use the value that was returned for LastEvaluatedTableName
-         * in a previous operation, so that you can obtain the next page of results.
+         * TAble name prefix.
          */
-        std::string exclusiveStartTableName;
+        std::string prefix;
 
         /**
-         * Limit, default is 100
+         * Page size
          */
-        int limit = 100;
+        int pageSize;
 
         /**
-         * Original HTTP request body
+         * Page index
          */
-        std::string body;
+        int pageIndex;
 
         /**
-         * Original HTTP request headers
+         * Page index
          */
-        std::map<std::string, std::string> headers;
+        std::vector<Core::SortColumn> sortColumns;
 
         /**
          * @brief Creates a JSON string from the object.
@@ -56,11 +54,6 @@ namespace AwsMock::Dto::DynamoDb {
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Prepares the request to be sent to the DynamoDB container
-         */
-        void PrepareRequest();
 
         /**
          * @brief Parse a JSON stream
@@ -81,9 +74,9 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTableRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListTableCountersRequest &r);
     };
 
 }// namespace AwsMock::Dto::DynamoDb
 
-#endif// AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
+#endif// AWSMOCK_DTO_DYNAMODB_LIST_TABLE_COUNTERS_REQUEST_H

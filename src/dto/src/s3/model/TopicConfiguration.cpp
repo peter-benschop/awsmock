@@ -63,8 +63,8 @@ namespace AwsMock::Dto::S3 {
         if (pt.get_optional<std::string>("Id")) {
             id = pt.get<std::string>("Id");
         }
-        if (pt.get_optional<std::string>("TopicArnArn")) {
-            topicArn = pt.get<std::string>("TopicArnArn");
+        if (pt.get_optional<std::string>("Topic")) {
+            topicArn = pt.get<std::string>("Topic");
         }
         if (pt.get_optional<std::string>("Filter")) {
             FilterRule filter;

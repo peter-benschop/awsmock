@@ -12,7 +12,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 
 namespace AwsMock::Dto::Common {
@@ -30,23 +29,26 @@ namespace AwsMock::Dto::Common {
         QUERY,
         SCAN,
         DELETE_ITEM,
+        LIST_TABLE_COUNTERS,
+        LIST_ITEM_COUNTERS,
         UNKNOWN
     };
 
     static std::map<DynamoDbCommandType, std::string> DynamoDbCommandTypeNames{
-            {DynamoDbCommandType::CREATE_TABLE, "CreateTable"},
-            {DynamoDbCommandType::LIST_TABLES, "ListTables"},
-            {DynamoDbCommandType::DESCRIBE_TABLE, "DescribeTable"},
-            {DynamoDbCommandType::DELETE_TABLE, "DeleteTable"},
-            {DynamoDbCommandType::GET_ITEM, "GetItem"},
-            {DynamoDbCommandType::PUT_ITEM, "PutItem"},
-            {DynamoDbCommandType::QUERY, "Query"},
-            {DynamoDbCommandType::SCAN, "Scan"},
-            {DynamoDbCommandType::DELETE_ITEM, "DeleteItem"},
-            {DynamoDbCommandType::UNKNOWN, "Unknown"},
-    };
+            {DynamoDbCommandType::CREATE_TABLE, "create-table"},
+            {DynamoDbCommandType::LIST_TABLES, "list-tables"},
+            {DynamoDbCommandType::DESCRIBE_TABLE, "describe-table"},
+            {DynamoDbCommandType::DELETE_TABLE, "delete-table"},
+            {DynamoDbCommandType::GET_ITEM, "get-item"},
+            {DynamoDbCommandType::PUT_ITEM, "put-item"},
+            {DynamoDbCommandType::QUERY, "query"},
+            {DynamoDbCommandType::SCAN, "scan"},
+            {DynamoDbCommandType::DELETE_ITEM, "delete-item"},
+            {DynamoDbCommandType::LIST_TABLE_COUNTERS, "list-table-counters"},
+            {DynamoDbCommandType::LIST_ITEM_COUNTERS, "list-item-counters"},
+            {DynamoDbCommandType::UNKNOWN, "unknown"}};
 
-    [[maybe_unused]] static std::string DynamoDbCommandTypeToString(DynamoDbCommandType commandType) {
+    [[maybe_unused]] static std::string DynamoDbCommandTypeToString(const DynamoDbCommandType &commandType) {
         return DynamoDbCommandTypeNames[commandType];
     }
 
@@ -80,7 +82,7 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return client command from AWS target header
          */
-        static DynamoDbCommandType GetClientCommandFromHeader(const http::request<http::dynamic_body> &request);
+        static std::string GetClientCommandFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Getś the value from the user-agent string
