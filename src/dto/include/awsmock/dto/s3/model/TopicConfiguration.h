@@ -88,7 +88,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Convert from an XML string
          *
-         * @return XML string
+         * @param pt boost property tree
          */
         void FromXml(const boost::property_tree::ptree &pt);
 

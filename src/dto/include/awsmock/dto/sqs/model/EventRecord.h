@@ -72,7 +72,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @param document DTO as BSON document
          */
         void FromDocument(const view_or_value<view, value> &document);
 

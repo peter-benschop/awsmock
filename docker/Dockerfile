@@ -27,7 +27,7 @@ RUN rm -rf /usr/src
 # Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-program_options boost-filesystem boost-thread boost-url plog yaml-cpp libarchive libmagic
+RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url plog yaml-cpp libarchive libmagic
 
 # Fix timezones
 ENV TZ=Europe/Berlin
