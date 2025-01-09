@@ -36,8 +36,8 @@
 # options. To request support for more options, contact support@codedocs.xyz.
 #
 PROJECT_NAME           = awsmock
-INPUT                  = src
-OUTPUT_DIRECTORY       = ./docs/html
+INPUT                  = src/
+OUTPUT_DIRECTORY       = docs/html/
 FILE_PATTERNS          = *.h main.cpp
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
