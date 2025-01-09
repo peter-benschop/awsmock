@@ -338,7 +338,8 @@ namespace AwsMock::FtpServer {
         if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
         } else {
-            ip_bytes = command_socket_.local_endpoint().address().to_v6().to_v4().to_bytes();
+            ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
+            //            ip_bytes = command_socket_.local_endpoint().address().to_v6().to_v4().to_bytes();
         }
         auto port = data_acceptor_.local_endpoint().port();
         log_info << "Server suggested port: " << port;
@@ -398,8 +399,8 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
-        auto port = data_acceptor_.local_endpoint().port();
+        const auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        const auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
         std::stringstream stream;
@@ -456,8 +457,8 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
-        auto port = data_acceptor_.local_endpoint().port();
+        const auto ip_bytes = command_socket_.local_endpoint().address().to_v4().to_bytes();
+        const auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
         std::stringstream stream;
@@ -523,8 +524,8 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
-        auto port = data_acceptor_.local_endpoint().port();
+        const auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+        const auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
         std::stringstream stream;
@@ -590,8 +591,8 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-        auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
-        auto port = data_acceptor_.local_endpoint().port();
+        const auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+        const auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
         std::stringstream stream;
@@ -617,14 +618,13 @@ namespace AwsMock::FtpServer {
             // living in the 21st centry, nobody should use ASCII mode anyways.
             sendFtpMessage(FtpReplyCode::COMMAND_OK, "Switching to ASCII mode");
             return;
-        } else if (param == "I") {
+        }
+        if (param == "I") {
             data_type_binary_ = true;
             sendFtpMessage(FtpReplyCode::COMMAND_OK, "Switching to binary mode");
             return;
-        } else {
-            sendFtpMessage(FtpReplyCode::COMMAND_NOT_IMPLEMENTED_FOR_PARAMETER, "Unknown or unsupported type");
-            return;
         }
+        sendFtpMessage(FtpReplyCode::COMMAND_NOT_IMPLEMENTED_FOR_PARAMETER, "Unknown or unsupported type");
     }
 
     void FtpSession::handleFtpCommandSTRU(const std::string & /*param*/) {
@@ -729,12 +729,10 @@ namespace AwsMock::FtpServer {
         const std::string local_path = toLocalPath(param);
 
         if (const auto file_status = FileStatus(local_path); file_status.isOk()) {
-            if ((file_status.type() == FileType::RegularFile) && (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0)) {
-                sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED,
-                               "File already exists. Permission denied to overwrite file.");
+            if (file_status.type() == FileType::RegularFile && static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0) {
+                sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "File already exists. Permission denied to overwrite file.");
             } else if (file_status.type() == FileType::Dir) {
-                sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED,
-                               "Cannot create file. A directory with that name already exists.");
+                sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "Cannot create file. A directory with that name already exists.");
             }
         }
 
@@ -771,17 +769,13 @@ namespace AwsMock::FtpServer {
 
         const std::string local_path = toLocalPath(param);
 
-        auto existing_file_filestatus = FileStatus(local_path);
-        if (!existing_file_filestatus.isOk() || (existing_file_filestatus.type() != FileType::RegularFile)) {
+        if (const auto existing_file_filestatus = FileStatus(local_path); !existing_file_filestatus.isOk() || (existing_file_filestatus.type() != FileType::RegularFile)) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "File does not exist.");
             return;
         }
 
-        const std::ios::openmode open_mode = (data_type_binary_
-                                                      ? (std::ios::out | std::ios::app | std::ios::binary)
-                                                      : (std::ios::out | std::ios::app));
-        const std::shared_ptr<IoFile> file = std::make_shared<
-                IoFile>(local_path, _logged_in_user->_username, open_mode);
+        const std::ios::openmode open_mode = data_type_binary_ ? std::ios::out | std::ios::app | std::ios::binary : std::ios::out | std::ios::app;
+        const auto file = std::make_shared<IoFile>(local_path, _logged_in_user->_username, open_mode);
 
         if (!file->file_stream_.good()) {
             sendFtpMessage(FtpReplyCode::ACTION_ABORTED_LOCAL_ERROR, "Error opening file for transfer");
@@ -803,9 +797,7 @@ namespace AwsMock::FtpServer {
     void FtpSession::handleFtpCommandRNFR(const std::string &param) {
         _renameFromPath.clear();
 
-        auto is_renamable_error = checkIfPathIsRenamable(param);
-
-        if (is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
+        if (const auto is_renamable_error = checkIfPathIsRenamable(param); is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
             _renameFromPath = param;
             sendFtpMessage(FtpReplyCode::FILE_ACTION_NEEDS_FURTHER_INFO, "Enter target name");
             return;
@@ -836,9 +828,8 @@ namespace AwsMock::FtpServer {
         // command will always succeed, as long as you enter a valid target file
         // name. Thus we use the two return codes anyways, the popular FileZilla
         // FTP Handler uses those as well.
-        auto is_renamable_error = checkIfPathIsRenamable(_renameFromPath);
 
-        if (is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
+        if (const auto is_renamable_error = checkIfPathIsRenamable(_renameFromPath); is_renamable_error.replyCode() == FtpReplyCode::COMMAND_OK) {
             const std::string local_from_path = toLocalPath(_renameFromPath);
             const std::string local_to_path = toLocalPath(param);
 
@@ -852,13 +843,10 @@ namespace AwsMock::FtpServer {
             if (rename(local_from_path.c_str(), local_to_path.c_str()) == 0) {
                 sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "OK");
                 return;
-            } else {
-                sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Error renaming file");
-                return;
             }
+            sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Error renaming file");
         } else {
             sendFtpMessage(is_renamable_error);
-            return;
         }
     }
 
@@ -878,24 +866,21 @@ namespace AwsMock::FtpServer {
         if (!file_status.isOk()) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Resource does not exist");
             return;
-        } else if (file_status.type() != FileType::RegularFile) {
+        }
+        if (file_status.type() != FileType::RegularFile) {
             sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Resource is not a file");
             return;
-        } else {
-            if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0) {
-                sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
-                return;
-            } else {
-                if (unlink(local_path.c_str()) == 0) {
-                    SendDeleteObjectRequest(_logged_in_user->_username, local_path);
-                    sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully deleted file");
-                    return;
-                } else {
-                    sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Unable to delete file");
-                    return;
-                }
-            }
         }
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0) {
+            sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied");
+            return;
+        }
+        if (unlink(local_path.c_str()) == 0) {
+            SendDeleteObjectRequest(_logged_in_user->_username, local_path);
+            sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully deleted file");
+            return;
+        }
+        sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Unable to delete file");
     }
 
     void FtpSession::handleFtpCommandRMD(const std::string &param) {
@@ -915,13 +900,11 @@ namespace AwsMock::FtpServer {
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
             return;
-        } else {
-            // If would be a good idea to return a 4xx error code here (-> temp error)
-            // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
-            // errors are permanent.
-            sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to remove directory");
-            return;
         }
+        // If would be a good idea to return a 4xx error code here (-> temp error)
+        // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
+        // errors are permanent.
+        sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to remove directory");
 #endif
     }
 
@@ -942,18 +925,15 @@ namespace AwsMock::FtpServer {
             return;
         }
 #else
-        const mode_t mode = 0755;
-        if (mkdir(local_path.c_str(), mode) == 0) {
+        if (constexpr mode_t mode = 0755; mkdir(local_path.c_str(), mode) == 0) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED,
                            createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
             return;
-        } else {
-            // If would be a good idea to return a 4xx error code here (-> temp error)
-            // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
-            // errors are permanent.
-            sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
-            return;
         }
+        // If would be a good idea to return a 4xx error code here (-> temp error)
+        // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
+        // errors are permanent.
+        sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
 #endif
     }
 
@@ -1055,27 +1035,22 @@ namespace AwsMock::FtpServer {
         }
 
         const std::string local_path = toLocalPath(param);
-        auto dir_status = FileStatus(local_path);
 
-        if (dir_status.isOk()) {
+        if (const auto dir_status = FileStatus(local_path); dir_status.isOk()) {
             if (dir_status.type() == FileType::Dir) {
                 if (dir_status.canOpenDir()) {
                     sendFtpMessage(FtpReplyCode::FILE_STATUS_OK_OPENING_DATA_CONNECTION, "Sending name list");
                     sendNameList(dirContent(local_path));
                     return;
-                } else {
-                    sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
-                    return;
                 }
-            } else {
-                // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
-                sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
+                sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Permission denied");
                 return;
             }
-        } else {
-            sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path does not exist");
+            // TODO: RFC959: If the pathname specifies a file then the manager should send current information on the file.
+            sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path is not a directory");
             return;
         }
+        sendFtpMessage(FtpReplyCode::FILE_ACTION_NOT_TAKEN, "Path does not exist");
     }
 
     void FtpSession::handleFtpCommandSITE(const std::string & /*param*/) {
@@ -1119,10 +1094,9 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::handleFtpCommandOPTS(const std::string &param) {
         std::string param_upper = param;
-        std::transform(param_upper.begin(),
-                       param_upper.end(),
-                       param_upper.begin(),
-                       [](char c) { return static_cast<char>(std::toupper(static_cast<unsigned char>(c))); });
+        std::ranges::transform(param_upper,
+                               param_upper.begin(),
+                               [](const char c) { return static_cast<char>(std::toupper(static_cast<unsigned char>(c))); });
 
         if (param_upper == "UTF8 ON") {
             sendFtpMessage(FtpReplyCode::COMMAND_OK, "OK");
@@ -1274,25 +1248,25 @@ namespace AwsMock::FtpServer {
                 [me = shared_from_this(), data_socket, fetch_more]() {
                     if (auto data = me->data_buffer_.front()) {
                         // Send out the buffer
-                        asio::async_write(*data_socket,
-                                          asio::buffer(*data),
-                                          me->data_buffer_strand_.wrap(
-                                                  [me, data_socket, data, fetch_more](
-                                                          const asio::error_code ec,
-                                                          std::size_t /*bytes_to_transfer*/) {
-                                                      me->data_buffer_.pop_front();
+                        async_write(*data_socket,
+                                    asio::buffer(*data),
+                                    me->data_buffer_strand_.wrap(
+                                            [me, data_socket, data, fetch_more](
+                                                    const asio::error_code ec,
+                                                    std::size_t /*bytes_to_transfer*/) {
+                                                me->data_buffer_.pop_front();
 
-                                                      if (ec) {
-                                                          log_error << "Data write error: " << ec.message();
-                                                          return;
-                                                      }
+                                                if (ec) {
+                                                    log_error << "Data write error: " << ec.message();
+                                                    return;
+                                                }
 
-                                                      fetch_more();
+                                                fetch_more();
 
-                                                      if (!me->data_buffer_.empty()) {
-                                                          me->writeDataToSocket(data_socket, fetch_more);
-                                                      }
-                                                  }));
+                                                if (!me->data_buffer_.empty()) {
+                                                    me->writeDataToSocket(data_socket, fetch_more);
+                                                }
+                                            }));
                     } else {
                         // we got to the end of transmission
                         me->data_buffer_.pop_front();

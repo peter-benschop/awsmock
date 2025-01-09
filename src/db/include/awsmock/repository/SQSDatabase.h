@@ -11,7 +11,6 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/options/find_one_and_update.hpp>
 
@@ -29,6 +28,9 @@
 
 namespace AwsMock::Database {
 
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_array;
+    using bsoncxx::builder::basic::make_document;
     using std::chrono::system_clock;
 
     /**
