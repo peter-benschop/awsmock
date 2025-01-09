@@ -78,7 +78,11 @@ namespace AwsMock::Service {
             Dto::DynamoDb::ListTableCountersResponse tableResponse;
             tableResponse.total = _dynamoDbDatabase.CountTables(request.region);
             for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region); const auto &table: tables) {
-                tableResponse.tableNames.push_back(table.name);
+                Dto::DynamoDb::TableCounter tableCounter;
+                tableCounter.tableName = table.name;
+                tableCounter.items = table.itemCount;
+                tableCounter.size = table.size;
+                tableResponse.tableCounters.push_back(tableCounter);
             }
             return tableResponse;
 

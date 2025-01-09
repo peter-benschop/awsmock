@@ -59,7 +59,6 @@ namespace AwsMock::Service {
             return Core::FileUtils::CreateTempFile("json", R"({"orgaNr":{"N":"1"}})");
         }
 
-
         static std::string WriteKeyFile() {
             return Core::FileUtils::CreateTempFile("json", R"({"orgaNr":{"N":"1"}})");
         }

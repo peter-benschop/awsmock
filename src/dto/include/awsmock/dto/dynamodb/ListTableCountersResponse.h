@@ -22,6 +22,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/dynamodb/model/TableCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -43,14 +44,9 @@ namespace AwsMock::Dto::DynamoDb {
     struct ListTableCountersResponse : Common::BaseRequest {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
          * Table names
          */
-        std::vector<std::string> tableNames;
+        std::vector<TableCounter> tableCounters;
 
         /**
          * Total number of tables
@@ -58,39 +54,21 @@ namespace AwsMock::Dto::DynamoDb {
         long total = 0;
 
         /**
-         * Total number of items
-         */
-        long items = 0;
-
-        /**
-         * Total size of all items
-         */
-        long size = 0;
-
-        /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Parse a JSON stream
-         *
-         * @param body JSON body
-         * @param headers HTTP headers
-         */
-        void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
-
-        /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

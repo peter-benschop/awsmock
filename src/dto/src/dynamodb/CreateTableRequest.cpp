@@ -58,6 +58,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
+            std::cerr << exc.what() << std::endl;
             throw Core::JsonException(exc.what());
         }
     }

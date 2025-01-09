@@ -14,31 +14,17 @@ namespace AwsMock::Dto::DynamoDb {
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetLongValue(document, "total", total);
 
-            if (!tableNames.empty()) {
+            if (!tableCounters.empty()) {
                 array array;
-                for (const auto &tableName: tableNames) {
-                    array.append(tableName);
+                for (const auto &tableCounter: tableCounters) {
+                    array.append(tableCounter.ToDocument());
                 }
-                document.append(kvp("tableNames", array));
+                document.append(kvp("tableCounters", array));
             }
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    void ListTableCountersResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headers) {
-
-        try {
-
-            if (const value documentValue = bsoncxx::from_json(body); documentValue.find("TableNames") != documentValue.end()) {
-                Core::Bson::FromBsonStringArray(documentValue, "TableNames", &tableNames);
-            }
-
-        } catch (std::exception &exc) {
-            log_error << exc.what() << " body: " << body;
             throw Core::JsonException(exc.what());
         }
     }
