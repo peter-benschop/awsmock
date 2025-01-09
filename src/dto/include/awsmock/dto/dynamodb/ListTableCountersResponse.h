@@ -53,19 +53,19 @@ namespace AwsMock::Dto::DynamoDb {
         std::vector<std::string> tableNames;
 
         /**
+         * Total number of tables
+         */
+        long total = 0;
+
+        /**
          * Total number of items
          */
-        long items;
+        long items = 0;
 
         /**
          * Total size of all items
          */
-        long size;
-
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
+        long size = 0;
 
         /**
          * Creates a JSON string from the object.

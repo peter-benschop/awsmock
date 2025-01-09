@@ -64,7 +64,26 @@ namespace AwsMock::Service {
             return listTableResponse;
 
         } catch (Core::JsonException &exc) {
-            log_error << "DynamoDbd create table failed, error: " << exc.message();
+            log_error << "DynamoDbd list tables failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd list tables failed, error: " + exc.message());
+        }
+    }
+
+    Dto::DynamoDb::ListTableCountersResponse DynamoDbService::ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_table_counters");
+        log_debug << "Starting list table request, region: " << request.region;
+
+        try {
+
+            Dto::DynamoDb::ListTableCountersResponse tableResponse;
+            tableResponse.total = _dynamoDbDatabase.CountTables(request.region);
+            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region); const auto &table: tables) {
+                tableResponse.tableNames.push_back(table.name);
+            }
+            return tableResponse;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd list table counters failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
         }
     }

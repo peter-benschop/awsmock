@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -105,9 +106,13 @@ namespace AwsMock::Database {
          * @brief Returns a list of DynamoDB tables
          *
          * @param region AWS region name
+         * @param prefix table name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sorting columns
          * @return list of DynamoDB tables
          */
-        Entity::DynamoDb::TableList ListTables(const std::string &region = {}) const;
+        Entity::DynamoDb::TableList ListTables(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns the number of DynamoDB tables
