@@ -12,6 +12,7 @@ namespace AwsMock::Dto::DynamoDb {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetLongValue(document, "total", total);
 
             if (!tableNames.empty()) {
                 array array;

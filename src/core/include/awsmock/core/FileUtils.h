@@ -92,7 +92,7 @@ namespace AwsMock::Core {
         static std::string GetTempFile(const std::string &dir, const std::string &extension);
 
         /**
-         * @brief Creates an temporary file containing an random string
+         * @brief Creates a temporary file containing a random string
          *
          * @param extension file name extension
          * @return file name
@@ -100,7 +100,7 @@ namespace AwsMock::Core {
         static std::string CreateTempFile(const std::string &extension);
 
         /**
-         * @brief Creates an temporary file containing an specific content string
+         * @brief Creates a temporary file containing a specific content string
          *
          * @param extension file name extension
          * @param content content of the file
@@ -221,6 +221,14 @@ namespace AwsMock::Core {
          * @param dirName directory to zip.
          */
         static void ZipFiles(const std::string &zipFile, const std::string &dirName);
+
+        /**
+         * @brief Read a whole file into a string
+         *
+         * @param fileName name of the file
+         * @return string with file content
+         */
+        static std::string ReadFile(const std::string &fileName);
 
         /**
          * @brief Touch an existing file

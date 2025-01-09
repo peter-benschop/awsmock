@@ -125,11 +125,14 @@ namespace AwsMock::Database {
         return _memoryDb.TableExists(region, tableName);
     }
 
-    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region) const {
+    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
             try {
+
+                mongocxx::options::find opts;
+
                 Entity::DynamoDb::TableList tables;
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
@@ -137,6 +140,25 @@ namespace AwsMock::Database {
                 document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
+                }
+                if (pageIndex > 0) {
+                    opts.skip(pageIndex * pageSize);
+                }
+
+                opts.sort(make_document(kvp("_id", 1)));
+                if (!sortColumns.empty()) {
+                    document sort;
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
                 }
 
                 for (auto tableCursor = _tableCollection.find(query.extract()); auto table: tableCursor) {

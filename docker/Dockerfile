@@ -42,6 +42,7 @@ RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/data/transfer && \
     mkdir -p /home/awsmock/data/dynamodb && \
     mkdir -p /home/awsmock/data/tmp && \
+    mkdir -p /home/awsmock/init && \
     mkdir -p /home/awsmock/frontend
 
 # Install Mongo C/C++ driver

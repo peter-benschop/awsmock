@@ -115,7 +115,8 @@ namespace AwsMock::Core {
 
         // Podman
         DefineBoolProperty("awsmock.podman.active", "AWSMOCK_PODMAN_ACTIVE", true);
-        DefineStringProperty("awsmock.podman.network.mode", "AWSMOCK_PODMAN_NETWORK_MODE", "local");
+        DefineStringProperty("awsmock.podman.network-mode", "AWSMOCK_PODMAN_NETWORK_MODE", "local");
+        DefineStringProperty("awsmock.podman.network-name", "AWSMOCK_PODMAN_NETWORK_NAME", "local");
         DefineIntProperty("awsmock.podman.default.memory-size", "AWSMOCK_PODMAN_DEFAULT_MEMORY_SIZE", 512);
         DefineIntProperty("awsmock.podman.default.temp-size", "AWSMOCK_PODMAN_DEFAULT_TEMP_SIZE", 10240);
         DefineIntProperty("awsmock.podman.container.port", "AWSMOCK_PODMAN_CONTAINER_PORT", 8080);

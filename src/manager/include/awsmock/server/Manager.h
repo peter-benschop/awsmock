@@ -26,6 +26,7 @@
 #define DEFAULT_MONGO_DBHOST "localhost"
 #define DEFAULT_MONGO_DBPORT 27017
 #define DEFAULT_MONGO_POOL_SIZE 256
+#define AUTO_LOAD_FILE std::string("/home/awsmock/init/init.bson")
 
 namespace AwsMock::Manager {
 
@@ -55,6 +56,14 @@ namespace AwsMock::Manager {
          * @brief Initialization
          */
         static void Initialize();
+
+        /**
+         * @brief Automatically loading init file
+         *
+         * @par
+         * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup.
+         */
+        static void AutoLoad();
 
         /**
          * @brief Stops all currently running modules.
