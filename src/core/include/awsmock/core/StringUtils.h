@@ -250,7 +250,6 @@ namespace AwsMock::Core {
          * @param target original
          * @param pattern pattern
          * @param replacement replacement string
-         * @return
          */
         static void Replace(std::string &target, const std::string &pattern, const std::string &replacement);
 
@@ -260,7 +259,7 @@ namespace AwsMock::Core {
          * @param s input string
          * @return trimmed string
          */
-        static inline std::string Ltrim(std::string s) {
+        static std::string Ltrim(std::string s) {
             s.erase(s.find_last_not_of(' ') + 1);
             return s;
         }
@@ -271,7 +270,7 @@ namespace AwsMock::Core {
          * @param s input string
          * @return trimmed string
          */
-        static inline std::string Rtrim(std::string s) {
+        static std::string Rtrim(std::string s) {
             s.erase(0, s.find_first_not_of(' '));
             return s;
         }
@@ -282,7 +281,7 @@ namespace AwsMock::Core {
          * @param s input string
          * @return trimmed string
          */
-        static inline std::string Trim(std::basic_string<char> s) {
+        static std::string Trim(std::basic_string<char> s) {
             s = Rtrim(s);
             s = Ltrim(s);
             return s;

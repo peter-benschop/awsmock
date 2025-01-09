@@ -178,13 +178,10 @@ namespace AwsMock::Monitoring {
          */
         void AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
-
         /**
          * @brief Adds a gauge to the map.
          *
          * @param name name of the gauge
-         * @param labelName name of the label
-         * @param labelValue label value of the counter
          */
         void DoAddGauge(const std::string &name);
 
