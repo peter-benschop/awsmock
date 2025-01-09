@@ -12,11 +12,16 @@ namespace AwsMock::Manager {
     }
 
     void Manager::Initialize() {
+
         InitializeDatabase();
+
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
                  << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
+
+        // Auto load init file
+        AutoLoad();
     }
 
     void Manager::InitializeDatabase() {
@@ -49,6 +54,15 @@ namespace AwsMock::Manager {
 
         } else {
             log_info << "In-memory database initialized";
+        }
+    }
+
+    void Manager::AutoLoad() {
+        if (Core::FileUtils::FileExists(AUTO_LOAD_FILE)) {
+            if (const std::string jsonString = Core::FileUtils::ReadFile(AUTO_LOAD_FILE); !jsonString.empty()) {
+                Service::ModuleService::ImportInfrastructure(jsonString);
+                log_info << "Loaded infrastructure from " << AUTO_LOAD_FILE;
+            }
         }
     }
 
@@ -152,6 +166,8 @@ namespace AwsMock::Manager {
         for (auto i = 0; i < Core::SystemUtils::GetNumberOfCores(); i++) {
             _threadGroup.create_thread([ObjectPtr = &ios] { return ObjectPtr->run(); });
         }
+
+        // Start IO context
         ios.run();
         log_info << "So long, and thanks for all the fish!";
     }

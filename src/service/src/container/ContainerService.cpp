@@ -28,7 +28,7 @@ namespace AwsMock::Service {
         const Core::Configuration &_configuration = Core::Configuration::instance();
         _networkName = _configuration.GetValueString("awsmock.docker.network-name");
         _containerPort = _configuration.GetValueString("awsmock.docker.container.port");
-        _isDocker = true;//_configuration.GetValueBool("awsmock.docker.active");
+        _isDocker = _configuration.GetValueBool("awsmock.docker.active");
         _containerSocketPath = _isDocker ? _configuration.GetValueString("awsmock.docker.socket") : _containerSocketPath = _configuration.GetValueString("awsmock.podman.socket");
         _domainSocket = std::make_shared<Core::DomainSocket>(_containerSocketPath);
     }
@@ -521,7 +521,7 @@ namespace AwsMock::Service {
     void ContainerService::StopContainer(const std::string &id) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/stop"); statusCode != http::status::no_content) {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
             log_warning << "Stop container failed, httpStatus: " << statusCode << " body: " << body;
             return;
         }

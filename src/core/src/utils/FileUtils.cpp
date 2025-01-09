@@ -147,7 +147,7 @@ namespace AwsMock::Core {
         for (auto &it: files) {
 
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -217,7 +217,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -255,6 +255,23 @@ namespace AwsMock::Core {
         return GetContentTypeMagic(path);
     }
 
+    std::string FileUtils::ReadFile(const std::string &fileName) {
+        boost::filesystem::path pat(fileName);
+
+        // Open the stream to 'lock' the file.
+        std::ifstream f(fileName, std::ios::in | std::ios::binary);
+
+        // Obtain the size of the file.
+        const auto sz = boost::filesystem::file_size(fileName);
+
+        // Create a buffer.
+        std::string result(sz, '\0');
+
+        // Read the whole file into the buffer.
+        f.read(result.data(), sz);
+
+        return result;
+    }
 
     std::string FileUtils::GetContentTypeMagic(const std::string &path) {
 

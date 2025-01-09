@@ -16,7 +16,7 @@
 
 namespace AwsMock::Core {
 
-    class FileUtilsTest : public ::testing::Test {
+    class FileUtilsTest : public testing::Test {
 
       protected:
 
@@ -129,6 +129,20 @@ namespace AwsMock::Core {
         EXPECT_FALSE(tempFile.empty());
         EXPECT_TRUE(FileUtils::FileExists(tempFile));
         EXPECT_EQ(FILE_SIZE, FileUtils::FileSize(tempFile));
+    }
+
+    TEST_F(FileUtilsTest, ReadFileTest) {
+
+        // arrange
+        const std::string fileName = FileUtils::CreateTempFile(tempDir, "txt", 100);
+
+        // act
+        std::string result;
+        EXPECT_NO_THROW({ result = FileUtils::ReadFile(fileName); });
+
+        // assert
+        EXPECT_TRUE(FileUtils::FileExists(fileName));
+        EXPECT_EQ(100, result.size());
     }
 
     TEST_F(FileUtilsTest, StripChunkSignatureTest) {
