@@ -133,8 +133,9 @@ namespace AwsMock::Database {
          * @brief Purge a given queueUrl.
          *
          * @param queueArn queue ARN
+         * @return total number of deleted messages
          */
-        void PurgeQueue(const std::string &queueArn);
+        long PurgeQueue(const std::string &queueArn);
 
         /**
          * @brief Updates a given queue.

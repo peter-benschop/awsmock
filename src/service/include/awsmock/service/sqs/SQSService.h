@@ -78,7 +78,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.
@@ -132,9 +132,10 @@ namespace AwsMock::Service {
          * @brief Purge a queue.
          *
          * @param request purge queue request
+         * @retzurn total number of deleted queues
          * @throws ServiceException
          */
-        void PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
+        long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes

@@ -86,7 +86,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const {
+    long SNSService::PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "purge_topic");
         log_trace << "Purge topic request, topicArn: " << request.topicArn;
 
@@ -101,10 +101,12 @@ namespace AwsMock::Service {
             log_debug << "Got topic: " << topic.topicArn;
 
             // Update database
-            _snsDatabase.PurgeTopic(topic);
+            long deleted = _snsDatabase.PurgeTopic(topic);
 
             // Adjust topic counters
             AdjustTopicCounters(topic);
+
+            return deleted;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS purge topic failed, message: " << ex.what();

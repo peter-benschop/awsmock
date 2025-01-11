@@ -143,9 +143,9 @@ namespace AwsMock::Service {
                     snsRequest.FromJson(clientCommand.payload);
                     log_debug << "Purge topic, topicArn: " << snsRequest.topicArn;
 
-                    _snsService.PurgeTopic(snsRequest);
+                    long deleted = _snsService.PurgeTopic(snsRequest);
 
-                    log_info << "Topic purged, topicArn: " << snsRequest.topicArn;
+                    log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
                     return SendOkResponse(request);
                 }
 

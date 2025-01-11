@@ -12,6 +12,7 @@ namespace AwsMock::Dto::SQS {
             const value document = bsoncxx::from_json(jsonString);
             queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
             body = Core::Bson::BsonUtils::GetStringValue(document, "MessageBody");
+            delaySeconds = Core::Bson::BsonUtils::GetIntValue(document, "DelaySeconds");
 
             // Sanitize
             queueUrl = Core::SanitizeSQSUrl(queueUrl);
@@ -48,6 +49,7 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "QueueUrl", queueUrl);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "MessageBody", body);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "DelaySeconds", delaySeconds);
 
             if (!messageAttributes.empty()) {
                 array jsonMessageAttributeArray;

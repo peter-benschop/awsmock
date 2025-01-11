@@ -209,7 +209,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const {
+    long SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "purge_queue");
         log_trace << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
 
@@ -223,7 +223,7 @@ namespace AwsMock::Service {
 
             // Update messages
             const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
-            _sqsDatabase.PurgeQueue(queueArn);
+            long deleted = _sqsDatabase.PurgeQueue(queueArn);
             log_trace << "SQS queue purged, queueArn: " << queueArn;
 
             // Update queue counter
@@ -233,6 +233,8 @@ namespace AwsMock::Service {
             queue.attributes.approximateNumberOfMessagesNotVisible = 0;
             queue = _sqsDatabase.UpdateQueue(queue);
             log_trace << "SQS queue counter updated, queueArn: " << queue.queueArn;
+
+            return deleted;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

@@ -17,7 +17,7 @@ WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     cd /usr/src/awsmock-ui && \
     npm install -g @angular/cli && \
-    npm install && \
+    npm install --legacy-peer-deps && \
     npm run build --prod && \
     cp -R dist/awsmock-ui/browser/ /tmp/frontend
 

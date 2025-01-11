@@ -105,6 +105,11 @@ namespace AwsMock::Dto::SQS {
         std::string body;
 
         /**
+         * Delay seconds
+         */
+        int delaySeconds;
+
+        /**
          * Attributes (system attributes)
          */
         std::map<std::string, std::string> attributes;
@@ -140,28 +145,28 @@ namespace AwsMock::Dto::SQS {
         std::string requestId;
 
         /**
-         * Converts the JSON string to a DTO
+         * @brief Converts the JSON string to a DTO
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson();
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString();
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

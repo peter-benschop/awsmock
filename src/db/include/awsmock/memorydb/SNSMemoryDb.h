@@ -134,9 +134,10 @@ namespace AwsMock::Database {
          * @brief Purge a topic.
          *
          * @param topic topic entity
+         * @return total number of deleted messages
          * @throws DatabaseException
          */
-        void PurgeTopic(const Entity::SNS::Topic &topic);
+        long PurgeTopic(const Entity::SNS::Topic &topic);
 
         /**
          * @brief Calculates the total size of all messages in the topic
