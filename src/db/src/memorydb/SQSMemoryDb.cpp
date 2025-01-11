@@ -111,7 +111,7 @@ namespace AwsMock::Database {
         return queueList;
     }
 
-    void SQSMemoryDb::PurgeQueue(const std::string &queueArn) {
+    long SQSMemoryDb::PurgeQueue(const std::string &queueArn) {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
         const auto count = std::erase_if(_messages, [queueArn](const auto &item) {
@@ -119,6 +119,7 @@ namespace AwsMock::Database {
             return value.queueArn == queueArn;
         });
         log_debug << "Purged queue, queueArn: " << queueArn << " count: " << count;
+        return count;
     }
 
     Entity::SQS::Queue SQSMemoryDb::UpdateQueue(Entity::SQS::Queue &queue) {

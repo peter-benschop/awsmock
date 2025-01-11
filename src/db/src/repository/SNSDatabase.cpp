@@ -347,14 +347,11 @@ namespace AwsMock::Database {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.CountTopics();
         }
+        return _memoryDb.CountTopics();
     }
 
-    void SNSDatabase::PurgeTopic(const Entity::SNS::Topic &topic) const {
+    long SNSDatabase::PurgeTopic(const Entity::SNS::Topic &topic) const {
 
         if (HasDatabase()) {
 
@@ -368,17 +365,15 @@ namespace AwsMock::Database {
                 const auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
                 log_debug << "Topic purge, count: " << result->deleted_count();
                 session.commit_transaction();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.PurgeTopic(topic);
         }
+        return _memoryDb.PurgeTopic(topic);
     }
 
     long SNSDatabase::GetTopicSize(const std::string &topicArn) const {

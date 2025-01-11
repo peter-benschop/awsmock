@@ -91,7 +91,6 @@ const patchXMLHttpRequest = () => {
         // TODO: clean up this function, make URL patterns configurable!
         const regex = /^https:\/\/(([a-z0-9-]+\.)+)amazonaws\.com:?[0-9]*\/.*/;
         const match = args[1].match(regex);
-        console.log("Original site: ", args[1]);
         if (args.length > 2 && match) {
             const path = _partition(_partition(args[1], "://")[1], "/")[1];
             args[1] = `http://${AWSMOCK_HOST}/${path}`;

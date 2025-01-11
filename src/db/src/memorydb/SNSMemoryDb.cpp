@@ -151,7 +151,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    void SNSMemoryDb::PurgeTopic(const Entity::SNS::Topic &topic) {
+    long SNSMemoryDb::PurgeTopic(const Entity::SNS::Topic &topic) {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         const auto count = std::erase_if(_messages, [topic](const auto &item) {
@@ -159,6 +159,7 @@ namespace AwsMock::Database {
             return value.topicArn == topic.topicArn;
         });
         log_debug << "Topic purged, count: " << count;
+        return count;
     }
 
     long SNSMemoryDb::GetTopicSize(const std::string &topicArn) const {

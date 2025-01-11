@@ -253,7 +253,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListQueues(region);
     }
 
-    void SQSDatabase::PurgeQueue(const std::string &queueArn) const {
+    long SQSDatabase::PurgeQueue(const std::string &queueArn) const {
 
         if (HasDatabase()) {
 
@@ -267,18 +267,15 @@ namespace AwsMock::Database {
                 const auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
                 session.commit_transaction();
                 log_debug << "Purged queue, count: " << result->deleted_count() << " queueArn: " << queueArn;
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            log_debug << "Purged queue, count: " << _messages.size();
-            _memoryDb.PurgeQueue(queueArn);
         }
+        return _memoryDb.PurgeQueue(queueArn);
     }
 
     Entity::SQS::Queue SQSDatabase::UpdateQueue(Entity::SQS::Queue &queue) const {

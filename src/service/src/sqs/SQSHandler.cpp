@@ -53,8 +53,8 @@ namespace AwsMock::Service {
                         std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
                         sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl};
                     }
-                    _sqsService.PurgeQueue(sqsRequest);
-                    log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl;
+                    long deleted = _sqsService.PurgeQueue(sqsRequest);
+                    log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl << " count: " << deleted;
 
                     return SendOkResponse(request);
                 }
@@ -155,7 +155,7 @@ namespace AwsMock::Service {
                     sqsRequest.region = clientCommand.region;
 
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
-                    log_info << "List queue counters, count: " << sqsResponse.queueCounters.size();
+                    log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
@@ -343,7 +343,7 @@ namespace AwsMock::Service {
                     sqsRequest.FromJson(clientCommand.payload);
 
                     Dto::SQS::ListMessageCountersResponse sqsResponse = _sqsService.ListMessageCounters(sqsRequest);
-                    log_info << "List queue message counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.total;
+                    log_debug << "List queue message counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.total;
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
