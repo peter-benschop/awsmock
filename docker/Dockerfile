@@ -49,7 +49,7 @@ RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/frontend
 
 # Install frontend
-COPY --from=buildfrontend /usr/src/dist/awsmock-ui/browser/ /home/awsmock/frontend/
+COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /home/awsmock/frontend/
 
 # Install Mongo C/C++ driver
 RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0
