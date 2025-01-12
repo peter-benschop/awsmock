@@ -42,6 +42,7 @@ namespace AwsMock::Dto::Common {
         // AwsMock
         LIST_TOPIC_COUNTERS,
         LIST_SUBSCRIPTION_COUNTERS,
+        LIST_MESSAGE_COUNTERS,
         UNKNOWN
     };
 
@@ -61,6 +62,7 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::DELETE_MESSAGE, "delete-message"},
             // AwsMock
             {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
+            {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
             {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
     };
 

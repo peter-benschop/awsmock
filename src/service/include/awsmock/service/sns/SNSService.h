@@ -21,6 +21,8 @@
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/GetTopicDetailsResponse.h>
+#include <awsmock/dto/sns/ListMessageCountersRequest.h>
+#include <awsmock/dto/sns/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/ListMessagesRequest.h>
 #include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionCountersRequest.h>
@@ -193,6 +195,16 @@ namespace AwsMock::Service {
         Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request) const;
 
         /**
+         * @brief List message counters
+         *
+         * @param request list message counters request
+         * @return ListmessageCountersResponse
+         * @see ListmessageCountersResponse
+         * @throws ServiceException
+         */
+        Dto::SNS::ListMessageCountersResponse ListMessageCounters(const Dto::SNS::ListMessageCountersRequest &request) const;
+
+        /**
          * @brief Deletes a message
          *
          * @par
@@ -202,7 +214,7 @@ namespace AwsMock::Service {
          * @see DeleteMessageRequest
          * @throws ServiceException
          */
-        void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request);
+        void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
       private:
 
@@ -219,7 +231,7 @@ namespace AwsMock::Service {
          * @param subscription SNS subscription
          * @param request SNS publish request
          */
-        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
+        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Adjust topic counters

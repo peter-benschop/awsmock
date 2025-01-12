@@ -22,42 +22,27 @@ namespace AwsMock::Database::Entity::SNS {
                           kvp("messageId", messageId),
                           kvp("size", size),
                           kvp("status", MessageStatusToString(status)),
-                          kvp("userAttributes", messageAttributesDoc),
-                          kvp("reset", bsoncxx::types::b_null()));
-
-        if (lastSend.time_since_epoch().count() != 0) {
-            messageDoc.append(kvp("lastSend", bsoncxx::types::b_date(lastSend)));
-        }
-        if (created.time_since_epoch().count() != 0) {
-            messageDoc.append(kvp("created", bsoncxx::types::b_date(created)));
-        }
-        if (modified.time_since_epoch().count() != 0) {
-            messageDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
-        }
+                          kvp("userAttributes", messageAttributesDoc));
+        MongoUtils::SetDatetime(messageDoc, "lastSend", lastSend);
+        MongoUtils::SetDatetime(messageDoc, "created", created);
+        MongoUtils::SetDatetime(messageDoc, "modified", modified);
         return messageDoc.extract();
     }
 
     void Message::FromDocument(const std::optional<view> &mResult) {
 
         try {
-            oid = mResult.value()["_id"].get_oid().value.to_string();
-            region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-            topicArn = bsoncxx::string::to_string(mResult.value()["topicArn"].get_string().value);
-            targetArn = bsoncxx::string::to_string(mResult.value()["targetArn"].get_string().value);
-            message = bsoncxx::string::to_string(mResult.value()["message"].get_string().value);
-            status = MessageStatusFromString(bsoncxx::string::to_string(mResult.value()["status"].get_string().value));
-            messageId = bsoncxx::string::to_string(mResult.value()["messageId"].get_string().value);
-            size = mResult.value()["size"].get_int64().value;
-
-            if (mResult.value().find("lastSend") != mResult.value().end()) {
-                lastSend = bsoncxx::types::b_date(mResult.value()["lastSend"].get_date());
-            }
-            if (mResult.value().find("created") != mResult.value().end()) {
-                created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-            }
-            if (mResult.value().find("modified") != mResult.value().end()) {
-                modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
-            }
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            topicArn = Core::Bson::BsonUtils::GetStringValue(mResult, "topicArn");
+            targetArn = Core::Bson::BsonUtils::GetStringValue(mResult, "targetArn");
+            message = Core::Bson::BsonUtils::GetStringValue(mResult, "message");
+            status = MessageStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+            messageId = Core::Bson::BsonUtils::GetStringValue(mResult, "messageId");
+            size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+            lastSend = Core::Bson::BsonUtils::GetDateValue(mResult, "lastSend");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             if (mResult.value().find("userAttributes") != mResult.value().end()) {
                 if (const bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value}; !attributesView.empty()) {

@@ -175,6 +175,21 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::LIST_MESSAGE_COUNTERS: {
+
+                    Dto::SNS::ListMessageCountersRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+                    snsRequest.region = region;
+
+                    log_debug << "List message counters, payload: " << clientCommand.payload;
+                    log_debug << "List message counters, topicArn: " << snsRequest.topicArn;
+
+                    Dto::SNS::ListMessageCountersResponse snsResponse = _snsService.ListMessageCounters(snsRequest);
+
+                    log_info << "List message counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messages.size();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
 
                     Dto::SNS::DeleteMessageRequest snsRequest;
@@ -208,6 +223,12 @@ namespace AwsMock::Service {
             log_error << e.message();
             return SendInternalServerError(request, e.message());
         } catch (Core::JsonException &e) {
+            log_error << e.message();
+            return SendInternalServerError(request, e.message());
+        } catch (Core::ServiceException &e) {
+            log_error << e.message();
+            return SendInternalServerError(request, e.message());
+        } catch (Core::NotFoundException &e) {
             log_error << e.message();
             return SendInternalServerError(request, e.message());
         }

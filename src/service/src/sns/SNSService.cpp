@@ -417,7 +417,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Get queue by ARN
@@ -442,7 +442,8 @@ namespace AwsMock::Service {
                 .requestId = Core::AwsUtils::CreateRequestId(),
         };
 
-        _sqsService.SendMessage(sendMessageRequest);
+        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
+        log_trace << "SNS SendMessage response: " << response.ToString();
     }
 
     Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) const {
@@ -467,7 +468,29 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) {
+    Dto::SNS::ListMessageCountersResponse SNSService::ListMessageCounters(const Dto::SNS::ListMessageCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_message_counters");
+        log_trace << "List message counters request, region: " << request.region << " topicArn: " << request.topicArn;
+
+        try {
+
+            const long total = _snsDatabase.CountMessages(request.topicArn);
+
+            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex);
+
+            Dto::SNS::ListMessageCountersResponse listMessageCountersResponse = Dto::SNS::Mapper::map(messageList);
+            listMessageCountersResponse.total = total;
+            log_trace << "SNS list messages, response: " << listMessageCountersResponse.ToJson();
+
+            return listMessageCountersResponse;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topics request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void SNSService::DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_message");
         log_trace << "Delete a message request, messageId: " << request.messageId;
 

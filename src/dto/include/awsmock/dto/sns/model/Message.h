@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -30,6 +29,21 @@ namespace AwsMock::Dto::SNS {
          * Message ID
          */
         std::string messageId;
+
+        /**
+         * Message
+         */
+        std::string message;
+
+        /**
+         * Creation time
+         */
+        system_clock::time_point created;
+
+        /**
+         * Modification time
+         */
+        system_clock::time_point modified;
 
         /**
          * @brief Converts the DTO to a JSON representation.

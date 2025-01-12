@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_SNS_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/sns/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/ListMessagesRequest.h>
 #include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/model/Message.h>
@@ -23,7 +24,7 @@ namespace AwsMock::Dto::SNS {
       public:
 
         /**
-         * @brief Maps a SNS message entity list to a list messages response
+         * @brief Maps an SNS message entity list to a list messages response
          *
          * Some values will be pulled over from the request.
          *
@@ -33,7 +34,18 @@ namespace AwsMock::Dto::SNS {
          * @see ListMessagesResponse
          * @see ListMessagesRequest
          */
-        static Dto::SNS::ListMessagesResponse map(const ListMessagesRequest &request, const std::vector<Database::Entity::SNS::Message> &messageEntities);
+        static ListMessagesResponse map(const ListMessagesRequest &request, const std::vector<Database::Entity::SNS::Message> &messageEntities);
+        /**
+         * @brief Maps an SNS message entity list to a list messages response
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param messageEntities SNS message entity list
+         * @return ListMessagesResponse
+         * @see ListMessagesResponse
+         * @see ListMessagesRequest
+         */
+        static ListMessageCountersResponse map(const std::vector<Database::Entity::SNS::Message> &messageEntities);
     };
 
 }// namespace AwsMock::Dto::SNS
