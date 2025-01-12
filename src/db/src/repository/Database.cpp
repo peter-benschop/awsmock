@@ -88,6 +88,7 @@ namespace AwsMock::Database {
             for (const auto &indexName: std::views::keys(indexDefinitions)) {
                 CreateIndex(database, indexName);
             }
+            log_info << "Start finished indexes, count: " << indexDefinitions.size();
         }
     }
 
