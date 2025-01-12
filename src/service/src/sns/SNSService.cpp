@@ -225,6 +225,49 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::UpdateSubscriptionResponse SNSService::UpdateSubscription(const Dto::SNS::UpdateSubscriptionRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "update_subscription");
+        log_trace << "Update subscription request: " << request.ToString();
+
+        // Check topic/target ARN
+        if (request.topicArn.empty()) {
+            log_error << "Topic ARN missing";
+            throw Core::ServiceException("Topic ARN missing");
+        }
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists";
+            throw Core::ServiceException("SNS topic does not exists");
+        }
+
+        try {
+
+            // Get topic
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            // Create new subscription
+            if (!topic.HasSubscription(request.subscriptionArn)) {
+                log_error << "SNS topic subscription does not exists";
+                throw Core::ServiceException("SNS topic subscription does not exists");
+            }
+
+            const int index = topic.GetSubscriptionIndex(request.subscriptionArn);
+            topic.subscriptions.at(index).endpoint = request.endpoint;
+            topic.subscriptions.at(index).protocol = request.protocol;
+
+            // Save to database
+            topic = _snsDatabase.UpdateTopic(topic);
+            log_debug << "Subscription updated, topic: " << topic.ToString();
+
+            return {.subscriptionArn = request.subscriptionArn};
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS subscription failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::UnsubscribeResponse SNSService::Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "unsubscribe");
         log_trace << "Unsubscribe request: " << request.ToString();
@@ -304,14 +347,97 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionCountersResponse response;
-            for (const auto &s: topic.subscriptions) {
-                Dto::SNS::Subscription subscription = {.topicArn = request.topicArn, .protocol = s.protocol, .subscriptionArn = s.subscriptionArn, .endpoint = s.endpoint};
+            response.total = topic.subscriptions.size();
+            for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
+                const std::string id = subscriptionArn.substr(subscriptionArn.rfind(':') + 1);
+                Dto::SNS::Subscription subscription = {.id = id, .topicArn = request.topicArn, .protocol = protocol, .subscriptionArn = subscriptionArn, .endpoint = endpoint};
                 response.subscriptionCounters.emplace_back(subscription);
             }
             return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS get subscription counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SNS::ListAttributeCountersResponse SNSService::ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_attribute_counters");
+        log_trace << "List attribute counters request: " << request.ToString();
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
+        }
+
+        try {
+
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            Dto::SNS::ListAttributeCountersResponse response;
+            response.total = 11;
+            Dto::SNS::AttributeCounter attributeCounter;
+            attributeCounter = {.attributeKey = "availableMessages", .attributeValue = std::to_string(topic.topicAttribute.availableMessages)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "archivePolicy", .attributeValue = topic.topicAttribute.archivePolicy};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "beginningArchiveTime", .attributeValue = Core::DateTimeUtils::ToISO8601(topic.topicAttribute.beginningArchiveTime)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "contentBasedDeduplication", .attributeValue = Core::StringUtils::ToString(topic.topicAttribute.contentBasedDeduplication)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "deliveryPolicy", .attributeValue = topic.topicAttribute.deliveryPolicy};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "displayName", .attributeValue = topic.topicAttribute.displayName};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "fifoTopic", .attributeValue = Core::StringUtils::ToString(topic.topicAttribute.fifoTopic)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "kmsMasterKeyId", .attributeValue = topic.topicAttribute.kmsMasterKeyId};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "policy", .attributeValue = topic.topicAttribute.policy};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "signatureVersion", .attributeValue = topic.topicAttribute.signatureVersion};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "tracingConfig", .attributeValue = topic.topicAttribute.tracingConfig};
+            response.attributeCounters.emplace_back(attributeCounter);
+
+            auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > 11) {
+                endArray = response.attributeCounters.end();
+            }
+            response.attributeCounters = std::vector(response.attributeCounters.begin() + request.pageSize * request.pageIndex, endArray);
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get attribute counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SNS::ListTagCountersResponse SNSService::ListTagCounters(const Dto::SNS::ListTagCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_tag_counters");
+        log_trace << "List tag counters request: " << request.ToString();
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
+        }
+
+        try {
+
+            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            Dto::SNS::ListTagCountersResponse response;
+            response.total = topic.tags.size();
+            for (const auto &tag: topic.tags) {
+                Dto::SNS::TagCounter tagCounter = {.tagKey = tag.first, .tagValue = tag.second};
+                response.tagCounters.emplace_back(tagCounter);
+            }
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get tag counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -406,13 +532,49 @@ namespace AwsMock::Service {
 
             // Set tags and update database
             topic.tags = request.tags;
-            _snsDatabase.UpdateTopic(topic);
-            log_info << "SNS tags updated, count: " << request.tags.size();
+            topic = _snsDatabase.UpdateTopic(topic);
+            log_info << "SNS tags updated, count: " << topic.tags.size();
 
-            return {};
+            constexpr Dto::SNS::TagResourceResponse response;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS tag resource failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SNS::UntagResourceResponse SNSService::UntagResource(const Dto::SNS::UntagResourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "untag_topic");
+        log_trace << "Untag topic request: " << request.ToString();
+
+        try {
+
+            // Check existence
+            if (!_snsDatabase.TopicExists(request.resourceArn)) {
+                log_error << "SNS topic does not exists, topicArn: " << request.resourceArn;
+                throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.resourceArn);
+            }
+
+            // Get the topic
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.resourceArn);
+
+            // Set tags and update database
+            int count = 0;
+            for (const auto &it: request.tags) {
+                count += std::erase_if(topic.tags, [it](const auto &item) {
+                    auto const &[key, value] = item;
+                    return key == it;
+                });
+            }
+            topic = _snsDatabase.UpdateTopic(topic);
+            log_info << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
+
+            constexpr Dto::SNS::UntagResourceResponse response;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS untag resource failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

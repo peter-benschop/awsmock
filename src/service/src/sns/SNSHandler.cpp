@@ -95,6 +95,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
+                case Dto::Common::SNSCommandType::UPDATE_SUBSCRIPTION: {
+
+                    Dto::SNS::UpdateSubscriptionRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SNS::UpdateSubscriptionResponse snsResponse = _snsService.UpdateSubscription(snsRequest);
+
+                    log_info << "Subscription updated, topicArn: " << snsRequest.topicArn << " subscriptionArn: " << snsResponse.subscriptionArn;
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 case Dto::Common::SNSCommandType::UNSUBSCRIBE: {
 
                     std::string subscriptionArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "SubscriptionArn");
@@ -121,19 +132,39 @@ namespace AwsMock::Service {
                     std::string resourceArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "ResourceArn");
                     log_debug << "Resource ARN: " << resourceArn;
 
-                    int count = Core::HttpUtils::CountQueryParametersByPrefix(clientCommand.payload, "Tags.member") / 2;
+                    int count = Core::HttpUtils::CountQueryParametersByPrefix(clientCommand.payload, "Tags.Tag") / 2;
                     log_trace << "Got tags count, count: " << count;
 
                     std::map<std::string, std::string> tags;
                     for (int i = 1; i <= count; i++) {
-                        std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tags.member." + std::to_string(i) + ".Key");
-                        std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tags.member." + std::to_string(i) + ".Value");
+                        std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tags.Tag." + std::to_string(i) + ".Key");
+                        std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tags.Tag." + std::to_string(i) + ".Value");
                         tags[tagKey] = tagValue;
                     }
                     Dto::SNS::TagResourceRequest snsRequest = {.region = clientCommand.region, .resourceArn = resourceArn, .tags = tags};
                     Dto::SNS::TagResourceResponse snsResponse = _snsService.TagResource(snsRequest);
 
                     log_info << "Topic tagged, resourceArn: " << resourceArn;
+                    return SendOkResponse(request, snsResponse.ToXml());
+                }
+
+                case Dto::Common::SNSCommandType::UNTAG_RESOURCE: {
+
+                    std::string resourceArn = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "ResourceArn");
+                    log_debug << "Resource ARN: " << resourceArn;
+
+                    int count = Core::HttpUtils::CountQueryParametersByPrefix(clientCommand.payload, "TagKeys.TagKey");
+                    log_trace << "Got tags count, count: " << count;
+
+                    std::vector<std::string> tags;
+                    for (int i = 1; i <= count; i++) {
+                        std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "TagKeys.TagKey." + std::to_string(i));
+                        tags.emplace_back(tagKey);
+                    }
+                    Dto::SNS::UntagResourceRequest snsRequest = {.region = clientCommand.region, .resourceArn = resourceArn, .tags = tags};
+                    Dto::SNS::UntagResourceResponse snsResponse = _snsService.UntagResource(snsRequest);
+
+                    log_info << "Topic untagged, resourceArn: " << resourceArn;
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
@@ -209,6 +240,28 @@ namespace AwsMock::Service {
                     Dto::SNS::ListSubscriptionCountersResponse snsResponse = _snsService.ListSubscriptionCounters(snsRequest);
 
                     log_info << "List subscriptions counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.subscriptionCounters.size();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
+                case Dto::Common::SNSCommandType::LIST_ATTRIBUTE_COUNTERS: {
+
+                    Dto::SNS::ListAttributeCountersRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SNS::ListAttributeCountersResponse snsResponse = _snsService.ListAttributeCounters(snsRequest);
+
+                    log_info << "List attributes counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.attributeCounters.size();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
+                case Dto::Common::SNSCommandType::LIST_TAG_COUNTERS: {
+
+                    Dto::SNS::ListTagCountersRequest snsRequest;
+                    snsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SNS::ListTagCountersResponse snsResponse = _snsService.ListTagCounters(snsRequest);
+
+                    log_info << "List tags counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.tagCounters.size();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 

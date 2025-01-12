@@ -93,10 +93,26 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * @brief Checks whether a subscription with the given protocol/endpoint exists already.
          *
-         * @param subscription name of the event
-         * @return true if notification with the given event name exists.
+         * @param subscription subscription object
+         * @return true if subscription exists.
          */
         bool HasSubscription(const Subscription &subscription);
+
+        /**
+         * @brief Checks whether a subscription with the given ARN exists already.
+         *
+         * @param subscriptionArn subscription ARN
+         * @return true if subscription with the given ARN exists.
+         */
+        bool HasSubscription(const std::string &subscriptionArn);
+
+        /**
+         * @brief Return the index of a subscription with the given ARN.
+         *
+         * @param subscriptionArn subscription ARN
+         * @return subscription index
+         */
+        int GetSubscriptionIndex(const std::string &subscriptionArn);
 
         /**
          * @brief Converts the entity to a MongoDB document

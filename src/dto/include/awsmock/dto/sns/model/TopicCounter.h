@@ -98,4 +98,4 @@ namespace AwsMock::Dto::SNS {
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SQS_QUEUEATTRIBUTE_H
+#endif// AWSMOCK_DTO_SNS_TOPIC_COUNTER_H

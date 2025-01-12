@@ -2,35 +2,21 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
-#define AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
+#ifndef AWSMOCK_DTO_SNS_UNTAG_RESOURCE_RESPONSE_H
+#define AWSMOCK_DTO_SNS_UNTAG_RESOURCE_RESPONSE_H
 
 // C++ standard includes
 #include <map>
 #include <string>
 
-// Awsmock includes
+// AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct TagResourceRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
-         * Resource ARN (topic ARN)
-         */
-        std::string resourceArn;
-
-        /**
-         * Tags map
-         */
-        std::map<std::string, std::string> tags;
+    struct UntagResourceResponse {
 
         /**
          * @brief Convert to JSON representation
@@ -38,6 +24,13 @@ namespace AwsMock::Dto::SNS {
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Convert to XML representation
+         *
+         * @return XML string
+         */
+        [[nodiscard]] std::string ToXml() const;
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -51,11 +44,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const TagResourceRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const UntagResourceResponse &r);
     };
-
-    typedef std::map<std::string, std::string> TagList;
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
+#endif// AWSMOCK_DTO_SNS_UNTAG_RESOURCE_RESPONSE_H

@@ -2,24 +2,25 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_LIST_ATTRIBUTE_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_SNS_LIST_ATTRIBUTE_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/dto/sns/model/TopicCounter.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/sns/model/AttributeCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct ListTopicCountersResponse {
+    struct ListAttributeCountersResponse {
 
         /**
-         * List of topic counters
+         * List of attribute counters
          */
-        std::vector<TopicCounter> topicCounters;
+        std::vector<AttributeCounter> attributeCounters;
 
         /**
          * Total number of queues
@@ -45,9 +46,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListAttributeCountersResponse &r);
     };
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_LIST_ATTRIBUTE_COUNTERS_RESPONSE_H

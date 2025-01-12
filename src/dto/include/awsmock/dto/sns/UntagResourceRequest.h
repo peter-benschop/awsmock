@@ -2,11 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
-#define AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
+#ifndef AWSMOCK_DTO_SNS_UNTAG_RESOURCE_REQUEST_H
+#define AWSMOCK_DTO_SNS_UNTAG_RESOURCE_REQUEST_H
 
 // C++ standard includes
-#include <map>
+#include <vector>
 #include <string>
 
 // Awsmock includes
@@ -15,7 +15,7 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct TagResourceRequest {
+    struct UntagResourceRequest {
 
         /**
          * AWS region
@@ -30,7 +30,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * Tags map
          */
-        std::map<std::string, std::string> tags;
+        std::vector<std::string> tags;
 
         /**
          * @brief Convert to JSON representation
@@ -51,11 +51,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const TagResourceRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const UntagResourceRequest &r);
     };
-
-    typedef std::map<std::string, std::string> TagList;
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
+#endif// AWSMOCK_DTO_SNS_UNTAG_RESOURCE_REQUEST_H

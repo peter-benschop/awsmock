@@ -36,13 +36,17 @@ namespace AwsMock::Dto::Common {
         UNSUBSCRIBE,
         LIST_SUBSCRIPTIONS_BY_TOPIC,
         TAG_RESOURCE,
+        UNTAG_RESOURCE,
         DELETE_TOPIC,
         LIST_MESSAGES,
         DELETE_MESSAGE,
         // AwsMock
         LIST_TOPIC_COUNTERS,
         LIST_SUBSCRIPTION_COUNTERS,
+        LIST_TAG_COUNTERS,
+        LIST_ATTRIBUTE_COUNTERS,
         LIST_MESSAGE_COUNTERS,
+        UPDATE_SUBSCRIPTION,
         UNKNOWN
     };
 
@@ -57,13 +61,17 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
             {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
             {SNSCommandType::TAG_RESOURCE, "tag-resource"},
+            {SNSCommandType::UNTAG_RESOURCE, "untag-resource"},
             {SNSCommandType::DELETE_TOPIC, "delete-topic"},
             {SNSCommandType::LIST_MESSAGES, "list-messages"},
             {SNSCommandType::DELETE_MESSAGE, "delete-message"},
             // AwsMock
             {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
-            {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
             {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
+            {SNSCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+            {SNSCommandType::LIST_ATTRIBUTE_COUNTERS, "list-attribute-counters"},
+            {SNSCommandType::UPDATE_SUBSCRIPTION, "update-subscription"},
+            {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {

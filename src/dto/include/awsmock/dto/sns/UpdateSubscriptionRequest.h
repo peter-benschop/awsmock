@@ -2,49 +2,45 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_SNS_UPDATE_SUBSCRIPTION_REQUEST_H
+#define AWSMOCK_DTO_SNS_UPDATE_SUBSCRIPTION_REQUEST_H
 
 // C++ standard includes
+#include <sstream>
 #include <string>
 
-// AwsMock includes
+// Awsmock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/SortColumn.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct ListSubscriptionCountersRequest {
+    struct UpdateSubscriptionRequest {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * TopicArn
+         * Topic ARN
          */
         std::string topicArn;
 
         /**
-         * Prefix
+         * Subscription ARN
          */
-        std::string prefix;
+        std::string subscriptionArn;
 
         /**
-         * Page size
+         * Protocol
          */
-        int pageSize;
+        std::string protocol;
 
         /**
-         * Page index
+         * Endpoint
          */
-        int pageIndex;
+        std::string endpoint;
 
         /**
-         * Sort column
+         * Owner
          */
-        std::vector<Core::SortColumn> sortColumns;
+        std::string owner;
 
         /**
          * @brief Convert from JSON representation
@@ -72,9 +68,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListSubscriptionCountersRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const UpdateSubscriptionRequest &r);
     };
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_SNS_UPDATE_SUBSCRIPTION_REQUEST_H
