@@ -209,6 +209,90 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SQS::ListQueueAttributeCountersResponse SQSService::ListQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_queue_attribute_counters");
+        log_trace << "List queue attribute counters request: " << request.ToString();
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "SQS queue does not exists, queueArn: " << request.queueArn;
+            throw Core::ServiceException("SQS queue does not exists, queueArn: " + request.queueArn);
+        }
+
+        try {
+            int total = 13;
+
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+
+            Dto::SQS::ListQueueAttributeCountersResponse response;
+            response.total = total;
+            Dto::SQS::AttributeCounter attributeCounter;
+            attributeCounter = {.attributeKey = "approximateNumberOfMessages", .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessages)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "approximateNumberOfMessagesDelayed", .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesDelayed)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "approximateNumberOfMessagesNotVisible", .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "deadLetterTargetArn", .attributeValue = queue.attributes.redrivePolicy.deadLetterTargetArn};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "delaySeconds", .attributeValue = std::to_string(queue.attributes.delaySeconds)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "maxMessageSize", .attributeValue = std::to_string(queue.attributes.maxMessageSize)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "messageRetentionPeriod", .attributeValue = std::to_string(queue.attributes.messageRetentionPeriod)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "policy", .attributeValue = queue.attributes.policy};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "maxReceiveCount", .attributeValue = std::to_string(queue.attributes.redrivePolicy.maxReceiveCount)};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "queueArn", .attributeValue = queue.attributes.queueArn};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "redriveAllowPolicy", .attributeValue = queue.attributes.redriveAllowPolicy};
+            response.attributeCounters.emplace_back(attributeCounter);
+            attributeCounter = {.attributeKey = "visibilityTimeout", .attributeValue = std::to_string(queue.attributes.visibilityTimeout)};
+            response.attributeCounters.emplace_back(attributeCounter);
+
+            auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > total) {
+                endArray = response.attributeCounters.end();
+            }
+            response.attributeCounters = std::vector(response.attributeCounters.begin() + request.pageSize * request.pageIndex, endArray);
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS get attribute counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SQS::ListTagCountersResponse SQSService::ListTagCounters(const Dto::SQS::ListTagCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_tag_counters");
+        log_trace << "List tag counters request: " << request.ToString();
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "SQS queue does not exists, queueArn: " << request.queueArn;
+            throw Core::ServiceException("SQS queue does not exists, queueArn: " + request.queueArn);
+        }
+
+        try {
+
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+
+            Dto::SQS::ListTagCountersResponse response;
+            response.total = queue.tags.size();
+            for (const auto &[fst, snd]: queue.tags) {
+                Dto::SQS::TagCounter tagCounter = {.tagKey = fst, .tagValue = snd};
+                response.tagCounters.emplace_back(tagCounter);
+            }
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SQS get tag counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     long SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "purge_queue");
         log_trace << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
@@ -420,14 +504,15 @@ namespace AwsMock::Service {
     }
 
     void SQSService::TagQueue(const Dto::SQS::TagQueueRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_visibility_timeout");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "tag_queue");
         log_trace << "Tag queue request, queue: " << request.queueUrl;
 
         try {
 
             // Check existence
             if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
-                throw Core::ServiceException("SQS queue topic does not exists");
+                log_error << "Queue does not exist, queueUrl: " << request.queueUrl;
+                throw Core::ServiceException("SQS queue does not exists, queueUrl: " + request.queueUrl);
             }
 
             // Get the topic
@@ -440,6 +525,39 @@ namespace AwsMock::Service {
 
             queue = _sqsDatabase.UpdateQueue(queue);
             log_info << "SQS queue tags updated, count: " << request.tags.size() << " queue: " << queue.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::UntagQueue(const Dto::SQS::UntagQueueRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "untag_queue");
+        log_trace << "Untag queue request, queue: " << request.queueUrl;
+
+        try {
+
+            // Check existence
+            if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
+                throw Core::ServiceException("SQS queue topic does not exists");
+            }
+
+            // Get the topic
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+
+            // Set tags and update database
+            int count = 0;
+            if (!request.tags.empty()) {
+                for (const auto &tag: request.tags) {
+                    count += std::erase_if(queue.tags, [tag](const auto &item) {
+                        auto const &[k, v] = item;
+                        return k == tag;
+                    });
+                }
+            }
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_info << "SQS queue tags deleted, count: " << count << " queue: " << queue.name;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

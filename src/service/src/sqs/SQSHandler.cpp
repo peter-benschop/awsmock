@@ -197,6 +197,31 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::UNTAG_QUEUE: {
+
+                    Dto::SQS::UntagQueueRequest sqsRequest;
+
+                    if (clientCommand.contentType == "json") {
+
+                        sqsRequest.FromJson(clientCommand.payload);
+                        sqsRequest.region = clientCommand.region;
+
+                    } else {
+
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
+                        std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tag.Key");
+
+                        std::vector<std::string> tags;
+                        tags.emplace_back(tagKey);
+
+                        sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl, .tags = tags};
+                    }
+                    _sqsService.UntagQueue(sqsRequest);
+                    log_info << "Untag queue, queueUrl: " << sqsRequest.queueUrl;
+
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::LIST_QUEUES: {
 
                     Dto::SQS::ListQueuesRequest sqsRequest;
@@ -213,6 +238,28 @@ namespace AwsMock::Service {
                         return SendOkResponse(request, sqsResponse.ToJson());
                     }
                     return SendOkResponse(request, sqsResponse.ToXml());
+                }
+
+                case Dto::Common::SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS: {
+
+                    Dto::SQS::ListQueueAttributeCountersRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SQS::ListQueueAttributeCountersResponse sqsResponse = _sqsService.ListQueueAttributeCounters(sqsRequest);
+
+                    log_info << "List attributes counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.attributeCounters.size();
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
+                case Dto::Common::SqsCommandType::LIST_TAG_COUNTERS: {
+
+                    Dto::SQS::ListTagCountersRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SQS::ListTagCountersResponse sqsResponse = _sqsService.ListTagCounters(sqsRequest);
+
+                    log_info << "List tags counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.tagCounters.size();
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_QUEUE: {

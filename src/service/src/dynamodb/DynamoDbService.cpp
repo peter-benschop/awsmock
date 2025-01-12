@@ -105,7 +105,7 @@ namespace AwsMock::Service {
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             describeTableResponse = {.body = body, .headers = outHeaders, .status = status};
             describeTableResponse.ScanResponse();
-            log_info << "DynamoDb describe table, name: " << request.tableName;
+            log_debug << "DynamoDb describe table, name: " << request.tableName;
             return describeTableResponse;
 
         } catch (Core::JsonException &exc) {

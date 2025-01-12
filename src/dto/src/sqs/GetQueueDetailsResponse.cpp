@@ -13,7 +13,8 @@ namespace AwsMock::Dto::SQS {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "queueName", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "queueName", queueName);
+            Core::Bson::BsonUtils::SetStringValue(document, "queueUrl", queueUrl);
             Core::Bson::BsonUtils::SetStringValue(document, "queueArn", queueArn);
             Core::Bson::BsonUtils::SetLongValue(document, "messageCount", messageCount);
             Core::Bson::BsonUtils::SetLongValue(document, "retentionPeriod", retentionPeriod);

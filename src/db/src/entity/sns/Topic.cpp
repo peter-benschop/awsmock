@@ -28,7 +28,6 @@ namespace AwsMock::Database::Entity::SNS {
         return -1;
     }
 
-
     view_or_value<view, value> Topic::ToDocument() const {
 
         auto subscriptionDocs = array{};
