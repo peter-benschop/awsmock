@@ -61,6 +61,6 @@ namespace AwsMock::Dto::SQS {
         friend std::ostream &operator<<(std::ostream &os, const UntagQueueRequest &r);
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UNTAG_QUEUE_REQUEST_H

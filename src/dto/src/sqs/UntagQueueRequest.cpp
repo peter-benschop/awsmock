@@ -29,9 +29,9 @@ namespace AwsMock::Dto::SQS {
             document rootDocument;
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "QueueUrl", queueUrl);
 
-            if(!tags.empty()) {
+            if (!tags.empty()) {
                 array tagsArray;
-                for(auto tag : tags) {
+                for (auto tag: tags) {
                     tagsArray.append(tag);
                 }
                 rootDocument.append(kvp("Tags", tagsArray));
@@ -55,4 +55,4 @@ namespace AwsMock::Dto::SQS {
         return os;
     }
 
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS

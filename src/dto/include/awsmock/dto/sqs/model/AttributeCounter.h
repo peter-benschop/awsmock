@@ -54,6 +54,6 @@ namespace AwsMock::Dto::SQS {
         friend std::ostream &operator<<(std::ostream &os, const AttributeCounter &r);
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_ATTRIBUTE_COUNTER_H

@@ -68,4 +68,4 @@ namespace AwsMock::Dto::SQS {
         return os;
     }
 
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS

@@ -42,4 +42,4 @@ namespace AwsMock::Dto::SQS {
         os << "TagCounter=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS

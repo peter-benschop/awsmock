@@ -75,6 +75,6 @@ namespace AwsMock::Dto::SQS {
         friend std::ostream &operator<<(std::ostream &os, const ListQueueAttributeCountersRequest &r);
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_QUEUE_ATTRIBUTE_COUNTERS_REQUEST_H
