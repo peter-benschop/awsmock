@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/10/2023.
 //
 
-#include "awsmock/dto/sns/model/Message.h"
+#include <awsmock/dto/sns/model/Message.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -16,6 +16,10 @@ namespace AwsMock::Dto::SNS {
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "TopicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
+            Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
+            Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {

@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_MESSAGES_REQUEST_H
-#define AWSMOCK_DTO_SNS_LIST_MESSAGES_REQUEST_H
+#ifndef AWSMOCK_DTO_SNS_LIST_MESSAGE_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_SNS_LIST_MESSAGE_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -11,22 +11,13 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/SortColumn.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SNS {
 
-    /**
-     * @brief List messages request
-     *
-     * @par
-     * This is not an AWS SDK request, but only available in awsmock
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    struct ListMessagesRequest {
+    struct ListMessageCountersRequest {
 
         /**
-         * Region
+         * AWS region
          */
         std::string region;
 
@@ -36,7 +27,7 @@ namespace AwsMock::Dto::SNS {
         std::string topicArn;
 
         /**
-         * Page size
+         * Prefix
          */
         std::string prefix;
 
@@ -56,14 +47,14 @@ namespace AwsMock::Dto::SNS {
         std::vector<Core::SortColumn> sortColumns;
 
         /**
-         * @brief Convert to a JSON string
+         * @brief Convert from JSON representation
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Convert to a JSON string
+         * @brief Convert to JSON representation
          *
          * @return JSON string
          */
@@ -77,13 +68,13 @@ namespace AwsMock::Dto::SNS {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Stream provider.
+         * Stream provider.
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListMessagesRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListMessageCountersRequest &r);
     };
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_PUBLISH_REQUEST_H
+#endif// AWSMOCK_DTO_SQS_LIST_MESSAGE_COUNTERS_REQUEST_H
