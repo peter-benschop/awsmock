@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/dto/sqs/MessageAttributeDataType.h>
+#include <awsmock/dto/sqs/model/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SQS {
 

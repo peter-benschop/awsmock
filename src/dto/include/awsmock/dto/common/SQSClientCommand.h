@@ -34,6 +34,7 @@ namespace AwsMock::Dto::Common {
         GET_QUEUE_URL,
         GET_QUEUE_DETAILS,
         TAG_QUEUE,
+        UNTAG_QUEUE,
         LIST_QUEUES,
         LIST_QUEUE_TAGS,
         LIST_QUEUE_ARNS,
@@ -47,6 +48,9 @@ namespace AwsMock::Dto::Common {
         LIST_MESSAGE_COUNTERS,
         DELETE_MESSAGE,
         DELETE_MESSAGE_BATCH,
+        // Awsmock
+        LIST_QUEUE_ATTRIBUTE_COUNTERS,
+        LIST_TAG_COUNTERS,
         UNKNOWN
     };
 
@@ -59,10 +63,10 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},
             {SqsCommandType::GET_QUEUE_DETAILS, "get-queue-details"},
             {SqsCommandType::TAG_QUEUE, "tag-queue"},
+            {SqsCommandType::UNTAG_QUEUE, "untag-queue"},
             {SqsCommandType::LIST_QUEUES, "list-queues"},
             {SqsCommandType::LIST_QUEUE_TAGS, "list-queue-tags"},
             {SqsCommandType::LIST_QUEUE_ARNS, "list-queue-arns"},
-            {SqsCommandType::LIST_QUEUE_COUNTERS, "list-queue-counters"},
             {SqsCommandType::DELETE_QUEUE, "delete-queue"},
             // Messages
             {SqsCommandType::SEND_MESSAGE, "send-message"},
@@ -70,9 +74,14 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::RECEIVE_MESSAGE, "receive-message"},
             {SqsCommandType::CHANGE_MESSAGE_VISIBILITY, "change-message-visibility"},
             {SqsCommandType::LIST_MESSAGES, "list-messages"},
-            {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
             {SqsCommandType::DELETE_MESSAGE, "delete-message"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
+            // Awsmock
+            {SqsCommandType::LIST_QUEUE_COUNTERS, "list-queue-counters"},
+            {SqsCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+            {SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS, "list-queue-attribute-counters"},
+            {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
+            {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
     };
 
     [[maybe_unused]] static std::string SqsCommandTypeToString(SqsCommandType commandType) {

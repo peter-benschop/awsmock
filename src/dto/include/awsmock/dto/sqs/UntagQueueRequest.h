@@ -2,22 +2,20 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_PUT_QUEUE_ATTRIBUTE_REQUEST_H
-#define AWSMOCK_DTO_SQS_PUT_QUEUE_ATTRIBUTE_REQUEST_H
+#ifndef AWSMOCK_DTO_SQS_UNTAG_QUEUE_REQUEST_H
+#define AWSMOCK_DTO_SQS_UNTAG_QUEUE_REQUEST_H
 
 // C++ standard includes
-#include <map>
 #include <string>
+#include <vector>
 
-// AwsMock includes
+// Awsmock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct SetQueueAttributesRequest {
+    struct UntagQueueRequest {
 
         /**
          * AWS region
@@ -25,24 +23,14 @@ namespace AwsMock::Dto::SQS {
         std::string region;
 
         /**
-         * Queue URL
+         * Queue Url
          */
         std::string queueUrl;
 
         /**
-         * Attributes
+         * Tags map
          */
-        std::map<std::string, std::string> attributes;
-
-        /**
-         * Resource
-         */
-        std::string resource = "SQS";
-
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+        std::vector<std::string> tags;
 
         /**
          * @brief Converts the JSON string to a DTO
@@ -52,11 +40,11 @@ namespace AwsMock::Dto::SQS {
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Converts the JSON string to a DTO
+         * @brief Convert to JSON representation
          *
          * @return JSON string
          */
-        std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -70,9 +58,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const UntagQueueRequest &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SQS_PUT_QUEUE_ATTRIBUTE_REQUEST_H
+#endif// AWSMOCK_DTO_SQS_UNTAG_QUEUE_REQUEST_H

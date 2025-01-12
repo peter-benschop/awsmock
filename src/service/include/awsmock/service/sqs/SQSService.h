@@ -34,12 +34,16 @@
 #include <awsmock/dto/sqs/ListMessagesRequest.h>
 #include <awsmock/dto/sqs/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/ListQueueArnsResponse.h>
+#include <awsmock/dto/sqs/ListQueueAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/ListQueueAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/ListQueueCountersRequest.h>
 #include <awsmock/dto/sqs/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
 #include <awsmock/dto/sqs/ListQueueTagsRequest.h>
 #include <awsmock/dto/sqs/ListQueueTagsResponse.h>
+#include <awsmock/dto/sqs/ListTagCountersRequest.h>
+#include <awsmock/dto/sqs/ListTagCountersResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
@@ -50,6 +54,7 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
+#include <awsmock/dto/sqs/UntagQueueRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
@@ -191,6 +196,29 @@ namespace AwsMock::Service {
          * @param request tag resource request DTO
          */
         void TagQueue(const Dto::SQS::TagQueueRequest &request) const;
+
+        /**
+         * @brief Removes a tags from a queue.
+         *
+         * @param request untag resource request DTO
+         */
+        void UntagQueue(const Dto::SQS::UntagQueueRequest &request) const;
+
+        /**
+         * @brief Returns a list of attribute counters for a queue
+         *
+         * @param request list attribute counters request DTO
+         * @return ListAttributeCountersResponse DTO
+         */
+        Dto::SQS::ListQueueAttributeCountersResponse ListQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const;
+
+        /**
+         * @brief Returns a list of tags counters for a queue
+         *
+         * @param request list tag counters request DTO
+         * @return ListTagCountersResponse DTO
+         */
+        Dto::SQS::ListTagCountersResponse ListTagCounters(const Dto::SQS::ListTagCountersRequest &request) const;
 
         /**
          * @brief Delete a queue

@@ -8,7 +8,7 @@ namespace AwsMock::Database::Entity::SQS {
 
     view_or_value<view, value> QueueAttribute::ToDocument() const {
 
-        view_or_value<view, value> queueAttributetDoc = make_document(
+        view_or_value<view, value> queueAttributeDoc = make_document(
                 kvp("delaySeconds", delaySeconds),
                 kvp("maxMessageSize", maxMessageSize),
                 kvp("messageRetentionPeriod", messageRetentionPeriod),
@@ -22,10 +22,10 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("approximateNumberOfMessagesNotVisible", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessagesNotVisible)),
                 kvp("queueArn", queueArn));
 
-        return queueAttributetDoc;
+        return queueAttributeDoc;
     }
 
-    void QueueAttribute::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void QueueAttribute::FromDocument(const std::optional<view> &mResult) {
 
         try {
 
@@ -40,6 +40,7 @@ namespace AwsMock::Database::Entity::SQS {
             approximateNumberOfMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessages");
             approximateNumberOfMessagesDelayed = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesDelayed");
             approximateNumberOfMessagesNotVisible = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesNotVisible");
+            queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
 
         } catch (std::exception &exc) {
             log_error << exc.what();
