@@ -12,11 +12,30 @@ namespace AwsMock::Database::Entity::SNS {
                }) != subscriptions.end();
     }
 
+    bool Topic::HasSubscription(const std::string &subscriptionArn) {
+        return std::ranges::find_if(subscriptions, [subscriptionArn](const Subscription &s) {
+                   return s.subscriptionArn == subscriptionArn;
+               }) != subscriptions.end();
+    }
+
+    int Topic::GetSubscriptionIndex(const std::string &subscriptionArn) {
+        const auto it = std::ranges::find_if(subscriptions, [subscriptionArn](const Subscription &s) {
+            return s.subscriptionArn == subscriptionArn;
+        });
+        if (it != subscriptions.end()) {
+            return static_cast<int>(std::distance(subscriptions.begin(), it));
+        }
+        return -1;
+    }
+
+
     view_or_value<view, value> Topic::ToDocument() const {
 
         auto subscriptionDocs = array{};
-        for (const auto &subscription: subscriptions) {
-            subscriptionDocs.append(subscription.ToDocument());
+        if (!subscriptions.empty()) {
+            for (const auto &subscription: subscriptions) {
+                subscriptionDocs.append(subscription.ToDocument());
+            }
         }
 
         auto tagsDoc = document{};

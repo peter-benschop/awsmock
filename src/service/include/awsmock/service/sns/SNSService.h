@@ -21,6 +21,8 @@
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/GetTopicDetailsResponse.h>
+#include <awsmock/dto/sns/ListAttributeCountersRequest.h>
+#include <awsmock/dto/sns/ListAttributeCountersResponse.h>
 #include <awsmock/dto/sns/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/ListMessagesRequest.h>
@@ -29,6 +31,8 @@
 #include <awsmock/dto/sns/ListSubscriptionCountersResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTagCountersRequest.h>
+#include <awsmock/dto/sns/ListTagCountersResponse.h>
 #include <awsmock/dto/sns/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
@@ -42,6 +46,10 @@
 #include <awsmock/dto/sns/TagResourceResponse.h>
 #include <awsmock/dto/sns/UnsubscribeRequest.h>
 #include <awsmock/dto/sns/UnsubscribeResponse.h>
+#include <awsmock/dto/sns/UntagResourceRequest.h>
+#include <awsmock/dto/sns/UntagResourceResponse.h>
+#include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
+#include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
 #include <awsmock/dto/sns/mapper/Mapper.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
@@ -66,7 +74,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
 
         /**
          * @brief Creates a new topic
@@ -118,16 +126,40 @@ namespace AwsMock::Service {
          *
          * @param request unsubscribe request DTO
          * @return UnsubscribeResponse DTO
+         * @see UnsubscribeRequest
+         * @see UnsubscribeResponse
          */
         Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const;
+
+        /**
+         * @brief Update a topic subscription
+         *
+         * @param request update subscription request DTO
+         * @return UpdateSubscriptionResponse DTO
+         * @see UpdateSubscriptionRequest
+         * @see UpdateSubscriptionResponse
+         */
+        Dto::SNS::UpdateSubscriptionResponse UpdateSubscription(const Dto::SNS::UpdateSubscriptionRequest &request) const;
 
         /**
          * @brief Sets tags for a topic
          *
          * @param request tag resource request DTO
          * @return TagResourceResponse DTO
+         * @see TagResourceRequest DTO
+         * @see TagResourceResponse DTO
          */
         Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request) const;
+
+        /**
+         * @brief Removes tags from a topic
+         *
+         * @param request untag resource request DTO
+         * @return UntagResourceResponse DTO
+         * @see UntagRequestResponse DTO
+         * @see UntagResourceResponse DTO
+         */
+        Dto::SNS::UntagResourceResponse UntagResource(const Dto::SNS::UntagResourceRequest &request) const;
 
         /**
          * @brief Returns the topic attributes
@@ -164,6 +196,22 @@ namespace AwsMock::Service {
          * @return ListSubscriptionCountersResponse DTO
          */
         Dto::SNS::ListSubscriptionCountersResponse ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request) const;
+
+        /**
+         * @brief Returns a list of tags counters for a topic
+         *
+         * @param request list tag counters request DTO
+         * @return ListTagCountersResponse DTO
+         */
+        Dto::SNS::ListTagCountersResponse ListTagCounters(const Dto::SNS::ListTagCountersRequest &request) const;
+
+        /**
+         * @brief Returns a list of attribute counters for a topic
+         *
+         * @param request list attribute counters request DTO
+         * @return ListAttributeCountersResponse DTO
+         */
+        Dto::SNS::ListAttributeCountersResponse ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const;
 
         /**
          * @brief Purge a topic

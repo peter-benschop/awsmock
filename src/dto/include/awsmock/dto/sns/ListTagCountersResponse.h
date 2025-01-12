@@ -2,24 +2,24 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/dto/sns/model/TopicCounter.h>
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/sns/model/TagCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct ListTopicCountersResponse {
+    struct ListTagCountersResponse {
 
         /**
-         * List of topic counters
+         * List of tag counters
          */
-        std::vector<TopicCounter> topicCounters;
+        std::vector<TagCounter> tagCounters;
 
         /**
          * Total number of queues
@@ -45,9 +45,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTopicCountersResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListTagCountersResponse &r);
     };
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_RESPONSE_H

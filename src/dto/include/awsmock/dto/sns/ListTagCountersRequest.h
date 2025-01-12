@@ -2,11 +2,12 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
+
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -14,7 +15,7 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct ListSubscriptionCountersRequest {
+    struct ListTagCountersRequest {
 
         /**
          * Region
@@ -72,9 +73,9 @@ namespace AwsMock::Dto::SNS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListSubscriptionCountersRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListTagCountersRequest &r);
     };
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_REQUEST_H

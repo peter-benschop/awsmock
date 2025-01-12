@@ -6,19 +6,28 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string TagResourceRequest::ToJson() const {
+
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "RequestId", Core::StringUtils::CreateRandomUuid());
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string TagResourceRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const TagResourceRequest &t) {
-        os << "TagResourceRequest={region='" << t.region << "', resourceArn='" << t.resourceArn << "', tags=[";
-        for (const auto &tag: t.tags) {
-            os << tag.first << "=" << tag.second << ", ";
-        }
-        os.seekp(-2, std::ostream::cur);
-        os << "]}";
+    std::ostream &operator<<(std::ostream &os, const TagResourceRequest &r) {
+        os << "TagResourceRequest=" + r.ToJson();
         return os;
     }
 
