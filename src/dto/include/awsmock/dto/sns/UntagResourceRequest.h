@@ -6,8 +6,8 @@
 #define AWSMOCK_DTO_SNS_UNTAG_RESOURCE_REQUEST_H
 
 // C++ standard includes
-#include <vector>
 #include <string>
+#include <vector>
 
 // Awsmock includes
 #include <awsmock/core/BsonUtils.h>

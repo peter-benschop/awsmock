@@ -13,9 +13,9 @@ namespace AwsMock::Dto::SNS {
             document rootDocument;
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "RequestId", Core::StringUtils::CreateRandomUuid());
 
-            if(tags.empty()) {
+            if (tags.empty()) {
                 array jsonArray;
-                for(const auto& tag : tags) {
+                for (const auto &tag: tags) {
                     document tagDoc;
                     jsonArray.append(tag);
                 }
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const UntagResourceRequest &t) {
-        os << "UntagResourceRequest="+t.ToJson();
+        os << "UntagResourceRequest=" + t.ToJson();
         return os;
     }
 
