@@ -60,7 +60,7 @@ namespace AwsMock::Service {
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status};
             listTableResponse.ScanResponse();
-            log_debug << "DynamoDb list tables, region: " << request.region << " body: " << body;
+            log_trace << "DynamoDb list tables, region: " << request.region << " body: " << body;
             return listTableResponse;
 
         } catch (Core::JsonException &exc) {
