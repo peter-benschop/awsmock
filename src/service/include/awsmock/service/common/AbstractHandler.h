@@ -7,6 +7,7 @@
 
 // C++ includes
 #include <string>
+#include <utility>
 
 // Boost includes
 #include <asio/buffer.hpp>
@@ -39,17 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        AbstractHandler() = default;
-
-        /**
-         * @brief Default User-defined Constructor
-         */
-        explicit AbstractHandler(const std::string &name) : _name(name) {};
-
-        /**
-         * Destructor
-         */
-        virtual ~AbstractHandler() = default;
+        explicit AbstractHandler(std::string name) : _name(std::move(name)){};
 
         /**
          * @brief Handles the HTTP method GET.

@@ -62,6 +62,9 @@ namespace AwsMock::Service {
 
         if (ec) {
             log_error << ec.message();
+            for (const auto &it: _parser->get().base()) {
+                log_error << it.name() << ": " << it.value();
+            }
             return;
         }
 

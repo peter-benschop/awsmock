@@ -5,17 +5,7 @@
 #ifndef AWSMOCK_SERVICE_TRANSFER_SERVICE_H
 #define AWSMOCK_SERVICE_TRANSFER_SERVICE_H
 
-// C++ standard includes
-#include <sstream>
-#include <string>
-
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/TarUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 #include <awsmock/dto/transfer/CreateServerResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
@@ -50,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferService() : _transferDatabase(Database::TransferDatabase::instance()){};
+        explicit TransferService() = default;
 
         /**
          * @brief Create transfer server request
@@ -123,7 +113,7 @@ namespace AwsMock::Service {
         /**
          * Transfer database connection
          */
-        Database::TransferDatabase &_transferDatabase;
+        Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
     };
 
 }// namespace AwsMock::Service

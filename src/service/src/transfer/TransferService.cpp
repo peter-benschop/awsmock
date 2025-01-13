@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/transfer/TransferService.h>
-#include <gtest/internal/gtest-port.h>
 
 namespace AwsMock::Service {
 

@@ -20,7 +20,7 @@ namespace AwsMock::Service {
     namespace ip = boost::asio::ip;
 
     /**
-     * @brief SNS mock handler
+     * @brief SNS request handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSHandler() : AbstractHandler("sqs-handler") {}
+        explicit SNSHandler() : AbstractHandler("sns-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         /**
          * SNS module
          */
-        Service::SNSService _snsService;
+        SNSService _snsService;
 
         /**
          * Default account ID

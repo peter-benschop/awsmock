@@ -13,8 +13,6 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/NumberUtils.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -43,7 +41,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler") {};
+        explicit S3Handler() : AbstractHandler("s3-handler"){};
 
         /**
          * @brief HTTP GET request.
