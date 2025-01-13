@@ -362,17 +362,13 @@ namespace AwsMock::Service {
         // Create the request
         const Dto::Docker::CreateContainerRequest request = {
                 .hostName = instanceName,
-                //.user = "root",
                 .image = imageName + ":" + tag,
                 .networkMode = GetNetworkName(),
                 .environment = environment,
                 .containerPort = _containerPort,
                 .hostPort = std::to_string(hostPort)};
 
-        const std::string jsonBody = request.ToJson();
-        log_debug << "Docker container configuration, json: " << jsonBody;
-
-        auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + instanceName, jsonBody);
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
             log_warning << "Create container failed, httpStatus: " << statusCode << " body: " << body;
             return {};
@@ -391,7 +387,6 @@ namespace AwsMock::Service {
         // Create the request
         const Dto::Docker::CreateContainerRequest request = {
                 .hostName = imageName,
-                //.user = "root",
                 .image = imageName + ":" + tag,
                 .networkMode = GetNetworkName(),
                 .containerPort = std::to_string(containerPort),
@@ -486,7 +481,7 @@ namespace AwsMock::Service {
             log_debug << "Container running, httpStatus: " << statusCode;
             Dto::Docker::InspectContainerResponse response;
             response.FromJson(body);
-            log_debug << "Docker container state, id: " << containerId << " state: " << response.state;
+            log_trace << "Docker container state, id: " << containerId << " state: " << response.state;
             return response.state.running;
         }
         log_debug << "Is docker container running failed, id: " << containerId;
