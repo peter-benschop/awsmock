@@ -142,8 +142,6 @@ namespace AwsMock::Service {
             response.modified = lambda.modified;
             response.tags = lambda.tags;
             response.environment = lambda.environment.variables;
-
-            log_info << "Lambda function: " + response.ToJson();
             return response;
 
         } catch (bsoncxx::exception &ex) {

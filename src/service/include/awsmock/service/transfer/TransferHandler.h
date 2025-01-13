@@ -9,7 +9,6 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/transfer/TransferService.h>
 
@@ -58,7 +57,7 @@ namespace AwsMock::Service {
         /**
          * Transfer module
          */
-        Service::TransferService _transferService;
+        TransferService _transferService;
     };
 
 }// namespace AwsMock::Service

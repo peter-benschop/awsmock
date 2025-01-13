@@ -2,7 +2,7 @@
 set(LIBRARY awsmocksrv)
 set(LIBRARY_STATIC awsmocksrv_static)
 
-set(COMMON_SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp src/common/AbstractDomainSocket.cpp)
+set(COMMON_SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp)
 set(S3_SOURCES src/s3/S3Server.cpp src/s3/S3Handler.cpp src/s3/S3Service.cpp src/s3/S3HashCreator.cpp)
 set(SQS_SOURCES src/sqs/SQSServer.cpp src/sqs/SQSHandler.cpp src/sqs/SQSService.cpp)
 set(SNS_SOURCES src/sns/SNSServer.cpp src/sns/SNSHandler.cpp src/sns/SNSService.cpp)
