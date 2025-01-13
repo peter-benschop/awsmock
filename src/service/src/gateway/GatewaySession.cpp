@@ -68,8 +68,9 @@ namespace AwsMock::Service {
         QueueWrite(HandleRequest(_parser->release()));
 
         // If we aren't at the queue limit, try to pipeline another request
-        if (_response_queue.size() < _queueLimit)
+        if (_response_queue.size() < _queueLimit) {
             DoRead();
+        }
         log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
