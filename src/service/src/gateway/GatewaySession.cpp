@@ -59,14 +59,10 @@ namespace AwsMock::Service {
             //       log_error << "End of stream";
             return DoShutdown();
         }
-        //
-        // if (ec) {
-        //     log_error << ec.message();
-        //     for (const auto &it: _parser->get().base()) {
-        //         log_error << it.name() << ": " << it.value();
-        //     }
-        //     return;
-        // }
+
+        if (ec) {
+            return;
+        }
 
         // Send the response
         QueueWrite(HandleRequest(_parser->release()));
