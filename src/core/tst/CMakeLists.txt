@@ -10,5 +10,5 @@ target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO
         archive z prometheus-cpp-core prometheus-cpp-pull magic)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
-add_custom_command(TARGET ${BINARY} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/core/tst/resources/*" "/tmp")
+#add_custom_command(TARGET ${BINARY} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/core/tst/resources/*" "/tmp")
 
