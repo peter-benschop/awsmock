@@ -12,7 +12,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -94,6 +93,16 @@ namespace AwsMock::Dto::SQS {
          * Number of message delayed
          */
         long delayed;
+
+        /**
+         * Dead letter queue ARN
+         */
+        std::string dlqArn;
+
+        /**
+         * Maximal number of retries
+         */
+        int dlqMaxReceive;
 
         /**
          * Created timestamp

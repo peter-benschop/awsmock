@@ -12,8 +12,8 @@ namespace AwsMock::Dto::SQS {
             const value document = bsoncxx::from_json(jsonString);
             queueUrl = Core::Bson::BsonUtils::GetStringValue(document, "QueueUrl");
 
-            if (document.find("AttributeNames") != document.end()) {
-                for (const view tagsView = document.view()["attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            if (document.find("Attributes") != document.end()) {
+                for (const view tagsView = document.view()["Attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     attributes.emplace(key, value);
