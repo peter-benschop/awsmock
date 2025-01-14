@@ -390,9 +390,7 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.match(make_document(kvp("topicArn", topicArn)));
-                p.group(make_document(kvp("_id", ""),
-                                      kvp("totalSize",
-                                          make_document(kvp("$sum", "$size")))));
+                p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 auto totalSizeCursor = _objectCollection.aggregate(p);
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
@@ -565,12 +563,8 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-                const long count = _messageCollection.count_documents(make_document(kvp("region", region),
-                                                                                    kvp("topicArn", topicArn),
-                                                                                    kvp("status",
-                                                                                        MessageStatusToString(status))));
-                log_trace << "Count resources by state, region: " << region << " arn: " << topicArn
-                          << " result: " << count;
+                const long count = _messageCollection.count_documents(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("status", MessageStatusToString(status))));
+                log_trace << "Count resources by state, region: " << region << " arn: " << topicArn << " result: " << count;
                 return count;
 
             } catch (const mongocxx::exception &exc) {
@@ -882,11 +876,14 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
+
                 long total = CountMessages(topicArn);
+                long size = GetTopicSize(topicArn);
+
                 session.start_transaction();
                 topicCollection.update_one(make_document(kvp("topicArn", topicArn)),
-                                           make_document(kvp("$set", make_document(kvp("attributes.availableMessages", total)))));
-                log_info << topicArn << " total: " << total;
+                                           make_document(kvp("$set", make_document(kvp("size", size), kvp("attributes.availableMessages", total)))));
+                log_debug << topicArn << " total: " << total;
                 session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {

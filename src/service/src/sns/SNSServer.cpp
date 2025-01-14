@@ -38,6 +38,7 @@ namespace AwsMock::Service {
     }
 
     void SNSServer::SynchronizeCounters() const {
+        _snsDatabase.AdjustAllMessageCounters();
         for (auto &topic: _snsDatabase.ListTopics()) {
             topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
             topic.size = _snsDatabase.GetTopicSize(topic.topicArn);
@@ -56,17 +57,12 @@ namespace AwsMock::Service {
 
         // Count resources per topic
         for (const auto &topic: _snsDatabase.ListTopics()) {
+
             std::string labelValue = topic.topicName;
             Core::StringUtils::Replace(labelValue, "-", "_");
-            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT,
-                                    "topic",
-                                    labelValue,
-                                    static_cast<double>(topic.topicAttribute.availableMessages));
-            const long topicSize = _snsDatabase.GetTopicSize(topic.topicArn);
-            _metricService.SetGauge(SNS_TOPIC_SIZE,
-                                    "queue",
-                                    labelValue,
-                                    static_cast<double>(topicSize));
+
+            _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(topic.topicAttribute.availableMessages));
+            _metricService.SetGauge(SNS_TOPIC_SIZE, "queue", labelValue, static_cast<double>(topic.size));
         }
         log_trace << "SNS monitoring finished";
     }
