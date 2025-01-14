@@ -367,9 +367,7 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.match(make_document(kvp("queueArn", queueArn)));
-                p.group(make_document(kvp("_id", ""),
-                                      kvp("totalSize",
-                                          make_document(kvp("$sum", "$size")))));
+                p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 auto totalSizeCursor = _objectCollection.aggregate(p);
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
@@ -1041,6 +1039,9 @@ namespace AwsMock::Database {
                 const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", message.receiptHandle)));
                 session.commit_transaction();
 
+                // Adjust queue message counters
+                AdjustMessageCounters(message.queueArn);
+
                 log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
                 return result->deleted_count();
 
@@ -1051,32 +1052,6 @@ namespace AwsMock::Database {
             }
         }
         return _memoryDb.DeleteMessage(message);
-    }
-
-    long SQSDatabase::DeleteMessage(const std::string &receiptHandle) const {
-
-        if (HasDatabase()) {
-
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
-            auto session = client->start_session();
-
-            try {
-
-                session.start_transaction();
-                const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
-                session.commit_transaction();
-                log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(receiptHandle, 0, 40) << "... count: " << result->deleted_count();
-
-                return result->deleted_count();
-
-            } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
-                log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what());
-            }
-        }
-        return _memoryDb.DeleteMessage(receiptHandle);
     }
 
     void SQSDatabase::DeleteAllMessages() const {
@@ -1162,12 +1137,14 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto totalSizeCursor = messageCollection.aggregate(p);
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    long total = Core::Bson::BsonUtils::GetLongValue(t, "invisible") + Core::Bson::BsonUtils::GetLongValue(t, "delayed") + Core::Bson::BsonUtils::GetLongValue(t, "initial");
+                    long size = GetQueueSize(queueArn);
                     queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
-                                               make_document(kvp("$set", make_document(kvp("attributes.approximateNumberOfMessages", total),
-                                                                                       kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
-                                                                                       kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
-                    log_info << queueArn << " total: " << total << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible");
+                                               make_document(kvp("$set", make_document(
+                                                                                 kvp("size", size),
+                                                                                 kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
+                    log_debug << queueArn << " size: " << size << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();
 

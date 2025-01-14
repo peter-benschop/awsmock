@@ -88,10 +88,8 @@ namespace AwsMock::Service {
             std::string labelValue = queue.name;
             Core::StringUtils::Replace(labelValue, "-", "_");
 
-            const long messagesPerQueue = _sqsDatabase.CountMessages(queue.queueArn);
-            _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "queue", labelValue, static_cast<double>(messagesPerQueue));
-            const long queueSize = _sqsDatabase.GetQueueSize(queue.queueArn);
-            _metricService.SetGauge(SQS_QUEUE_SIZE, "queue", labelValue, static_cast<double>(queueSize));
+            _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "queue", labelValue, static_cast<double>(queue.attributes.approximateNumberOfMessages));
+            _metricService.SetGauge(SQS_QUEUE_SIZE, "queue", labelValue, static_cast<double>(queue.size));
         }
         log_trace << "SQS counter update finished";
     }

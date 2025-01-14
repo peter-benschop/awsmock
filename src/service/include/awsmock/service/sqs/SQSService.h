@@ -83,7 +83,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.
@@ -296,7 +296,7 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Checks the attributes for a entry with 'all'. The search is case insensitive.
+         * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
          *
          * @param lambda lambda to invoke.
          * @param message SQS message.
@@ -311,13 +311,6 @@ namespace AwsMock::Service {
          * @param value value to check for.
          */
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
-
-        /**
-         * @brief Adjust queue counters after update/delete of messages
-         *
-         * @param queueArn SQS queue ARN
-         */
-        void AdjustMessageCounters(const std::string &queueArn) const;
 
         /**
          * SQS database connection
