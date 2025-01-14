@@ -1100,7 +1100,6 @@ namespace AwsMock::Database {
     void SQSDatabase::AdjustMessageCounters(const std::string &queueArn) const {
         if (HasDatabase()) {
 
-
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             auto queueCollection = (*client)[_databaseName][_queueCollectionName];
@@ -1145,6 +1144,13 @@ namespace AwsMock::Database {
                                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
                                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
                     log_debug << queueArn << " size: " << size << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                } else {
+                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
+                                               make_document(kvp("$set", make_document(
+                                                                                 kvp("size", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessages", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", 0)))));
                 }
                 session.commit_transaction();
 
