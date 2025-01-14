@@ -25,6 +25,8 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
             Core::Bson::BsonUtils::SetLongValue(document, "available", available);
             Core::Bson::BsonUtils::SetLongValue(document, "delayed", delayed);
+            Core::Bson::BsonUtils::SetStringValue(document, "dlqArn", dlqArn);
+            Core::Bson::BsonUtils::SetIntValue(document, "dlqMaxReceive", dlqMaxReceive);
             Core::Bson::BsonUtils::SetDateValue(document, "created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
             return Core::Bson::BsonUtils::ToJsonString(document);

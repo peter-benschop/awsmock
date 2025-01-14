@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             const value document = bsoncxx::from_json(jsonString);
             deadLetterTargetArn = Core::Bson::BsonUtils::GetStringValue(document, "deadLetterTargetArn");
-            maxReceiveCount = Core::Bson::BsonUtils::GetIntValue(document, "maxReceiveCount");
+            maxReceiveCount = std::stoi(Core::Bson::BsonUtils::GetStringValue(document, "maxReceiveCount"));
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

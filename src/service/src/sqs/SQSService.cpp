@@ -177,6 +177,8 @@ namespace AwsMock::Service {
             sqsResponse.available = queue.attributes.approximateNumberOfMessages;
             sqsResponse.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
             sqsResponse.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
+            sqsResponse.dlqArn = queue.attributes.redrivePolicy.deadLetterTargetArn;
+            sqsResponse.dlqMaxReceive = queue.attributes.redrivePolicy.maxReceiveCount;
             sqsResponse.created = queue.created;
             sqsResponse.modified = queue.modified;
 
@@ -507,13 +509,13 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "tag_queue");
         log_trace << "Tag queue request, queue: " << request.queueUrl;
 
-        try {
+        // Check existence
+        if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
+            log_error << "Queue does not exist, queueUrl: " << request.queueUrl;
+            throw Core::ServiceException("SQS queue does not exists, queueUrl: " + request.queueUrl);
+        }
 
-            // Check existence
-            if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
-                log_error << "Queue does not exist, queueUrl: " << request.queueUrl;
-                throw Core::ServiceException("SQS queue does not exists, queueUrl: " + request.queueUrl);
-            }
+        try {
 
             // Get the topic
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
@@ -536,12 +538,13 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "untag_queue");
         log_trace << "Untag queue request, queue: " << request.queueUrl;
 
-        try {
+        // Check existence
+        if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
+            log_error << "Queue does not exist, queueUrl: " << request.queueUrl;
+            throw Core::ServiceException("SQS queue topic does not exists");
+        }
 
-            // Check existence
-            if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
-                throw Core::ServiceException("SQS queue topic does not exists");
-            }
+        try {
 
             // Get the topic
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
@@ -700,7 +703,6 @@ namespace AwsMock::Service {
                     sqsResponse.failed.emplace_back(f);
                 }
             }
-
             return sqsResponse;
 
         } catch (Core::DatabaseException &ex) {
