@@ -855,7 +855,7 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
 
             // Delete from database
-            const long deleted = _sqsDatabase.DeleteMessage({.receiptHandle = request.receiptHandle});
+            const long deleted = _sqsDatabase.DeleteMessage(request.receiptHandle);
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << "deleted: " << deleted;
 
             // Update queue counters

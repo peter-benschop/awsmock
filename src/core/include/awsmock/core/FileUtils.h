@@ -20,6 +20,7 @@
 // Boost includes
 #include <boost/asio/streambuf.hpp>
 #include <boost/beast/core/file.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/iostreams/copy.hpp>
 
@@ -250,7 +251,7 @@ namespace AwsMock::Core {
          * @param path absolute file path
          * @return content type, as mime type
          */
-        static std::string GetContentTypeMagic(const std::string &path);
+        static std::string GetContentTypeMagicFile(const std::string &path);
 
         /**
          * @brief Get the Mime type by extension
@@ -261,12 +262,23 @@ namespace AwsMock::Core {
         static std::string GetContentType(const std::string &path);
 
         /**
+         * @brief Get the Mime type using libmagic from a string
+         *
+         * @param content content string
+         * @return content type, as mime type
+         */
+        static std::string GetContentTypeMagicString(const std::string &content);
+
+        /**
          * @brief File path separator
          *
          * @return file path separator
          */
         static std::string separator();
 
+        /**
+         * Mime types from file extensions
+         */
         const static std::map<std::string, std::string> MimeTypes;
     };
 

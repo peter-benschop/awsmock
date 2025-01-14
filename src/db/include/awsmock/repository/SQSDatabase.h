@@ -319,11 +319,11 @@ namespace AwsMock::Database {
         /**
          * @brief Reset expired resources
          *
-         * @param queueUrl URL of the queue
+         * @param queueArn ARN of the queue
          * @param visibility visibilityTimeout period in seconds
          * @return number of message resets
          */
-        long ResetMessages(const std::string &queueUrl, long visibility) const;
+        long ResetMessages(const std::string &queueArn, long visibility) const;
 
         /**
          * @brief Redrive expired resources.
@@ -423,7 +423,12 @@ namespace AwsMock::Database {
         void DeleteAllMessages() const;
 
         /**
-         * @brief Adjust counters
+         * @brief Adjust all message counters
+         */
+        void AdjustAllMessageCounters() const;
+
+        /**
+         * @brief Adjust message counters for a single queue
          *
          * @param queueArn AWS queue ARN
          */

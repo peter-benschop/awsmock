@@ -33,23 +33,8 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::AdjustCounters() const {
-        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
-        log_trace << "SQS adjust counter starting, count: " << queueList.size();
-
-        // Loop over queues and synchronize queue counters
-        for (auto &queue: queueList) {
-            queue.attributes.approximateNumberOfMessages = _sqsDatabase.CountMessagesByStatus(
-                    queue.queueArn,
-                    Database::Entity::SQS::MessageStatus::INITIAL);
-            queue.attributes.approximateNumberOfMessagesNotVisible = _sqsDatabase.CountMessagesByStatus(
-                    queue.queueArn,
-                    Database::Entity::SQS::MessageStatus::INVISIBLE);
-            queue.attributes.approximateNumberOfMessagesDelayed = _sqsDatabase.CountMessagesByStatus(
-                    queue.queueArn,
-                    Database::Entity::SQS::MessageStatus::DELAYED);
-            queue = _sqsDatabase.UpdateQueue(queue);
-        }
-        log_trace << "SQS adjust counter finished, count: " << queueList.size();
+        _sqsDatabase.AdjustAllMessageCounters();
+        log_trace << "SQS adjust counter finished";
     }
 
     void SQSServer::ResetMessages() const {
@@ -67,23 +52,17 @@ namespace AwsMock::Service {
 
                 // Check retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
-                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(
-                            queue.queueUrl,
-                            queue.attributes.messageRetentionPeriod);
+                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
                 }
 
                 // Check visibility timeout
                 if (queue.attributes.visibilityTimeout > 0) {
-                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase.ResetMessages(
-                            queue.queueArn,
-                            queue.attributes.visibilityTimeout);
+                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase.ResetMessages(queue.queueArn, queue.attributes.visibilityTimeout);
                 }
 
                 // Check delays
                 if (queue.attributes.delaySeconds > 0) {
-                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(
-                            queue.queueUrl,
-                            queue.attributes.delaySeconds);
+                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
                 }
 
                 // Save results
@@ -105,18 +84,14 @@ namespace AwsMock::Service {
 
         // Count resources per queue
         for (const auto &queue: _sqsDatabase.ListQueues()) {
+
             std::string labelValue = queue.name;
             Core::StringUtils::Replace(labelValue, "-", "_");
+
             const long messagesPerQueue = _sqsDatabase.CountMessages(queue.queueArn);
-            _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT,
-                                    "queue",
-                                    labelValue,
-                                    static_cast<double>(messagesPerQueue));
+            _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "queue", labelValue, static_cast<double>(messagesPerQueue));
             const long queueSize = _sqsDatabase.GetQueueSize(queue.queueArn);
-            _metricService.SetGauge(SQS_QUEUE_SIZE,
-                                    "queue",
-                                    labelValue,
-                                    static_cast<double>(queueSize));
+            _metricService.SetGauge(SQS_QUEUE_SIZE, "queue", labelValue, static_cast<double>(queueSize));
         }
         log_trace << "SQS counter update finished";
     }
