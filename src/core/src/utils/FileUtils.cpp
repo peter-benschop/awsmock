@@ -1,5 +1,4 @@
 #include <awsmock/core/FileUtils.h>
-#include <boost/filesystem/convenience.hpp>
 
 namespace AwsMock::Core {
 
@@ -252,7 +251,7 @@ namespace AwsMock::Core {
         if (const std::string extension = boost::filesystem::path(path).extension().string(); MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
-        return GetContentTypeMagic(path);
+        return GetContentTypeMagicFile(path);
     }
 
     std::string FileUtils::ReadFile(const std::string &fileName) {
@@ -273,14 +272,14 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string FileUtils::GetContentTypeMagic(const std::string &path) {
+    std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
 
         if (!FileExists(path)) {
             return "application/octet-stream";
         }
 
         // allocate magic cookie
-        const magic_t magic = magic_open(MAGIC_MIME_TYPE);
+        magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
             log_error << "Could not open libmagic";
         }
@@ -297,6 +296,40 @@ namespace AwsMock::Core {
 
         // get description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
+        if (mime == nullptr) {
+            log_error << "Could not get mime type";
+            mime = "application/octet-stream";
+        } else {
+            log_debug << "Found content-type: " << mime;
+        }
+        std::string result = {mime};
+
+        // Free magic cookie and mime
+        magic_close(magic);
+
+        return result;
+    }
+
+    std::string FileUtils::GetContentTypeMagicString(const std::string &content) {
+
+        // allocate magic cookie
+        magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
+        if (magic == nullptr) {
+            log_error << "Could not open libmagic";
+        }
+
+        // load the default magic database (indicated by nullptr)
+        if (magic_load(magic, nullptr) != 0) {
+            log_error << "Could not load libmagic";
+        }
+
+        // compile the default magic database (indicated by nullptr)
+        if (magic_compile(magic, nullptr) != 0) {
+            log_error << "Could not compile libmagic";
+        }
+
+        // get description of the filename argument
+        const char *mime = magic_buffer(magic, content.data(), content.size());
         if (mime == nullptr) {
             log_error << "Could not get mime type";
             mime = "application/octet-stream";

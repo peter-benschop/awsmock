@@ -175,7 +175,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetContentTypeJsonTest) {
 
         // arrange
-        const std::string tempFile = FileUtils::CreateTempFile("json", "{\"key\":\"value\"}");
+        const std::string tempFile = FileUtils::CreateTempFile("json", R"({"key":"value"})");
 
         // act
         const std::string contentType = FileUtils::GetContentType(tempFile);
@@ -196,6 +196,32 @@ namespace AwsMock::Core {
         // assert
         EXPECT_FALSE(contentType.empty());
         EXPECT_TRUE(contentType == "application/xml");
+    }
+
+    TEST_F(FileUtilsTest, GetContentTypeJsonStringTest) {
+
+        // arrange
+        const std::string content = R"({"key":"value"})";
+
+        // act
+        const std::string contentType = FileUtils::GetContentTypeMagicString(content);
+
+        // assert
+        EXPECT_FALSE(contentType.empty());
+        EXPECT_TRUE(contentType == "application/json");
+    }
+
+    TEST_F(FileUtilsTest, GetContentTypeXmlStringTest) {
+
+        // arrange
+        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
+
+        // act
+        const std::string contentType = FileUtils::GetContentTypeMagicString(content);
+
+        // assert
+        EXPECT_FALSE(contentType.empty());
+        EXPECT_TRUE(contentType == "text/plain");
     }
 
 }// namespace AwsMock::Core

@@ -347,6 +347,18 @@ namespace AwsMock::Database {
          */
         void DeleteAllMessages() const;
 
+        /**
+         * @brief Adjust all message counters
+         */
+        void AdjustAllMessageCounters() const;
+
+        /**
+         * @brief Adjust message counters for a single topic
+         *
+         * @param topicArn AWS topic ARN
+         */
+        void AdjustMessageCounters(const std::string &topicArn) const;
+
       private:
 
         /**

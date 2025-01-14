@@ -365,6 +365,10 @@ namespace AwsMock::Database {
                 const auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
                 log_debug << "Topic purge, count: " << result->deleted_count();
                 session.commit_transaction();
+
+                // Adjust all topic message counters
+                AdjustMessageCounters(topic.topicArn);
+
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
@@ -491,6 +495,9 @@ namespace AwsMock::Database {
                 const auto result = _messageCollection.insert_one(message.ToDocument());
                 log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
+
+                // Adjust all topic message counters
+                AdjustMessageCounters(message.topicArn);
 
                 message.oid = result->inserted_id().get_oid().value.to_string();
                 return message;
@@ -720,6 +727,9 @@ namespace AwsMock::Database {
 
             DeleteMessage(message.messageId);
 
+            // Adjust all topic message counters
+            AdjustMessageCounters(message.topicArn);
+
         } else {
 
             _memoryDb.DeleteMessage(message.messageId);
@@ -775,6 +785,9 @@ namespace AwsMock::Database {
                 log_debug << "Messages deleted, count: " << result->result().deleted_count();
                 session.commit_transaction();
 
+                // Adjust all topic message counters
+                AdjustMessageCounters(topicArn);
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
@@ -806,6 +819,9 @@ namespace AwsMock::Database {
                     log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
                 }
 
+                // Adjust all topic message counters
+                AdjustAllMessageCounters();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
@@ -829,6 +845,9 @@ namespace AwsMock::Database {
                 const auto result = _messageCollection.delete_many({});
                 log_debug << "All resources deleted, count: " << result->deleted_count();
 
+                // Adjust all topic message counters
+                AdjustAllMessageCounters();
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
@@ -837,6 +856,44 @@ namespace AwsMock::Database {
         } else {
 
             _memoryDb.DeleteAllMessages();
+        }
+    }
+
+    void SNSDatabase::AdjustAllMessageCounters() const {
+
+        if (HasDatabase()) {
+
+            const Entity::SNS::TopicList topicList = ListTopics();
+            log_trace << "SNS adjust counter starting, count: " << topicList.size();
+
+            // Loop over topics and synchronize counters
+            for (auto &topic: topicList) {
+                AdjustMessageCounters(topic.topicArn);
+            }
+        }
+    }
+
+    void SNSDatabase::AdjustMessageCounters(const std::string &topicArn) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto topicCollection = (*client)[_databaseName][_topicCollectionName];
+            auto session = client->start_session();
+
+            try {
+                long total = CountMessages(topicArn);
+                session.start_transaction();
+                topicCollection.update_one(make_document(kvp("topicArn", topicArn)),
+                                           make_document(kvp("$set", make_document(kvp("attributes.availableMessages", total)))));
+                log_info << topicArn << " total: " << total;
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
         }
     }
 
