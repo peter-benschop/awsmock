@@ -638,7 +638,7 @@ namespace AwsMock::Service {
 
             const long total = _snsDatabase.CountMessages(request.topicArn);
 
-            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex);
+            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex, request.sortColumns);
 
             Dto::SNS::ListMessageCountersResponse listMessageCountersResponse = Dto::SNS::Mapper::map(messageList);
             listMessageCountersResponse.total = total;

@@ -267,26 +267,17 @@ namespace AwsMock::Database {
         long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) const;
 
         /**
-         * @brief List all available resources
-         *
-         * @param region AWS region
-         * @param topicArn AWS topic ARN
-         * @return list of SNS messages
-         * @throws DatabaseException
-         */
-        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}) const;
-
-        /**
          * @brief Paged list all available messages
          *
          * @param region AWS region
          * @param topicArn AWS topic ARN
          * @param pageSize page size
          * @param pageIndex page index
+         * @param sortColumns vector of sort columns
          * @return list of SNS messages
          * @throws DatabaseException
          */
-        Entity::SNS::MessageList ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex) const;
+        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Updates an existing message
