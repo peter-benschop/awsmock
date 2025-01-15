@@ -254,8 +254,7 @@ namespace AwsMock::Database {
                     opts.sort(sort.extract());
                 }
 
-                auto queueCursor = _queueCollection.find(query.view(), opts);
-                for (auto queue: queueCursor) {
+                for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                     Entity::SNS::Topic result;
                     result.FromDocument(queue);
                     topicList.push_back(result);
@@ -606,38 +605,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountMessages(topicArn);
     }
 
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn) const {
-
-        Entity::SNS::MessageList messageList;
-        if (HasDatabase()) {
-
-            auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-
-            bsoncxx::builder::basic::document query = {};
-            if (!region.empty()) {
-                query.append(kvp("region", region));
-            }
-
-            if (!topicArn.empty()) {
-                query.append(kvp("topicArn", topicArn));
-            }
-
-            for (auto messageCursor = _messageCollection.find(query.extract()); auto message: messageCursor) {
-                Entity::SNS::Message result;
-                result.FromDocument(message);
-                messageList.push_back(result);
-            }
-
-        } else {
-
-            messageList = _memoryDb.ListMessages(region, topicArn);
-        }
-        log_trace << "Got message list, size: " << messageList.size();
-        return messageList;
-    }
-
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex) const {
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
             Entity::SNS::MessageList messageList;
@@ -658,6 +626,14 @@ namespace AwsMock::Database {
             }
             if (!topicArn.empty()) {
                 query.append(kvp("topicArn", topicArn));
+            }
+            opts.sort(make_document(kvp("_id", 1)));
+            if (!sortColumns.empty()) {
+                bsoncxx::builder::basic::document sort;
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    sort.append(kvp(column, sortDirection));
+                }
+                opts.sort(sort.extract());
             }
 
             for (auto messageCursor = _messageCollection.find(query.extract(), opts); auto message: messageCursor) {
