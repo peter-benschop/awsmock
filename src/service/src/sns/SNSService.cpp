@@ -101,7 +101,8 @@ namespace AwsMock::Service {
             log_debug << "Got topic: " << topic.topicArn;
 
             // Update database
-            long deleted = _snsDatabase.PurgeTopic(topic);
+            const long deleted = _snsDatabase.PurgeTopic(topic);
+            log_debug << "SNS topic prune, deleted: " << deleted;
 
             // Adjust topic counters
             AdjustTopicCounters(topic);
@@ -680,6 +681,7 @@ namespace AwsMock::Service {
 
     void SNSService::AdjustTopicCounters(Database::Entity::SNS::Topic &topic) const {
         topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
+        topic.size = _snsDatabase.GetTopicSize(topic.topicArn);
         topic = _snsDatabase.UpdateTopic(topic);
         log_debug << "Topic counters updated, queue: " << topic.topicArn;
     }
