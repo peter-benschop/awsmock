@@ -20,7 +20,6 @@ namespace AwsMock::Dto::Common {
 
         } else {
 
-            Core::HttpUtils::DumpHeaders(request);
             UserAgent userAgent;
             userAgent.FromRequest(request);
             std::string tmp = Core::StringUtils::ToSnakeCase(userAgent.clientCommand);
