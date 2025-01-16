@@ -44,7 +44,8 @@ namespace AwsMock::Dto::SQS {
             if (!attributes.empty()) {
                 document jsonAttributeObject;
                 for (const auto &[fst, snd]: attributes) {
-                    jsonAttributeObject.append(kvp(fst, snd));
+                    if (fst == "ApproximateReceiveCount" || fst == "SentTimestamp" || fst == "SenderId" || fst == "ApproximateFirstReceiveTimestamp")
+                        jsonAttributeObject.append(kvp(fst, snd));
                 }
                 rootDocument.append(kvp("attributes", jsonAttributeObject));
             }

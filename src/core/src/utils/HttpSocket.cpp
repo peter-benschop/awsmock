@@ -161,6 +161,7 @@ namespace AwsMock::Core {
                 request.base().set(fst, snd);
             }
         }
+        HttpUtils::DumpRequest(request);
         return request;
     }
 

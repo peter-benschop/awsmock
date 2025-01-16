@@ -251,6 +251,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
+                case Dto::Common::SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS: {
+
+                    Dto::SQS::ListLambdaTriggerCountersRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    Dto::SQS::ListLambdaTriggerCountersResponse sqsResponse = _sqsService.ListLambdaTriggerCounters(sqsRequest);
+
+                    log_info << "List lambda trigger counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.lambdaTriggerCounters.size();
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::LIST_TAG_COUNTERS: {
 
                     Dto::SQS::ListTagCountersRequest sqsRequest;

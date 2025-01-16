@@ -340,6 +340,14 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] bool HasEventSource(const std::string &eventSourceArn) const;
 
         /**
+         * @brief Returns an event source with the given ARN.
+         *
+         * @param eventSourceArn event source ARN
+         * @return true if an event source with the given ARN exists.
+         */
+        [[nodiscard]] EventSourceMapping GetEventSource(const std::string &eventSourceArn) const;
+
+        /**
          * @brief Checks whether a tags with the given tags key exists.
          *
          * @param key key of the tags
