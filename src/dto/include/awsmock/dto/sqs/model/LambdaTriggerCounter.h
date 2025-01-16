@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_ATTRIBUTE_COUNTER_H
-#define AWSMOCK_DTO_SQS_ATTRIBUTE_COUNTER_H
+#ifndef AWSMOCK_DTO_SQS_LAMBDA_TRIGGER_COUNTER_H
+#define AWSMOCK_DTO_SQS_LAMBDA_TRIGGER_COUNTER_H
 
 // C++ standard includes
 #include <string>
@@ -13,17 +13,22 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct AttributeCounter {
+    struct LambdaTriggerCounter {
 
         /**
-         * Key
+         * UUID
          */
-        std::string attributeKey;
+        std::string uuid;
 
         /**
-         * Value
+         * AWS resource ARN
          */
-        std::string attributeValue;
+        std::string arn;
+
+        /**
+         * Enabled flag
+         */
+        bool enabled;
 
         /**
          * @brief Converts the DTO to a JSON string.
@@ -51,9 +56,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const AttributeCounter &r);
+        friend std::ostream &operator<<(std::ostream &os, const LambdaTriggerCounter &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_ATTRIBUTE_COUNTER_H
+#endif// AWSMOCK_DTO_SQS_LAMBDA_TRIGGER_COUNTER_H

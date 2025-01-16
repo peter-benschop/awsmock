@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <thread>
 
@@ -262,6 +263,38 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS get attribute counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SQS::ListLambdaTriggerCountersResponse SQSService::ListLambdaTriggerCounters(const Dto::SQS::ListLambdaTriggerCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_lambda_trigger_counters");
+        log_trace << "List lambda trigger counters request: " << request.ToString();
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "SQS queue does not exists, queueArn: " << request.queueArn;
+            throw Core::ServiceException("SQS queue does not exists, queueArn: " + request.queueArn);
+        }
+
+        try {
+
+            std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(request.queueArn);
+
+            Dto::SQS::ListLambdaTriggerCountersResponse response;
+            response.total = lambdas.size();
+            std::string queueArn = request.queueArn;
+            for (const auto &lambda: lambdas) {
+                if (lambda.HasEventSource(request.queueArn)) {
+                    const Database::Entity::Lambda::EventSourceMapping eventSourceMapping = lambda.GetEventSource(request.queueArn);
+                    Dto::SQS::LambdaTriggerCounter triggerCounter = {.uuid = eventSourceMapping.uuid, .arn = lambda.arn, .enabled = eventSourceMapping.enabled};
+                    response.lambdaTriggerCounters.emplace_back(triggerCounter);
+                }
+            }
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SQS get tag counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

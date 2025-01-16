@@ -50,6 +50,7 @@ namespace AwsMock::Dto::Common {
         DELETE_MESSAGE_BATCH,
         // Awsmock
         LIST_QUEUE_ATTRIBUTE_COUNTERS,
+        LIST_LAMBDA_TRIGGER_COUNTERS,
         LIST_TAG_COUNTERS,
         UNKNOWN
     };
@@ -80,6 +81,7 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::LIST_QUEUE_COUNTERS, "list-queue-counters"},
             {SqsCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
             {SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS, "list-queue-attribute-counters"},
+            {SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS, "list-lambda-trigger-counters"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
             {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
     };

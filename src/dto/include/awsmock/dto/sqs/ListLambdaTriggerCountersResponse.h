@@ -2,24 +2,24 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_QUEUE_ATTRIBUTE_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SNS_LIST_QUEUE_ATTRIBUTE_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_LIST_LAMBDA_TRIGGER_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_SNS_LIST_LAMBDA_TRIGGER_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/sqs/model/AttributeCounter.h>
+#include <awsmock/dto/sqs/model/LambdaTriggerCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListQueueAttributeCountersResponse {
+    struct ListLambdaTriggerCountersResponse {
 
         /**
-         * List of attribute counters
+         * List of lambda trigger counters
          */
-        std::vector<AttributeCounter> attributeCounters;
+        std::vector<LambdaTriggerCounter> lambdaTriggerCounters;
 
         /**
          * Total number of queues
@@ -45,9 +45,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListQueueAttributeCountersResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListLambdaTriggerCountersResponse &r);
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SNS_LIST_QUEUE_ATTRIBUTE_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_LIST_LAMBDA_TRIGGER_COUNTERS_RESPONSE_H

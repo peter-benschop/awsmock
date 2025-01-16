@@ -29,6 +29,8 @@
 #include <awsmock/dto/sqs/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/ListLambdaTriggerCountersRequest.h>
+#include <awsmock/dto/sqs/ListLambdaTriggerCountersResponse.h>
 #include <awsmock/dto/sqs/ListMessageCountersRequest.h>
 #include <awsmock/dto/sqs/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/ListMessagesRequest.h>
@@ -211,6 +213,14 @@ namespace AwsMock::Service {
          * @return ListAttributeCountersResponse DTO
          */
         Dto::SQS::ListQueueAttributeCountersResponse ListQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const;
+
+        /**
+         * @brief Returns a list of lambda trigger counters for a queue
+         *
+         * @param request list lambda trigger counters request DTO
+         * @return ListLambdaTriggerCountersResponse DTO
+         */
+        Dto::SQS::ListLambdaTriggerCountersResponse ListLambdaTriggerCounters(const Dto::SQS::ListLambdaTriggerCountersRequest &request) const;
 
         /**
          * @brief Returns a list of tags counters for a queue

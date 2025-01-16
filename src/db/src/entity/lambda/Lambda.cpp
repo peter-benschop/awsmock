@@ -12,6 +12,16 @@ namespace AwsMock::Database::Entity::Lambda {
                }) != eventSources.end();
     }
 
+    EventSourceMapping Lambda::GetEventSource(const std::string &eventSourceArn) const {
+        const auto it = std::ranges::find_if(eventSources, [eventSourceArn](const EventSourceMapping &e) {
+            return e.eventSourceArn == eventSourceArn;
+        });
+        if (it != eventSources.end()) {
+            return *it;
+        }
+        return {};
+    }
+
     bool Lambda::HasTag(const std::string &key) const {
         return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
                    return t.first == key;
