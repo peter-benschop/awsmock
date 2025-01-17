@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::Transfer {
     }
 
     std::ostream &operator<<(std::ostream &os, const Transfer &t) {
-        os << "Transfer=" << bsoncxx::to_json(t.ToDocument());
+        os << "Transfer=" << to_json(t.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Transfer
