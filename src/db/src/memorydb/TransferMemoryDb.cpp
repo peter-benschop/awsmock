@@ -62,7 +62,7 @@ namespace AwsMock::Database {
 
     std::vector<Entity::Transfer::User> TransferMemoryDb::ListUsers(const std::string &region, const std::string &serverId) {
 
-        Entity::Transfer::Transfer server = GetTransferByServerId(serverId);
+        Entity::Transfer::Transfer server = GetTransferByServerId(region, serverId);
         if (!server.users.empty()) {
             log_trace << "Got user list, size: " << server.users.size();
             return server.users;
@@ -114,11 +114,11 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::Transfer::Transfer TransferMemoryDb::GetTransferByServerId(const std::string &serverId) {
+    Entity::Transfer::Transfer TransferMemoryDb::GetTransferByServerId(const std::string &region, const std::string &serverId) {
 
         const auto it = std::ranges::find_if(_transfers,
-                                             [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                                                 return transfer.second.serverId == serverId;
+                                             [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
+                                                 return transfer.second.region == region && transfer.second.serverId == serverId;
                                              });
 
         if (it == _transfers.end()) {

@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_REQUEST_H
-#define AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_REQUEST_H
+#ifndef AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_REQUEST_H
+#define AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -13,9 +13,9 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::Transfer {
 
-    struct GetQueueDetailsRequest {
+    struct GetServerDetailsRequest {
 
         /**
          * AWS region name
@@ -23,9 +23,9 @@ namespace AwsMock::Dto::SQS {
         std::string region;
 
         /**
-         * Queue ARN
+         * Server ID
          */
-        std::string queueArn;
+        std::string serverId;
 
         /**
          * @brief Converts the JSON string to a DTO
@@ -53,9 +53,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const GetQueueDetailsRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const GetServerDetailsRequest &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_REQUEST_H
+#endif// AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_REQUEST_H

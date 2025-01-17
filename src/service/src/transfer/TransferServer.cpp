@@ -112,7 +112,7 @@ namespace AwsMock::Service {
 
         for (const auto &key: _transferServerList | std::views::keys) {
             if (!_transferDatabase.TransferExists(key)) {
-                Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(key);
+                Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(_region, key);
                 StopTransferServer(server);
                 log_info << "Transfer server stopped, serverId: " << key;
             }

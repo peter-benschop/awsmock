@@ -11,10 +11,15 @@
 #include <awsmock/dto/transfer/CreateUserRequest.h>
 #include <awsmock/dto/transfer/CreateUserResponse.h>
 #include <awsmock/dto/transfer/DeleteServerRequest.h>
+#include <awsmock/dto/transfer/DeleteUserRequest.h>
+#include <awsmock/dto/transfer/GetServerDetailsRequest.h>
+#include <awsmock/dto/transfer/GetServerDetailsResponse.h>
 #include <awsmock/dto/transfer/ListServerCountersRequest.h>
 #include <awsmock/dto/transfer/ListServerCountersResponse.h>
 #include <awsmock/dto/transfer/ListServerRequest.h>
 #include <awsmock/dto/transfer/ListServerResponse.h>
+#include <awsmock/dto/transfer/ListUserCountersRequest.h>
+#include <awsmock/dto/transfer/ListUserCountersResponse.h>
 #include <awsmock/dto/transfer/ListUsersRequest.h>
 #include <awsmock/dto/transfer/ListUsersResponse.h>
 #include <awsmock/dto/transfer/StartServerRequest.h>
@@ -88,6 +93,15 @@ namespace AwsMock::Service {
         Dto::Transfer::ListUsersResponse ListUsers(const Dto::Transfer::ListUsersRequest &request) const;
 
         /**
+         * @brief Returns a list of available user counters
+         *
+         * @param request list user counters request
+         * @return ListUserCountersResponse
+         * @see Dto::Transfer::ListUserCountersResponse
+         */
+        Dto::Transfer::ListUserCountersResponse ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const;
+
+        /**
          * @brief Starts a manager.
          *
          * @param request StartServer manager request
@@ -102,11 +116,27 @@ namespace AwsMock::Service {
         void StopServer(const Dto::Transfer::StopServerRequest &request) const;
 
         /**
+         * @brief Returns the transfer server details.
+         *
+         * @param request delete manager request
+         * @return GetServerDetailsResponse DTO
+         * @see GetServerDetailsResponse
+         */
+        Dto::Transfer::GetServerDetailsResponse GetServerDetails(const Dto::Transfer::GetServerDetailsRequest &request) const;
+
+        /**
          * @brief Deleted a manager.
          *
          * @param request delete manager request
          */
         void DeleteServer(const Dto::Transfer::DeleteServerRequest &request) const;
+
+        /**
+         * @brief Deleted a user from a server.
+         *
+         * @param request delete user request
+         */
+        void DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const;
 
       private:
 

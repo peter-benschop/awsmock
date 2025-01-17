@@ -125,11 +125,12 @@ namespace AwsMock::Database {
         /**
          * @brief Returns a transfer manager entity by manager ID
          *
+         * @param region AWS region name
          * @param serverId transfer manager ID
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        Entity::Transfer::Transfer GetTransferByServerId(const std::string &serverId);
+        Entity::Transfer::Transfer GetTransferByServerId(const std::string &region, const std::string &serverId);
 
         /**
          * @brief Returns a transfer manager entity by ARN
