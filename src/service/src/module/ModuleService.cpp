@@ -210,9 +210,9 @@ namespace AwsMock::Service {
             log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
         }
         if (!infrastructure.transferServers.empty()) {
-            Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+            const Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
             for (auto &transfer: infrastructure.transferServers) {
-                _transferDatabase.CreateOrUpdateTransfer(transfer);
+                transfer = _transferDatabase.CreateOrUpdateTransfer(transfer);
             }
             log_info << "Transfer servers imported, count: " << infrastructure.transferServers.size();
         }

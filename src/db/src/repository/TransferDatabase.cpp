@@ -133,9 +133,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-            auto result = _transferCollection.replace_one(make_document(kvp("region", transfer.region),
-                                                                        kvp("serverId", transfer.serverId)),
-                                                          transfer.ToDocument());
+            auto result = _transferCollection.find_one_and_update(make_document(kvp("region", transfer.region), kvp("serverId", transfer.serverId)), transfer.ToDocument());
             log_trace << "Transfer updated: " << transfer.ToString();
             return GetTransferByServerId(transfer.region, transfer.serverId);
         }
