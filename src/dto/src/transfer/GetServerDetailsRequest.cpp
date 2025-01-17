@@ -46,4 +46,4 @@ namespace AwsMock::Dto::Transfer {
         return os;
     }
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::Transfer
