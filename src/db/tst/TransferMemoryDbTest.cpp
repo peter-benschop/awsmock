@@ -97,7 +97,7 @@ namespace AwsMock::Database {
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
-        Entity::Transfer::Transfer result = _transferDatabase.GetTransferByServerId(transfer.serverId);
+        Entity::Transfer::Transfer result = _transferDatabase.GetTransferByServerId(_region, transfer.serverId);
 
         // assert
         EXPECT_TRUE(result.serverId == transfer.serverId);

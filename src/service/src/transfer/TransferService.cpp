@@ -50,7 +50,7 @@ namespace AwsMock::Service {
 
             throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
         }
-        transferEntity = _transferDatabase.GetTransferByServerId(request.serverId);
+        transferEntity = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
 
         // Check user
         if (transferEntity.HasUser(request.userName)) {
@@ -140,6 +140,40 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Transfer::GetServerDetailsResponse TransferService::GetServerDetails(const Dto::Transfer::GetServerDetailsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "get_server_details");
+
+        // Check existence
+        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            log_error << "Transfer server does not exist, region: " << request.region << " serverId: " << request.serverId;
+            throw Core::ServiceException("Transfer server does not exist, region: " + request.region + " serverId: " + request.serverId);
+        }
+
+        try {
+            Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+
+            auto response = Dto::Transfer::GetServerDetailsResponse();
+            response.server = {
+                    .region = server.region,
+                    .arn = server.arn,
+                    .serverId = server.serverId,
+                    .state = ServerStateToString(server.state),
+                    .userCount = static_cast<int>(server.users.size()),
+                    .port = server.port,
+                    .concurrency = server.concurrency,
+                    .created = server.created,
+                    .modified = server.modified,
+            };
+
+            log_trace << "Transfer server list outcome: " + response.ToJson();
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Transfer server list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::Transfer::ListUsersResponse TransferService::ListUsers(const Dto::Transfer::ListUsersRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
 
@@ -149,11 +183,36 @@ namespace AwsMock::Service {
             Dto::Transfer::ListUsersResponse response = Dto::Transfer::Mapper::map(request, users);
             response.nextToken = Core::StringUtils::CreateRandomUuid();
 
-            log_trace << "Handler list outcome: " + response.ToJson();
+            log_trace << "User list result: " << response.ToJson();
             return response;
 
         } catch (bsoncxx::exception &ex) {
-            log_error << "Handler list request failed, message: " << ex.what();
+            log_error << "User list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+    Dto::Transfer::ListUserCountersResponse TransferService::ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
+
+        try {
+            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
+
+            auto response = Dto::Transfer::ListUserCountersResponse();
+            response.total = _transferDatabase.CountUsers(request.region, request.serverId);
+            for (const auto &user: users) {
+                Dto::Transfer::User userDto = {
+                        .region = request.region,
+                        .userName = user.userName,
+                        .arn = user.arn,
+                        .password = user.password};
+                response.userCounters.emplace_back(userDto);
+            }
+
+            log_trace << "Transfer user list result: " << response.ToJson();
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Transfer user list request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -169,7 +228,7 @@ namespace AwsMock::Service {
             }
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.serverId);
+            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
 
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerState::ONLINE;
@@ -197,7 +256,7 @@ namespace AwsMock::Service {
             }
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.serverId);
+            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
 
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerState::OFFLINE;
@@ -226,7 +285,7 @@ namespace AwsMock::Service {
             }
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.serverId);
+            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
 
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerState::OFFLINE;
@@ -243,6 +302,37 @@ namespace AwsMock::Service {
             server = _transferDatabase.UpdateTransfer(server);
 
             log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void TransferService::DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_user");
+
+        Database::Entity::Transfer::Transfer server;
+        try {
+            if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+                log_error << "Transfer server does not exist, serverId: " << request.serverId;
+                throw Core::ServiceException("Transfer server does not exist, serverId: " + request.serverId);
+            }
+
+            // Get the manager
+            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+
+            if (server.HasUser(request.userName)) {
+                std::string userName = request.userName;
+                std::erase_if(server.users,
+                              [userName](const Database::Entity::Transfer::User &user) {
+                                  return user.userName == userName;
+                              });
+            }
+
+            // Update server
+            server = _transferDatabase.UpdateTransfer(server);
+            log_info << "User deleted, serverId: " << server.serverId << " userName: " << request.userName;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Delete user request failed, serverId: " << server.serverId << " message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

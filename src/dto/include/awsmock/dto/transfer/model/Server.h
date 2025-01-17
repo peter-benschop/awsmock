@@ -17,6 +17,11 @@ namespace AwsMock::Dto::Transfer {
     struct Server {
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * ARN
          */
         std::string arn;
@@ -55,6 +60,16 @@ namespace AwsMock::Dto::Transfer {
          * User count
          */
         int userCount;
+
+        /**
+         * Port
+         */
+        int port;
+
+        /**
+         * Concurrency
+         */
+        int concurrency;
 
         /**
          * Created timestamp

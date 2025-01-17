@@ -10,12 +10,17 @@ namespace AwsMock::Dto::Transfer {
 
         try {
             const value document = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
             serverId = Core::Bson::BsonUtils::GetStringValue(document, "ServerId");
             arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
             domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
             endpointType = Core::Bson::BsonUtils::GetStringValue(document, "EndpointType");
             state = Core::Bson::BsonUtils::GetStringValue(document, "State");
             userCount = Core::Bson::BsonUtils::GetIntValue(document, "UserCount");
+            port = Core::Bson::BsonUtils::GetIntValue(document, "Port");
+            concurrency = Core::Bson::BsonUtils::GetIntValue(document, "Concurrency");
+            created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
+            modified = Core::Bson::BsonUtils::GetDateValue(document, "Modified");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -28,6 +33,7 @@ namespace AwsMock::Dto::Transfer {
         try {
 
             document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
             Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
             Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
@@ -36,6 +42,8 @@ namespace AwsMock::Dto::Transfer {
             Core::Bson::BsonUtils::SetStringValue(document, "LoggingRole", loggingRole);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
             Core::Bson::BsonUtils::SetIntValue(document, "UserCount", userCount);
+            Core::Bson::BsonUtils::SetIntValue(document, "Port", port);
+            Core::Bson::BsonUtils::SetIntValue(document, "Concurrency", concurrency);
             Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
             return document.extract();

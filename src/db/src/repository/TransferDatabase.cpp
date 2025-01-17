@@ -94,29 +94,37 @@ namespace AwsMock::Database {
         return _memoryDb.GetTransferById(oid);
     }
 
-    Entity::Transfer::Transfer TransferDatabase::GetTransferByServerId(const std::string &serverId) const {
+    Entity::Transfer::Transfer TransferDatabase::GetTransferByServerId(const std::string &region, const std::string &serverId) const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
 
-            if (const std::optional<value> mResult = _transferCollection.find_one(make_document(kvp("serverId", serverId))); mResult.has_value()) {
+            document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!serverId.empty()) {
+                query.append(kvp("serverId", serverId));
+            }
+
+            if (const std::optional<value> mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
                 Entity::Transfer::Transfer result;
                 result.FromDocument(mResult->view());
                 return result;
             }
             return {};
         }
-        return _memoryDb.GetTransferByServerId(serverId);
+        return _memoryDb.GetTransferByServerId(region, serverId);
     }
 
-    Entity::Transfer::Transfer TransferDatabase::CreateOrUpdateTransfer(const Entity::Transfer::Transfer &lambda) {
+    Entity::Transfer::Transfer TransferDatabase::CreateOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const {
 
-        if (TransferExists(lambda)) {
-            return UpdateTransfer(lambda);
+        if (TransferExists(transfer)) {
+            return UpdateTransfer(transfer);
         }
-        return CreateTransfer(lambda);
+        return CreateTransfer(transfer);
     }
 
     Entity::Transfer::Transfer TransferDatabase::UpdateTransfer(const Entity::Transfer::Transfer &transfer) const {
@@ -129,7 +137,7 @@ namespace AwsMock::Database {
                                                                         kvp("serverId", transfer.serverId)),
                                                           transfer.ToDocument());
             log_trace << "Transfer updated: " << transfer.ToString();
-            return GetTransferByServerId(transfer.serverId);
+            return GetTransferByServerId(transfer.region, transfer.serverId);
         }
         return _memoryDb.UpdateTransfer(transfer);
     }
@@ -201,7 +209,7 @@ namespace AwsMock::Database {
         return transfers;
     }
 
-    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId) const {
+    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 
@@ -212,7 +220,15 @@ namespace AwsMock::Database {
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
 
-                if (std::optional<value> mResult = _transferCollection.find_one(make_document(kvp("region", region), kvp("serverId", serverId))); mResult.has_value()) {
+                document query = {};
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!serverId.empty()) {
+                    query.append(kvp("serverId", serverId));
+                }
+
+                if (std::optional<value> mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
                     Entity::Transfer::Transfer result;
                     result.FromDocument(mResult->view());
                     log_trace << "Got transfer server, serverId:" << serverId;
@@ -250,6 +266,17 @@ namespace AwsMock::Database {
         }
         log_trace << "Count servers, result: " << count;
         return count;
+    }
+
+    long TransferDatabase::CountUsers(const std::string &region, const std::string &serverId) const {
+
+        if (HasDatabase()) {
+
+            const Entity::Transfer::Transfer transfer = GetTransferByServerId(region, serverId);
+            log_trace << "Count users, count: " << transfer.users.size();
+            return transfer.users.size();
+        }
+        return 0;
     }
 
     void TransferDatabase::DeleteTransfer(const std::string &serverId) const {

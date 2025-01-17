@@ -43,6 +43,14 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, transferResponse.ToJson());
             }
 
+            if (target == "TransferService.ListUserCounters") {
+
+                Dto::Transfer::ListUserCountersRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+                Dto::Transfer::ListUserCountersResponse transferResponse = _transferService.ListUserCounters(transferRequest);
+                return SendOkResponse(request, transferResponse.ToJson());
+            }
+
             if (target == "TransferService.ListUsers") {
 
                 std::string serverId;
@@ -75,6 +83,27 @@ namespace AwsMock::Service {
                 _transferService.DeleteServer(transferRequest);
                 return SendOkResponse(request);
             }
+
+            if (target == "TransferService.GetServerDetails") {
+
+                Dto::Transfer::GetServerDetailsRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+                Dto::Transfer::GetServerDetailsResponse transferResponse = _transferService.GetServerDetails(transferRequest);
+                log_info << "Get transfer details, region: " << transferRequest.region << " serverId: " << transferRequest.serverId;
+
+                return SendOkResponse(request, transferResponse.ToJson());
+            }
+
+            if (target == "TransferService.DeleteUser") {
+
+                Dto::Transfer::DeleteUserRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+                _transferService.DeleteUser(transferRequest);
+                log_info << "Delete user, region: " << transferRequest.region << " serverId: " << transferRequest.serverId << " userName: " << transferRequest.userName;
+
+                return SendOkResponse(request);
+            }
+
             log_error << "Unknown method";
             return SendBadRequestError(request, "Unknown method");
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETE_MESSAGE_RESPONSE_H
-#define AWSMOCK_DTO_SQS_DELETE_MESSAGE_RESPONSE_H
+#ifndef AWSMOCK_DTO_TRANSFER_DELETE_USER_REQUEST_H
+#define AWSMOCK_DTO_TRANSFER_DELETE_USER_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -11,22 +11,25 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::Transfer {
 
-    struct DeleteMessageResponse {
+    struct DeleteUserRequest {
 
         /**
-         * Resource
+         * AWS region
          */
-        std::string resource = "SQS";
+        std::string region;
 
         /**
-         * Resource
+         * Server ID
          */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+        std::string serverId;
+
+        /**
+         * User name
+         */
+        std::string userName;
 
         /**
          * @brief Convert to a JSON string
@@ -36,11 +39,11 @@ namespace AwsMock::Dto::SQS {
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * @brief Convert to XML representation
+         * @brief Converts the JSON string to DTO.
          *
-         * @return XML string
+         * @param jsonString JSON string
          */
-        [[nodiscard]] std::string ToXml() const;
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -54,9 +57,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const DeleteUserRequest &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_RESPONSE_H
+#endif// AWSMOCK_DTO_TRANSFER_DELETE_USER_REQUEST_H

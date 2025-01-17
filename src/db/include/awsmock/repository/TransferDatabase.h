@@ -102,7 +102,7 @@ namespace AwsMock::Database {
          * @param transfer transfer entity
          * @return created or updated transfer entity.
          */
-        Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &transfer);
+        Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
 
         /**
          * @brief Returns a transfer manager entity by primary key
@@ -125,11 +125,12 @@ namespace AwsMock::Database {
         /**
          * @brief Returns a transfer manager entity by manager ID
          *
+         * @param region AWS region name
          * @param serverId transfer manager ID
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        Entity::Transfer::Transfer GetTransferByServerId(const std::string &serverId) const;
+        Entity::Transfer::Transfer GetTransferByServerId(const std::string &region, const std::string &serverId) const;
 
         /**
          * @brief Returns a transfer manager entity by ARN
@@ -157,9 +158,13 @@ namespace AwsMock::Database {
          *
          * @param region AWS region name
          * @param serverId AWS server ID
+         * @param prefix user name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sorting column names
          * @return list of transfer users
          */
-        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId) const;
+        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns the total number of servers.
@@ -168,6 +173,15 @@ namespace AwsMock::Database {
          * @return total number of transfer server
          */
         long CountServers(const std::string &region = {}) const;
+
+        /**
+         * @brief Returns the total number of users for a server.
+         *
+         * @param region AWS region name
+         * @param serverId server ID
+         * @return total number of transfer server users
+         */
+        long CountUsers(const std::string &region = {}, const std::string &serverId = {}) const;
 
         /**
          * @brief Deletes an existing transfer manager
