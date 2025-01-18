@@ -12,7 +12,9 @@ namespace AwsMock::Database {
 
     DynamoDbDatabase::DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {}
 
-    Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(const Entity::DynamoDb::Table &table) const {
+    Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(Entity::DynamoDb::Table &table) const {
+
+        table.created = system_clock::now();
 
         if (HasDatabase()) {
 
@@ -25,8 +27,11 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = _tableCollection.insert_one(table.ToDocument());
                 session.commit_transaction();
-                log_trace << "DynamoDb table created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetTableById(result->inserted_id().get_oid().value);
+                table.oid = result->inserted_id().get_oid().value.to_string();
+
+                log_trace << "DynamoDb table created, oid: " << table.oid;
+
+                return table;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -178,7 +183,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListTables(region);
     }
 
-    long DynamoDbDatabase::CountTables(const std::string &region) const {
+    long DynamoDbDatabase::CountTables(const std::string &region, const std::string &prefix) const {
 
         if (HasDatabase()) {
 
@@ -190,6 +195,9 @@ namespace AwsMock::Database {
                 document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("name", bsoncxx::types::b_regex{"^" + prefix + ".*"}));
                 }
                 return _tableCollection.count_documents(query.extract());
 
@@ -204,13 +212,14 @@ namespace AwsMock::Database {
     Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(Entity::DynamoDb::Table &table) const {
 
         if (TableExists(table.region, table.name)) {
-
             return UpdateTable(table);
         }
         return CreateTable(table);
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::UpdateTable(Entity::DynamoDb::Table &table) const {
+
+        table.modified = system_clock::now();
 
         if (HasDatabase()) {
 
