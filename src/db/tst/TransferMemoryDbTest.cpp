@@ -93,7 +93,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferGetByServerIdTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .serverId = "test", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act

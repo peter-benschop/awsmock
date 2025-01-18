@@ -11,6 +11,7 @@
 #include <string>
 
 // Boost includes
+#include <boost/asio/local/stream_protocol.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
@@ -30,7 +31,7 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit DomainSocket(const std::string &path) : _path(path){};
+        explicit DomainSocket(const std::string &path) : _path(path) {};
 
         /**
          * @brief Send JSON data
@@ -60,7 +61,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendBinary(http::verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {}) const;
+        DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {}) const;
 
       private:
 
@@ -72,7 +73,7 @@ namespace AwsMock::Core {
          * @param body HTTP body
          * @param headers HTTP headers
          */
-        static http::request<http::string_body> PrepareJsonMessage(http::verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers);
+        static request<string_body> PrepareJsonMessage(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
          * @brief Prepare HTTP message
@@ -82,7 +83,7 @@ namespace AwsMock::Core {
          * @param filename name of the file to send
          * @param headers HTTP headers
          */
-        static http::request<http::file_body> PrepareBinaryMessage(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers);
+        static request<file_body> PrepareBinaryMessage(verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers);
 
         /**
          * @brief Prepare HTTP message
@@ -91,7 +92,7 @@ namespace AwsMock::Core {
          * @return response struct
          * @see Core::DomainSocketResult
          */
-        static DomainSocketResult PrepareResult(http::response<http::string_body> response);
+        static DomainSocketResult PrepareResult(response<string_body> response);
 
         /**
          * Domain socket path

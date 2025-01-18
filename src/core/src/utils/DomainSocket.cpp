@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/DomainSocket.h>
-#include <boost/asio/local/stream_protocol.hpp>
 
 namespace AwsMock::Core {
 

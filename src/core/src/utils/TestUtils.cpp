@@ -77,6 +77,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueBool("awsmock.docker.active", true);
         Configuration::instance().SetValueString("awsmock.docker.network-mode", "bridge");
         Configuration::instance().SetValueString("awsmock.docker.network-name", "local");
+        Configuration::instance().SetValueString("awsmock.docker.socket", "/var/run/docker.sock");
 
         // Logging
         Configuration::instance().SetValueString("awsmock.logging.level", "debug");
@@ -89,6 +90,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueBool("awsmock.podman.active", false);
         Configuration::instance().SetValueString("awsmock.podman.network-mode", "local");
         Configuration::instance().SetValueString("awsmock.podman.network-name", "local");
+        Configuration::instance().SetValueString("awsmock.podman.socket", "/var/run/podman/podman.sock");
 
         // Write file
         Configuration::instance().WriteFile(TMP_PROPERTIES_FILE);
