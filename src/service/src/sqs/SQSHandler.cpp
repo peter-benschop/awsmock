@@ -459,6 +459,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
+                case Dto::Common::SqsCommandType::DELETE_ATTRIBUTE: {
+
+                    Dto::SQS::DeleteAttributeRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    _sqsService.DeleteMessageAttribute(sqsRequest);
+                    log_info << "Delete message attribute, messageId: " << sqsRequest.messageId;
+
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return Core::HttpUtils::BadRequest(request, "Unknown method");

@@ -41,21 +41,21 @@ namespace AwsMock::Database::Entity::Transfer {
             usersDoc.append(user.ToDocument());
         }
 
-        view_or_value<view, value> transferDoc = make_document(
-                kvp("region", region),
-                kvp("serverId", serverId),
-                kvp("arn", arn),
-                kvp("protocols", protocolsDoc),
-                kvp("users", usersDoc),
-                kvp("state", ServerStateToString(state)),
-                kvp("concurrency", concurrency),
-                kvp("port", port),
-                kvp("listenAddress", listenAddress),
-                kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+        document transferDoc;
+        Core::Bson::BsonUtils::SetStringValue(transferDoc, "region", region);
+        Core::Bson::BsonUtils::SetStringValue(transferDoc, "serverId", serverId);
+        Core::Bson::BsonUtils::SetStringValue(transferDoc, "arn", arn);
+        Core::Bson::BsonUtils::SetIntValue(transferDoc, "port", port);
+        Core::Bson::BsonUtils::SetIntValue(transferDoc, "concurrency", concurrency);
+        Core::Bson::BsonUtils::SetStringValue(transferDoc, "listenAddress", listenAddress);
+        Core::Bson::BsonUtils::SetStringValue(transferDoc, "state", ServerStateToString(state));
+        Core::Bson::BsonUtils::SetArrayValue(transferDoc, "protocols", protocolsDoc);
+        Core::Bson::BsonUtils::SetArrayValue(transferDoc, "users", usersDoc);
+        Core::Bson::BsonUtils::SetDateValue(transferDoc, "lastStarted", lastStarted);
+        Core::Bson::BsonUtils::SetDateValue(transferDoc, "created", created);
+        Core::Bson::BsonUtils::SetDateValue(transferDoc, "modified", modified);
 
-        return transferDoc;
+        return transferDoc.extract();
     }
 
     void Transfer::FromDocument(const std::optional<view> &mResult) {
@@ -66,11 +66,11 @@ namespace AwsMock::Database::Entity::Transfer {
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         state = ServerStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
         concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
-        port = mResult.value()["port"].get_int32().value;
-        listenAddress = bsoncxx::string::to_string(mResult.value()["listenAddress"].get_string().value);
-        lastStarted = bsoncxx::types::b_date(mResult.value()["lastStarted"].get_date());
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date());
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date());
+        port = Core::Bson::BsonUtils::GetIntValue(mResult, "port");
+        listenAddress = Core::Bson::BsonUtils::GetStringValue(mResult, "listenAddress");
+        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStarted");
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Protocols
         if (mResult.value().find("protocols") != mResult.value().end()) {

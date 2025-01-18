@@ -68,7 +68,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             const auto result = _transferCollection.insert_one(transfer.ToDocument());
-            log_trace << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string();
+            log_trace << "Transfer server created, oid: " << result->inserted_id().get_oid().value.to_string();
 
             return GetTransferById(result->inserted_id().get_oid().value);
         }
@@ -111,7 +111,7 @@ namespace AwsMock::Database {
 
             if (const std::optional<value> mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
                 Entity::Transfer::Transfer result;
-                result.FromDocument(mResult->view());
+                result.FromDocument(mResult);
                 return result;
             }
             return {};

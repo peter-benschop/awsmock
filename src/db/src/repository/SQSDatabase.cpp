@@ -482,12 +482,32 @@ namespace AwsMock::Database {
         return _memoryDb.MessageExists(receiptHandle);
     }
 
+    bool SQSDatabase::MessageExistsByMessageId(const std::string &messageId) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            try {
+
+                const auto count = messageCollection.find_one(make_document(kvp("messageId", make_document(kvp("$exists", true)))));
+                log_trace << "Message exists: " << std::boolalpha << count.has_value();
+                return count.has_value();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.MessageExistsByMessageId(messageId);
+    }
+
     Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-        std::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
+        const std::optional<value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult->view());
 
@@ -501,7 +521,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-            if (std::optional<bsoncxx::document::value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
+            if (const std::optional<value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
                 Entity::SQS::Message result;
                 result.FromDocument(mResult->view());
                 return result;
@@ -509,6 +529,23 @@ namespace AwsMock::Database {
             return {};
         }
         return _memoryDb.GetMessageByReceiptHandle(receiptHandle);
+    }
+
+    Entity::SQS::Message SQSDatabase::GetMessageByMessageId(const std::string &messageId) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+
+            if (const std::optional<value> mResult = messageCollection.find_one(make_document(kvp("messageId", messageId)))) {
+                Entity::SQS::Message result;
+                result.FromDocument(mResult->view());
+                return result;
+            }
+            return {};
+        }
+        return _memoryDb.GetMessageByMessageId(messageId);
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageById(const std::string &oid) const {

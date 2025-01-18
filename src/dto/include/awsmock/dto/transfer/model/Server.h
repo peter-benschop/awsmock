@@ -72,6 +72,11 @@ namespace AwsMock::Dto::Transfer {
         int concurrency;
 
         /**
+         * Last started
+         */
+        system_clock::time_point lastStarted;
+
+        /**
          * Created timestamp
          */
         system_clock::time_point created;

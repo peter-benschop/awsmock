@@ -87,7 +87,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSServerJavaTest : public ::testing::Test, public TestBase {
+    class SQSServerJavaTest : public testing::Test, public TestBase {
 
       protected:
 

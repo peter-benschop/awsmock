@@ -49,7 +49,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferCreateTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
 
         // act
         Entity::Transfer::Transfer result = _transferDatabase.CreateTransfer(transfer);
@@ -62,8 +62,8 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferExistsUniqueTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer1 = {.region = _region, .protocols = {"tcp", "ftp"}};
-        Entity::Transfer::Transfer transfer2 = {.region = _region, .protocols = {"tcp", "http"}};
+        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {"tcp", "http"}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
 
         // act
@@ -78,7 +78,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferExistsByServerIdTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -93,7 +93,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferGetByServerIdTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "test", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .serverId = "test", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -106,7 +106,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferGetByServerArnTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .arn = "aws:transfer", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .arn = "aws:transfer", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferUpdateTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -133,7 +133,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferDeleteTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -147,8 +147,8 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferDeleteAllTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer1 = {.region = _region, .protocols = {"tcp", "ftp"}};
-        Entity::Transfer::Transfer transfer2 = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {"tcp", "ftp"}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
         transfer2 = _transferDatabase.CreateTransfer(transfer2);
 

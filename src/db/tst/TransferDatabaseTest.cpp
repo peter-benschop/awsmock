@@ -78,12 +78,12 @@ namespace AwsMock::Database {
     TEST_F(TransferDatabaseTest, TransferExistsByServerIdTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
-        bool result1 = _transferDatabase.TransferExists(_region, transfer.serverId);
-        bool result2 = _transferDatabase.TransferExists(transfer.serverId);
+        const bool result1 = _transferDatabase.TransferExists(_region, transfer.serverId);
+        const bool result2 = _transferDatabase.TransferExists(transfer.serverId);
 
         // assert
         EXPECT_TRUE(result1);
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
     TEST_F(TransferDatabaseTest, TransferUpdateTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -133,7 +133,7 @@ namespace AwsMock::Database {
     TEST_F(TransferDatabaseTest, TransferDeleteTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -147,8 +147,8 @@ namespace AwsMock::Database {
     TEST_F(TransferDatabaseTest, TransferDeleteAllTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer1 = {.region = _region, .protocols = {"tcp", "ftp"}};
-        Entity::Transfer::Transfer transfer2 = {.region = _region, .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_14eab3422", .protocols = {"tcp", "ftp"}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
         transfer2 = _transferDatabase.CreateTransfer(transfer2);
 

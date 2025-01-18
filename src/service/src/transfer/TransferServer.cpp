@@ -69,13 +69,15 @@ namespace AwsMock::Service {
         }
 
         // Update database
+        server.lastStarted = system_clock::now();
         server.state = Database::Entity::Transfer::ServerState::ONLINE;
+        server = _transferDatabase.UpdateTransfer(server);
         log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << " port: " << server.port;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
         // Create transfer manager thread
-        std::shared_ptr<FtpServer::FtpServer> ftpServer = _transferServerList[server.serverId];
+        const std::shared_ptr<FtpServer::FtpServer> ftpServer = _transferServerList[server.serverId];
         ftpServer->stop();
 
         // Update database

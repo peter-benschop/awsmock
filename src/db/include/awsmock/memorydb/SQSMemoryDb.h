@@ -195,7 +195,16 @@ namespace AwsMock::Database {
          * @return true if message exists, otherwise false
          * @throws Core::DatabaseException
          */
-        bool MessageExists(const std::string &receiptHandle);
+        bool MessageExists(const std::string &receiptHandle) const;
+
+        /**
+         * @brief Checks whether the message exists by message ID
+         *
+         * @param messageId SQS message ID
+         * @return true if message exists, otherwise false
+         * @throws Core::DatabaseException
+         */
+        bool MessageExistsByMessageId(const std::string &messageId) const;
 
         /**
          * @brief Returns a message by ID.
@@ -278,6 +287,15 @@ namespace AwsMock::Database {
           * @throws Core::DatabaseException
           */
         Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle);
+
+        /**
+         * @brief Returns a message by message ID
+         *
+         * @param messageId message ID
+         * @return message entity
+         * @throws Core::DatabaseException
+         */
+        Entity::SQS::Message GetMessageByMessageId(const std::string &messageId);
 
         /**
          * @brief Count the number of message by queue
