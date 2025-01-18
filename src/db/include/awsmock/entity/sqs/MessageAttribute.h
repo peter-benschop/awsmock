@@ -100,7 +100,6 @@ namespace AwsMock::Database::Entity::SQS {
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
     };
 
-    typedef MessageAttribute MessageAttribute;
     typedef std::vector<MessageAttribute> MessageAttributeList;
 
 }// namespace AwsMock::Database::Entity::SQS

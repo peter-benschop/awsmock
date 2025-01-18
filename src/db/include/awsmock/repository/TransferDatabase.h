@@ -64,11 +64,11 @@ namespace AwsMock::Database {
         /**
          * @brief Check existence of transfer server
          *
-         * @param transferName AWS transfer name
+         * @param serverId AWS transfer server ID
          * @return true if transfer server already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &transferName) const;
+        bool TransferExists(const std::string &serverId) const;
 
         /**
          * @brief Check existence of transfer server

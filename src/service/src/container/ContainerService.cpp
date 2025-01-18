@@ -36,7 +36,7 @@ namespace AwsMock::Service {
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (_isDocker) {
+        if (Core::Configuration::instance().GetValueBool("awsmock.docker.active")) {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
             if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
                 Dto::Docker::ListImageResponse response;

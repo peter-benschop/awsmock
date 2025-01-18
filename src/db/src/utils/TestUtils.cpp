@@ -11,7 +11,7 @@ namespace AwsMock::Database {
     void TestUtils::CreateServices() {
         ModuleDatabase &_serviceDatabase = ModuleDatabase::instance();
         for (const auto &it: _modules) {
-            Database::Entity::Module::Module module = {.oid = {}, .name = it, .state = Entity::Module::ModuleState::RUNNING, .status = Entity::Module::ModuleStatus::ACTIVE};
+            Entity::Module::Module module = {.oid = {}, .name = it, .state = Entity::Module::ModuleState::RUNNING, .status = Entity::Module::ModuleStatus::ACTIVE};
             _serviceDatabase.CreateOrUpdateModule(module);
         }
     }

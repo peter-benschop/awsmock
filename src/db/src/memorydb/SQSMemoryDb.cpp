@@ -199,11 +199,19 @@ namespace AwsMock::Database {
         return GetMessageById(oid);
     }
 
-    bool SQSMemoryDb::MessageExists(const std::string &receiptHandle) {
+    bool SQSMemoryDb::MessageExists(const std::string &receiptHandle) const {
 
         return std::ranges::find_if(_messages,
                                     [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
                                         return message.second.receiptHandle == receiptHandle;
+                                    }) != _messages.end();
+    }
+
+    bool SQSMemoryDb::MessageExistsByMessageId(const std::string &messageId) const {
+
+        return std::ranges::find_if(_messages,
+                                    [messageId](const std::pair<std::string, Entity::SQS::Message> &message) {
+                                        return message.second.messageId == messageId;
                                     }) != _messages.end();
     }
 
@@ -227,6 +235,21 @@ namespace AwsMock::Database {
         const auto it = std::ranges::find_if(_messages,
                                              [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &message) {
                                                  return message.second.receiptHandle == receiptHandle;
+                                             });
+
+        if (it != _messages.end()) {
+            it->second.oid = it->first;
+            result = it->second;
+        }
+        return result;
+    }
+
+    Entity::SQS::Message SQSMemoryDb::GetMessageByMessageId(const std::string &messageId) {
+
+        Entity::SQS::Message result = {};
+        const auto it = std::ranges::find_if(_messages,
+                                             [messageId](const std::pair<std::string, Entity::SQS::Message> &message) {
+                                                 return message.second.messageId == messageId;
                                              });
 
         if (it != _messages.end()) {

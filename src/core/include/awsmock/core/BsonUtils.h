@@ -134,6 +134,14 @@ namespace AwsMock::Core::Bson {
             SetStringValue(document, name, DateTimeUtils::ToISO8601(value));
         }
 
+        static void SetDocumentValue(document &rootDocument, const std::string &name, document &value) {
+            rootDocument.append(kvp(name, value));
+        }
+
+        static void SetArrayValue(document &rootDocument, const std::string &name, array &value) {
+            rootDocument.append(kvp(name, value));
+        }
+
         static std::string GetOidValue(const std::optional<view> &view, const std::string &name) {
             if (view.value().find(name) != view.value().end()) {
                 return GetOidValue(view.value()[name]);

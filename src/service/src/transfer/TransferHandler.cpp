@@ -90,7 +90,7 @@ namespace AwsMock::Service {
                 transferRequest.FromJson(body);
                 Dto::Transfer::GetServerDetailsResponse transferResponse = _transferService.GetServerDetails(transferRequest);
                 log_info << "Get transfer details, region: " << transferRequest.region << " serverId: " << transferRequest.serverId;
-
+                log_info << transferResponse.ToJson();
                 return SendOkResponse(request, transferResponse.ToJson());
             }
 

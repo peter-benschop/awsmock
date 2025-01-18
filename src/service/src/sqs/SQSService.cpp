@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <thread>
@@ -855,6 +856,7 @@ namespace AwsMock::Service {
 
             Dto::SQS::ListMessageCountersResponse listMessagesResponse;
             listMessagesResponse.total = total;
+            // TODO: create mapper for the conversion
             for (const auto &message: messages) {
                 Dto::SQS::MessageEntry messageEntry;
                 messageEntry.messageId = message.messageId;
@@ -864,6 +866,15 @@ namespace AwsMock::Service {
                 messageEntry.md5Sum = message.md5Body;
                 messageEntry.created = message.created;
                 messageEntry.modified = message.modified;
+                if (!message.messageAttributes.empty()) {
+                    for (const auto &attribute: message.messageAttributes) {
+                        Dto::SQS::MessageAttribute messageAttribute;
+                        messageAttribute.name = attribute.attributeName;
+                        messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeTypeToString(attribute.attributeType));
+                        messageAttribute.stringValue = attribute.attributeValue;
+                        messageEntry.messageAttributes[attribute.attributeName] = messageAttribute;
+                    }
+                }
                 listMessagesResponse.messages.emplace_back(messageEntry);
             }
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
@@ -889,6 +900,30 @@ namespace AwsMock::Service {
             // Delete from database
             const long deleted = _sqsDatabase.DeleteMessage(message);
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << "deleted: " << deleted;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message_attribute");
+        log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
+
+        try {
+            if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+                log_error << "Message does not exist, messageId: " << request.messageId;
+                throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+            }
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
+
+            // Update attributes
+            const auto deleted = std::erase_if(message.messageAttributes, [request](const auto &item) {
+                return item.attributeName == request.name;
+            });
+            message = _sqsDatabase.UpdateMessage(message);
+            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name << ", deleted: " << deleted;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

@@ -52,6 +52,8 @@ namespace AwsMock::Dto::Common {
         LIST_QUEUE_ATTRIBUTE_COUNTERS,
         LIST_LAMBDA_TRIGGER_COUNTERS,
         LIST_TAG_COUNTERS,
+        UPDATE_MESSAGE,
+        DELETE_ATTRIBUTE,
         UNKNOWN
     };
 
@@ -82,8 +84,10 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
             {SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS, "list-queue-attribute-counters"},
             {SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS, "list-lambda-trigger-counters"},
-            {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
             {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
+            {SqsCommandType::UPDATE_MESSAGE, "update_message"},
+            {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
+            {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
     };
 
     [[maybe_unused]] static std::string SqsCommandTypeToString(SqsCommandType commandType) {

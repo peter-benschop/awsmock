@@ -17,6 +17,7 @@
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
+#include <awsmock/dto/sqs/DeleteAttributeRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchResponse.h>
 #include <awsmock/dto/sqs/DeleteMessageRequest.h>
@@ -85,7 +86,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.
@@ -181,7 +182,7 @@ namespace AwsMock::Service {
         Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
 
         /**
-         * @brief Sets the message visibility timeout timeout.
+         * @brief Sets the message visibility timeout.
          *
          * @param request set visibility timeout request
          * @throws ServiceException
@@ -293,6 +294,14 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
+
+        /**
+         * @brief Deletes a message attribute
+         *
+         * @param request delete message attribute request DTO
+         * @throws ServiceException
+         */
+        void DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const;
 
         /**
          * @brief Deletes a message in a batch

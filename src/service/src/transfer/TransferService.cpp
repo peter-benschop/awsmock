@@ -125,6 +125,7 @@ namespace AwsMock::Service {
                         .serverId = s.serverId,
                         .state = ServerStateToString(s.state),
                         .userCount = static_cast<int>(s.users.size()),
+                        .lastStarted = s.lastStarted,
                         .created = s.created,
                         .modified = s.modified,
                 };
@@ -161,6 +162,7 @@ namespace AwsMock::Service {
                     .userCount = static_cast<int>(server.users.size()),
                     .port = server.port,
                     .concurrency = server.concurrency,
+                    .lastStarted = server.lastStarted,
                     .created = server.created,
                     .modified = server.modified,
             };

@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Transfer {
             userCount = Core::Bson::BsonUtils::GetIntValue(document, "UserCount");
             port = Core::Bson::BsonUtils::GetIntValue(document, "Port");
             concurrency = Core::Bson::BsonUtils::GetIntValue(document, "Concurrency");
+            lastStarted = Core::Bson::BsonUtils::GetDateValue(document, "LastStarted");
             created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
             modified = Core::Bson::BsonUtils::GetDateValue(document, "Modified");
 
@@ -44,6 +45,7 @@ namespace AwsMock::Dto::Transfer {
             Core::Bson::BsonUtils::SetIntValue(document, "UserCount", userCount);
             Core::Bson::BsonUtils::SetIntValue(document, "Port", port);
             Core::Bson::BsonUtils::SetIntValue(document, "Concurrency", concurrency);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastStarted", lastStarted);
             Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
             return document.extract();

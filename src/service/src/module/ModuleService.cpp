@@ -158,12 +158,14 @@ namespace AwsMock::Service {
             const auto _s3Database = std::make_shared<Database::S3Database>();
             if (!infrastructure.s3Buckets.empty()) {
                 for (auto &bucket: infrastructure.s3Buckets) {
+                    bucket.modified = system_clock::now();
                     _s3Database->CreateOrUpdateBucket(bucket);
                 }
                 log_info << "S3 buckets imported, count: " << infrastructure.s3Buckets.size();
             }
             if (!infrastructure.s3Objects.empty()) {
                 for (auto &object: infrastructure.s3Objects) {
+                    object.modified = system_clock::now();
                     _s3Database->CreateOrUpdateObject(object);
                 }
                 log_info << "S3 objects imported, count: " << infrastructure.s3Objects.size();
@@ -173,6 +175,7 @@ namespace AwsMock::Service {
             const Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
+                    queue.modified = system_clock::now();
                     queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
                     _sqsDatabase.CreateOrUpdateQueue(queue);
                     log_debug << "SQS queues imported, url: " << queue.queueUrl;
@@ -181,6 +184,7 @@ namespace AwsMock::Service {
             }
             if (!infrastructure.sqsMessages.empty()) {
                 for (auto &message: infrastructure.sqsMessages) {
+                    message.modified = system_clock::now();
                     _sqsDatabase.CreateOrUpdateMessage(message);
                     log_debug << "SQS queues imported, queueArn: " << message.queueArn;
                 }
@@ -191,12 +195,14 @@ namespace AwsMock::Service {
             const Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
             if (!infrastructure.snsTopics.empty()) {
                 for (auto &topic: infrastructure.snsTopics) {
+                    topic.modified = system_clock::now();
                     _snsDatabase.CreateOrUpdateTopic(topic);
                 }
                 log_info << "SNS topics imported, count: " << infrastructure.snsTopics.size();
             }
             if (!infrastructure.snsMessages.empty()) {
                 for (auto &message: infrastructure.snsMessages) {
+                    message.modified = system_clock::now();
                     _snsDatabase.CreateOrUpdateMessage(message);
                 }
                 log_info << "SNS resources imported, count: " << infrastructure.snsMessages.size();
@@ -205,6 +211,7 @@ namespace AwsMock::Service {
         if (!infrastructure.lambdas.empty()) {
             Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
             for (auto &lambda: infrastructure.lambdas) {
+                lambda.modified = system_clock::now();
                 _lambdaDatabase.CreateOrUpdateLambda(lambda);
             }
             log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
@@ -212,6 +219,7 @@ namespace AwsMock::Service {
         if (!infrastructure.transferServers.empty()) {
             const Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
             for (auto &transfer: infrastructure.transferServers) {
+                transfer.modified = system_clock::now();
                 transfer = _transferDatabase.CreateOrUpdateTransfer(transfer);
             }
             log_info << "Transfer servers imported, count: " << infrastructure.transferServers.size();
@@ -222,12 +230,14 @@ namespace AwsMock::Service {
             Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
             if (!infrastructure.cognitoUserPools.empty()) {
                 for (auto &userPool: infrastructure.cognitoUserPools) {
+                    userPool.modified = system_clock::now();
                     _cognitoDatabase.CreateOrUpdateUserPool(userPool);
                 }
                 log_info << "Cognito user pools imported, count: " << infrastructure.cognitoUserPools.size();
             }
             if (!infrastructure.cognitoUsers.empty()) {
                 for (auto &user: infrastructure.cognitoUsers) {
+                    user.modified = system_clock::now();
                     _cognitoDatabase.CreateOrUpdateUser(user);
                 }
                 log_info << "Cognito users imported, count: " << infrastructure.cognitoUsers.size();

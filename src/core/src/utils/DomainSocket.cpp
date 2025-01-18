@@ -7,7 +7,7 @@
 
 namespace AwsMock::Core {
 
-    DomainSocketResult DomainSocket::SendJson(http::verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) const {
+    DomainSocketResult DomainSocket::SendJson(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) const {
 
         boost::system::error_code ec;
 
@@ -53,13 +53,13 @@ namespace AwsMock::Core {
         }
 
         // Prepare message
-        http::request<http::file_body> request = PrepareBinaryMessage(method, path, fileName, headers);
+        request<file_body> request = PrepareBinaryMessage(method, path, fileName, headers);
 
         // Write to unix socket
         http::write(socket, request);
 
         boost::beast::flat_buffer buffer;
-        http::response<http::string_body> response;
+        response<string_body> response;
         read(socket, buffer, response, ec);
         if (ec) {
             log_error << "Send to docker daemon failed, error: " << ec.message();
@@ -67,12 +67,12 @@ namespace AwsMock::Core {
         socket.close();
         if (ec) {
             log_error << "Shutdown socket failed, error: " << ec.message();
-            return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+            return {.statusCode = status::internal_server_error, .body = ec.message()};
         }
         return PrepareResult(response);
     }
 
-    http::request<http::string_body> DomainSocket::PrepareJsonMessage(http::verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
+    request<string_body> DomainSocket::PrepareJsonMessage(const verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         http::request<http::string_body> request;
 
@@ -80,22 +80,22 @@ namespace AwsMock::Core {
         request.target(path);
         request.body() = body;
         request.prepare_payload();
-        request.base().set(http::field::host, "localhost");
-        request.base().set(http::field::content_type, "application/json");
-        request.base().set(http::field::content_length, std::to_string(body.size()));
+        request.base().set(field::host, "localhost");
+        request.base().set(field::content_type, "application/json");
+        request.base().set(field::content_length, std::to_string(body.size()));
 
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                request.base().set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                request.base().set(fst, snd);
             }
         }
         return request;
     }
 
-    http::request<http::file_body> DomainSocket::PrepareBinaryMessage(http::verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
+    request<file_body> DomainSocket::PrepareBinaryMessage(const verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
 
         boost::system::error_code ec;
-        http::request<http::file_body> request;
+        request<file_body> request;
         request.method(method);
         request.target(path);
         request.base().set("Host", "localhost");
@@ -104,14 +104,14 @@ namespace AwsMock::Core {
         request.prepare_payload();
 
         if (!headers.empty()) {
-            for (const auto &header: headers) {
-                request.base().set(header.first, header.second);
+            for (const auto &[fst, snd]: headers) {
+                request.base().set(fst, snd);
             }
         }
         return request;
     }
 
-    DomainSocketResult DomainSocket::PrepareResult(http::response<http::string_body> response) {
+    DomainSocketResult DomainSocket::PrepareResult(response<string_body> response) {
 
         DomainSocketResult domainSocketResult;
         domainSocketResult.body = response.body();
