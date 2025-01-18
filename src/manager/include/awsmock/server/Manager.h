@@ -26,7 +26,6 @@
 #define DEFAULT_MONGO_DBHOST "localhost"
 #define DEFAULT_MONGO_DBPORT 27017
 #define DEFAULT_MONGO_POOL_SIZE 256
-#define AUTO_LOAD_FILE std::string("/home/awsmock/init/init.bson")
 
 namespace AwsMock::Manager {
 
@@ -40,6 +39,7 @@ namespace AwsMock::Manager {
      *   - Start the database (either MongoDB or in-memory database)
      *   - General initializations
      *   - Start the activated services are background threads
+     *   - Auto load infrastructure BSON init file
      *   - Start the API gateway on port 4566 by default (can be changed in the configuration file)
      *   - Start the frontend server on port 4567 by default (can be changed in the configuration file)
      *   - Wait for a termination signal

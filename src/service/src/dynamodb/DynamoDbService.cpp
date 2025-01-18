@@ -106,7 +106,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             describeTableResponse = {.body = body, .headers = outHeaders, .status = status};
-            describeTableResponse.ScanResponse();
+            describeTableResponse.PrepareResponse();
             log_debug << "DynamoDb describe table, name: " << request.tableName;
             return describeTableResponse;
 

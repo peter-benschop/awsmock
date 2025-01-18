@@ -102,7 +102,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * @brief Scans the response and fills in the attributes
          */
-        void ScanResponse();
+        void PrepareResponse();
 
         /**
          * @brief Creates a JSON string from the object.

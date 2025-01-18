@@ -106,7 +106,48 @@ namespace AwsMock::Service {
                     describeTableRequest.PrepareRequest();
                     Dto::DynamoDb::DescribeTableResponse describeTableResponse = _dynamoDbService.DescribeTable(describeTableRequest);
                     describeTableResponse.region = _region;
-                    describeTableResponse.ScanResponse();
+                    describeTableResponse.PrepareResponse();
+
+                    Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
+                    table = _dynamoDbDatabase.CreateOrUpdateTable(table);
+                    log_debug << "Table synchronized, table: " << table.name;
+                }
+
+            } else {
+
+                log_debug << "Empty table list";
+                _dynamoDbDatabase.DeleteAllTables();
+            }
+            log_debug << "DynamoDB synchronized";
+
+        } catch (Core::JsonException &exc) {
+            log_error << exc.what();
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.what();
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.what();
+        }
+    }
+
+    void DynamoDbServer::SynchronizeItems() const {
+
+        try {
+
+            // Get the list of tables from DynamoDB
+            Dto::DynamoDb::ListTableRequest request;
+            request.region = _region;
+            request.PrepareRequest();
+            if (Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
+
+                for (const auto &tableName: listTableResponse.tableNames) {
+
+                    Dto::DynamoDb::ScanRequest scanRequest;
+                    scanRequest.region = _region;
+                    scanRequest.tableName = tableName;
+                    scanRequest.PrepareRequest();
+                    Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
+                    scanResponse.region = _region;
+                    scanResponse.ScanResponse();
 
                     Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
                     table = _dynamoDbDatabase.CreateOrUpdateTable(table);
