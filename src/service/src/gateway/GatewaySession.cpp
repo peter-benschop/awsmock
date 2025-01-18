@@ -2,6 +2,7 @@
 // Created by vogje01 on 5/27/24.
 //
 
+#include <awsmock/service/gateway/GatewayRouter.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
@@ -13,22 +14,6 @@ namespace AwsMock::Service {
         _bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
         _timeout = configuration.GetValueInt("awsmock.gateway.http.timeout");
         _verifySignature = configuration.GetValueBool("awsmock.aws.signature.verify");
-
-        _routingTable = {
-                {"s3", std::make_shared<S3Handler>()},
-                {"s3api", std::make_shared<S3Handler>()},
-                {"sqs", std::make_shared<SQSHandler>()},
-                {"sns", std::make_shared<SNSHandler>()},
-                {"lambda", std::make_shared<LambdaHandler>()},
-                {"transfer", std::make_shared<TransferHandler>()},
-                {"cognito-idp", std::make_shared<CognitoHandler>()},
-                {"cognito-identity", std::make_shared<CognitoHandler>()},
-                {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
-                {"kms", std::make_shared<KMSHandler>()},
-                {"ssm", std::make_shared<SSMHandler>()},
-                {"dynamodb", std::make_shared<DynamoDbHandler>()},
-                {"monitoring", std::make_shared<MonitoringHandler>()},
-                {"module", std::make_shared<ModuleHandler>()}};
     };
 
     void GatewaySession::Run() {
@@ -56,7 +41,6 @@ namespace AwsMock::Service {
 
         // This means they closed the connection
         if (ec == http::error::end_of_stream) {
-            //       log_error << "End of stream";
             return DoShutdown();
         }
 
@@ -78,7 +62,6 @@ namespace AwsMock::Service {
 
         // Allocate and store the work
         _response_queue.push(std::move(response));
-        //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, static_cast<double>(response_queue_.size()));
 
         // If there was no previous work, start the write loop
         if (_response_queue.size() == 1)
@@ -124,7 +107,7 @@ namespace AwsMock::Service {
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            handler = _routingTable[target];
+            handler = GatewayRouter::instance().GetHandler(target);
             log_trace << "Handler found, name: " << handler->name();
 
         } else {
@@ -139,7 +122,7 @@ namespace AwsMock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             region = authKey.region;
-            handler = _routingTable[authKey.module];
+            handler = GatewayRouter::instance().GetHandler(authKey.module);
             log_trace << "Handler found, name: " << handler->name();
         }
 
@@ -208,7 +191,6 @@ namespace AwsMock::Service {
         _response_queue.pop();
 
         DoWrite();
-        //Monitoring::MetricService::instance().SetGauge(GATEWAY_HTTP_QUEUE_LENGTH, response_queue_.size());
     }
 
     void GatewaySession::DoShutdown() {

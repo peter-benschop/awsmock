@@ -26,7 +26,6 @@ namespace AwsMock::Service {
     ContainerService::ContainerService() {
         // Get network mode
         const Core::Configuration &_configuration = Core::Configuration::instance();
-        _configuration.Dump();
         _networkName = _configuration.GetValueString("awsmock.docker.network-name");
         _containerPort = _configuration.GetValueString("awsmock.docker.container.port");
         _isDocker = _configuration.GetValueBool("awsmock.docker.active");

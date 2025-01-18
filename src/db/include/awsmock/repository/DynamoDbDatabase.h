@@ -56,7 +56,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return created DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table) const;
+        Entity::DynamoDb::Table CreateTable(Entity::DynamoDb::Table &table) const;
 
         /**
          * @brief Updates a DynamoDb table
@@ -118,9 +118,10 @@ namespace AwsMock::Database {
          * @brief Returns the number of DynamoDB tables
          *
          * @param region AWS region name
+         * @param prefix table name prefix
          * @return number of DynamoDB tables
          */
-        long CountTables(const std::string &region = {}) const;
+        long CountTables(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Deletes an existing DynamoDB table

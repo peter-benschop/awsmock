@@ -76,12 +76,14 @@ namespace AwsMock::Service {
         try {
 
             Dto::DynamoDb::ListTableCountersResponse tableResponse;
-            tableResponse.total = _dynamoDbDatabase.CountTables(request.region);
+            tableResponse.total = _dynamoDbDatabase.CountTables(request.region, request.prefix);
             for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region); const auto &table: tables) {
                 Dto::DynamoDb::TableCounter tableCounter;
                 tableCounter.tableName = table.name;
                 tableCounter.items = table.itemCount;
                 tableCounter.size = table.size;
+                tableCounter.created = table.created;
+                tableCounter.modified = table.modified;
                 tableResponse.tableCounters.push_back(tableCounter);
             }
             return tableResponse;
@@ -127,7 +129,16 @@ namespace AwsMock::Service {
         try {
 
             // Send request to DynamoDB docker container
-            auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, request.headers);
+            Dto::DynamoDb::DeleteTableRequest dynamoDeleteRequest;
+            dynamoDeleteRequest.tableName = request.tableName;
+            dynamoDeleteRequest.body = dynamoDeleteRequest.ToJson();
+            dynamoDeleteRequest.headers["Region"] = "eu-central-1";
+            dynamoDeleteRequest.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
+            dynamoDeleteRequest.headers["Content-Type"] = "application/x-amz-json-1.0";
+            dynamoDeleteRequest.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
+            dynamoDeleteRequest.headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
+            dynamoDeleteRequest.headers["X-Amz-Security-Token"] = "none";
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, dynamoDeleteRequest.headers);
             deleteTableResponse = {.body = body, .headers = outHeaders, .status = status};
 
             // Delete table in database

@@ -16,7 +16,7 @@ set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secret
 set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSWorker.cpp src/kms/KMSService.cpp src/kms/KMSMonitoring.cpp src/kms/KMSCreator.cpp)
 set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
-set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp src/gateway/GatewayWorker.cpp)
+set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp src/gateway/GatewayWorker.cpp src/gateway/GatewayRouter.cpp)
 set(DOCKER_SOURCES src/container/ContainerService.cpp)
 set(MODULE_SOURCES src/module/ModuleService.cpp src/module/ModuleHandler.cpp src/module/ModuleMonitoring.cpp src/module/ModuleMap.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp
