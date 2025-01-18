@@ -24,18 +24,21 @@ awsmock:
     workers: 20                                                       # Number of worker threads
     timeout: 900                                                      # HTTP timeout
     doc-root: /home/awsmock/frontend                                  # Document root directory
+  autoload: # BSON auto load on startup
+    active: true                                                      # Autoload activation flag
+    file: /home/awsmock/init/init.bson                                # AUto load file
   docker: # Docker settings
-    active: true
-    network-mode: local
-    network-name: local
-    defaults:
-      memory-size: 512
-      temp-size: 10240
-    container:
-      port: 8080
+    active: true                                                      # Docker daemon activation flag
+    network-mode: local                                               # Docker network mode, default: local
+    network-name: local                                               # Docker network name
+    defaults: # Docker container default values
+      memory-size: 512                                                # Docker container memory size
+      temp-size: 10240                                                # Docker container tmp size
+    container: # Docker container defaults
+      port: 8080                                                      # Docker container default port
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
-    socket: /var/run/docker.sock
+    socket: /var/run/docker.sock                                      # Docker REST API domain socket
   podman:
     active: false
     network-mode: podman

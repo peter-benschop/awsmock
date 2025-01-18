@@ -48,7 +48,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    void DescribeTableResponse::ScanResponse() {
+    void DescribeTableResponse::PrepareResponse() {
         FromJson(body, headers);
     }
 

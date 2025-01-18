@@ -37,6 +37,10 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
+    void ScanResponse::PrepareResponse() {
+        FromJson(body);
+    }
+
     std::string ScanResponse::ToString() const {
         std::stringstream ss;
         ss << *this;

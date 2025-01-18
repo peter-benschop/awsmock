@@ -70,7 +70,7 @@ namespace AwsMock::Service {
         void StopLocalDynamoDb() const;
 
         /**
-         * Update counters
+         * @brief Update counters
          */
         void UpdateCounter() const;
 
@@ -80,6 +80,13 @@ namespace AwsMock::Service {
          * Loops over all DynamoDB tables an updates the MongoDB backend.
          */
         void SynchronizeTables() const;
+
+        /**
+         * @brief Synchronize items.
+         *
+         * Loops over all DynamoDB table items an updates the MongoDB backend.
+         */
+        void SynchronizeItems() const;
 
         /**
          * Docker module

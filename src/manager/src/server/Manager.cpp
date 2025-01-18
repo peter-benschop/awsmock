@@ -58,10 +58,12 @@ namespace AwsMock::Manager {
     }
 
     void Manager::AutoLoad() {
-        if (Core::FileUtils::FileExists(AUTO_LOAD_FILE)) {
-            if (const std::string jsonString = Core::FileUtils::ReadFile(AUTO_LOAD_FILE); !jsonString.empty()) {
-                Service::ModuleService::ImportInfrastructure(jsonString);
-                log_info << "Loaded infrastructure from " << AUTO_LOAD_FILE;
+        if (Core::Configuration::instance().GetValueBool("awsmock.autoload.active")) {
+            if (const std::string autoLoadFile = Core::Configuration::instance().GetValueString("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
+                if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
+                    Service::ModuleService::ImportInfrastructure(jsonString);
+                    log_info << "Loaded infrastructure from " << autoLoadFile;
+                }
             }
         }
     }

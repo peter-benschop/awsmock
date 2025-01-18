@@ -29,6 +29,10 @@ namespace AwsMock::Core {
         DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
 
+        // Auto load
+        DefineBoolProperty("awsmock.autoload.active", "AWSMOCK_AUTOLOAD_ACTIVE", true);
+        DefineStringProperty("awsmock.autoload.file", "AWSMOCK_AUTOLOAD_FILE", "/home/awsmock/init/init.bson");
+
         // Gateway
         DefineBoolProperty("awsmock.gateway.active", "AWSMOCK_GATEWAY_ACTIVE", true);
         DefineStringProperty("awsmock.gateway.http.host", "AWSMOCK_GATEWAY_HOST", "localhost");
