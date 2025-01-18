@@ -31,9 +31,12 @@ class TestEnvironment final : public ::testing::Environment {
         AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
         AwsMock::Database::TestUtils::CreateServices();
 
+        // Create docker service
+        dockerService = AwsMock::Service::ContainerService::instance();
+
         // Check image
         if (!dockerService.ImageExists(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION)) {
-            dockerService.CreateImage(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION, TEST_CONTAINER_NAME);
+            dockerService.CreateImage(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION, TEST_IMAGE_NAME);
         }
 
         // Check container
@@ -60,7 +63,7 @@ class TestEnvironment final : public ::testing::Environment {
     /**
      * Docker service
      */
-    AwsMock::Service::ContainerService dockerService = AwsMock::Service::ContainerService::instance();
+    AwsMock::Service::ContainerService dockerService;
 };
 
 int main(int argc, char **argv) {

@@ -26,6 +26,7 @@ namespace AwsMock::Service {
     ContainerService::ContainerService() {
         // Get network mode
         const Core::Configuration &_configuration = Core::Configuration::instance();
+        _configuration.Dump();
         _networkName = _configuration.GetValueString("awsmock.docker.network-name");
         _containerPort = _configuration.GetValueString("awsmock.docker.container.port");
         _isDocker = _configuration.GetValueBool("awsmock.docker.active");
@@ -36,7 +37,7 @@ namespace AwsMock::Service {
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (Core::Configuration::instance().GetValueBool("awsmock.docker.active")) {
+        if (_isDocker) {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
             if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
                 Dto::Docker::ListImageResponse response;
