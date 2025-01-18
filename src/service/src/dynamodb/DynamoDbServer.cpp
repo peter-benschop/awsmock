@@ -147,11 +147,11 @@ namespace AwsMock::Service {
                     scanRequest.PrepareRequest();
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
                     scanResponse.region = _region;
-                    scanResponse.ScanResponse();
+                    //scanResponse.ScanResponse();
 
-                    Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
-                    table = _dynamoDbDatabase.CreateOrUpdateTable(table);
-                    log_debug << "Table synchronized, table: " << table.name;
+                    //Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
+                    //table = _dynamoDbDatabase.CreateOrUpdateTable(table);
+                    //log_debug << "Table synchronized, table: " << table.name;
                 }
 
             } else {
