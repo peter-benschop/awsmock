@@ -32,13 +32,13 @@ namespace AwsMock::Dto::DynamoDb {
             tableName = Core::Bson::BsonUtils::GetStringValue(rootDocument, "TableName");
 
             if (rootDocument.view().find("Keys") != rootDocument.view().end()) {
-                const view keyDocument = rootDocument.view()["Key"].get_document().value;
+                const view keyDocument = rootDocument.view()["Keys"].get_document().value;
                 GetItemKey getItemKey;
                 for (const auto &element: keyDocument) {
                     std::string key = bsoncxx::string::to_string(element.key());
                     std::string value = bsoncxx::string::to_string(element[key].get_string().value);
                     getItemKey.type = key;
-                    getItemKey.type = Core::Bson::BsonUtils::GetStringValue(element);
+                    getItemKey.value = Core::Bson::BsonUtils::GetStringValue(element);
                 }
             }
         } catch (bsoncxx::exception &exc) {

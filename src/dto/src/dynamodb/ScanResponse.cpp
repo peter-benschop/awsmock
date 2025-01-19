@@ -27,9 +27,19 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
 
-            const value document = bsoncxx::from_json(jsonString);
-            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
-            tableName = Core::Bson::BsonUtils::GetStringValue(document, "TableName");
+            const value rootDocument = bsoncxx::from_json(jsonString);
+            region = Core::Bson::BsonUtils::GetStringValue(rootDocument, "Region");
+            tableName = Core::Bson::BsonUtils::GetStringValue(rootDocument, "TableName");
+            count = Core::Bson::BsonUtils::GetLongValue(rootDocument, "Count");
+            scannedCount = Core::Bson::BsonUtils::GetLongValue(rootDocument, "ScannedCount");
+
+            if (rootDocument.find("Items") != rootDocument.end()) {
+                for (const view jsonItems = rootDocument["Items"].get_array().value; const auto jsonItem: jsonItems) {
+                    Database::Entity::DynamoDb::Item item;
+                    item.FromDynamodb(jsonItem.get_document().value);
+                    items.emplace_back(item);
+                }
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -37,8 +47,17 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    void ScanResponse::PrepareResponse() {
+    void ScanResponse::PrepareResponse(const Database::Entity::DynamoDb::Table &table) {
         FromJson(body);
+        for (auto &item: items) {
+            item.region = table.region;
+            item.tableName = table.name;
+            for (const auto &key: table.keySchemas | std::views::keys) {
+                if (item.attributes.contains(key)) {
+                    item.keys[key] = item.attributes.at(key);
+                }
+            }
+        }
     }
 
     std::string ScanResponse::ToString() const {

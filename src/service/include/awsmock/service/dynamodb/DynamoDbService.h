@@ -32,6 +32,8 @@
 #include <awsmock/dto/dynamodb/DynamoDbResponse.h>
 #include <awsmock/dto/dynamodb/GetItemRequest.h>
 #include <awsmock/dto/dynamodb/GetItemResponse.h>
+#include <awsmock/dto/dynamodb/ListItemCountersRequest.h>
+#include <awsmock/dto/dynamodb/ListItemCountersResponse.h>
 #include <awsmock/dto/dynamodb/ListTableCountersRequest.h>
 #include <awsmock/dto/dynamodb/ListTableCountersResponse.h>
 #include <awsmock/dto/dynamodb/ListTableRequest.h>
@@ -93,6 +95,15 @@ namespace AwsMock::Service {
          * @see ListTableCountersResponse
          */
         Dto::DynamoDb::ListTableCountersResponse ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const;
+
+        /**
+         * @brief Lists all item counters
+         *
+         * @param request list item counters request DTO
+         * @return ListItemCountersResponse
+         * @see ListItemCountersResponse
+         */
+        Dto::DynamoDb::ListItemCountersResponse ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const;
 
         /**
          * @brief Describes a table
@@ -180,6 +191,13 @@ namespace AwsMock::Service {
          * @return response body
          */
         Dto::DynamoDb::DynamoDbResponse SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers) const;
+
+        /**
+         * @brief Prepare the headers for the docker request
+         *
+         * @param command DynamoDB command
+         */
+        std::map<std::string, std::string> PrepareHeaders(const std::string &command) const;
 
         /**
          * Database connection

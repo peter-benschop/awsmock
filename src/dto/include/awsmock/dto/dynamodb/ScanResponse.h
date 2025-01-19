@@ -6,6 +6,8 @@
 #define AWSMOCK_DTO_DYNAMODB_SCAN_RESPONSE_H
 
 // C++ standard includes
+#include <map>
+#include <ranges>
 #include <string>
 
 // Boost include<
@@ -16,6 +18,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseRequest.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include <awsmock/entity/dynamodb/Item.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -25,14 +28,33 @@ namespace AwsMock::Dto::DynamoDb {
      * @brief Scan response
      *
      * Example:
-     * @code{.json}
+     * @code(.json)
      * {
-     *   "ConsumedCapacity":
-     *     {
-     *       "TableName":"test-table",
-     *       "CapacityUnits":1.0
-     *     }
-     * }
+     * "Items": [
+     *   {
+     *       "featureCustom": {
+     *           "N": "1024"
+     *       },
+     *       "featureName": {
+     *           "S": "ONIX_PARSING"
+     *       },
+     *       "featureState": {
+     *           "S": "{\"enabled\":true,\"strategyId\":null,\"parameters\":{}}"
+     *       }
+     *   },
+     *   {
+     *       "featureName": {
+     *           "S": "ONIX_SPLITTING"
+     *       },
+     *       "featureState": {
+     *           "S": "{\"enabled\":true,\"strategyId\":null,\"parameters\":{}}"
+     *       }
+     *   }
+     *  ],
+     *  "Count": 2,
+     *  "ScannedCount": 2,
+     *  "ConsumedCapacity": null
+     *}
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -65,9 +87,25 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
-         * @brief Scans the response and fills in the attributes
+         * Item count
          */
-        void PrepareResponse();
+        long count;
+
+        /**
+         * Scanned item count
+         */
+        long scannedCount;
+        /**
+         * Items array
+         */
+        std::vector<Database::Entity::DynamoDb::Item> items;
+
+        /**
+         * @brief Scans the response and fills in the attributes
+         *
+         * @param table table entity
+         */
+        void PrepareResponse(const Database::Entity::DynamoDb::Table &table);
 
         /**
          * Creates a JSON string from the object.

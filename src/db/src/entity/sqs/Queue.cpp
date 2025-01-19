@@ -50,12 +50,10 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
-                if (mResult.value().find("tags") != mResult.value().end()) {
-                    for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                        std::string key = bsoncxx::string::to_string(tagElement.key());
-                        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-                        tags.emplace(key, value);
-                    }
+                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                    std::string key = bsoncxx::string::to_string(tagElement.key());
+                    std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                    tags.emplace(key, value);
                 }
             }
 

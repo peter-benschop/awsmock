@@ -32,8 +32,9 @@ namespace AwsMock::Service {
         // Start DynamoDB monitoring update counters
         scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
-        // Start synchronizing tables
+        // Start synchronizing
         scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
+        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod);
 
         // Set running
         SetRunning();
@@ -141,17 +142,30 @@ namespace AwsMock::Service {
 
                 for (const auto &tableName: listTableResponse.tableNames) {
 
+                    Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(_region, tableName);
+
+                    long size = 0;
                     Dto::DynamoDb::ScanRequest scanRequest;
                     scanRequest.region = _region;
                     scanRequest.tableName = tableName;
                     scanRequest.PrepareRequest();
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
                     scanResponse.region = _region;
-                    //scanResponse.ScanResponse();
+                    scanResponse.PrepareResponse(table);
 
-                    //Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
-                    //table = _dynamoDbDatabase.CreateOrUpdateTable(table);
-                    //log_debug << "Table synchronized, table: " << table.name;
+                    if (!scanResponse.items.empty()) {
+                        for (auto &item: scanResponse.items) {
+                            item = _dynamoDbDatabase.CreateOrUpdateItem(item);
+                            log_trace << "Item synchronized, item: " << item.oid;
+                            size += item.ToJson().size();
+                        }
+                    }
+
+                    // Adjust table counters
+                    table.itemCount = scanResponse.count;
+                    table.size = size;
+                    table = _dynamoDbDatabase.UpdateTable(table);
+                    log_debug << "Table counter adjusted, table: " << table.name;
                 }
 
             } else {

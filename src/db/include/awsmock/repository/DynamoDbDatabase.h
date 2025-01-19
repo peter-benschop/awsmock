@@ -175,7 +175,7 @@ namespace AwsMock::Database {
          * @return created item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item) const;
+        Entity::DynamoDb::Item CreateItem(Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Updates an existing item
@@ -184,7 +184,7 @@ namespace AwsMock::Database {
          * @return updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item) const;
+        Entity::DynamoDb::Item UpdateItem(Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Create or update item
@@ -193,15 +193,17 @@ namespace AwsMock::Database {
          * @return created or updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateOrUpdateItem(const Entity::DynamoDb::Item &item) const;
+        Entity::DynamoDb::Item CreateOrUpdateItem(Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Returns the number of DynamoDB items.
          *
          * @param region AWS region name
+         * @param tableName Dynamodb table name
+         * @param prefix key prefix
          * @return number of DynamoDB items
          */
-        long CountItems(const std::string &region = {}) const;
+        long CountItems(const std::string &region = {}, const std::string &tableName = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Deletes an item by primary key
