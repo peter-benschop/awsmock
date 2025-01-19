@@ -9,13 +9,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
     view_or_value<view, value> AttributeValue::ToDocument() const {
 
         auto attributeDoc = document{};
-        attributeDoc.append(
-                kvp("S", stringValue),
-                kvp("N", numberValue),
-                kvp("BOOL", boolValue),
-                kvp("NULL", nullValue),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+        Core::Bson::BsonUtils::SetStringValue(attributeDoc, "S", stringValue);
+        Core::Bson::BsonUtils::SetStringValue(attributeDoc, "N", numberValue);
+        Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "BOOL", boolValue);
+        Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "NULL", nullValue);
 
         // Convert string set to document
         if (!stringSetValue.empty()) {
@@ -28,13 +25,20 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         // Convert number set to document
         if (!numberSetValue.empty()) {
-            auto numberSetDoc = bsoncxx::builder::basic::array{};
+            auto numberSetDoc = array{};
             for (const auto &nValue: numberSetValue) {
                 numberSetDoc.append(nValue);
             }
             attributeDoc.append(kvp("NS", numberSetDoc));
         }
         return attributeDoc.extract();
+    }
+
+    void AttributeValue::FromDocument(view_or_value<view, value> mResult) {
+        stringValue = Core::Bson::BsonUtils::GetStringValue(mResult, "S");
+        numberValue = Core::Bson::BsonUtils::GetStringValue(mResult, "N");
+        boolValue = Core::Bson::BsonUtils::GetBoolValue(mResult, "BOOL");
+        nullValue = Core::Bson::BsonUtils::GetBoolValue(mResult, "NULL");
     }
 
     std::string AttributeValue::ToString() const {

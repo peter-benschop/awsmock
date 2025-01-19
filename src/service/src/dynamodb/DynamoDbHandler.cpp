@@ -61,6 +61,19 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
+                case Dto::Common::DynamoDbCommandType::LIST_ITEM_COUNTERS: {
+
+                    Dto::DynamoDb::ListItemCountersRequest itemRequest;
+                    itemRequest.FromJson(clientCommand.payload);
+                    itemRequest.region = clientCommand.region;
+                    itemRequest.requestId = clientCommand.requestId;
+                    itemRequest.user = clientCommand.user;
+
+                    Dto::DynamoDb::ListItemCountersResponse itemResponse = _dynamoDbService.ListItemCounters(itemRequest);
+                    log_debug << "Item counters listed, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName;
+                    return SendOkResponse(request, itemResponse.ToJson());
+                }
+
                 case Dto::Common::DynamoDbCommandType::DESCRIBE_TABLE: {
 
                     Dto::DynamoDb::DescribeTableRequest tableRequest;

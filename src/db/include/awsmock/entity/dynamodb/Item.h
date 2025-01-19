@@ -13,6 +13,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/dynamodb/AttributeValue.h>
+#include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -20,8 +21,20 @@ namespace AwsMock::Database::Entity::DynamoDb {
     using std::chrono::system_clock;
 
     /**
-     * @brief DynamoDB item entity
-     *
+     * @brief DynamoDB item primary key
+     * @code(.json)
+     * {
+     *   "featureCustom": {
+     *     "N": "1024"
+     *   },
+     *   "featureName": {
+     *     "S": "ONIX_PARSING"
+     *   },
+     *   "featureState": {
+     *     "S": "{\"enabled\":true,\"strategyId\":null,\"parameters\":{}}"
+     *   }
+     * }
+     * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
     struct Item {
@@ -73,7 +86,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        Item FromDocument(const optional<view> &mResult);
+        Item FromDocument(const view_or_value<view, value> &mResult);
+
+        /**
+         * @brief Converts the DynamoDB document to an MongoDb entity
+         *
+         * @param mResult query result.
+         */
+        Item FromDynamodb(const view_or_value<view, value> &mResult);
 
         /**
          * Converts the entity to a JSON string

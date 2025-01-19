@@ -81,7 +81,7 @@ namespace AwsMock::Database {
 
                 Entity::DynamoDb::Table result;
                 result.FromDocument(mResult->view());
-                log_debug << "Got table by ID, table: " << result.ToString();
+                log_trace << "Got table by ID, table: " << result.ToString();
                 return result;
 
             } catch (const mongocxx::exception &exc) {
@@ -355,22 +355,25 @@ namespace AwsMock::Database {
                 }
 
                 if (!item.tableName.empty()) {
-                    query.append(kvp("name", item.tableName));
+                    query.append(kvp("tableName", item.tableName));
                 }
 
                 // Add primary keys
-                for (const auto &key: table.keySchemas | std::views::keys) {
-                    std::string keyName = key;
+                for (const auto &fst: table.keySchemas | std::views::keys) {
+                    std::string keyName = fst;
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
                     auto it = std::ranges::find_if(att,
                                                    [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
                                                        return attribute.first == keyName;
                                                    });
                     if (it != att.end()) {
-                        query.append(kvp("attributes." + key + ".S", it->second.stringValue));
-                        query.append(kvp("attributes." + key + ".N", it->second.numberValue));
-                        query.append(kvp("attributes." + key + ".BOOL", it->second.boolValue));
-                        query.append(kvp("attributes." + key + ".NULL", it->second.boolValue));
+                        if (!it->second.stringValue.empty()) {
+                            query.append(kvp("attributes." + keyName + ".S", it->second.stringValue));
+                        }
+                        if (!it->second.numberValue.empty()) {
+                            query.append(kvp("attributes." + keyName + ".N", it->second.numberValue));
+                        }
+                        query.append(kvp("attributes." + keyName + ".BOOL", it->second.boolValue));
                     }
                 }
                 const int64_t count = _itemCollection.count_documents(query.extract());
@@ -401,10 +404,10 @@ namespace AwsMock::Database {
                 }
 
                 if (!tableName.empty()) {
-                    query.append(kvp("name", tableName));
+                    query.append(kvp("tableName", tableName));
                 }
 
-                for (auto itemCursor = _itemCollection.find(query.extract()); auto item: itemCursor) {
+                for (auto itemCursor = _itemCollection.find(query.extract()); const auto item: itemCursor) {
                     Entity::DynamoDb::Item result;
                     result.FromDocument(item);
                     items.push_back(result);
@@ -447,7 +450,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(const Entity::DynamoDb::Item &item) const {
+    Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(Entity::DynamoDb::Item &item) const {
 
         if (HasDatabase()) {
 
@@ -461,8 +464,11 @@ namespace AwsMock::Database {
                 log_info << to_json(item.ToDocument());
                 const auto result = _itemCollection.insert_one(item.ToDocument());
                 session.commit_transaction();
+
                 log_trace << "DynamoDb item created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetItemById(result->inserted_id().get_oid().value);
+                item.oid = result->inserted_id().get_oid().value.to_string();
+
+                return item;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -473,7 +479,9 @@ namespace AwsMock::Database {
         return _memoryDb.CreateItem(item);
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(const Entity::DynamoDb::Item &item) const {
+    Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(Entity::DynamoDb::Item &item) const {
+
+        item.modified = system_clock::now();
 
         if (HasDatabase()) {
 
@@ -485,13 +493,16 @@ namespace AwsMock::Database {
 
                 Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
 
+                mongocxx::options::find_one_and_update opts{};
+                opts.return_document(mongocxx::options::return_document::k_after);
+
                 document query;
                 if (!item.region.empty()) {
                     query.append(kvp("region", item.region));
                 }
 
                 if (!item.tableName.empty()) {
-                    query.append(kvp("name", item.tableName));
+                    query.append(kvp("tableName", item.tableName));
                 }
 
                 // Add primary keys
@@ -503,21 +514,25 @@ namespace AwsMock::Database {
                                                        return attribute.first == keyName;
                                                    });
                     if (it != att.end()) {
-                        query.append(kvp("attributes." + key + ".S", it->second.stringValue));
-                        query.append(kvp("attributes." + key + ".N", it->second.numberValue));
+                        if (!it->second.stringValue.empty()) {
+                            query.append(kvp("attributes." + key + ".S", it->second.stringValue));
+                        }
+                        if (!it->second.numberValue.empty()) {
+                            query.append(kvp("attributes." + key + ".N", it->second.numberValue));
+                        }
                         query.append(kvp("attributes." + key + ".BOOL", it->second.boolValue));
-                        query.append(kvp("attributes." + key + ".NULL", it->second.boolValue));
                     }
                 }
 
                 session.start_transaction();
-                auto result = _itemCollection.replace_one(query.extract(), item.ToDocument());
-                const auto findResult = _itemCollection.find_one(query.extract());
+                const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
                 session.commit_transaction();
-
-                log_info << "DynamoDb item updated, oid: " << findResult.value()["_id"].get_oid().value.to_string();
-                return Entity::DynamoDb::Item().FromDocument(findResult->view());
-
+                if (result.has_value()) {
+                    item = Entity::DynamoDb::Item().FromDocument(result->view());
+                    log_info << "DynamoDb item updated, oid: " << item.oid;
+                    return item;
+                }
+                return {};
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
@@ -527,7 +542,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateItem(item);
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::CreateOrUpdateItem(const Entity::DynamoDb::Item &item) const {
+    Entity::DynamoDb::Item DynamoDbDatabase::CreateOrUpdateItem(Entity::DynamoDb::Item &item) const {
 
         if (ItemExists(item)) {
             return UpdateItem(item);
@@ -535,7 +550,7 @@ namespace AwsMock::Database {
         return CreateItem(item);
     }
 
-    long DynamoDbDatabase::CountItems(const std::string &region) const {
+    long DynamoDbDatabase::CountItems(const std::string &region, const std::string &tableName, const std::string &prefix) const {
 
         if (HasDatabase()) {
 
@@ -543,11 +558,18 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-                if (region.empty()) {
 
-                    return _itemCollection.count_documents({});
+                document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
                 }
-                return _itemCollection.count_documents(make_document(kvp("region", region)));
+                if (!tableName.empty()) {
+                    query.append(kvp("tableName", tableName));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("prefix", prefix));
+                }
+                return _itemCollection.count_documents(query.extract());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

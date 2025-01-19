@@ -6,12 +6,10 @@
 #define AWSMOCK_SERVER_DYNAMODB_SERVER_H
 
 // C++ standard includes
+#include <map>
 #include <string>
 
 // AwsMock includes
-#include "DynamoDbService.h"
-
-
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
@@ -19,6 +17,7 @@
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 

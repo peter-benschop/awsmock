@@ -59,16 +59,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
         bool nullValue = false;
 
         /**
-         * Creation date
-         */
-        system_clock::time_point created = system_clock::now();
-
-        /**
-         * Last modification date
-         */
-        system_clock::time_point modified = system_clock::now();
-
-        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
@@ -80,7 +70,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(view_or_value<view, value> mResult);
 
         /**
          * @brief Converts the DTO to a string representation.
