@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/dynamodb/PutItemRequest.h>
+#include <awsmock/entity/dynamodb/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -31,6 +32,15 @@ namespace AwsMock::Dto::DynamoDb {
             const value document = bsoncxx::from_json(jsonString);
             region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
             tableName = Core::Bson::BsonUtils::GetStringValue(document, "TableName");
+
+            if (document.find("Item") != document.end()) {
+                for (const view attributesView = document.view()["Item"].get_document().value; const bsoncxx::document::element &attribute: attributesView) {
+                    std::string key = bsoncxx::string::to_string(attribute.key());
+                    AttributeValue value;
+                    value.FromDocument(attributesView[key].get_document().value);
+                    attributes.emplace(key, value);
+                }
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

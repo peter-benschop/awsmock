@@ -42,23 +42,22 @@ namespace AwsMock::Dto::DynamoDb {
 
         try {
             for (bsoncxx::document::element ele: jsonObject) {
-                type = ele["type"].get_string();
-                if (type == "S") {
-                    stringValue = ele["S"].get_string();
-                } else if (type == "SS") {
-                    for (bsoncxx::array::view jsonArray = ele["SS"].get_array().value; const auto &value: jsonArray) {
+                if (ele.key() == "S") {
+                    stringValue = jsonObject["S"].get_string().value;
+                } else if (ele.key() == "SS") {
+                    for (bsoncxx::array::view jsonArray = jsonObject["SS"].get_array().value; const auto &value: jsonArray) {
                         stringSetValue.emplace_back(value.get_string().value);
                     }
-                } else if (type == "N") {
-                    numberValue = ele["S"].get_int64();
-                } else if (type == "NS") {
-                    for (bsoncxx::array::view jsonArray = ele["NS"].get_array().value; const auto &value: jsonArray) {
+                } else if (ele.key() == "N") {
+                    numberValue = jsonObject["N"].get_string().value;
+                } else if (ele.key() == "NS") {
+                    for (bsoncxx::array::view jsonArray = jsonObject["NS"].get_array().value; const auto &value: jsonArray) {
                         numberSetValue.emplace_back(value.get_string().value);
                     }
-                } else if (type == "BOOL") {
-                    boolValue = ele["S"].get_bool();
-                } else if (type == "NULL") {
-                    nullValue = true;
+                } else if (ele.key() == "BOOL") {
+                    boolValue = std::make_shared<bool>(jsonObject["BOOL"].get_bool().value);
+                } else if (ele.key() == "NULL") {
+                    nullValue = std::make_shared<bool>(true);
                 }
             }
         } catch (bsoncxx::exception &exc) {

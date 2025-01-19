@@ -16,6 +16,9 @@
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
+namespace AwsMock::Dto::DynamoDb {
+    struct Key;
+}
 namespace AwsMock::Database {
 
     /**
@@ -210,10 +213,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName name of the table
-         * @param key primary key of the item
+         * @param keys primary key of the item
          * @throws DatabaseException
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) const;
+        void DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
 
         /**
          * @brief Deletes all item of a table

@@ -244,10 +244,10 @@ namespace AwsMock::Database {
         return static_cast<long>(_items.size());
     }
 
-    void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) {
+    void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) {
         boost::mutex::scoped_lock lock(_itemMutex);
 
-        const auto count = std::erase_if(_items, [region, tableName, key](const auto &item) {
+        const auto count = std::erase_if(_items, [region, tableName, keys](const auto &item) {
             auto const &[k, v] = item;
             return v.region == region && v.tableName == tableName;
         });

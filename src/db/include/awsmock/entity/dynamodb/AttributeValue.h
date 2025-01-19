@@ -24,11 +24,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
     struct AttributeValue {
 
         /**
-         * Type
-         */
-        std::string type;
-
-        /**
          * String value
          */
         std::string stringValue;
@@ -51,12 +46,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Boolean value
          */
-        bool boolValue = false;
+        std::shared_ptr<bool> boolValue;
 
         /**
          * Null value
          */
-        bool nullValue = false;
+        std::shared_ptr<bool> nullValue;
 
         /**
          * @brief Converts the entity to a MongoDB document

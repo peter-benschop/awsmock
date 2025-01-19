@@ -54,12 +54,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Boolean value
          */
-        bool boolValue = false;
+        std::shared_ptr<bool> boolValue;
 
         /**
          * Null value
          */
-        bool nullValue = false;
+        std::shared_ptr<bool> nullValue;
 
         /**
          * @brief Convert to JSON value

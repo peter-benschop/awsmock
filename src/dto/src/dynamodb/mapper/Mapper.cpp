@@ -28,7 +28,6 @@ namespace AwsMock::Dto::DynamoDb {
 
         for (const auto &[fst, snd]: request.key.keys) {
             Database::Entity::DynamoDb::AttributeValue attributeValue;
-            attributeValue.type = snd.type;
             attributeValue.stringValue = snd.stringValue;
             attributeValue.stringSetValue = snd.stringSetValue;
             attributeValue.numberValue = snd.numberValue;
@@ -49,7 +48,6 @@ namespace AwsMock::Dto::DynamoDb {
 
         for (const auto &[fst, snd]: request.attributes) {
             Database::Entity::DynamoDb::AttributeValue attribute;
-            attribute.type = snd.type;
             attribute.stringValue = snd.stringValue;
             attribute.stringSetValue = snd.stringSetValue;
             attribute.numberValue = snd.numberValue;

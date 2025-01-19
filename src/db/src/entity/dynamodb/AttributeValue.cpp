@@ -3,16 +3,25 @@
 //
 
 #include <awsmock/entity/dynamodb/AttributeValue.h>
+#include <jwt-cpp/jwt.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> AttributeValue::ToDocument() const {
 
         auto attributeDoc = document{};
-        Core::Bson::BsonUtils::SetStringValue(attributeDoc, "S", stringValue);
-        Core::Bson::BsonUtils::SetStringValue(attributeDoc, "N", numberValue);
-        Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "BOOL", boolValue);
-        Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "NULL", nullValue);
+        if (!stringValue.empty()) {
+            Core::Bson::BsonUtils::SetStringValue(attributeDoc, "S", stringValue);
+        }
+        if (!numberValue.empty()) {
+            Core::Bson::BsonUtils::SetStringValue(attributeDoc, "N", numberValue);
+        }
+        if (boolValue) {
+            Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "BOOL", *boolValue);
+        }
+        if (nullValue) {
+            Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "NULL", *nullValue);
+        }
 
         // Convert string set to document
         if (!stringSetValue.empty()) {
@@ -35,10 +44,15 @@ namespace AwsMock::Database::Entity::DynamoDb {
     }
 
     void AttributeValue::FromDocument(view_or_value<view, value> mResult) {
-        stringValue = Core::Bson::BsonUtils::GetStringValue(mResult, "S");
-        numberValue = Core::Bson::BsonUtils::GetStringValue(mResult, "N");
-        boolValue = Core::Bson::BsonUtils::GetBoolValue(mResult, "BOOL");
-        nullValue = Core::Bson::BsonUtils::GetBoolValue(mResult, "NULL");
+        if (mResult.view().find("S") != mResult.view().end()) {
+            stringValue = Core::Bson::BsonUtils::GetStringValue(mResult, "S");
+        } else if (mResult.view().find("N") != mResult.view().end()) {
+            numberValue = Core::Bson::BsonUtils::GetStringValue(mResult, "N");
+        } else if (mResult.view().find("BOOL") != mResult.view().end()) {
+            boolValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "BOOL"));
+        } else if (mResult.view().find("NULL") != mResult.view().end()) {
+            nullValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "NULL"));
+        }
     }
 
     std::string AttributeValue::ToString() const {

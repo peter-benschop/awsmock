@@ -131,7 +131,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static void SetDateValue(document &document, const std::string &name, const system_clock::time_point &value) {
-            SetStringValue(document, name, DateTimeUtils::ToISO8601(value));
+            document.append(kvp(name, bsoncxx::types::b_date(value)));
         }
 
         static void SetDocumentValue(document &rootDocument, const std::string &name, document &value) {

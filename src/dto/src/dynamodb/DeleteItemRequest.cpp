@@ -31,6 +31,10 @@ namespace AwsMock::Dto::DynamoDb {
             region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
             tableName = Core::Bson::BsonUtils::GetStringValue(document, "TableName");
 
+            if (document.find("Key") != document.end()) {
+                key.FromDocument(document["Key"].get_document().value);
+            }
+
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
