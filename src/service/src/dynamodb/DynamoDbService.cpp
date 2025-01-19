@@ -145,16 +145,8 @@ namespace AwsMock::Service {
         try {
 
             // Send request to DynamoDB docker container
-            Dto::DynamoDb::DeleteTableRequest dynamoDeleteRequest;
-            dynamoDeleteRequest.tableName = request.tableName;
-            dynamoDeleteRequest.body = dynamoDeleteRequest.ToJson();
-            dynamoDeleteRequest.headers["Region"] = "eu-central-1";
-            dynamoDeleteRequest.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
-            dynamoDeleteRequest.headers["Content-Type"] = "application/x-amz-json-1.0";
-            dynamoDeleteRequest.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
-            dynamoDeleteRequest.headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
-            dynamoDeleteRequest.headers["X-Amz-Security-Token"] = "none";
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, dynamoDeleteRequest.headers);
+            std::map<std::string, std::string> headers = PrepareHeaders("DeleteTable");
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             deleteTableResponse = {.body = body, .headers = outHeaders, .status = status};
 
             // Delete table in database
@@ -181,12 +173,7 @@ namespace AwsMock::Service {
                 Dto::DynamoDb::DeleteTableRequest dynamoDeleteRequest;
                 dynamoDeleteRequest.tableName = table.name;
                 dynamoDeleteRequest.body = dynamoDeleteRequest.ToJson();
-                dynamoDeleteRequest.headers["Region"] = "eu-central-1";
-                dynamoDeleteRequest.headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb.delete-table";
-                dynamoDeleteRequest.headers["Content-Type"] = "application/x-amz-json-1.0";
-                dynamoDeleteRequest.headers["X-Amz-Target"] = "DynamoDB_20120810.DeleteTable";
-                dynamoDeleteRequest.headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
-                dynamoDeleteRequest.headers["X-Amz-Security-Token"] = "none";
+                dynamoDeleteRequest.headers = PrepareHeaders("DeleteTable");
                 SendAuthorizedDynamoDbRequest(dynamoDeleteRequest.body, dynamoDeleteRequest.headers);
             }
 
