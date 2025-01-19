@@ -321,7 +321,21 @@ namespace AwsMock::Service {
             if (status == http::status::ok) {
 
                 // Delete item in database
-                _dynamoDbDatabase.DeleteItem(request.region, request.tableName, "");
+                std::map<std::string, Database::Entity::DynamoDb::AttributeValue> keys;
+                for (const auto &[fst, snd]: request.key.keys) {
+                    Database::Entity::DynamoDb::AttributeValue attributeEntity;
+                    if (!snd.stringValue.empty()) {
+                        attributeEntity.stringValue = snd.stringValue;
+                    } else if (!snd.numberValue.empty()) {
+                        attributeEntity.numberValue = snd.numberValue;
+                    } else if (snd.boolValue) {
+                        attributeEntity.boolValue = snd.boolValue;
+                    } else if (snd.nullValue && *snd.nullValue) {
+                        attributeEntity.nullValue = snd.nullValue;
+                    }
+                    keys[fst] = attributeEntity;
+                }
+                _dynamoDbDatabase.DeleteItem(request.region, request.tableName, keys);
             }
             log_info << "DynamoDb item deleted, table: " << request.tableName;
 

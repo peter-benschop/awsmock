@@ -21,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteItemRequest : public Dto::Common::BaseRequest {
+    struct DeleteItemRequest : Common::BaseRequest {
 
         /**
          * Region

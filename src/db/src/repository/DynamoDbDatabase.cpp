@@ -4,6 +4,9 @@
 
 #include <awsmock/repository/DynamoDbDatabase.h>
 
+namespace AwsMock::Dto::DynamoDb {
+    struct Key;
+}
 namespace AwsMock::Database {
 
     using bsoncxx::builder::basic::kvp;
@@ -310,34 +313,6 @@ namespace AwsMock::Database {
         }
     }
 
-    /*bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName) {
-
-        if (HasDatabase()) {
-
-            try {
-
-                int64_t count;
-                auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                if (!region.empty()) {
-                    count = _tableCollection.count_documents(make_document(kvp("region", region), kvp("name", tableName)));
-                } else {
-                    count = _tableCollection.count_documents(make_document(kvp("name", tableName)));
-                }
-                log_trace << "DynamoDb table exists: " << std::boolalpha<<(count>0);
-                return count > 0;
-
-            } catch (const mongocxx::exception &exc) {
-                log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-            }
-
-        } else {
-
-            return _memoryDb.ItemExists(region, tableName, key);
-        }
-    }*/
-
     bool DynamoDbDatabase::ItemExists(const Entity::DynamoDb::Item &item) const {
 
         if (HasDatabase()) {
@@ -373,7 +348,12 @@ namespace AwsMock::Database {
                         if (!it->second.numberValue.empty()) {
                             query.append(kvp("attributes." + keyName + ".N", it->second.numberValue));
                         }
-                        query.append(kvp("attributes." + keyName + ".BOOL", it->second.boolValue));
+                        if (it->second.boolValue) {
+                            query.append(kvp("attributes." + keyName + ".BOOL", *it->second.boolValue));
+                        }
+                        if (it->second.nullValue && *it->second.nullValue) {
+                            query.append(kvp("attributes." + keyName + ".NULL", *it->second.nullValue));
+                        }
                     }
                 }
                 const int64_t count = _itemCollection.count_documents(query.extract());
@@ -520,7 +500,12 @@ namespace AwsMock::Database {
                         if (!it->second.numberValue.empty()) {
                             query.append(kvp("attributes." + key + ".N", it->second.numberValue));
                         }
-                        query.append(kvp("attributes." + key + ".BOOL", it->second.boolValue));
+                        if (it->second.boolValue) {
+                            query.append(kvp("attributes." + key + ".BOOL", *it->second.boolValue));
+                        }
+                        if (it->second.nullValue && it->second.nullValue) {
+                            query.append(kvp("attributes." + key + ".NULL", *it->second.nullValue));
+                        }
                     }
                 }
 
@@ -579,7 +564,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountItems(region);
     }
 
-    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &key) const {
+    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
 
         if (HasDatabase()) {
 
@@ -587,7 +572,22 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-                const auto result = _itemCollection.delete_many(make_document(kvp("name", tableName)));
+
+                document query;
+                query.append(kvp("region", region));
+                query.append(kvp("tableName", tableName));
+                for (const auto &[fst, snd]: keys) {
+                    if (!snd.stringValue.empty()) {
+                        query.append(kvp(fst + "S", snd.stringValue));
+                    } else if (!snd.numberValue.empty()) {
+                        query.append(kvp(fst + "N", snd.numberValue));
+                    } else if (snd.boolValue) {
+                        query.append(kvp(fst + "BOOL", *snd.boolValue));
+                    } else if (snd.nullValue && *snd.nullValue) {
+                        query.append(kvp(fst + "NULL", *snd.nullValue));
+                    }
+                }
+                const auto result = _itemCollection.delete_one(make_document(kvp("tableName", tableName)));
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
@@ -597,7 +597,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteItem(region, tableName, key);
+            _memoryDb.DeleteItem(region, tableName, keys);
         }
     }
 
