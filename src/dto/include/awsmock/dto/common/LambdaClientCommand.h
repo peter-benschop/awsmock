@@ -41,7 +41,7 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<LambdaCommandType, std::string> LambdaCommandTypeNames{
-            {LambdaCommandType::CREATE_LAMBDA, "create-queue"},
+            {LambdaCommandType::CREATE_LAMBDA, "create-function"},
             {LambdaCommandType::DELETE_LAMBDA, "delete-function"},
             {LambdaCommandType::INVOKE_LAMBDA, "invoke-function"},
             {LambdaCommandType::LIST_LAMBDAS, "list-functions"},

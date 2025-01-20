@@ -35,9 +35,11 @@ namespace AwsMock::Dto::Docker {
 
             spaceReclaimed = Core::Bson::BsonUtils::GetLongValue(document, "SpaceReclaimed");
 
-            if (document.find("ContainersDeleted") != document.end()) {
-                for (const bsoncxx::array::view jsonArray = document.view()["ContainersDeleted"].get_array().value; const auto &container: jsonArray) {
-                    containersDeleted.emplace_back(container.get_string().value);
+            if (spaceReclaimed > 0) {
+                if (document.find("ContainersDeleted") != document.end()) {
+                    for (const bsoncxx::array::view jsonArray = document.view()["ContainersDeleted"].get_array().value; const auto &container: jsonArray) {
+                        containersDeleted.emplace_back(container.get_string().value);
+                    }
                 }
             }
 

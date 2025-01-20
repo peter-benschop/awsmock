@@ -357,11 +357,12 @@ namespace AwsMock::Service {
         }
 
         // Delete the containers, if existing
-        for (Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName); const auto &instance: lambda.instances) {
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+        for (const auto &instance: lambda.instances) {
 
-            if (dockerService.ContainerExists(instance.id)) {
+            if (dockerService.ContainerExists(instance.containerId)) {
 
-                Dto::Docker::Container container = dockerService.GetContainerById(instance.id);
+                Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
                 dockerService.StopContainer(container.id);
                 dockerService.DeleteContainer(container);
                 log_debug << "Docker container deleted, function: " + request.functionName;
@@ -369,11 +370,15 @@ namespace AwsMock::Service {
         }
 
         // Delete the image, if existing
-        if (dockerService.ImageExists(request.functionName, request.qualifier)) {
-            Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, request.qualifier);
+        if (dockerService.ImageExists(request.functionName, lambda.dockerTag)) {
+            Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, lambda.dockerTag);
             dockerService.DeleteImage(image.id);
             log_debug << "Docker image deleted, function: " + request.functionName;
         }
+
+        // Prune containers
+        dockerService.PruneContainers();
+        log_debug << "Docker image deleted, function: " + request.functionName;
 
         _lambdaDatabase.DeleteLambda(request.functionName);
         log_info << "Lambda function deleted, function: " + request.functionName;

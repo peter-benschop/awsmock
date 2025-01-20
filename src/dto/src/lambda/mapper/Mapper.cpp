@@ -70,6 +70,7 @@ namespace AwsMock::Dto::Lambda {
         lambda.code.s3Bucket = request.code.s3Bucket;
         lambda.code.s3Key = request.code.s3Key;
         lambda.code.s3ObjectVersion = request.code.s3ObjectVersion;
+        lambda.tags = request.tags;
         return lambda;
     }
 
@@ -96,7 +97,7 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
-    ListFunctionCountersResponse Mapper::map(const Dto::Lambda::ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
+    ListFunctionCountersResponse Mapper::map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
         ListFunctionCountersResponse response;
         for (auto &lambdaEntity: lambdaEntities) {
             FunctionCounter counter;
