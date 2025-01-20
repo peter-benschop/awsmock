@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::Lambda {
             {Failed, "Failed"},
     };
 
-    [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
+    [[maybe_unused]] static std::string LambdaStateToString(const LambdaState &lambdaState) {
         return LambdaStateNames[lambdaState];
     }
 
