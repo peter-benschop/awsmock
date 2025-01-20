@@ -138,6 +138,10 @@ namespace AwsMock::Core::Bson {
             rootDocument.append(kvp(name, value));
         }
 
+        static void SetDocumentValue(document &rootDocument, const std::string &name, const view_or_value<view, value> &value) {
+            rootDocument.append(kvp(name, value));
+        }
+
         static void SetArrayValue(document &rootDocument, const std::string &name, array &value) {
             rootDocument.append(kvp(name, value));
         }

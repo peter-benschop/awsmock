@@ -441,7 +441,6 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                log_info << to_json(item.ToDocument());
                 const auto result = _itemCollection.insert_one(item.ToDocument());
                 session.commit_transaction();
 

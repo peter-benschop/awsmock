@@ -61,7 +61,8 @@ namespace AwsMock::Database::Entity::Lambda {
         for (const auto &[fst, snd]: environment.variables) {
             variablesDoc.append(make_document(kvp(fst, snd)));
         }
-        view_or_value<view, value> varDoc = make_document(kvp("variables", variablesDoc));
+        document varDoc;
+        varDoc.append(kvp("variables", variablesDoc));
 
         // Convert tags to document
         auto tagsDoc = document{};
@@ -75,42 +76,43 @@ namespace AwsMock::Database::Entity::Lambda {
             eventSourcesDoc.append(e.ToDocument());
         }
 
-        view_or_value<view, value> ephemeralStorageDoc = make_document(kvp("size", static_cast<bsoncxx::types::b_int64>(ephemeralStorage.size)));
+        document ephemeralStorageDoc;
+        Core::Bson::BsonUtils::SetLongValue(ephemeralStorageDoc, "size", ephemeralStorage.size);
 
         document lambdaDoc;
-        lambdaDoc.append(
-                kvp("region", region),
-                kvp("user", user),
-                kvp("function", function),
-                kvp("runtime", runtime),
-                kvp("role", role),
-                kvp("handler", handler),
-                kvp("memorySize", static_cast<bsoncxx::types::b_int64>(memorySize)),
-                kvp("ephemeralStorage", ephemeralStorageDoc),
-                kvp("codeSize", static_cast<bsoncxx::types::b_int64>(codeSize)),
-                kvp("imageId", imageId),
-                kvp("imageSize", imageSize),
-                kvp("containerId", containerId),
-                kvp("containerSize", containerSize),
-                kvp("tags", tagsDoc),
-                kvp("arn", arn),
-                kvp("timeout", timeout),
-                kvp("concurrency", concurrency),
-                kvp("codeSha256", codeSha256),
-                kvp("environment", varDoc),
-                kvp("code", code.ToDocument()),
-                kvp("state", LambdaStateToString(state)),
-                kvp("stateReason", stateReason),
-                kvp("stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode)),
-                kvp("instances", instancesDoc),
-                kvp("invocations", invocations),
-                kvp("averageRuntime", averageRuntime),
-                kvp("dockerTag", dockerTag),
-                kvp("eventSources", eventSourcesDoc),
-                kvp("lastStarted", bsoncxx::types::b_date(lastStarted)),
-                kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "region", region);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "arn", arn);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "user", user);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "function", function);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "runtime", runtime);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "role", role);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "handler", handler);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "imageId", imageId);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "memorySize", memorySize);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "codeSize", codeSize);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "imageSize", imageSize);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "containerId", containerId);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "containerSize", containerSize);
+        Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "tags", tagsDoc);
+        Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "ephemeralStorage", ephemeralStorageDoc);
+        Core::Bson::BsonUtils::SetIntValue(lambdaDoc, "timeout", timeout);
+        Core::Bson::BsonUtils::SetIntValue(lambdaDoc, "concurrency", concurrency);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "codeSha256", codeSha256);
+        Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "environment", varDoc);
+        Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "code", code.ToDocument());
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "state", LambdaStateToString(state));
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReason", stateReason);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode));
+        Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "instances", instancesDoc);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "invocations", invocations);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "averageRuntime", averageRuntime);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "dockerTag", dockerTag);
+        Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "eventSources", eventSourcesDoc);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStarted", lastStarted);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastInvocation", lastInvocation);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "created", created);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "modified", modified);
+
         return lambdaDoc.extract();
     }
 

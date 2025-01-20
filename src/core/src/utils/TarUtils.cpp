@@ -8,7 +8,7 @@
 namespace AwsMock::Core {
 
     void TarUtils::Unzip(const std::string &zipFile, const std::string &directory) {
-        struct archive_entry *entry;
+        archive_entry *entry;
         int r;
 
         /* Select which attributes we want to restore. */

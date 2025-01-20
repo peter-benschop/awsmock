@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Code::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Code::FromDocument(const std::optional<view> &mResult) {
 
         if (mResult.value().find("zipFile") != mResult.value().end()) {
             zipFile = Core::Bson::BsonUtils::GetStringValue(mResult, "zipFile");
@@ -39,7 +39,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     std::ostream &operator<<(std::ostream &os, const Code &t) {
-        os << "Code=" << bsoncxx::to_json(t.ToDocument());
+        os << "Code=" << to_json(t.ToDocument());
         return os;
     }
 }// namespace AwsMock::Database::Entity::Lambda

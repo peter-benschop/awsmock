@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::Lambda {
             {Failed, "Failed"},
     };
 
-    [[maybe_unused]] static std::string LambdaStateToString(LambdaState lambdaState) {
+    [[maybe_unused]] static std::string LambdaStateToString(const LambdaState &lambdaState) {
         return LambdaStateNames[lambdaState];
     }
 
@@ -185,7 +185,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Size of the code in bytes, usually the size of the ZIP or JAR file.
          */
-        long codeSize;
+        long codeSize = 0;
 
         /**
          * Image ID
@@ -195,7 +195,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * @brief Image size, as reported by the docker daemon
          */
-        long imageSize;
+        long imageSize = 0;
 
         /**
          * Container ID
@@ -209,7 +209,7 @@ namespace AwsMock::Database::Entity::Lambda {
          * Usually this id the size of the root file system of the container, as reported by the docker daemon. The docker container
          * reports this size as 'SizeRootFs' in container JSON.
          */
-        long containerSize;
+        long containerSize = 0;
 
         /**
          * Tags
@@ -224,7 +224,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Timeout in seconds
          */
-        int timeout;
+        int timeout = 3600;
 
         /**
          * Concurrency

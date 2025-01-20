@@ -65,7 +65,7 @@ namespace AwsMock::Service {
          * @param functionId lambda function OID
          * @param instanceId instanceId
          */
-        void operator()(std::string &functionCode, const std::string &functionId, const std::string &instanceId) const;
+        void operator()(const std::string &functionCode, const std::string &functionId, const std::string &instanceId) const;
 
       private:
 
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
          * @param lambdaEntity lambda entity
          * @param functionCode function code
          */
-        static void CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, std::string &functionCode);
+        static void CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode);
 
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder

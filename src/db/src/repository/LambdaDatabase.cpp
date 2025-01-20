@@ -246,7 +246,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region),
                                                                           kvp("function", lambda.function),

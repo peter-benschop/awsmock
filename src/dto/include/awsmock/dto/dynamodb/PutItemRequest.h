@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PutItemRequest : public Dto::Common::BaseRequest {
+    struct PutItemRequest : Common::BaseRequest {
 
         /**
          * Region

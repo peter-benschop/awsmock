@@ -83,6 +83,7 @@ namespace AwsMock::Service {
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
         if (statusCode != http::status::ok) {
             log_error << "Get image by name failed, httpStatus: " << statusCode;
+            return {};
         }
         Dto::Docker::ListImageResponse response;
         response.FromJson(body);
@@ -176,7 +177,7 @@ namespace AwsMock::Service {
         if (_isDocker) {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
             if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/json?all=true&filters=" + filters); statusCode == http::status::ok) {
-                Dto::Docker::ListContainerResponse response(body);
+                const Dto::Docker::ListContainerResponse response(body);
                 log_debug << "Docker container found, id: " << id;
                 return !response.containerList.empty();
             } else {

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    void LambdaCreator::operator()(std::string &functionCode, const std::string &functionId, const std::string &instanceId) const {
+    void LambdaCreator::operator()(const std::string &functionCode, const std::string &functionId, const std::string &instanceId) const {
 
         log_debug << "Start creating lambda function, oid: " << functionId;
 
@@ -20,12 +20,13 @@ namespace AwsMock::Service {
         lambdaEntity.lastStarted = system_clock::now();
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
         lambdaEntity.stateReason = "Activated";
+        lambdaEntity.codeSize = functionCode.size();
         lambdaEntity = Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
 
         log_debug << "Lambda function created: " << lambdaEntity.function;
     }
 
-    void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, std::string &functionCode) {
+    void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode) {
 
         // Docker tag
         lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
@@ -69,7 +70,7 @@ namespace AwsMock::Service {
 
         // Write base64 encoded zip file
         const std::string encodedFile = WriteBase64File(functionCode, lambdaEntity, dockerTag);
-        log_debug << "Create Base64 string, length: " << encodedFile.size();
+        log_debug << "Create Base64 string, length: " << functionCode.size();
 
         // Unzip provided zip-file into a temporary directory
         codeDir = UnpackZipFile(codeDir, functionCode, lambdaEntity.runtime);
@@ -133,7 +134,6 @@ namespace AwsMock::Service {
             } else {
 
                 // Decompress the Python/C/go code
-                //std::string extractDir = Core::DirUtils::CreateTempDir("/tmp");
                 Core::TarUtils::Unzip(zipFile, codeDir);
             }
             log_debug << "ZIP file unpacked, dir: " << codeDir;
