@@ -872,7 +872,11 @@ namespace AwsMock::Service {
             if (Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event); notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
+                Dto::S3::NotificationBucket notificationBucket;
+                notificationBucket.name = s3Bucket.bucketName;
+                notificationBucket.arn = s3Bucket.arn;
+                notificationBucket.ownerIdentity.principalId = s3Bucket.owner;
+                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = notificationBucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
                 Dto::S3::EventNotification eventNotification;
@@ -892,7 +896,11 @@ namespace AwsMock::Service {
             if (Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event); notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
+                Dto::S3::NotificationBucket notificationBucket;
+                notificationBucket.name = s3Bucket.bucketName;
+                notificationBucket.arn = s3Bucket.arn;
+                notificationBucket.ownerIdentity.principalId = s3Bucket.owner;
+                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = notificationBucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
                 Dto::S3::EventNotification eventNotification;
@@ -912,7 +920,11 @@ namespace AwsMock::Service {
             if (Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event); notification.CheckFilter(key)) {
 
                 // Create the event record
-                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = s3Bucket, .object = s3Object};
+                Dto::S3::NotificationBucket notificationBucket;
+                notificationBucket.name = s3Bucket.bucketName;
+                notificationBucket.arn = s3Bucket.arn;
+                notificationBucket.ownerIdentity.principalId = s3Bucket.owner;
+                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = notificationBucket, .object = s3Object};
 
                 Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
                 Dto::S3::EventNotification eventNotification;
@@ -1047,7 +1059,7 @@ namespace AwsMock::Service {
         // Get queue URL
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
 
-        SQSService _sqsService;
+        const SQSService _sqsService;
         const Dto::SQS::SendMessageRequest request = {.region = region, .queueUrl = queueUrl, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
         const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
@@ -1128,7 +1140,6 @@ namespace AwsMock::Service {
             std::vector algorithms = {request.checksumAlgorithm};
             boost::thread t(boost::ref(s3HashCreator), algorithms, object);
             t.detach();
-            //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
             log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
         }
 

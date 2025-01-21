@@ -349,7 +349,7 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-    struct Bucket {
+    struct NotificationBucket {
 
         /**
          * Bucket name
@@ -424,7 +424,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * S3 bucket
          */
-        Bucket bucket;
+        NotificationBucket bucket;
 
         /**
          * S3 object
@@ -569,7 +569,7 @@ namespace AwsMock::Dto::S3 {
                 Core::Bson::BsonUtils::SetStringValue(document, "eventVersion", eventVersion);
                 Core::Bson::BsonUtils::SetStringValue(document, "eventSource", eventSource);
                 Core::Bson::BsonUtils::SetStringValue(document, "awsRegion", region);
-                Core::Bson::BsonUtils::SetDateValue(document, "eventTime", eventTime);
+                Core::Bson::BsonUtils::SetStringValue(document, "eventTime", Core::DateTimeUtils::ToISO8601(eventTime));
                 Core::Bson::BsonUtils::SetStringValue(document, "eventName", eventName);
 
                 document.append(kvp("userIdentity", userIdentity.ToDocument()));
