@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
         // Create response
         Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
-        log_info << "Function created, name: " << request.functionName;
+        log_info << "Function created, name: " << request.functionName << " status: " << lambdaEntity.state;
 
         return response;
     }
@@ -141,6 +141,7 @@ namespace AwsMock::Service {
             response.created = lambda.created;
             response.modified = lambda.modified;
             response.tags = lambda.tags;
+            response.version = lambda.dockerTag;
             response.environment = lambda.environment.variables;
             return response;
 

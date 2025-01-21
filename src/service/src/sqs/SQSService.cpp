@@ -972,7 +972,7 @@ namespace AwsMock::Service {
                }) != attributes.end();
     }
 
-    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
+    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, size: " << lambda.function;
 
         const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");

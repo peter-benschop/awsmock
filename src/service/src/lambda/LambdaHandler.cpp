@@ -178,7 +178,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
 
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
-                log_trace << "Lambda function counters list,, count: " << lambdaResponse.functionCounters.size();
+                log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }

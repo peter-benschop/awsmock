@@ -375,7 +375,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult query result.
          */
-        void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.

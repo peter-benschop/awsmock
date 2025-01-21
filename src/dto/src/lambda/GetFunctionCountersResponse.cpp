@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetStringValue(document, "user", user);
             Core::Bson::BsonUtils::SetStringValue(document, "role", role);
             Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+            Core::Bson::BsonUtils::SetStringValue(document, "version", version);
             Core::Bson::BsonUtils::SetLongValue(document, "concurrency", concurrency);
             Core::Bson::BsonUtils::SetLongValue(document, "invocations", invocations);
             Core::Bson::BsonUtils::SetLongValue(document, "averageRuntime", averageRuntime);
@@ -44,8 +45,6 @@ namespace AwsMock::Dto::Lambda {
                 }
                 document.append(kvp("tags", tagDoc));
             }
-            log_info << bsoncxx::to_json(document);
-
             return bsoncxx::to_json(document);
 
         } catch (bsoncxx::exception &exc) {
