@@ -569,9 +569,9 @@ namespace AwsMock::Service {
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            //for (const auto &[fst, snd]: environment) {
-            //                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            //          }
+            for (const auto &[fst, snd]: environment) {
+                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+            }
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
