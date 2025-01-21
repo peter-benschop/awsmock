@@ -1149,11 +1149,11 @@ namespace AwsMock::Service {
 
         // Check encryption
         CheckEncryption(bucket, object);
-        log_info << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+        log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
 
         // Check notification
         CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-        log_info << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+        log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
 
         return {
                 .bucket = request.bucket,
