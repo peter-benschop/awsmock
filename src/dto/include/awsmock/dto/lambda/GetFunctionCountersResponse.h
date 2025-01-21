@@ -162,6 +162,11 @@ namespace AwsMock::Dto::Lambda {
         std::string runtime;
 
         /**
+         * Version
+         */
+        std::string version;
+
+        /**
          * Size
          */
         long size;

@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Lambda {
                     jsonObject.append(kvp("functionName", functionCounter.functionName));
                     jsonObject.append(kvp("runtime", functionCounter.runtime));
                     jsonObject.append(kvp("handler", functionCounter.handler));
+                    jsonObject.append(kvp("version", functionCounter.version));
                     jsonObject.append(kvp("state", functionCounter.state));
                     jsonObject.append(kvp("averageRuntime", functionCounter.averageRuntime));
                     jsonObject.append(kvp("invocations", functionCounter.invocations));
