@@ -12,7 +12,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
@@ -350,6 +349,66 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
+    struct Bucket {
+
+        /**
+         * Bucket name
+         */
+        std::string name;
+
+        /**
+         * Bucket ARN
+         */
+        std::string arn;
+
+        /**
+         * Owner identity
+         */
+        OwnerIdentity ownerIdentity;
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as string for logging.
+         */
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+            try {
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "name", name);
+                Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
+                Core::Bson::BsonUtils::SetDocumentValue(document, "ownerIdentity", ownerIdentity.ToDocument());
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+
+        /**
+         * @brief Converts a JSON representation to a DTO.
+         *
+         * @param document JSON object
+         */
+        void FromDocument(const view_or_value<view, value> &document) {
+
+            try {
+
+                name = Core::Bson::BsonUtils::GetStringValue(document, "name");
+                arn = Core::Bson::BsonUtils::GetStringValue(document, "arn");
+                if (document.view().find("ownerIdentity") != document.view().end()) {
+                    ownerIdentity.FromDocument(document.view()["ownerIdentity"].get_document().value);
+                }
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+    };
+
     struct S3 {
 
         /**
@@ -390,6 +449,7 @@ namespace AwsMock::Dto::S3 {
 
             try {
 
+                // Fix dates
                 document document;
                 Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
                 Core::Bson::BsonUtils::SetStringValue(document, "configurationId", configurationId);
