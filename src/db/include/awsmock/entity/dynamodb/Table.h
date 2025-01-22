@@ -53,14 +53,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
         std::map<std::string, std::string> attributes;
 
         /**
-         * Tags
-         */
-        std::map<std::string, std::string> tags;
-
-        /**
          * Key schemas
          */
         std::map<std::string, std::string> keySchemas;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
 
         /**
          * Item count

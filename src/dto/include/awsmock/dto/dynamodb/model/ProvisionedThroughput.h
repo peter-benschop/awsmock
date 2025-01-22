@@ -50,7 +50,7 @@ namespace AwsMock::Dto::DynamoDb {
         long numberOfDecreasesToday = 0;
 
         /**
-         * Converts the entity to a JSON object
+         * @brief Converts the entity to a JSON object
          *
          * @return JSON object
          */
@@ -59,23 +59,29 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * @brief Convert to a BSON document
          */
-        bsoncxx::document::view ToDocument() const;
+        view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Convert from a BSON document
          */
-        void FromDocument(bsoncxx::document::view document);
+        void FromDocument(view_or_value<view, value> document);
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
+         *
+         * @return DTO as JSON string
+         */
         std::string ToJson();
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

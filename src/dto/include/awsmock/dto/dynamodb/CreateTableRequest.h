@@ -53,11 +53,6 @@ namespace AwsMock::Dto::DynamoDb {
         std::string tableName;
 
         /**
-         * Tags
-         */
-        std::map<std::string, std::string> tags;
-
-        /**
          * Attribute definitions
          */
         std::map<std::string, std::string> attributes;
@@ -71,6 +66,11 @@ namespace AwsMock::Dto::DynamoDb {
          * Provisioned throughput
          */
         ProvisionedThroughput provisionedThroughput;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
 
         /**
          * Original HTTP request body

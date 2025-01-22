@@ -17,7 +17,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(Entity::DynamoDb::Table &table) const {
 
-        table.created = system_clock::now();
+        table.created = table.modified = system_clock::now();
 
         if (HasDatabase()) {
 
@@ -431,6 +431,8 @@ namespace AwsMock::Database {
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(Entity::DynamoDb::Item &item) const {
+
+        item.created = item.created = system_clock::now();
 
         if (HasDatabase()) {
 

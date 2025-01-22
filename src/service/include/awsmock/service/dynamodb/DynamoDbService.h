@@ -56,8 +56,9 @@ namespace AwsMock::Service {
     /**
      * @brief DynamoDb module service.
      *
+     * @par
      * Handles all DynamoDb related requests. The DynamoDB itself runs as docker container on the local host. It will start the DynamoDB server automatically as soon
-     * as the server starts. DynamoDB commands will be sent via HTTP to the DynamoDB docker container on port 8000. THe docker posrt can be configured in the AwsMock
+     * as the server starts. DynamoDB commands will be sent via HTTP to the DynamoDB docker container on port 8000. The docker port can be configured in the AwsMock
      * configuration properties.
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -78,6 +79,15 @@ namespace AwsMock::Service {
          * @return CreateTableResponse
          */
         Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
+
+        /**
+         * @brief check existence of table in DynamoDB docker image.
+         *
+         * @param region AWS region
+         * @param tableName table name
+         * @return true if table exists in dynamoDb docker image
+         */
+        bool ExistTable(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Lists all available tables
@@ -197,7 +207,7 @@ namespace AwsMock::Service {
          *
          * @param command DynamoDB command
          */
-        std::map<std::string, std::string> PrepareHeaders(const std::string &command) const;
+        static std::map<std::string, std::string> PrepareHeaders(const std::string &command);
 
         /**
          * Database connection
