@@ -17,27 +17,29 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "create_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
+        Dto::DynamoDb::CreateTableResponse createTableResponse = {.region = request.region, .tableName = request.tableName};
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
-            log_warning << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
-            return {};
+            log_info << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
+            return createTableResponse;
         }
 
-        Dto::DynamoDb::CreateTableResponse createTableResponse;
         try {
 
             // Send request to DynamoDB docker container
-            std::map<std::string, std::string> headers = request.headers;
+            std::map<std::string, std::string> headers = PrepareHeaders("CreateTable");
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             createTableResponse = {.body = body, .headers = outHeaders, .status = status};
             createTableResponse.ScanResponse();
 
             // Update database
+            const Database::Entity::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = request.provisionedThroughput.readCapacityUnits, .writeCapacityUnits = request.provisionedThroughput.writeCapacityUnits};
             Database::Entity::DynamoDb::Table table = {
                     .region = request.region,
                     .name = request.tableName,
                     .attributes = request.attributes,
+                    .keySchemas = request.keySchemas,
                     .tags = request.tags,
-                    .keySchemas = request.keySchemas};
+                    .provisionedThroughput = provisionedThroughput};
             table = _dynamoDbDatabase.CreateTable(table);
             log_info << "DynamoDb table created, name: " << table.name;
 
@@ -47,6 +49,33 @@ namespace AwsMock::Service {
         }
 
         return createTableResponse;
+    }
+
+    bool DynamoDbService::ExistTable(const std::string &region, const std::string &tableName) const {
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_tables");
+        log_debug << "Starting exists table request, region: " << region << ", tableName: " << tableName;
+
+        try {
+
+            // Send request to docker container
+            Dto::DynamoDb::ListTableRequest request;
+            request.region = region;
+            request.limit = 100;
+            request.body = request.ToJson();
+            std::map<std::string, std::string> headers = PrepareHeaders("ListTables");
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
+            Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status};
+            listTableResponse.ScanResponse();
+            log_trace << "DynamoDb list tables, region: " << region << ", tableName: " << tableName;
+            return std::ranges::find_if(listTableResponse.tableNames,
+                                        [tableName](const std::string &t) {
+                                            return t == tableName;
+                                        }) != listTableResponse.tableNames.end();
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd list tables failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd list tables failed, error: " + exc.message());
+        }
     }
 
     Dto::DynamoDb::ListTableResponse DynamoDbService::ListTables(const Dto::DynamoDb::ListTableRequest &request) const {
@@ -347,7 +376,7 @@ namespace AwsMock::Service {
         return deleteItemResponse;
     }
 
-    std::map<std::string, std::string> DynamoDbService::PrepareHeaders(const std::string &command) const {
+    std::map<std::string, std::string> DynamoDbService::PrepareHeaders(const std::string &command) {
         std::map<std::string, std::string> headers;
         const std::string commandSnake = Core::StringUtils::ToSnakeCase(command);
         headers["Region"] = "eu-central-1";

@@ -6,17 +6,17 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    bsoncxx::document::view ProvisionedThroughput::ToDocument() const {
-        bsoncxx::builder::basic::document document;
+    view_or_value<view, value> ProvisionedThroughput::ToDocument() const {
+        document document;
         Core::Bson::BsonUtils::SetIntValue(document, "ReadCapacityUnits", readCapacityUnits);
         Core::Bson::BsonUtils::SetIntValue(document, "WriteCapacityUnits", writeCapacityUnits);
         Core::Bson::BsonUtils::SetDateValue(document, "LastDecreaseDateTime", lastDecreaseDateTime);
         Core::Bson::BsonUtils::SetDateValue(document, "LastIncreaseDateTime", lastIncreaseDateTime);
         Core::Bson::BsonUtils::SetLongValue(document, "NumberOfDecreasesToday", numberOfDecreasesToday);
-        return document;
+        return document.extract();
     }
 
-    void ProvisionedThroughput::FromDocument(bsoncxx::document::view document) {
+    void ProvisionedThroughput::FromDocument(view_or_value<view, value> document) {
         readCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "ReadCapacityUnits");
         writeCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "WriteCapacityUnits");
         lastDecreaseDateTime = Core::Bson::BsonUtils::GetDateValue(document, "LastDecreaseDateTime");

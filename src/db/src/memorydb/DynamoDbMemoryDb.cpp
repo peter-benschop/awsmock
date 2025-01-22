@@ -9,7 +9,6 @@ namespace AwsMock::Database {
     boost::mutex DynamoDbMemoryDb::_tableMutex;
     boost::mutex DynamoDbMemoryDb::_itemMutex;
 
-
     template<typename Map, typename Key>
     bool KeyCompare(Map const &lhs, Map const &rhs, Key const &keys) {
 

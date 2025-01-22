@@ -19,9 +19,6 @@ namespace AwsMock::Manager {
                  << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level");
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
-
-        // Auto load init file
-        AutoLoad();
     }
 
     void Manager::InitializeDatabase() {
@@ -61,7 +58,8 @@ namespace AwsMock::Manager {
         if (Core::Configuration::instance().GetValueBool("awsmock.autoload.active")) {
             if (const std::string autoLoadFile = Core::Configuration::instance().GetValueString("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
-                    Service::ModuleService::ImportInfrastructure(jsonString);
+                    Service::ModuleService _moduleService;
+                    _moduleService.ImportInfrastructure(jsonString);
                     log_info << "Loaded infrastructure from " << autoLoadFile;
                 }
             }
@@ -163,6 +161,9 @@ namespace AwsMock::Manager {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             }
         }
+
+        // Auto load init file
+        AutoLoad();
 
         // Start listener threads
         for (auto i = 0; i < Core::SystemUtils::GetNumberOfCores(); i++) {

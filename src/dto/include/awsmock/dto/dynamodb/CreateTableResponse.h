@@ -62,7 +62,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateTableResponse : public Dto::Common::BaseRequest {
+    struct CreateTableResponse : Common::BaseRequest {
 
         /**
          * Region
@@ -87,12 +87,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Table size
          */
-        long tableSizeBytes;
+        long tableSizeBytes = 0;
 
         /**
          * Item count
          */
-        long itemCount;
+        long itemCount = 0;
 
         /**
          * Delete protection enabled

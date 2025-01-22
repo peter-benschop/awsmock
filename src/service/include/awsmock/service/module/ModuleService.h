@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Services.h>
+#include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/module/CleanInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
@@ -29,6 +30,7 @@
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
+#include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/module/ModuleMap.h>
 
 namespace AwsMock::Service {
@@ -45,7 +47,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()){};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
          * @brief Return all list of all modules

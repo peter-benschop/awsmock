@@ -14,6 +14,7 @@ namespace AwsMock::Dto::DynamoDb {
             Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
             Core::Bson::BsonUtils::SetStringValue(document, "TableClass", tableClass);
+            Core::Bson::BsonUtils::SetDocumentValue(document, "ProvisionedThroughput", provisionedThroughput.ToDocument());
 
             // Attributes
             if (!attributes.empty()) {
@@ -39,9 +40,6 @@ namespace AwsMock::Dto::DynamoDb {
                 document.append(kvp("KeySchema", keySchemasArray));
             }
 
-            // Provisioned throughput
-            document.append(kvp("ProvisionedThroughput", provisionedThroughput.ToDocument()));
-
             // Tags
             if (!tags.empty()) {
                 array tagsArray;
@@ -58,7 +56,6 @@ namespace AwsMock::Dto::DynamoDb {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            std::cerr << exc.what() << std::endl;
             throw Core::JsonException(exc.what());
         }
     }

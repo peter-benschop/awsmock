@@ -154,6 +154,7 @@ namespace AwsMock::Service {
         Dto::Module::Infrastructure infrastructure;
         infrastructure.FromJson(jsonString);
 
+        // S3
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
             const auto _s3Database = std::make_shared<Database::S3Database>();
             if (!infrastructure.s3Buckets.empty()) {
@@ -171,6 +172,8 @@ namespace AwsMock::Service {
                 log_info << "S3 objects imported, count: " << infrastructure.s3Objects.size();
             }
         }
+
+        // SQS
         if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
             const Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             if (!infrastructure.sqsQueues.empty()) {
@@ -191,6 +194,8 @@ namespace AwsMock::Service {
                 log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();
             }
         }
+
+        // SNS
         if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
             const Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
             if (!infrastructure.snsTopics.empty()) {
@@ -208,6 +213,8 @@ namespace AwsMock::Service {
                 log_info << "SNS resources imported, count: " << infrastructure.snsMessages.size();
             }
         }
+
+        // Lambdas
         if (!infrastructure.lambdas.empty()) {
             Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
             for (auto &lambda: infrastructure.lambdas) {
@@ -216,6 +223,8 @@ namespace AwsMock::Service {
             }
             log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
         }
+
+        // Transfer server
         if (!infrastructure.transferServers.empty()) {
             const Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
             for (auto &transfer: infrastructure.transferServers) {
@@ -249,13 +258,21 @@ namespace AwsMock::Service {
             const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
             if (!infrastructure.dynamoDbTables.empty()) {
                 for (auto &table: infrastructure.dynamoDbTables) {
-                    _dynamoDatabase.CreateOrUpdateTable(table);
+                    if (DynamoDbService _dynamoDbService; !_dynamoDbService.ExistTable(table.region, table.name)) {
+                        constexpr Dto::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = 1, .writeCapacityUnits = 1};
+                        Dto::DynamoDb::CreateTableRequest request = {.region = table.region, .tableName = table.name, .attributes = table.attributes, .keySchemas = table.keySchemas, .provisionedThroughput = provisionedThroughput, .tags = table.tags};
+                        request.body = request.ToJson();
+                        Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+                    } else {
+                        _dynamoDatabase.CreateOrUpdateTable(table);
+                    }
+                    log_debug << "DynamoDB table created: " << table.name;
                 }
                 log_info << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size();
             }
             if (!infrastructure.dynamoDbItems.empty()) {
                 for (auto &item: infrastructure.dynamoDbItems) {
-                    //_dynamoDatabase->CreateOrUpdateUser(user);
+                    _dynamoDatabase.CreateOrUpdateItem(item);
                 }
                 log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
             }
@@ -265,7 +282,7 @@ namespace AwsMock::Service {
         if (!infrastructure.secrets.empty()) {
             const Database::SecretsManagerDatabase &_secretsDatabase = Database::SecretsManagerDatabase::instance();
             for (auto &secret: infrastructure.secrets) {
-                _secretsDatabase.CreateOrUpdateSecret(secret);
+                secret = _secretsDatabase.CreateOrUpdateSecret(secret);
             }
             log_info << "Secrets imported, count: " << infrastructure.secrets.size();
         }
