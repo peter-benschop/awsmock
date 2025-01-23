@@ -190,7 +190,7 @@ namespace AwsMock::Service {
         return deleteTableResponse;
     }
 
-    void DynamoDbService::DeleteAllTables() const {
+    long DynamoDbService::DeleteAllTables() const {
         Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_all_tables");
         log_debug << "Deleting all tables";
 
@@ -207,8 +207,9 @@ namespace AwsMock::Service {
             }
 
             // Delete table in database
-            _dynamoDbDatabase.DeleteAllTables();
-            log_info << "DynamoDb tables deleted";
+            const long count = _dynamoDbDatabase.DeleteAllTables();
+            log_info << "DynamoDb tables deleted, count: " << count;
+            return count;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete table failed, message: " << exc.message();

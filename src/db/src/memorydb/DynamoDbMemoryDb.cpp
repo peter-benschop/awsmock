@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
+#include <boost/accumulators/statistics/count.hpp>
 
 namespace AwsMock::Database {
 
@@ -114,11 +115,13 @@ namespace AwsMock::Database {
         log_debug << "DynamoDB table deleted, count: " << count;
     }
 
-    void DynamoDbMemoryDb::DeleteAllTables() {
+    long DynamoDbMemoryDb::DeleteAllTables() {
         boost::mutex::scoped_lock lock(_tableMutex);
 
-        log_debug << "All DynamoDb tables deleted, count: " << _tables.size();
+        const long count = _tables.size();
+        log_debug << "All DynamoDb tables deleted, count: " << count;
         _tables.clear();
+        return count;
     }
 
     bool DynamoDbMemoryDb::ItemExists(const Entity::DynamoDb::Item &item) {

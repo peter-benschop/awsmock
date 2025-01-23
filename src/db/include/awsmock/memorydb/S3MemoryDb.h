@@ -198,8 +198,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all buckets
+         *
+         * @return total number of deleted objects
          */
-        void DeleteAllBuckets();
+        long DeleteAllBuckets();
 
         /**
          * Check the existence of an object

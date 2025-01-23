@@ -186,11 +186,13 @@ namespace AwsMock::Database {
         log_debug << "Topic deleted, count: " << count;
     }
 
-    void SNSMemoryDb::DeleteAllTopics() {
+    long SNSMemoryDb::DeleteAllTopics() {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
+        const long count = _topics.size();
         log_debug << "All topics deleted, count: " << _topics.size();
         _topics.clear();
+        return count;
     }
 
     bool SNSMemoryDb::MessageExists(const std::string &id) {

@@ -176,10 +176,12 @@ namespace AwsMock::Database {
         log_debug << "Transfer server deleted, count: " << count;
     }
 
-    void TransferMemoryDb::DeleteAllTransfers() {
+    long TransferMemoryDb::DeleteAllTransfers() {
         boost::mutex::scoped_lock lock(_transferMutex);
 
-        log_debug << "All transfer servers deleted, count: " << _transfers.size();
+        const long count = _transfers.size();
+        log_debug << "All transfer servers deleted, count: " << count;
         _transfers.clear();
+        return count;
     }
 }// namespace AwsMock::Database

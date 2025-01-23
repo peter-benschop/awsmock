@@ -431,7 +431,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SNSDatabase::DeleteAllTopics() const {
+    long SNSDatabase::DeleteAllTopics() const {
 
         if (HasDatabase()) {
 
@@ -445,6 +445,7 @@ namespace AwsMock::Database {
                 const auto result = _topicCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All topics deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -454,7 +455,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteAllTopics();
+            return _memoryDb.DeleteAllTopics();
         }
     }
 

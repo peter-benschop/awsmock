@@ -134,7 +134,7 @@ namespace AwsMock::Service {
         /**
          * @brief Deletes all tables with all items
          */
-        void DeleteAllTables() const;
+        long DeleteAllTables() const;
 
         /**
          * Gets an item

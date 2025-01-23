@@ -186,11 +186,13 @@ namespace AwsMock::Database {
         log_debug << "Bucket deleted, count: " << count;
     }
 
-    void S3MemoryDb::DeleteAllBuckets() {
+    long S3MemoryDb::DeleteAllBuckets() {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
+        const long count = _buckets.size();
         log_debug << "All buckets deleted, count: " << _buckets.size();
         _buckets.clear();
+        return count;
     }
 
     bool S3MemoryDb::ObjectExists(const Entity::S3::Object &object) {

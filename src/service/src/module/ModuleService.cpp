@@ -315,19 +315,21 @@ namespace AwsMock::Service {
         if (request.onlyObjects) {
             return;
         }
+
+        long count = 0;
         for (const auto &m: request.modules) {
 
             if (m == "s3") {
-                Database::S3Database::instance().DeleteAllBuckets();
+                count += Database::S3Database::instance().DeleteAllBuckets();
             } else if (m == "sqs") {
-                Database::SQSDatabase::instance().DeleteAllQueues();
+                count += Database::SQSDatabase::instance().DeleteAllQueues();
             } else if (m == "sns") {
-                Database::SNSDatabase::instance().DeleteAllTopics();
+                count += Database::SNSDatabase::instance().DeleteAllTopics();
             } else if (m == "dynamodb") {
-                //Service::DynamoDbService _dynamoDbService;
-                //_dynamoDbService.DeleteAllTables();
+                DynamoDbService _dynamoDbService;
+                count += _dynamoDbService.DeleteAllTables();
             } else if (m == "transfer") {
-                Database::TransferDatabase::instance().DeleteAllTransfers();
+                count += Database::TransferDatabase::instance().DeleteAllTransfers();
             }
         }
     }

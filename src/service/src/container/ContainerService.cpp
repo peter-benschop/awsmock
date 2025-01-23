@@ -518,7 +518,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "http://localhost/containers/" + id + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
-            log_warning << "Stop container failed, httpStatus: " << statusCode << " body: " << body;
+            log_warning << "Stop container failed, httpStatus: " << statusCode;
             return;
         }
         log_debug << "Docker container stopped, id: " << id;

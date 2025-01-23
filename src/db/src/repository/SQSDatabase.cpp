@@ -695,8 +695,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
 
                 // Get the cursor
-                auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts);
-                for (auto message: messageCursor) {
+                for (auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
 
                     Entity::SQS::Message result;
                     result.FromDocument(message);

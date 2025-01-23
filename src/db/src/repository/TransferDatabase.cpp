@@ -292,7 +292,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void TransferDatabase::DeleteAllTransfers() const {
+    long TransferDatabase::DeleteAllTransfers() const {
 
         if (HasDatabase()) {
 
@@ -300,11 +300,9 @@ namespace AwsMock::Database {
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             const auto result = _transferCollection.delete_many({});
             log_debug << "All transfers deleted, count: " << result->deleted_count();
-
-        } else {
-
-            _memoryDb.DeleteAllTransfers();
+            return result->deleted_count();
         }
+        return _memoryDb.DeleteAllTransfers();
     }
 
 }// namespace AwsMock::Database
