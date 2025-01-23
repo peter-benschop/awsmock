@@ -23,8 +23,8 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.access.account-id", "AWSMOCK_ACCESS_ACCOUNT_ID", "000000000000");
         DefineStringProperty("awsmock.access.client-id", "AWSMOCK_ACCESS_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.access.secret-access-key", "AWSMOCK_ACCESS_SECRET_ACCESS_KEY", "none");
-        DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "/tmp/awsmock/data");
-        DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "/tmp/awsmock/tmp");
+        DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "/home/awsmock/data");
+        DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "/home/awsmock/tmp");
         DefineBoolProperty("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
         DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
