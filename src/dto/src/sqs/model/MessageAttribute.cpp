@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SQS {
             if (!snd.empty()) {
                 bytes[0] = 1;
                 EVP_DigestUpdate(context, bytes, 1);
-                UpdateLengthAndBytes(context, snd);
+                UpdateLengthAndBytes(context, Core::StringUtils::UrlDecode(snd));
             }
         }
         EVP_DigestFinal(context, md_value, &md_len);
@@ -65,7 +65,9 @@ namespace AwsMock::Dto::SQS {
             if (!snd.stringValue.empty()) {
                 bytes[0] = 1;
                 EVP_DigestUpdate(context, bytes, 1);
-                UpdateLengthAndBytes(context, snd.stringValue);
+
+                // Url decode the attribute
+                UpdateLengthAndBytes(context, Core::StringUtils::UrlDecode(snd.stringValue));
             }
         }
         EVP_DigestFinal(context, md_value, &md_len);
