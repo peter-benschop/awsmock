@@ -160,9 +160,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing transfer server
          *
+         * @return total number of deleted objects
          * @throws DatabaseException
          */
-        void DeleteAllTransfers();
+        long DeleteAllTransfers();
 
       private:
 

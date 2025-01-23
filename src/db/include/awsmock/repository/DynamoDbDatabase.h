@@ -138,9 +138,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing DynamoDB tables
          *
+         * @return total number of deleted objects
          * @throws DatabaseException
          */
-        void DeleteAllTables() const;
+        long DeleteAllTables() const;
 
         /**
          * @brief Checks the existence of an item.

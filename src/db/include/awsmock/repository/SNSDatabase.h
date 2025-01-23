@@ -202,8 +202,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all topics
+         *
+         * @return total number of deleted objects
          */
-        void DeleteAllTopics() const;
+        long DeleteAllTopics() const;
 
         /**
          * @brief Check existence of message
