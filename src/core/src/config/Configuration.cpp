@@ -52,16 +52,16 @@ namespace AwsMock::Core {
 
         // SQS
         DefineBoolProperty("awsmock.modules.sqs.active", "AWSMOCK_MODULES_SQS_ACTIVE", true);
-        DefineIntProperty("awsmock.modules.s3.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
-        DefineIntProperty("awsmock.modules.s3.reset.period", "AWSMOCK_WORKER_SQS_RESET_PERIOD", 30);
-        DefineIntProperty("awsmock.modules.s3.counter.period", "AWSMOCK_WORKER_SQS_COUNTER_PERIOD", 30);
+        DefineIntProperty("awsmock.modules.sqs.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.sqs.reset.period", "AWSMOCK_WORKER_SQS_RESET_PERIOD", 30);
+        DefineIntProperty("awsmock.modules.sqs.counter.period", "AWSMOCK_WORKER_SQS_COUNTER_PERIOD", 30);
 
         // SNS
         DefineBoolProperty("awsmock.modules.sns.active", "AWSMOCK_MODULES_SNS_ACTIVE", true);
         DefineIntProperty("awsmock.modules.sns.timeout", "AWSMOCK_MODULES_SNS_TIMEOUT", 14);
-        DefineIntProperty("awsmock.monitoring.sns.monitoring.period", "AWSMOCK_SNS_MONITORING_PERIOD", 300);
-        DefineIntProperty("awsmock.monitoring.sns.delete.period", "AWSMOCK_SNS_DELETE_PERIOD", 300);
-        DefineIntProperty("awsmock.monitoring.sns.counter.period", "AWSMOCK_SNS_COUNTER_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.sns.monitoring.period", "AWSMOCK_SNS_MONITORING_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.sns.delete.period", "AWSMOCK_SNS_DELETE_PERIOD", 300);
+        DefineIntProperty("awsmock.modules.sns.counter.period", "AWSMOCK_SNS_COUNTER_PERIOD", 300);
 
         // Lambda
         DefineBoolProperty("awsmock.modules.lambda.active", "AWSMOCK_MODULES_LAMBDA_ACTIVE", true);
