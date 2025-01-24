@@ -27,7 +27,9 @@ namespace AwsMock::Dto::SQS {
                     document messageAttributesDocument;
                     MessageAttributeList messageAttributeListDto;
                     for (const auto &at: message.messageAttributes) {
-
+                        if (Core::StringUtils::ContainsIgnoreCase(at.attributeName, "contentType")) {
+                            continue;
+                        }
                         MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
 
                         if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {

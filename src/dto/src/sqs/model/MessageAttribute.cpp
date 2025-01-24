@@ -44,7 +44,7 @@ namespace AwsMock::Dto::SQS {
         return output;
     }
 
-    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType) {
+    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, const bool includeContentType) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -78,7 +78,7 @@ namespace AwsMock::Dto::SQS {
         EVP_MD_CTX_free(context);
         delete[] bytes;
 
-        return Core::Crypto::HexEncode(md_value, md_len);
+        return Core::Crypto::HexEncode(md_value, static_cast<int>(md_len));
     }
 
     void MessageAttribute::GetIntAsByteArray(const size_t n, unsigned char *bytes) {
