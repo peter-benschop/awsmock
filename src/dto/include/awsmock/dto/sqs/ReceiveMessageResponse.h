@@ -103,6 +103,11 @@ namespace AwsMock::Dto::SQS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, ReceiveMessageResponse &r);
+
+        /**
+         * Excluded headers
+         */
+        static std::vector<std::string> excludedHeaders;
     };
 
 }// namespace AwsMock::Dto::SQS
