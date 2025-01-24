@@ -20,7 +20,7 @@ namespace AwsMock::Dto::SQS {
         return messageEntity;
     }
 
-    Dto::SQS::SendMessageResponse Mapper::map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity) {
+    SendMessageResponse Mapper::map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity) {
 
         SendMessageResponse response;
         response.queueUrl = request.queueUrl,
