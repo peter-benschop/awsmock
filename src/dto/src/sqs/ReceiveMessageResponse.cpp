@@ -26,23 +26,23 @@ namespace AwsMock::Dto::SQS {
                     // Message attributes
                     document messageAttributesDocument;
                     MessageAttributeList messageAttributeListDto;
-                    for (const auto &at: message.messageAttributes) {
-                        if (Core::StringUtils::ContainsIgnoreCase(at.attributeName, "contentType")) {
+                    for (const auto &[attributeName, attributeValue, attributeType]: message.messageAttributes) {
+                        if (Core::StringUtils::ContainsIgnoreCase(attributeName, "contentType") || Core::StringUtils::ContainsIgnoreCase(attributeName, "timestamp")) {
                             continue;
                         }
-                        MessageAttribute messageAttributeDto = {.name = at.attributeName, .stringValue = at.attributeValue};
+                        MessageAttribute messageAttributeDto = {.name = attributeName, .stringValue = attributeValue};
 
-                        if (at.attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
+                        if (attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
                             Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "String");
-                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", at.attributeValue);
+                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", attributeValue);
                             messageAttributeDto.type = STRING;
-                        } else if (at.attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
+                        } else if (attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
                             Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "Number");
-                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", at.attributeValue);
+                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", attributeValue);
                             messageAttributeDto.type = NUMBER;
                         }
-                        messageAttributeListDto[at.attributeName] = messageAttributeDto;
-                        messageAttributesDocument.append(kvp(at.attributeName, messageAttributesDocument.extract()));
+                        messageAttributeListDto[attributeName] = messageAttributeDto;
+                        messageAttributesDocument.append(kvp(attributeName, messageAttributesDocument.extract()));
                     }
                     messageDocument.append(kvp("MessageAttributes", messageAttributesDocument.extract()));
 

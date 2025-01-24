@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SQS {
             {BINARY, "Binary"},
     };
 
-    [[maybe_unused]] static std::string MessageAttributeDataTypeToString(MessageAttributeDataType messageAttributeDataType) {
+    [[maybe_unused]] static std::string MessageAttributeDataTypeToString(const MessageAttributeDataType &messageAttributeDataType) {
         return MessageAttributeDataTypeNames[messageAttributeDataType];
     }
 
