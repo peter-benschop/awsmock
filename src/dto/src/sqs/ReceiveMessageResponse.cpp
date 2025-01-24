@@ -6,6 +6,8 @@
 
 namespace AwsMock::Dto::SQS {
 
+    std::vector<std::string> ReceiveMessageResponse::excludedHeaders{"contentType", "timestamp", "id"};
+
     std::string ReceiveMessageResponse::ToJson() {
 
         try {
@@ -27,9 +29,12 @@ namespace AwsMock::Dto::SQS {
                     document messageAttributesDocument;
                     MessageAttributeList messageAttributeListDto;
                     for (const auto &[attributeName, attributeValue, attributeType]: message.messageAttributes) {
-                        if (Core::StringUtils::ContainsIgnoreCase(attributeName, "contentType") || Core::StringUtils::ContainsIgnoreCase(attributeName, "timestamp")) {
+
+                        // Check headers
+                        if (std::ranges::find(excludedHeaders, attributeName) != excludedHeaders.end()) {
                             continue;
                         }
+
                         MessageAttribute messageAttributeDto = {.name = attributeName, .stringValue = attributeValue};
 
                         if (attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
