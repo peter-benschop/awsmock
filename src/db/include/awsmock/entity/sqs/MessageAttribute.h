@@ -14,7 +14,9 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
+
+// AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -72,26 +74,28 @@ namespace AwsMock::Database::Entity::SQS {
         MessageAttributeType attributeType;
 
         /**
-         * System attribute flag
-         */
-        bool systemAttribute = true;
-
-        /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a JSON string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @param os output stream
          * @param m message attribute

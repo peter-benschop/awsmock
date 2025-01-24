@@ -631,7 +631,7 @@ namespace AwsMock::Service {
 
     Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "send_message");
-        log_trace << "Send message request, queueUrl: " << request.queueUrl;
+        log_trace << "Sending message request, queueUrl: " << request.queueUrl;
 
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
@@ -652,13 +652,6 @@ namespace AwsMock::Service {
             message.attributes["ApproximateReceivedCount"] = std::to_string(0);
             message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
             message.attributes["SenderId"] = request.senderId;
-
-            // Set userAttributes
-            for (const auto &[fst, snd]: request.messageAttributes) {
-                message.messageAttributes.push_back({.attributeName = fst,
-                                                     .attributeValue = snd.stringValue,
-                                                     .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))});
-            }
 
             // Set delay
             if (queue.attributes.delaySeconds > 0) {
@@ -694,6 +687,7 @@ namespace AwsMock::Service {
                     SendLambdaInvocationRequest(lambda, message, queueArn);
                 }
             }
+            log_info << "Send message, queueArn: " << request.queueArn;
 
             return Dto::SQS::Mapper::map(request, message);
 

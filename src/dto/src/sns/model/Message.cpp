@@ -13,14 +13,25 @@ namespace AwsMock::Dto::SNS {
     view_or_value<view, value> Message::ToDocument() const {
 
         try {
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "TopicArn", topicArn);
-            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
-            Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
-            Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
-            Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
-            return document.extract();
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TopicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Message", message);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "Created", created);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "Modified", modified);
+
+            if (!messageAttributes.empty()) {
+                array jsonMessageAttributeArray;
+                for (const auto &[fst, snd]: messageAttributes) {
+                    document jsonAttribute;
+                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
+                    jsonMessageAttributeArray.append(jsonAttribute);
+                }
+                rootDocument.append(kvp("MessageAttributes", jsonMessageAttributeArray));
+            }
+
+            return rootDocument.extract();
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

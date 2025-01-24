@@ -11,10 +11,13 @@ namespace AwsMock::Database::Entity::SQS {
         view_or_value<view, value> messageAttributeDoc = make_document(
                 kvp("attributeName", attributeName),
                 kvp("attributeValue", attributeValue),
-                kvp("systemAttribute", systemAttribute),
                 kvp("attributeType", MessageAttributeTypeToString(attributeType)));
 
         return messageAttributeDoc;
+    }
+
+    std::string MessageAttribute::ToJson() const {
+        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
     std::string MessageAttribute::ToString() const {
@@ -24,7 +27,7 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-        os << "MessageAttribute=" << to_json(m.ToDocument());
+        os << "MessageAttribute=" << m.ToJson();
         return os;
     }
 

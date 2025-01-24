@@ -111,7 +111,7 @@ namespace AwsMock::Service {
          * @param request AWS region
          * @return PublishResponse
          */
-        Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
+        Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Subscribe to a topic
@@ -271,7 +271,7 @@ namespace AwsMock::Service {
          *
          * <p>If a SQS topic subscription is found send the message to the SQS topic.</p>
          */
-        void CheckSubscriptions(const Dto::SNS::PublishRequest &request);
+        void CheckSubscriptions(const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Send a SNS message to an SQS topic

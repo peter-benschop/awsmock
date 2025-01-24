@@ -84,7 +84,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Converts the entity to a JSON object
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
@@ -105,7 +105,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * @brief Converts the entity to a string representation.
          *
-         * @return entity as string for logging.
+         * @return entity as string
          */
         [[nodiscard]] std::string ToString() const;
 

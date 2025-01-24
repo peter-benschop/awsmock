@@ -9,7 +9,11 @@
 #include <string>
 
 // AwsMock includes
+#include "MessageAttribute.h"
+
+
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -34,6 +38,11 @@ namespace AwsMock::Dto::SNS {
          * Message
          */
         std::string message;
+
+        /**
+         * Message attributes
+         */
+        MessageAttributeList messageAttributes;
 
         /**
          * Creation time
@@ -62,7 +71,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
@@ -73,5 +82,7 @@ namespace AwsMock::Dto::SNS {
          */
         friend std::ostream &operator<<(std::ostream &os, const Message &r);
     };
+
 }// namespace AwsMock::Dto::SNS
+
 #endif//AWSMOCK_DTO_SNS_MESSAGE_H

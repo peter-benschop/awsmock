@@ -47,6 +47,14 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * Get the message attributes.
+         *
+         * @param payload HTTP body
+         * @return list of message userAttributes
+         */
+        static std::map<std::string, Dto::SNS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+
+        /**
          * SNS module
          */
         SNSService _snsService;

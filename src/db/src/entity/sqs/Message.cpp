@@ -24,11 +24,9 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     int Message::RemoveAttribute(const std::string &key) {
-        if (HasAttribute(key)) {
-            return erase_if(attributes, [key](const std::pair<std::string, std::string> &attribute) {
-                return attribute.first == key;
-            });
-        }
+        return static_cast<int>(erase_if(attributes, [key](const std::pair<std::string, std::string> &attribute) {
+            return attribute.first == key;
+        }));
         return -1;
     }
 

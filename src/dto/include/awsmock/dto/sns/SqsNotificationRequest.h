@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "model/MessageAttribute.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 
 namespace AwsMock::Dto::SNS {
@@ -28,7 +31,12 @@ namespace AwsMock::Dto::SNS {
      *   "SignatureVersion" : "1",
      *   "Signature" : "OI5myFtSfUP8dOymRI0cW48FTAmb/VHYI2N10DwQ7X/fkHtJmG7hJNC4qjOkYUYC6kTATshpvo/VR5v0nnIHBFYgxrb9diLUMG2AsI6z2F02nGGWSTOjnH0XFpCGdyOB+2En6EZhzoUTOdFpGRXsijFDmXfxt2vS/RaGJLz/6Ibz+KeEYosgElQ2R1Nr9lz8jHCeaSdPzW7rTyIXv0b+cBDd8xHFc79IkSGmuepidAseTKkLX+oZ5Ry3Q1iTtTMOziXoz6kZhXXZHy/Q/clYCMzTP7BabDG5LK11gNfA0ytO/KDyiWxGykUommXnk6rt7FcCnNDW5/qrAmPHzbaO3w==",
      *   "SigningCertURL" : "https://sns.eu-central-1.amazonaws.com/SimpleNotificationService-01d088a6f77103d0fe307c0069e40ed6.pem",
-     *   "UnsubscribeURL" : "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:012096702153:pim-prod-protokollierung-topic:a278c03b-c5de-42a4-9c0e-f9c3412de940"
+     *   "UnsubscribeURL" : "https://sns.eu-central-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-central-1:012096702153:pim-prod-protokollierung-topic:a278c03b-c5de-42a4-9c0e-f9c3412de940",
+     *   "MessageAttributes": {
+     *      "Type": {
+     *      "Type": "String",
+     *      "Value": "Orchestration.Services.Model.Pollution.PollutionMessage"
+     *   }
      * }
      * @endcode
      */
@@ -80,21 +88,26 @@ namespace AwsMock::Dto::SNS {
         std::string unsubscribeURL;
 
         /**
-         * Converts the DTO to a JSON representation.
+         * Attributes
+         */
+        MessageAttributeList messageAttributes;
+
+        /**
+         * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
