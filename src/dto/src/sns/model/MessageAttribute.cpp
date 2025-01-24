@@ -143,4 +143,4 @@ namespace AwsMock::Dto::SNS {
         os << "MessageAttribute=" << to_json(r.ToDocument());
         return os;
     }
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SNS
