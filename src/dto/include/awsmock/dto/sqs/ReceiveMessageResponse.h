@@ -51,7 +51,6 @@ namespace AwsMock::Dto::SQS {
      * @endcode
      */
     struct ReceiveMessageResponse {
-
         /**
          * Message list
          */

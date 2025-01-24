@@ -48,7 +48,7 @@ namespace AwsMock::Dto::SQS {
         bool systemAttribute = true;
 
         /**
-         * Returns the MD5 sum of all attributes (system attributes).
+         * @brief Returns the MD5 sum of all attributes (system attributes).
          *
          * @param attributes map of attributes
          * @return MD5 sum of attributes string
@@ -56,15 +56,16 @@ namespace AwsMock::Dto::SQS {
         static std::string GetMd5Attributes(const std::map<std::string, std::string> &attributes);
 
         /**
-         * Returns the MD5 sum of all message attributes (user attributes).
+         * @brief Returns the MD5 sum of all message attributes (user attributes).
          *
          * @param attributes vector of message attributes
+         * @param includeContentType if true contentType is included
          * @return MD5 sum of message attributes string
          */
-        static std::string GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes);
+        static std::string GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType);
 
         /**
-         * Update the MD5 hash with a given value
+         * @brief Update the MD5 hash with a given value
          *
          * @param context MD5 hash model
          * @param str string to append
@@ -72,7 +73,7 @@ namespace AwsMock::Dto::SQS {
         static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
 
         /**
-         * Returns a integer as byte array and fill it in the given byte array at position offset.
+         * @brief Returns an integer as byte array and fill it in the given byte array at position offset.
          *
          * @param n integer value
          * @param bytes output byte array
@@ -80,7 +81,7 @@ namespace AwsMock::Dto::SQS {
         static void GetIntAsByteArray(size_t n, unsigned char *bytes);
 
         /**
-         * Convert from JSON string
+         * @brief Convert from JSON string
          *
          * @param attributeObject attribute object
          */
@@ -88,14 +89,14 @@ namespace AwsMock::Dto::SQS {
 
 
         /**
-         * Convert from JSON object
+         * @brief Convert from JSON object
          *
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Name comparator
+         * @brief Name comparator
          *
          * @param other
          * @return
@@ -103,14 +104,14 @@ namespace AwsMock::Dto::SQS {
         bool operator<(const MessageAttribute &other) const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string for logging.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */
