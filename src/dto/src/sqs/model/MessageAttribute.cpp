@@ -44,7 +44,7 @@ namespace AwsMock::Dto::SQS {
         return output;
     }
 
-    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes) {
+    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -54,6 +54,10 @@ namespace AwsMock::Dto::SQS {
 
         EVP_DigestInit(context, md);
         for (const auto &[fst, snd]: attributes) {
+
+            if (fst == "contentType" && !includeContentType) {
+                continue;
+            }
 
             // Encoded name
             UpdateLengthAndBytes(context, fst);
@@ -78,10 +82,12 @@ namespace AwsMock::Dto::SQS {
     }
 
     void MessageAttribute::GetIntAsByteArray(const size_t n, unsigned char *bytes) {
-        bytes[3] = n & 0x000000ff;
-        bytes[2] = (n & 0x0000ff00) >> 8;
-        bytes[1] = (n & 0x00ff0000) >> 16;
-        bytes[0] = (n & 0xff000000) >> 24;
+        if (bytes) {
+            bytes[3] = n & 0x000000ff;
+            bytes[2] = (n & 0x0000ff00) >> 8;
+            bytes[1] = (n & 0x00ff0000) >> 16;
+            bytes[0] = (n & 0xff000000) >> 24;
+        }
     }
 
     void MessageAttribute::UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str) {

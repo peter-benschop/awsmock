@@ -52,7 +52,7 @@ namespace AwsMock::Dto::SQS {
                     messageDocument.append(kvp("Attributes", attributeDocument));
 
                     // MD5 of message attributes
-                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto));
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto, false));
                     messageArray.append(messageDocument);
                 }
 
