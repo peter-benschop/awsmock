@@ -9,8 +9,8 @@ namespace AwsMock::Database::Entity::SNS {
     view_or_value<view, value> Message::ToDocument() const {
 
         auto messageAttributesDoc = array{};
-        for (const auto &attribute: attributes) {
-            messageAttributesDoc.append(attribute.ToDocument());
+        for (const auto &messageAttribute: messageAttributes) {
+            messageAttributesDoc.append(messageAttribute.ToDocument());
         }
 
         // Mandatory fields
@@ -22,7 +22,7 @@ namespace AwsMock::Database::Entity::SNS {
                           kvp("messageId", messageId),
                           kvp("size", size),
                           kvp("status", MessageStatusToString(status)),
-                          kvp("userAttributes", messageAttributesDoc));
+                          kvp("messageAttribute", messageAttributesDoc));
         MongoUtils::SetDatetime(messageDoc, "lastSend", lastSend);
         MongoUtils::SetDatetime(messageDoc, "created", created);
         MongoUtils::SetDatetime(messageDoc, "modified", modified);
@@ -44,13 +44,13 @@ namespace AwsMock::Database::Entity::SNS {
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
-            if (mResult.value().find("userAttributes") != mResult.value().end()) {
-                if (const bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value}; !attributesView.empty()) {
+            if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+                if (const bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value}; !attributesView.empty()) {
                     for (const bsoncxx::array::element &attributeElement: attributesView) {
                         MessageAttribute attribute{
                                 .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
                                 .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value)};
-                        attributes.push_back(attribute);
+                        messageAttributes.push_back(attribute);
                     }
                 }
             }

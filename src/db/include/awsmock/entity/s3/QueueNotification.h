@@ -79,7 +79,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 

@@ -60,7 +60,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Converts the entity to a string representation.
          *
-         * @return entity as string for logging.
+         * @return entity as string
          */
         [[nodiscard]] std::string ToString() const;
 

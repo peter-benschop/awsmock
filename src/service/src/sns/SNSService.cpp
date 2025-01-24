@@ -138,7 +138,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
+    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "publish");
         log_trace << "Publish message request: " << request.ToString();
 
@@ -154,8 +154,8 @@ namespace AwsMock::Service {
             throw Core::ServiceException("SNS topic does not exists");
         }
 
-        Database::Entity::SNS::Message message;
         try {
+            Database::Entity::SNS::Message message;
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
@@ -167,6 +167,10 @@ namespace AwsMock::Service {
                        .message = request.message,
                        .messageId = messageId,
                        .size = static_cast<long>(request.message.length())};
+            for (const auto &[fst, snd]: request.messageAttributes) {
+                Database::Entity::SNS::MessageAttribute attribute = {.attributeName = fst, .attributeValue = snd.stringValue, .attributeType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))};
+                message.messageAttributes.emplace_back(attribute);
+            }
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions
@@ -282,9 +286,8 @@ namespace AwsMock::Service {
             }
 
             // Create new subscription
-            Database::Entity::SNS::TopicList topics = _snsDatabase.GetTopicsBySubscriptionArn(request.subscriptionArn);
 
-            for (auto &topic: topics) {
+            for (Database::Entity::SNS::TopicList topics = _snsDatabase.GetTopicsBySubscriptionArn(request.subscriptionArn); auto &topic: topics) {
 
                 // Remove subscription
                 const auto count = std::erase_if(topic.subscriptions, [request](const auto &item) {
@@ -431,8 +434,8 @@ namespace AwsMock::Service {
 
             Dto::SNS::ListTagCountersResponse response;
             response.total = topic.tags.size();
-            for (const auto &tag: topic.tags) {
-                Dto::SNS::TagCounter tagCounter = {.tagKey = tag.first, .tagValue = tag.second};
+            for (const auto &[fst, snd]: topic.tags) {
+                Dto::SNS::TagCounter tagCounter = {.tagKey = fst, .tagValue = snd};
                 response.tagCounters.emplace_back(tagCounter);
             }
             return response;
@@ -454,7 +457,7 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("SNS topic does not exists");
             }
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             return {
                     .region = topic.region,
                     .topicArn = topic.topicArn,
@@ -499,7 +502,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();
 
@@ -593,10 +596,10 @@ namespace AwsMock::Service {
                 .messageId = Core::AwsUtils::CreateMessageId(),
                 .topicArn = request.topicArn,
                 .message = request.message,
-                .timestamp = Core::DateTimeUtils::UnixTimestamp(std::chrono::system_clock::now())};
+                .timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now())};
 
         // Wrap it in a SQS message request
-        const Dto::SQS::SendMessageRequest sendMessageRequest = {
+        Dto::SQS::SendMessageRequest sendMessageRequest = {
                 .region = request.region,
                 .queueUrl = sqsQueue.queueUrl,
                 .queueArn = sqsQueue.queueArn,
@@ -604,6 +607,11 @@ namespace AwsMock::Service {
                 .messageId = Core::AwsUtils::CreateMessageId(),
                 .requestId = Core::AwsUtils::CreateRequestId(),
         };
+
+        for (const auto &[fst, snd]: request.messageAttributes) {
+            const Dto::SQS::MessageAttribute messageAttribute = {.name = fst, .stringValue = snd.stringValue, .numberValue = snd.numberValue, .binaryValue = snd.binaryValue, .type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type))};
+            sendMessageRequest.messageAttributes[fst] = messageAttribute;
+        }
 
         const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
         log_trace << "SNS SendMessage response: " << response.ToString();

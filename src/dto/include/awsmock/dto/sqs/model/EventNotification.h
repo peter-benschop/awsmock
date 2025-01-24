@@ -56,7 +56,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToJson() const;
 
@@ -70,7 +70,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 

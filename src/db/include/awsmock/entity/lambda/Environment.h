@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * @brief Converts the entity to a JSON object
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
     };

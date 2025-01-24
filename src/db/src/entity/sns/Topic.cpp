@@ -44,21 +44,20 @@ namespace AwsMock::Database::Entity::SNS {
             }
         }
 
-        view_or_value<view, value> topicDoc = make_document(
-                kvp("region", region),
-                kvp("topicName", topicName),
-                kvp("owner", owner),
-                kvp("topicUrl", topicUrl),
-                kvp("topicArn", topicArn),
-                kvp("subscriptions", subscriptionDocs),
-                kvp("attributes", topicAttribute.ToDocument()),
-                kvp("tags", tagsDoc),
-                kvp("size", size),
-                kvp("messages", messages),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+        document topicDoc;
+        Core::Bson::BsonUtils::SetStringValue(topicDoc, "region", region);
+        Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicName", topicName);
+        Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicUrl", topicUrl);
+        Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicArn", topicArn);
+        Core::Bson::BsonUtils::SetLongValue(topicDoc, "messages", messages);
+        Core::Bson::BsonUtils::SetLongValue(topicDoc, "size", size);
+        Core::Bson::BsonUtils::SetDateValue(topicDoc, "created", created);
+        Core::Bson::BsonUtils::SetDateValue(topicDoc, "modified", modified);
 
-        return topicDoc;
+        topicDoc.append(kvp("subscriptions", subscriptionDocs));
+        topicDoc.append(kvp("attributes", topicAttribute.ToDocument()));
+        topicDoc.append(kvp("tags", tagsDoc));
+        return topicDoc.extract();
     }
 
     void Topic::FromDocument(const std::optional<view> &mResult) {

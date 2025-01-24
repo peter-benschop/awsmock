@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 

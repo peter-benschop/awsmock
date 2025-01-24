@@ -11,18 +11,39 @@ namespace AwsMock::Dto::SNS {
 
         try {
 
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Type", type);
-            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
-            Core::Bson::BsonUtils::SetStringValue(document, "TopicArn", topicArn);
-            Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
-            Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
-            Core::Bson::BsonUtils::SetLongValue(document, "Timestamp", timestamp);
-            Core::Bson::BsonUtils::SetStringValue(document, "SignatureVersion", signatureVersion);
-            Core::Bson::BsonUtils::SetStringValue(document, "Signature", signature);
-            Core::Bson::BsonUtils::SetStringValue(document, "SignatureCertURL", signingCertURL);
-            Core::Bson::BsonUtils::SetStringValue(document, "UnsubscribeURL", unsubscribeURL);
-            return Core::Bson::BsonUtils::ToJsonString(document);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Type", type);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TopicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "MessageId", messageId);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Message", message);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Timestamp", timestamp);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "SignatureVersion", signatureVersion);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Signature", signature);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "SignatureCertURL", signingCertURL);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "UnsubscribeURL", unsubscribeURL);
+
+            document messageAttributesDocument;
+            MessageAttributeList messageAttributeListDto;
+            for (const auto &[fst, snd]: messageAttributes) {
+
+                MessageAttribute messageAttributeDto = {.name = snd.name, .stringValue = snd.stringValue};
+
+                if (snd.type == STRING) {
+                    Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "String");
+                    Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", snd.stringValue);
+                    messageAttributeDto.type = STRING;
+                } else if (snd.type == NUMBER) {
+                    Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "Number");
+                    Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", snd.stringValue);
+                    messageAttributeDto.type = NUMBER;
+                }
+                messageAttributeListDto[snd.name] = messageAttributeDto;
+                messageAttributesDocument.append(kvp(snd.name, messageAttributesDocument.extract()));
+            }
+            messageAttributesDocument.append(kvp("MessageAttributes", messageAttributesDocument.extract()));
+
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

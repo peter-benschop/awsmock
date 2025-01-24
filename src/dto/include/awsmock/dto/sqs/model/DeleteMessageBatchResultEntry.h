@@ -39,14 +39,14 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 

@@ -98,14 +98,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Converts the entity to a JSON string
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 

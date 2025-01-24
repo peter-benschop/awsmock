@@ -12,12 +12,17 @@ namespace AwsMock::Dto::SQS {
         messageEntity.body = request.body,
         messageEntity.size = static_cast<long>(request.body.length()),
         messageEntity.contentType = request.contentType;
+
+        for (const auto &[fst, snd]: request.messageAttributes) {
+            Database::Entity::SQS::MessageAttribute attribute = {.attributeName = fst, .attributeValue = snd.stringValue, .attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))};
+            messageEntity.messageAttributes.emplace_back(attribute);
+        }
         return messageEntity;
     }
 
     Dto::SQS::SendMessageResponse Mapper::map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity) {
 
-        Dto::SQS::SendMessageResponse response;
+        SendMessageResponse response;
         response.queueUrl = request.queueUrl,
         response.messageId = messageEntity.messageId,
         response.receiptHandle = messageEntity.receiptHandle,

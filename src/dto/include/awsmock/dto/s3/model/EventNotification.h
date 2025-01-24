@@ -100,7 +100,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
@@ -154,7 +154,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
@@ -192,7 +192,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
@@ -228,7 +228,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
@@ -277,7 +277,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
@@ -330,7 +330,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
@@ -369,7 +369,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
@@ -434,7 +434,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToJson() const {
             return Core::Bson::BsonUtils::ToJsonString(ToDocument());
@@ -443,7 +443,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
@@ -491,7 +491,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
@@ -560,7 +560,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
@@ -620,7 +620,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;
@@ -649,7 +649,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToJson() const {
 
@@ -699,7 +699,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Converts the DTO to a string representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream ss;

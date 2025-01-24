@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Converts the DTO to a JSON representation.
          *
-         * @return DTO as string for logging.
+         * @return DTO as string
          */
         view_or_value<view, value> ToDocument() const;
     };

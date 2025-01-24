@@ -101,7 +101,7 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * @brief Converts the entity to a string representation.
          *
-         * @return entity as string for logging.
+         * @return entity as string
          */
         [[nodiscard]] std::string ToString() const;
 
