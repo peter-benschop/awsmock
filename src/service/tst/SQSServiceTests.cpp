@@ -202,12 +202,12 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.StringValue=application/json
         // MessageAttribute.1.Value.DataType=String
         //
-        const Dto::SQS::MessageAttribute messageAttribute = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
+        const Dto::SQS::MessageAttribute messageAttribute = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING};
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         messageAttributes[messageAttribute.name] = messageAttribute;
 
         // act
-        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes, true);
+        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes, true);
 
         // assert
         EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -224,14 +224,14 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.StringValue=42
         // MessageAttribute.2.Value.DataType=Number
         //
-        const Dto::SQS::MessageAttribute messageAttribute1 = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING, .systemAttribute = false};
-        const Dto::SQS::MessageAttribute messageAttribute2 = {.name = "contentLength", .stringValue = "42", .type = Dto::SQS::MessageAttributeDataType::NUMBER, .systemAttribute = false};
+        const Dto::SQS::MessageAttribute messageAttribute1 = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING};
+        const Dto::SQS::MessageAttribute messageAttribute2 = {.name = "contentLength", .stringValue = "42", .type = Dto::SQS::MessageAttributeDataType::NUMBER};
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         messageAttributes[messageAttribute1.name] = messageAttribute1;
         messageAttributes[messageAttribute2.name] = messageAttribute2;
 
         // act
-        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(messageAttributes, true);
+        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes, true);
 
         // assert
         EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

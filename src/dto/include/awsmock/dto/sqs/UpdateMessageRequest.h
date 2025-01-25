@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-     * Send message request
+     * @brief Update message request
      *
      * Example (from Java v2 client):
      * @code{.json}
@@ -80,64 +80,14 @@ namespace AwsMock::Dto::SQS {
     struct UpdateMessageRequest {
 
         /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
-         * Queue URL
-         */
-        std::string queueUrl;
-
-        /**
-         * Queue ARN
-         */
-        std::string queueArn;
-
-        /**
-         * Queue name
-         */
-        std::string queueName;
-
-        /**
-         * Message body
-         */
-        std::string body;
-
-        /**
-         * Delay seconds
-         */
-        int delaySeconds;
-
-        /**
-         * Attributes (system attributes)
-         */
-        std::map<std::string, std::string> attributes;
-
-        /**
-         * Message attributes (user attributes)
-         */
-        MessageAttributeList messageAttributes;
-
-        /**
          * Message ID
          */
         std::string messageId;
 
         /**
-         * Sender ID
+         * Message attributes (user attributes)
          */
-        std::string senderId;
-
-        /**
-         * MD5 of request body
-         */
-        std::string md5sum;
-
-        /**
-         * Content type (can only be XML, JSON, TXT)
-         */
-        std::string contentType;
+        MessageAttributeList messageAttributes;
 
         /**
          * @brief Converts the JSON string to a DTO

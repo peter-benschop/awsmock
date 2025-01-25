@@ -6,9 +6,6 @@
 
 namespace AwsMock::Dto::SQS {
 
-    //    std::vector<std::string> ReceiveMessageResponse::excludedHeaders{"contentType", "timestamp", "id"};
-    std::vector<std::string> ReceiveMessageResponse::excludedHeaders{"contentType"};
-
     std::string ReceiveMessageResponse::ToJson() {
 
         try {
@@ -30,11 +27,6 @@ namespace AwsMock::Dto::SQS {
                     document messageAttributesDocument;
                     MessageAttributeList messageAttributeListDto;
                     for (const auto &[attributeName, attributeValue, attributeType]: message.messageAttributes) {
-
-                        // Check headers
-                        if (std::ranges::find(excludedHeaders, attributeName) != excludedHeaders.end()) {
-                            continue;
-                        }
 
                         MessageAttribute messageAttributeDto = {.name = attributeName, .stringValue = attributeValue};
 
@@ -60,7 +52,7 @@ namespace AwsMock::Dto::SQS {
                     messageDocument.append(kvp("Attributes", attributeDocument));
 
                     // MD5 of message attributes
-                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5MessageAttributes(messageAttributeListDto, false));
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5Attributes(messageAttributeListDto, false));
                     messageArray.append(messageDocument);
                 }
 
@@ -71,7 +63,7 @@ namespace AwsMock::Dto::SQS {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::ServiceException(exc.what());
+            throw Core::JsonException(exc.what());
         }
     }
 

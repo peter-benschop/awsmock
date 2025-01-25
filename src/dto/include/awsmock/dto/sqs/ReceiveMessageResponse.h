@@ -8,13 +8,8 @@
 // C++ standard includes
 #include <string>
 
-// Boost includes
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 // AwsMock includes
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 #include <awsmock/entity/sqs/Message.h>
 
@@ -51,6 +46,7 @@ namespace AwsMock::Dto::SQS {
      * @endcode
      */
     struct ReceiveMessageResponse {
+
         /**
          * Message list
          */
@@ -103,11 +99,6 @@ namespace AwsMock::Dto::SQS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, ReceiveMessageResponse &r);
-
-        /**
-         * Excluded headers
-         */
-        static std::vector<std::string> excludedHeaders;
     };
 
 }// namespace AwsMock::Dto::SQS

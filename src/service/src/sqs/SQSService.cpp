@@ -2,10 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/cognito/model/MessageAction.h>
-#include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/service/sqs/SQSService.h>
-#include <thread>
 
 namespace AwsMock::Service {
 
@@ -700,8 +697,7 @@ namespace AwsMock::Service {
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
-            message.md5UserAttr = Dto::SQS::MessageAttribute::GetMd5MessageAttributes(request.messageAttributes, true);
-            message.md5SystemAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.attributes);
+            message.md5UserAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes, true);
 
             // Update database
             queue.attributes.approximateNumberOfMessages++;
@@ -879,32 +875,31 @@ namespace AwsMock::Service {
 
             Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
 
-            Dto::SQS::ListMessageCountersResponse listMessagesResponse;
-            listMessagesResponse.total = total;
-            // TODO: create mapper for the conversion
-            for (const auto &message: messages) {
-                Dto::SQS::MessageEntry messageEntry;
-                messageEntry.messageId = message.messageId;
-                messageEntry.id = message.oid;
-                messageEntry.body = message.body;
-                messageEntry.receiptHandle = message.receiptHandle;
-                messageEntry.md5Sum = message.md5Body;
-                messageEntry.retries = message.retries;
-                messageEntry.created = message.created;
-                messageEntry.modified = message.modified;
-                if (!message.messageAttributes.empty()) {
-                    for (const auto &attribute: message.messageAttributes) {
-                        Dto::SQS::MessageAttribute messageAttribute;
-                        messageAttribute.name = attribute.attributeName;
-                        messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeTypeToString(attribute.attributeType));
-                        messageAttribute.stringValue = attribute.attributeValue;
-                        messageEntry.messageAttributes[attribute.attributeName] = messageAttribute;
-                    }
-                }
-                listMessagesResponse.messages.emplace_back(messageEntry);
-            }
+            Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
             return listMessagesResponse;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "update_message");
+        log_trace << "Update message request, url: " << request.messageId;
+
+        try {
+            if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+                log_error << "Message does not exist, messageId: " << request.messageId;
+                throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+            }
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
+            message.messageAttributes = Dto::SQS::Mapper::map(request.messageAttributes);
+
+            // Delete from database
+            message = _sqsDatabase.UpdateMessage(message);
+            log_debug << "Message updated, messageId: " << request.messageId;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -925,7 +920,7 @@ namespace AwsMock::Service {
 
             // Delete from database
             const long deleted = _sqsDatabase.DeleteMessage(message);
-            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << "deleted: " << deleted;
+            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << " deleted: " << deleted;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

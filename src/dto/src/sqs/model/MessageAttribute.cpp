@@ -10,7 +10,7 @@ namespace AwsMock::Dto::SQS {
         return name < other.name;
     }
 
-    std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, std::string> &attributes) {
+    std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, const bool includeContentType) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -20,44 +20,6 @@ namespace AwsMock::Dto::SQS {
 
         EVP_DigestInit(context, md);
         for (const auto &[fst, snd]: attributes) {
-
-            // Encoded name
-            UpdateLengthAndBytes(context, fst);
-
-            // Encoded value
-            if (!snd.empty()) {
-                bytes[0] = 1;
-                EVP_DigestUpdate(context, bytes, 1);
-                UpdateLengthAndBytes(context, Core::StringUtils::UrlDecode(snd));
-            }
-        }
-        EVP_DigestFinal(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] bytes;
-
-        std::string output;
-        output.resize(md_len * 2);
-        for (unsigned int i = 0; i < md_len; ++i) {
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
-        }
-
-        return output;
-    }
-
-    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, const bool includeContentType) {
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        auto *bytes = new unsigned char[1];
-
-        EVP_DigestInit(context, md);
-        for (const auto &[fst, snd]: attributes) {
-
-            if (fst == "contentType" && !includeContentType) {
-                continue;
-            }
 
             // Encoded name
             UpdateLengthAndBytes(context, fst);
@@ -102,15 +64,11 @@ namespace AwsMock::Dto::SQS {
 
         try {
             name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Name");
-            stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
+            if (type == STRING || type == NUMBER) {
+                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+            }
 
-            if (!stringValue.empty()) {
-                type = STRING;
-            }
-            numberValue = Core::Bson::BsonUtils::GetLongValue(jsonObject, "NumberValue");
-            if (numberValue > 0) {
-                type = NUMBER;
-            }
         } catch (bsoncxx::exception &e) {
             log_error << e.what();
             throw Core::JsonException(e.what());

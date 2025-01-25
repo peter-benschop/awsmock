@@ -717,33 +717,45 @@ namespace AwsMock::Database {
 
                     // Check retries
                     result.retries++;
-                    if (maxRetries > 0 && result.retries >= maxRetries) {
+                    if (maxRetries > 0 && result.retries >= maxRetries && !dlQueueArn.empty()) {
 
-                        // Send to DQL when existing
-                        if (!dlQueueArn.empty()) {
+                        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
+                        std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
 
-                            std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
-                            std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
-                            messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                                         make_document(kvp("$set", make_document(kvp("receiptHandle", ""),
-                                                                                                 kvp("queueArn", dlQueueArn),
-                                                                                                 kvp("queueUrl", dlqQueueUrl),
-                                                                                                 kvp("queueName", dlqQueueName),
-                                                                                                 kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
-                            log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
-                        }
+                        document filterQuery;
+                        filterQuery.append(kvp("_id", message["_id"].get_oid()));
+
+                        document setQuery;
+                        setQuery.append(kvp("queueArn", dlQueueArn));
+                        setQuery.append(kvp("queueUrl", dlqQueueUrl));
+                        setQuery.append(kvp("dlqQueueName", dlqQueueName));
+                        setQuery.append(kvp("receiptHandle", ""));
+                        setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+
+                        document updateQuery;
+                        updateQuery.append(kvp("$set", setQuery));
+
+                        messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                        log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
 
                     } else {
 
                         result.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
                         messageList.push_back(result);
 
-                        messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                                     make_document(kvp("$set",
-                                                                       make_document(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                                                                                     kvp("reset", bsoncxx::types::b_date(reset)),
-                                                                                     kvp("receiptHandle", result.receiptHandle),
-                                                                                     kvp("retries", result.retries)))));
+                        document filterQuery;
+                        filterQuery.append(kvp("_id", message["_id"].get_oid()));
+
+                        document setQuery;
+                        setQuery.append(kvp("reset", bsoncxx::types::b_date(reset)));
+                        setQuery.append(kvp("retries", result.retries));
+                        setQuery.append(kvp("receiptHandle", result.receiptHandle));
+                        setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+
+                        document updateQuery;
+                        updateQuery.append(kvp("$set", setQuery));
+
+                        messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
                     }
                 }
@@ -780,10 +792,10 @@ namespace AwsMock::Database {
 
             try {
 
-                document selectQuery;
-                selectQuery.append(kvp("queueArn", queueArn));
-                selectQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)));
-                selectQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
+                document filterQuery;
+                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)));
+                filterQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
 
                 document setQuery;
                 setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
@@ -794,11 +806,10 @@ namespace AwsMock::Database {
                 updateQuery.append(kvp("$set", setQuery));
 
                 session.start_transaction();
-                const auto result = messageCollection.update_many(selectQuery.extract(), updateQuery.extract());
+                const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
 
                 session.commit_transaction();
-                log_info << "Message reset, updated: " << result->modified_count() << " queueArn: " << queueArn;
-                log_info << "Query: " << bsoncxx::to_json(selectQuery);
+                log_debug << "Message reset, updated: " << result->modified_count() << " queueArn: " << queueArn;
 
                 // Adjust queue message counters
                 AdjustMessageCounters(queueArn);
@@ -871,20 +882,22 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
+                const auto now = system_clock::now();
+
+                document filterQuery;
+                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)));
+                filterQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(now)))));
+
+                document setQuery;
+                setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
 
                 session.start_transaction();
-                const auto now = std::chrono::system_clock::now();
-                const auto result = messageCollection.update_many(
-                        make_document(
-                                kvp("queueArn", queueArn),
-                                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
-                                kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(now))))),
-                        make_document(
-                                kvp("$set",
-                                    make_document(
-                                            kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
                 session.commit_transaction();
-
                 log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
 
                 return result->upserted_count();
@@ -957,15 +970,20 @@ namespace AwsMock::Database {
 
             try {
 
+                document filterQuery;
+                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset)))));
+
                 session.start_transaction();
-                const auto result = messageCollection.delete_many(
-                        make_document(
-                                kvp("queueArn", queueArn),
-                                kvp("created", make_document(
-                                                       kvp("$lt", bsoncxx::types::b_date(reset))))));
+                const auto result = messageCollection.delete_many(filterQuery.extract());
                 session.commit_transaction();
 
                 log_trace << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueArn;
+
+                // Adjust queue message counters
+                if (result->deleted_count() > 0) {
+                    AdjustMessageCounters(queueArn);
+                }
 
                 return result->deleted_count();
 
@@ -1012,9 +1030,7 @@ namespace AwsMock::Database {
             if (!queueArn.empty()) {
                 p.match(make_document(kvp("queueArn", queueArn)));
             }
-            p.group(make_document(kvp("_id", ""),
-                                  kvp("totalSize",
-                                      make_document(kvp("$sum", "$size")))));
+            p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
             p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
             auto totalSizeCursor = messageCollection.aggregate(p);
             if (const auto t = *totalSizeCursor.begin(); !t.empty()) {

@@ -417,6 +417,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
+
+                    Dto::SQS::UpdateMessageRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    _sqsService.UpdateMessage(sqsRequest);
+                    log_info << "Update message, messageId: " << sqsRequest.messageId;
+
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
 
                     Dto::SQS::DeleteMessageRequest sqsRequest;
