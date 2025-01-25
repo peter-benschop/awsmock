@@ -43,26 +43,14 @@ namespace AwsMock::Dto::SQS {
         MessageAttributeDataType type;
 
         /**
-         * System attribute flag
-         */
-        bool systemAttribute = true;
-
-        /**
-         * @brief Returns the MD5 sum of all attributes (system attributes).
-         *
-         * @param attributes map of attributes
-         * @return MD5 sum of attributes string
-         */
-        static std::string GetMd5Attributes(const std::map<std::string, std::string> &attributes);
-
-        /**
          * @brief Returns the MD5 sum of all message attributes (user attributes).
          *
          * @param attributes vector of message attributes
          * @param includeContentType if true contentType is included
          * @return MD5 sum of message attributes string
+         * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html
          */
-        static std::string GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType);
+        static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType);
 
         /**
          * @brief Update the MD5 hash with a given value
@@ -83,10 +71,9 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Convert from JSON string
          *
-         * @param attributeObject attribute object
+         * @param jsonObject attribute object
          */
-        void FromDocument(const view_or_value<view, value> &attributeObject);
-
+        void FromDocument(const view_or_value<view, value> &jsonObject);
 
         /**
          * @brief Convert from JSON object

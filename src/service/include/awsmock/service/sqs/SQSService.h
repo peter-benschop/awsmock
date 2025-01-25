@@ -7,6 +7,7 @@
 
 // C++ standard includes
 #include <string>
+#include <thread>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -14,6 +15,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -59,6 +61,7 @@
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
+#include <awsmock/dto/sqs/UpdateMessageRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
@@ -296,6 +299,14 @@ namespace AwsMock::Service {
          * @see ListMessageCountersResponse
          */
         Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
+
+        /**
+         * @brief Updates a message
+         *
+         * @param request update message request DTO
+         * @throws ServiceException
+         */
+        void UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
 
         /**
          * @brief Deletes a message

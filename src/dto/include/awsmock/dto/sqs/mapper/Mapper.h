@@ -6,9 +6,11 @@
 #define AWSMOCK_DTO_SQS_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/sqs/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/model/Message.h>
+#include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/entity/sqs/Message.h>
 
 namespace AwsMock::Dto::SQS {
@@ -44,6 +46,29 @@ namespace AwsMock::Dto::SQS {
          * @see ListObjectVersionsResponse
          */
         static SendMessageResponse map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity);
+
+        /**
+         * @brief Maps a SQS message entity to a SQS send message response DTO
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param messages message counter list
+         * @param total total number of messages
+         * @return ListMessageCountersResponse
+         * @see ListMessageCountersResponse
+         */
+        static ListMessageCountersResponse map(const Database::Entity::SQS::MessageList &messages, long total);
+
+        /**
+         * @brief Maps a SQS message entity to a SQS send message response DTO
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param messageAttributes list of message attributes
+         * @return MessageAttributeList
+         * @see Database::Entity::SQS::MessageAttributeList
+         */
+        static Database::Entity::SQS::MessageAttributeList map(const MessageAttributeList &messageAttributes);
     };
 
 }// namespace AwsMock::Dto::SQS
