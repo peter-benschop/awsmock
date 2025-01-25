@@ -20,7 +20,6 @@ namespace AwsMock::Dto::SNS {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "messageId", messageId);
-
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

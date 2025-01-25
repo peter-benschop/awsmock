@@ -69,6 +69,11 @@ namespace AwsMock::Dto::SQS {
         std::string md5Sum;
 
         /**
+         * Message retries
+         */
+        int retries = 0;
+
+        /**
          * Created time stamp
          */
         system_clock::time_point created = Core::DateTimeUtils::LocalDateTimeNow();

@@ -10,26 +10,26 @@ namespace AwsMock::Database::Entity::SQS {
 
         auto tagsDoc = document{};
         if (!tags.empty()) {
-            for (const auto &t: tags) {
-                tagsDoc.append(kvp(t.first, t.second));
+            for (const auto &[fst, snd]: tags) {
+                tagsDoc.append(kvp(fst, snd));
             }
         }
 
-        view_or_value<view, value> queueDoc = make_document(
-                kvp("region", region),
-                kvp("name", name),
-                kvp("owner", owner),
-                kvp("queueUrl", queueUrl),
-                kvp("queueArn", queueArn),
-                kvp("attributes", attributes.ToDocument()),
-                kvp("tags", tagsDoc),
-                kvp("size", size),
-                kvp("isDlq", isDlq),
-                kvp("mainQueue", mainQueue),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+        document rootDocument;
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "owner", owner);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueUrl", queueUrl);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueArn", queueArn);
+        Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "attributes", attributes.ToDocument());
+        Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "tags", tagsDoc);
+        Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+        Core::Bson::BsonUtils::SetBoolValue(rootDocument, "isDlq", isDlq);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "mainQueue", mainQueue);
+        Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+        Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 
-        return queueDoc;
+        return rootDocument.extract();
     }
 
     Queue Queue::FromDocument(const std::optional<view> &mResult) {
