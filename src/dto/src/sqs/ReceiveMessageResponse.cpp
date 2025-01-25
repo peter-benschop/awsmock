@@ -6,7 +6,8 @@
 
 namespace AwsMock::Dto::SQS {
 
-    std::vector<std::string> ReceiveMessageResponse::excludedHeaders{"contentType", "timestamp", "id"};
+    //    std::vector<std::string> ReceiveMessageResponse::excludedHeaders{"contentType", "timestamp", "id"};
+    std::vector<std::string> ReceiveMessageResponse::excludedHeaders{"contentType"};
 
     std::string ReceiveMessageResponse::ToJson() {
 

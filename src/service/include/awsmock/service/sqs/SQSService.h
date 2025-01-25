@@ -50,6 +50,7 @@
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
+#include <awsmock/dto/sqs/RedriveMessagesRequest.h>
 #include <awsmock/dto/sqs/SendMessageBatchRequest.h>
 #include <awsmock/dto/sqs/SendMessageBatchResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
@@ -144,6 +145,15 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
+
+        /**
+         * @brief Redrive messages in queue
+         *
+         * @param request redrive messages request
+         * @retzurn total number of redrive messages
+         * @throws ServiceException
+         */
+        long RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes

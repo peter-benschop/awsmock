@@ -130,6 +130,15 @@ namespace AwsMock::Database {
         Entity::SQS::Queue GetQueueByUrl(const std::string &queueUrl);
 
         /**
+         * @brief Returns a queue by DQL ARN
+         *
+         * @param dlqQueueArn queue ARN of the DQL
+         * @return queue entity
+         * @throws DatabaseException
+         */
+        Entity::SQS::Queue GetQueueByDlq(const std::string &dlqQueueArn);
+
+        /**
          * @brief Purge a given queueUrl.
          *
          * @param queueArn queue ARN
@@ -258,26 +267,35 @@ namespace AwsMock::Database {
          *
          * @param queueArn ARN of the queue
          * @param redrivePolicy redrive policy
+         * @return number of message sendto DLQ
          */
-        void RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy);
+        long RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy);
 
         /**
          * @brief Any message, which has a message state is DELAYED is reset when the delay period is over.
          *
          * @param queueArn queue URL.
-         * @param delay delay in seconds.
          * @return number of delayed messages
          */
-        long ResetDelayedMessages(const std::string &queueArn, long delay);
+        long ResetDelayedMessages(const std::string &queueArn);
+
+        /**
+         * @brief Redrive message
+         *
+         * @param originalQueue original queue
+         * @param dlqQueue DLQ queue
+         * @return total number of redriven messages
+         */
+        long RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue);
 
         /**
          * @brief Any message, which has is older than the retention period is deleted.
          *
-         * @param queueUrl queue URL.
+         * @param queueArn queue URL.
          * @param retentionPeriod retention period in seconds.
          * @return number of deleted messages
          */
-        long MessageRetention(const std::string &queueUrl, long retentionPeriod);
+        long MessageRetention(const std::string &queueArn, long retentionPeriod);
 
         /**
           * @brief Returns a message by receipt handle.

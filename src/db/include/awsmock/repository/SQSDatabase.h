@@ -121,6 +121,15 @@ namespace AwsMock::Database {
         Entity::SQS::Queue GetQueueByArn(const std::string &queueArn) const;
 
         /**
+         * @brief Returns a queue by DQL ARN
+         *
+         * @param dlqQueueArn queue ARN of the DQL
+         * @return queue entity
+         * @throws DatabaseException
+         */
+        Entity::SQS::Queue GetQueueByDlq(const std::string &dlqQueueArn) const;
+
+        /**
          * @brief Returns a queue by name and region
          *
          * @param region AWS region
@@ -348,8 +357,9 @@ namespace AwsMock::Database {
          *
          * @param queueArn ARN of the queue
          * @param redrivePolicy redrive policy
+         * @return number of message sendto DLQ
          */
-        void RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const;
+        long RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const;
 
         /**
          * @brief Any message, which has a message state is DELAYED is reset when the delay period is over.
@@ -359,6 +369,15 @@ namespace AwsMock::Database {
          * @return number of updated queues
          */
         long ResetDelayedMessages(const std::string &queueArn, long delay) const;
+
+        /**
+         * @brief Redrive message
+         *
+         * @param originalQueue original queue
+         * @param dlqQueue DLQ queue
+         * @return total number of redriven messages
+         */
+        long RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const;
 
         /**
          * @brief Any message, which has is older than the retention period is deleted.

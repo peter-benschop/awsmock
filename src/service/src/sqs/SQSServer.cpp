@@ -24,7 +24,9 @@ namespace AwsMock::Service {
 
         // Start reset messages task
         scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod);
-        scheduler.AddTask("sqs-count-messages", [this] { this->AdjustCounters(); }, _resetPeriod);
+        scheduler.AddTask("sqs-relocate-messages", [this] { this->RelocateMessages(); }, _resetPeriod);
+        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, _resetPeriod);
+        scheduler.AddTask("sqs-count-messages", [this] { this->AdjustCounters(); }, _counterPeriod);
 
         // Set running
         SetRunning();
@@ -71,6 +73,57 @@ namespace AwsMock::Service {
             }
         }
         log_trace << "SQS reset messages finished, count: " << queueList.size();
+    }
+
+    void SQSServer::RelocateMessages() const {
+        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        log_trace << "SQS relocate messages starting, count: " << queueList.size();
+
+        if (queueList.empty()) {
+            return;
+        }
+
+        // Loop over queues and do some maintenance work
+        for (auto &queue: queueList) {
+
+            if (const long messageCount = _sqsDatabase.CountMessages(queue.queueArn); messageCount > 0) {
+
+                // Check retention period
+                if (queue.attributes.redrivePolicy.maxReceiveCount > 0) {
+                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.RelocateToDlqMessages(queue.queueUrl, queue.attributes.redrivePolicy);
+                }
+
+                // Save results
+                queue = _sqsDatabase.UpdateQueue(queue);
+                log_trace << "Queue updated, queueName" << queue.name;
+            }
+        }
+        log_trace << "SQS reset messages finished, count: " << queueList.size();
+    }
+
+    void SQSServer::SetDlq() const {
+        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        log_trace << "SQS relocate messages starting, count: " << queueList.size();
+
+        if (queueList.empty()) {
+            return;
+        }
+
+        // Loop over queues and do some maintenance work
+        for (auto &queue: queueList) {
+
+            if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
+
+                Database::Entity::SQS::Queue dlq = _sqsDatabase.GetQueueByArn(queue.attributes.redrivePolicy.deadLetterTargetArn);
+                dlq.isDlq = true;
+                dlq.mainQueue = queue.queueArn;
+
+                // Save results
+                dlq = _sqsDatabase.UpdateQueue(dlq);
+                log_trace << "DLQ updated, queueName" << dlq.name;
+            }
+        }
+        log_trace << "SQS DQL finished, count: " << queueList.size();
     }
 
     void SQSServer::UpdateCounter() const {

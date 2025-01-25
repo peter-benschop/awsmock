@@ -53,6 +53,14 @@ namespace AwsMock::Service {
         void ResetMessages() const;
 
         /**
+         * @brief Reset resources
+         *
+         * @par
+         * Loops over all SQS queues and check the redrive policy for messages which needs to be sent to the DLQ.
+         */
+        void RelocateMessages() const;
+
+        /**
          * @brief Collect waiting time statistics
          *
          * @par
@@ -64,6 +72,11 @@ namespace AwsMock::Service {
          * @brief Update counters
          */
         void UpdateCounter() const;
+
+        /**
+         * @brief Sets the DLQ flags
+         */
+        void SetDlq() const;
 
         /**
          * Metric service

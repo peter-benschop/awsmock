@@ -130,6 +130,25 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueByArn(queueArn);
     }
 
+    Entity::SQS::Queue SQSDatabase::GetQueueByDlq(const std::string &dlqQueueArn) const {
+
+        if (HasDatabase()) {
+            Entity::SQS::Queue result;
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
+
+            const auto mResult = _queueCollection.find_one(make_document(kvp("attributes.redrivePolicy.deadLetterTargetArn", dlqQueueArn)));
+
+            if (!mResult) {
+                log_error << "Queue not found, queueArn: " << dlqQueueArn;
+                throw Core::DatabaseException("Queue not found, queueArn: " + dlqQueueArn);
+            }
+            return result.FromDocument(mResult->view());
+        }
+        return _memoryDb.GetQueueByDlq(dlqQueueArn);
+    }
+
     Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &region, const std::string &queueUrl) const {
 
         if (HasDatabase()) {
@@ -673,10 +692,6 @@ namespace AwsMock::Database {
 
     void SQSDatabase::ReceiveMessages(const std::string &queueArn, const int visibility, const int maxResult, const std::string &dlQueueArn, const int maxRetries, Entity::SQS::MessageList &messageList) const {
 
-        // First reset resources
-        const long resetCount = ResetMessages(queueArn, visibility);
-        log_trace << "Messages reset, count " << resetCount;
-
         const auto reset = system_clock::now() + std::chrono::seconds(visibility);
 
         if (HasDatabase()) {
@@ -710,22 +725,12 @@ namespace AwsMock::Database {
                             std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
                             std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
                             messageCollection.update_one(make_document(kvp("_id", message["_id"].get_oid())),
-                                                         make_document(kvp("$set", make_document(kvp("retries", 0),
-                                                                                                 kvp("queueArn",
-                                                                                                     dlQueueArn),
-                                                                                                 kvp("queueUrl",
-                                                                                                     dlqQueueUrl),
-                                                                                                 kvp("queueName",
-                                                                                                     dlqQueueName),
-                                                                                                 kvp("status",
-                                                                                                     MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                                                         make_document(kvp("$set", make_document(kvp("receiptHandle", ""),
+                                                                                                 kvp("queueArn", dlQueueArn),
+                                                                                                 kvp("queueUrl", dlqQueueUrl),
+                                                                                                 kvp("queueName", dlqQueueName),
+                                                                                                 kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                             log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
-
-                        } else {
-
-                            // Delete message
-                            long deleted = DeleteMessage(result);
-                            log_debug << "Message deleted, id: " << result.oid << " queueArn: " << queueArn << " count: " << deleted;
                         }
 
                     } else {
@@ -748,7 +753,9 @@ namespace AwsMock::Database {
                 log_trace << "Messages received, queueArn: " << queueArn + " count: " << messageList.size();
 
                 // Adjust queue message counters
-                AdjustMessageCounters(queueArn);
+                if (!messageList.empty()) {
+                    AdjustMessageCounters(queueArn);
+                }
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -769,24 +776,29 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             auto session = client->start_session();
 
-            const auto reset = system_clock::now() - std::chrono::seconds{visibility};
+            const auto newReset = system_clock::now() + std::chrono::seconds{visibility};
 
             try {
 
+                document selectQuery;
+                selectQuery.append(kvp("queueArn", queueArn));
+                selectQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)));
+                selectQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
+
+                document setQuery;
+                setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+                setQuery.append(kvp("receiptHandle", ""));
+                setQuery.append(kvp("reset", bsoncxx::types::b_date(newReset)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
                 session.start_transaction();
-                const auto result = messageCollection.update_many(
-                        make_document(
-                                kvp("queueArn", queueArn),
-                                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                                kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now()))))),
-                        make_document(kvp("$set",
-                                          make_document(
-                                                  kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                                                  kvp("receiptHandle", ""),
-                                                  kvp("reset", bsoncxx::types::b_date(reset))))));
+                const auto result = messageCollection.update_many(selectQuery.extract(), updateQuery.extract());
 
                 session.commit_transaction();
-                log_trace << "Message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
+                log_info << "Message reset, updated: " << result->modified_count() << " queueArn: " << queueArn;
+                log_info << "Query: " << bsoncxx::to_json(selectQuery);
 
                 // Adjust queue message counters
                 AdjustMessageCounters(queueArn);
@@ -796,16 +808,13 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
                 session.abort_transaction();
+                throw Core::DatabaseException(e.what());
             }
-
-        } else {
-
-            return _memoryDb.ResetMessages(queueArn, visibility);
         }
-        return 0;
+        return _memoryDb.ResetMessages(queueArn, visibility);
     }
 
-    void SQSDatabase::RedriveMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const {
+    long SQSDatabase::RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const {
 
         if (HasDatabase()) {
 
@@ -814,32 +823,43 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
-
-                session.start_transaction();
                 std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
                 std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(redrivePolicy.deadLetterTargetArn);
-                const auto result = messageCollection.update_many(make_document(kvp("queueArn", queueArn),
-                                                                                kvp("retries", make_document(kvp("$gt", redrivePolicy.maxReceiveCount)))),
-                                                                  make_document(kvp("$set", make_document(kvp("retries", 0),
-                                                                                                          kvp("queueArn", redrivePolicy.deadLetterTargetArn),
-                                                                                                          kvp("queueUrl", dlqQueueUrl),
-                                                                                                          kvp("queueName", dlqQueueName),
-                                                                                                          kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+
+                document filterQuery;
+                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("retries", make_document(kvp("$gt", redrivePolicy.maxReceiveCount))));
+
+                document setQuery;
+                setQuery.append(kvp("retries", 0));
+                setQuery.append(kvp("queueArn", redrivePolicy.deadLetterTargetArn));
+                setQuery.append(kvp("queueUrl", dlqQueueUrl));
+                setQuery.append(kvp("queueName", dlqQueueName));
+                setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                session.start_transaction();
+                const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
                 session.commit_transaction();
                 log_trace << "Message re-drive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queueArn: " << queueArn;
 
                 // Adjust queue message counters
-                AdjustMessageCounters(queueArn);
+                if (result->modified_count() > 0) {
+                    AdjustMessageCounters(queueArn);
+                    AdjustMessageCounters(redrivePolicy.deadLetterTargetArn);
+                }
+
+                return result->modified_count();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
                 session.abort_transaction();
+                throw Core::DatabaseException(e.what());
             }
-
-        } else {
-
-            _memoryDb.RedriveMessages(queueArn, redrivePolicy);
         }
+        return _memoryDb.RelocateToDlqMessages(queueArn, redrivePolicy);
     }
 
     long SQSDatabase::ResetDelayedMessages(const std::string &queueArn, const long delay) const {
@@ -875,7 +895,54 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException(exc.what());
             }
         }
-        return _memoryDb.ResetDelayedMessages(queueArn, delay);
+        return _memoryDb.ResetDelayedMessages(queueArn);
+    }
+
+    long SQSDatabase::RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto session = client->start_session();
+
+            const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
+            try {
+
+                document filterQuery;
+                filterQuery.append(kvp("queueArn", dlqQueue.queueArn));
+
+                document setQuery;
+                setQuery.append(kvp("queueArn", originalQueue.queueArn));
+                setQuery.append(kvp("queueUrl", originalQueue.queueUrl));
+                setQuery.append(kvp("queueName", originalQueue.name));
+                setQuery.append(kvp("retries", 0));
+                setQuery.append(kvp("reset", bsoncxx::types::b_date(newReset)));
+                setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                session.start_transaction();
+                const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
+                session.commit_transaction();
+                log_trace << "Message re-drive, arn: " << dlqQueue.queueArn << " updated: " << result->modified_count();
+
+                // Adjust queue message counters
+                if (result->modified_count() > 0) {
+                    AdjustMessageCounters(dlqQueue.queueArn);
+                    AdjustMessageCounters(originalQueue.queueArn);
+                }
+
+                return result->modified_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.RedriveMessages(originalQueue, dlqQueue);
     }
 
     long SQSDatabase::MessageRetention(const std::string &queueArn, const long retentionPeriod) const {
@@ -893,7 +960,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = messageCollection.delete_many(
                         make_document(
-                                kvp("queueUrl", queueArn),
+                                kvp("queueArn", queueArn),
                                 kvp("created", make_document(
                                                        kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();

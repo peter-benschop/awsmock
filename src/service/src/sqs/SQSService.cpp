@@ -141,6 +141,7 @@ namespace AwsMock::Service {
                 counter.maxMessageSize = queue.attributes.maxMessageSize;
                 counter.retentionPeriod = queue.attributes.messageRetentionPeriod;
                 counter.size = queue.size;
+                counter.isDlq = queue.isDlq;
                 counter.created = queue.created;
                 counter.modified = queue.modified;
                 listQueueResponse.queueCounters.emplace_back(counter);
@@ -342,7 +343,7 @@ namespace AwsMock::Service {
 
             // Update messages
             const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
-            long deleted = _sqsDatabase.PurgeQueue(queueArn);
+            const long deleted = _sqsDatabase.PurgeQueue(queueArn);
             log_trace << "SQS queue purged, queueArn: " << queueArn;
 
             // Update queue counter
@@ -354,6 +355,36 @@ namespace AwsMock::Service {
             log_trace << "SQS queue counter updated, queueArn: " << queue.queueArn;
 
             return deleted;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    long SQSService::RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "redrive_messages");
+        log_trace << "Redrive messages request, queueArn: " << request.queueArn;
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        try {
+
+            // Update messages
+            const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
+            const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            const long count = _sqsDatabase.RedriveMessages(originalQueue, dqlQueue);
+
+            // Update queue counter
+            _sqsDatabase.AdjustMessageCounters(request.queueArn);
+            _sqsDatabase.AdjustMessageCounters(originalQueue.queueArn);
+            log_trace << "SQS queue counter updated, queueArn: " << request.queueArn;
+
+            return count;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -858,6 +889,7 @@ namespace AwsMock::Service {
                 messageEntry.body = message.body;
                 messageEntry.receiptHandle = message.receiptHandle;
                 messageEntry.md5Sum = message.md5Body;
+                messageEntry.retries = message.retries;
                 messageEntry.created = message.created;
                 messageEntry.modified = message.modified;
                 if (!message.messageAttributes.empty()) {
