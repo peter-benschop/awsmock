@@ -31,7 +31,8 @@ namespace AwsMock::Core {
 
         // Auto load
         DefineBoolProperty("awsmock.autoload.active", "AWSMOCK_AUTOLOAD_ACTIVE", true);
-        DefineStringProperty("awsmock.autoload.file", "AWSMOCK_AUTOLOAD_FILE", "/home/awsmock/init/init.bson");
+        DefineStringProperty("awsmock.autoload.file", "AWSMOCK_AUTOLOAD_FILE", "/home/awsmock/init/init.json");
+        DefineStringProperty("awsmock.autoload.dir", "AWSMOCK_AUTOLOAD_DIR", "/home/awsmock/init");
 
         // Gateway
         DefineBoolProperty("awsmock.gateway.active", "AWSMOCK_GATEWAY_ACTIVE", true);

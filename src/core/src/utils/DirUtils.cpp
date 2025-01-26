@@ -100,6 +100,17 @@ namespace AwsMock::Core {
         return fileNames;
     }
 
+    std::vector<std::string> DirUtils::ListFilesByExtension(const std::string &dirName, const std::string &extension) {
+
+        std::vector<std::string> fileNames;
+        for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
+            if (is_regular_file(entry) && StringUtils::EndsWith(entry.path().string(), extension)) {
+                fileNames.emplace_back(entry.path().string());
+            }
+        }
+        return fileNames;
+    }
+
     std::vector<std::string> DirUtils::ListFilesByPattern(const std::string &dirName, const std::string &pattern, const bool recursive) {
 
         const std::regex regex(pattern);

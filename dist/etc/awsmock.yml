@@ -26,7 +26,8 @@ awsmock:
     doc-root: /home/awsmock/frontend                                  # Document root directory
   autoload: # BSON auto load on startup
     active: true                                                      # Autoload activation flag
-    file: /home/awsmock/init/init.json                                # AUto load file
+    dir: /home/awsmock/init                                           # Autoload directory, has priority over autoload file
+    file: /home/awsmock/init/init.json                                # Autoload file
   docker: # Docker settings
     active: true                                                      # Docker daemon activation flag
     network-mode: local                                               # Docker network mode, default: local
