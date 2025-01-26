@@ -54,6 +54,16 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::Item
          */
         static Database::Entity::DynamoDb::Item map(const PutItemRequest &request, const Database::Entity::DynamoDb::Table &table);
+
+        /**
+         * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.
+         *
+         * @param attributeValue attribute value entity
+         * @return Dynamodb attribute DTO
+         * @see Dto::DynamoDb::AttributeValue
+         * @see Database::Entity::DynamoDb::AttributeValue
+         */
+        static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::AttributeValue> &attributeValue);
     };
 
 }// namespace AwsMock::Dto::DynamoDb
