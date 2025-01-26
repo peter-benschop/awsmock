@@ -116,10 +116,10 @@ namespace AwsMock::Service {
 
             } else {
 
-                log_debug << "Empty table list";
-                _dynamoDbDatabase.DeleteAllTables();
+                long count = _dynamoDbDatabase.DeleteAllTables();
+                log_debug << "Tables deleted, count: " << count;
             }
-            log_debug << "DynamoDB synchronized";
+            log_debug << "DynamoDB tables synchronized";
 
         } catch (Core::JsonException &exc) {
             log_error << exc.what();
@@ -167,13 +167,8 @@ namespace AwsMock::Service {
                     table = _dynamoDbDatabase.UpdateTable(table);
                     log_debug << "Table counter adjusted, table: " << table.name;
                 }
-
-            } else {
-
-                log_debug << "Empty table list";
-                _dynamoDbDatabase.DeleteAllTables();
             }
-            log_debug << "DynamoDB synchronized";
+            log_debug << "DynamoDB items synchronized";
 
         } catch (Core::JsonException &exc) {
             log_error << exc.what();

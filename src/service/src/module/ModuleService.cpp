@@ -255,10 +255,11 @@ namespace AwsMock::Service {
 
         // DynamoDB
         if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
+            DynamoDbService _dynamoDbService;
             const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
             if (!infrastructure.dynamoDbTables.empty()) {
                 for (auto &table: infrastructure.dynamoDbTables) {
-                    if (DynamoDbService _dynamoDbService; !_dynamoDbService.ExistTable(table.region, table.name)) {
+                    if (!_dynamoDbService.ExistTable(table.region, table.name)) {
                         constexpr Dto::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = 1, .writeCapacityUnits = 1};
                         Dto::DynamoDb::CreateTableRequest request = {.region = table.region, .tableName = table.name, .attributes = table.attributes, .keySchemas = table.keySchemas, .provisionedThroughput = provisionedThroughput, .tags = table.tags};
                         request.body = request.ToJson();
@@ -272,7 +273,12 @@ namespace AwsMock::Service {
             }
             if (!infrastructure.dynamoDbItems.empty()) {
                 for (auto &item: infrastructure.dynamoDbItems) {
-                    _dynamoDatabase.CreateOrUpdateItem(item);
+                    if (_dynamoDbService.ExistTable(item.region, item.tableName)) {
+                        Dto::DynamoDb::PutItemRequest request = {.region = item.region, .tableName = item.tableName, .attributes = Dto::DynamoDb::Mapper::map(item.attributes), .keys = Dto::DynamoDb::Mapper::map(item.keys)};
+                        request.body = request.ToJson();
+                        Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(request);
+                        log_debug << "DynamoDB item created, tableName: " << response.tableName;
+                    }
                 }
                 log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
             }

@@ -60,7 +60,21 @@ namespace AwsMock::Dto::DynamoDb {
                 item.keys[fst] = attribute;
             }
         }
-
         return item;
+    }
+
+    std::map<std::string, AttributeValue> Mapper::map(const std::map<std::string, Database::Entity::DynamoDb::AttributeValue> &attributeValue) {
+        std::map<std::string, AttributeValue> resultMap;
+        for (const auto &[fst, snd]: attributeValue) {
+            AttributeValue result;
+            result.stringValue = snd.stringValue;
+            result.stringSetValue = snd.stringSetValue;
+            result.numberValue = snd.numberValue;
+            result.numberSetValue = snd.numberSetValue;
+            result.boolValue = snd.boolValue;
+            result.nullValue = snd.nullValue;
+            resultMap[fst] = result;
+        }
+        return resultMap;
     }
 }// namespace AwsMock::Dto::DynamoDb
