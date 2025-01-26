@@ -122,10 +122,12 @@ namespace AwsMock::Service {
             log_debug << "DynamoDB tables synchronized";
 
         } catch (Core::JsonException &exc) {
-            log_error << exc.what();
+            log_error << exc.message();
         } catch (Core::DatabaseException &exc) {
-            log_error << exc.what();
+            log_error << exc.message();
         } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+        } catch (std::exception &exc) {
             log_error << exc.what();
         }
     }
@@ -171,10 +173,12 @@ namespace AwsMock::Service {
             log_debug << "DynamoDB items synchronized";
 
         } catch (Core::JsonException &exc) {
-            log_error << exc.what();
+            log_error << exc.message();
         } catch (Core::DatabaseException &exc) {
-            log_error << exc.what();
+            log_error << exc.message();
         } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+        } catch (std::exception &exc) {
             log_error << exc.what();
         }
     }
