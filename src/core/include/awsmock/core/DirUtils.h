@@ -141,10 +141,19 @@ namespace AwsMock::Core {
          * @brief Get a sorted list of files with the given prefix.
          *
          * @param dirName name of the directory
-         * @param prefix regular expression which must match the filename
+         * @param prefix file name prefix
          * @return vector of file names
          */
         static std::vector<std::string> ListFilesByPrefix(const std::string &dirName, const std::string &prefix);
+
+        /**
+         * @brief Get a sorted list of files with the given extension.
+         *
+         * @param dirName name of the directory
+         * @param extension file extension
+         * @return vector of file names
+         */
+        static std::vector<std::string> ListFilesByExtension(const std::string &dirName, const std::string &extension);
 
         /**
          * @brief Get a list of files with the given pattern.
