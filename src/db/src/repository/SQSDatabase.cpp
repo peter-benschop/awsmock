@@ -487,11 +487,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+
             try {
 
-                const int64_t count = messageCollection.count_documents(make_document(kvp("receiptHandle", receiptHandle)));
-                log_trace << "Message exists: " << std::boolalpha << count;
-                return count > 0;
+                document query;
+                query.append(kvp("receiptHandle", make_document(kvp("$exists", receiptHandle))));
+
+                const auto result = messageCollection.find_one(query.extract());
+                log_trace << "Message exists: " << std::boolalpha << result->empty();
+                return !result->empty();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -509,9 +513,9 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             try {
 
-                const auto count = messageCollection.find_one(make_document(kvp("messageId", make_document(kvp("$exists", true)))));
-                log_trace << "Message exists: " << std::boolalpha << count.has_value();
-                return count.has_value();
+                const auto result = messageCollection.find_one(make_document(kvp("messageId", make_document(kvp("$exists", messageId)))));
+                log_trace << "Message exists: " << std::boolalpha << result.has_value();
+                return result.has_value();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -750,7 +754,7 @@ namespace AwsMock::Database {
                         setQuery.append(kvp("reset", bsoncxx::types::b_date(reset)));
                         setQuery.append(kvp("retries", result.retries));
                         setQuery.append(kvp("receiptHandle", result.receiptHandle));
-                        setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+                        setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)));
 
                         document updateQuery;
                         updateQuery.append(kvp("$set", setQuery));
@@ -1161,7 +1165,8 @@ namespace AwsMock::Database {
                 // Adjust queue message counters
                 AdjustMessageCounters(message.queueArn);
 
-                log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
+                //                log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
+                log_debug << "Messages deleted, receiptHandle: " << message.receiptHandle << ", count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {

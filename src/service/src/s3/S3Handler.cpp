@@ -794,6 +794,9 @@ namespace AwsMock::Service {
             }
             return SendHeadResponse(request, s3Response.size, headers);
 
+        } catch (Core::NotFoundException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());

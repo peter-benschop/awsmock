@@ -89,7 +89,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -287,6 +287,13 @@ namespace AwsMock::Service {
          * @param lambda lambda entity to check
          */
         static void WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Returns the full path to the base64 encoded lambda function code.
+         * @param lambda lambda entity
+         * @return full path to base64 function code
+         */
+        static std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * lambda database connection

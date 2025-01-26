@@ -235,9 +235,8 @@ namespace AwsMock::Database {
 
         if (LambdaExists(lambda)) {
             return UpdateLambda(lambda);
-        } else {
-            return CreateLambda(lambda);
         }
+        return CreateLambda(lambda);
     }
 
     Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) const {
