@@ -198,8 +198,10 @@ To start the docker image:
   docker run -p 4566-4567:4566-4567 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
   ```
 
-This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance. Port ```4566``` (gateway) and ```4567``` (manager)
-should be reachable. ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and ```-v /var/run/docker.sock:/var/run/docker.sock``` for
+This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance. Port
+```4566``` (gateway) and ```4567``` (manager)
+should be reachable. ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and
+```-v /var/run/docker.sock:/var/run/docker.sock``` for
 the communication with the host's docker daemon (lambdas, dynamodb).
 
 If you have problems with the docker daemon connection and you see errors like:
@@ -234,7 +236,8 @@ To connect a MongoDB instance use the provided docker-compose file:
 ```
 
 This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured
-separately. See for instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
+separately. See for
+instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
 
 ## Examples
 
@@ -261,3 +264,9 @@ machine.
 ```
 c:\Program Files\awsmock\bin\awsmockctl status
 ```
+
+## Configuration
+
+In order to configure your infrastructure, you use the provided web interface on ```http://localhost:4567`. This is a
+Angular application which is hosted by awsmock. In there you can import/export JSON files, which are simply dumps of
+MongoDB collection. This way its very easy to load different infrastructure scenarios rapidly.
