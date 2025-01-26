@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
+#include <awsmock/dto/sqs/mapper/Mapper.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -23,24 +24,11 @@ namespace AwsMock::Dto::SQS {
                     Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfBody", message.md5Body);
                     Core::Bson::BsonUtils::SetStringValue(messageDocument, "MessageId", message.messageId);
 
-                    // Message attributes
+                    // Message attributes, first converted to DTO, then to document
                     document messageAttributesDocument;
-                    MessageAttributeList messageAttributeListDto;
-                    for (const auto &[attributeName, attributeValue, attributeType]: message.messageAttributes) {
-
-                        MessageAttribute messageAttributeDto = {.name = attributeName, .stringValue = attributeValue};
-
-                        if (attributeType == Database::Entity::SQS::MessageAttributeType::STRING) {
-                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "String");
-                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", attributeValue);
-                            messageAttributeDto.type = STRING;
-                        } else if (attributeType == Database::Entity::SQS::MessageAttributeType::NUMBER) {
-                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "DataType", "Number");
-                            Core::Bson::BsonUtils::SetStringValue(messageAttributesDocument, "StringValue", attributeValue);
-                            messageAttributeDto.type = NUMBER;
-                        }
-                        messageAttributeListDto[attributeName] = messageAttributeDto;
-                        messageAttributesDocument.append(kvp(attributeName, messageAttributesDocument.extract()));
+                    MessageAttributeList messageAttributeListDto = Mapper::map(message.messageAttributes);
+                    for (const auto &[fst, snd]: messageAttributeListDto) {
+                        messageAttributesDocument.append(kvp(fst, snd.ToDocument()));
                     }
                     messageDocument.append(kvp("MessageAttributes", messageAttributesDocument.extract()));
 
@@ -52,7 +40,7 @@ namespace AwsMock::Dto::SQS {
                     messageDocument.append(kvp("Attributes", attributeDocument));
 
                     // MD5 of message attributes
-                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5Attributes(messageAttributeListDto, false));
+                    Core::Bson::BsonUtils::SetStringValue(messageDocument, "MD5OfMessageAttributes", MessageAttribute::GetMd5Attributes(messageAttributeListDto));
                     messageArray.append(messageDocument);
                 }
 

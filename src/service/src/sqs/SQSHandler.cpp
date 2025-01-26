@@ -3,8 +3,6 @@
 
 namespace AwsMock::Service {
 
-    //    const std::map<std::string, std::string> SQSHandler::headers = CognitoHandler::CreateHeaderMap();
-
     http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SQS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 

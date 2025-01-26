@@ -60,15 +60,24 @@ namespace AwsMock::Dto::SQS {
         static ListMessageCountersResponse map(const Database::Entity::SQS::MessageList &messages, long total);
 
         /**
-         * @brief Maps a SQS message entity to a SQS send message response DTO
-         *
-         * Some values will be pulled over from the request.
+         * @brief Maps a SQS attribute DTO to a attribute entity
          *
          * @param messageAttributes list of message attributes
          * @return MessageAttributeList
          * @see Database::Entity::SQS::MessageAttributeList
          */
         static Database::Entity::SQS::MessageAttributeList map(const MessageAttributeList &messageAttributes);
+
+        /**
+       * @brief Maps a SQS attribute entity to a attribute DTO
+       *
+       * @param messageAttributes list of message attributes
+       * @return MessageAttributeList
+       * @see Database::Entity::SQS::MessageAttributeList
+       */
+        static MessageAttributeList map(const Database::Entity::SQS::MessageAttributeList &messageAttributes);
+
+        static std::vector<std::string> excludedAttributeNames;
     };
 
 }// namespace AwsMock::Dto::SQS

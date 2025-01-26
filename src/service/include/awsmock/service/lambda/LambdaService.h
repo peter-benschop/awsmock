@@ -289,6 +289,13 @@ namespace AwsMock::Service {
         static void WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda);
 
         /**
+         * @brief Returns the full path to the base64 encoded lambda function code.
+         * @param lambda lambda entity
+         * @return full path to base64 function code
+         */
+        static std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
+
+        /**
          * lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;

@@ -41,10 +41,11 @@ namespace AwsMock::Service {
         const std::string containerName = lambdaEntity.function + "-" + instanceId;
         if (!ContainerService::instance().ContainerExistsByName(containerName)) {
             Database::Entity::Lambda::Instance instance;
-            instance.hostPort = CreateRandomHostPort();
             instance.id = instanceId;
+            instance.hostPort = CreateRandomHostPort();
             instance.containerName = containerName;
             instance.status = Database::Entity::Lambda::InstanceIdle;
+            instance.created = system_clock::now();
             CreateDockerContainer(lambdaEntity, instance, lambdaEntity.dockerTag);
             lambdaEntity.instances.emplace_back(instance);
         }

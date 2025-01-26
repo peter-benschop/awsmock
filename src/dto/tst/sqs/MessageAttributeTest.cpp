@@ -43,7 +43,7 @@ namespace AwsMock::Dto::SQS {
         response.messageAttributes = messageAttributes;
 
         // act
-        const std::string result = MessageAttribute::GetMd5Attributes(messageAttributes, false);
+        const std::string result = MessageAttribute::GetMd5Attributes(messageAttributes);
 
         // assert
         EXPECT_FALSE(result.empty());
@@ -60,7 +60,7 @@ namespace AwsMock::Dto::SQS {
         response.messageAttributes = messageAttributes;
 
         // act
-        const std::string result = MessageAttribute::GetMd5Attributes(messageAttributes, false);
+        const std::string result = MessageAttribute::GetMd5Attributes(messageAttributes);
 
         // assert
         EXPECT_FALSE(result.empty());
@@ -78,7 +78,7 @@ namespace AwsMock::Dto::SQS {
         response.messageAttributes = messageAttributes;
 
         // act
-        const std::string result = MessageAttribute::GetMd5Attributes(messageAttributes, false);
+        const std::string result = MessageAttribute::GetMd5Attributes(messageAttributes);
 
         // assert
         EXPECT_FALSE(result.empty());

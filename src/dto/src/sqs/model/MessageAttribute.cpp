@@ -10,7 +10,7 @@ namespace AwsMock::Dto::SQS {
         return name < other.name;
     }
 
-    std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, const bool includeContentType) {
+    std::string MessageAttribute::GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();

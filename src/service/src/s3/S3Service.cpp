@@ -158,14 +158,14 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            log_info << "Bucket " << request.bucket << " does not exist";
-            throw Core::NotFoundException("Bucket does not exist");
+            log_info << "Bucket does not exist, region: " << request.region << ", bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist, region: " + request.region + ", bucket: " + request.bucket);
         }
 
         if (!request.key.empty()) {
             if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
-                log_info << "Object " << request.key << " does not exist";
-                throw Core::NotFoundException("Object does not exist");
+                log_info << "Object does not exists, bucket: " << request.bucket << ", key: " << request.key;
+                throw Core::NotFoundException("Object does not exists, bucket: " + request.bucket + ", key: " + request.key);
             }
         }
 

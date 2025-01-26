@@ -46,11 +46,10 @@ namespace AwsMock::Dto::SQS {
          * @brief Returns the MD5 sum of all message attributes (user attributes).
          *
          * @param attributes vector of message attributes
-         * @param includeContentType if true contentType is included
          * @return MD5 sum of message attributes string
          * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html
          */
-        static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType);
+        static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes);
 
         /**
          * @brief Update the MD5 hash with a given value

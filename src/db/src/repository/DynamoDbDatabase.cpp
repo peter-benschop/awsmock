@@ -4,9 +4,6 @@
 
 #include <awsmock/repository/DynamoDbDatabase.h>
 
-namespace AwsMock::Dto::DynamoDb {
-    struct Key;
-}
 namespace AwsMock::Database {
 
     using bsoncxx::builder::basic::kvp;

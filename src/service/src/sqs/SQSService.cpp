@@ -692,12 +692,13 @@ namespace AwsMock::Service {
             // Set parameters
             message.queueArn = queue.queueArn;
             message.queueName = queue.name;
+            message.size = request.body.size();
             message.created = system_clock::now();
             message.modified = system_clock::now();
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
-            message.md5UserAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes, true);
+            message.md5UserAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
 
             // Update database
             queue.attributes.approximateNumberOfMessages++;
@@ -873,7 +874,7 @@ namespace AwsMock::Service {
 
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
-            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
 
             Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
@@ -889,11 +890,12 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "update_message");
         log_trace << "Update message request, url: " << request.messageId;
 
+        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+
         try {
-            if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
-                log_error << "Message does not exist, messageId: " << request.messageId;
-                throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
-            }
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
             message.messageAttributes = Dto::SQS::Mapper::map(request.messageAttributes);
 
@@ -911,11 +913,12 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message");
         log_trace << "Delete message request, url: " << request.receiptHandle;
 
+        if (!_sqsDatabase.MessageExists(request.receiptHandle)) {
+            log_error << "Message does not exist, receiptHandle: " << request.receiptHandle;
+            throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
+        }
+
         try {
-            if (!_sqsDatabase.MessageExists(request.receiptHandle)) {
-                log_error << "Message does not exist, receiptHandle: " << request.receiptHandle;
-                throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
-            }
             const Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
 
             // Delete from database
@@ -932,11 +935,12 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message_attribute");
         log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
 
+        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+
         try {
-            if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
-                log_error << "Message does not exist, messageId: " << request.messageId;
-                throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
-            }
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
 
             // Update attributes
@@ -963,19 +967,21 @@ namespace AwsMock::Service {
             for (const auto &[id, receiptHandle]: request.deleteMessageBatchEntries) {
 
                 if (!_sqsDatabase.MessageExists(receiptHandle)) {
+
                     log_warning << "Message does not exist, receiptHandle: " << receiptHandle.substr(0, 40);
                     Dto::SQS::BatchResultErrorEntry failure = {.id = id};
                     deleteMessageBatchResponse.failed.emplace_back(failure);
-                    return deleteMessageBatchResponse;
+
+                } else {
+
+                    // Delete from database
+                    Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(receiptHandle);
+                    deleted += _sqsDatabase.DeleteMessage(message);
+
+                    // Successful
+                    Dto::SQS::DeleteMessageBatchResultEntry success = {.id = id};
+                    deleteMessageBatchResponse.successFull.emplace_back(success);
                 }
-
-                // Delete from database
-                Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(receiptHandle);
-                deleted += _sqsDatabase.DeleteMessage(message);
-
-                // Successful
-                Dto::SQS::DeleteMessageBatchResultEntry success = {.id = id};
-                deleteMessageBatchResponse.successFull.emplace_back(success);
             }
 
             log_debug << "Message batch deleted, count: " << deleted;
