@@ -376,6 +376,17 @@ namespace AwsMock::Database {
         return _memoryDb.ListLambdas(region);
     }
 
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ExportLambdas(const std::string &region) const {
+
+        std::vector<Entity::Lambda::Lambda> lambdas = ListLambdas(region);
+
+        // Remove instances, as they will confuse the re-import
+        for (auto &lambda: lambdas) {
+            lambda.instances.clear();
+        }
+        return lambdas;
+    }
+
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<Core::SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;

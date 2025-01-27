@@ -82,7 +82,6 @@ namespace AwsMock::Service {
 
         // Get the image struct
         const Dto::Docker::Image image = ContainerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
-        lambdaEntity.codeSize = static_cast<long>(functionCode.size());
         lambdaEntity.imageId = image.id;
         lambdaEntity.imageSize = image.size;
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);

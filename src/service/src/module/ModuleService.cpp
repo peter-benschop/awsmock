@@ -107,7 +107,7 @@ namespace AwsMock::Service {
             } else if (module == "lambda") {
 
                 Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-                infrastructure.lambdas = _lambdaDatabase.ListLambdas();
+                infrastructure.lambdas = _lambdaDatabase.ExportLambdas();
 
             } else if (module == "cognito") {
 
