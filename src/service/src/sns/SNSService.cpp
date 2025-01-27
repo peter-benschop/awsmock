@@ -143,15 +143,13 @@ namespace AwsMock::Service {
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
-        if (request.targetArn.empty() && request.topicArn.empty()) {
-            log_error << "Either topicARN or targetArn must exist";
-            throw Core::ServiceException("Either topicARN or targetArn must exist");
+        if (request.topicArn.empty() && request.targetArn.empty()) {
+            throw Core::ServiceException("Either topicArn or targetArn must exist");
         }
 
         // Check existence
         if (!_snsDatabase.TopicExists(request.topicArn)) {
-            log_error << "Topic does not exist: " << request.topicArn;
-            throw Core::ServiceException("SNS topic does not exists");
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {
@@ -218,9 +216,7 @@ namespace AwsMock::Service {
             if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
 
                 // Add subscription
-                topic.subscriptions.push_back({.protocol = request.protocol,
-                                               .endpoint = request.endpoint,
-                                               .subscriptionArn = subscriptionArn});
+                topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
