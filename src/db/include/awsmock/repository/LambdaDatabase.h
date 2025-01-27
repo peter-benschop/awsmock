@@ -200,6 +200,14 @@ namespace AwsMock::Database {
         std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
+         * @brief Export a list of lambdas
+         *
+         * @param region Export the lambdas as list
+         * @return
+         */
+        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::string &region = {}) const;
+
+        /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.
          *
          * @param eventSourceArn event source ARN
