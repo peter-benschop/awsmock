@@ -159,7 +159,6 @@ namespace AwsMock::Service {
         }
 
         try {
-
             // Get the topic by topic ARN or target ARN
             Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
 

@@ -111,7 +111,6 @@ namespace AwsMock::Core::Bson {
     }
 
     struct BsonUtils {
-
         static void SetStringValue(document &document, const std::string &name, const std::string &value) {
             if (!value.empty()) {
                 document.append(kvp(name, value));
@@ -138,7 +137,9 @@ namespace AwsMock::Core::Bson {
             rootDocument.append(kvp(name, value));
         }
 
-        static void SetDocumentValue(document &rootDocument, const std::string &name, const view_or_value<view, value> &value) {
+        static void SetDocumentValue(document &rootDocument,
+                                     const std::string &name,
+                                     const view_or_value<view, value> &value) {
             rootDocument.append(kvp(name, value));
         }
 
@@ -213,7 +214,6 @@ namespace AwsMock::Core::Bson {
         }
 
         static int GetIntValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return 0;
             }
@@ -269,7 +269,6 @@ namespace AwsMock::Core::Bson {
         }
 
         static std::string GetStringValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return {};
             }
@@ -320,7 +319,6 @@ namespace AwsMock::Core::Bson {
         }
 
         static system_clock::time_point GetDateValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return {};
             }
