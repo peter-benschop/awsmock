@@ -168,6 +168,14 @@ namespace AwsMock::Service {
         static http::response<http::dynamic_body> SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers = {});
 
         /**
+         * @brief Send continue response
+         *
+         * @param request HTTP request
+         * @return HTTP response
+         */
+        static http::response<http::dynamic_body> SendContinueResponse(const http::request<http::dynamic_body> &request);
+
+        /**
          * Get the name
          */
         std::string name() { return _name; }
