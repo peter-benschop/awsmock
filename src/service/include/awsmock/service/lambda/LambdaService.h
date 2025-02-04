@@ -278,7 +278,7 @@ namespace AwsMock::Service {
          *
          * @param lambda lambda entity to cleanup
          */
-        static void CleanupDocker(const Database::Entity::Lambda::Lambda &lambda);
+        static void CleanupDocker(Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Returns the host name, to where we send lambda invocation notifications
