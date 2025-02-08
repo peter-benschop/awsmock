@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -141,6 +142,14 @@ namespace AwsMock::Database {
         std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {}) const;
 
         /**
+         * @brief Exports a list of cognito user pools.
+         *
+         * @param sortColumns sort columns
+         * @return list of cognito user pools
+         */
+        std::vector<Entity::Cognito::UserPool> ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const;
+
+        /**
          * @brief Deletes an existing cognito user pool
          *
          * @param id cognito user pool ID
@@ -232,6 +241,14 @@ namespace AwsMock::Database {
         std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
+         * @brief Exports a list of cognito users.
+         *
+         * @param sortColumns sort columns
+         * @return list of cognito groups
+         */
+        std::vector<Entity::Cognito::User> ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const;
+
+        /**
          * @brief Returns a list of cognito users in given group.
          *
          * @param region AWS region name
@@ -319,6 +336,14 @@ namespace AwsMock::Database {
          * @return list of cognito groups
          */
         std::vector<Entity::Cognito::Group> ListGroups(const std::string &region = {}, const std::string &userPoolId = {}) const;
+
+        /**
+         * @brief Exports a list of cognito groups.
+         *
+         * @param sortColumns sort columns
+         * @return list of cognito groups
+         */
+        std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Deletes an existing cognito user group.
