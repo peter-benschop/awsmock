@@ -18,9 +18,6 @@ add_subdirectory(tst)
 
 # Includes
 include_directories(./include /usr/local/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
-if(APPLE)
-    include_directories(/opt/homebrew/include /opt/homebrew/opt/libarchive/include)
-endif ()
 add_library(${LIBRARY} SHARED ${SOURCES})
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})

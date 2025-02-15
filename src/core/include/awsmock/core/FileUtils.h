@@ -16,6 +16,13 @@
 #include <iostream>
 #include <pwd.h>
 #include <string>
+#if __APPLE__
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <sys/uio.h>
+#elif
+    #include <sys/sendfile.h>
+#endif
 
 // Boost includes
 #include <boost/asio/streambuf.hpp>

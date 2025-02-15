@@ -1135,8 +1135,8 @@ namespace AwsMock::Database {
                         lastTimestamp = lastMessage.created;
                     }
 
-                    const double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - firstTimestamp).count();
-                    if (const double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - lastTimestamp).count(); max + min > 5) {
+                    const double max = std::chrono::duration<double, std::milli>(system_clock::now() - firstTimestamp).count();
+                    if (const double min = std::chrono::duration<double, std::milli>(system_clock::now() - lastTimestamp).count(); max + min > 5) {
                         waitTime.waitTime[queue.name] = (max + min) / 2.0;
                     } else {
                         waitTime.waitTime[queue.name] = 0.0;
@@ -1303,7 +1303,7 @@ namespace AwsMock::Database {
                     long size = GetQueueSize(queueArn);
                     queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", size),
+                                                                                 kvp("size", bsoncxx::types::b_int64(size)),
                                                                                  kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
                                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
                                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
@@ -1311,7 +1311,7 @@ namespace AwsMock::Database {
                 } else {
                     queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", 0),
+                                                                                 kvp("size", bsoncxx::types::b_int64(0)),
                                                                                  kvp("attributes.approximateNumberOfMessages", 0),
                                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", 0),
                                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", 0)))));
