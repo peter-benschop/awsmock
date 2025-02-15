@@ -39,9 +39,9 @@ namespace AwsMock::Core::Bson {
         if (!a.empty()) {
             array jsonArray;
             for (const auto &e: a) {
-                jsonArray.append<document>(e.ToDocument());
+                jsonArray.append(bsoncxx::types::b_document(e.ToDocument()));
             }
-            d.append(kvp(name, jsonArray));
+            d.append(kvp(name, bsoncxx::types::b_array(jsonArray)));
         }
     }
 
