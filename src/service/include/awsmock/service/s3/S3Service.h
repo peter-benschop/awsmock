@@ -194,9 +194,7 @@ namespace AwsMock::Service {
          *
          * @param request S3 put versioning request
          */
-        void
-
-        PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) const;
+        void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) const;
 
         /**
          * @brief Creates a new bucket
@@ -405,7 +403,8 @@ namespace AwsMock::Service {
          * @param bucket S3 bucket
          * @param object S3 object
          */
-        static void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object& object);
+        static void
+        CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
 
         /**
          * @brief Checks the existence of a bucket by region and name.
@@ -414,7 +413,7 @@ namespace AwsMock::Service {
          * @param name S3 bucket name
          */
         static void
-        CheckBucket(const std::string& region, const std::string &name);
+        CheckBucket(const std::string &region, const std::string &name);
 
         /**
          * @brief Checks the existence of a bucket by region and name.
