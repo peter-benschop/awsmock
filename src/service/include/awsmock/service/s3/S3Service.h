@@ -412,7 +412,15 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param name S3 bucket name
          */
-        static void CheckBucket(const std::string &region, const std::string &name);
+        static void CheckBucketExistence(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Checks whether the bucket exists already.
+         *
+         * @param region AWS region
+         * @param name S3 bucket name
+         */
+        static void CheckBucketNonExistence(const std::string &region, const std::string &name);
 
         /**
          * @brief Checks the decryption status and decrypts the internal file using
