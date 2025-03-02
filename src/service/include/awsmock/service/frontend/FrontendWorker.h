@@ -21,9 +21,9 @@
 #include <boost/numeric/ublas/fwd.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/config/Configuration.h>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>

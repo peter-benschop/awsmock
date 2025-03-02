@@ -9,9 +9,9 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef WIN32
-#include <unistd.h>
+#ifndef _WIN32
 #include <sys/mman.h>
+#include <unistd.h>
 #endif
 
 // C++ includes

@@ -27,6 +27,7 @@
 
 // Boost includes
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>

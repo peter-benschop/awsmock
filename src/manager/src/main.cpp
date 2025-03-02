@@ -27,6 +27,7 @@
 // Boost includes
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+
 //#ifdef WIN32
 //#include <boost/application.hpp>
 //#include <boost/application/initializers.hpp>
@@ -37,11 +38,11 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/server/Manager.h>
 #include <awsmock/service/frontend/FrontendServer.h>
-#include <awsmock/service/gateway/GatewayServer.h>
 
 #ifdef WIN32
-#define DEFAULT_CONFIG_FILE "C:\\Program Files (x86)\\awsmock\\etc\\awsmock.yml"
-#define DEFAULT_LOG_FILE "C:\\Program Files (x86)\\awsmock\\log\\awsmock.log"
+#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.yml")
+#define DEFAULT_LOG_FILE std::string("C:\\Program Files (x86)\\awsmock\\log\\awsmock.log")
+#define DEFAULT_SERVICE_PATH std::string("C:\\Program Files (x86)\\awsmock\\bin\\awsmock.exe")
 #else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
@@ -66,15 +67,15 @@ int main(int argc, char *argv[]) {
     desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "set configuration file");
     desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value("info"), "set log level");
     desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_FILE), "set log file");
-    //#ifdef WIN32
-    //    desc.add_options()("install", "install windows service");
-    //    desc.add_options()("check", "check windows service");
-    //    desc.add_options()("uninstall", "uninstall windows service");
-    //    desc.add_options()("name", boost::program_options::value<std::string>()->default_value("awsmock"), "windows service name");
-    //    desc.add_options()("description", boost::program_options::value<std::string>()->default_value("AWS Cloud Simulation"), "windows service description");
-    //    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AwsMock"), "windows service display name");
-    //    desc.add_options()("path", boost::program_options::value<std::string>()->default_value("c:/program files (x86)/awsmock/bin/awsmockmgr.exe"), "windows service path");
-    //#endif
+#ifdef _WIN32
+    desc.add_options()("install", "install windows service");
+    desc.add_options()("check", "check windows service");
+    desc.add_options()("uninstall", "uninstall windows service");
+    desc.add_options()("name", boost::program_options::value<std::string>()->default_value("awsmock"), "windows service name");
+    desc.add_options()("description", boost::program_options::value<std::string>()->default_value("AWS Cloud Simulation"), "windows service description");
+    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AwsMock"), "windows service display name");
+    desc.add_options()("path", boost::program_options::value<std::string>()->default_value(DEFAULT_SERVICE_PATH), "windows service path");
+#endif
 
     boost::program_options::variables_map vm;
     store(parse_command_line(argc, argv, desc), vm);
@@ -131,12 +132,8 @@ int main(int argc, char *argv[]) {
     //#endif
 
     // Read configuration
-    AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.contains("config")) {
-        configuration.SetFilename(vm["config"].as<std::string>());
-    } else {
-        configuration.SetFilename(DEFAULT_CONFIG_FILE);
-    }
+    std::string configFilename = vm["config"].as<std::string>();
+    AwsMock::Core::Configuration::instance().SetFilename(configFilename.c_str());
 
     // Set log level
     if (vm.contains("loglevel")) {
@@ -167,3 +164,9 @@ int main(int argc, char *argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+#ifdef _WIN32
+int APIENTRY mainCRTStartup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    return main(__argc, __argv);
+}
+#endif

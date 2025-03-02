@@ -36,11 +36,8 @@
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
 
-#define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
-#define CONTAINER_PORT "8080/tcp"
-#define NETWORK_DEFAULT_MODE "local"
 
 namespace AwsMock::Service {
 

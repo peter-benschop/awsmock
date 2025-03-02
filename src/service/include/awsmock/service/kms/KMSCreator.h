@@ -32,7 +32,7 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         [[maybe_unused]] explicit KMSCreator() = default;
 

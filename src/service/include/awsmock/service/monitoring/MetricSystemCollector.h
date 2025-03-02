@@ -6,7 +6,7 @@
 #define AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
 
 // C includes
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/times.h>
 #endif
 #ifdef __linux__
@@ -14,6 +14,9 @@
 #elif __APPLE__
 #include <mach/mach.h>
 #include <sys/resource.h>
+#endif
+#ifdef _WIN32
+//#include "psapi.h"
 #endif
 
 // C++ Standard includes
@@ -84,6 +87,19 @@ namespace AwsMock::Monitoring {
          */
         static void GetMemoryInfoLinux();
 
+#elif _WIN32
+
+        /**
+         * @brief Get CPU utilization on Windows
+         */
+        void GetCpuInfoWin32();
+
+
+        /**
+         * @brief Get memory utilization on Win32
+         */
+        static void GetMemoryInfoWin32();
+
 #endif
 
       private:
@@ -93,6 +109,10 @@ namespace AwsMock::Monitoring {
         clock_t _lastTotalCPU = 0;
         clock_t _lastSysCPU = 0;
         clock_t _lastUserCPU = 0;
+#elif _WIN32
+        ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
+        int numProcessors;
+        HANDLE self;
 #endif
 
         /**
