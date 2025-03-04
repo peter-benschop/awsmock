@@ -25,6 +25,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -50,12 +51,12 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector();
+        explicit AWSMOCK_API MetricSystemCollector();
 
         /**
          * @brief Updates the system counter
          */
-        void CollectSystemCounter();
+        AWSMOCK_API void CollectSystemCounter();
 
 #ifdef __APPLE__
 
@@ -96,17 +97,17 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get CPU utilization on Windows
          */
-        void GetCpuInfoWin32();
+        void GetCpuInfoWin32() const;
 
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetMemoryInfoWin32();
+        void GetMemoryInfoWin32() const;
 
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetThreadInfoWin32();
+        void GetThreadInfoWin32() const;
 
 #endif
 
@@ -130,7 +131,7 @@ namespace AwsMock::Monitoring {
          * @param counter name of the WMI counter
          * @return value of the WMI counter
          */
-        long long GetPerformanceValue(const std::string &counter);
+        long long GetPerformanceValue(const std::string &counter) const;
 
 #endif
 
