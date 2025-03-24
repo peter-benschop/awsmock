@@ -26,22 +26,9 @@ namespace AwsMock::Monitoring {
     using namespace std::chrono;
 
     struct MetricCache {
-
-        /**
-         * Counter name
-         */
         std::string name;
-
-        /**
-         * Counter label name
-         */
         std::string labelName;
-
-        /**
-         * Counter label value
-         */
         std::string labelValue;
-
         double value;
         int count;
         system_clock::time_point lastWritten = system_clock::now();
@@ -65,6 +52,11 @@ namespace AwsMock::Monitoring {
         MetricCacheService();
 
         /**
+         * @brief Initialization
+         */
+        void Initialize();
+
+        /**
          * @brief Increments a labeled counter.
          *
          * @param name of the counter
@@ -78,10 +70,17 @@ namespace AwsMock::Monitoring {
          * @brief Clears a counter.
          *
          * @param name of the counter
+         */
+        void ClearCounter(const std::string &name);
+
+        /**
+         * @brief Clears a counter.
+         *
+         * @param name of the counter
          * @param labelName name of the label
          * @param labelValue label value of the counter
          */
-        void ClearCounter(const std::string &name, const std::string &labelName = {}, const std::string &labelValue = {});
+        void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * @brief Sets a double gauge value in the map.
@@ -155,14 +154,14 @@ namespace AwsMock::Monitoring {
         static std::string GetId(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
-         * Aggregation period in minutes
+         * Mutex
          */
-        int _aggregationPeriod;
+        static boost::mutex _gaugeMutex;
 
         /**
          * Mutex
          */
-        static boost::mutex _cacheMutex;
+        static boost::mutex _counterMutex;
 
         /**
          * Database
@@ -170,7 +169,7 @@ namespace AwsMock::Monitoring {
         Database::MonitoringDatabase &_database;
 
         /**
-         * The cache
+         * Monitoring metric cache
          */
         std::map<std::string, MetricCache> _metricCache;
     };
