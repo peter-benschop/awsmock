@@ -54,7 +54,7 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/internal/ListBucketCounterRequest.cpp src/s3/internal/ListBucketCounterResponse.cpp
         src/s3/model/ObjectCounter.cpp src/s3/internal/ListObjectCounterRequest.cpp src/s3/internal/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
         src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp
-        src/s3/internal/UpdateObjectRequest.cpp)
+        src/s3/internal/UpdateObjectRequest.cpp src/s3/internal/UpdateLambdaConfigurationRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -144,5 +144,5 @@ target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mong
         boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
 
 if (NOT WIN32)
-    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

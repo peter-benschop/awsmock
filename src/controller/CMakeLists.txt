@@ -33,32 +33,14 @@ else ()
                 ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
                 boost_url boost_thread boost_locale boost_program_options yaml-cpp ssl crypto archive magic systemd)
-        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockCtl)
-        install(RUNTIME_DEPENDENCY_SET libAwsMockCtl
-                PRE_EXCLUDE_REGEXES
-                [=[api-ms-]=]
-                [=[ext-ms-]=]
-                [[kernel32\.dll]]
-                [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
-                POST_EXCLUDE_REGEXES
-                [=[.*(\\|/)system32(\\|/).*\.dll]=]
-                [=[^/(lib|usr/lib|usr/local/lib/lib64)]=])
+        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     else ()
         # systemd not available
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
                 boost_url boost_thread boost_locale boost_program_options yaml-cpp ssl crypto archive magic)
         target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
                 ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
-        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockCtl)
-        install(RUNTIME_DEPENDENCY_SET libAwsMockCtl
-                PRE_EXCLUDE_REGEXES
-                [=[api-ms-]=]
-                [=[ext-ms-]=]
-                [[kernel32\.dll]]
-                [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
-                POST_EXCLUDE_REGEXES
-                [=[.*(\\|/)system32(\\|/).*\.dll]=]
-                [=[^/(lib|usr/lib|usr/local/lib/lib64)]=] DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     endif ()
 endif ()
 

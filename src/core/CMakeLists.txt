@@ -37,5 +37,5 @@ target_link_libraries(${LIBRARY_STATIC} mongocxx bsoncxx boost_filesystem boost_
 
 # Installation
 if (NOT WIN32)
-    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

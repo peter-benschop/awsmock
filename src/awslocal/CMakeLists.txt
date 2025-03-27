@@ -23,15 +23,6 @@ else ()
     target_link_libraries(${BINARY} PUBLIC awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread
             boost_locale boost_program_options yaml-cpp ssl crypto archive magic)
     target_include_directories(${BINARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
-    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockLocal)
-    install(RUNTIME_DEPENDENCY_SET libAwsMockLocal
-            PRE_EXCLUDE_REGEXES
-            [=[api-ms-]=]
-            [=[ext-ms-]=]
-            [[kernel32\.dll]]
-            [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
-            POST_EXCLUDE_REGEXES
-            [=[.*(\\|/)system32(\\|/).*\.dll]=]
-            [=[^/(lib|usr/lib|usr/local/lib/lib64)]=] DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
 

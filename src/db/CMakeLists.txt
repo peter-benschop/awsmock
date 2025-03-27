@@ -56,5 +56,5 @@ target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boos
 
 # Installation
 if (NOT WIN32)
-    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

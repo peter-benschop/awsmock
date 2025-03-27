@@ -140,6 +140,7 @@ namespace AwsMock::Monitoring {
          * Last collection timestamp for total CPU utilization
          */
         clock_t _lastTotalCPU = 0;
+
         /**
          * Last collection timestamp for system CPU utilization
          */
@@ -158,17 +159,17 @@ namespace AwsMock::Monitoring {
         /**
          * Last collection timestamp for Awsmock CPU utilization
          */
-        clock_t _lastAwsmockCPU = 0;
+        unsigned long _lastAwsmockTotalCPU = 0;
 
         /**
          * Last collection timestamp for system CPU utilization
          */
-        clock_t _lastAwsmockSysCPU = 0;
+        unsigned long _lastAwsmockSysCPU = 0;
 
         /**
          * Last collection timestamp for user CPU utilization
          */
-        clock_t _lastAwsmockUserCPU = 0;
+        unsigned long _lastAwsmockUserCPU = 0;
 
 #elif _WIN32
 

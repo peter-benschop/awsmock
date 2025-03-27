@@ -44,14 +44,14 @@ include_directories(./include ../core/include ../db/include ../dto/include ${BSO
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb awsmockdto boost_locale yaml-cpp ssl crypto archive
+    target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale yaml-cpp ssl crypto archive
             magic prometheus-cpp-core prometheus-cpp-pull)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 if (WIN32)
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
+    target_link_libraries(${LIBRARY_STATIC} PRIVATE ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
             $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
             $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
             Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
@@ -62,5 +62,5 @@ else ()
 endif ()
 
 if (NOT WIN32)
-    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
