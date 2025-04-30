@@ -460,8 +460,8 @@ namespace AwsMock::Service {
         /**
          * @brief Deletes a bucket
          *
-         * <p>This method is recursive, if the bucket contains objects, also all
-         * object are removed </p>
+         * @par
+         * This method is recursive, if the bucket contains objects, also all objects are removed.
          *
          * @param bucket S3 bucket name
          */
