@@ -8,6 +8,14 @@
 // C++ standard includes
 #include <string>
 
+// Boost includes
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/connect.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -58,6 +66,8 @@
 #include <awsmock/service/sqs/SQSService.h>
 
 #define SQS_PROTOCOL "sqs"
+#define HTTP_PROTOCOL "http"
+#define HTTPS_PROTOCOL "https"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
 namespace AwsMock::Service {
@@ -280,6 +290,14 @@ namespace AwsMock::Service {
          * @param request SNS publish request
          */
         void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
+
+        /**
+         * @brief Send a SNS message to an HTTP endpoint.
+         *
+         * @param subscription SNS subscription
+         * @param request SNS publish request
+         */
+        void SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Adjust topic counters

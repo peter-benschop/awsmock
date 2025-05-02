@@ -549,11 +549,14 @@ namespace AwsMock::Service {
         if (const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn); !topic.subscriptions.empty()) {
 
             for (const auto &it: topic.subscriptions) {
+                const std::string protocol = Core::StringUtils::ToLower(it.protocol);
 
-                if (Core::StringUtils::ToLower(it.protocol) == SQS_PROTOCOL) {
-
+                if (protocol == SQS_PROTOCOL) {
                     SendSQSMessage(it, request);
-                    log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
+                    log_debug << "Message sent to SQS queue, queueArn: " << it.endpoint;
+                } else if (protocol == HTTP_PROTOCOL || protocol == HTTPS_PROTOCOL) {
+                    SendHttpMessage(it, request);
+                    log_debug << "Message sent to HTTP endpoint: " << it.endpoint;
                 }
             }
         }
@@ -660,6 +663,71 @@ namespace AwsMock::Service {
 
         const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
         log_trace << "SNS SendMessage response: " << response.ToString();
+    }
+
+    void SNSService::SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
+        namespace beast = boost::beast;
+        namespace http = beast::http;
+        namespace net = boost::asio;
+        using tcp = boost::asio::ip::tcp;
+
+        try {
+            log_debug << "Sending HTTP message to: " << subscription.endpoint;
+
+            // Parse URI (e.g., http://host:port/path)
+            const std::string &url = subscription.endpoint;
+            const std::string protocol_prefix = "http://";
+            if (!Core::StringUtils::StartsWith(url, protocol_prefix)) {
+                log_warning << "Unsupported protocol in endpoint: " << url;
+                return;
+            }
+
+            std::string host_port_path = url.substr(protocol_prefix.size());
+            auto path_pos = host_port_path.find('/');
+            std::string host_port = path_pos == std::string::npos ? host_port_path : host_port_path.substr(0, path_pos);
+            std::string path = path_pos == std::string::npos ? "/" : host_port_path.substr(path_pos);
+
+            std::string host;
+            std::string port = "80";
+            auto colon_pos = host_port.find(':');
+            if (colon_pos != std::string::npos) {
+                host = host_port.substr(0, colon_pos);
+                port = host_port.substr(colon_pos + 1);
+            } else {
+                host = host_port;
+            }
+
+            net::io_context ioc;
+            tcp::resolver resolver(ioc);
+            beast::tcp_stream stream(ioc);
+
+            auto const results = resolver.resolve(host, port);
+            stream.connect(results);
+
+            http::request<http::string_body> req{http::verb::post, path, 11};
+            req.set(http::field::host, host);
+            req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+            req.set(http::field::content_type, "application/json");
+
+            // Basic payload
+            const std::string body = R"({"Type":"Notification","Message":")" + request.message + R"("})";
+            req.body() = body;
+            req.prepare_payload();
+
+            http::write(stream, req);
+
+            beast::flat_buffer buffer;
+            http::response<http::string_body> res;
+            http::read(stream, buffer, res);
+
+            log_debug << "HTTP Response: " << res.result_int() << " - " << res.body();
+
+            beast::error_code ec;
+            stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+
+        } catch (const std::exception &ex) {
+            log_error << "Failed to send HTTP message to: " << subscription.endpoint << ", error: " << ex.what();
+        }
     }
 
     Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) const {
