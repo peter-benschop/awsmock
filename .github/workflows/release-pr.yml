@@ -41,7 +41,7 @@ jobs:
 
       - name: Build Docker
         run: |
-          VERSION=$(cat version.txt)
+          $VERSION = Get-Content version.txt
           cd docker 
           docker build --no-cache --build-arg GH_TOKEN=${GH_TOKEN} -t awsmock:$VERSION .
 
@@ -61,7 +61,7 @@ jobs:
 
       - name: Tag images
         run: |
-          VERSION=$(cat version.txt)
+          $VERSION = Get-Content version.txt
           docker tag awsmock:$VERSION ${{ secrets.DOCKER_USER }}/awsmock:$VERSION
           docker push ${{ secrets.DOCKER_USER }}/awsmock:$VERSION
           docker tag awsmock:$VERSION ${{ secrets.DOCKER_USER }}/awsmock:latest
