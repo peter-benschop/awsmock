@@ -92,7 +92,9 @@ namespace AwsMock::Service {
         const Dto::SNS::PublishRequest request = {.region = REGION, .topicArn = topicResponse.topicArn, .message = BODY};
         const auto [messageId, requestId] = _snsService.Publish(request);
         EXPECT_TRUE(messageId.length() > 1);
-        const Dto::SNS::PurgeTopicRequest purgeRequest = {.topicArn = topicResponse.topicArn};
+
+        Dto::SNS::PurgeTopicRequest purgeRequest;
+        purgeRequest.topicArn = topicResponse.topicArn;
 
         // act
         long count = _snsService.PurgeTopic(purgeRequest);
