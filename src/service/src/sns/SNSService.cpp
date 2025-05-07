@@ -709,8 +709,11 @@ namespace AwsMock::Service {
             req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
             req.set(http::field::content_type, "application/json");
 
-            // Basic payload
-            const std::string body = R"({"Type":"Notification","Message":")" + request.message + R"("})";
+            boost::json::object root;
+            root["Type"] = "Notification";
+            root["Message"] = request.message;// this will be escaped properly
+
+            std::string body = boost::json::serialize(root);
             req.body() = body;
             req.prepare_payload();
 
