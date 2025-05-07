@@ -715,7 +715,7 @@ namespace AwsMock::Service {
 
             boost::json::object root;
             root["Type"] = "Notification";
-            root["Message"] = boost::json::parse(request.message);
+            root["Message"] = boost::json::string(request.message);
 
             std::string body = boost::json::serialize(root);
 
