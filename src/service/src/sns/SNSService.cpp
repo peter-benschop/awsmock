@@ -733,7 +733,6 @@ namespace AwsMock::Service {
         }
     }
 
-
     Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_messages");
         log_trace << "List all messages request, region: " << request.region << " topicArn: " << request.topicArn;
