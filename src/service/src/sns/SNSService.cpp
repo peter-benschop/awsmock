@@ -4,6 +4,8 @@
 
 #include <awsmock/service/sns/SNSService.h>
 #include <map>
+#include <boost/json.hpp>
+#include <boost/json/src.hpp>
 
 namespace AwsMock::Service {
 
@@ -672,6 +674,8 @@ namespace AwsMock::Service {
         using tcp = boost::asio::ip::tcp;
 
         try {
+            log_debug << "Original request.message: " << request.message;
+
             log_debug << "Sending HTTP message to: " << subscription.endpoint;
 
             // Parse URI (e.g., http://host:port/path)
@@ -711,9 +715,13 @@ namespace AwsMock::Service {
 
             boost::json::object root;
             root["Type"] = "Notification";
-            root["Message"] = request.message;// this will be escaped properly
+            root["Message"] = boost::json::parse(request.message);
 
             std::string body = boost::json::serialize(root);
+
+            // Log the final serialized JSON body
+            log_debug << "Final serialized JSON body: " << body;
+
             req.body() = body;
             req.prepare_payload();
 
