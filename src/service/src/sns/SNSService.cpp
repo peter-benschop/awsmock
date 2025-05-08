@@ -675,10 +675,8 @@ namespace AwsMock::Service {
 
         try {
             log_debug << "Original request.message: " << request.message;
-
             log_debug << "Sending HTTP message to: " << subscription.endpoint;
 
-            // Parse URI (e.g., http://host:port/path)
             const std::string &url = subscription.endpoint;
             const std::string protocol_prefix = "http://";
             if (!Core::StringUtils::StartsWith(url, protocol_prefix)) {
@@ -713,13 +711,15 @@ namespace AwsMock::Service {
             req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
             req.set(http::field::content_type, "application/json");
 
+            // Build AWS SNS-style payload
             boost::json::object root;
             root["Type"] = "Notification";
+            root["MessageId"] = Core::AwsUtils::CreateMessageId();
+            root["TopicArn"] = request.topicArn;
             root["Message"] = boost::json::string(request.message);
+            root["Timestamp"] = Core::DateTimeUtils::UnixTimestamp(system_clock::now());
 
             std::string body = boost::json::serialize(root);
-
-            // Log the final serialized JSON body
             log_debug << "Final serialized JSON body: " << body;
 
             req.body() = body;
