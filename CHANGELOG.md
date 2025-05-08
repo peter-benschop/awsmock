@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.2.2](https://github.com/peter-benschop/awsmock/compare/v1.2.1...v1.2.2) (2025-05-08)
+
+
+### Bug Fixes
+
+* **1164-sftp-on-windows:** windows absolute path ([b30a1b5](https://github.com/peter-benschop/awsmock/commit/b30a1b5373a3f0bb648bc2b2ceba1c699ba24d65))
+* add .gitignore ([91b38af](https://github.com/peter-benschop/awsmock/commit/91b38af7e42c2c17fe695542cb6f403f0e52cba3))
+* add MessageId, TopicArn and Timestamp fields. ([155c8d5](https://github.com/peter-benschop/awsmock/commit/155c8d542c2dbc9561d514c4cdfb37d79cf7d055))
+* initializer ([70cd991](https://github.com/peter-benschop/awsmock/commit/70cd991167a88d9c8ff0967f0346de0fae4825fb))
+* json string ([599644f](https://github.com/peter-benschop/awsmock/commit/599644f93e7e4dfde317c67cdc65039137017af1))
+* json string ([d520170](https://github.com/peter-benschop/awsmock/commit/d520170eddc8f41b82d2c2c9ccbbaef7133fb28f))
+* json string ([0131a7a](https://github.com/peter-benschop/awsmock/commit/0131a7a6997260989c6a4cbec7d921eb43b78cdf))
+* json string ([182454f](https://github.com/peter-benschop/awsmock/commit/182454f1edd44242f748bd3edc81cc193fce78ac))
+* json string add debug info ([88e293d](https://github.com/peter-benschop/awsmock/commit/88e293d36b683f04315511f19a3c8d8ab18131e7))
+* send message as string ([2c1f52d](https://github.com/peter-benschop/awsmock/commit/2c1f52daa2ff292f37ec6b2ea2acbdee3ba5df2b))
+* update dockerfile ([38f8282](https://github.com/peter-benschop/awsmock/commit/38f8282ea8c0b8b8dcc61103fe01a979836a0eb4))
+* use DOCKER_BUILDKIT ([413be55](https://github.com/peter-benschop/awsmock/commit/413be555f34afb6290565d39dbb2e1bba0fcf8d3))
+* use powershell ([58a6062](https://github.com/peter-benschop/awsmock/commit/58a606290026d5a4a241878a911151cbf2e53509))
+
 ## [1.2.1](https://github.com/jensvogt/awsmock/compare/v1.2.0...v1.2.1) (2025-05-01)
 
 
